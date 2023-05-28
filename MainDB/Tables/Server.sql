@@ -1,0 +1,5 @@
+﻿CREATE TABLE [dbo].[Server]
+(
+	[ServerId] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [DiscordId] VARCHAR(20) NOT NULL UNIQUE
+)

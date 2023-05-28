@@ -1,0 +1,4 @@
+﻿USE [$(DatabaseName)];
+
+INSERT INTO [dbo].[Channel] VALUES (1, '750721047170383872');
+INSERT INTO [dbo].[Channel] VALUES (1, '750719483064090734');

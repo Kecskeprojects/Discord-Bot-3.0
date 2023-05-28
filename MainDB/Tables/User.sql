@@ -1,0 +1,6 @@
+﻿CREATE TABLE [dbo].[User]
+(
+	[UserId] INT NOT NULL PRIMARY KEY IDENTITY,
+    [DiscordId] VARCHAR(20) NOT NULL UNIQUE,
+    [LastFMUsername] VARCHAR(100) NULL
+)

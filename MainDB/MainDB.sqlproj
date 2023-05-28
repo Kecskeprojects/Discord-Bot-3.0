@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>MainDB</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{009fc268-6f36-4ea3-a37f-0daede86279c}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql160DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>MainDB</RootNamespace>
+    <AssemblyName>MainDB</AssemblyName>
+    <ModelCollation>1033, CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="Tables" />
+    <Folder Include="Post-deployment" />
+    <Folder Include="Post-deployment\PostDeployment" />
+    <Folder Include="Post-deployment\PostDeployment\Inserts" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Post-deployment\PostDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <SqlCmdVariable Include="BuildConfiguration">
+      <DefaultValue>Release</DefaultValue>
+      <Value>$(SqlCmdVar__1)</Value>
+    </SqlCmdVariable>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Local_Debug.publish.xml" />
+    <None Include="Local_Release.publish.xml" />
+    <None Include="Main_Release.publish.xml" />
+    <None Include="Post-deployment\PostDeployment\Inserts\Server_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\Role_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\Channel_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\Reminder_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\CustomCommand_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\Greeting_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\Idol_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\IdolGroup_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\Keyword_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\UserBias_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\TwitchChannel_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\ServerSettingChannel_Inserts.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Tables\User.sql" />
+    <Build Include="Tables\Reminder.sql" />
+    <Build Include="Tables\ServerSettingChannel.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="MainDB.refactorlog" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Tables\Server.sql" />
+    <Build Include="Tables\Greeting.sql" />
+    <Build Include="Tables\Keyword.sql" />
+    <Build Include="Tables\CustomCommand.sql" />
+    <Build Include="Tables\Role.sql" />
+    <Build Include="Tables\IdolGroup.sql" />
+    <Build Include="Tables\Idol.sql" />
+    <Build Include="Tables\UserBias.sql" />
+    <Build Include="Tables\TwitchChannel.sql" />
+    <Build Include="Tables\Channel.sql" />
+    <Build Include="Tables\ChannelType.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\ChannelType_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\User_Inserts.sql" />
+  </ItemGroup>
+</Project>
