@@ -61,6 +61,7 @@
     <Folder Include="Post-deployment" />
     <Folder Include="Post-deployment\PostDeployment" />
     <Folder Include="Post-deployment\PostDeployment\Inserts" />
+    <Folder Include="Patch" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Post-deployment\PostDeployment.sql" />
