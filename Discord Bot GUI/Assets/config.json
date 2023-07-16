@@ -1,0 +1,17 @@
+{
+	"token":"",
+	"img":"",
+	"bitrate":0,
+	"twitch_client_id":"",
+	"spotify_client_id":"",
+	"spotify_client_secret":"",
+	"lastfm_api_key":"",
+	"lastfm_api_secret":"",
+	"youtube_api_keys":[],
+	"youtube_filter_words":[],
+	"enable_instagram_embed":false,
+	"instagram_username":[],
+	"instagram_password":[],
+	"enable_twitter_embed": false,
+	"sql_connection_string": ""
+}
