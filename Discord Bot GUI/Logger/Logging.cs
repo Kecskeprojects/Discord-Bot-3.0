@@ -1,11 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Media;
 
 namespace Discord_Bot.Logger
 {
-    public static class Logging
+    public class Logging
     {
+        //List of logs, before they are cleared
+        public readonly List<Log> Logs = new();
+
         #region Bot logging
-        public static void Log(string message, bool ConsoleOnly = false, bool LogOnly = false)
+        public void Log(string message, bool ConsoleOnly = false, bool LogOnly = false)
         {
             Log log = BaseLog(LogType.Log);
 
@@ -14,17 +20,16 @@ namespace Discord_Bot.Logger
 
             if (!LogOnly)
             {
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine(log.Content);
+                LogToWindow(log, Brushes.White);
             }
 
             if (!ConsoleOnly)
             {
-                Global.Logs.Add(log);
+                Logs.Add(log);
             }
         }
 
-        public static void Query(string message, bool ConsoleOnly = false, bool LogOnly = false)
+        public void Query(string message, bool ConsoleOnly = false, bool LogOnly = false)
         {
             Log log = BaseLog(LogType.Query);
 
@@ -33,18 +38,16 @@ namespace Discord_Bot.Logger
 
             if (!LogOnly)
             {
-
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.WriteLine(log.Content);
+                LogToWindow(log, Brushes.DarkCyan);
             }
 
             if (!ConsoleOnly)
             {
-                Global.Logs.Add(log);
+                Logs.Add(log);
             }
         }
 
-        public static void Client(string message, bool ConsoleOnly = false, bool LogOnly = false)
+        public void Client(string message, bool ConsoleOnly = false, bool LogOnly = false)
         {
             Log log = BaseLog(LogType.Client);
 
@@ -53,41 +56,40 @@ namespace Discord_Bot.Logger
 
             if (!LogOnly)
             {
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.WriteLine(log.Content);
+                LogToWindow(log, Brushes.DarkGray);
             }
 
             if (!ConsoleOnly)
             {
-                Global.Logs.Add(log);
+                Logs.Add(log);
             }
         }
         #endregion
 
         #region Message logging
-        public static void Mes_User(string message, string server = "DM")
+        public void Mes_User(string message, string server = "DM")
         {
             Log log = BaseLog(LogType.Mes_User);
 
             log.Content += $"Server: {server}, Content: {message}";
             log.Content = PutTabsOnNewLines(log.Content);
 
-            Global.Logs.Add(log);
+            Logs.Add(log);
         }
 
-        public static void Mes_Other(string message, string server = "DM")
+        public void Mes_Other(string message, string server = "DM")
         {
             Log log = BaseLog(LogType.Mes_Other);
 
             log.Content += $"Server: {server}, Content: {message}";
             log.Content = PutTabsOnNewLines(log.Content);
 
-            Global.Logs.Add(log);
+            Logs.Add(log);
         }
         #endregion
 
         #region Error logging
-        public static void Error(string location, string message, bool ConsoleOnly = false, bool LogOnly = false)
+        public void Error(string location, string message, bool ConsoleOnly = false, bool LogOnly = false)
         {
             Log log = BaseLog(LogType.Error);
 
@@ -96,17 +98,16 @@ namespace Discord_Bot.Logger
 
             if (!LogOnly)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(log.Content);
+                LogToWindow(log, Brushes.Red);
             }
 
             if (!ConsoleOnly)
             {
-                Global.Logs.Add(log);
+                Logs.Add(log);
             }
         }
 
-        public static void Warning(string location, string message, bool ConsoleOnly = false, bool LogOnly = false)
+        public void Warning(string location, string message, bool ConsoleOnly = false, bool LogOnly = false)
         {
             Log log = BaseLog(LogType.Warning);
 
@@ -115,18 +116,32 @@ namespace Discord_Bot.Logger
 
             if (!LogOnly)
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine(log.Content);
+                LogToWindow(log, Brushes.Yellow);
             }
 
             if (!ConsoleOnly)
             {
-                Global.Logs.Add(log);
+                Logs.Add(log);
             }
         }
         #endregion
 
         #region Helper methods
+        private static void LogToWindow(Log log, Brush color)
+        {
+            if(Application.Current != null)
+            {
+                string mess = log.Content.Replace(":\t", ":    \t");
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    MainWindow main = Application.Current.MainWindow as MainWindow;
+                    main.MainLogText.Foreground = color;
+                    main.MainLogText.Text += "\n" + mess;
+                });
+            }
+        }
+
         private static Log BaseLog(LogType type)
         {
             return new Log(DateTime.Now, type, $"[{CurrentTime()}][{type.Value}]:\t");

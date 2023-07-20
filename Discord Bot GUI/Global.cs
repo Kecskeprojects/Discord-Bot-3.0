@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord_Bot.Assets;
-using Discord_Bot.Logger;
+using Discord_Bot.Resources;
 using System.Collections.Generic;
 using System.IO;
 
@@ -10,15 +9,13 @@ namespace Discord_Bot
     public static class Global
     {
         #region Global variables
-        //List of logs, before they are cleared
-        public static readonly List<Log> Logs = new();
-
+        //Might not be needed
         //Server information stored in a dictionary, the key is the Context.Guild.Id, the value is a complex class
-        public static readonly Dictionary<ulong, Server> servers = new();
+        public static readonly Dictionary<ulong, ServerResource> servers = new();
 
         public static bool InstagramChecker { get; set; }
-
-        public static bool TwitterChecker { get => Config.Enable_Twitter_Embed; }
+        
+        public static bool TwitterChecker { get; set; }
         #endregion
 
         #region Global Functions

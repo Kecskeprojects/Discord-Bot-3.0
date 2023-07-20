@@ -7,8 +7,11 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <ScrollViewer x:Name="MainLog" Background="Black"/>
+        <ScrollViewer x:Name="MainLog" Background="Black" Margin="0,25,360,0" CanContentScroll="True" ScrollChanged="ScrollViewer_ScrollChanged">
+            <TextBlock x:Name="MainLogText" TextWrapping="Wrap" Foreground="White"/>
+        </ScrollViewer>
         <ToolBar HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="790"/>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="593,202,0,0" VerticalAlignment="Top" Click="WriteLog"/>
 
     </Grid>
 </Window>
