@@ -6,11 +6,17 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <ScrollViewer x:Name="MainLog" Background="Black" Margin="0,25,360,0" CanContentScroll="True" ScrollChanged="ScrollViewer_ScrollChanged">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="450*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="440*"/>
+            <ColumnDefinition Width="360*"/>
+        </Grid.ColumnDefinitions>
+        <ScrollViewer x:Name="MainLog" Background="Black" CanContentScroll="True" Grid.Column="0" ScrollChanged="ScrollViewer_ScrollChanged" Margin="0,0,0,0">
             <TextBlock x:Name="MainLogText" TextWrapping="Wrap" Foreground="White"/>
         </ScrollViewer>
-        <ToolBar HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="790"/>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="593,202,0,0" VerticalAlignment="Top" Click="WriteLog"/>
-
+        <ToolBar x:Name="MainToolBar" ToolBarTray.IsLocked="True" Grid.Column="1" Grid.Row="0" Loaded="ToolBar_Loaded" Height="20" VerticalAlignment="Top"/>
+        <Button Grid.Column="1" Grid.Row="0" Content="Button" Click="WriteLog" HorizontalAlignment="Right" Width="40" Height="20" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>

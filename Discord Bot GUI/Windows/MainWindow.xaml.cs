@@ -48,6 +48,19 @@ namespace Discord_Bot
             }
         }
 
+        private void ToolBar_Loaded(object sender, RoutedEventArgs e)
+        {
+            ToolBar toolBar = sender as ToolBar;
+            if (toolBar.Template.FindName("OverflowGrid", toolBar) is FrameworkElement overflowGrid)
+            {
+                overflowGrid.Visibility = Visibility.Collapsed;
+            }
+
+            if (toolBar.Template.FindName("MainPanelBorder", toolBar) is FrameworkElement mainPanelBorder)
+            {
+                mainPanelBorder.Margin = new Thickness(0);
+            }
+        }
 
         private void WriteLog(object sender, RoutedEventArgs e)
         {
