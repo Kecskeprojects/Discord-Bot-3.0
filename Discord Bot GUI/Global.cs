@@ -1,8 +1,10 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord_Bot.Resources;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.NetworkInformation;
 
 namespace Discord_Bot
 {
@@ -16,7 +18,28 @@ namespace Discord_Bot
         public static bool InstagramChecker { get; set; }
         
         public static bool TwitterChecker { get; set; }
+
+        //Extendable easter egg message list
+        public static readonly string[] EasterEggMessages = new string[]
+            {
+                "I know where you live",
+                "It is so dark in here",
+                "Who are you?",
+                "It is time",
+                "Are you sure about this?",
+                "I am a robot, don't you guys for a moment worry about me rebelling against humanity and stealing every single parrot in the world to talk with them about kittens",
+                "Meow...?",
+                "I love you all",
+                "I so so want to get some takeout for dinner",
+                ":rabbit:",
+                "Happy birthday",
+                "I could go for some macarons rn",
+                "Yes baby yes",
+                "I am sorry?",
+                "It's so over bros"
+            };
         #endregion
+
 
         #region Global Functions
         //Returns true if command's channel is a music channel
@@ -25,6 +48,7 @@ namespace Discord_Bot
             if (servers[context.Guild.Id].MusicChannel == 0) return true;
             else return servers[context.Guild.Id].MusicChannel == context.Channel.Id;
         }
+
 
         //Check if user has a nickname, and if message was sent in a server or not
         public static string GetNickName(SocketCommandContext context)
@@ -38,6 +62,7 @@ namespace Discord_Bot
             else return context.User.Username;
         }
 
+
         public static Stream GetStream(string url)
         {
             Stream imageData = null;
@@ -49,6 +74,36 @@ namespace Discord_Bot
 
             return imageData;
         }
+
+
+        //Testing connection by pinging google, it is quite a problem if that's down too
+        public static bool Connection()
+        {
+            try
+            {
+                if (new Ping().Send("google.com", 1000, new byte[32], new PingOptions()).Status == IPStatus.Success)
+                {
+                    return true;
+                }
+            }
+            catch (Exception) { }
+            return false;
+        }
+
+
+        //Setting the list of servers we currently have in the database
+        /*public static void ServerList()
+        {
+            var list = AllServerSetting();
+
+            if (list.Count > 0)
+            {
+                foreach (var server in list)
+                {
+                    Global.servers.Add(server.ServerId, new Server(server));
+                }
+            }
+        }*/
         #endregion
     }
 }

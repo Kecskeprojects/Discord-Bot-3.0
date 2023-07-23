@@ -1,26 +1,6 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.Interactions;
-using Discord.WebSocket;
-using Discord_Bot.Logger;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Timers;
+﻿using Discord_Bot.Logger;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Discord_Bot
 {
@@ -29,9 +9,11 @@ namespace Discord_Bot
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly Logging _logging;
-        private static TextBlock mainStaticLog;
         public static TextBlock MainStaticLog { get { return mainStaticLog; } }
+
+        private static TextBlock mainStaticLog;
+        private readonly Logging _logging;
+
         public MainWindow(Logging logging)
         {
             InitializeComponent();
@@ -39,8 +21,8 @@ namespace Discord_Bot
             mainStaticLog = MainLogText;
         }
 
-        private bool AutoScroll = true;
 
+        private bool AutoScroll = true;
         private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             // User scroll event : set or unset autoscroll mode
@@ -65,6 +47,7 @@ namespace Discord_Bot
                 (e.Source as ScrollViewer).ScrollToVerticalOffset((e.Source as ScrollViewer).ExtentHeight);
             }
         }
+
 
         private void WriteLog(object sender, RoutedEventArgs e)
         {

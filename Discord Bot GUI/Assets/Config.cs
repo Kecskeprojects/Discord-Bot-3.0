@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Discord_Bot.Logger;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
@@ -8,6 +7,7 @@ namespace Discord_Bot.Assets
 {
     public class Config
     {
+        private readonly IConfiguration Configuration;
         public struct ConfigModel
         {
             public string token;
@@ -26,8 +26,6 @@ namespace Discord_Bot.Assets
             public bool enable_Twitter_Embed;
             public string sql_connection_string;
         }
-
-        private readonly IConfiguration Configuration;
 
         public Config()
         {

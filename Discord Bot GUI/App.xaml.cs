@@ -57,7 +57,6 @@ namespace Discord_Bot
                 .AddSingleton(_client)
                 .AddSingleton(_commands)
                 .AddSingleton(_interactions)
-                .AddSingleton(_mainLogic)
                 .BuildServiceProvider();
 
             var mainWindow = _services.GetRequiredService<MainWindow>();
@@ -74,36 +73,6 @@ namespace Discord_Bot
             aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             aTimer.Start();
 
-            /*
-            //Constant timer, only stopping when the Bot's process stops
-            System.Timers.Timer aTimer = new(60000) { AutoReset = true }; //1 minute
-
-            aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-
-            while (true)
-            {
-                if (StartupFunctions.Connection())
-                {
-                    aTimer.Start();
-
-                    Logging.Log("Application starting...");
-
-                    try
-                    {
-                        new Program().RunBotAsync().GetAwaiter().GetResult();
-                    }
-                    catch (Exception ex)
-                    {
-                        Logging.Error("Program.cs Main", ex.ToString());
-                    }
-
-                    aTimer.Stop();
-                }
-                //Waiting 1 minute before checking connection again
-                Thread.Sleep(60000);
-            }
-            */
-
             await RunBotAsync();
         }
 
@@ -114,6 +83,7 @@ namespace Discord_Bot
 
             base.OnExit(e);
         }
+
 
         protected override void OnSessionEnding(SessionEndingCancelEventArgs e)
         {
@@ -126,7 +96,7 @@ namespace Discord_Bot
         //Main Bot Startup Logic
         public async Task RunBotAsync()
         {
-            if (!ProgramFunctions.Connection()) return;
+            if (!Global.Connection()) return;
             //Might not be needed
             //StartupFunctions.ServerList();
 
@@ -162,15 +132,13 @@ namespace Discord_Bot
         }
 
 
-
         //Repeated operations
         static int minutes_count = 0;
         public async void OnTimedEvent(object source, ElapsedEventArgs e)
         {
-            ///Bot restart could potentially be moved hereű
             if(_client.LoginState == LoginState.LoggedOut)
             {
-
+                //Start a modified login function
             }
             //Database backup function
             if (minutes_count == 1440) minutes_count = 0;
@@ -186,7 +154,6 @@ namespace Discord_Bot
             await _mainLogic.ReminderCheck(_client);
         }
         #endregion
-
 
 
         #region Client logging
@@ -225,7 +192,6 @@ namespace Discord_Bot
         #endregion
 
 
-
         #region Websocket events
         private Task OnWebSocketReady()
         {
@@ -233,6 +199,7 @@ namespace Discord_Bot
             _logging.Log("Current user data updated!");
             return Task.CompletedTask;
         }
+
 
         private Task OnWebsocketDisconnect(Exception arg)
         {
@@ -242,7 +209,6 @@ namespace Discord_Bot
         #endregion
 
 
-
         #region Message handling
         //Watching Messages
         public async Task RegisterCommandsAsync()
@@ -250,7 +216,6 @@ namespace Discord_Bot
             _client.MessageReceived += HandleCommandAsync;
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
-
 
 
         //Handling commands and special cases
@@ -371,7 +336,6 @@ namespace Discord_Bot
         #endregion
 
 
-
         #region Interaction handling
         //Watching Interactions
         public async Task RegisterInteractionsAsync()
@@ -379,6 +343,7 @@ namespace Discord_Bot
             _client.InteractionCreated += HandleInteractionAsync;
             await _interactions.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
+
 
         //Handling Interactions
         private async Task HandleInteractionAsync(SocketInteraction arg)

@@ -10,6 +10,7 @@ namespace Discord_Bot.Logger
         //List of logs, before they are cleared
         public readonly List<Log> Logs = new();
 
+
         #region Bot logging
         public void Log(string message, bool ConsoleOnly = false, bool LogOnly = false)
         {
@@ -29,6 +30,7 @@ namespace Discord_Bot.Logger
             }
         }
 
+
         public void Query(string message, bool ConsoleOnly = false, bool LogOnly = false)
         {
             Log log = BaseLog(LogType.Query);
@@ -46,6 +48,7 @@ namespace Discord_Bot.Logger
                 Logs.Add(log);
             }
         }
+
 
         public void Client(string message, bool ConsoleOnly = false, bool LogOnly = false)
         {
@@ -65,6 +68,7 @@ namespace Discord_Bot.Logger
             }
         }
         #endregion
+
 
         #region Message logging
         public void Mes_User(string message, string server = "DM")
@@ -88,6 +92,7 @@ namespace Discord_Bot.Logger
         }
         #endregion
 
+
         #region Error logging
         public void Error(string location, string message, bool ConsoleOnly = false, bool LogOnly = false)
         {
@@ -106,6 +111,7 @@ namespace Discord_Bot.Logger
                 Logs.Add(log);
             }
         }
+
 
         public void Warning(string location, string message, bool ConsoleOnly = false, bool LogOnly = false)
         {
@@ -126,6 +132,7 @@ namespace Discord_Bot.Logger
         }
         #endregion
 
+
         #region Helper methods
         private static void LogToWindow(Log log, Brush color)
         {
@@ -142,15 +149,18 @@ namespace Discord_Bot.Logger
             }
         }
 
+
         private static Log BaseLog(LogType type)
         {
             return new Log(DateTime.Now, type, $"[{CurrentTime()}][{type.Value}]:\t");
         }
 
+
         private static string PutTabsOnNewLines(string message)
         {
             return message.Replace("\n", "\n\t\t\t");
         }
+
 
         private static string CurrentTime() 
         {
