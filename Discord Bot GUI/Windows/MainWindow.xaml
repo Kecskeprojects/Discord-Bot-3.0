@@ -13,10 +13,10 @@
             <ColumnDefinition Width="440*"/>
             <ColumnDefinition Width="360*"/>
         </Grid.ColumnDefinitions>
-        <ScrollViewer x:Name="MainLog" Background="Black" CanContentScroll="True" Grid.Column="0" ScrollChanged="ScrollViewer_ScrollChanged" Margin="0,0,0,0">
+        <ScrollViewer x:Name="MainLog" Background="Black" CanContentScroll="True" Grid.Column="0" Grid.Row="0" ScrollChanged="ScrollViewer_ScrollChanged" Margin="0,0,0,0">
             <TextBlock x:Name="MainLogText" TextWrapping="Wrap" Foreground="White"/>
         </ScrollViewer>
-        <ToolBar x:Name="MainToolBar" ToolBarTray.IsLocked="True" Grid.Column="1" Grid.Row="0" Loaded="ToolBar_Loaded" Height="20" VerticalAlignment="Top"/>
+        <ToolBar x:Name="MainToolBar" Grid.Column="1" Grid.Row="0" Height="20" VerticalAlignment="Top" ToolBarTray.IsLocked="True" Loaded="ToolBar_Loaded"/>
         <Button Grid.Column="1" Grid.Row="0" Content="Button" Click="WriteLog" HorizontalAlignment="Right" Width="40" Height="20" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>
