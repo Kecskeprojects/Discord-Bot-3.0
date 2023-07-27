@@ -129,7 +129,7 @@ namespace Discord_Bot
 
 
         //Repeated operations
-        static int minutes_count = 0;
+        private static int minutes_count = 0;
         public async void OnTimedEvent(object source, ElapsedEventArgs e)
         {
             if(_client.LoginState == LoginState.LoggedOut)
