@@ -396,3 +396,10 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+#Personal
+/database.sql
+/Kim_Synthji.ico
+/Last_Release.sql
+Patch/
+Post-deployment/
