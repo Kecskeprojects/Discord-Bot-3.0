@@ -15,7 +15,6 @@ namespace Discord_Bot
         }
 
 
-        #region Log to file method
         //For logging messages, errors, and messages to log files
         public void LogToFile()
         {
@@ -37,10 +36,8 @@ namespace Discord_Bot
                 _logging.Error("ProgramFunctions.cs LogtoFile", ex.ToString());
             }
         }
-        #endregion
 
 
-        #region File and folder check
         //Check if folders for long term storage exist
         public void Check_Folders()
         {
@@ -74,6 +71,58 @@ namespace Discord_Bot
                 _logging.Log(string.Join('\n', logs));
             }
         }
-        #endregion
+
+
+        protected List<Uri> LinkSearch(string message, string baseURL, bool ignoreEmbedSuppress)
+        {
+            try
+            {
+                message = message.Replace("www.", "");
+
+                if (message.Contains(baseURL))
+                {
+                    List<Uri> urls = new();
+
+                    //Going throught the whole message to find all the instagram links
+                    int startIndex = 0;
+                    while (startIndex != -1)
+                    {
+                        //We check if there are any links left, one is expected
+                        startIndex = message.IndexOf(baseURL, startIndex);
+
+                        if (startIndex != -1)
+                        {
+                            //We cut off anything before the start of the link and replace embed supression characters
+                            string beginningCut = message[startIndex..];
+
+                            //And anything after the first space that ended the link
+                            string url = beginningCut.Split(new char[] { ' ', '\n' }, StringSplitOptions.RemoveEmptyEntries)[0];
+
+                            if (!ignoreEmbedSuppress && !url.Contains('<') && !url.Contains('>'))
+                            {
+                                url = url.Split('?')[0];
+                                urls.Add(new Uri(url));
+                            }
+                            else if (ignoreEmbedSuppress)
+                            {
+                                url = url.Replace("<", "").Replace(">", "").Split('?')[0];
+                                urls.Add(new Uri(url));
+                            }
+
+                            startIndex++;
+                        }
+                    }
+
+                    return urls;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logging.Error("ProgramFunctions.cs LinkSearch", ex.ToString());
+            }
+
+            return null;
+        }
     }
 }

@@ -28,7 +28,6 @@ namespace Discord_Bot
                 "Who are you?",
                 "It is time",
                 "Are you sure about this?",
-                "I am a robot, don't you guys for a moment worry about me rebelling against humanity and stealing every single parrot in the world to talk with them about kittens",
                 "Meow...?",
                 "I love you all",
                 "I so so want to get some takeout for dinner",
@@ -37,7 +36,10 @@ namespace Discord_Bot
                 "I could go for some macarons rn",
                 "Yes baby yes",
                 "I am sorry?",
-                "It's so over bros"
+                "It's so over for you",
+                "Sus",
+                "I will not let you off that easy",
+                "I hear voices while you sleep"
             };
         #endregion
 

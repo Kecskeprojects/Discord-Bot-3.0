@@ -7,7 +7,7 @@ namespace Discord_Bot.Assets
 {
     public class Config
     {
-        private readonly IConfiguration Configuration;
+        private IConfiguration Configuration;
         public struct ConfigModel
         {
             public string token;
@@ -29,7 +29,6 @@ namespace Discord_Bot.Assets
 
         public Config()
         {
-
             string path = Path.Combine(Directory.GetCurrentDirectory(), "Assets");
             if (!File.Exists(Path.Combine(path, "config.json")))
             {

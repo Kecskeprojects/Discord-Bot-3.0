@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Windows;
-using Microsoft.EntityFrameworkCore;
 using Discord_Bot.Assets;
-using Discord_Bot.Database;
 using Discord_Bot.Logger;
 using Discord.Commands;
 using Discord.Interactions;
@@ -48,16 +46,14 @@ namespace Discord_Bot
                 });
             _interactions = new InteractionService(_client, new InteractionServiceConfig() { DefaultRunMode = Discord.Interactions.RunMode.Async });
             _commands = new CommandService(new CommandServiceConfig() { DefaultRunMode = Discord.Commands.RunMode.Async });
-            _services = new ServiceCollection()
-                .AddDbContext<MainDbContext>(options => options.UseSqlServer(_config.SqlConnectionString))
-                .AddAutoMapper(x => x.AddProfile<MapperConfig>())
-                .AddTransient(typeof(MainWindow))
-                .AddSingleton(_logging)
-                .AddSingleton(_config)
+
+            IServiceCollection collection = new ServiceCollection()
                 .AddSingleton(_client)
                 .AddSingleton(_commands)
                 .AddSingleton(_interactions)
-                .BuildServiceProvider();
+                .AddSingleton(_logging)
+                .AddSingleton(_config);
+            _services = ServiceBuilder.BuildService(collection, _config);
 
             var mainWindow = _services.GetRequiredService<MainWindow>();
             mainWindow.Show();
