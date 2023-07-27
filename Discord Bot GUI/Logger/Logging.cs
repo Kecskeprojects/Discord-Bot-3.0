@@ -142,9 +142,12 @@ namespace Discord_Bot.Logger
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    MainWindow main = Application.Current.MainWindow as MainWindow;
-                    main.MainLogText.Foreground = color;
-                    main.MainLogText.Text += "\n" + mess;
+                    if(Application.Current.MainWindow != null)
+                    {
+                        MainWindow main = Application.Current.MainWindow as MainWindow;
+                        main.MainLogText.Foreground = color;
+                        main.MainLogText.Text += "\n" + mess;
+                    }
                 });
             }
         }

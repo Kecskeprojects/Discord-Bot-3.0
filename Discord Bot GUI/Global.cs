@@ -4,6 +4,7 @@ using Discord_Bot.Resources;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.NetworkInformation;
 
 namespace Discord_Bot
@@ -45,8 +46,8 @@ namespace Discord_Bot
         //Returns true if command's channel is a music channel
         public static bool IsMusicChannel(SocketCommandContext context)
         {
-            if (servers[context.Guild.Id].MusicChannel == 0) return true;
-            else return servers[context.Guild.Id].MusicChannel == context.Channel.Id;
+            if (servers[context.Guild.Id].MusicChannel.Length == 0) return true;
+            else return servers[context.Guild.Id].MusicChannel.Contains(context.Channel.Id);
         }
 
 
