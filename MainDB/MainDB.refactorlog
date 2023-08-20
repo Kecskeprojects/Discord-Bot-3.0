@@ -189,4 +189,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="ServerSettingChannelId" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="3e78582d-f291-4e24-9a59-82fdc43460a0" ChangeDateTime="08/20/2023 21:49:15">
+    <Property Name="ElementName" Value="[dbo].[IdolAlias].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[IdolAlias]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="IdolAliasIdId" />
+  </Operation>
 </Operations>

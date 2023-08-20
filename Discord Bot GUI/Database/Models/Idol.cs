@@ -13,5 +13,7 @@ public partial class Idol
 
     public virtual IdolGroup Group { get; set; }
 
+    public virtual ICollection<IdolAlias> IdolAliases { get; set; } = new List<IdolAlias>();
+
     public virtual ICollection<UserBias> UserBiases { get; set; } = new List<UserBias>();
 }

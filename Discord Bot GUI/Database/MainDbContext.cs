@@ -22,6 +22,8 @@ public partial class MainDbContext : DbContext
 
     public virtual DbSet<Idol> Idols { get; set; }
 
+    public virtual DbSet<IdolAlias> IdolAliases { get; set; }
+
     public virtual DbSet<IdolGroup> IdolGroups { get; set; }
 
     public virtual DbSet<Keyword> Keywords { get; set; }
@@ -32,7 +34,7 @@ public partial class MainDbContext : DbContext
 
     public virtual DbSet<Server> Servers { get; set; }
 
-    public virtual DbSet<ServerSettingChannel> ServerSettingChannels { get; set; }
+    public virtual DbSet<ServerChannelView> ServerChannelViews { get; set; }
 
     public virtual DbSet<TwitchChannel> TwitchChannels { get; set; }
 
@@ -46,9 +48,11 @@ public partial class MainDbContext : DbContext
 
         modelBuilder.Entity<Channel>(entity =>
         {
-            entity.HasKey(e => e.ChannelId).HasName("PK__Channel__38C3E814956C735B");
+            entity.HasKey(e => e.ChannelId).HasName("PK_ChannelId");
 
             entity.ToTable("Channel");
+
+            entity.HasIndex(e => e.DiscordId, "UQ_ChannelDiscordId").IsUnique();
 
             entity.Property(e => e.DiscordId)
                 .IsRequired()
@@ -59,11 +63,28 @@ public partial class MainDbContext : DbContext
                 .HasForeignKey(d => d.ServerId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Channel_Server");
+
+            entity.HasMany(d => d.ChannelTypes).WithMany(p => p.Channels)
+                .UsingEntity<Dictionary<string, object>>(
+                    "ServerSettingChannel",
+                    r => r.HasOne<ChannelType>().WithMany()
+                        .HasForeignKey("ChannelTypeId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_ServerSettingChannel_ChannelType"),
+                    l => l.HasOne<Channel>().WithMany()
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_ServerSettingChannel_Channel"),
+                    j =>
+                    {
+                        j.HasKey("ChannelId", "ChannelTypeId").HasName("PK_ChannelId_ChannelTypeId");
+                        j.ToTable("ServerSettingChannel");
+                    });
         });
 
         modelBuilder.Entity<ChannelType>(entity =>
         {
-            entity.HasKey(e => e.ChannelTypeId).HasName("PK__ChannelT__5ACA2B180367F05A");
+            entity.HasKey(e => e.ChannelTypeId).HasName("PK_ChannelTypeId");
 
             entity.ToTable("ChannelType");
 
@@ -76,7 +97,7 @@ public partial class MainDbContext : DbContext
 
         modelBuilder.Entity<CustomCommand>(entity =>
         {
-            entity.HasKey(e => e.CommandId).HasName("PK__CustomCo__6B410B06E55CACF7");
+            entity.HasKey(e => e.CommandId).HasName("PK_CommandId");
 
             entity.ToTable("CustomCommand");
 
@@ -97,7 +118,7 @@ public partial class MainDbContext : DbContext
 
         modelBuilder.Entity<Greeting>(entity =>
         {
-            entity.HasKey(e => e.GreetingId).HasName("PK__Greeting__FCC1D6527F344E4A");
+            entity.HasKey(e => e.GreetingId).HasName("PK_GreetingId");
 
             entity.ToTable("Greeting");
 
@@ -109,7 +130,7 @@ public partial class MainDbContext : DbContext
 
         modelBuilder.Entity<Idol>(entity =>
         {
-            entity.HasKey(e => e.IdolId).HasName("PK__Idol__A041481E21438F3E");
+            entity.HasKey(e => e.IdolId).HasName("PK_IdolId");
 
             entity.ToTable("Idol");
 
@@ -124,9 +145,26 @@ public partial class MainDbContext : DbContext
                 .HasConstraintName("FK_Idol_IdolGroup");
         });
 
+        modelBuilder.Entity<IdolAlias>(entity =>
+        {
+            entity.HasKey(e => e.IdolAliasId).HasName("PK_IdolAliasId");
+
+            entity.ToTable("IdolAlias");
+
+            entity.Property(e => e.Alias)
+                .IsRequired()
+                .HasMaxLength(100)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.Idol).WithMany(p => p.IdolAliases)
+                .HasForeignKey(d => d.IdolId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IdolAlias_Idol");
+        });
+
         modelBuilder.Entity<IdolGroup>(entity =>
         {
-            entity.HasKey(e => e.GroupId).HasName("PK__IdolGrou__149AF36AB8098B82");
+            entity.HasKey(e => e.GroupId).HasName("PK_GroupId");
 
             entity.ToTable("IdolGroup");
 
@@ -138,7 +176,7 @@ public partial class MainDbContext : DbContext
 
         modelBuilder.Entity<Keyword>(entity =>
         {
-            entity.HasKey(e => e.KeywordId).HasName("PK__Keyword__37C135212EDFF2DF");
+            entity.HasKey(e => e.KeywordId).HasName("PK_KeywordId");
 
             entity.ToTable("Keyword");
 
@@ -159,7 +197,7 @@ public partial class MainDbContext : DbContext
 
         modelBuilder.Entity<Reminder>(entity =>
         {
-            entity.HasKey(e => e.ReminderId).HasName("PK__Reminder__01A830875522E92B");
+            entity.HasKey(e => e.ReminderId).HasName("PK_ReminderId");
 
             entity.ToTable("Reminder");
 
@@ -176,11 +214,11 @@ public partial class MainDbContext : DbContext
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.RoleId).HasName("PK__Role__8AFACE1A1334FAB2");
+            entity.HasKey(e => e.RoleId).HasName("PK_RoleId");
 
             entity.ToTable("Role");
 
-            entity.HasIndex(e => e.DiscordId, "UQ__Role__4AB57A5DA315F836").IsUnique();
+            entity.HasIndex(e => e.DiscordId, "UQ_RoleDiscordId").IsUnique();
 
             entity.Property(e => e.DiscordId)
                 .IsRequired()
@@ -195,11 +233,11 @@ public partial class MainDbContext : DbContext
 
         modelBuilder.Entity<Server>(entity =>
         {
-            entity.HasKey(e => e.ServerId).HasName("PK__Server__C56AC8E61234E88D");
+            entity.HasKey(e => e.ServerId).HasName("PK_ServerId");
 
             entity.ToTable("Server");
 
-            entity.HasIndex(e => e.DiscordId, "UQ__Server__4AB57A5D52BAFD40").IsUnique();
+            entity.HasIndex(e => e.DiscordId, "UQ_ServerDiscordId").IsUnique();
 
             entity.Property(e => e.DiscordId)
                 .IsRequired()
@@ -207,26 +245,26 @@ public partial class MainDbContext : DbContext
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<ServerSettingChannel>(entity =>
+        modelBuilder.Entity<ServerChannelView>(entity =>
         {
-            entity.HasKey(e => e.ServerSettingChannelId).HasName("PK__ServerSe__9799A24309A1938A");
+            entity
+                .HasNoKey()
+                .ToView("ServerChannelView");
 
-            entity.ToTable("ServerSettingChannel");
-
-            entity.HasOne(d => d.Channel).WithMany(p => p.ServerSettingChannels)
-                .HasForeignKey(d => d.ChannelId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_ServerSettingChannel_Channel");
-
-            entity.HasOne(d => d.ChannelType).WithMany(p => p.ServerSettingChannels)
-                .HasForeignKey(d => d.ChannelTypeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_ServerSettingChannel_ChannelType");
+            entity.Property(e => e.ChannelDiscordId)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.ChannelTypeName)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.ServerDiscordId)
+                .HasMaxLength(20)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<TwitchChannel>(entity =>
         {
-            entity.HasKey(e => e.TwitchChannelId).HasName("PK__TwitchCh__908BAECF915B9E5C");
+            entity.HasKey(e => e.TwitchChannelId).HasName("PK_TwitchChannelId");
 
             entity.ToTable("TwitchChannel");
 
@@ -251,11 +289,11 @@ public partial class MainDbContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__User__1788CC4C007521E0");
+            entity.HasKey(e => e.UserId).HasName("PK_UserId");
 
             entity.ToTable("User");
 
-            entity.HasIndex(e => e.DiscordId, "UQ__User__4AB57A5D36E69D80").IsUnique();
+            entity.HasIndex(e => e.DiscordId, "UQ_UserDiscordId").IsUnique();
 
             entity.Property(e => e.DiscordId)
                 .IsRequired()
@@ -269,7 +307,7 @@ public partial class MainDbContext : DbContext
 
         modelBuilder.Entity<UserBias>(entity =>
         {
-            entity.HasKey(e => e.UserBiasId).HasName("PK__UserBias__0940EA0592E06A09");
+            entity.HasKey(e => e.UserBiasId).HasName("PK_UserBiasId");
 
             entity.ToTable("UserBias");
 

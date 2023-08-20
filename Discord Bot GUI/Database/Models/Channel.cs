@@ -13,5 +13,5 @@ public partial class Channel
 
     public virtual Server Server { get; set; }
 
-    public virtual ICollection<ServerSettingChannel> ServerSettingChannels { get; set; } = new List<ServerSettingChannel>();
+    public virtual ICollection<ChannelType> ChannelTypes { get; set; } = new List<ChannelType>();
 }
