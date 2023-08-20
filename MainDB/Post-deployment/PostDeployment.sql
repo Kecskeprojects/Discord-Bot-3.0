@@ -25,6 +25,7 @@ BEGIN
     :r .\PostDeployment\Inserts\ServerSettingChannel_Inserts.sql
     :r .\PostDeployment\Inserts\CustomCommand_Inserts.sql
     :r .\PostDeployment\Inserts\Idol_Inserts.sql
+    :r .\PostDeployment\Inserts\IdolAlias_Inserts.sql
     :r .\PostDeployment\Inserts\Keyword_Inserts.sql
     :r .\PostDeployment\Inserts\TwitchChannel_Inserts.sql
     :r .\PostDeployment\Inserts\UserBias_Inserts.sql
