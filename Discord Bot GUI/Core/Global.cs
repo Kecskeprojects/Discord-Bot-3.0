@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 
-namespace Discord_Bot
+namespace Discord_Bot.Core
 {
     public static class Global
     {
@@ -17,7 +17,7 @@ namespace Discord_Bot
         public static readonly Dictionary<ulong, ServerResource> servers = new();
 
         public static bool InstagramChecker { get; set; }
-        
+
         public static bool TwitterChecker { get; set; }
 
         //Extendable easter egg message list
@@ -48,8 +48,8 @@ namespace Discord_Bot
         //Returns true if command's channel is a music channel
         public static bool IsMusicChannel(SocketCommandContext context)
         {
-            if (servers[context.Guild.Id].MusicChannel.Length == 0) return true;
-            else return servers[context.Guild.Id].MusicChannel.Contains(context.Channel.Id);
+            if (servers[context.Guild.Id].MusicChannels.Length == 0) return true;
+            else return servers[context.Guild.Id].MusicChannels.Contains(context.Channel.Id);
         }
 
 
@@ -92,21 +92,6 @@ namespace Discord_Bot
             catch (Exception) { }
             return false;
         }
-
-
-        //Setting the list of servers we currently have in the database
-        /*public static void ServerList()
-        {
-            var list = AllServerSetting();
-
-            if (list.Count > 0)
-            {
-                foreach (var server in list)
-                {
-                    Global.servers.Add(server.ServerId, new Server(server));
-                }
-            }
-        }*/
         #endregion
     }
 }

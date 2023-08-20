@@ -2,13 +2,13 @@
 using Discord.Commands;
 using Discord.Rest;
 using Discord.WebSocket;
-using Discord_Bot.Logger;
+using Discord_Bot.Core.Logger;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord_Bot
+namespace Discord_Bot.Core
 {
     public class MainLogic : ProgramFunctions
     {
@@ -103,7 +103,7 @@ namespace Discord_Bot
                     {
                         await context.Channel.SendMessageAsync("I agree wholeheartedly!");
                     }
-                    else if ((mess.StartsWith("i am") && mess != "i am") || (mess.StartsWith("i'm") && mess != "i'm"))
+                    else if (mess.StartsWith("i am") && mess != "i am" || mess.StartsWith("i'm") && mess != "i'm")
                     {
                         await context.Channel.SendMessageAsync(string.Concat("Hey ", context.Message.Content.AsSpan(mess.StartsWith("i am") ? 5 : 4), ", I'm Kim Synthji!"));
                     }

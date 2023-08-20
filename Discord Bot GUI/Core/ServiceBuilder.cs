@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace Discord_Bot
+namespace Discord_Bot.Core
 {
     public static class ServiceBuilder
     {

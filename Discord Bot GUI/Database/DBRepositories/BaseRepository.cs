@@ -1,4 +1,4 @@
-﻿using Discord_Bot.Logger;
+﻿using Discord_Bot.Core.Logger;
 
 namespace Discord_Bot.Database.DBRepositories
 {

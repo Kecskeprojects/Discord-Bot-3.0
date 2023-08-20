@@ -7,7 +7,7 @@ namespace Discord_Bot.Assets
 {
     public class Config
     {
-        private IConfiguration Configuration;
+        private readonly IConfiguration Configuration;
         public struct ConfigModel
         {
             public string token;

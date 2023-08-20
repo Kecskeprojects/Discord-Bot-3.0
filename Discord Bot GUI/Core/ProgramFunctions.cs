@@ -2,9 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using Discord_Bot.Logger;
+using Discord_Bot.Core.Logger;
 
-namespace Discord_Bot
+namespace Discord_Bot.Core
 {
     public class ProgramFunctions
     {

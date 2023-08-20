@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Discord_Bot.Logger
+namespace Discord_Bot.Core.Logger
 {
     public class Log
     {

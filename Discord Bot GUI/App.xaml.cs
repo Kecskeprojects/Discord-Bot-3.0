@@ -2,7 +2,6 @@
 using System;
 using System.Windows;
 using Discord_Bot.Assets;
-using Discord_Bot.Logger;
 using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -10,6 +9,11 @@ using Discord;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.Timers;
+using Discord_Bot.Resources;
+using System.Collections.Generic;
+using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Core.Logger;
+using Discord_Bot.Core;
 
 namespace Discord_Bot
 {
@@ -25,6 +29,7 @@ namespace Discord_Bot
         private InteractionService _interactions;
         private CommandService _commands;
         private MainLogic _mainLogic;
+        private IServerService serverService;
 
         #region Main methods
         //The main program, runs even if the bot crashes, and restarts it
@@ -38,10 +43,9 @@ namespace Discord_Bot
                 new DiscordSocketConfig()
                 {
                     GatewayIntents = GatewayIntents.DirectMessageReactions | GatewayIntents.DirectMessages | GatewayIntents.DirectMessageTyping |
-                                                            GatewayIntents.GuildBans | GatewayIntents.GuildEmojis | GatewayIntents.GuildIntegrations | GatewayIntents.GuildMembers |
-                                                            GatewayIntents.GuildMessageReactions | GatewayIntents.GuildMessages | GatewayIntents.GuildMessageTyping |
-                                                            GatewayIntents.Guilds | GatewayIntents.GuildVoiceStates | GatewayIntents.GuildWebhooks |
-                                                            GatewayIntents.MessageContent,
+                                     GatewayIntents.GuildBans | GatewayIntents.GuildEmojis | GatewayIntents.GuildIntegrations | GatewayIntents.GuildMembers |
+                                     GatewayIntents.GuildMessageReactions | GatewayIntents.GuildMessages | GatewayIntents.GuildMessageTyping |
+                                     GatewayIntents.Guilds | GatewayIntents.GuildVoiceStates | GatewayIntents.GuildWebhooks | GatewayIntents.MessageContent,
                     LogLevel = LogSeverity.Info
                 });
             _interactions = new InteractionService(_client, new InteractionServiceConfig() { DefaultRunMode = Discord.Interactions.RunMode.Async });
@@ -69,6 +73,7 @@ namespace Discord_Bot
             aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             aTimer.Start();
 
+            serverService = _services.GetService<IServerService>();
             await RunBotAsync();
         }
 
@@ -93,8 +98,16 @@ namespace Discord_Bot
         public async Task RunBotAsync()
         {
             if (!Global.Connection()) return;
-            //Might not be needed
-            //StartupFunctions.ServerList();
+
+            List<ServerResource> servers = await serverService.GetAllServerAsync();
+
+            if (servers.Count > 0)
+            {
+                foreach (var server in servers)
+                {
+                    if(!Global.servers.ContainsKey(server.ServerId)) Global.servers.Add(server.ServerId, server);
+                }
+            }
 
             //YoutubeAPI.KeyReset();
 

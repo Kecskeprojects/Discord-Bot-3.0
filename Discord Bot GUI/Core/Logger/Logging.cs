@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 
-namespace Discord_Bot.Logger
+namespace Discord_Bot.Core.Logger
 {
     public class Logging
     {
@@ -136,13 +136,13 @@ namespace Discord_Bot.Logger
         #region Helper methods
         private static void LogToWindow(Log log, Brush color)
         {
-            if(Application.Current != null)
+            if (Application.Current != null)
             {
                 string mess = log.Content.Replace(":\t", ":    \t");
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    if(Application.Current.MainWindow != null)
+                    if (Application.Current.MainWindow != null)
                     {
                         MainWindow main = Application.Current.MainWindow as MainWindow;
                         main.MainLogText.Foreground = color;
@@ -165,13 +165,13 @@ namespace Discord_Bot.Logger
         }
 
 
-        private static string CurrentTime() 
+        private static string CurrentTime()
         {
             string hour = DateTime.Now.Hour < 10 ? "0" + DateTime.Now.Hour.ToString() : DateTime.Now.Hour.ToString();
             string minute = DateTime.Now.Minute < 10 ? "0" + DateTime.Now.Minute.ToString() : DateTime.Now.Minute.ToString();
             string second = DateTime.Now.Second < 10 ? "0" + DateTime.Now.Second.ToString() : DateTime.Now.Second.ToString();
 
-            return $"{hour}:{minute}:{second}"; 
+            return $"{hour}:{minute}:{second}";
         }
         #endregion
     }
