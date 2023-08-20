@@ -3,7 +3,7 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
-namespace Discord_Bot.Assets
+namespace Discord_Bot.Core.Config
 {
     public class Config
     {
@@ -91,7 +91,7 @@ namespace Discord_Bot.Assets
 
         public bool Enable_Twitter_Embed { get { return Configuration.GetSection("enable_twitter_embed").Get<bool>(); } }
 
-        public  string SqlConnectionString { get { return Configuration.GetSection("sql_connection_string").Get<string>(); } }
+        public string SqlConnectionString { get { return Configuration.GetSection("sql_connection_string").Get<string>(); } }
         #endregion
 
     }

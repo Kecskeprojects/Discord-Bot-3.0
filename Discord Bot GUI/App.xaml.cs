@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Windows;
-using Discord_Bot.Assets;
 using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -14,6 +13,7 @@ using System.Collections.Generic;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Core;
+using Discord_Bot.Core.Config;
 
 namespace Discord_Bot
 {
