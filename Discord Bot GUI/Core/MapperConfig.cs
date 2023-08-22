@@ -13,12 +13,15 @@ namespace Discord_Bot.Core
         {
             //Provide all the Mapping Configuration
             CreateMap<Server, ServerResource>()
-                .ForMember(dest => dest.DiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.DiscordId)));
+                .ForMember(dest => dest.DiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.DiscordId)))
+                .ForMember(dest => dest.AudioVariables, opt => opt.MapFrom(x => new AudioVariables()))
+                .ForMember(dest => dest.MusicRequests, opt => opt.MapFrom(x => new List<MusicRequest>()));
             CreateMap<IGrouping<int?, ServerChannelView>, KeyValuePair<ChannelTypeEnum, List<ulong>>>()
             .ConstructUsing(scv => new KeyValuePair<ChannelTypeEnum, List<ulong>>(
                 scv.Key != null ? (ChannelTypeEnum)scv.Key : ChannelTypeEnum.None,
                 scv.Select(x => ulong.Parse(x.ChannelDiscordId)).ToList()));
             CreateMap<TwitchChannel, TwitchChannelResource>();
+            CreateMap<Greeting, GreetingResource>();
         }
     }
 }

@@ -24,6 +24,24 @@ namespace Discord_Bot.Database.DBServices
             this.channelViewRepository = channelViewRepository;
         }
 
+        public async Task AddServerAsync(ulong id)
+        {
+            try
+            {
+                Server server = new()
+                {
+                    DiscordId = id.ToString()
+                };
+                await serverRepository.AddServerAsync(server);
+
+                logger.Log($"Server added with the following ID: {id}");
+            }
+            catch (Exception ex)
+            {
+                logger.Error("ServerService.cs AddServerAsync", ex.ToString());
+            }
+        }
+
         public async Task<ServerResource> GetByDiscordIdAsync(ulong id)
         {
             ServerResource result = null;

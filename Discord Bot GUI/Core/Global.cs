@@ -39,20 +39,6 @@ namespace Discord_Bot.Core
         #endregion
 
         #region Global Functions
-        //Returns true if command's channel is a music channel
-        public static bool IsMusicTextChannel(ServerResource server, ulong channelId)
-        {
-            if (!server.SettingsChannels.ContainsKey(ChannelTypeEnum.MusicText)) return true;
-            else return server.SettingsChannels[ChannelTypeEnum.MusicText].Contains(channelId);
-        }
-
-        //Returns true if command's channel is a music channel
-        public static bool IsMusicVoiceChannel(ServerResource server, ulong channelId)
-        {
-            if (!server.SettingsChannels.ContainsKey(ChannelTypeEnum.MusicVoice)) return true;
-            else return server.SettingsChannels[ChannelTypeEnum.MusicVoice].Contains(channelId);
-        }
-
         //Check if user has a nickname, and if message was sent in a server or not
         public static string GetNickName(SocketCommandContext context)
         {
@@ -63,6 +49,13 @@ namespace Discord_Bot.Core
                 return (context.User as Discord.WebSocket.SocketGuildUser).Nickname ?? context.User.Username;
             }
             else return context.User.Username;
+        }
+
+        //Check if server has a type of channel, and if yes, is it on the list
+        public static bool IsTypeOfChannel(ServerResource server, ChannelTypeEnum type, ulong channelId, bool allowLackOfType = false)
+        {
+            if (!server.SettingsChannels.ContainsKey(type)) return allowLackOfType;
+            else return server.SettingsChannels[type].Contains(channelId);
         }
 
         public static Stream GetStream(string url)
@@ -89,6 +82,28 @@ namespace Discord_Bot.Core
             }
             catch (Exception) { }
             return false;
+        }
+
+        public static string CurrentTime(bool utc = false)
+        {
+            DateTime curr = utc ? DateTime.UtcNow : DateTime.Now;
+
+            string hour = curr.Hour < 10 ? "0" + curr.Hour.ToString() : curr.Hour.ToString();
+            string minute = curr.Minute < 10 ? "0" + curr.Minute.ToString() : curr.Minute.ToString();
+            string second = curr.Second < 10 ? "0" + curr.Second.ToString() : curr.Second.ToString();
+
+            return $"{hour}:{minute}:{second}";
+        }
+
+        public static string CurrentDate(bool utc = false)
+        {
+            DateTime curr = utc ? DateTime.UtcNow : DateTime.Now;
+
+            string year = curr.Year.ToString();
+            string month = curr.Month < 10 ? "0" + curr.Month.ToString() : curr.Month.ToString();
+            string day = curr.Day < 10 ? "0" + curr.Day.ToString() : curr.Day.ToString();
+
+            return $"{year}-{month}-{day}";
         }
         #endregion
     }

@@ -186,7 +186,7 @@ namespace Discord_Bot.Core
         //Check if message is an instagram link and has an embed or not
         public void InstagramEmbed(SocketCommandContext context)
         {
-            List<Uri> urls = LinkSearch(context.Message.Content, "https://instagram.com/", false);
+            List<Uri> urls = LinkSearch(context.Message.Content, false, "https://instagram.com/");
 
             //Check if message is an instagram link
             if (urls != null && urls.Count > 0)
@@ -205,11 +205,11 @@ namespace Discord_Bot.Core
                             //A profile url looks like so https://www.instagram.com/[username]/ that creates 2 Segments, it is the only way to identify it
                             if (urls[i].Segments.Length == 2)
                             {
-                                ///await InstagramAPI.ProfileEmbed(context.Channel, refer, urls[i]);
+                                //await InstagramAPI.ProfileEmbed(context.Channel, refer, urls[i]);
                             }
                             else if (urls[i].Segments[1][..^1] == "stories")
                             {
-                                ///await InstagramAPI.StoryEmbed(context.Channel, refer, urls[i]);
+                                //await InstagramAPI.StoryEmbed(context.Channel, refer, urls[i]);
                             }
                             else if (urls[i].Segments[1][..^1] != "live" && urls[i].Segments[2][..^1] != "live")
                             {
@@ -241,7 +241,7 @@ namespace Discord_Bot.Core
 
         public void TwitterEmbed(SocketCommandContext context)
         {
-            List<Uri> urls = LinkSearch(context.Message.Content, "https://twitter.com/", true);
+            List<Uri> urls = LinkSearch(context.Message.Content, true, new string[] { "https://twitter.com/", "https://x.com/" });
 
             //Check if message is an instagram link
             if (urls != null)

@@ -48,14 +48,19 @@ namespace Discord_Bot.Core
             collection.AddSingleton(new Logging());
             collection.AddSingleton(config);
             collection.AddSingleton(new CoreLogic(logging));
-            collection.AddDbContext<MainDbContext>(options => options.UseSqlServer(config.SqlConnectionString));
-            collection.AddAutoMapper(x => x.AddProfile<MapperConfig>());
-            collection.AddTransient(typeof(MainWindow));
             collection.AddSingleton(new Cache());
+
+            collection.AddDbContext<MainDbContext>(options => options.UseSqlServer(config.SqlConnectionString));
+
+            collection.AddAutoMapper(x => x.AddProfile<MapperConfig>());
+
+            collection.AddTransient(typeof(MainWindow));
 
             collection.AddScoped<IServerRepository, ServerRepository>();
             collection.AddScoped<IServerService, ServerService>();
             collection.AddScoped<IServerChannelViewRepository, ServerChannelViewRepository>();
+            collection.AddScoped<IGreetingRepository, GreetingRepository>();
+            collection.AddScoped<IGreetingService, GreetingService>();
 
             return collection.BuildServiceProvider();
         }

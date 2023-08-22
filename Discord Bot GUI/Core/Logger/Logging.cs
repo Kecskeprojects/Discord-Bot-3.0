@@ -155,23 +155,13 @@ namespace Discord_Bot.Core.Logger
 
         private static Log BaseLog(LogType type)
         {
-            return new Log(DateTime.Now, type, $"[{CurrentTime()}][{type.Value}]:\t");
+            return new Log(DateTime.Now, type, $"[{Global.CurrentTime()}][{type.Value}]:\t");
         }
 
 
         private static string PutTabsOnNewLines(string message)
         {
             return message.Replace("\n", "\n\t\t\t");
-        }
-
-
-        private static string CurrentTime()
-        {
-            string hour = DateTime.Now.Hour < 10 ? "0" + DateTime.Now.Hour.ToString() : DateTime.Now.Hour.ToString();
-            string minute = DateTime.Now.Minute < 10 ? "0" + DateTime.Now.Minute.ToString() : DateTime.Now.Minute.ToString();
-            string second = DateTime.Now.Second < 10 ? "0" + DateTime.Now.Second.ToString() : DateTime.Now.Second.ToString();
-
-            return $"{hour}:{minute}:{second}";
         }
         #endregion
     }

@@ -9,5 +9,7 @@ namespace Discord_Bot.Resources
         public ulong DiscordId { get; set; }
         public Dictionary<ChannelTypeEnum, List<ulong>> SettingsChannels { get; set; }
         public List<TwitchChannelResource> TwitchChannels { get; set; }
+        public AudioVariables AudioVariables { get; set; }
+        public List<MusicRequest> MusicRequests { get; set; }
     }
 }

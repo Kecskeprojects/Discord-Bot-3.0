@@ -23,9 +23,15 @@ namespace Discord_Bot.Core
             {
                 if (_logging.Logs.Count != 0 && LogFile_writer == null)
                 {
-                    string file_location = "Logs\\logs" + "[" + DateTime.Now.Year + "-" + (DateTime.Now.Month < 10 ? "0" + DateTime.Now.Month.ToString() : DateTime.Now.Month.ToString()) + "-" + (DateTime.Now.Day < 10 ? "0" + DateTime.Now.Day.ToString() : DateTime.Now.Day.ToString()) + "].txt";
+                    string file_location = $"Logs\\logs[{Global.CurrentDate()}].txt";
 
-                    using (LogFile_writer = File.AppendText(file_location)) foreach (string log in _logging.Logs.Select(n => n.Content)) LogFile_writer.WriteLine(log);
+                    using (LogFile_writer = File.AppendText(file_location))
+                    {
+                        foreach (string log in _logging.Logs.Select(n => n.Content))
+                        {
+                            LogFile_writer.WriteLine(log);
+                        }
+                    }
 
                     LogFile_writer = null;
                     _logging.Logs.Clear();
@@ -42,28 +48,22 @@ namespace Discord_Bot.Core
         public void Check_Folders()
         {
             List<string> logs = new();
-            if (!Directory.Exists(Directory.GetCurrentDirectory() + "\\Logs"))
+            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "\\Logs")))
             {
-                Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\Logs");
+                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "\\Logs"));
                 logs.Add("Logs folder created!");
             }
 
-            if (!Directory.Exists(Directory.GetCurrentDirectory() + "\\Assets"))
+            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "\\Assets")))
             {
-                Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\Assets");
+                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "\\Assets"));
                 logs.Add("Assets folder created!");
             }
 
-            if (!Directory.Exists(Directory.GetCurrentDirectory() + "\\Assets\\Commands"))
+            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "\\Assets\\Commands")))
             {
-                Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\Assets\\Commands");
+                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "\\Assets\\Commands"));
                 logs.Add("Commands folder created!");
-            }
-
-            if (!Directory.Exists(Directory.GetCurrentDirectory() + "\\Assets\\Data"))
-            {
-                Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\Assets\\Data");
-                logs.Add("Data folder created!");
             }
 
             if (logs.Count != 0)
@@ -73,13 +73,13 @@ namespace Discord_Bot.Core
         }
 
 
-        protected List<Uri> LinkSearch(string message, string baseURL, bool ignoreEmbedSuppress)
+        protected List<Uri> LinkSearch(string message, bool ignoreEmbedSuppress, params string[] baseURLs)
         {
             try
             {
                 message = message.Replace("www.", "");
 
-                if (message.Contains(baseURL))
+                if (baseURLs.Any(x => message.Contains(x)))
                 {
                     List<Uri> urls = new();
 
@@ -87,29 +87,29 @@ namespace Discord_Bot.Core
                     int startIndex = 0;
                     while (startIndex != -1)
                     {
-                        //We check if there are any links left, one is expected
-                        startIndex = message.IndexOf(baseURL, startIndex);
-
-                        if (startIndex != -1)
+                        //We check if there are any links left, one is expected if function gets this far
+                        foreach (var baseURL in baseURLs)
                         {
-                            //We cut off anything before the start of the link and replace embed supression characters
-                            string beginningCut = message[startIndex..];
-
-                            //And anything after the first space that ended the link
-                            string url = beginningCut.Split(new char[] { ' ', '\n' }, StringSplitOptions.RemoveEmptyEntries)[0];
-
-                            if (!ignoreEmbedSuppress && !url.Contains('<') && !url.Contains('>'))
+                            startIndex = message.IndexOf(baseURL, startIndex);
+                            if (startIndex != -1)
                             {
-                                url = url.Split('?')[0];
-                                urls.Add(new Uri(url));
-                            }
-                            else if (ignoreEmbedSuppress)
-                            {
-                                url = url.Replace("<", "").Replace(">", "").Split('?')[0];
-                                urls.Add(new Uri(url));
-                            }
+                                //We cut off anything before the start of the link and replace embed supression characters
+                                string beginningCut = message[startIndex..];
 
-                            startIndex++;
+                                //And anything after the first space that ended the link
+                                string url = beginningCut.Split(new char[] { ' ', '\n' }, StringSplitOptions.RemoveEmptyEntries)[0];
+                                if (!ignoreEmbedSuppress && !url.Contains('<') && !url.Contains('>'))
+                                {
+                                    url = url.Split('?')[0];
+                                    urls.Add(new Uri(url));
+                                }
+                                else if (ignoreEmbedSuppress)
+                                {
+                                    url = url.Replace("<", "").Replace(">", "").Split('?')[0];
+                                    urls.Add(new Uri(url));
+                                }
+                                startIndex++;
+                            }
                         }
                     }
 
