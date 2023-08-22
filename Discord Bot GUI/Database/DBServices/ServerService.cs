@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Discord_Bot.Core;
+using Discord_Bot.Core.Caching;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
@@ -18,7 +18,7 @@ namespace Discord_Bot.Database.DBServices
         private readonly IServerRepository serverRepository;
         private readonly IServerChannelViewRepository channelViewRepository;
 
-        public ServerService(IServerRepository serverRepository, IServerChannelViewRepository channelViewRepository, IMapper mapper, Logging logger) : base(mapper, logger)
+        public ServerService(IServerRepository serverRepository, IServerChannelViewRepository channelViewRepository, IMapper mapper, Logging logger, Cache cache) : base(mapper, logger, cache)
         {
             this.serverRepository = serverRepository;
             this.channelViewRepository = channelViewRepository;
@@ -26,31 +26,34 @@ namespace Discord_Bot.Database.DBServices
 
         public async Task<ServerResource> GetByDiscordIdAsync(ulong id)
         {
+            ServerResource result = null;
             try
             {
-                if (Global.Cache.ServerCache.ContainsKey(id))
+                if (cache.ServerCache.ContainsKey(id))
                 {
-                    return Global.Cache.ServerCache[id];
+                    return cache.ServerCache[id];
                 }
 
-                Server result = await serverRepository.GetByDiscordIdAsync(id);
-                ServerResource resource = mapper.Map<Server, ServerResource>(result);
-                await FillWithChannels(resource);
+                Server server = await serverRepository.GetByDiscordIdAsync(id);
+                if(server == null) return null;
 
-                Global.Cache.ServerCache.Add(resource.DiscordId, resource);
+                result = mapper.Map<Server, ServerResource>(server);
+                await FillWithChannels(result);
 
-                return resource;
+                cache.ServerCache.Add(result.DiscordId, result);
             }
             catch(Exception ex)
             {
                 logger.Error("ServerService.cs GetByDiscordIdAsync", ex.ToString());
-                return null;
             }
+
+            return result;
         }
 
         private async Task FillWithChannels(ServerResource resource)
         {
             List<ServerChannelView> channels = await channelViewRepository.GetServerChannels(resource.ServerId);
+
             List<IGrouping<int?, ServerChannelView>> groups = channels.GroupBy(ch => ch.ChannelTypeId).ToList();
             resource.SettingsChannels = mapper.Map<List<IGrouping<int?, ServerChannelView>>, Dictionary<ChannelTypeEnum, List<ulong>>>(groups);
             return;

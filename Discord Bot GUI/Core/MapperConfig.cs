@@ -18,6 +18,7 @@ namespace Discord_Bot.Core
             .ConstructUsing(scv => new KeyValuePair<ChannelTypeEnum, List<ulong>>(
                 scv.Key != null ? (ChannelTypeEnum)scv.Key : ChannelTypeEnum.None,
                 scv.Select(x => ulong.Parse(x.ChannelDiscordId)).ToList()));
+            CreateMap<TwitchChannel, TwitchChannelResource>();
         }
     }
 }

@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Core
 {
-    public class MainLogic : ProgramFunctions
+    public class CoreLogic : ProgramFunctions
     {
         private readonly Logging _logging;
-        public MainLogic(Logging logging) : base(logging)
+        public CoreLogic(Logging logging) : base(logging)
         {
             _logging = logging;
         }

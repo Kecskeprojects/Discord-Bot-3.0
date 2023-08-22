@@ -9,12 +9,10 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.Timers;
 using Discord_Bot.Resources;
-using System.Collections.Generic;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
-using Discord_Bot.Database.DBServices;
 using Discord_Bot.Enums;
 
 namespace Discord_Bot
@@ -30,71 +28,50 @@ namespace Discord_Bot
         private static DiscordSocketClient _client;
         private InteractionService _interactions;
         private CommandService _commands;
-        private MainLogic _mainLogic;
+        private CoreLogic _coreLogic;
         private IServerService serverService;
 
         #region Main methods
         //The main program, runs even if the bot crashes, and restarts it
         protected override async void OnStartup(StartupEventArgs e)
         {
-            _config = new Config();
-            _logging = new Logging();
-            _mainLogic = new MainLogic(_logging);
-            _client = new DiscordSocketClient(
-                new DiscordSocketConfig()
-                {
-                    //GatewayIntents.GuildPresences | GatewayIntents.GuildScheduledEvents | GatewayIntents.GuildInvites  NOT USED GATEWAY INTENTS
-                    GatewayIntents = GatewayIntents.DirectMessageReactions | GatewayIntents.DirectMessages | GatewayIntents.DirectMessageTyping |
-                                     GatewayIntents.GuildBans | GatewayIntents.GuildEmojis | GatewayIntents.GuildIntegrations | GatewayIntents.GuildMembers |
-                                     GatewayIntents.GuildMessageReactions | GatewayIntents.GuildMessages | GatewayIntents.GuildMessageTyping |
-                                     GatewayIntents.Guilds | GatewayIntents.GuildVoiceStates | GatewayIntents.GuildWebhooks | GatewayIntents.MessageContent,
-                    LogLevel = LogSeverity.Info
-                });
-            _interactions = new InteractionService(_client, new InteractionServiceConfig() { DefaultRunMode = Discord.Interactions.RunMode.Async });
-            _commands = new CommandService(new CommandServiceConfig() { DefaultRunMode = Discord.Commands.RunMode.Async });
-
-            IServiceCollection collection = new ServiceCollection()
-                .AddSingleton(_client)
-                .AddSingleton(_commands)
-                .AddSingleton(_interactions)
-                .AddSingleton(_logging)
-                .AddSingleton(_config);
-            _services = ServiceBuilder.BuildService(collection, _config);
-
-            var mainWindow = _services.GetRequiredService<MainWindow>();
-            mainWindow.Show();
-
-            _logging.Log("App started!");
-
-            _mainLogic.Check_Folders();
-
-            //Event handler for the closing of the app
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(_mainLogic.Closing);
-
             Timer aTimer = new(60000) { AutoReset = true }; //1 minute
             aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             aTimer.Start();
 
+            _services = ServiceBuilder.BuildService();
+            _config = _services.GetService<Config>();
+            _logging = _services.GetService<Logging>();
+            _client = _services.GetService<DiscordSocketClient>();
+            _interactions = _services.GetService<InteractionService>();
+            _commands = _services.GetService<CommandService>();
+            _coreLogic = _services.GetService<CoreLogic>();
             serverService = _services.GetService<IServerService>();
+            MainWindow mainWindow = _services.GetRequiredService<MainWindow>();
+
+            mainWindow.Show();
+
+            _logging.Log("App started!");
+
+            _coreLogic.Check_Folders();
+
+            //Event handler for the closing of the app
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(_coreLogic.Closing);
+
             await RunBotAsync();
         }
 
-
         protected override void OnExit(ExitEventArgs e)
         {
-            _mainLogic.Closing();
-
+            _coreLogic.Closing();
             base.OnExit(e);
         }
 
-
         protected override void OnSessionEnding(SessionEndingCancelEventArgs e)
         {
-            _mainLogic.Closing();
-
+            _coreLogic.Closing();
             base.OnSessionEnding(e);
         }
-
 
         //Main Bot Startup Logic
         public async Task RunBotAsync()
@@ -108,7 +85,7 @@ namespace Discord_Bot
 
             if (string.IsNullOrEmpty(_config.Token))
             {
-                _logging.Error("Program.cs RunBotAsync", "Bot cannot start without a valid token, fill out it's filled in the config!");
+                _logging.Error("App.xaml.cs RunBotAsync", "Bot cannot start without a valid token, fill out it's filled in the config!");
                 return;
             }
 
@@ -130,7 +107,6 @@ namespace Discord_Bot
             _logging.Log("Bot started!");
         }
 
-
         //Repeated operations
         private static int minutes_count = 0;
         public async void OnTimedEvent(object source, ElapsedEventArgs e)
@@ -139,21 +115,22 @@ namespace Discord_Bot
             {
                 await RunBotAsync();
             }
-            //Database backup function
-            if (minutes_count == 1440) minutes_count = 0;
+
+            //Logic to be done once a day
+            if (minutes_count == 1440)
+            {
+                minutes_count = 0;
+            }
             minutes_count++;
 
             //Youtube api key reset function
            // if (DateTime.Now.Hour == 10 && DateTime.Now.Minute == 0) YoutubeAPI.KeyReset();
 
-            //Logging function
-            _mainLogic.LogToFile();
+            _coreLogic.LogToFile();
 
-            //Reminder function
-            await _mainLogic.ReminderCheck(_client);
+            await _coreLogic.ReminderCheck(_client);
         }
         #endregion
-
 
         #region Client logging
         //Client Messages
@@ -171,13 +148,13 @@ namespace Discord_Bot
                     case "WebSocket connection was closed":
                     case "WebSocket session expired":
                         {
-                            _logging.Warning("Program.cs ClientLog", $"{arg.Exception.Message}!", ConsoleOnly: true);
-                            _logging.Warning("Program.cs ClientLog", arg.Exception.ToString(), LogOnly: true);
+                            _logging.Warning("App.xaml.cs ClientLog", $"{arg.Exception.Message}!", ConsoleOnly: true);
+                            _logging.Warning("App.xaml.cs ClientLog", arg.Exception.ToString(), LogOnly: true);
                             break;
                         }
                     default:
                         {
-                            _logging.Error("Program.cs ClientLog", arg.Exception.ToString());
+                            _logging.Error("App.xaml.cs ClientLog", arg.Exception.ToString());
                             break;
                         }
                 }
@@ -190,7 +167,6 @@ namespace Discord_Bot
         }
         #endregion
 
-
         #region Websocket events
         private Task OnWebSocketReady()
         {
@@ -199,14 +175,12 @@ namespace Discord_Bot
             return Task.CompletedTask;
         }
 
-
         private Task OnWebsocketDisconnect(Exception arg)
         {
             _logging.Log("Disconnect handled!");
             return Task.CompletedTask;
         }
         #endregion
-
 
         #region Message handling
         //Watching Messages
@@ -215,7 +189,6 @@ namespace Discord_Bot
             _client.MessageReceived += HandleCommandAsync;
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
-
 
         //Handling commands and special cases
         private async Task HandleCommandAsync(SocketMessage arg)
@@ -285,7 +258,7 @@ namespace Discord_Bot
                     {
                         if (message.Channel.GetChannelType() == ChannelType.Text)
                         {
-                            await _mainLogic.CustomCommands(context);
+                            await _coreLogic.CustomCommands(context);
                         }
                     }
                     else
@@ -298,14 +271,14 @@ namespace Discord_Bot
             }
             else if (Global.TwitterChecker && message.HasStringPrefix(".twt", ref argPos))
             {
-                _mainLogic.TwitterEmbed(context);
+                _coreLogic.TwitterEmbed(context);
             }
             else if (message.Channel.GetChannelType() == ChannelType.Text && server.SettingsChannels[ChannelTypeEnum.RoleText].Contains(context.Channel.Id))
             {
                 if (message.HasCharPrefix('+', ref argPos) || message.HasCharPrefix('-', ref argPos))
                 {
                     //self roles
-                    await _mainLogic.SelfRole(context);
+                    await _coreLogic.SelfRole(context);
                 }
 
                 await context.Message.DeleteAsync();
@@ -325,26 +298,22 @@ namespace Discord_Bot
                 }
 
                 //Responses to triggers
-                await _mainLogic.FeatureChecks(context);
+                await _coreLogic.FeatureChecks(context);
 
                 //Make embed independently from main thread
                 if (Global.InstagramChecker)
                 {
-                    _mainLogic.InstagramEmbed(context);
+                    _coreLogic.InstagramEmbed(context);
                 }
             }
         }
-        #endregion
 
-
-        #region Interaction handling
         //Watching Interactions
         public async Task RegisterInteractionsAsync()
         {
             _client.InteractionCreated += HandleInteractionAsync;
             await _interactions.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
-
 
         //Handling Interactions
         private async Task HandleInteractionAsync(SocketInteraction arg)

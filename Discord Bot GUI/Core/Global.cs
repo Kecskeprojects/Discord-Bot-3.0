@@ -1,25 +1,16 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord_Bot.Core.Caching;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using System;
 using System.IO;
-using System.Linq;
 using System.Net.NetworkInformation;
 
 namespace Discord_Bot.Core
 {
     public static class Global
     {
-        static Global()
-        {
-            Cache = new Cache();
-        }
-
         #region Global variables
-        public static Cache Cache { get; private set; }
-
         public static bool InstagramChecker { get; set; }
 
         public static bool TwitterChecker { get; set; }
