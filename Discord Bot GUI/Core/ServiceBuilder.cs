@@ -11,13 +11,14 @@ namespace Discord_Bot.Core
 {
     public static class ServiceBuilder
     {
-        public static IServiceProvider BuildService(IServiceCollection service, Config config)
+        public static IServiceProvider BuildService(IServiceCollection service, Config.Config config)
         {
             service.AddDbContext<MainDbContext>(options => options.UseSqlServer(config.SqlConnectionString));
             service.AddAutoMapper(x => x.AddProfile<MapperConfig>());
             service.AddTransient(typeof(MainWindow));
             service.AddScoped<IServerRepository, ServerRepository>();
             service.AddScoped<IServerService, ServerService>();
+            service.AddScoped<IServerChannelViewRepository, ServerChannelViewRepository>();
 
             return service.BuildServiceProvider();
         }

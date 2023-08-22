@@ -169,6 +169,11 @@ namespace Discord_Bot.Core
         #region Before closing method
         //Things to do when app is closing
         //3 second time limit to event by default
+        public void Closing()
+        {
+            _logging.Log("Application closing...");
+            LogToFile();
+        }
         public void Closing(object sender, EventArgs e)
         {
             _logging.Log("Application closing...");

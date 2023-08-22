@@ -1,8 +1,9 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord_Bot.Core.Caching;
+using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
@@ -11,10 +12,13 @@ namespace Discord_Bot.Core
 {
     public static class Global
     {
+        static Global()
+        {
+            Cache = new Cache();
+        }
+
         #region Global variables
-        //Might not be needed
-        //Server information stored in a dictionary, the key is the Context.Guild.Id, the value is a complex class
-        public static readonly Dictionary<ulong, ServerResource> servers = new();
+        public static Cache Cache { get; private set; }
 
         public static bool InstagramChecker { get; set; }
 
@@ -43,15 +47,20 @@ namespace Discord_Bot.Core
             };
         #endregion
 
-
         #region Global Functions
         //Returns true if command's channel is a music channel
-        public static bool IsMusicChannel(SocketCommandContext context)
+        public static bool IsMusicTextChannel(ServerResource server, ulong channelId)
         {
-            if (servers[context.Guild.Id].MusicChannels.Length == 0) return true;
-            else return servers[context.Guild.Id].MusicChannels.Contains(context.Channel.Id);
+            if (!server.SettingsChannels.ContainsKey(ChannelTypeEnum.MusicText)) return true;
+            else return server.SettingsChannels[ChannelTypeEnum.MusicText].Contains(channelId);
         }
 
+        //Returns true if command's channel is a music channel
+        public static bool IsMusicVoiceChannel(ServerResource server, ulong channelId)
+        {
+            if (!server.SettingsChannels.ContainsKey(ChannelTypeEnum.MusicVoice)) return true;
+            else return server.SettingsChannels[ChannelTypeEnum.MusicVoice].Contains(channelId);
+        }
 
         //Check if user has a nickname, and if message was sent in a server or not
         public static string GetNickName(SocketCommandContext context)
@@ -65,7 +74,6 @@ namespace Discord_Bot.Core
             else return context.User.Username;
         }
 
-
         public static Stream GetStream(string url)
         {
             Stream imageData = null;
@@ -77,7 +85,6 @@ namespace Discord_Bot.Core
 
             return imageData;
         }
-
 
         //Testing connection by pinging google, it is quite a problem if that's down too
         public static bool Connection()

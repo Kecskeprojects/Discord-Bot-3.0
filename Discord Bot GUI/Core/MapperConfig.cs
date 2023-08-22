@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Discord_Bot.Database.Models;
+using Discord_Bot.Enums;
 using Discord_Bot.Resources;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Discord_Bot.Core
@@ -11,11 +13,11 @@ namespace Discord_Bot.Core
         {
             //Provide all the Mapping Configuration
             CreateMap<Server, ServerResource>()
-                .ForMember(dest => dest.SettingsChannels, opt => opt.MapFrom(sv =>
-                        sv.Channels
-                        .Select(ch => new ServerSettingsChannelResource(ch.DiscordId, 0))
-                        .ToList()//Make server settings into lists, and then combine those lists to get a complete list?
-                ));
+                .ForMember(dest => dest.DiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.DiscordId)));
+            CreateMap<IGrouping<int?, ServerChannelView>, KeyValuePair<ChannelTypeEnum, List<ulong>>>()
+            .ConstructUsing(scv => new KeyValuePair<ChannelTypeEnum, List<ulong>>(
+                scv.Key != null ? (ChannelTypeEnum)scv.Key : ChannelTypeEnum.None,
+                scv.Select(x => ulong.Parse(x.ChannelDiscordId)).ToList()));
         }
     }
 }

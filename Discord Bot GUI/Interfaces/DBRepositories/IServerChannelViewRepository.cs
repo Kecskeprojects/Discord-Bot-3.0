@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Interfaces.DBRepositories
 {
-    public interface IServerRepository
+    public interface IServerChannelViewRepository
     {
-        Task<Server> GetByDiscordIdAsync(ulong id);
+        Task<List<ServerChannelView>> GetServerChannels(int serverId);
     }
 }

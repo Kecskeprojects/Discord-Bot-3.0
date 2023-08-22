@@ -14,6 +14,8 @@ using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
+using Discord_Bot.Database.DBServices;
+using Discord_Bot.Enums;
 
 namespace Discord_Bot
 {
@@ -39,9 +41,9 @@ namespace Discord_Bot
             _logging = new Logging();
             _mainLogic = new MainLogic(_logging);
             _client = new DiscordSocketClient(
-                //GatewayIntents.GuildPresences | GatewayIntents.GuildScheduledEvents | GatewayIntents.GuildInvites  NOT USED GATEWAY INTENTS
                 new DiscordSocketConfig()
                 {
+                    //GatewayIntents.GuildPresences | GatewayIntents.GuildScheduledEvents | GatewayIntents.GuildInvites  NOT USED GATEWAY INTENTS
                     GatewayIntents = GatewayIntents.DirectMessageReactions | GatewayIntents.DirectMessages | GatewayIntents.DirectMessageTyping |
                                      GatewayIntents.GuildBans | GatewayIntents.GuildEmojis | GatewayIntents.GuildIntegrations | GatewayIntents.GuildMembers |
                                      GatewayIntents.GuildMessageReactions | GatewayIntents.GuildMessages | GatewayIntents.GuildMessageTyping |
@@ -80,7 +82,7 @@ namespace Discord_Bot
 
         protected override void OnExit(ExitEventArgs e)
         {
-            //Implement StartupFunctions.Closing
+            _mainLogic.Closing();
 
             base.OnExit(e);
         }
@@ -88,7 +90,7 @@ namespace Discord_Bot
 
         protected override void OnSessionEnding(SessionEndingCancelEventArgs e)
         {
-            //Implement StartupFunctions.Closing
+            _mainLogic.Closing();
 
             base.OnSessionEnding(e);
         }
@@ -98,18 +100,6 @@ namespace Discord_Bot
         public async Task RunBotAsync()
         {
             if (!Global.Connection()) return;
-
-            List<ServerResource> servers = await serverService.GetAllServerAsync();
-
-            if (servers.Count > 0)
-            {
-                foreach (var server in servers)
-                {
-                    if(!Global.servers.ContainsKey(server.ServerId)) Global.servers.Add(server.ServerId, server);
-                }
-            }
-
-            //YoutubeAPI.KeyReset();
 
             _client.Log += ClientLog;
 
@@ -147,7 +137,7 @@ namespace Discord_Bot
         {
             if(_client.LoginState == LoginState.LoggedOut)
             {
-                //Start a modified login function
+                await RunBotAsync();
             }
             //Database backup function
             if (minutes_count == 1440) minutes_count = 0;
@@ -262,8 +252,10 @@ namespace Discord_Bot
                 _logging.Mes_User(message.Content);
             }
 
+            ServerResource server = await serverService.GetByDiscordIdAsync(context.Guild.Id);
+
             //If message is not private message, and the server is not on the list, add it to the database and the list
-            if (message.Channel.GetChannelType() != ChannelType.DM && !Global.servers.ContainsKey(context.Guild.Id))
+            if (message.Channel.GetChannelType() != ChannelType.DM && server == null)
             {
                 /*
                 int affected = DBFunctions.AddNewServer(context.Guild.Id);
@@ -308,7 +300,7 @@ namespace Discord_Bot
             {
                 _mainLogic.TwitterEmbed(context);
             }
-            else if (message.Channel.GetChannelType() == ChannelType.Text && Global.servers[context.Guild.Id].RoleChannel == context.Channel.Id)
+            else if (message.Channel.GetChannelType() == ChannelType.Text && server.SettingsChannels[ChannelTypeEnum.RoleText].Contains(context.Channel.Id))
             {
                 if (message.HasCharPrefix('+', ref argPos) || message.HasCharPrefix('-', ref argPos))
                 {

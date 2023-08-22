@@ -2,7 +2,6 @@
 using Discord_Bot.Database.Models;
 using Discord_Bot.Interfaces.DBRepositories;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBRepositories
@@ -13,15 +12,11 @@ namespace Discord_Bot.Database.DBRepositories
         {
         }
 
-        public Task<List<Server>> GetAllServerAsync()
+        public Task<Server> GetByDiscordIdAsync(ulong id)
         {
             return context.Servers
-                .Include(x => x.TwitchChannels)
-                .Include(x => x.Channels).ThenInclude(z => z.ChannelTypes)
-                .Include(x => x.CustomCommands)
-                .Include(x => x.Keywords)
-                .Include(x => x.Roles)
-                .ToListAsync();
+                    .Include(x => x.TwitchChannels)
+                    .FirstOrDefaultAsync(x => x.DiscordId == id.ToString());
         }
     }
 }

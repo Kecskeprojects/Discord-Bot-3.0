@@ -1,28 +1,30 @@
-﻿using System.Collections.Generic;
+﻿using Discord_Bot.Resources;
 
 namespace Discord_Bot.Core.Caching
 {
-    public class Caching
+    public class Cache
     {
-        Dictionary<CacheType, SizedDictionary<ulong, object>> _Cache;
-        public Dictionary<CacheType, SizedDictionary<ulong, object>> Cache
+        private SizedDictionary<ulong, ServerResource> _ServerCache;
+        public SizedDictionary<ulong, ServerResource> ServerCache
         {
             get
             {
-                _Cache ??= new()
-                {
-                    { CacheType.Server, new SizedDictionary<ulong, object>(3) }
-                };
-                return _Cache;
+                _ServerCache ??= new(10);
+                return _ServerCache;
             }
         }
 
-        public void RemoveCachedEntityManually(CacheType cacheType, ulong key)
+        public void RemoveCachedEntityManually(ulong key)
         {
-            if (Cache.ContainsKey(cacheType))
+            if (ServerCache.ContainsKey(key))
             {
-                Cache[cacheType].Remove(key);
+                ServerCache.Remove(key);
             }
+        }
+
+        public void ClearCachedEntityManually()
+        {
+            ServerCache.Clear();
         }
     }
 }

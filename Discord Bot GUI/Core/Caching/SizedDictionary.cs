@@ -35,5 +35,10 @@ namespace Discord_Bot.Core.Caching
             keys = newQueue;
             return base.Remove(key);
         }
+        new public void Clear()
+        {
+            keys.Clear();
+            base.Clear();
+        }
     }
 }
