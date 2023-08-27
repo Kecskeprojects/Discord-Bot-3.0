@@ -1,20 +1,20 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Windows;
+﻿using Discord;
 using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Discord;
-using System.Threading.Tasks;
-using System.Reflection;
-using System.Timers;
-using Discord_Bot.Resources;
-using Discord_Bot.Interfaces.DBServices;
-using Discord_Bot.Core.Logger;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
+using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Resources;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Threading.Tasks;
+using System.Timers;
+using System.Windows;
 
 namespace Discord_Bot
 {
@@ -116,7 +116,7 @@ namespace Discord_Bot
         private static int minutes_count = 0;
         public async void OnTimedEvent(object source, ElapsedEventArgs e)
         {
-            if(_client.LoginState == LoginState.LoggedOut)
+            if (_client.LoginState == LoginState.LoggedOut)
             {
                 await RunBotAsync();
             }
@@ -215,8 +215,8 @@ namespace Discord_Bot
                 }
             }
 
-            var message = arg as SocketUserMessage;
-            var context = new SocketCommandContext(_client, message);
+            SocketUserMessage message = arg as SocketUserMessage;
+            SocketCommandContext context = new(_client, message);
             int argPos = 0;
 
             //Check if the message is an embed or not
@@ -235,12 +235,12 @@ namespace Discord_Bot
             if (message.Channel.GetChannelType() != ChannelType.DM)
             {
                 server = await serverService.GetByDiscordIdAsync(context.Guild.Id);
-                if(server == null)
+                if (server == null)
                 {
                     await serverService.AddServerAsync(context.Guild.Id);
                     server = await serverService.GetByDiscordIdAsync(context.Guild.Id);
 
-                    if(server == null)
+                    if (server == null)
                     {
                         _logging.Log($"{context.Guild.Name} could not be added to list!");
                     }
@@ -249,7 +249,7 @@ namespace Discord_Bot
 
             if (message.HasCharPrefix('!', ref argPos))
             {
-                var result = await _commands.ExecuteAsync(context, argPos, _services);
+                Discord.Commands.IResult result = await _commands.ExecuteAsync(context, argPos, _services);
 
                 //In case there is no such hard coded command, check the list of custom commands
                 if (!result.IsSuccess)
@@ -315,7 +315,7 @@ namespace Discord_Bot
         //Handling Interactions
         private async Task HandleInteractionAsync(SocketInteraction arg)
         {
-            var context = new SocketInteractionContext(_client, arg);
+            SocketInteractionContext context = new(_client, arg);
             await _interactions.ExecuteCommandAsync(context, _services);
         }
         #endregion Main methods

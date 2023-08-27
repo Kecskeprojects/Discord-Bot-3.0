@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace Discord_Bot.Core.Logger
@@ -145,8 +146,11 @@ namespace Discord_Bot.Core.Logger
                     if (Application.Current.MainWindow != null)
                     {
                         MainWindow main = Application.Current.MainWindow as MainWindow;
-                        main.MainLogText.Foreground = color;
-                        main.MainLogText.Text += "\n" + mess;
+                        Run run = new(mess + "\n")
+                        {
+                            Foreground = color
+                        };
+                        main.MainLogText.Inlines.Add(run);
                     }
                 });
             }

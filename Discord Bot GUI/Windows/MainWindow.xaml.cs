@@ -9,7 +9,7 @@ namespace Discord_Bot
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static TextBlock MainStaticLog { get { return mainStaticLog; } }
+        public static TextBlock MainStaticLog => mainStaticLog;
 
         private static TextBlock mainStaticLog;
         private readonly Logging _logging;
@@ -59,9 +59,6 @@ namespace Discord_Bot
             }
         }
 
-        private void WriteLog(object sender, RoutedEventArgs e)
-        {
-            _logging.Log("Logged action!\nNew Line");
-        }
+        private void WriteLog(object sender, RoutedEventArgs e) => _logging.Warning("test", "Logged action!\nNew Line");
     }
 }
