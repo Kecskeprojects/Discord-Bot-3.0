@@ -9,16 +9,15 @@ namespace Discord_Bot
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static TextBlock MainStaticLog => mainStaticLog;
+        public static TextBlock MainStaticLog { get; private set; }
 
-        private static TextBlock mainStaticLog;
         private readonly Logging _logging;
 
         public MainWindow(Logging logging)
         {
             InitializeComponent();
             _logging = logging;
-            mainStaticLog = MainLogText;
+            MainStaticLog = MainLogText;
         }
 
 
@@ -28,14 +27,7 @@ namespace Discord_Bot
             // User scroll event : set or unset autoscroll mode
             if (e.ExtentHeightChange == 0)
             {   // Content unchanged : user scroll event
-                if ((e.Source as ScrollViewer).VerticalOffset == (e.Source as ScrollViewer).ScrollableHeight)
-                {   // Scroll bar is in bottom
-                    AutoScroll = true;
-                }
-                else
-                {   // Scroll bar isn't in bottom
-                    AutoScroll = false;
-                }
+                AutoScroll = (e.Source as ScrollViewer).VerticalOffset == (e.Source as ScrollViewer).ScrollableHeight;
             }
 
             // Content scroll event : autoscroll eventually
@@ -59,6 +51,7 @@ namespace Discord_Bot
             }
         }
 
-        private void WriteLog(object sender, RoutedEventArgs e) => _logging.Warning("test", "Logged action!\nNew Line");
+        private void WriteLog(object sender, RoutedEventArgs e) =>
+            _logging.Log("Logged action!\nNew Line");
     }
 }

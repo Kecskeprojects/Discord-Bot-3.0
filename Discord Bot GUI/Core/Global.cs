@@ -4,6 +4,7 @@ using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using System;
 using System.IO;
+using System.Net.Http;
 using System.Net.NetworkInformation;
 
 namespace Discord_Bot.Core
@@ -48,21 +49,21 @@ namespace Discord_Bot.Core
                 //If user has a nickname, use that in the embed
                 return (context.User as Discord.WebSocket.SocketGuildUser).Nickname ?? context.User.Username;
             }
-            else return context.User.Username;
+            else
+            {
+                return context.User.Username;
+            }
         }
 
         //Check if server has a type of channel, and if yes, is it on the list
-        public static bool IsTypeOfChannel(ServerResource server, ChannelTypeEnum type, ulong channelId, bool allowLackOfType = false)
-        {
-            if (!server.SettingsChannels.ContainsKey(type)) return allowLackOfType;
-            else return server.SettingsChannels[type].Contains(channelId);
-        }
+        public static bool IsTypeOfChannel(ServerResource server, ChannelTypeEnum type, ulong channelId, bool allowLackOfType = false) =>
+            !server.SettingsChannels.ContainsKey(type) ? allowLackOfType : server.SettingsChannels[type].Contains(channelId);
 
         public static Stream GetStream(string url)
         {
             Stream imageData = null;
 
-            using (var wc = new System.Net.Http.HttpClient())
+            using (HttpClient wc = new())
             {
                 imageData = wc.GetStreamAsync(url).GetAwaiter().GetResult();
             }

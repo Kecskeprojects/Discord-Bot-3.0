@@ -22,9 +22,7 @@ namespace Discord_Bot.Core.Caching
             }
         }
 
-        public void ClearCachedEntityManually()
-        {
+        public void ClearCachedEntityManually() =>
             ServerCache.Clear();
-        }
     }
 }

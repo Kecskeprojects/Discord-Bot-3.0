@@ -14,10 +14,8 @@ namespace Discord_Bot.Database.DBServices
     public class GreetingService : BaseService, IGreetingService
     {
         private readonly IGreetingRepository greetingRepository;
-        public GreetingService(IGreetingRepository greetingRepository, IMapper mapper, Logging logger, Cache cache) : base(mapper, logger, cache)
-        {
+        public GreetingService(IGreetingRepository greetingRepository, IMapper mapper, Logging logger, Cache cache) : base(mapper, logger, cache) =>
             this.greetingRepository = greetingRepository;
-        }
 
         public async Task<List<GreetingResource>> GetAllGreetingAsync()
         {
@@ -25,7 +23,7 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 List<Greeting> greetings = await greetingRepository.GetAllGreetingAsync();
-                result =  mapper.Map<List<Greeting>, List<GreetingResource>>(greetings);
+                result = mapper.Map<List<Greeting>, List<GreetingResource>>(greetings);
             }
             catch (Exception ex)
             {

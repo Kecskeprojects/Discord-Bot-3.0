@@ -202,7 +202,10 @@ namespace Discord_Bot
             //In case the message was a system message (eg. the message seen when someone a pin is made), a webhook's or a bot's message, the function stops
             if (arg.Source == MessageSource.System || arg.Source == MessageSource.Webhook || arg.Source == MessageSource.Bot)
             {
-                if (arg.Content.Length < 1) return;
+                if (arg.Content.Length < 1)
+                {
+                    return;
+                }
                 else if (arg.Channel.GetChannelType() == ChannelType.Text)
                 {
                     _logging.Mes_Other(arg.Content, (arg.Channel as SocketGuildChannel).Guild.Name);
@@ -220,7 +223,10 @@ namespace Discord_Bot
             int argPos = 0;
 
             //Check if the message is an embed or not
-            if (message.Content.Length < 1) return;
+            if (message.Content.Length < 1)
+            {
+                return;
+            }
             else if (message.Channel.GetChannelType() == ChannelType.Text)
             {
                 _logging.Mes_User(message.Content, context.Guild.Name);

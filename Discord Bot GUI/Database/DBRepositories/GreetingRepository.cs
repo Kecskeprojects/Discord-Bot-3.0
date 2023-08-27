@@ -13,9 +13,7 @@ namespace Discord_Bot.Database.DBRepositories
         {
         }
 
-        public Task<List<Greeting>> GetAllGreetingAsync()
-        {
-            return context.Greetings.ToListAsync();
-        }
+        public Task<List<Greeting>> GetAllGreetingAsync() =>
+            context.Greetings.ToListAsync();
     }
 }

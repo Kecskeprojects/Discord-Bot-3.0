@@ -26,10 +26,10 @@ namespace Discord_Bot.Core.Caching
         {
             if (key == null) throw new();
             if (!keys.Contains(key)) return false;
-            var newQueue = new Queue<TKey>();
+            Queue<TKey> newQueue = new();
             while (keys.Count > 0)
             {
-                var thisKey = keys.Dequeue();
+                TKey thisKey = keys.Dequeue();
                 if (!thisKey.Equals(key)) newQueue.Enqueue(thisKey);
             }
             keys = newQueue;

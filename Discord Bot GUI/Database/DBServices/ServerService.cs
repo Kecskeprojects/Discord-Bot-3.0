@@ -53,14 +53,14 @@ namespace Discord_Bot.Database.DBServices
                 }
 
                 Server server = await serverRepository.GetByDiscordIdAsync(id);
-                if(server == null) return null;
+                if (server == null) return null;
 
                 result = mapper.Map<Server, ServerResource>(server);
                 await FillWithChannels(result);
 
                 cache.ServerCache.Add(result.DiscordId, result);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("ServerService.cs GetByDiscordIdAsync", ex.ToString());
             }

@@ -1,18 +1,16 @@
-﻿using System;
+﻿using Discord_Bot.Core.Logger;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Collections.Generic;
-using Discord_Bot.Core.Logger;
 
 namespace Discord_Bot.Core
 {
     public class ProgramFunctions
     {
         private readonly Logging _logging;
-        public ProgramFunctions(Logging logging)
-        {
+        public ProgramFunctions(Logging logging) => 
             _logging = logging;
-        }
 
 
         //For logging messages, errors, and messages to log files
@@ -88,7 +86,7 @@ namespace Discord_Bot.Core
                     while (startIndex != -1)
                     {
                         //We check if there are any links left, one is expected if function gets this far
-                        foreach (var baseURL in baseURLs)
+                        foreach (string baseURL in baseURLs)
                         {
                             startIndex = message.IndexOf(baseURL, startIndex);
                             if (startIndex != -1)

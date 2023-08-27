@@ -1,7 +1,7 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Discord;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Database;
@@ -20,24 +20,24 @@ namespace Discord_Bot.Core
         public static IServiceProvider BuildService()
         {
             DiscordSocketClient client = new(new DiscordSocketConfig()
-                                            {
-                                                //GatewayIntents.GuildPresences | GatewayIntents.GuildScheduledEvents | GatewayIntents.GuildInvites  NOT USED GATEWAY INTENTS
-                                                GatewayIntents = GatewayIntents.DirectMessageReactions | GatewayIntents.DirectMessages | GatewayIntents.DirectMessageTyping |
-                                                                 GatewayIntents.GuildBans | GatewayIntents.GuildEmojis | GatewayIntents.GuildIntegrations | GatewayIntents.GuildMembers |
-                                                                 GatewayIntents.GuildMessageReactions | GatewayIntents.GuildMessages | GatewayIntents.GuildMessageTyping |
-                                                                 GatewayIntents.Guilds | GatewayIntents.GuildVoiceStates | GatewayIntents.GuildWebhooks | GatewayIntents.MessageContent,
-                                                LogLevel = LogSeverity.Info
-                                            });
-            InteractionService interactions = new(client, 
-                                                  new InteractionServiceConfig() 
-                                                  { 
-                                                      DefaultRunMode = Discord.Interactions.RunMode.Async 
-                                                  });
+            {
+                //GatewayIntents.GuildPresences | GatewayIntents.GuildScheduledEvents | GatewayIntents.GuildInvites  NOT USED GATEWAY INTENTS
+                GatewayIntents = GatewayIntents.DirectMessageReactions | GatewayIntents.DirectMessages | GatewayIntents.DirectMessageTyping |
+                                 GatewayIntents.GuildBans | GatewayIntents.GuildEmojis | GatewayIntents.GuildIntegrations | GatewayIntents.GuildMembers |
+                                 GatewayIntents.GuildMessageReactions | GatewayIntents.GuildMessages | GatewayIntents.GuildMessageTyping |
+                                 GatewayIntents.Guilds | GatewayIntents.GuildVoiceStates | GatewayIntents.GuildWebhooks | GatewayIntents.MessageContent,
+                LogLevel = LogSeverity.Info
+            });
+            InteractionService interactions = new(client,
+                new InteractionServiceConfig()
+                    {
+                        DefaultRunMode = Discord.Interactions.RunMode.Async
+                    });
 
-            CommandService commands = new(new CommandServiceConfig() 
-                                          { 
-                                              DefaultRunMode = Discord.Commands.RunMode.Async 
-                                          });
+            CommandService commands = new(new CommandServiceConfig()
+            {
+                DefaultRunMode = Discord.Commands.RunMode.Async
+            });
             Logging logging = new();
             Config.Config config = new();
 

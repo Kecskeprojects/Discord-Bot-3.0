@@ -23,8 +23,8 @@ namespace Discord_Bot.Resources
         public Stopwatch Stopwatch { get; set; }
 
 
-        public AudioVariables() 
-        { 
+        public AudioVariables()
+        {
             AbruptDisconnect = false;
             Playing = false;
         }

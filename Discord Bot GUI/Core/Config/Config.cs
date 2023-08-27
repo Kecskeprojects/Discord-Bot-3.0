@@ -1,7 +1,7 @@
-﻿using System;
-using System.IO;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using System;
+using System.IO;
 
 namespace Discord_Bot.Core.Config
 {
@@ -63,35 +63,35 @@ namespace Discord_Bot.Core.Config
         }
 
         #region Config values
-        public string Token { get { return Configuration.GetSection("token").Get<string>(); } }
+        public string Token => Configuration.GetSection("token").Get<string>();
 
-        public string Img { get { return Configuration.GetSection("img").Get<string>(); } }
+        public string Img => Configuration.GetSection("img").Get<string>();
 
-        public int Bitrate { get { return Configuration.GetSection("bitrate").Get<int>(); } }
+        public int Bitrate => Configuration.GetSection("bitrate").Get<int>();
 
-        public string Twitch_Client_Id { get { return Configuration.GetSection("twitch_client_id").Get<string>(); } }
+        public string Twitch_Client_Id => Configuration.GetSection("twitch_client_id").Get<string>();
 
-        public string Spotify_Client_Id { get { return Configuration.GetSection("spotify_client_id").Get<string>(); } }
+        public string Spotify_Client_Id => Configuration.GetSection("spotify_client_id").Get<string>();
 
-        public string Spotify_Client_Secret { get { return Configuration.GetSection("spotify_client_secret").Get<string>(); } }
+        public string Spotify_Client_Secret => Configuration.GetSection("spotify_client_secret").Get<string>();
 
-        public string Lastfm_API_Key { get { return Configuration.GetSection("lastfm_api_key").Get<string>(); } }
+        public string Lastfm_API_Key => Configuration.GetSection("lastfm_api_key").Get<string>();
 
-        public string Lastfm_API_Secret { get { return Configuration.GetSection("lastfm_api_secret").Get<string>(); } }
+        public string Lastfm_API_Secret => Configuration.GetSection("lastfm_api_secret").Get<string>();
 
-        public string[] Youtube_API_Keys { get { return Configuration.GetSection("youtube_api_keys").Get<string[]>(); } }
+        public string[] Youtube_API_Keys => Configuration.GetSection("youtube_api_keys").Get<string[]>();
 
-        public string[] Youtube_Filter_Words { get { return Configuration.GetSection("youtube_filter_words").Get<string[]>(); } }
+        public string[] Youtube_Filter_Words => Configuration.GetSection("youtube_filter_words").Get<string[]>();
 
-        public bool Enable_Instagram_Embed { get { return Configuration.GetSection("enable_instagram_embed").Get<bool>(); } }
+        public bool Enable_Instagram_Embed => Configuration.GetSection("enable_instagram_embed").Get<bool>();
 
-        public string[] Instagram_Username { get { return Configuration.GetSection("instagram_username").Get<string[]>(); } }
+        public string[] Instagram_Username => Configuration.GetSection("instagram_username").Get<string[]>();
 
-        public string[] Instagram_Password { get { return Configuration.GetSection("instagram_password").Get<string[]>(); } }
+        public string[] Instagram_Password => Configuration.GetSection("instagram_password").Get<string[]>();
 
-        public bool Enable_Twitter_Embed { get { return Configuration.GetSection("enable_twitter_embed").Get<bool>(); } }
+        public bool Enable_Twitter_Embed => Configuration.GetSection("enable_twitter_embed").Get<bool>();
 
-        public string SqlConnectionString { get { return Configuration.GetSection("sql_connection_string").Get<string>(); } }
+        public string SqlConnectionString => Configuration.GetSection("sql_connection_string").Get<string>();
         #endregion
 
     }

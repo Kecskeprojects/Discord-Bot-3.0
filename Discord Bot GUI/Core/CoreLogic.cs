@@ -13,10 +13,8 @@ namespace Discord_Bot.Core
     public class CoreLogic : ProgramFunctions
     {
         private readonly Logging _logging;
-        public CoreLogic(Logging logging) : base(logging)
-        {
+        public CoreLogic(Logging logging) : base(logging) => 
             _logging = logging;
-        }
 
 
         #region Feature handle methods
@@ -103,7 +101,7 @@ namespace Discord_Bot.Core
                     {
                         await context.Channel.SendMessageAsync("I agree wholeheartedly!");
                     }
-                    else if (mess.StartsWith("i am") && mess != "i am" || mess.StartsWith("i'm") && mess != "i'm")
+                    else if ((mess.StartsWith("i am") && mess != "i am") || (mess.StartsWith("i'm") && mess != "i'm"))
                     {
                         await context.Channel.SendMessageAsync(string.Concat("Hey ", context.Message.Content.AsSpan(mess.StartsWith("i am") ? 5 : 4), ", I'm Kim Synthji!"));
                     }

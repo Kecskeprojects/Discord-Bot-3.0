@@ -20,16 +20,16 @@ namespace Discord_Bot.Core.Logger
 
     public class LogType
     {
-        private LogType(string value) { Value = value; }
+        private LogType(string value) => Value = value;
 
         public string Value { get; private set; }
 
-        public static LogType Log { get { return new LogType("LOG"); } }
-        public static LogType Query { get { return new LogType("QUERY"); } }
-        public static LogType Client { get { return new LogType("CLIENT"); } }
-        public static LogType Mes_User { get { return new LogType("MES_USER"); } }
-        public static LogType Mes_Other { get { return new LogType("MES_OTHER"); } }
-        public static LogType Error { get { return new LogType("ERROR"); } }
-        public static LogType Warning { get { return new LogType("WARNING"); } }
+        public static LogType Log => new("LOG");
+        public static LogType Query => new("QUERY");
+        public static LogType Client => new("CLIENT");
+        public static LogType Mes_User => new("MES_USER");
+        public static LogType Mes_Other => new("MES_OTHER");
+        public static LogType Error => new("ERROR");
+        public static LogType Warning => new("WARNING");
     }
 }
