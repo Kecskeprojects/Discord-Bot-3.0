@@ -40,13 +40,11 @@ namespace Discord_Bot.Core
         #endregion
 
         #region Global Functions
-        //Check if user has a nickname, and if message was sent in a server or not
+        //Check if user has a nickname
         public static string GetNickName(SocketCommandContext context)
         {
-            //Only check for nickname if user is not using DMs
             if (context.Channel.GetChannelType() != ChannelType.DM)
             {
-                //If user has a nickname, use that in the embed
                 return (context.User as Discord.WebSocket.SocketGuildUser).Nickname ?? context.User.Username;
             }
             else

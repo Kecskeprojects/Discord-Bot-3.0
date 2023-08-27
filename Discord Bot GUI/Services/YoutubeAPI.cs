@@ -1,20 +1,18 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Linq;
-using Discord.Commands;
+﻿using Discord_Bot.Core.Config;
+using Discord_Bot.Core.Logger;
+using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Resources;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
-using System.Collections.Generic;
 using Google.Apis.YouTube.v3.Data;
-using System.Web;
-using Discord_Bot.Core.Logger;
-using Discord_Bot.Core.Config;
-using Discord_Bot.Enums;
+using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
-using Discord_Bot.Core;
-using Discord_Bot.Interfaces.Services;
-using Discord_Bot.Interfaces.DBServices;
-using Discord_Bot.Resources;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web;
 
 namespace Discord_Bot.Services
 {
@@ -94,12 +92,12 @@ namespace Discord_Bot.Services
 
             logger.Query($"API key used: {current_key}");
 
-            if(Uri.IsWellFormedUriString(query, UriKind.Absolute))
+            if (Uri.IsWellFormedUriString(query, UriKind.Absolute))
             {
                 Uri uri = new(query);
-                if(uri.Segments.Length == 2)
+                if (uri.Segments.Length == 2)
                 {
-                    if(uri.Host.Contains("youtu.be"))
+                    if (uri.Host.Contains("youtu.be"))
                     {
                         return await VideoSearch(youtubeService, uri.Segments[1], username);
                     }
@@ -197,7 +195,7 @@ namespace Discord_Bot.Services
                 logger.Query("No videos/playlists found or it is unlisted/private!");
                 //Todo: Move to Command level
                 //await context.Channel.SendMessageAsync("No videos/playlists found or it is unlisted/private!");
-                return SearchResultEnum.NotFound; 
+                return SearchResultEnum.NotFound;
             }
 
             logger.Query("Youtube keyword query Complete!");
@@ -208,14 +206,14 @@ namespace Discord_Bot.Services
             {
                 return await PlaylistSearch(youtubeService, searchListResponse.Items[0].Id.PlaylistId, username);
             }
-            else if(searchListResponse.Items[0].Id.VideoId != null)
+            else if (searchListResponse.Items[0].Id.VideoId != null)
             {
                 return await VideoSearch(youtubeService, searchListResponse.Items[0].Id.VideoId, username);
             }
             return SearchResultEnum.NotFound;
         }
 
-        private IList<Google.Apis.YouTube.v3.Data.SearchResult> FilteredResults(IList<Google.Apis.YouTube.v3.Data.SearchResult> items, string query)
+        private IList<SearchResult> FilteredResults(IList<SearchResult> items, string query)
         {
             //Filter youtube channels
             items = items.Where(x => x.Id.Kind != "youtube#channel").ToList();
@@ -224,7 +222,7 @@ namespace Discord_Bot.Services
             string[] filterWords = config.Youtube_Filter_Words;
             if (!filterWords.Any(query.ToLower().Contains))
             {
-                var filteredList = items.Where(result => !filterWords.Any(result.Snippet.Title.ToLower().Contains)).ToList();
+                List<SearchResult> filteredList = items.Where(result => !filterWords.Any(result.Snippet.Title.ToLower().Contains)).ToList();
                 if (filteredList.Count > 0)
                 {
                     items = filteredList;
@@ -237,9 +235,9 @@ namespace Discord_Bot.Services
         //Searching by playlist ID
         private async Task<SearchResultEnum> PlaylistSearch(YouTubeService youtubeService, string query, string username)
         {
-            var current_key = config.Youtube_API_Keys[youtube_index];
+            string current_key = config.Youtube_API_Keys[youtube_index];
 
-            var searchListRequest = youtubeService.PlaylistItems.List("snippet,contentDetails");
+            PlaylistItemsResource.ListRequest searchListRequest = youtubeService.PlaylistItems.List("snippet,contentDetails");
 
             searchListRequest.PlaylistId = query;
             searchListRequest.MaxResults = 50;

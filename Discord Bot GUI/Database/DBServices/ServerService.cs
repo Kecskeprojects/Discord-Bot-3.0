@@ -42,6 +42,8 @@ namespace Discord_Bot.Database.DBServices
             }
         }
 
+        public Task AddToMusicRequest(MusicRequest musicRequest) => throw new NotImplementedException();
+
         public async Task<ServerResource> GetByDiscordIdAsync(ulong id)
         {
             ServerResource result = null;

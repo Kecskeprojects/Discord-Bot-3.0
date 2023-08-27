@@ -81,20 +81,17 @@ namespace Discord_Bot.Core
                 {
                     List<Uri> urls = new();
 
-                    //Going throught the whole message to find all the instagram links
-                    int startIndex = 0;
-                    while (startIndex != -1)
+                    //We check for each baseURL for each that was sent, one is expected
+                    foreach (string baseURL in baseURLs)
                     {
-                        //We check if there are any links left, one is expected if function gets this far
-                        foreach (string baseURL in baseURLs)
+                        int startIndex = 0;
+                        while (startIndex != -1)
                         {
                             startIndex = message.IndexOf(baseURL, startIndex);
                             if (startIndex != -1)
                             {
-                                //We cut off anything before the start of the link and replace embed supression characters
                                 string beginningCut = message[startIndex..];
 
-                                //And anything after the first space that ended the link
                                 string url = beginningCut.Split(new char[] { ' ', '\n' }, StringSplitOptions.RemoveEmptyEntries)[0];
                                 if (!ignoreEmbedSuppress && !url.Contains('<') && !url.Contains('>'))
                                 {

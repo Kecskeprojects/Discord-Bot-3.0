@@ -8,7 +8,9 @@ using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
+using Discord_Bot.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -24,13 +26,13 @@ namespace Discord_Bot
     public partial class App : Application
     {
         #region Variables
-        private IServiceProvider _services;
-        private Config _config;
-        private Logging _logging;
-        private static DiscordSocketClient _client;
-        private InteractionService _interactions;
-        private CommandService _commands;
-        private CoreLogic _coreLogic;
+        private IServiceProvider services;
+        private Config config;
+        private Logging logger;
+        private static DiscordSocketClient client;
+        private InteractionService interactions;
+        private CommandService commands;
+        private CoreLogic coreLogic;
         private IServerService serverService;
         private IGreetingService greetingService;
         #endregion
@@ -43,38 +45,38 @@ namespace Discord_Bot
             aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             aTimer.Start();
 
-            _services = ServiceBuilder.BuildService();
-            _config = _services.GetService<Config>();
-            _logging = _services.GetService<Logging>();
-            _client = _services.GetService<DiscordSocketClient>();
-            _interactions = _services.GetService<InteractionService>();
-            _commands = _services.GetService<CommandService>();
-            _coreLogic = _services.GetService<CoreLogic>();
-            serverService = _services.GetService<IServerService>();
-            greetingService = _services.GetService<IGreetingService>();
-            MainWindow mainWindow = _services.GetRequiredService<MainWindow>();
+            services = ServiceBuilder.BuildService();
+            config = services.GetService<Config>();
+            logger = services.GetService<Logging>();
+            client = services.GetService<DiscordSocketClient>();
+            interactions = services.GetService<InteractionService>();
+            commands = services.GetService<CommandService>();
+            coreLogic = services.GetService<CoreLogic>();
+            serverService = services.GetService<IServerService>();
+            greetingService = services.GetService<IGreetingService>();
+            MainWindow mainWindow = services.GetRequiredService<MainWindow>();
 
             mainWindow.Show();
 
-            _logging.Log("App started!");
+            logger.Log("App started!");
 
-            _coreLogic.Check_Folders();
+            coreLogic.Check_Folders();
 
             //Event handler for the closing of the app
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(_coreLogic.Closing);
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(coreLogic.Closing);
 
             await RunBotAsync();
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
-            _coreLogic.Closing();
+            coreLogic.Closing();
             base.OnExit(e);
         }
 
         protected override void OnSessionEnding(SessionEndingCancelEventArgs e)
         {
-            _coreLogic.Closing();
+            coreLogic.Closing();
             base.OnSessionEnding(e);
         }
 
@@ -83,40 +85,42 @@ namespace Discord_Bot
         {
             if (!Global.Connection()) return;
 
-            _client.Log += ClientLog;
+            client.Log += ClientLog;
 
             await RegisterCommandsAsync();
             await RegisterInteractionsAsync();
 
-            if (string.IsNullOrEmpty(_config.Token))
+            if (string.IsNullOrEmpty(config.Token))
             {
-                _logging.Error("App.xaml.cs RunBotAsync", "Bot cannot start without a valid token, fill out it's filled in the config!");
+                logger.Error("App.xaml.cs RunBotAsync", "Bot cannot start without a valid token, fill out it's filled in the config!");
                 return;
             }
 
-            await _client.LoginAsync(TokenType.Bot, _config.Token);
+            await client.LoginAsync(TokenType.Bot, config.Token);
 
-            await _client.StartAsync();
+            await client.StartAsync();
 
-            _client.Disconnected += OnWebsocketDisconnect;
-            _client.Ready += OnWebSocketReady;
+            client.Disconnected += OnWebsocketDisconnect;
+            client.Ready += OnWebSocketReady;
 
+            //Todo: Reimplement TwitchAPI
             /*new Thread(() =>
             {
-                TwitchAPI.Twitch(_client);
+                TwitchAPI.Twitch(client);
             }).Start();*/
 
+            //Todo:Reimplement instagram logic as much as possible
             //Instagram embed function
             //await InstagramAPI.Startup();
 
-            _logging.Log("Bot started!");
+            logger.Log("Bot started!");
         }
 
         //Repeated operations
         private static int minutes_count = 0;
         public async void OnTimedEvent(object source, ElapsedEventArgs e)
         {
-            if (_client.LoginState == LoginState.LoggedOut)
+            if (client.LoginState == LoginState.LoggedOut)
             {
                 await RunBotAsync();
             }
@@ -129,11 +133,15 @@ namespace Discord_Bot
             minutes_count++;
 
             //Youtube api key reset function
-            //if (DateTime.Now.Hour == 10 && DateTime.Now.Minute == 0) YoutubeAPI.KeyReset();
+            if (DateTime.UtcNow.Hour == 8 && DateTime.UtcNow.Minute == 0)
+            {
+                YoutubeAPI.KeyReset(config.Youtube_API_Keys);
+                logger.Log("Youtube keys reset!");
+            }
 
-            _coreLogic.LogToFile();
+            coreLogic.LogToFile();
 
-            await _coreLogic.ReminderCheck(_client);
+            await coreLogic.ReminderCheck(client);
         }
         #endregion
 
@@ -147,27 +155,27 @@ namespace Discord_Bot
                 {
                     case "Server requested a reconnect":
                         {
-                            _logging.Client($"{arg.Exception.Message}!");
+                            logger.Client($"{arg.Exception.Message}!");
                             break;
                         }
                     case "WebSocket connection was closed":
                     case "WebSocket session expired":
                     case "A task was canceled":
                         {
-                            _logging.Warning("App.xaml.cs ClientLog", $"{arg.Exception.Message}!", ConsoleOnly: true);
-                            _logging.Warning("App.xaml.cs ClientLog", arg.Exception.ToString(), LogOnly: true);
+                            logger.Warning("App.xaml.cs ClientLog", $"{arg.Exception.Message}!", ConsoleOnly: true);
+                            logger.Warning("App.xaml.cs ClientLog", arg.Exception.ToString(), LogOnly: true);
                             break;
                         }
                     default:
                         {
-                            _logging.Error("App.xaml.cs ClientLog", arg.Exception.ToString());
+                            logger.Error("App.xaml.cs ClientLog", arg.Exception.ToString());
                             break;
                         }
                 }
             }
             else
             {
-                _logging.Client(arg.ToString());
+                logger.Client(arg.ToString());
             }
             return Task.CompletedTask;
         }
@@ -176,14 +184,14 @@ namespace Discord_Bot
         #region Websocket events
         private Task OnWebSocketReady()
         {
-            _client.Rest.CurrentUser.UpdateAsync().Wait();
-            _logging.Log("Current user data updated!");
+            client.Rest.CurrentUser.UpdateAsync().Wait();
+            logger.Log("Current user data updated!");
             return Task.CompletedTask;
         }
 
         private Task OnWebsocketDisconnect(Exception arg)
         {
-            _logging.Log("Disconnect handled!");
+            logger.Log("Disconnect handled!");
             return Task.CompletedTask;
         }
         #endregion
@@ -192,14 +200,14 @@ namespace Discord_Bot
         //Watching Messages
         public async Task RegisterCommandsAsync()
         {
-            _client.MessageReceived += HandleCommandAsync;
-            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
+            client.MessageReceived += HandleCommandAsync;
+            await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
         }
 
         //Handling commands and special cases
         private async Task HandleCommandAsync(SocketMessage arg)
         {
-            //In case the message was a system message (eg. the message seen when someone a pin is made), a webhook's or a bot's message, the function stops
+            //In case the message was a system message (eg. the message seen when someone a pin is made), a webhook's or a bot's message, the function stops as it would cause an infinite loop
             if (arg.Source == MessageSource.System || arg.Source == MessageSource.Webhook || arg.Source == MessageSource.Bot)
             {
                 if (arg.Content.Length < 1)
@@ -208,18 +216,18 @@ namespace Discord_Bot
                 }
                 else if (arg.Channel.GetChannelType() == ChannelType.Text)
                 {
-                    _logging.Mes_Other(arg.Content, (arg.Channel as SocketGuildChannel).Guild.Name);
+                    logger.Mes_Other(arg.Content, (arg.Channel as SocketGuildChannel).Guild.Name);
                     return;
                 }
                 else
                 {
-                    _logging.Mes_Other(arg.Content);
+                    logger.Mes_Other(arg.Content);
                     return;
                 }
             }
 
             SocketUserMessage message = arg as SocketUserMessage;
-            SocketCommandContext context = new(_client, message);
+            SocketCommandContext context = new(client, message);
             int argPos = 0;
 
             //Check if the message is an embed or not
@@ -229,14 +237,14 @@ namespace Discord_Bot
             }
             else if (message.Channel.GetChannelType() == ChannelType.Text)
             {
-                _logging.Mes_User(message.Content, context.Guild.Name);
+                logger.Mes_User(message.Content, context.Guild.Name);
             }
             else
             {
-                _logging.Mes_User(message.Content);
+                logger.Mes_User(message.Content);
             }
 
-            //If message is not private message, and the server is not on the list, add it to the database and the list
+            //If message is not private message, and the server is not on our losts, add it to the database
             ServerResource server = null;
             if (message.Channel.GetChannelType() != ChannelType.DM)
             {
@@ -248,14 +256,14 @@ namespace Discord_Bot
 
                     if (server == null)
                     {
-                        _logging.Log($"{context.Guild.Name} could not be added to list!");
+                        logger.Log($"{context.Guild.Name} could not be added to list!");
                     }
                 }
             }
 
             if (message.HasCharPrefix('!', ref argPos))
             {
-                Discord.Commands.IResult result = await _commands.ExecuteAsync(context, argPos, _services);
+                Discord.Commands.IResult result = await commands.ExecuteAsync(context, argPos, services);
 
                 //In case there is no such hard coded command, check the list of custom commands
                 if (!result.IsSuccess)
@@ -264,26 +272,26 @@ namespace Discord_Bot
                     {
                         if (message.Channel.GetChannelType() == ChannelType.Text)
                         {
-                            await _coreLogic.CustomCommands(context);
+                            await coreLogic.CustomCommands(context);
                             return;
                         }
                     }
 
                     if (result.Error.Equals(CommandError.UnmetPrecondition)) await message.Channel.SendMessageAsync(result.ErrorReason);
 
-                    _logging.Warning("App.xaml.cs HandleCommandAsync", result.ErrorReason);
+                    logger.Warning("App.xaml.cs HandleCommandAsync", result.ErrorReason);
                 }
             }
             else if (Global.TwitterChecker && message.HasStringPrefix(".twt", ref argPos))
             {
-                _coreLogic.TwitterEmbed(context);
+                coreLogic.TwitterEmbed(context);
             }
             else if (message.Channel.GetChannelType() == ChannelType.Text && Global.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id))
             {
                 if (message.HasCharPrefix('+', ref argPos) || message.HasCharPrefix('-', ref argPos))
                 {
                     //self roles
-                    await _coreLogic.SelfRole(context);
+                    await coreLogic.SelfRole(context);
                 }
 
                 await context.Message.DeleteAsync();
@@ -291,7 +299,7 @@ namespace Discord_Bot
             else
             {
                 //Response to mention
-                if (message.Content.Contains(_client.CurrentUser.Mention) || message.Content.Contains(_client.CurrentUser.Mention.Remove(2, 1)))
+                if (message.Content.Contains(client.CurrentUser.Mention) || message.Content.Contains(client.CurrentUser.Mention.Remove(2, 1)))
                 {
                     List<GreetingResource> list = await greetingService.GetAllGreetingAsync();
                     if (list.Count > 0)
@@ -301,28 +309,29 @@ namespace Discord_Bot
                 }
 
                 //Responses to triggers
-                await _coreLogic.FeatureChecks(context);
+                await coreLogic.FeatureChecks(context);
 
+                //Todo:Reimplement instagram logic as much as possible
                 //Make embed independently from main thread
-                if (Global.InstagramChecker)
-                {
-                    _coreLogic.InstagramEmbed(context);
-                }
+                //if (Global.InstagramChecker)
+                //{
+                //    coreLogic.InstagramEmbed(context);
+                //}
             }
         }
 
         //Watching Interactions
         public async Task RegisterInteractionsAsync()
         {
-            _client.InteractionCreated += HandleInteractionAsync;
-            await _interactions.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
+            client.InteractionCreated += HandleInteractionAsync;
+            await interactions.AddModulesAsync(Assembly.GetEntryAssembly(), services);
         }
 
         //Handling Interactions
         private async Task HandleInteractionAsync(SocketInteraction arg)
         {
-            SocketInteractionContext context = new(_client, arg);
-            await _interactions.ExecuteCommandAsync(context, _services);
+            SocketInteractionContext context = new(client, arg);
+            await interactions.ExecuteCommandAsync(context, services);
         }
         #endregion Main methods
     }

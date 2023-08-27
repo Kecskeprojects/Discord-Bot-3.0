@@ -9,6 +9,8 @@ using Discord_Bot.Database.DBRepositories;
 using Discord_Bot.Database.DBServices;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -38,16 +40,17 @@ namespace Discord_Bot.Core
             {
                 DefaultRunMode = Discord.Commands.RunMode.Async
             });
-            Logging logging = new();
             Config.Config config = new();
 
             IServiceCollection collection = new ServiceCollection();
+
+            //Singletons
             collection.AddSingleton(client);
             collection.AddSingleton(interactions);
             collection.AddSingleton(commands);
             collection.AddSingleton(new Logging());
             collection.AddSingleton(config);
-            collection.AddSingleton(new CoreLogic(logging));
+            collection.AddSingleton(x => new CoreLogic(x.GetService<Logging>()));
             collection.AddSingleton(new Cache());
 
             collection.AddDbContext<MainDbContext>(options => options.UseSqlServer(config.SqlConnectionString));
@@ -56,6 +59,10 @@ namespace Discord_Bot.Core
 
             collection.AddTransient(typeof(MainWindow));
 
+            //API
+            collection.AddScoped<IYoutubeAPI, YoutubeAPI>();
+
+            //Database
             collection.AddScoped<IServerRepository, ServerRepository>();
             collection.AddScoped<IServerService, ServerService>();
             collection.AddScoped<IServerChannelViewRepository, ServerChannelViewRepository>();
