@@ -13,7 +13,7 @@ namespace Discord_Bot.Core
     public class CoreLogic : ProgramFunctions
     {
         private readonly Logging _logging;
-        public CoreLogic(Logging logging) : base(logging) => 
+        public CoreLogic(Logging logging) : base(logging) =>
             _logging = logging;
 
 

@@ -34,7 +34,7 @@ namespace Discord_Bot.Services
 
         #region Main functions
         //Main function starting the api request
-        public async Task<SearchResultEnum> Searching(string query, string username)
+        public async Task<SearchResultEnum> Searching(string query, string username, ulong serverId)
         {
             logger.Query("=======================================================================");
             logger.Query("YouTube Data API: Search");
@@ -44,7 +44,7 @@ namespace Discord_Bot.Services
             {
                 if (keys.Count != 0)
                 {
-                    result = await Run(query, username);
+                    result = await Run(query, username, serverId);
                 }
                 else
                 {
@@ -69,7 +69,7 @@ namespace Discord_Bot.Services
                     logger.Warning("YoutubeAPI.cs Searching", ex.ToString(), LogOnly: true);
                     logger.Log($"Key switched out to key in {youtube_index} position, value: {current_key}!");
 
-                    result = await Run(query, username);
+                    result = await Run(query, username, serverId);
                 }
                 else
                 {
@@ -80,7 +80,7 @@ namespace Discord_Bot.Services
         }
 
         //The function running the query
-        private async Task<SearchResultEnum> Run(string query, string username)
+        private async Task<SearchResultEnum> Run(string query, string username, ulong serverId)
         {
             string current_key = config.Youtube_API_Keys[youtube_index];
 
@@ -99,7 +99,7 @@ namespace Discord_Bot.Services
                 {
                     if (uri.Host.Contains("youtu.be"))
                     {
-                        return await VideoSearch(youtubeService, uri.Segments[1], username);
+                        return await VideoSearch(youtubeService, uri.Segments[1], username, serverId);
                     }
                     else if (uri.Segments[1] == "watch")
                     {
@@ -108,13 +108,13 @@ namespace Discord_Bot.Services
                         //Todo: Move to Command level somehow
                         //if (queryPart.AllKeys.Contains("list")) _ = AddPlaylist(context, youtubeService, queryPart["list"]);
 
-                        return await VideoSearch(youtubeService, queryPart["v"], username);
+                        return await VideoSearch(youtubeService, queryPart["v"], username, serverId);
                     }
                     else if (uri.Segments[1] == "playlist")
                     {
                         NameValueCollection queryPart = HttpUtility.ParseQueryString(uri.Query);
 
-                        return await PlaylistSearch(youtubeService, queryPart["list"], username);
+                        return await PlaylistSearch(youtubeService, queryPart["list"], username, serverId);
                     }
                     else
                     {
@@ -124,13 +124,13 @@ namespace Discord_Bot.Services
             }
 
             //In any other case, search the result as a keyword
-            return await KeywordSearch(youtubeService, query, username);
+            return await KeywordSearch(youtubeService, query, username, serverId);
         }
         #endregion
 
         #region Api calls
         //Searching by video ID
-        private async Task<SearchResultEnum> VideoSearch(YouTubeService youtubeService, string query, string username)
+        private async Task<SearchResultEnum> VideoSearch(YouTubeService youtubeService, string query, string username, ulong serverId)
         {
             string current_key = config.Youtube_API_Keys[youtube_index];
 
@@ -161,7 +161,7 @@ namespace Discord_Bot.Services
             Video video = searchListResponse.Items[0];
 
             string[] temp = { "https://www.youtube.com/watch?v=" + video.Id, video.Snippet.Title.Replace("&#39;", "'"), video.Snippet.Thumbnails.Default__.Url, video.ContentDetails.Duration };
-            await serverService.AddToMusicRequest(new MusicRequest(temp[0], temp[1], temp[2], temp[3], username));
+            await serverService.AddToMusicRequestAsync(new MusicRequest(temp[0], temp[1], temp[2], temp[3], username), serverId);
 
             logger.Query("Youtube video query Complete!");
             logger.Query($"{temp[0]}\n{temp[1]}");
@@ -170,7 +170,7 @@ namespace Discord_Bot.Services
         }
 
         //Searching by keywords
-        private async Task<SearchResultEnum> KeywordSearch(YouTubeService youtubeService, string query, string username)
+        private async Task<SearchResultEnum> KeywordSearch(YouTubeService youtubeService, string query, string username, ulong serverId)
         {
             string current_key = config.Youtube_API_Keys[youtube_index];
 
@@ -204,11 +204,11 @@ namespace Discord_Bot.Services
 
             if (searchListResponse.Items[0].Id.PlaylistId != null)
             {
-                return await PlaylistSearch(youtubeService, searchListResponse.Items[0].Id.PlaylistId, username);
+                return await PlaylistSearch(youtubeService, searchListResponse.Items[0].Id.PlaylistId, username, serverId);
             }
             else if (searchListResponse.Items[0].Id.VideoId != null)
             {
-                return await VideoSearch(youtubeService, searchListResponse.Items[0].Id.VideoId, username);
+                return await VideoSearch(youtubeService, searchListResponse.Items[0].Id.VideoId, username, serverId);
             }
             return SearchResultEnum.NotFound;
         }
@@ -233,7 +233,7 @@ namespace Discord_Bot.Services
         }
 
         //Searching by playlist ID
-        private async Task<SearchResultEnum> PlaylistSearch(YouTubeService youtubeService, string query, string username)
+        private async Task<SearchResultEnum> PlaylistSearch(YouTubeService youtubeService, string query, string username, ulong serverId)
         {
             string current_key = config.Youtube_API_Keys[youtube_index];
 
@@ -264,7 +264,7 @@ namespace Discord_Bot.Services
 
             foreach (PlaylistItem item in searchListResponse.Items)
             {
-                await VideoSearch(youtubeService, item.ContentDetails.VideoId, username);
+                await VideoSearch(youtubeService, item.ContentDetails.VideoId, username, serverId);
             }
 
             logger.Query("Youtube playlist query Complete!");

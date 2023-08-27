@@ -32,9 +32,9 @@ namespace Discord_Bot.Core
             });
             InteractionService interactions = new(client,
                 new InteractionServiceConfig()
-                    {
-                        DefaultRunMode = Discord.Interactions.RunMode.Async
-                    });
+                {
+                    DefaultRunMode = Discord.Interactions.RunMode.Async
+                });
 
             CommandService commands = new(new CommandServiceConfig()
             {

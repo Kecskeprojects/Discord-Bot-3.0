@@ -43,14 +43,9 @@ namespace Discord_Bot.Core
         //Check if user has a nickname
         public static string GetNickName(SocketCommandContext context)
         {
-            if (context.Channel.GetChannelType() != ChannelType.DM)
-            {
-                return (context.User as Discord.WebSocket.SocketGuildUser).Nickname ?? context.User.Username;
-            }
-            else
-            {
-                return context.User.Username;
-            }
+            return context.Channel.GetChannelType() != ChannelType.DM
+                ? (context.User as Discord.WebSocket.SocketGuildUser).Nickname ?? context.User.Username
+                : context.User.Username;
         }
 
         //Check if server has a type of channel, and if yes, is it on the list

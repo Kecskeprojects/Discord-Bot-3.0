@@ -9,7 +9,7 @@ namespace Discord_Bot.Core
     public class ProgramFunctions
     {
         private readonly Logging _logging;
-        public ProgramFunctions(Logging logging) => 
+        public ProgramFunctions(Logging logging) =>
             _logging = logging;
 
 
