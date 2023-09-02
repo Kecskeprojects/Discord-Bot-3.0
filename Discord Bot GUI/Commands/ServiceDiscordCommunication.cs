@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
@@ -14,7 +15,13 @@ namespace Discord_Bot.Commands
     public class ServiceDiscordCommunication : ModuleBase<SocketCommandContext>, IServiceDiscordCommunication
     {
         private readonly IServerService serverService;
-        public ServiceDiscordCommunication(IServerService serverService) => this.serverService = serverService;
+        private readonly DiscordSocketClient client;
+
+        public ServiceDiscordCommunication(IServerService serverService, DiscordSocketClient client)
+        {
+            this.serverService = serverService;
+            this.client = client;
+        }
 
         public async Task SendTwitchEmbed(TwitchChannelResource twitchChannel, string thumbnailUrl, string title)
         {
@@ -25,7 +32,7 @@ namespace Discord_Bot.Commands
             {
                 foreach (ulong channelId in server.SettingsChannels[ChannelTypeEnum.TwitchNotificationText])
                 {
-                    IMessageChannel channel = Context.Client.GetChannel(channelId) as IMessageChannel;
+                    IMessageChannel channel = client.GetChannel(channelId) as IMessageChannel;
 
                     string thumbnail = thumbnailUrl.Replace("{width}", "1024").Replace("{height}", "576");
 
@@ -47,8 +54,8 @@ namespace Discord_Bot.Commands
 
         public async Task<bool> YoutubeAddPlaylistMessage(ulong channelId)
         {
-            IMessageChannel channel = Context.Client.GetChannel(channelId) as IMessageChannel;
-            IUserMessage message = await channel.SendMessageAsync("You requested a song from a playlist!\n Do you want to me to add the playlist to the queue?"); //Todo: Was RestUserMessage, does it affect the logic?
+            IMessageChannel channel = client.GetChannel(channelId) as IMessageChannel;
+            IUserMessage message = await channel.SendMessageAsync("You requested a song from a playlist!\n Do you want to me to add the playlist to the queue?");
             await message.AddReactionAsync(new Emoji("\U00002705"));
 
             //Wait 15 seconds for user to react to message, and then delete it, also delete it if they react, but add playlist
@@ -57,13 +64,14 @@ namespace Discord_Bot.Commands
             {
                 IEnumerable<IUser> result = await message.GetReactionUsersAsync(new Emoji("\U00002705"), 5).FlattenAsync();
 
-                if (result.Count() > 1) return true;
+                if (result.Count() > 1) break;
 
                 await Task.Delay(1000);
                 timer++;
             }
             await message.DeleteAsync();
-            return false;
+
+            return timer <= 15;
         }
     }
 }

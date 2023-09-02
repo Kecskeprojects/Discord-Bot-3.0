@@ -75,6 +75,8 @@ namespace Discord_Bot
             });
             twitchThread.Start();
 
+            YoutubeAPI.KeyReset(config.Youtube_API_Keys);
+
             await RunBotAsync();
         }
 
@@ -230,27 +232,26 @@ namespace Discord_Bot
                 }
             }
 
-            SocketUserMessage message = arg as SocketUserMessage;
-            SocketCommandContext context = new(client, message);
+            SocketCommandContext context = new(client, arg as SocketUserMessage);
             int argPos = 0;
 
             //Check if the message is an embed or not
-            if (message.Content.Length < 1)
+            if (context.Message.Content.Length < 1)
             {
                 return;
             }
-            else if (message.Channel.GetChannelType() == ChannelType.Text)
+            else if (context.Message.Channel.GetChannelType() == ChannelType.Text)
             {
-                logger.Mes_User(message.Content, context.Guild.Name);
+                logger.Mes_User(context.Message.Content, context.Guild.Name);
             }
             else
             {
-                logger.Mes_User(message.Content);
+                logger.Mes_User(context.Message.Content);
             }
 
             //If message is not private message, and the server is not on our losts, add it to the database
             ServerResource server = null;
-            if (message.Channel.GetChannelType() != ChannelType.DM)
+            if (context.Channel.GetChannelType() != ChannelType.DM)
             {
                 server = await serverService.GetByDiscordIdAsync(context.Guild.Id);
                 if (server == null)
@@ -265,7 +266,7 @@ namespace Discord_Bot
                 }
             }
 
-            if (message.HasCharPrefix('!', ref argPos))
+            if (context.Message.HasCharPrefix('!', ref argPos))
             {
                 Discord.Commands.IResult result = await commands.ExecuteAsync(context, argPos, services);
 
@@ -274,25 +275,25 @@ namespace Discord_Bot
                 {
                     if (result.ErrorReason == "Unknown command.")
                     {
-                        if (message.Channel.GetChannelType() == ChannelType.Text)
+                        if (context.Channel.GetChannelType() == ChannelType.Text)
                         {
                             await coreLogic.CustomCommands(context);
                             return;
                         }
                     }
 
-                    if (result.Error.Equals(CommandError.UnmetPrecondition)) await message.Channel.SendMessageAsync(result.ErrorReason);
+                    if (result.Error.Equals(CommandError.UnmetPrecondition)) await context.Channel.SendMessageAsync(result.ErrorReason);
 
                     logger.Warning("App.xaml.cs HandleCommandAsync", result.ErrorReason);
                 }
             }
-            else if (Global.TwitterChecker && message.HasStringPrefix(".twt", ref argPos))
+            else if (Global.TwitterChecker && context.Message.HasStringPrefix(".twt", ref argPos))
             {
                 coreLogic.TwitterEmbed(context);
             }
-            else if (message.Channel.GetChannelType() == ChannelType.Text && Global.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id))
+            else if (context.Channel.GetChannelType() == ChannelType.Text && Global.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id))
             {
-                if (message.HasCharPrefix('+', ref argPos) || message.HasCharPrefix('-', ref argPos))
+                if (context.Message.HasCharPrefix('+', ref argPos) || context.Message.HasCharPrefix('-', ref argPos))
                 {
                     //self roles
                     await coreLogic.SelfRole(context);
@@ -303,12 +304,12 @@ namespace Discord_Bot
             else
             {
                 //Response to mention
-                if (message.Content.Contains(client.CurrentUser.Mention) || message.Content.Contains(client.CurrentUser.Mention.Remove(2, 1)))
+                if (context.Message.Content.Contains(client.CurrentUser.Mention) || context.Message.Content.Contains(client.CurrentUser.Mention.Remove(2, 1)))
                 {
                     List<GreetingResource> list = await greetingService.GetAllGreetingAsync();
                     if (list.Count > 0)
                     {
-                        await message.Channel.SendMessageAsync(list[new Random().Next(0, list.Count)].Url);
+                        await context.Channel.SendMessageAsync(list[new Random().Next(0, list.Count)].Url);
                     }
                 }
 
