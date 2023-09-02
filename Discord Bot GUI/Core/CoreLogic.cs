@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Core
 {
+    //Move Logic from here to Commands as another Communication file similar to the Service one
     public class CoreLogic : ICoreLogic
     {
         private readonly Logging _logging;

@@ -1,13 +1,8 @@
-﻿using Discord;
-using Discord.Commands;
+﻿using Discord.Commands;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Interfaces.Services;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands

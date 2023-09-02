@@ -210,6 +210,7 @@ namespace Discord_Bot
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
         }
 
+        //Todo: Break up HandleCommand into more smaller parts
         //Handling commands and special cases
         private async Task HandleCommandAsync(SocketMessage arg)
         {
