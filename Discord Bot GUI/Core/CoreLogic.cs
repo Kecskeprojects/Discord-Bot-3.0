@@ -3,7 +3,7 @@ using Discord.Commands;
 using Discord.Rest;
 using Discord.WebSocket;
 using Discord_Bot.Core.Logger;
-using Discord_Bot.Interfaces;
+using Discord_Bot.Interfaces.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,7 +24,7 @@ namespace Discord_Bot.Core
         {
             try
             {
-                //Todo: Reimplement
+                //Todo: Reimplement custom command
                 /*
                 var command = DBFunctions.CustomCommandGet(context.Guild.Id, context.Message.Content[1..].ToLower());
 
@@ -45,7 +45,7 @@ namespace Discord_Bot.Core
             try
             {
                 RestUserMessage reply = null;
-                //Todo: Reimplement
+                //Todo: Reimplement self role
                 /*
                 var role = DBFunctions.SelfRoleGet(context.Guild.Id, context.Message.Content[1..].ToLower());
 
@@ -113,7 +113,7 @@ namespace Discord_Bot.Core
 
                 if (context.Message.Content.Length <= 100 && context.Channel.GetChannelType() != ChannelType.DM)
                 {
-                    //Todo: Reimplement
+                    //Todo: Reimplement keyword
                     /*
                     var keyword = DBFunctions.KeywordGet(context.Guild.Id, context.Message.Content.Replace("\'" , "").Replace("\"", "").Replace("`", "").Replace(";", ""));
                     if (keyword != null)
@@ -133,7 +133,7 @@ namespace Discord_Bot.Core
         {
             try
             {
-                //Todo: Reimplement
+                //Todo: Reimplement reminder
                 //Get the list of reminders that are before or exactly set to this minute
                 //Also format date to sql compatible format
                 /*var result = DBFunctions.ReminderList(DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
@@ -203,7 +203,7 @@ namespace Discord_Bot.Core
                         {
                             _logging.Log($"Embed message from following link: {urls[i]}");
 
-                            //Todo: Reimplement
+                            //Todo: Reimplement instagram logic as much as possible
                             //A profile url looks like so https://www.instagram.com/[username]/ that creates 2 Segments, it is the easiest way to identify it
                             if (urls[i].Segments.Length == 2)
                             {
@@ -257,7 +257,7 @@ namespace Discord_Bot.Core
                         {
                             _logging.Log($"Embed message from following links: \n{string.Join("\n", urls)}");
 
-                            //Todo: Reimplement
+                            //Todo: Reimplement twitter scraper
                             MessageReference refer = new(context.Message.Id, context.Channel.Id, context.Guild.Id, false);
                             /*string message = await new TwitterScraper().Main(context.Channel, refer, urls);
 

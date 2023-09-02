@@ -69,7 +69,6 @@ namespace Discord_Bot
             //Event handler for the closing of the app
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(coreLogic.Closing);
 
-            //Todo: Reimplement TwitchAPI
             twitchThread = new Thread(() =>
             {
                 services.GetService<ITwitchAPI>().Start();
@@ -316,12 +315,11 @@ namespace Discord_Bot
                 //Responses to triggers
                 await coreLogic.FeatureChecks(context);
 
-                //Todo:Reimplement instagram logic as much as possible
                 //Make embed independently from main thread
-                //if (Global.InstagramChecker)
-                //{
-                //    coreLogic.InstagramEmbed(context);
-                //}
+                if (Global.InstagramChecker)
+                {
+                    coreLogic.InstagramEmbed(context);
+                }
             }
         }
 

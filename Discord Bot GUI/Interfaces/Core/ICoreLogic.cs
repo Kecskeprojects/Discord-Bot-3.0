@@ -3,7 +3,7 @@ using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Interfaces
+namespace Discord_Bot.Interfaces.Core
 {
     public interface ICoreLogic
     {

@@ -7,7 +7,7 @@ using Discord_Bot.Core.Logger;
 using Discord_Bot.Database;
 using Discord_Bot.Database.DBRepositories;
 using Discord_Bot.Database.DBServices;
-using Discord_Bot.Interfaces;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;

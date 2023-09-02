@@ -102,7 +102,7 @@ namespace Discord_Bot.Services
                     !channelStatuses[channel.TwitchId] &&
                     channel.TwitchId == e.Stream.UserId)
                 {
-                    //Todo: Move to command level
+                    //Todo: Move stream online embed to command level
                     /*
                     //Do not send a message if a channel was not set
                     if(server.Value.TNotifChannel != 0)

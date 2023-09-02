@@ -103,7 +103,7 @@ namespace Discord_Bot.Services
                     {
                         NameValueCollection queryPart = HttpUtility.ParseQueryString(uri.Query);
 
-                        //Todo: Move to Command level somehow
+                        //Todo: Move add playlist logic to Command level
                         //if (queryPart.AllKeys.Contains("list")) _ = AddPlaylist(context, youtubeService, queryPart["list"]);
 
                         return await VideoSearch(youtubeService, queryPart["v"], username, serverId);
@@ -151,7 +151,7 @@ namespace Discord_Bot.Services
             if (searchListResponse.Items == null || searchListResponse.Items.Count < 1)
             {
                 logger.Query("No videos found or it is unlisted/private!");
-                //Todo: Move to Command level
+                //Todo: Move message to Command level
                 //await context.Channel.SendMessageAsync("No videos found or it is unlisted/private!");
                 return SearchResultEnum.NotFound;
             }
@@ -196,7 +196,7 @@ namespace Discord_Bot.Services
             if (searchListResponse.Items == null || searchListResponse.Items.Count < 1)
             {
                 logger.Query("No videos/playlists found or it is unlisted/private!");
-                //Todo: Move to Command level
+                //Todo: Move message to Command level
                 //await context.Channel.SendMessageAsync("No videos/playlists found or it is unlisted/private!");
                 return SearchResultEnum.NotFound;
             }
@@ -260,7 +260,7 @@ namespace Discord_Bot.Services
             if (searchListResponse.Items == null || searchListResponse.Items.Count < 1)
             {
                 logger.Query("No playlist found or it is unlisted/private!");
-                //Todo: Move to Command level
+                //Todo: Move message to Command level
                 //await context.Channel.SendMessageAsync("No playlist found or it is unlisted/private!");
                 return SearchResultEnum.NotFound;
             }
@@ -271,13 +271,13 @@ namespace Discord_Bot.Services
             }
 
             logger.Query("Youtube playlist query Complete!");
-            //Todo: Move to Command level
+            //Todo: Move message to Command level
             //await context.Channel.SendMessageAsync("Playlist added!");
 
             return SearchResultEnum.FoundPlaylist;
         }
 
-        //Todo: Move to Command level somehow
+        //Todo: Move add playlist logic to Command level
         //Checking if user wants to add playlist
         /*private static async Task AddPlaylist(SocketCommandContext context, YouTubeService youtubeService, string playlist_id)
         {
