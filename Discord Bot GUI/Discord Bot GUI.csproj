@@ -55,7 +55,5 @@
 			<Generator>ResXFileCodeGenerator</Generator>
 			<LastGenOutput>Resource.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
-		<Folder Include="Commands\" />
-		<Folder Include="Interfaces\Commands\" />
 	</ItemGroup>
 </Project>

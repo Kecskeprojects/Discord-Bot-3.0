@@ -1,5 +1,6 @@
 ﻿using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
+using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
@@ -21,11 +22,13 @@ namespace Discord_Bot.Services
         private readonly Logging logger;
         private readonly Config config;
         private readonly ITwitchChannelService twitchChannelService;
-        public TwitchAPI(Logging logger, Config config, ITwitchChannelService twitchChannelService)
+        private readonly IServiceDiscordCommunication serviceDiscordCommunication;
+        public TwitchAPI(Logging logger, Config config, ITwitchChannelService twitchChannelService, IServiceDiscordCommunication serviceDiscordCommunication)
         {
             this.logger = logger;
             this.config = config;
             this.twitchChannelService = twitchChannelService;
+            this.serviceDiscordCommunication = serviceDiscordCommunication;
         }
 
         #region Global variables
@@ -102,29 +105,7 @@ namespace Discord_Bot.Services
                     !channelStatuses[channel.TwitchId] &&
                     channel.TwitchId == e.Stream.UserId)
                 {
-                    //Todo: Move stream online embed to command level
-                    /*
-                    //Do not send a message if a channel was not set
-                    if(server.Value.TNotifChannel != 0)
-                    {
-                        IMessageChannel channel = client.GetChannel(server.Value.TNotifChannel) as IMessageChannel;
-
-                        string thumbnail = e.Stream.ThumbnailUrl.Replace("{width}", "1024").Replace("{height}", "576");
-
-                        EmbedBuilder builder = new();
-                        builder.WithTitle("Stream is now online!");
-                        builder.AddField(e.Stream.Title != "" ? e.Stream.Title : "No Title", server.Value.TChannelLink, false);
-                        builder.WithImageUrl(thumbnail);
-                        builder.WithCurrentTimestamp();
-
-                        builder.WithColor(Color.Purple);
-
-                        //If there is no notification role set on the server, we just send a message without the role ping
-                        string notifRole = server.Value.TNotifChannel != 0 ? $"<@&{server.Value.TNotifRole}>" : "";
-
-                        await channel.SendMessageAsync(notifRole, false, builder.Build());
-                    }
-                    */
+                    await serviceDiscordCommunication.SendTwitchEmbed(channel, e.Stream.ThumbnailUrl, e.Stream.Title);
                     channelStatuses[channel.TwitchId] = true;
                 }
             }

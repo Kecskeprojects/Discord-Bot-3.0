@@ -2,6 +2,7 @@
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
 using Google.Apis.Services;
@@ -23,16 +24,18 @@ namespace Discord_Bot.Services
         private static int youtube_index = 0;
         private readonly Logging logger;
         private readonly Config config;
+        private readonly IServiceDiscordCommunication serviceDiscordCommunication;
 
-        public YoutubeAPI(Logging logger, Config config)
+        public YoutubeAPI(Logging logger, Config config, IServiceDiscordCommunication serviceDiscordCommunication)
         {
             this.logger = logger;
             this.config = config;
+            this.serviceDiscordCommunication = serviceDiscordCommunication;
         }
 
         #region Main functions
         //Main function starting the api request
-        public async Task<SearchResultEnum> Searching(string query, string username, ulong serverId)
+        public async Task<SearchResultEnum> Searching(string query, string username, ulong serverId, ulong channelId)
         {
             logger.Query("=======================================================================");
             logger.Query("YouTube Data API: Search");
@@ -42,7 +45,7 @@ namespace Discord_Bot.Services
             {
                 if (keys.Count != 0)
                 {
-                    result = await Run(query, username, serverId);
+                    result = await Run(query, username, serverId, channelId);
                 }
                 else
                 {
@@ -67,7 +70,7 @@ namespace Discord_Bot.Services
                     logger.Warning("YoutubeAPI.cs Searching", ex.ToString(), LogOnly: true);
                     logger.Log($"Key switched out to key in {youtube_index} position, value: {current_key}!");
 
-                    result = await Run(query, username, serverId);
+                    result = await Run(query, username, serverId, channelId);
                 }
                 else
                 {
@@ -78,7 +81,7 @@ namespace Discord_Bot.Services
         }
 
         //The function running the query
-        private async Task<SearchResultEnum> Run(string query, string username, ulong serverId)
+        private async Task<SearchResultEnum> Run(string query, string username, ulong serverId, ulong channelId)
         {
             string current_key = config.Youtube_API_Keys[youtube_index];
 
@@ -103,8 +106,10 @@ namespace Discord_Bot.Services
                     {
                         NameValueCollection queryPart = HttpUtility.ParseQueryString(uri.Query);
 
-                        //Todo: Move add playlist logic to Command level
-                        //if (queryPart.AllKeys.Contains("list")) _ = AddPlaylist(context, youtubeService, queryPart["list"]);
+                        if (queryPart.AllKeys.Contains("list"))
+                        {
+                            _ = AddPlaylistAsync(youtubeService, queryPart, username, serverId, channelId);
+                        }
 
                         return await VideoSearch(youtubeService, queryPart["v"], username, serverId);
                     }
@@ -277,28 +282,16 @@ namespace Discord_Bot.Services
             return SearchResultEnum.FoundPlaylist;
         }
 
-        //Todo: Move add playlist logic to Command level
-        //Checking if user wants to add playlist
-        /*private static async Task AddPlaylist(SocketCommandContext context, YouTubeService youtubeService, string playlist_id)
-        {
-            var message = await context.Channel.SendMessageAsync("You requested a song from a playlist!\n Do you want to me to add the playlist to the queue?");
-            await message.AddReactionAsync(new Emoji("\U00002705"));
 
-            //Wait 15 seconds for user to react to message, and then delete it, also delete it if they react, but add playlist
-            int timer = 0;
-            while (timer <= 15)
+        //Checking if user wants to add playlist
+        private async Task AddPlaylistAsync(YouTubeService youtubeService, NameValueCollection queryPart, string username, ulong serverId, ulong channelId)
+        {
+            bool result = await serviceDiscordCommunication.YoutubeAddPlaylistMessage(channelId);
+            if (result)
             {
-                var result = await message.GetReactionUsersAsync(new Emoji("\U00002705"), 5).FlattenAsync();
-                if (result.Count() > 1) 
-                {
-                    await PlaylistSearch(context, youtubeService, playlist_id);
-                    break; 
-                }
-                await Task.Delay(1000);
-                timer++;
+                await PlaylistSearch(youtubeService, queryPart["list"], username, serverId);
             }
-            await message.DeleteAsync();
-        }*/
+        }
         #endregion
 
 

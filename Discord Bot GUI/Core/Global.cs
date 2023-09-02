@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Discord.Commands;
+using Discord.WebSocket;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using System;
@@ -40,16 +40,20 @@ namespace Discord_Bot.Core
 
         #region Global Functions
         //Check if user has a nickname
-        public static string GetNickName(SocketCommandContext context)
+        public static string GetNickName(ISocketMessageChannel channel, SocketUser user)
         {
-            return context.Channel.GetChannelType() != ChannelType.DM
-                ? (context.User as Discord.WebSocket.SocketGuildUser).Nickname ?? context.User.Username
-                : context.User.Username;
+            return channel.GetChannelType() != ChannelType.DM ?
+                (user as SocketGuildUser).Nickname ?? user.Username :
+                user.Username;
         }
 
         //Check if server has a type of channel, and if yes, is it on the list
-        public static bool IsTypeOfChannel(ServerResource server, ChannelTypeEnum type, ulong channelId, bool allowLackOfType = false) =>
-            !server.SettingsChannels.ContainsKey(type) ? allowLackOfType : server.SettingsChannels[type].Contains(channelId);
+        public static bool IsTypeOfChannel(ServerResource server, ChannelTypeEnum type, ulong channelId, bool allowLackOfType = false)
+        {
+            return !server.SettingsChannels.ContainsKey(type) ?
+                        allowLackOfType :
+                        server.SettingsChannels[type].Contains(channelId);
+        }
 
         public static Stream GetStream(string url)
         {

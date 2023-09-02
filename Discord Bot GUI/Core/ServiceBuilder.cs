@@ -2,11 +2,13 @@
 using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Discord_Bot.Commands;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Database;
 using Discord_Bot.Database.DBRepositories;
 using Discord_Bot.Database.DBServices;
+using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
@@ -72,6 +74,9 @@ namespace Discord_Bot.Core
             collection.AddScoped<IGreetingService, GreetingService>();
             collection.AddScoped<ITwitchChannelService, TwitchChannelService>();
             collection.AddScoped<ITwitchChannelRepository, TwitchChannelRepository>();
+
+            //Commands
+            collection.AddScoped<IServiceDiscordCommunication, ServiceDiscordCommunication>();
 
             return collection.BuildServiceProvider();
         }
