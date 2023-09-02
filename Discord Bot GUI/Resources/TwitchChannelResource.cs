@@ -2,6 +2,7 @@
 {
     public class TwitchChannelResource
     {
+        public ulong ServerDiscordId { get; set; }
 
         public string TwitchId { get; set; }
 

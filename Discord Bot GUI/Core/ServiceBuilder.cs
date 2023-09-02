@@ -7,6 +7,7 @@ using Discord_Bot.Core.Logger;
 using Discord_Bot.Database;
 using Discord_Bot.Database.DBRepositories;
 using Discord_Bot.Database.DBServices;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
@@ -44,14 +45,14 @@ namespace Discord_Bot.Core
 
             IServiceCollection collection = new ServiceCollection();
 
-            //Singletons
+            //Core
             collection.AddSingleton(client);
             collection.AddSingleton(interactions);
             collection.AddSingleton(commands);
-            collection.AddSingleton(new Logging());
             collection.AddSingleton(config);
-            collection.AddSingleton(x => new CoreLogic(x.GetService<Logging>()));
+            collection.AddSingleton(new Logging());
             collection.AddSingleton(new Cache());
+            collection.AddScoped<ICoreLogic, CoreLogic>();
 
             collection.AddDbContext<MainDbContext>(options => options.UseSqlServer(config.SqlConnectionString));
 
@@ -61,6 +62,7 @@ namespace Discord_Bot.Core
 
             //API
             collection.AddScoped<IYoutubeAPI, YoutubeAPI>();
+            collection.AddScoped<ITwitchAPI, TwitchAPI>();
 
             //Database
             collection.AddScoped<IServerRepository, ServerRepository>();
@@ -68,6 +70,8 @@ namespace Discord_Bot.Core
             collection.AddScoped<IServerChannelViewRepository, ServerChannelViewRepository>();
             collection.AddScoped<IGreetingRepository, GreetingRepository>();
             collection.AddScoped<IGreetingService, GreetingService>();
+            collection.AddScoped<ITwitchChannelService, TwitchChannelService>();
+            collection.AddScoped<ITwitchChannelRepository, TwitchChannelRepository>();
 
             return collection.BuildServiceProvider();
         }

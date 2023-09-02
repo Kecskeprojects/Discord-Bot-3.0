@@ -42,20 +42,6 @@ namespace Discord_Bot.Database.DBServices
             }
         }
 
-        public async Task AddToMusicRequestAsync(MusicRequest musicRequest, ulong discordId)
-        {
-            try
-            {
-                ServerResource server = await GetByDiscordIdAsync(discordId);
-
-                cache.ServerCache[server.DiscordId].MusicRequests.Add(musicRequest);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("ServerService.cs AddToMusicRequestAsync", ex.ToString());
-            }
-        }
-
         public async Task<ServerResource> GetByDiscordIdAsync(ulong id)
         {
             ServerResource result = null;

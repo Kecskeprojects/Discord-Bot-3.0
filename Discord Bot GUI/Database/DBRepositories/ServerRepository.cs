@@ -20,7 +20,6 @@ namespace Discord_Bot.Database.DBRepositories
         public Task<Server> GetByDiscordIdAsync(ulong id)
         {
             return context.Servers
-                    .Include(x => x.TwitchChannels)
                     .FirstOrDefaultAsync(x => x.DiscordId == id.ToString());
         }
     }

@@ -3,18 +3,19 @@ using Discord.Commands;
 using Discord.Rest;
 using Discord.WebSocket;
 using Discord_Bot.Core.Logger;
+using Discord_Bot.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Core
 {
-    public class CoreLogic : ProgramFunctions
+    public class CoreLogic : ICoreLogic
     {
         private readonly Logging _logging;
-        public CoreLogic(Logging logging) : base(logging) =>
-            _logging = logging;
+        public CoreLogic(Logging logging) => _logging = logging;
 
 
         #region Feature handle methods
@@ -37,7 +38,6 @@ namespace Discord_Bot.Core
                 _logging.Error("ProgramFunctions.cs CustomCommands", ex.ToString());
             }
         }
-
 
         //Add/Remove roles from users, and keep the role chat clean
         public async Task SelfRole(SocketCommandContext context)
@@ -82,7 +82,6 @@ namespace Discord_Bot.Core
                 _logging.Error("ProgramFunctions.cs SelfRole", ex.ToString());
             }
         }
-
 
         //Check for messages starting with I think and certain Keywords
         public async Task FeatureChecks(SocketCommandContext context)
@@ -129,7 +128,6 @@ namespace Discord_Bot.Core
             }
         }
 
-
         //Checking and sending out reminders
         public async Task ReminderCheck(DiscordSocketClient Client)
         {
@@ -169,7 +167,6 @@ namespace Discord_Bot.Core
         }
         #endregion
 
-
         #region Before closing method
         //Things to do when app is closing
         //3 second time limit to event by default
@@ -185,7 +182,6 @@ namespace Discord_Bot.Core
             LogToFile();
         }
         #endregion
-
 
         #region Embed handlers
         //Check if message is an instagram link and has an embed or not
@@ -244,7 +240,6 @@ namespace Discord_Bot.Core
             }
         }
 
-
         public void TwitterEmbed(SocketCommandContext context)
         {
             List<Uri> urls = LinkSearch(context.Message.Content, true, new string[] { "https://twitter.com/", "https://x.com/" });
@@ -282,6 +277,111 @@ namespace Discord_Bot.Core
                     });
                 }
             }
+        }
+
+        //For logging messages, errors, and messages to log files
+        public void LogToFile()
+        {
+            StreamWriter LogFile_writer = null;
+            try
+            {
+                if (_logging.Logs.Count != 0 && LogFile_writer == null)
+                {
+                    string file_location = $"Logs\\logs[{Global.CurrentDate()}].txt";
+
+                    using (LogFile_writer = File.AppendText(file_location))
+                    {
+                        foreach (string log in _logging.Logs.Select(n => n.Content))
+                        {
+                            LogFile_writer.WriteLine(log);
+                        }
+                    }
+
+                    LogFile_writer = null;
+                    _logging.Logs.Clear();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logging.Error("ProgramFunctions.cs LogtoFile", ex.ToString());
+            }
+        }
+
+        //Check if folders for long term storage exist
+        public void Check_Folders()
+        {
+            List<string> logs = new();
+            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "\\Logs")))
+            {
+                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "\\Logs"));
+                logs.Add("Logs folder created!");
+            }
+
+            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "\\Assets")))
+            {
+                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "\\Assets"));
+                logs.Add("Assets folder created!");
+            }
+
+            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "\\Assets\\Commands")))
+            {
+                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "\\Assets\\Commands"));
+                logs.Add("Commands folder created!");
+            }
+
+            if (logs.Count != 0)
+            {
+                _logging.Log(string.Join('\n', logs));
+            }
+        }
+
+        private List<Uri> LinkSearch(string message, bool ignoreEmbedSuppress, params string[] baseURLs)
+        {
+            try
+            {
+                message = message.Replace("www.", "");
+
+                if (baseURLs.Any(x => message.Contains(x)))
+                {
+                    List<Uri> urls = new();
+
+                    //We check for each baseURL for each that was sent, one is expected
+                    foreach (string baseURL in baseURLs)
+                    {
+                        int startIndex = 0;
+                        while (startIndex != -1)
+                        {
+                            startIndex = message.IndexOf(baseURL, startIndex);
+                            if (startIndex != -1)
+                            {
+                                string beginningCut = message[startIndex..];
+
+                                string url = beginningCut.Split(new char[] { ' ', '\n' }, StringSplitOptions.RemoveEmptyEntries)[0];
+                                if (!ignoreEmbedSuppress && !url.Contains('<') && !url.Contains('>'))
+                                {
+                                    url = url.Split('?')[0];
+                                    urls.Add(new Uri(url));
+                                }
+                                else if (ignoreEmbedSuppress)
+                                {
+                                    url = url.Replace("<", "").Replace(">", "").Split('?')[0];
+                                    urls.Add(new Uri(url));
+                                }
+                                startIndex++;
+                            }
+                        }
+                    }
+
+                    return urls;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logging.Error("CoreLogic.cs LinkSearch", ex.ToString());
+            }
+
+            return null;
         }
         #endregion
     }

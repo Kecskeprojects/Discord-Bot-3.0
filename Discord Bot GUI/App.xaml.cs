@@ -6,13 +6,16 @@ using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
 using Discord_Bot.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -31,16 +34,18 @@ namespace Discord_Bot
         private static DiscordSocketClient client;
         private InteractionService interactions;
         private CommandService commands;
-        private CoreLogic coreLogic;
+        private ICoreLogic coreLogic;
         private IServerService serverService;
         private IGreetingService greetingService;
+        private MainWindow mainWindow;
+        private Thread twitchThread;
         #endregion
 
         #region Main methods
         //The main program, runs even if the bot crashes, and restarts it
         protected override async void OnStartup(StartupEventArgs e)
         {
-            Timer aTimer = new(60000) { AutoReset = true }; //1 minute
+            System.Timers.Timer aTimer = new(60000) { AutoReset = true }; //1 minute
             aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             aTimer.Start();
 
@@ -50,10 +55,10 @@ namespace Discord_Bot
             client = services.GetService<DiscordSocketClient>();
             interactions = services.GetService<InteractionService>();
             commands = services.GetService<CommandService>();
-            coreLogic = services.GetService<CoreLogic>();
+            coreLogic = services.GetService<ICoreLogic>();
             serverService = services.GetService<IServerService>();
             greetingService = services.GetService<IGreetingService>();
-            MainWindow mainWindow = services.GetRequiredService<MainWindow>();
+            mainWindow = services.GetRequiredService<MainWindow>();
 
             mainWindow.Show();
 
@@ -63,6 +68,13 @@ namespace Discord_Bot
 
             //Event handler for the closing of the app
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(coreLogic.Closing);
+
+            //Todo: Reimplement TwitchAPI
+            twitchThread = new Thread(() =>
+            {
+                services.GetService<ITwitchAPI>().Start();
+            });
+            twitchThread.Start();
 
             await RunBotAsync();
         }
@@ -101,12 +113,6 @@ namespace Discord_Bot
 
             client.Disconnected += OnWebsocketDisconnect;
             client.Ready += OnWebSocketReady;
-
-            //Todo: Reimplement TwitchAPI
-            /*new Thread(() =>
-            {
-                TwitchAPI.Twitch(client);
-            }).Start();*/
 
             //Todo:Reimplement instagram logic as much as possible
             //Instagram embed function

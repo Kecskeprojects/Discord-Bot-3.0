@@ -1,7 +1,7 @@
-﻿using Discord_Bot.Core.Config;
+﻿using Discord_Bot.Core;
+using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
 using Google.Apis.Services;
@@ -23,13 +23,11 @@ namespace Discord_Bot.Services
         private static int youtube_index = 0;
         private readonly Logging logger;
         private readonly Config config;
-        private readonly IServerService serverService;
 
-        public YoutubeAPI(Logging logger, Config config, IServerService serverService)
+        public YoutubeAPI(Logging logger, Config config)
         {
             this.logger = logger;
             this.config = config;
-            this.serverService = serverService;
         }
 
         #region Main functions
@@ -161,7 +159,12 @@ namespace Discord_Bot.Services
             Video video = searchListResponse.Items[0];
 
             string[] temp = { "https://www.youtube.com/watch?v=" + video.Id, video.Snippet.Title.Replace("&#39;", "'"), video.Snippet.Thumbnails.Default__.Url, video.ContentDetails.Duration };
-            await serverService.AddToMusicRequestAsync(new MusicRequest(temp[0], temp[1], temp[2], temp[3], username), serverId);
+
+            if (!Global.ServerAudioResources.ContainsKey(serverId))
+            {
+                Global.ServerAudioResources.Add(serverId, new(serverId));
+            }
+            Global.ServerAudioResources[serverId].MusicRequests.Add(new MusicRequest(temp[0], temp[1], temp[2], temp[3], username));
 
             logger.Query("Youtube video query Complete!");
             logger.Query($"{temp[0]}\n{temp[1]}");

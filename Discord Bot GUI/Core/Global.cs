@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.NetworkInformation;
@@ -13,11 +14,9 @@ namespace Discord_Bot.Core
     {
         #region Global variables
         public static bool InstagramChecker { get; set; }
-
         public static bool TwitterChecker { get; set; }
-
-        //Extendable easter egg message list
-        public static readonly string[] EasterEggMessages = new string[]
+        public static Dictionary<ulong, ServerAudioResource> ServerAudioResources { get; set; } = new();
+        public static string[] EasterEggMessages { get; } = new string[]
             {
                 "I know where you live",
                 "It is so dark in here",
