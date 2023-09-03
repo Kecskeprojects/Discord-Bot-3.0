@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Core
 {
-    //Todo: Move Logic from here to Commands as another Communication file similar to the Service one
     public class CoreLogic : ICoreLogic
     {
         private readonly Logging _logging;
@@ -168,7 +167,7 @@ namespace Discord_Bot.Core
         }
         #endregion
 
-        #region Before closing method
+        #region OnClose logic
         //Things to do when app is closing
         //3 second time limit to event by default
         public void Closing()
@@ -184,7 +183,7 @@ namespace Discord_Bot.Core
         }
         #endregion
 
-        #region Embed handlers
+        #region Embed Handlers
         //Check if message is an instagram link and has an embed or not
         public void InstagramEmbed(SocketCommandContext context)
         {
@@ -280,62 +279,6 @@ namespace Discord_Bot.Core
             }
         }
 
-        //For logging messages, errors, and messages to log files
-        public void LogToFile()
-        {
-            StreamWriter LogFile_writer = null;
-            try
-            {
-                if (_logging.Logs.Count != 0 && LogFile_writer == null)
-                {
-                    string file_location = $"Logs\\logs[{Global.CurrentDate()}].txt";
-
-                    using (LogFile_writer = File.AppendText(file_location))
-                    {
-                        foreach (string log in _logging.Logs.Select(n => n.Content))
-                        {
-                            LogFile_writer.WriteLine(log);
-                        }
-                    }
-
-                    LogFile_writer = null;
-                    _logging.Logs.Clear();
-                }
-            }
-            catch (Exception ex)
-            {
-                _logging.Error("ProgramFunctions.cs LogtoFile", ex.ToString());
-            }
-        }
-
-        //Check if folders for long term storage exist
-        public void Check_Folders()
-        {
-            List<string> logs = new();
-            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "\\Logs")))
-            {
-                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "\\Logs"));
-                logs.Add("Logs folder created!");
-            }
-
-            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "\\Assets")))
-            {
-                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "\\Assets"));
-                logs.Add("Assets folder created!");
-            }
-
-            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "\\Assets\\Commands")))
-            {
-                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "\\Assets\\Commands"));
-                logs.Add("Commands folder created!");
-            }
-
-            if (logs.Count != 0)
-            {
-                _logging.Log(string.Join('\n', logs));
-            }
-        }
-
         private List<Uri> LinkSearch(string message, bool ignoreEmbedSuppress, params string[] baseURLs)
         {
             try
@@ -383,6 +326,66 @@ namespace Discord_Bot.Core
             }
 
             return null;
+        }
+        #endregion
+
+        #region Helper Methods
+        //For logging messages, errors, and messages to log files
+        public void LogToFile()
+        {
+            StreamWriter LogFile_writer = null;
+            try
+            {
+                if (_logging.Logs.Count != 0 && LogFile_writer == null)
+                {
+                    string file_location = $"Logs\\logs[{Global.CurrentDate()}].txt";
+
+                    using (LogFile_writer = File.AppendText(file_location))
+                    {
+                        foreach (string log in _logging.Logs.Select(n => n.Content))
+                        {
+                            LogFile_writer.WriteLine(log);
+                        }
+                    }
+
+                    LogFile_writer = null;
+                    _logging.Logs.Clear();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logging.Error("ProgramFunctions.cs LogtoFile", ex.ToString());
+            }
+        }
+
+        //Check if folders for long term storage exist
+        public void Check_Folders()
+        {
+            List<string> logs = new();
+
+            string currentDir = Directory.GetCurrentDirectory();
+            if (!Directory.Exists(Path.Combine(currentDir, "Logs")))
+            {
+                Directory.CreateDirectory(Path.Combine(currentDir, "Logs"));
+                logs.Add("Logs folder created!");
+            }
+
+            if (!Directory.Exists(Path.Combine(currentDir, "Assets")))
+            {
+                Directory.CreateDirectory(Path.Combine(currentDir, "Assets"));
+                logs.Add("Assets folder created!");
+            }
+
+            if (!Directory.Exists(Path.Combine(currentDir, "Assets\\Commands")))
+            {
+                Directory.CreateDirectory(Path.Combine(currentDir, "Assets\\Commands"));
+                logs.Add("Commands folder created!");
+            }
+
+            if (logs.Count != 0)
+            {
+                _logging.Log(string.Join('\n', logs));
+            }
         }
         #endregion
     }

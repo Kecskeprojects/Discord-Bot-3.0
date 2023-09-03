@@ -10,6 +10,7 @@ namespace Discord_Bot
     public partial class MainWindow : Window
     {
         public static TextBlock MainStaticLog { get; private set; }
+        private bool AutoScroll = true;
 
         private readonly Logging _logging;
 
@@ -20,8 +21,6 @@ namespace Discord_Bot
             MainStaticLog = MainLogText;
         }
 
-
-        private bool AutoScroll = true;
         private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             // User scroll event : set or unset autoscroll mode

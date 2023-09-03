@@ -12,7 +12,7 @@ namespace Discord_Bot.Core.Logger
         public readonly List<Log> Logs = new();
 
 
-        #region Bot logging
+        #region Bot Logging
         public void Log(string message, bool ConsoleOnly = false, bool LogOnly = false)
         {
             Log log = BaseLog(LogType.Log);
@@ -71,7 +71,7 @@ namespace Discord_Bot.Core.Logger
         #endregion
 
 
-        #region Message logging
+        #region Message Logging
         public void Mes_User(string message, string server = "DM")
         {
             Log log = BaseLog(LogType.Mes_User);
@@ -94,7 +94,7 @@ namespace Discord_Bot.Core.Logger
         #endregion
 
 
-        #region Error logging
+        #region Error Logging
         public void Error(string location, string message, bool ConsoleOnly = false, bool LogOnly = false)
         {
             Log log = BaseLog(LogType.Error);
@@ -133,8 +133,7 @@ namespace Discord_Bot.Core.Logger
         }
         #endregion
 
-
-        #region Helper methods
+        #region Helper Methods
         private static void LogToWindow(Log log, Brush color)
         {
             if (Application.Current != null)
@@ -156,10 +155,8 @@ namespace Discord_Bot.Core.Logger
             }
         }
 
-
         private static Log BaseLog(LogType type) =>
             new(DateTime.Now, type, $"[{Global.CurrentTime()}][{type.Value}]:\t");
-
 
         private static string PutTabsOnNewLines(string message) =>
             message.Replace("\n", "\n\t\t\t");

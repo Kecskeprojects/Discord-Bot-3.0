@@ -54,13 +54,14 @@ namespace Discord_Bot.Core
             collection.AddSingleton(config);
             collection.AddSingleton(new Logging());
             collection.AddSingleton(new Cache());
-            collection.AddScoped<ICoreLogic, CoreLogic>();
 
             collection.AddDbContext<MainDbContext>(options => options.UseSqlServer(config.SqlConnectionString));
 
             collection.AddAutoMapper(x => x.AddProfile<MapperConfig>());
 
             collection.AddTransient(typeof(MainWindow));
+
+            collection.AddScoped<ICoreLogic, CoreLogic>();
 
             //API
             collection.AddScoped<IYoutubeAPI, YoutubeAPI>();

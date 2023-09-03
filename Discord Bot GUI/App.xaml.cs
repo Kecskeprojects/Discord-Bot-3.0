@@ -39,9 +39,10 @@ namespace Discord_Bot
         private IGreetingService greetingService;
         private MainWindow mainWindow;
         private Thread twitchThread;
+        private static int minutes_count = 0;
         #endregion
 
-        #region Main methods
+        #region Main Methods
         //The main program, runs even if the bot crashes, and restarts it
         protected override async void OnStartup(StartupEventArgs e)
         {
@@ -69,15 +70,22 @@ namespace Discord_Bot
             //Event handler for the closing of the app
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(coreLogic.Closing);
 
+            YoutubeAPI.KeyReset(config.Youtube_API_Keys);
+
             twitchThread = new Thread(() =>
             {
                 services.GetService<ITwitchAPI>().Start();
             });
             twitchThread.Start();
 
-            YoutubeAPI.KeyReset(config.Youtube_API_Keys);
+            //Todo:Reimplement instagram logic as much as possible
+            //Instagram embed function
+            //await InstagramAPI.Startup();
 
             await RunBotAsync();
+
+            client.Disconnected += OnWebsocketDisconnect;
+            client.Ready += OnWebSocketReady;
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -112,22 +120,15 @@ namespace Discord_Bot
 
             await client.StartAsync();
 
-            client.Disconnected += OnWebsocketDisconnect;
-            client.Ready += OnWebSocketReady;
-
-            //Todo:Reimplement instagram logic as much as possible
-            //Instagram embed function
-            //await InstagramAPI.Startup();
-
             logger.Log("Bot started!");
         }
 
         //Repeated operations
-        private static int minutes_count = 0;
         public async void OnTimedEvent(object source, ElapsedEventArgs e)
         {
             if (client.LoginState == LoginState.LoggedOut)
             {
+                logger.Log("Attempting to connect bot after disconnect.");
                 await RunBotAsync();
             }
 
@@ -151,7 +152,7 @@ namespace Discord_Bot
         }
         #endregion
 
-        #region Client logging
+        #region Client Logging
         //Client Messages
         private Task ClientLog(LogMessage arg)
         {
@@ -187,12 +188,11 @@ namespace Discord_Bot
         }
         #endregion
 
-        #region Websocket events
-        private Task OnWebSocketReady()
+        #region Discord Events
+        private async Task OnWebSocketReady()
         {
-            client.Rest.CurrentUser.UpdateAsync().Wait();
+            await client.Rest.CurrentUser.UpdateAsync();
             logger.Log("Current user data updated!");
-            return Task.CompletedTask;
         }
 
         private Task OnWebsocketDisconnect(Exception arg)
@@ -200,9 +200,7 @@ namespace Discord_Bot
             logger.Log("Disconnect handled!");
             return Task.CompletedTask;
         }
-        #endregion
 
-        #region Message handling
         //Watching Messages
         public async Task RegisterCommandsAsync()
         {
@@ -210,38 +208,37 @@ namespace Discord_Bot
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
         }
 
-        //Todo: Break up HandleCommand into more smaller parts
+        //Watching Interactions
+        public async Task RegisterInteractionsAsync()
+        {
+            client.InteractionCreated += HandleInteractionAsync;
+            await interactions.AddModulesAsync(Assembly.GetEntryAssembly(), services);
+        }
+
         //Handling commands and special cases
         private async Task HandleCommandAsync(SocketMessage arg)
         {
+            if (arg.Content.Length < 1) return;
+
             //In case the message was a system message (eg. the message seen when someone a pin is made), a webhook's or a bot's message, the function stops as it would cause an infinite loop
             if (arg.Source == MessageSource.System || arg.Source == MessageSource.Webhook || arg.Source == MessageSource.Bot)
             {
-                if (arg.Content.Length < 1)
-                {
-                    return;
-                }
-                else if (arg.Channel.GetChannelType() == ChannelType.Text)
+                if (arg.Channel.GetChannelType() != ChannelType.DM)
                 {
                     logger.Mes_Other(arg.Content, (arg.Channel as SocketGuildChannel).Guild.Name);
-                    return;
                 }
                 else
                 {
                     logger.Mes_Other(arg.Content);
-                    return;
                 }
+                return;
             }
 
             SocketCommandContext context = new(client, arg as SocketUserMessage);
             int argPos = 0;
 
             //Check if the message is an embed or not
-            if (context.Message.Content.Length < 1)
-            {
-                return;
-            }
-            else if (context.Message.Channel.GetChannelType() == ChannelType.Text)
+            if (context.Message.Channel.GetChannelType() != ChannelType.DM)
             {
                 logger.Mes_User(context.Message.Content, context.Guild.Name);
             }
@@ -250,7 +247,7 @@ namespace Discord_Bot
                 logger.Mes_User(context.Message.Content);
             }
 
-            //If message is not private message, and the server is not on our losts, add it to the database
+            //If message is not private message, and the server is not in our database, add it
             ServerResource server = null;
             if (context.Channel.GetChannelType() != ChannelType.DM)
             {
@@ -263,6 +260,7 @@ namespace Discord_Bot
                     if (server == null)
                     {
                         logger.Log($"{context.Guild.Name} could not be added to list!");
+                        return;
                     }
                 }
             }
@@ -276,23 +274,20 @@ namespace Discord_Bot
                 {
                     if (result.ErrorReason == "Unknown command.")
                     {
-                        if (context.Channel.GetChannelType() == ChannelType.Text)
+                        if (context.Channel.GetChannelType() != ChannelType.DM)
                         {
                             await coreLogic.CustomCommands(context);
                             return;
                         }
                     }
 
-                    if (result.Error.Equals(CommandError.UnmetPrecondition)) await context.Channel.SendMessageAsync(result.ErrorReason);
+                    if (result.Error.Equals(CommandError.UnmetPrecondition)) 
+                        await context.Channel.SendMessageAsync(result.ErrorReason);
 
                     logger.Warning("App.xaml.cs HandleCommandAsync", result.ErrorReason);
                 }
             }
-            else if (Global.TwitterChecker && context.Message.HasStringPrefix(".twt", ref argPos))
-            {
-                coreLogic.TwitterEmbed(context);
-            }
-            else if (context.Channel.GetChannelType() == ChannelType.Text && Global.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id))
+            else if (context.Channel.GetChannelType() != ChannelType.DM && Global.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id))
             {
                 if (context.Message.HasCharPrefix('+', ref argPos) || context.Message.HasCharPrefix('-', ref argPos))
                 {
@@ -301,6 +296,10 @@ namespace Discord_Bot
                 }
 
                 await context.Message.DeleteAsync();
+            }
+            else if (Global.TwitterChecker && context.Message.HasStringPrefix(".twt", ref argPos))
+            {
+                coreLogic.TwitterEmbed(context);
             }
             else
             {
@@ -314,7 +313,6 @@ namespace Discord_Bot
                     }
                 }
 
-                //Responses to triggers
                 await coreLogic.FeatureChecks(context);
 
                 //Make embed independently from main thread
@@ -325,19 +323,12 @@ namespace Discord_Bot
             }
         }
 
-        //Watching Interactions
-        public async Task RegisterInteractionsAsync()
-        {
-            client.InteractionCreated += HandleInteractionAsync;
-            await interactions.AddModulesAsync(Assembly.GetEntryAssembly(), services);
-        }
-
         //Handling Interactions
         private async Task HandleInteractionAsync(SocketInteraction arg)
         {
             SocketInteractionContext context = new(client, arg);
             await interactions.ExecuteCommandAsync(context, services);
         }
-        #endregion Main methods
+        #endregion
     }
 }

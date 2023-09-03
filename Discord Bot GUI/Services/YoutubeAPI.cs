@@ -20,11 +20,13 @@ namespace Discord_Bot.Services
 
     public class YoutubeAPI : IYoutubeAPI
     {
+        #region Variables
         private static readonly Dictionary<string, int> keys = new();
         private static int youtube_index = 0;
         private readonly Logging logger;
         private readonly Config config;
         private readonly IServiceDiscordCommunication serviceDiscordCommunication;
+        #endregion
 
         public YoutubeAPI(Logging logger, Config config, IServiceDiscordCommunication serviceDiscordCommunication)
         {
@@ -33,7 +35,7 @@ namespace Discord_Bot.Services
             this.serviceDiscordCommunication = serviceDiscordCommunication;
         }
 
-        #region Main functions
+        #region Base Methods
         //Main function starting the api request
         public async Task<SearchResultEnum> Searching(string query, string username, ulong serverId, ulong channelId)
         {
@@ -131,7 +133,7 @@ namespace Discord_Bot.Services
         }
         #endregion
 
-        #region Api calls
+        #region Helper Methods
         //Searching by video ID
         private async Task<SearchResultEnum> VideoSearch(YouTubeService youtubeService, string query, string username, ulong serverId)
         {
@@ -282,7 +284,6 @@ namespace Discord_Bot.Services
             return SearchResultEnum.FoundPlaylist;
         }
 
-
         //Checking if user wants to add playlist
         private async Task AddPlaylistAsync(YouTubeService youtubeService, NameValueCollection queryPart, string username, ulong serverId, ulong channelId)
         {
@@ -292,11 +293,7 @@ namespace Discord_Bot.Services
                 await PlaylistSearch(youtubeService, queryPart["list"], username, serverId);
             }
         }
-        #endregion
 
-
-
-        #region Key reset method
         //Resetting API key counters
         public static void KeyReset(string[] configKeys)
         {

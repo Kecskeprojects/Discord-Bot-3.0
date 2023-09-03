@@ -62,7 +62,7 @@ namespace Discord_Bot.Core.Config
              .Build();
         }
 
-        #region Config values
+        #region Config Values
         public string Token => Configuration.GetSection("token").Get<string>();
 
         public string Img => Configuration.GetSection("img").Get<string>();

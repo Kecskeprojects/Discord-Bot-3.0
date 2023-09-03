@@ -19,10 +19,20 @@ namespace Discord_Bot.Services
 {
     public class TwitchAPI : ITwitchAPI
     {
+        #region Variables
+        //Saved variables
+        private LiveStreamMonitorService Monitor;
+        private TwitchLib.Api.TwitchAPI API;
+        private static readonly Dictionary<string, bool> channelStatuses = new();
+        private static string Token;
+        private static int TokenTick = 0;
+
         private readonly Logging logger;
         private readonly Config config;
         private readonly ITwitchChannelService twitchChannelService;
         private readonly IServiceDiscordCommunication serviceDiscordCommunication;
+        #endregion
+
         public TwitchAPI(Logging logger, Config config, ITwitchChannelService twitchChannelService, IServiceDiscordCommunication serviceDiscordCommunication)
         {
             this.logger = logger;
@@ -31,16 +41,7 @@ namespace Discord_Bot.Services
             this.serviceDiscordCommunication = serviceDiscordCommunication;
         }
 
-        #region Global variables
-        //Saved variables
-        private LiveStreamMonitorService Monitor;
-        private TwitchLib.Api.TwitchAPI API;
-        private static readonly Dictionary<string, bool> channelStatuses = new();
-        private static string Token;
-        private static int TokenTick = 0;
-        #endregion
-
-        #region Startup functions
+        #region Base Methods
         //Running the Twitch api request and catching errors
         public async void Start()
         {
@@ -57,8 +58,6 @@ namespace Discord_Bot.Services
                 logger.Error("TwitchAPI.cs Twitch", ex.ToString());
             }
         }
-
-
 
         //The main function that keeps checking the stream state
         private async Task Check()
@@ -93,7 +92,7 @@ namespace Discord_Bot.Services
         }
         #endregion
 
-        #region Event handlers
+        #region Event Handlers
         //Make announcement when stream comes online
         private async void Monitor_OnStreamOnline(object sender, OnStreamOnlineArgs e)
         {
@@ -162,7 +161,7 @@ namespace Discord_Bot.Services
         private void Monitor_OnServiceStarted(object sender, OnServiceStartedArgs e) => logger.Log("Twitch monitoring started!");
         #endregion
 
-        #region Helper functions
+        #region Helper Methods
         //Responsible for generating the access tokens to Twitch's api requests
         private string Generate_Token()
         {
