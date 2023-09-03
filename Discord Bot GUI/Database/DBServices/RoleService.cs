@@ -13,8 +13,7 @@ namespace Discord_Bot.Database.DBServices
     public class RoleService : BaseService, IRoleService
     {
         private readonly IRoleRepository roleRepository;
-        public RoleService(IMapper mapper, Logging logger, Cache cache, IRoleRepository roleRepository) : base(mapper, logger, cache)
-            => this.roleRepository = roleRepository;
+        public RoleService(IMapper mapper, Logging logger, Cache cache, IRoleRepository roleRepository) : base(mapper, logger, cache) => this.roleRepository = roleRepository;
 
         public async Task<RoleResource> GetRoleAsync(ulong id, string roleName)
         {

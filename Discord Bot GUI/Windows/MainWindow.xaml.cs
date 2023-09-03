@@ -12,12 +12,12 @@ namespace Discord_Bot
         public static TextBlock MainStaticLog { get; private set; }
         private bool AutoScroll = true;
 
-        private readonly Logging _logging;
+        private readonly Logging logger;
 
-        public MainWindow(Logging logging)
+        public MainWindow(Logging logger)
         {
             InitializeComponent();
-            _logging = logging;
+            this.logger = logger;
             MainStaticLog = MainLogText;
         }
 
@@ -50,7 +50,6 @@ namespace Discord_Bot
             }
         }
 
-        private void WriteLog(object sender, RoutedEventArgs e) =>
-            _logging.Log("Logged action!\nNew Line");
+        private void WriteLog(object sender, RoutedEventArgs e) => logger.Log("Logged action!\nNew Line");
     }
 }

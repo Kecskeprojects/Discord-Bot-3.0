@@ -338,22 +338,23 @@ namespace Discord_Bot.Core
         //For logging messages, errors, and messages to log files
         public void LogToFile()
         {
-            StreamWriter LogFile_writer = null;
+            StreamWriter logFileWriter = null;
             try
             {
-                if (logger.Logs.Count != 0 && LogFile_writer == null)
+                if (logger.Logs.Count != 0 && logFileWriter == null)
                 {
                     string file_location = $"Logs\\logs[{Global.CurrentDate()}].txt";
 
-                    using (LogFile_writer = File.AppendText(file_location))
+                    using (logFileWriter = File.AppendText(file_location))
                     {
-                        foreach (string log in logger.Logs.Select(n => n.Content))
+                        string[] contents = logger.Logs.Select(n => n.Content).ToArray();
+                        foreach (string log in contents)
                         {
-                            LogFile_writer.WriteLine(log);
+                            logFileWriter.WriteLine(log);
                         }
                     }
 
-                    LogFile_writer = null;
+                    logFileWriter = null;
                     logger.Logs.Clear();
                 }
             }
@@ -364,7 +365,7 @@ namespace Discord_Bot.Core
         }
 
         //Check if folders for long term storage exist
-        public void Check_Folders()
+        public void CheckFolders()
         {
             List<string> logs = new();
 

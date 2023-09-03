@@ -16,6 +16,6 @@ namespace Discord_Bot.Interfaces.Core
         void InstagramEmbed(SocketCommandContext context);
         void TwitterEmbed(SocketCommandContext context);
         void LogToFile();
-        void Check_Folders();
+        void CheckFolders();
     }
 }

@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Core.Logger;
-using Discord_Bot.Database.DBRepositories;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
@@ -15,10 +14,7 @@ namespace Discord_Bot.Database.DBServices
     public class ReminderService : BaseService, IReminderService
     {
         private readonly IReminderRepository reminderRepository;
-        public ReminderService(IMapper mapper, Logging logger, Cache cache, IReminderRepository reminderRepository) : base(mapper, logger, cache)
-        {
-            this.reminderRepository = reminderRepository;
-        }
+        public ReminderService(IMapper mapper, Logging logger, Cache cache, IReminderRepository reminderRepository) : base(mapper, logger, cache) => this.reminderRepository = reminderRepository;
 
         public async Task<List<ReminderResource>> GetCurrentRemindersAsync(DateTime dateTime)
         {

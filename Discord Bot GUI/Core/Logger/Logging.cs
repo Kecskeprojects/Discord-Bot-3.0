@@ -72,7 +72,7 @@ namespace Discord_Bot.Core.Logger
 
 
         #region Message Logging
-        public void Mes_User(string message, string server = "DM")
+        public void MesUser(string message, string server = "DM")
         {
             Log log = BaseLog(LogType.Mes_User);
 
@@ -82,7 +82,7 @@ namespace Discord_Bot.Core.Logger
             Logs.Add(log);
         }
 
-        public void Mes_Other(string message, string server = "DM")
+        public void MesOther(string message, string server = "DM")
         {
             Log log = BaseLog(LogType.Mes_Other);
 
@@ -155,11 +155,9 @@ namespace Discord_Bot.Core.Logger
             }
         }
 
-        private static Log BaseLog(LogType type) =>
-            new(DateTime.Now, type, $"[{Global.CurrentTime()}][{type.Value}]:\t");
+        private static Log BaseLog(LogType type) => new(DateTime.Now, type, $"[{Global.CurrentTime()}][{type.Value}]:\t");
 
-        private static string PutTabsOnNewLines(string message) =>
-            message.Replace("\n", "\n\t\t\t");
+        private static string PutTabsOnNewLines(string message) => message.Replace("\n", "\n\t\t\t");
         #endregion
     }
 }

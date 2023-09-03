@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Core.Logger;
-using Discord_Bot.Database.DBRepositories;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
@@ -14,10 +13,7 @@ namespace Discord_Bot.Database.DBServices
     public class KeywordService : BaseService, IKeywordService
     {
         private readonly IKeywordRepository keywordRepository;
-        public KeywordService(IMapper mapper, Logging logger, Cache cache, IKeywordRepository keywordRepository) : base(mapper, logger, cache)
-        {
-            this.keywordRepository = keywordRepository;
-        }
+        public KeywordService(IMapper mapper, Logging logger, Cache cache, IKeywordRepository keywordRepository) : base(mapper, logger, cache) => this.keywordRepository = keywordRepository;
 
         public async Task<KeywordResource> GetKeywordAsync(ulong serverId, string trigger)
         {

@@ -49,7 +49,7 @@ namespace Discord_Bot.Services
             {
                 logger.Log("Twitch monitoring starting!");
 
-                Token = Generate_Token();
+                Token = GenerateToken();
 
                 await Check();
             }
@@ -77,12 +77,12 @@ namespace Discord_Bot.Services
 
             List<string> lst = await GetChannels();
 
-            Monitor.OnStreamOnline += Monitor_OnStreamOnline;
-            Monitor.OnStreamOffline += Monitor_OnStreamOffline;
-            Monitor.OnServiceTick += Monitor_OnServiceTick;
+            Monitor.OnStreamOnline += MonitorOnStreamOnline;
+            Monitor.OnStreamOffline += MonitorOnStreamOffline;
+            Monitor.OnServiceTick += MonitorOnServiceTick;
 
-            Monitor.OnServiceStarted += Monitor_OnServiceStarted;
-            Monitor.OnChannelsSet += Monitor_OnChannelsSet;
+            Monitor.OnServiceStarted += MonitorOnServiceStarted;
+            Monitor.OnChannelsSet += MonitorOnChannelsSet;
 
             Monitor.SetChannelsById(lst);
 
@@ -94,7 +94,7 @@ namespace Discord_Bot.Services
 
         #region Event Handlers
         //Make announcement when stream comes online
-        private async void Monitor_OnStreamOnline(object sender, OnStreamOnlineArgs e)
+        private async void MonitorOnStreamOnline(object sender, OnStreamOnlineArgs e)
         {
             logger.Query($"Streamer turned online: {e.Stream.UserName} with id: {e.Stream.Id}");
             List<TwitchChannelResource> channels = await twitchChannelService.GetChannelsAsync();
@@ -111,7 +111,7 @@ namespace Discord_Bot.Services
         }
 
         //Make console message when stream goes offline
-        private async void Monitor_OnStreamOffline(object sender, OnStreamOfflineArgs e)
+        private async void MonitorOnStreamOffline(object sender, OnStreamOfflineArgs e)
         {
             logger.Query($"Streamer turned offline: {e.Stream.UserName} with id: {e.Stream.Id}");
 
@@ -128,12 +128,12 @@ namespace Discord_Bot.Services
         }
 
         //Every 2 hours, send message on console, every 24 hours, refresh token and reset counter
-        private async void Monitor_OnServiceTick(object sender, OnServiceTickArgs e)
+        private async void MonitorOnServiceTick(object sender, OnServiceTickArgs e)
         {
             TokenTick++;
             if (TokenTick > 1440)
             {
-                Token = Generate_Token();
+                Token = GenerateToken();
                 TokenTick = 0;
             }
 
@@ -152,18 +152,18 @@ namespace Discord_Bot.Services
             }
         }
 
-        private void Monitor_OnChannelsSet(object sender, OnChannelsSetArgs e)
+        private void MonitorOnChannelsSet(object sender, OnChannelsSetArgs e)
         {
             string channels = string.Join(", ", e.Channels);
             logger.Query("Now listening to twitch channel ids: " + channels);
         }
 
-        private void Monitor_OnServiceStarted(object sender, OnServiceStartedArgs e) => logger.Log("Twitch monitoring started!");
+        private void MonitorOnServiceStarted(object sender, OnServiceStartedArgs e) => logger.Log("Twitch monitoring started!");
         #endregion
 
         #region Helper Methods
         //Responsible for generating the access tokens to Twitch's api requests
-        private string Generate_Token()
+        private string GenerateToken()
         {
             Process process = new()
             {

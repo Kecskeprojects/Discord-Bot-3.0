@@ -22,7 +22,7 @@ namespace Discord_Bot.Services
     {
         #region Variables
         private static readonly Dictionary<string, int> keys = new();
-        private static int youtube_index = 0;
+        private static int youtubeIndex = 0;
         private readonly Logging logger;
         private readonly Config config;
         private readonly IServiceDiscordCommunication serviceDiscordCommunication;
@@ -60,17 +60,17 @@ namespace Discord_Bot.Services
                 //switching api keys if quota is exceeded
                 if ((ex.ToString().Contains("quotaExceeded") || ex.ToString().Contains("you have exceeded your")) && keys.Count != 0)
                 {
-                    string current_key = config.Youtube_API_Keys[youtube_index];
+                    string currentKey = config.Youtube_API_Keys[youtubeIndex];
 
-                    keys.Remove(current_key);
+                    keys.Remove(currentKey);
 
                     Random r = new();
 
-                    youtube_index = r.Next(0, keys.Count);
-                    current_key = config.Youtube_API_Keys[youtube_index];
+                    youtubeIndex = r.Next(0, keys.Count);
+                    currentKey = config.Youtube_API_Keys[youtubeIndex];
 
                     logger.Warning("YoutubeAPI.cs Searching", ex.ToString(), LogOnly: true);
-                    logger.Log($"Key switched out to key in {youtube_index} position, value: {current_key}!");
+                    logger.Log($"Key switched out to key in {youtubeIndex} position, value: {currentKey}!");
 
                     result = await Run(query, username, serverId, channelId);
                 }
@@ -85,15 +85,15 @@ namespace Discord_Bot.Services
         //The function running the query
         private async Task<SearchResultEnum> Run(string query, string username, ulong serverId, ulong channelId)
         {
-            string current_key = config.Youtube_API_Keys[youtube_index];
+            string currentKey = config.Youtube_API_Keys[youtubeIndex];
 
             YouTubeService youtubeService = new(new BaseClientService.Initializer()
             {
-                ApiKey = current_key,
+                ApiKey = currentKey,
                 ApplicationName = GetType().ToString()
             });
 
-            logger.Query($"API key used: {current_key}");
+            logger.Query($"API key used: {currentKey}");
 
             if (Uri.IsWellFormedUriString(query, UriKind.Absolute))
             {
@@ -137,7 +137,7 @@ namespace Discord_Bot.Services
         //Searching by video ID
         private async Task<SearchResultEnum> VideoSearch(YouTubeService youtubeService, string query, string username, ulong serverId)
         {
-            string current_key = config.Youtube_API_Keys[youtube_index];
+            string currentKey = config.Youtube_API_Keys[youtubeIndex];
 
             VideosResource.ListRequest searchListRequest = youtubeService.Videos.List("snippet,contentDetails");
             searchListRequest.Id = query;
@@ -153,7 +153,7 @@ namespace Discord_Bot.Services
                 logger.Error("YoutubeAPI.cs VideoSearch", ex.ToString());
             }
 
-            keys[current_key] += 1;
+            keys[currentKey] += 1;
 
             if (searchListResponse.Items == null || searchListResponse.Items.Count < 1)
             {
@@ -182,7 +182,7 @@ namespace Discord_Bot.Services
         //Searching by keywords
         private async Task<SearchResultEnum> KeywordSearch(YouTubeService youtubeService, string query, string username, ulong serverId)
         {
-            string current_key = config.Youtube_API_Keys[youtube_index];
+            string currentKey = config.Youtube_API_Keys[youtubeIndex];
 
             SearchResource.ListRequest searchListRequest = youtubeService.Search.List("id,snippet");
             searchListRequest.Q = query;
@@ -198,7 +198,7 @@ namespace Discord_Bot.Services
                 logger.Error("YoutubeAPI.cs KeywordSearch", ex.ToString());
             }
 
-            keys[current_key] += 100;
+            keys[currentKey] += 100;
 
             if (searchListResponse.Items == null || searchListResponse.Items.Count < 1)
             {
@@ -223,29 +223,10 @@ namespace Discord_Bot.Services
             return SearchResultEnum.NotFound;
         }
 
-        private IList<SearchResult> FilteredResults(IList<SearchResult> items, string query)
-        {
-            //Filter youtube channels
-            items = items.Where(x => x.Id.Kind != "youtube#channel").ToList();
-
-            //Filter for trigger words
-            string[] filterWords = config.Youtube_Filter_Words;
-            if (!filterWords.Any(query.ToLower().Contains))
-            {
-                List<SearchResult> filteredList = items.Where(result => !filterWords.Any(result.Snippet.Title.ToLower().Contains)).ToList();
-                if (filteredList.Count > 0)
-                {
-                    items = filteredList;
-                }
-            }
-
-            return items;
-        }
-
         //Searching by playlist ID
         private async Task<SearchResultEnum> PlaylistSearch(YouTubeService youtubeService, string query, string username, ulong serverId)
         {
-            string current_key = config.Youtube_API_Keys[youtube_index];
+            string currentKey = config.Youtube_API_Keys[youtubeIndex];
 
             PlaylistItemsResource.ListRequest searchListRequest = youtubeService.PlaylistItems.List("snippet,contentDetails");
 
@@ -262,7 +243,7 @@ namespace Discord_Bot.Services
                 logger.Error("YoutubeAPI.cs PlaylistSearch", ex.ToString());
             }
 
-            keys[current_key] += 1;
+            keys[currentKey] += 1;
 
             if (searchListResponse.Items == null || searchListResponse.Items.Count < 1)
             {
@@ -284,6 +265,25 @@ namespace Discord_Bot.Services
             return SearchResultEnum.FoundPlaylist;
         }
 
+        private IList<SearchResult> FilteredResults(IList<SearchResult> items, string query)
+        {
+            //Filter youtube channels
+            items = items.Where(x => x.Id.Kind != "youtube#channel").ToList();
+
+            //Filter for trigger words
+            string[] filterWords = config.Youtube_Filter_Words;
+            if (!filterWords.Any(query.ToLower().Contains))
+            {
+                List<SearchResult> filteredList = items.Where(result => !filterWords.Any(result.Snippet.Title.ToLower().Contains)).ToList();
+                if (filteredList.Count > 0)
+                {
+                    items = filteredList;
+                }
+            }
+
+            return items;
+        }
+
         //Checking if user wants to add playlist
         private async Task AddPlaylistAsync(YouTubeService youtubeService, NameValueCollection queryPart, string username, ulong serverId, ulong channelId)
         {
@@ -300,7 +300,7 @@ namespace Discord_Bot.Services
             keys.Clear();
             foreach (string item in configKeys) keys.Add(item, 0);
 
-            youtube_index = new Random().Next(0, keys.Count);
+            youtubeIndex = new Random().Next(0, keys.Count);
         }
         #endregion
     }

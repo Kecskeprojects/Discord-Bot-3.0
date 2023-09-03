@@ -4,15 +4,7 @@ namespace Discord_Bot.Core.Caching
 {
     public class Cache
     {
-        private SizedDictionary<ulong, ServerResource> _ServerCache;
-        public SizedDictionary<ulong, ServerResource> ServerCache
-        {
-            get
-            {
-                _ServerCache ??= new(10);
-                return _ServerCache;
-            }
-        }
+        public SizedDictionary<ulong, ServerResource> ServerCache { get; } = new(10);
 
         public void RemoveCachedEntityManually(ulong key)
         {
@@ -22,7 +14,6 @@ namespace Discord_Bot.Core.Caching
             }
         }
 
-        public void ClearCachedEntityManually() =>
-            ServerCache.Clear();
+        public void ClearCachedEntityManually() => ServerCache.Clear();
     }
 }

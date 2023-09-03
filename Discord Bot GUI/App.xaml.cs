@@ -39,7 +39,7 @@ namespace Discord_Bot
         private IGreetingService greetingService;
         private MainWindow mainWindow;
         private Thread twitchThread;
-        private static int minutes_count = 0;
+        private static int minutesCount = 0;
         #endregion
 
         #region Main Methods
@@ -65,7 +65,7 @@ namespace Discord_Bot
 
             logger.Log("App started!");
 
-            coreLogic.Check_Folders();
+            coreLogic.CheckFolders();
 
             //Event handler for the closing of the app
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(coreLogic.Closing);
@@ -133,11 +133,11 @@ namespace Discord_Bot
             }
 
             //Logic to be done once a day
-            if (minutes_count == 1440)
+            if (minutesCount == 1440)
             {
-                minutes_count = 0;
+                minutesCount = 0;
             }
-            minutes_count++;
+            minutesCount++;
 
             //Youtube api key reset function
             if (DateTime.UtcNow.Hour == 8 && DateTime.UtcNow.Minute == 0)
@@ -225,11 +225,11 @@ namespace Discord_Bot
             {
                 if (arg.Channel.GetChannelType() != ChannelType.DM)
                 {
-                    logger.Mes_Other(arg.Content, (arg.Channel as SocketGuildChannel).Guild.Name);
+                    logger.MesOther(arg.Content, (arg.Channel as SocketGuildChannel).Guild.Name);
                 }
                 else
                 {
-                    logger.Mes_Other(arg.Content);
+                    logger.MesOther(arg.Content);
                 }
                 return;
             }
@@ -240,11 +240,11 @@ namespace Discord_Bot
             //Check if the message is an embed or not
             if (context.Message.Channel.GetChannelType() != ChannelType.DM)
             {
-                logger.Mes_User(context.Message.Content, context.Guild.Name);
+                logger.MesUser(context.Message.Content, context.Guild.Name);
             }
             else
             {
-                logger.Mes_User(context.Message.Content);
+                logger.MesUser(context.Message.Content);
             }
 
             //If message is not private message, and the server is not in our database, add it
