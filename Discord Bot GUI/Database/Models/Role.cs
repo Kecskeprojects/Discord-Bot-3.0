@@ -11,6 +11,8 @@ public partial class Role
 
     public string DiscordId { get; set; }
 
+    public string RoleName { get; set; }
+
     public virtual Server Server { get; set; }
 
     public virtual ICollection<TwitchChannel> TwitchChannels { get; set; } = new List<TwitchChannel>();

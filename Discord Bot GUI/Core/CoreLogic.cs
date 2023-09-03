@@ -4,6 +4,9 @@ using Discord.Rest;
 using Discord.WebSocket;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Interfaces.Core;
+using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Resources;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,72 +17,75 @@ namespace Discord_Bot.Core
 {
     public class CoreLogic : ICoreLogic
     {
-        private readonly Logging _logging;
-        public CoreLogic(Logging logging) => _logging = logging;
+        private readonly Logging logger;
+        private readonly ICustomCommandService customCommandService;
+        private readonly IRoleService roleService;
+
+        public CoreLogic(Logging logger, ICustomCommandService customCommandService, IRoleService roleService)
+        {
+            this.logger = logger;
+            this.customCommandService = customCommandService;
+            this.roleService = roleService;
+        }
 
 
         #region Feature handle methods
         //Check the list of custom commands on the server
-        public async Task CustomCommands(SocketCommandContext context)
+        public async Task CustomCommands(ulong serverId, string message, ISocketMessageChannel channel)
         {
             try
             {
-                //Todo: Reimplement custom command
-                /*
-                var command = DBFunctions.CustomCommandGet(context.Guild.Id, context.Message.Content[1..].ToLower());
-
-                if (command != null) 
+                CustomCommandResource command = await customCommandService.GetCustomCommandAsync(serverId, message[1..].ToLower());
+                if (command != null)
                 {
-                    await context.Message.Channel.SendMessageAsync(command.URL);
-                }*/
+                    await channel.SendMessageAsync(command.Url);
+                }
             }
             catch (Exception ex)
             {
-                _logging.Error("ProgramFunctions.cs CustomCommands", ex.ToString());
+                logger.Error("ProgramFunctions.cs CustomCommands", ex.ToString());
             }
         }
 
         //Add/Remove roles from users, and keep the role chat clean
-        public async Task SelfRole(SocketCommandContext context)
+        public async Task SelfRole(ulong serverId, string message, ISocketMessageChannel channel, SocketUser user)
         {
             try
             {
                 RestUserMessage reply = null;
-                //Todo: Reimplement self role
-                /*
-                var role = DBFunctions.SelfRoleGet(context.Guild.Id, context.Message.Content[1..].ToLower());
+                RoleResource role = await roleService.GetRoleAsync(serverId, message[1..].ToLower());
 
                 if (role != null)
                 {
-                    IRole get_role = (context.Channel as IGuildChannel).Guild.GetRole(role.RoleId);
+                    IRole discordRole = (channel as IGuildChannel).Guild.GetRole(role.DiscordId);
 
-                    switch (context.Message.Content[0])
+                    switch (message[0])
                     {
                         case '+':
                             {
-                                await (context.User as SocketGuildUser).AddRoleAsync(get_role);
-                                reply = await context.Channel.SendMessageAsync("You now have the `" + role.RoleName + "` role!");
+                                await (user as SocketGuildUser).AddRoleAsync(discordRole);
+                                reply = await channel.SendMessageAsync($"You now have the `{discordRole.Name}` role!");
                                 break;
                             }
                         case '-':
                             {
-                                await (context.User as SocketGuildUser).RemoveRoleAsync(get_role);
-                                reply = await context.Channel.SendMessageAsync("`" + role.RoleName+ "` role has been removed!");
+                                await (user as SocketGuildUser).RemoveRoleAsync(discordRole);
+                                reply = await channel.SendMessageAsync($"`{discordRole.Name}` role has been removed!");
                                 break;
                             }
                     }
                 }
-                */
+
                 if (reply != null)
                 {
-                    await Task.Delay(2000);
+                    await Task.Delay(1500);
 
                     await reply.DeleteAsync();
                 }
             }
             catch (Exception ex)
             {
-                _logging.Error("ProgramFunctions.cs SelfRole", ex.ToString());
+                logger.Error("ProgramFunctions.cs SelfRole", ex.ToString());
             }
         }
 
@@ -124,7 +130,7 @@ namespace Discord_Bot.Core
             }
             catch (Exception ex)
             {
-                _logging.Error("ProgramFunctions.cs FeatureCheck", ex.ToString());
+                logger.Error("ProgramFunctions.cs FeatureCheck", ex.ToString());
             }
         }
 
@@ -162,7 +168,7 @@ namespace Discord_Bot.Core
             }
             catch (Exception ex)
             {
-                _logging.Error("ProgramFunctions.cs Log ReminderCheck", ex.ToString());
+                logger.Error("ProgramFunctions.cs Log ReminderCheck", ex.ToString());
             }
         }
         #endregion
@@ -172,13 +178,13 @@ namespace Discord_Bot.Core
         //3 second time limit to event by default
         public void Closing()
         {
-            _logging.Log("Application closing...");
+            logger.Log("Application closing...");
             LogToFile();
         }
 
         public void Closing(object sender, EventArgs e)
         {
-            _logging.Log("Application closing...");
+            logger.Log("Application closing...");
             LogToFile();
         }
         #endregion
@@ -201,7 +207,7 @@ namespace Discord_Bot.Core
                         string message = "";
                         for (int i = 0; i < urls.Count; i++)
                         {
-                            _logging.Log($"Embed message from following link: {urls[i]}");
+                            logger.Log($"Embed message from following link: {urls[i]}");
 
                             //Todo: Reimplement instagram logic as much as possible
                             //A profile url looks like so https://www.instagram.com/[username]/ that creates 2 Segments, it is the easiest way to identify it
@@ -234,7 +240,7 @@ namespace Discord_Bot.Core
                     }
                     catch (Exception ex)
                     {
-                        _logging.Error("ProgramFunctions.cs InstagramEmbed", ex.ToString());
+                        logger.Error("ProgramFunctions.cs InstagramEmbed", ex.ToString());
                     }
                 });
             }
@@ -255,7 +261,7 @@ namespace Discord_Bot.Core
                     {
                         try
                         {
-                            _logging.Log($"Embed message from following links: \n{string.Join("\n", urls)}");
+                            logger.Log($"Embed message from following links: \n{string.Join("\n", urls)}");
 
                             //Todo: Reimplement twitter scraper
                             MessageReference refer = new(context.Message.Id, context.Channel.Id, context.Guild.Id, false);
@@ -272,7 +278,7 @@ namespace Discord_Bot.Core
                         }
                         catch (Exception ex)
                         {
-                            _logging.Error("ProgramFunctions.cs TwitterEmbed", ex.ToString());
+                            logger.Error("ProgramFunctions.cs TwitterEmbed", ex.ToString());
                         }
                     });
                 }
@@ -322,7 +328,7 @@ namespace Discord_Bot.Core
             }
             catch (Exception ex)
             {
-                _logging.Error("CoreLogic.cs LinkSearch", ex.ToString());
+                logger.Error("CoreLogic.cs LinkSearch", ex.ToString());
             }
 
             return null;
@@ -336,25 +342,25 @@ namespace Discord_Bot.Core
             StreamWriter LogFile_writer = null;
             try
             {
-                if (_logging.Logs.Count != 0 && LogFile_writer == null)
+                if (logger.Logs.Count != 0 && LogFile_writer == null)
                 {
                     string file_location = $"Logs\\logs[{Global.CurrentDate()}].txt";
 
                     using (LogFile_writer = File.AppendText(file_location))
                     {
-                        foreach (string log in _logging.Logs.Select(n => n.Content))
+                        foreach (string log in logger.Logs.Select(n => n.Content))
                         {
                             LogFile_writer.WriteLine(log);
                         }
                     }
 
                     LogFile_writer = null;
-                    _logging.Logs.Clear();
+                    logger.Logs.Clear();
                 }
             }
             catch (Exception ex)
             {
-                _logging.Error("ProgramFunctions.cs LogtoFile", ex.ToString());
+                logger.Error("ProgramFunctions.cs LogtoFile", ex.ToString());
             }
         }
 
@@ -384,7 +390,7 @@ namespace Discord_Bot.Core
 
             if (logs.Count != 0)
             {
-                _logging.Log(string.Join('\n', logs));
+                logger.Log(string.Join('\n', logs));
             }
         }
         #endregion

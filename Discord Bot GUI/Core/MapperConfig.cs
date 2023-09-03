@@ -22,6 +22,9 @@ namespace Discord_Bot.Core
             CreateMap<Greeting, GreetingResource>();
             CreateMap<TwitchChannel, TwitchChannelResource>()
                 .ForMember(dest => dest.ServerDiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.Server.DiscordId)));
+            CreateMap<CustomCommand, CustomCommandResource>();
+            CreateMap<Role, RoleResource>()
+                .ForMember(dest => dest.DiscordId, opt => opt.MapFrom(r => ulong.Parse(r.DiscordId)));
         }
     }
 }

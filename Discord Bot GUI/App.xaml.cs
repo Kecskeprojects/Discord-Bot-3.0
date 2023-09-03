@@ -276,7 +276,7 @@ namespace Discord_Bot
                     {
                         if (context.Channel.GetChannelType() != ChannelType.DM)
                         {
-                            await coreLogic.CustomCommands(context);
+                            await coreLogic.CustomCommands(context.Guild.Id, context.Message.Content, context.Channel);
                             return;
                         }
                     }
@@ -292,7 +292,7 @@ namespace Discord_Bot
                 if (context.Message.HasCharPrefix('+', ref argPos) || context.Message.HasCharPrefix('-', ref argPos))
                 {
                     //self roles
-                    await coreLogic.SelfRole(context);
+                    await coreLogic.SelfRole(context.Guild.Id, context.Message.Content, context.Channel, context.User);
                 }
 
                 await context.Message.DeleteAsync();

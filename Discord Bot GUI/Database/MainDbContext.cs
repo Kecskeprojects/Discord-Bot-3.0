@@ -224,6 +224,10 @@ public partial class MainDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
+            entity.Property(e => e.RoleName)
+                .IsRequired()
+                .HasMaxLength(50)
+                .IsUnicode(false);
 
             entity.HasOne(d => d.Server).WithMany(p => p.Roles)
                 .HasForeignKey(d => d.ServerId)

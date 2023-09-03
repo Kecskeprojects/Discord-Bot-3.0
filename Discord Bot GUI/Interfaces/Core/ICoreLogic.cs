@@ -7,8 +7,8 @@ namespace Discord_Bot.Interfaces.Core
 {
     public interface ICoreLogic
     {
-        Task CustomCommands(SocketCommandContext context);
-        Task SelfRole(SocketCommandContext context);
+        Task CustomCommands(ulong serverId, string message, ISocketMessageChannel channel);
+        Task SelfRole(ulong serverId, string message, ISocketMessageChannel channel, SocketUser user);
         Task FeatureChecks(SocketCommandContext context);
         Task ReminderCheck(DiscordSocketClient Client);
         void Closing();

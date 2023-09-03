@@ -75,6 +75,10 @@ namespace Discord_Bot.Core
             collection.AddScoped<IGreetingService, GreetingService>();
             collection.AddScoped<ITwitchChannelService, TwitchChannelService>();
             collection.AddScoped<ITwitchChannelRepository, TwitchChannelRepository>();
+            collection.AddScoped<ICustomCommandService, CustomCommandService>();
+            collection.AddScoped<ICustomCommandRepository, CustomCommandRepository>();
+            collection.AddScoped<IRoleService, RoleService>();
+            collection.AddScoped<IRoleRepository, RoleRepository>();
 
             //Commands
             collection.AddScoped<IServiceDiscordCommunication, ServiceDiscordCommunication>();
