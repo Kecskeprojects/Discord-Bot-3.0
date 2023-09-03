@@ -281,7 +281,7 @@ namespace Discord_Bot
                         }
                     }
 
-                    if (result.Error.Equals(CommandError.UnmetPrecondition)) 
+                    if (result.Error.Equals(CommandError.UnmetPrecondition))
                         await context.Channel.SendMessageAsync(result.ErrorReason);
 
                     logger.Warning("App.xaml.cs HandleCommandAsync", result.ErrorReason);
