@@ -313,7 +313,7 @@ namespace Discord_Bot
                     }
                 }
 
-                await coreLogic.FeatureChecks(context);
+                await coreLogic.FeatureChecks(context.Guild.Id, context.Message.Content, context.Channel);
 
                 //Make embed independently from main thread
                 if (Global.InstagramChecker)

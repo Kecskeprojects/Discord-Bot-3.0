@@ -21,8 +21,8 @@ namespace Discord_Bot.Database.DBServices
             RoleResource result = null;
             try
             {
-                Role command = await roleRepository.GetRoleAsync(id, roleName);
-                result = mapper.Map<Role, RoleResource>(command);
+                Role role = await roleRepository.GetRoleAsync(id, roleName);
+                result = mapper.Map<Role, RoleResource>(role);
             }
             catch (Exception ex)
             {

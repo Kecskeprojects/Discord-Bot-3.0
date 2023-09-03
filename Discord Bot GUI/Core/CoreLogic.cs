@@ -19,12 +19,16 @@ namespace Discord_Bot.Core
         private readonly Logging logger;
         private readonly ICustomCommandService customCommandService;
         private readonly IRoleService roleService;
+        private readonly IKeywordService keywordService;
+        private readonly IReminderService reminderService;
 
-        public CoreLogic(Logging logger, ICustomCommandService customCommandService, IRoleService roleService)
+        public CoreLogic(Logging logger, ICustomCommandService customCommandService, IRoleService roleService, IKeywordService keywordService, IReminderService reminderService)
         {
             this.logger = logger;
             this.customCommandService = customCommandService;
             this.roleService = roleService;
+            this.keywordService = keywordService;
+            this.reminderService = reminderService;
         }
 
 
@@ -42,7 +46,7 @@ namespace Discord_Bot.Core
             }
             catch (Exception ex)
             {
-                logger.Error("ProgramFunctions.cs CustomCommands", ex.ToString());
+                logger.Error("CoreLogic.cs CustomCommands", ex.ToString());
             }
         }
 
@@ -84,12 +88,12 @@ namespace Discord_Bot.Core
             }
             catch (Exception ex)
             {
-                logger.Error("ProgramFunctions.cs SelfRole", ex.ToString());
+                logger.Error("CoreLogic.cs SelfRole", ex.ToString());
             }
         }
 
         //Check for messages starting with I think and certain Keywords
-        public async Task FeatureChecks(SocketCommandContext context)
+        public async Task FeatureChecks(ulong serverId, string message, ISocketMessageChannel channel)
         {
             try
             {
@@ -98,76 +102,71 @@ namespace Discord_Bot.Core
                 //Easter egg messages
                 if (r.Next(0, 5000) == 0)
                 {
-                    await context.Channel.SendMessageAsync(Global.EasterEggMessages[r.Next(0, Global.EasterEggMessages.Length)]);
+                    await channel.SendMessageAsync(Global.EasterEggMessages[r.Next(0, Global.EasterEggMessages.Length)]);
                     return;
                 }
                 else if (r.Next(1, 101) < 10)
                 {
-                    string mess = context.Message.Content.ToLower();
+                    string mess = message.ToLower();
                     if (mess.StartsWith("i think"))
                     {
-                        await context.Channel.SendMessageAsync("I agree wholeheartedly!");
+                        await channel.SendMessageAsync("I agree wholeheartedly!");
                     }
                     else if ((mess.StartsWith("i am") && mess != "i am") || (mess.StartsWith("i'm") && mess != "i'm"))
                     {
-                        await context.Channel.SendMessageAsync(string.Concat("Hey ", context.Message.Content.AsSpan(mess.StartsWith("i am") ? 5 : 4), ", I'm Kim Synthji!"));
+                        await channel.SendMessageAsync(string.Concat("Hey ", message.AsSpan(mess.StartsWith("i am") ? 5 : 4), ", I'm Kim Synthji!"));
                     }
 
                     return;
                 }
 
-                if (context.Message.Content.Length <= 100 && context.Channel.GetChannelType() != ChannelType.DM)
+                if (message.Length <= 100 && channel.GetChannelType() != ChannelType.DM)
                 {
-                    //Todo: Reimplement keyword
-                    /*
-                    var keyword = DBFunctions.KeywordGet(context.Guild.Id, context.Message.Content.Replace("\'" , "").Replace("\"", "").Replace("`", "").Replace(";", ""));
+                    KeywordResource keyword = await keywordService.GetKeywordAsync(serverId, message.Replace("\'", "").Replace("\"", "").Replace("`", "").Replace(";", ""));
                     if (keyword != null)
                     {
-                        await context.Channel.SendMessageAsync(keyword.Response);
-                    }*/
+                        await channel.SendMessageAsync(keyword.Response);
+                    }
                 }
             }
             catch (Exception ex)
             {
-                logger.Error("ProgramFunctions.cs FeatureCheck", ex.ToString());
+                logger.Error("CoreLogic.cs FeatureCheck", ex.ToString());
             }
         }
 
         //Checking and sending out reminders
-        public async Task ReminderCheck(DiscordSocketClient Client)
+        public async Task ReminderCheck(DiscordSocketClient client)
         {
             try
             {
-                //Todo: Reimplement reminder
                 //Get the list of reminders that are before or exactly set to this minute
-                //Also format date to sql compatible format
-                /*var result = DBFunctions.ReminderList(DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
-
+                DateTime dateTime = DateTime.Parse(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm"));
+                List<ReminderResource> result = await reminderService.GetCurrentRemindersAsync(dateTime);
                 if (result.Count > 0)
                 {
-                    foreach (var reminder in result)
+                    foreach (ReminderResource reminder in result)
                     {
                         //Modify message
                         reminder.Message = reminder.Message.Insert(0, $"You told me to remind you at `{reminder.Date}` with the following message:\n\n");
 
                         //Try getting user
-                        var user = await Client.GetUserAsync(reminder.UserId);
+                        IUser user = await client.GetUserAsync(reminder.UserDiscordId);
 
                         //If user exists send a direct message to the user
                         if (user != null)
                         {
                             await UserExtensions.SendMessageAsync(user, reminder.Message);
                         }
-
-                        //Delete the user regardless of the outcome, unless an error occurs of course, keep it in that case
-                        //Also format date to sql compatible format
-                        DBFunctions.ReminderRemove(reminder.UserId, reminder.Date.ToString("yyyy-MM-dd HH:mm"));
                     }
-                }*/
+
+                    List<int> reminderIds = result.Select(r => r.ReminderId).ToList();
+                    await reminderService.RemoveCurrentRemindersAsync(reminderIds);
+                }
             }
             catch (Exception ex)
             {
-                logger.Error("ProgramFunctions.cs Log ReminderCheck", ex.ToString());
+                logger.Error("CoreLogic.cs Log ReminderCheck", ex.ToString());
             }
         }
         #endregion
@@ -239,7 +238,7 @@ namespace Discord_Bot.Core
                     }
                     catch (Exception ex)
                     {
-                        logger.Error("ProgramFunctions.cs InstagramEmbed", ex.ToString());
+                        logger.Error("CoreLogic.cs InstagramEmbed", ex.ToString());
                     }
                 });
             }
@@ -264,7 +263,8 @@ namespace Discord_Bot.Core
 
                             //Todo: Reimplement twitter scraper
                             MessageReference refer = new(context.Message.Id, context.Channel.Id, context.Guild.Id, false);
-                            /*string message = await new TwitterScraper().Main(context.Channel, refer, urls);
+                            /*string message = await new TwitterScraper().Main(context.Channel, refer, urls);*/
+                            string message = "";
 
                             if (!string.IsNullOrEmpty(message))
                             {
@@ -273,11 +273,11 @@ namespace Discord_Bot.Core
                             else
                             {
                                 await context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
-                            }*/
+                            }
                         }
                         catch (Exception ex)
                         {
-                            logger.Error("ProgramFunctions.cs TwitterEmbed", ex.ToString());
+                            logger.Error("CoreLogic.cs TwitterEmbed", ex.ToString());
                         }
                     });
                 }
@@ -359,7 +359,7 @@ namespace Discord_Bot.Core
             }
             catch (Exception ex)
             {
-                logger.Error("ProgramFunctions.cs LogtoFile", ex.ToString());
+                logger.Error("CoreLogic.cs LogtoFile", ex.ToString());
             }
         }
 

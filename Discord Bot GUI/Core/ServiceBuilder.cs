@@ -79,6 +79,10 @@ namespace Discord_Bot.Core
             collection.AddScoped<ICustomCommandRepository, CustomCommandRepository>();
             collection.AddScoped<IRoleService, RoleService>();
             collection.AddScoped<IRoleRepository, RoleRepository>();
+            collection.AddScoped<IKeywordService, KeywordService>();
+            collection.AddScoped<IKeywordRepository, KeywordRepository>();
+            collection.AddScoped<IReminderService, ReminderService>();
+            collection.AddScoped<IReminderRepository, ReminderRepository>();
 
             //Commands
             collection.AddScoped<IServiceDiscordCommunication, ServiceDiscordCommunication>();
