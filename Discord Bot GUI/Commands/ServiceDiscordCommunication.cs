@@ -18,13 +18,11 @@ namespace Discord_Bot.Commands
     {
         private readonly IServerService serverService;
         private readonly DiscordSocketClient client;
-        private readonly Logging logger;
 
-        public ServiceDiscordCommunication(IServerService serverService, DiscordSocketClient client, Logging logger)
+        public ServiceDiscordCommunication(IServerService serverService, DiscordSocketClient client)
         {
             this.serverService = serverService;
             this.client = client;
-            this.logger = logger;
         }
 
         public async Task SendTwitchEmbed(TwitchChannelResource twitchChannel, string thumbnailUrl, string title)

@@ -64,7 +64,8 @@ namespace Discord_Bot.Core
 
             //API
             collection.AddSingleton<ITwitchAPI, TwitchAPI>();
-            collection.AddScoped<IYoutubeAPI, YoutubeAPI>();
+            collection.AddSingleton<ISpotifyAPI, Services.SpotifyAPI>();
+            collection.AddSingleton<IYoutubeAPI, YoutubeAPI>();
 
             //Database
             collection.AddScoped<IServerRepository, ServerRepository>();

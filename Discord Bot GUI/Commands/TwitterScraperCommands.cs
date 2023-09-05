@@ -43,42 +43,41 @@ namespace Discord_Bot.Commands
                             await ReplyAsync(result.ErrorMessage);
                         }
 
-                        try
+                        List<FileAttachment> attachments = TwitterScraperService.AllContentInRegularMessage(result.Videos, result.Images);
+                        if (attachments.Count > 0)
                         {
-                            List<FileAttachment> attachments = TwitterScraperService.AllContentInRegularMessage(result.Videos, result.Images);
-                            if (attachments.Count > 0)
+                            try
                             {
                                 await Context.Channel.SendFilesAsync(attachments, messageReference: refer);
-                                await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
-                                return;
+                            }
+                            catch (HttpException ex)
+                            {
+                                if (ex.Message.Contains("40005"))
+                                {
+                                    logger.Warning("ServiceDiscordCommunication.cs SendTwitterMessage", "Embed too large, only sending images!", LogOnly: true);
+                                    logger.Warning("ServiceDiscordCommunication.cs SendTwitterMessage", ex.ToString(), LogOnly: true);
+
+                                    attachments = TwitterScraperService.AllContentInRegularMessage(result.Videos, result.Images, false);
+                                    if (attachments.Count > 0)
+                                    {
+                                        await Context.Channel.SendFilesAsync(attachments, messageReference: refer);
+                                        await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
+                                    }
+                                    else
+                                    {
+                                        await ReplyAsync("Post content too large to send!");
+                                    }
+
+                                    return;
+                                }
                             }
 
-                            await ReplyAsync("No image/videos in tweet.");
+                            await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
                             return;
                         }
-                        catch (HttpException ex)
-                        {
-                            if (ex.Message.Contains("40005"))
-                            {
-                                logger.Warning("ServiceDiscordCommunication.cs SendTwitterMessage", "Embed too large, only sending images!", LogOnly: true);
-                                logger.Warning("ServiceDiscordCommunication.cs SendTwitterMessage", ex.ToString(), LogOnly: true);
 
-                                List<FileAttachment> attachments = TwitterScraperService.AllContentInRegularMessage(result.Videos, result.Images, false);
-                                if (attachments.Count > 0)
-                                {
-                                    await Context.Channel.SendFilesAsync(attachments, messageReference: refer);
-                                    await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
-                                }
-                                else
-                                {
-                                    await ReplyAsync("Post content too large to send!");
-                                }
-
-                                return;
-                            }
-                        }
-
-                        await ReplyAsync("Unexpected error occured!");
+                        await ReplyAsync("No image/videos in tweet.");
+                        return;
                     }
                 }
             }
