@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 
-namespace Discord_Bot.Resources
+namespace Discord_Bot.Communication
 {
     public class AudioVariables
     {

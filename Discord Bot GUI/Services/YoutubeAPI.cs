@@ -1,10 +1,10 @@
-﻿using Discord_Bot.Core;
+﻿using Discord_Bot.Communication;
+using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.Services;
-using Discord_Bot.Resources;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;

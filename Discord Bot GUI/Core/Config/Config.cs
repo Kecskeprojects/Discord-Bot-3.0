@@ -60,6 +60,9 @@ namespace Discord_Bot.Core.Config
              .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "Assets"))
              .AddJsonFile("config.json", optional: false, reloadOnChange: true)
              .Build();
+
+            Global.TwitterChecker = Enable_Twitter_Embed;
+            Global.InstagramChecker = Enable_Instagram_Embed;
         }
 
         #region Config Values

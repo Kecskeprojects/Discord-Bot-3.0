@@ -30,6 +30,5 @@ namespace Discord_Bot.Commands
                 logger.Error("TestCommands.cs Test", ex.ToString());
             }
         }
-
     }
 }

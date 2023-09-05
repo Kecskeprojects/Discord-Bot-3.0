@@ -6,6 +6,8 @@ using Discord_Bot.Core.Logger;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
+using Discord_Bot.Services;
+using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -178,12 +180,14 @@ namespace Discord_Bot.Core
         {
             logger.Log("Application closing...");
             LogToFile();
+            TwitterScraper.CloseBrowser();
         }
 
         public void Closing(object sender, EventArgs e)
         {
             logger.Log("Application closing...");
             LogToFile();
+            TwitterScraper.CloseBrowser();
         }
         #endregion
 
@@ -191,7 +195,7 @@ namespace Discord_Bot.Core
         //Check if message is an instagram link and has an embed or not
         public void InstagramEmbed(SocketCommandContext context)
         {
-            List<Uri> urls = LinkSearch(context.Message.Content, false, "https://instagram.com/");
+            List<Uri> urls = UrlTools.LinkSearch(context.Message.Content, false, "https://instagram.com/");
 
             //Check if message is an instagram link
             if (urls != null && urls.Count > 0)
@@ -242,95 +246,6 @@ namespace Discord_Bot.Core
                     }
                 });
             }
-        }
-
-        public void TwitterEmbed(SocketCommandContext context)
-        {
-            List<Uri> urls = LinkSearch(context.Message.Content, true, new string[] { "https://twitter.com/", "https://x.com/" });
-
-            //Check if message is an instagram link
-            if (urls != null)
-            {
-                urls = urls.Where(x => x.Segments.Length >= 3 && x.Segments[2] == "status/").ToList();
-                if (urls.Count > 0)
-                {
-                    //Run link embedding in separate thread
-                    _ = Task.Run(async () =>
-                    {
-                        try
-                        {
-                            logger.Log($"Embed message from following links: \n{string.Join("\n", urls)}");
-
-                            //Todo: Reimplement twitter scraper
-                            MessageReference refer = new(context.Message.Id, context.Channel.Id, context.Guild.Id, false);
-                            /*string message = await new TwitterScraper().Main(context.Channel, refer, urls);*/
-                            string message = "";
-
-                            if (!string.IsNullOrEmpty(message))
-                            {
-                                await context.Channel.SendMessageAsync(message);
-                            }
-                            else
-                            {
-                                await context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.Error("CoreLogic.cs TwitterEmbed", ex.ToString());
-                        }
-                    });
-                }
-            }
-        }
-
-        private List<Uri> LinkSearch(string message, bool ignoreEmbedSuppress, params string[] baseURLs)
-        {
-            try
-            {
-                message = message.Replace("www.", "");
-
-                if (baseURLs.Any(x => message.Contains(x)))
-                {
-                    List<Uri> urls = new();
-
-                    //We check for each baseURL for each that was sent, one is expected
-                    foreach (string baseURL in baseURLs)
-                    {
-                        int startIndex = 0;
-                        while (startIndex != -1)
-                        {
-                            startIndex = message.IndexOf(baseURL, startIndex);
-                            if (startIndex != -1)
-                            {
-                                string beginningCut = message[startIndex..];
-
-                                string url = beginningCut.Split(new char[] { ' ', '\n' }, StringSplitOptions.RemoveEmptyEntries)[0];
-                                if (!ignoreEmbedSuppress && !url.Contains('<') && !url.Contains('>'))
-                                {
-                                    url = url.Split('?')[0];
-                                    urls.Add(new Uri(url));
-                                }
-                                else if (ignoreEmbedSuppress)
-                                {
-                                    url = url.Replace("<", "").Replace(">", "").Split('?')[0];
-                                    urls.Add(new Uri(url));
-                                }
-                                startIndex++;
-                            }
-                        }
-                    }
-
-                    return urls;
-                }
-
-            }
-            catch (Exception ex)
-            {
-                logger.Error("CoreLogic.cs LinkSearch", ex.ToString());
-            }
-
-            return null;
         }
         #endregion
 

@@ -78,6 +78,8 @@ namespace Discord_Bot
             });
             twitchThread.Start();
 
+            TwitterScraper.OpenBroser();
+
             //Todo:Reimplement instagram logic as much as possible
             //Instagram embed function
             //await InstagramAPI.Startup();
@@ -287,6 +289,10 @@ namespace Discord_Bot
                     logger.Warning("App.xaml.cs HandleCommandAsync", result.ErrorReason);
                 }
             }
+            else if (Global.TwitterChecker && context.Message.HasStringPrefix(".", ref argPos))
+            {
+                await commands.ExecuteAsync(context, argPos, services);
+            }
             else if (context.Channel.GetChannelType() != ChannelType.DM && Global.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id))
             {
                 if (context.Message.HasCharPrefix('+', ref argPos) || context.Message.HasCharPrefix('-', ref argPos))
@@ -296,10 +302,6 @@ namespace Discord_Bot
                 }
 
                 await context.Message.DeleteAsync();
-            }
-            else if (Global.TwitterChecker && context.Message.HasStringPrefix(".twt", ref argPos))
-            {
-                coreLogic.TwitterEmbed(context);
             }
             else
             {

@@ -1,4 +1,4 @@
-﻿namespace Discord_Bot.Resources
+﻿namespace Discord_Bot.Communication
 {
     public class MusicRequest
     {

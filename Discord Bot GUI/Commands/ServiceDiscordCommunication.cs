@@ -1,14 +1,21 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Discord_Bot.Core;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TwitchLib.Api.Helix.Models.Bits;
+using TwitchLib.Api.Helix;
+using Discord.Net;
+using Microsoft.Extensions.Logging;
+using Discord_Bot.Core.Logger;
 
 namespace Discord_Bot.Commands
 {
@@ -16,11 +23,13 @@ namespace Discord_Bot.Commands
     {
         private readonly IServerService serverService;
         private readonly DiscordSocketClient client;
+        private readonly Logging logger;
 
-        public ServiceDiscordCommunication(IServerService serverService, DiscordSocketClient client)
+        public ServiceDiscordCommunication(IServerService serverService, DiscordSocketClient client, Logging logger)
         {
             this.serverService = serverService;
             this.client = client;
+            this.logger = logger;
         }
 
         public async Task SendTwitchEmbed(TwitchChannelResource twitchChannel, string thumbnailUrl, string title)
@@ -72,6 +81,63 @@ namespace Discord_Bot.Commands
             await message.DeleteAsync();
 
             return timer <= 15;
+        }
+
+        public async Task<string> SendTwitterMessage(List<Uri> videos, List<Uri> images, ulong channelId, MessageReference messageReference, string messages)
+        {
+            IMessageChannel channel = client.GetChannel(channelId) as IMessageChannel;
+            try
+            {
+                List<FileAttachment> result = AllContentInRegularMessage(videos, images);
+                if (result.Count > 0)
+                {
+                    await channel.SendFilesAsync(result, messageReference: messageReference);
+
+                    return "";
+                }
+
+                if (messages.Length > 0)
+                {
+                    return messages;
+                }
+
+                return "No image/videos in tweet.";
+            }
+            catch (HttpException ex)
+            {
+                if (ex.Message.Contains("40005"))
+                {
+                    logger.Warning("ServiceDiscordCommunication.cs SendTwitterMessage", "Embed too large, only sending images!", LogOnly: true);
+                    logger.Warning("ServiceDiscordCommunication.cs SendTwitterMessage", ex.ToString(), LogOnly: true);
+
+                    List<FileAttachment> result = AllContentInRegularMessage(videos, images, false);
+                    if (result.Count > 0) await channel.SendFilesAsync(result, messageReference: messageReference);
+                    else return "Post content too large to send!";
+
+                    return "";
+                }
+            }
+
+            return "Unexpected error occured!";
+        }
+
+        private static List<FileAttachment> AllContentInRegularMessage(List<Uri> videos, List<Uri> images, bool sendVideos = true)
+        {
+            List<FileAttachment> Embeds = new();
+            string commonFileName = $"twitter_{DateTime.Now:yyMMdd}_{DateTime.Now:HHmmss}";
+
+            for (int i = 0; i < (images.Count < 10 ? images.Count : 10) && Embeds.Count < 10; i++)
+            {
+                images[i] = new Uri(images[i].OriginalString.Split("?")[0] + "?format=jpg");
+                Embeds.Add(new FileAttachment(Global.GetStream(images[i].OriginalString), $"{commonFileName}_image_{i + 1}.png"));
+            }
+
+            for (int i = 0; sendVideos && i < (videos.Count < 10 ? videos.Count : 10) && Embeds.Count < 10; i++)
+            {
+                Embeds.Add(new FileAttachment(Global.GetStream(videos[i].OriginalString), $"{commonFileName}_video_{i + 1}.mp4"));
+            }
+
+            return Embeds;
         }
     }
 }
