@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.Rest;
 using Discord.WebSocket;
 using Discord_Bot.Core.Logger;
+using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
@@ -23,14 +24,16 @@ namespace Discord_Bot.Core
         private readonly IRoleService roleService;
         private readonly IKeywordService keywordService;
         private readonly IReminderService reminderService;
+        private readonly IServiceDiscordCommunication serviceDiscordCommunication;
 
-        public CoreLogic(Logging logger, ICustomCommandService customCommandService, IRoleService roleService, IKeywordService keywordService, IReminderService reminderService)
+        public CoreLogic(Logging logger, ICustomCommandService customCommandService, IRoleService roleService, IKeywordService keywordService, IReminderService reminderService, IServiceDiscordCommunication serviceDiscordCommunication)
         {
             this.logger = logger;
             this.customCommandService = customCommandService;
             this.roleService = roleService;
             this.keywordService = keywordService;
             this.reminderService = reminderService;
+            this.serviceDiscordCommunication = serviceDiscordCommunication;
         }
 
 
@@ -138,7 +141,7 @@ namespace Discord_Bot.Core
         }
 
         //Checking and sending out reminders
-        public async Task ReminderCheck(DiscordSocketClient client)
+        public async Task ReminderCheck()
         {
             try
             {
@@ -149,17 +152,7 @@ namespace Discord_Bot.Core
                 {
                     foreach (ReminderResource reminder in result)
                     {
-                        //Modify message
-                        reminder.Message = reminder.Message.Insert(0, $"You told me to remind you at `{reminder.Date}` with the following message:\n\n");
-
-                        //Try getting user
-                        IUser user = await client.GetUserAsync(reminder.UserDiscordId);
-
-                        //If user exists send a direct message to the user
-                        if (user != null)
-                        {
-                            await UserExtensions.SendMessageAsync(user, reminder.Message);
-                        }
+                        await serviceDiscordCommunication.SendReminder(reminder);
                     }
 
                     List<int> reminderIds = result.Select(r => r.ReminderId).ToList();

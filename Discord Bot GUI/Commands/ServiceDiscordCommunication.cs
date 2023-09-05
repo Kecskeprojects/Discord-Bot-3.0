@@ -24,6 +24,21 @@ namespace Discord_Bot.Commands
             this.client = client;
         }
 
+        public async Task SendReminder(ReminderResource reminder)
+        {
+            //Modify message
+            reminder.Message = reminder.Message.Insert(0, $"You told me to remind you at `{reminder.Date}` with the following message:\n\n");
+
+            //Try getting user
+            IUser user = await client.GetUserAsync(reminder.UserDiscordId);
+
+            //If user exists send a direct message to the user
+            if (user != null)
+            {
+                await UserExtensions.SendMessageAsync(user, reminder.Message);
+            }
+        }
+
         public async Task SendTwitchEmbed(TwitchChannelResource twitchChannel, string thumbnailUrl, string title)
         {
             ServerResource server = await serverService.GetByDiscordIdAsync(twitchChannel.ServerDiscordId);
