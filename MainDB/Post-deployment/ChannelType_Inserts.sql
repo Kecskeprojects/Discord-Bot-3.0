@@ -1,4 +1,5 @@
 ﻿USE [$(DatabaseName)];
+--PLACE INTO ./PostDeployment/Inserts
 
 IF NOT EXISTS ( SELECT * FROM [dbo].[ChannelType] WHERE [ChannelTypeId] = 1 )
 	INSERT INTO [dbo].[ChannelType] VALUES (1, 'RoleText');
