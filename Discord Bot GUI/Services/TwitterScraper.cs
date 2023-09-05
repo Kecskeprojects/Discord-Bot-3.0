@@ -48,10 +48,7 @@ namespace Discord_Bot.Services
             Browser = browser;
         }
 
-        public static async void CloseBrowser()
-        {
-            await Browser.CloseAsync();
-        }
+        public static async void CloseBrowser() => await Browser.CloseAsync();
 
         public async Task<TwitterScrapingResult> GetDataFromUrls(List<Uri> uris)
         {
@@ -87,11 +84,9 @@ namespace Discord_Bot.Services
 
                 await mainPage.CloseAsync();
 
-                if (string.IsNullOrEmpty(messages))
-                {
-                    return new TwitterScrapingResult(Videos, Images);
-                }
-                return new TwitterScrapingResult(Videos, Images, messages);
+                return string.IsNullOrEmpty(messages)
+                    ? new TwitterScrapingResult(Videos, Images)
+                    : new TwitterScrapingResult(Videos, Images, messages);
             }
             catch (Exception ex)
             {
@@ -124,7 +119,7 @@ namespace Discord_Bot.Services
                 IElement main = articles.First(x => x.QuerySelectorAll("a[href]").FirstOrDefault(e => e.GetAttribute("href").ToLower().Contains(uri.AbsolutePath.ToLower())) != null);
                 int mainPos = articles.Index(main);
 
-                if(main.Text().Contains("sensitive content"))
+                if (main.Text().Contains("sensitive content"))
                 {
                     return "Post is flagged as potentially sensitive content!";
                 }
@@ -163,7 +158,7 @@ namespace Discord_Bot.Services
                 Images.AddRange(currImages);
                 Videos.AddRange(TempVideos.Skip(videosBeforeMainCount).Take(videoCount));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return ex.ToString();
             }

@@ -1,15 +1,15 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.Net;
+using Discord_Bot.CommandsService;
+using Discord_Bot.Communication;
 using Discord_Bot.Core.Logger;
+using Discord_Bot.Services;
 using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord_Bot.Communication;
-using Discord_Bot.CommandsService;
-using Discord_Bot.Services;
 
 namespace Discord_Bot.Commands
 {
@@ -69,7 +69,11 @@ namespace Discord_Bot.Commands
                                     await Context.Channel.SendFilesAsync(attachments, messageReference: refer);
                                     await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
                                 }
-                                else await ReplyAsync("Post content too large to send!");
+                                else
+                                {
+                                    await ReplyAsync("Post content too large to send!");
+                                }
+
                                 return;
                             }
                         }

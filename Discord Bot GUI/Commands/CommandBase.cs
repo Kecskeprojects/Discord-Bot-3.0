@@ -7,9 +7,6 @@ namespace Discord_Bot.Commands
     {
         protected readonly Logging logger;
 
-        public CommandBase(Logging logger) 
-        {
-            this.logger = logger;
-        }
+        public CommandBase(Logging logger) => this.logger = logger;
     }
 }
