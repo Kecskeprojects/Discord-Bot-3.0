@@ -150,7 +150,7 @@ namespace Discord_Bot
 
             coreLogic.LogToFile();
 
-            await coreLogic.ReminderCheck(client);
+            await coreLogic.ReminderCheck();
         }
         #endregion
 
