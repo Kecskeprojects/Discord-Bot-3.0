@@ -41,7 +41,7 @@ namespace Discord_Bot.Services
         {
             logger.Query("=======================================================================");
             logger.Query("YouTube Data API: Search");
-            SearchResultEnum result = SearchResultEnum.NotFound;
+            SearchResultEnum result = SearchResultEnum.YoutubeNotFound;
 
             try
             {
@@ -123,7 +123,7 @@ namespace Discord_Bot.Services
                     }
                     else
                     {
-                        return SearchResultEnum.NotFound;
+                        return SearchResultEnum.YoutubeNotFound;
                     }
                 }
             }
@@ -160,7 +160,7 @@ namespace Discord_Bot.Services
                 logger.Query("No videos found or it is unlisted/private!");
                 //Todo: Move message to Command level
                 //await context.Channel.SendMessageAsync("No videos found or it is unlisted/private!");
-                return SearchResultEnum.NotFound;
+                return SearchResultEnum.YoutubeNotFound;
             }
 
             Video video = searchListResponse.Items[0];
@@ -176,7 +176,7 @@ namespace Discord_Bot.Services
             logger.Query("Youtube video query Complete!");
             logger.Query($"{temp[0]}\n{temp[1]}");
 
-            return SearchResultEnum.FoundVideo;
+            return SearchResultEnum.YoutubeFoundVideo;
         }
 
         //Searching by keywords
@@ -205,7 +205,7 @@ namespace Discord_Bot.Services
                 logger.Query("No videos/playlists found or it is unlisted/private!");
                 //Todo: Move message to Command level
                 //await context.Channel.SendMessageAsync("No videos/playlists found or it is unlisted/private!");
-                return SearchResultEnum.NotFound;
+                return SearchResultEnum.YoutubeNotFound;
             }
 
             logger.Query("Youtube keyword query Complete!");
@@ -220,7 +220,7 @@ namespace Discord_Bot.Services
             {
                 return await VideoSearch(youtubeService, searchListResponse.Items[0].Id.VideoId, username, serverId);
             }
-            return SearchResultEnum.NotFound;
+            return SearchResultEnum.YoutubeNotFound;
         }
 
         //Searching by playlist ID
@@ -250,7 +250,7 @@ namespace Discord_Bot.Services
                 logger.Query("No playlist found or it is unlisted/private!");
                 //Todo: Move message to Command level
                 //await context.Channel.SendMessageAsync("No playlist found or it is unlisted/private!");
-                return SearchResultEnum.NotFound;
+                return SearchResultEnum.YoutubeNotFound;
             }
 
             foreach (PlaylistItem item in searchListResponse.Items)
@@ -262,7 +262,7 @@ namespace Discord_Bot.Services
             //Todo: Move message to Command level
             //await context.Channel.SendMessageAsync("Playlist added!");
 
-            return SearchResultEnum.FoundPlaylist;
+            return SearchResultEnum.YoutubePlaylistFound;
         }
 
         private IList<SearchResult> FilteredResults(IList<SearchResult> items, string query)

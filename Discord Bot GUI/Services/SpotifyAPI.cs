@@ -1,13 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
-using SpotifyAPI.Web;
-using System.Linq;
-using Discord.Commands;
+﻿using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
-using Discord_Bot.Core.Config;
 using Discord_Bot.Interfaces.Services;
+using SpotifyAPI.Web;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Discord_Bot.Services
 {
@@ -40,12 +39,11 @@ namespace Discord_Bot.Services
 
                 return result;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("SpotifyAPI.cs SpotifySearch", ex.ToString());
             }
             return SearchResultEnum.SpotifyNotFound;
-            
         }
 
 
@@ -53,7 +51,7 @@ namespace Discord_Bot.Services
         private async Task<SearchResultEnum> Run(string query, ulong serverId, ulong channelId, string username)
         {
             SpotifyClientConfig configuration = SpotifyClientConfig.CreateDefault().WithAuthenticator(new ClientCredentialsAuthenticator(config.Spotify_Client_Id, config.Spotify_Client_Secret));
-            SpotifyClient spotify = new (configuration);
+            SpotifyClient spotify = new(configuration);
 
             //Spotify link format: https://open.spotify.com/[TYPE]/[ID]?query, the id is 22 characters long
             if (Uri.IsWellFormedUriString(query, UriKind.Absolute))
@@ -83,11 +81,9 @@ namespace Discord_Bot.Services
 
                         logger.Query($"Result: {temp}");
 
-                        if (await youtubeAPI.Searching(temp, username, serverId, channelId) == SearchResultEnum.FoundVideo)
-                        {
-                            return SearchResultEnum.FoundVideo;
-                        }
-                        else return SearchResultEnum.SpotifyFoundYoutubeNotFound;
+                        return await youtubeAPI.Searching(temp, username, serverId, channelId) == SearchResultEnum.YoutubeFoundVideo
+                            ? SearchResultEnum.SpotifyVideoFound
+                            : SearchResultEnum.SpotifyFoundYoutubeNotFound;
                     }
                 }
                 else if (type == "playlist" || type == "album")
@@ -132,7 +128,7 @@ namespace Discord_Bot.Services
             try
             {
                 SpotifyClientConfig configuration = SpotifyClientConfig.CreateDefault().WithAuthenticator(new ClientCredentialsAuthenticator(config.Spotify_Client_Id, config.Spotify_Client_Secret));
-                SpotifyClient spotify = new (configuration);
+                SpotifyClient spotify = new(configuration);
 
                 string spotifyArtist = "", spotifyImage = "";
 
@@ -164,7 +160,7 @@ namespace Discord_Bot.Services
                         }
                     }
 
-                    if(spotifyArtist == "")
+                    if (spotifyArtist == "")
                     {
                         foreach (FullArtist item in result.Artists.Items)
                         {
@@ -176,7 +172,7 @@ namespace Discord_Bot.Services
                             }
                         }
 
-                        if(spotifyArtist == "")
+                        if (spotifyArtist == "")
                         {
                             logger.Query("Name only search also failed, returning first item on list");
 
@@ -190,7 +186,7 @@ namespace Discord_Bot.Services
                     SearchRequest request = new(SearchRequest.Types.Track, song + " " + artist);
                     SearchResponse result = await spotify.Search.Item(request);
 
-                    if(tags != null)
+                    if (tags != null)
                     {
                         foreach (FullTrack item in result.Tracks.Items)
                         {
