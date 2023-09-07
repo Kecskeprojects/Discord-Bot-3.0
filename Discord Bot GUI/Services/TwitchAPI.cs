@@ -5,6 +5,7 @@ using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.Twitch;
+using Discord_Bot.Tools;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -76,6 +77,12 @@ namespace Discord_Bot.Services
             Monitor = new LiveStreamMonitorService(API);
 
             List<string> lst = await GetChannels();
+
+            if (CollectionTools.IsNullOrEmpty(lst))
+            {
+                logger.Query("No channels to monitor on twitch, service stopped!");
+                return;
+            }
 
             Monitor.OnStreamOnline += MonitorOnStreamOnline;
             Monitor.OnStreamOffline += MonitorOnStreamOffline;
