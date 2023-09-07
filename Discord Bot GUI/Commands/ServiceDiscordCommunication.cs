@@ -10,10 +10,12 @@ using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.Instagram;
 using Discord_Bot.Tools;
+using Google.Apis.YouTube.v3.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reactive.Joins;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands

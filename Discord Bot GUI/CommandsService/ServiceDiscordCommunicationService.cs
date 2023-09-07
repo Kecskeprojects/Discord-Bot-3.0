@@ -30,15 +30,18 @@ namespace Discord_Bot.CommandsService
             return message;
         }
 
+        //https://instaloader.github.io/basic-usage.html
+        //https://github.com/instaloader/instaloader
+        //instaloader.exe --quiet --filename-pattern={date_utc}_{shortcode} --dirname-pattern={ shortcode} --no-video-thumbnails --no-compress-json -- -CfGa5x0FCak -Cppwn5qjMJA
         public static void DownloadFromInstagram(Uri uri, Logging logger)
         {
             ProcessStartInfo instaloader = new()
             {
                 FileName = "cmd.exe",
                 Arguments = @"/C instaloader.exe " +
-                                            @"--quiet --no-video-thumbnails --no-compress-json " +
-                                            @"--filename-pattern={date_utc}_{shortcode} --dirname-pattern={shortcode} -- -" +
-                                            uri.Segments[2][..^1],
+                            @"--quiet --no-video-thumbnails --no-compress-json " +
+                            @"--filename-pattern={date_utc}_{shortcode} --dirname-pattern={shortcode} -- -" +
+                            uri.Segments[2][..^1],
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 CreateNoWindow = true,
