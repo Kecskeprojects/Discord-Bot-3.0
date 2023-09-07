@@ -1,5 +1,4 @@
-﻿using Discord.Commands;
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
 
@@ -13,7 +12,7 @@ namespace Discord_Bot.Interfaces.Core
         Task ReminderCheck();
         void Closing();
         void Closing(object sender, EventArgs e);
-        void InstagramEmbed(SocketCommandContext context);
+        void InstagramEmbed(string message, ulong messageId, ulong channelId, ulong? guildId);
         void LogToFile();
         void CheckFolders();
     }

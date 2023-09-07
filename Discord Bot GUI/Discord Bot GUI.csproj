@@ -48,7 +48,7 @@
 		</Content>
 		<Content Include="External Files\**">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-			<TargetPath>.\%(Filename)%(Extension)</TargetPath>
+			<TargetPath>%(RecursiveDir)\%(Filename)%(Extension)</TargetPath>
 		</Content>
 		<Resource Include="Kim_Synthji.ico" />
 		<Compile Update="Properties\Resource.Designer.cs">

@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.Commands;
 using Discord.Rest;
 using Discord.WebSocket;
 using Discord_Bot.Core.Logger;
@@ -60,9 +59,9 @@ namespace Discord_Bot.Core
         {
             try
             {
-                RestUserMessage reply = null;
                 RoleResource role = await roleService.GetRoleAsync(serverId, message[1..].ToLower());
 
+                RestUserMessage reply = null;
                 if (role != null)
                 {
                     IRole discordRole = (channel as IGuildChannel).Guild.GetRole(role.DiscordId);
@@ -186,9 +185,9 @@ namespace Discord_Bot.Core
 
         #region Embed Handlers
         //Check if message is an instagram link and has an embed or not
-        public void InstagramEmbed(SocketCommandContext context)
+        public void InstagramEmbed(string message, ulong messageId, ulong channelId, ulong? guildId)
         {
-            List<Uri> urls = UrlTools.LinkSearch(context.Message.Content, false, "https://instagram.com/");
+            List<Uri> urls = UrlTools.LinkSearch(message, false, "https://instagram.com/");
 
             //Check if message is an instagram link
             if (urls != null && urls.Count > 0)
@@ -198,39 +197,16 @@ namespace Discord_Bot.Core
                 {
                     try
                     {
-                        MessageReference refer = new(context.Message.Id, context.Channel.Id, context.Guild.Id, false);
-                        string message = "";
                         for (int i = 0; i < urls.Count; i++)
                         {
                             logger.Log($"Embed message from following link: {urls[i]}");
-
-                            //Todo: Reimplement instagram logic as much as possible
-                            //A profile url looks like so https://www.instagram.com/[username]/ that creates 2 Segments, it is the easiest way to identify it
-                            if (urls[i].Segments.Length == 2)
+                            if (urls[i].Segments.Length != 2 &&
+                                urls[i].Segments[1][..^1] != "stories" &&
+                                urls[i].Segments[1][..^1] != "live" &&
+                                urls[i].Segments[2][..^1] != "live")
                             {
-                                //await InstagramAPI.ProfileEmbed(context.Channel, refer, urls[i]);
+                                await serviceDiscordCommunication.SendInstagramPostEmbed(urls[i], messageId, channelId, guildId);
                             }
-                            else if (urls[i].Segments[1][..^1] == "stories")
-                            {
-                                //await InstagramAPI.StoryEmbed(context.Channel, refer, urls[i]);
-                            }
-                            else if (urls[i].Segments[1][..^1] != "live" && urls[i].Segments[2][..^1] != "live")
-                            {
-                                /*string msg = await InstagramAPI.PostEmbed(context.Channel, refer, urls[i]);
-                                if (!string.IsNullOrEmpty(msg))
-                                {
-                                    message = msg;
-                                }*/
-                            }
-                        }
-
-                        if (!string.IsNullOrEmpty(message))
-                        {
-                            await context.Channel.SendMessageAsync(message);
-                        }
-                        else
-                        {
-                            await context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
                         }
                     }
                     catch (Exception ex)

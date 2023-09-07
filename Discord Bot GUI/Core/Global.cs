@@ -14,8 +14,6 @@ namespace Discord_Bot.Core
     public static class Global
     {
         #region Global Variables
-        public static bool InstagramChecker { get; set; }
-        public static bool TwitterChecker { get; set; }
         public static Dictionary<ulong, ServerAudioResource> ServerAudioResources { get; set; } = new();
         public static string[] EasterEggMessages { get; } = new string[]
             {

@@ -80,10 +80,6 @@ namespace Discord_Bot
 
             TwitterScraper.OpenBroser();
 
-            //Todo:Reimplement instagram logic as much as possible
-            //Instagram embed function
-            //await InstagramAPI.Startup();
-
             await RunBotAsync();
 
             client.Disconnected += OnWebsocketDisconnect;
@@ -289,7 +285,7 @@ namespace Discord_Bot
                     logger.Warning("App.xaml.cs HandleCommandAsync", result.ErrorReason);
                 }
             }
-            else if (Global.TwitterChecker && context.Message.HasStringPrefix(".", ref argPos))
+            else if (config.Enable_Twitter_Embed && context.Message.HasStringPrefix(".", ref argPos))
             {
                 await commands.ExecuteAsync(context, argPos, services);
             }
@@ -318,9 +314,9 @@ namespace Discord_Bot
                 await coreLogic.FeatureChecks(context.Guild.Id, context.Message.Content, context.Channel);
 
                 //Make embed independently from main thread
-                if (Global.InstagramChecker)
+                if (config.Enable_Instagram_Embed)
                 {
-                    coreLogic.InstagramEmbed(context);
+                    coreLogic.InstagramEmbed(context.Message.Content, context.Message.Id, context.Channel.Id, context.Guild == null ? context.Guild.Id : null);
                 }
             }
         }

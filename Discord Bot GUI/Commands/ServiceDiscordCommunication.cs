@@ -1,13 +1,18 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Net;
 using Discord.WebSocket;
+using Discord_Bot.CommandsService;
+using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
+using Discord_Bot.Services.Models.Instagram;
 using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,11 +22,78 @@ namespace Discord_Bot.Commands
     {
         private readonly IServerService serverService;
         private readonly DiscordSocketClient client;
+        private readonly Logging logger;
 
-        public ServiceDiscordCommunication(IServerService serverService, DiscordSocketClient client)
+        public ServiceDiscordCommunication(IServerService serverService, DiscordSocketClient client, Logging logger)
         {
             this.serverService = serverService;
             this.client = client;
+            this.logger = logger;
+        }
+
+        public async Task SendInstagramPostEmbed(Uri uri, ulong messageId, ulong channelId, ulong? guildId)
+        {
+            IMessageChannel channel = client.GetChannel(channelId) as IMessageChannel;
+            bool shouldMessageBeSuppressed = false;
+
+            List<FileAttachment> attachments = null;
+            try
+            {
+                ServiceDiscordCommunicationService.DownloadFromInstagram(uri, logger);
+
+                string[] files = Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), $"Instagram\\{uri.Segments[2][..^1]}"));
+                string caption = "";
+                Node metadata = null;
+
+                attachments = ServiceDiscordCommunicationService.ReadFiles(files, ref caption, ref metadata, false);
+                string message = ServiceDiscordCommunicationService.GetCaption(uri, caption, metadata);
+
+                MessageReference refer = new(messageId, channelId, guildId, false);
+                try
+                {
+                    await channel.SendFilesAsync(attachments, message, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
+                    shouldMessageBeSuppressed = true;
+                }
+                catch (HttpException ex)
+                {
+                    if (ex.Message.Contains("40005"))
+                    {
+                        logger.Warning("InstagramDownloader.cs GetImagesFromPost", "Embed too large, only sending images!", LogOnly: true);
+                        logger.Warning("InstagramDownloader.cs GetImagesFromPost", ex.ToString(), LogOnly: true);
+
+                        attachments = ServiceDiscordCommunicationService.ReadFiles(files, ref caption, ref metadata, true);
+                        if (attachments.Count > 0)
+                        {
+                            await channel.SendFilesAsync(attachments, caption, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
+                            shouldMessageBeSuppressed = true;
+                        }
+                        else
+                        {
+                            await channel.SendMessageAsync("Post content too large to send!");
+                        }
+                    }
+                    else
+                    {
+                        logger.Error("InstagramDownloader.cs GetImagesFromPost HttpException", ex.ToString());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("InstagramDownloader.cs GetImagesFromPost", ex.ToString());
+                await channel.SendMessageAsync("Unexpected exception occured.");
+            }
+
+
+            attachments.ForEach(x => x.Dispose());
+            attachments.Clear();
+            Directory.Delete(Path.Combine(Directory.GetCurrentDirectory(), $"Instagram/{uri.Segments[2][..^1]}"), true);
+
+            if (shouldMessageBeSuppressed)
+            {
+                IUserMessage discordMessage = (await channel.GetMessageAsync(messageId)) as IUserMessage;
+                await discordMessage.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
+            }
         }
 
         public async Task SendReminder(ReminderResource reminder)
