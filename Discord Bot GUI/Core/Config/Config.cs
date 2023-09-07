@@ -21,8 +21,6 @@ namespace Discord_Bot.Core.Config
             public string[] youtube_API_Keys;
             public string[] youtube_Filter_Words;
             public bool enable_Instagram_Embed;
-            public string[] instagram_Username;
-            public string[] instagram_Password;
             public bool enable_Twitter_Embed;
             public string sql_connection_string;
         }
@@ -45,8 +43,6 @@ namespace Discord_Bot.Core.Config
                     youtube_API_Keys = Array.Empty<string>(),
                     youtube_Filter_Words = Array.Empty<string>(),
                     enable_Instagram_Embed = false,
-                    instagram_Username = Array.Empty<string>(),
-                    instagram_Password = Array.Empty<string>(),
                     enable_Twitter_Embed = false
                 };
 
@@ -84,10 +80,6 @@ namespace Discord_Bot.Core.Config
         public string[] Youtube_Filter_Words => Configuration.GetSection("youtube_filter_words").Get<string[]>();
 
         public bool Enable_Instagram_Embed => Configuration.GetSection("enable_instagram_embed").Get<bool>();
-
-        public string[] Instagram_Username => Configuration.GetSection("instagram_username").Get<string[]>();
-
-        public string[] Instagram_Password => Configuration.GetSection("instagram_password").Get<string[]>();
 
         public bool Enable_Twitter_Embed => Configuration.GetSection("enable_twitter_embed").Get<bool>();
 

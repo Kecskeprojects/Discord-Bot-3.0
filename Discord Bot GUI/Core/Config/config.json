@@ -10,8 +10,6 @@
 	"youtube_api_keys":[],
 	"youtube_filter_words":[],
 	"enable_instagram_embed":false,
-	"instagram_username":[],
-	"instagram_password":[],
 	"enable_twitter_embed": false,
 	"sql_connection_string": ""
 }
