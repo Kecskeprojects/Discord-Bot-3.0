@@ -11,7 +11,7 @@ Text Commands:
 !remind at [date*] >[message]		remind by date (DM)
 !remind in [amount**] >[message]	remind in given time (DM)
 !remind list				your reminders (DM)
-!remind remove [position]		remove a reminder (DM)
+!remind remove [id]		remove a reminder (DM)
 *use timezone in the following format:
 *22.01.01 01:01 +12 or 01.01 01:01 +12
 **years to minutes (e.g. !remind in 15 days >...)

@@ -5,6 +5,6 @@ namespace Discord_Bot.Interfaces.DBServices
 {
     public interface IRoleService
     {
-        Task<RoleResource> GetRoleAsync(ulong id, string roleName);
+        Task<RoleResource> GetRoleAsync(ulong serverId, string roleName);
     }
 }

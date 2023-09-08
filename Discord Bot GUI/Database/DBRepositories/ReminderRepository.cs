@@ -14,6 +14,12 @@ namespace Discord_Bot.Database.DBRepositories
         {
         }
 
+        public async Task AddReminderAsync(Reminder reminder)
+        {
+            context.Reminders.Add(reminder);
+            await context.SaveChangesAsync();
+        }
+
         public Task<List<Reminder>> GetCurrentRemindersAsync(DateTime dateTime)
         {
             return context.Reminders
@@ -29,9 +35,30 @@ namespace Discord_Bot.Database.DBRepositories
                 .ToListAsync();
         }
 
+        public Task<Reminder> GetUserReminderById(ulong userId, int reminderId)
+        {
+            return context.Reminders
+                .Include(r => r.User)
+                .FirstOrDefaultAsync(r => r.User.DiscordId == userId.ToString() && r.ReminderId == reminderId);
+        }
+
+        public Task<List<Reminder>> GetUserReminderListAsync(ulong userId)
+        {
+            return context.Reminders
+                .Include(r => r.User)
+                .Where(r => r.User.DiscordId == userId.ToString())
+                .ToListAsync();
+        }
+
         public async Task RemoveCurrentRemindersAsync(List<Reminder> reminders)
         {
             context.Reminders.RemoveRange(reminders);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task RemoveReminderAsync(Reminder reminder)
+        {
+            context.Remove(reminder);
             await context.SaveChangesAsync();
         }
     }

@@ -17,10 +17,10 @@ namespace Discord_Bot.Database.DBRepositories
             await context.SaveChangesAsync();
         }
 
-        public Task<Server> GetByDiscordIdAsync(ulong id)
+        public Task<Server> GetByDiscordIdAsync(ulong serverId)
         {
             return context.Servers
-                    .FirstOrDefaultAsync(x => x.DiscordId == id.ToString());
+                    .FirstOrDefaultAsync(x => x.DiscordId == serverId.ToString());
         }
     }
 }

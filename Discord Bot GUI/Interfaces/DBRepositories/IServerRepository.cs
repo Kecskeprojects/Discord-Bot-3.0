@@ -6,6 +6,6 @@ namespace Discord_Bot.Interfaces.DBRepositories
     public interface IServerRepository
     {
         Task AddServerAsync(Server server);
-        Task<Server> GetByDiscordIdAsync(ulong id);
+        Task<Server> GetByDiscordIdAsync(ulong serverId);
     }
 }

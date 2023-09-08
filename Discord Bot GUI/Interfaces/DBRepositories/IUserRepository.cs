@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Interfaces.DBRepositories
 {
-    public interface IRoleRepository
+    public interface IUserRepository
     {
-        Task<Role> GetRoleAsync(ulong serverId, string roleName);
+        Task<User> GetUserByDiscordId(ulong userId);
     }
 }

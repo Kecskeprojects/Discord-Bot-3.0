@@ -18,12 +18,12 @@ namespace Discord_Bot.Database.DBServices
 
         public CustomCommandService(IMapper mapper, Logging logger, Cache cache, ICustomCommandRepository customCommandRepository) : base(mapper, logger, cache) => this.customCommandRepository = customCommandRepository;
 
-        public async Task<CustomCommandResource> GetCustomCommandAsync(ulong id, string commandName)
+        public async Task<CustomCommandResource> GetCustomCommandAsync(ulong serverId, string commandName)
         {
             CustomCommandResource result = null;
             try
             {
-                CustomCommand command = await customCommandRepository.GetCustomCommandAsync(id, commandName);
+                CustomCommand command = await customCommandRepository.GetCustomCommandAsync(serverId, commandName);
                 result = mapper.Map<CustomCommand, CustomCommandResource>(command);
             }
             catch (Exception ex)
@@ -33,12 +33,12 @@ namespace Discord_Bot.Database.DBServices
             return result;
         }
 
-        public async Task<List<CustomCommandResource>> GetServerCustomCommandListAsync(ulong id)
+        public async Task<List<CustomCommandResource>> GetServerCustomCommandListAsync(ulong serverId)
         {
             List<CustomCommandResource> result = null;
             try
             {
-                List<CustomCommand> commands = await customCommandRepository.GetCustomCommandAsync(id);
+                List<CustomCommand> commands = await customCommandRepository.GetCustomCommandAsync(serverId);
                 result = mapper.Map<List<CustomCommand>, List<CustomCommandResource>>(commands);
             }
             catch (Exception ex)

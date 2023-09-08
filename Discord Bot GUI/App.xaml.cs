@@ -290,10 +290,12 @@ namespace Discord_Bot
                     server = await serverService.GetByDiscordIdAsync(context.Guild.Id);
                     if (server == null)
                     {
-                        await serverService.AddServerAsync(context.Guild.Id);
-                        server = await serverService.GetByDiscordIdAsync(context.Guild.Id);
-
-                        if (server == null)
+                        DbProcessResultEnum result = await serverService.AddServerAsync(context.Guild.Id);
+                        if(result == DbProcessResultEnum.Success)
+                        {
+                            server = await serverService.GetByDiscordIdAsync(context.Guild.Id);
+                        }
+                        else
                         {
                             logger.Log($"{context.Guild.Name} could not be added to list!");
                             return;

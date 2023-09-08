@@ -49,7 +49,13 @@ namespace Discord_Bot.Services
             Browser = browser;
         }
 
-        public static async void CloseBrowser() => await Browser.CloseAsync();
+        public static async void CloseBrowser()
+        {
+            if(Browser != null && !Browser.IsClosed)
+            {
+                await Browser.CloseAsync();
+            }
+        }
 
         public async Task<TwitterScrapingResult> GetDataFromUrls(List<Uri> uris)
         {

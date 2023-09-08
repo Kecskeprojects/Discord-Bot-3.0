@@ -15,12 +15,12 @@ namespace Discord_Bot.Database.DBServices
         private readonly IRoleRepository roleRepository;
         public RoleService(IMapper mapper, Logging logger, Cache cache, IRoleRepository roleRepository) : base(mapper, logger, cache) => this.roleRepository = roleRepository;
 
-        public async Task<RoleResource> GetRoleAsync(ulong id, string roleName)
+        public async Task<RoleResource> GetRoleAsync(ulong serverId, string roleName)
         {
             RoleResource result = null;
             try
             {
-                Role role = await roleRepository.GetRoleAsync(id, roleName);
+                Role role = await roleRepository.GetRoleAsync(serverId, roleName);
                 result = mapper.Map<Role, RoleResource>(role);
             }
             catch (Exception ex)

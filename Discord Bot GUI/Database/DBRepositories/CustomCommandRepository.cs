@@ -13,18 +13,18 @@ namespace Discord_Bot.Database.DBRepositories
         {
         }
 
-        public Task<CustomCommand> GetCustomCommandAsync(ulong id, string commandName)
+        public Task<CustomCommand> GetCustomCommandAsync(ulong serverId, string commandName)
         {
             return context.CustomCommands
                 .Include(cc => cc.Server)
-                .FirstOrDefaultAsync(cc => cc.Server.DiscordId == id.ToString() && cc.Command.Trim().ToLower() == commandName.Trim().ToLower());
+                .FirstOrDefaultAsync(cc => cc.Server.DiscordId == serverId.ToString() && cc.Command.Trim().ToLower() == commandName.Trim().ToLower());
         }
 
-        public Task<List<CustomCommand>> GetCustomCommandAsync(ulong id)
+        public Task<List<CustomCommand>> GetCustomCommandAsync(ulong serverId)
         {
             return context.CustomCommands
                 .Include(cc => cc.Server)
-                .Where(cc => cc.Server.DiscordId == id.ToString())
+                .Where(cc => cc.Server.DiscordId == serverId.ToString())
                 .ToListAsync();
         }
     }

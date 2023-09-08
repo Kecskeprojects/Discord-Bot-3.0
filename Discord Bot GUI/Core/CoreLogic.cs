@@ -2,6 +2,7 @@
 using Discord.Rest;
 using Discord.WebSocket;
 using Discord_Bot.Core.Logger;
+using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
@@ -155,7 +156,11 @@ namespace Discord_Bot.Core
                     }
 
                     List<int> reminderIds = result.Select(r => r.ReminderId).ToList();
-                    await reminderService.RemoveCurrentRemindersAsync(reminderIds);
+                    DbProcessResultEnum reminderResult = await reminderService.RemoveCurrentRemindersAsync(reminderIds);
+                    if(reminderResult == DbProcessResultEnum.Failure)
+                    {
+                        logger.Error("CoreLogic.cs ReminderCheck", "Failure during reminder check!");
+                    }
                 }
             }
             catch (Exception ex)

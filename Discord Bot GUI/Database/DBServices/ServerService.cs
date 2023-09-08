@@ -24,36 +24,38 @@ namespace Discord_Bot.Database.DBServices
             this.channelViewRepository = channelViewRepository;
         }
 
-        public async Task AddServerAsync(ulong id)
+        public async Task<DbProcessResultEnum> AddServerAsync(ulong serverId)
         {
             try
             {
                 Server server = new()
                 {
-                    DiscordId = id.ToString()
+                    DiscordId = serverId.ToString()
                 };
                 await serverRepository.AddServerAsync(server);
 
-                logger.Log($"Server added with the following ID: {id}");
+                logger.Log($"Server added with the following ID: {serverId}");
+                return DbProcessResultEnum.Success;
             }
             catch (Exception ex)
             {
                 logger.Error("ServerService.cs AddServerAsync", ex.ToString());
             }
+            return DbProcessResultEnum.Failure;
         }
 
-        public async Task<ServerResource> GetByDiscordIdAsync(ulong id)
+        public async Task<ServerResource> GetByDiscordIdAsync(ulong serverId)
         {
             ServerResource result = null;
             try
             {
-                ServerResource cachedServer = cache.TryGetValue(id);
+                ServerResource cachedServer = cache.TryGetValue(serverId);
                 if (cachedServer != null)
                 {
                     return cachedServer;
                 }
 
-                Server server = await serverRepository.GetByDiscordIdAsync(id);
+                Server server = await serverRepository.GetByDiscordIdAsync(serverId);
                 if (server == null) return null;
 
                 result = mapper.Map<Server, ServerResource>(server);

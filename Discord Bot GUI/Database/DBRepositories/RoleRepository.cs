@@ -11,11 +11,11 @@ namespace Discord_Bot.Database.DBRepositories
         {
         }
 
-        public Task<Role> GetRoleAsync(ulong id, string roleName)
+        public Task<Role> GetRoleAsync(ulong serverId, string roleName)
         {
             return context.Roles
                 .Include(r => r.Server)
-                .FirstOrDefaultAsync(r => r.Server.DiscordId == id.ToString() && r.RoleName.Trim().ToLower() == roleName.Trim().ToLower());
+                .FirstOrDefaultAsync(r => r.Server.DiscordId == serverId.ToString() && r.RoleName.Trim().ToLower() == roleName.Trim().ToLower());
         }
     }
 }
