@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord_Bot.Tools;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Documents;
@@ -155,7 +156,7 @@ namespace Discord_Bot.Core.Logger
             }
         }
 
-        private static Log BaseLog(LogType type) => new(DateTime.Now, type, $"[{Global.CurrentTime()}][{type.Value}]:\t");
+        private static Log BaseLog(LogType type) => new(DateTime.Now, type, $"[{DateTimeTools.CurrentTime()}][{type.Value}]:\t");
 
         private static string PutTabsOnNewLines(string message) => message.Replace("\n", "\n\t\t\t");
         #endregion

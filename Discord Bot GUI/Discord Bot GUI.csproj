@@ -23,7 +23,7 @@
 		<PackageReference Include="AutoMapper" Version="12.0.1" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
 		<PackageReference Include="Discord.Net" Version="3.12.0" />
-		<PackageReference Include="Google.Apis.YouTube.v3" Version="1.62.0.3155" />
+		<PackageReference Include="Google.Apis.YouTube.v3" Version="1.62.0.3169" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.10">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -37,6 +37,7 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
 		<PackageReference Include="PuppeteerSharp" Version="11.0.5" />
+		<PackageReference Include="RestSharp" Version="110.2.0" />
 		<PackageReference Include="SixLabors.ImageSharp" Version="3.0.2" />
 		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0" />
 		<PackageReference Include="SpotifyAPI.Web" Version="7.0.0" />
@@ -50,6 +51,16 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 			<TargetPath>%(RecursiveDir)\%(Filename)%(Extension)</TargetPath>
 		</Content>
+		<Compile Remove="External Files\NewFolder1\**" />
+		<Compile Remove="External Files\NewFolder\**" />
+		<Content Remove="External Files\NewFolder1\**" />
+		<Content Remove="External Files\NewFolder\**" />
+		<EmbeddedResource Remove="External Files\NewFolder1\**" />
+		<EmbeddedResource Remove="External Files\NewFolder\**" />
+		<None Remove="External Files\NewFolder1\**" />
+		<None Remove="External Files\NewFolder\**" />
+		<Page Remove="External Files\NewFolder1\**" />
+		<Page Remove="External Files\NewFolder\**" />
 		<Resource Include="Kim_Synthji.ico" />
 		<Compile Update="Properties\Resource.Designer.cs">
 			<DesignTime>True</DesignTime>

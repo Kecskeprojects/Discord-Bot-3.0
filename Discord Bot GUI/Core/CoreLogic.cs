@@ -242,7 +242,7 @@ namespace Discord_Bot.Core
                 StreamWriter logFileWriter = null;
                 if (logger.Logs.Count != 0 && logFileWriter == null)
                 {
-                    string file_location = $"Logs\\logs[{Global.CurrentDate()}].txt";
+                    string file_location = $"Logs\\logs[{DateTimeTools.CurrentDate()}].txt";
 
                     using (logFileWriter = File.AppendText(file_location))
                     {

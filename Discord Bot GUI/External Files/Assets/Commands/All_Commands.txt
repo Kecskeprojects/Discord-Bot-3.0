@@ -1,0 +1,84 @@
+!!Update Admin_Commands.txt and Commands.txt in Jiubot/Modules if you update this list!!
+
+Text Commands:
+
+.twt [links]				twitter embed(DM)
+!help					List of commands (DM)
+!8ball [question]			8ball game (DM)
+!custom list				List of custom commands
+!coin flip				Flip a coin(DM)
+!wotd [language]			Word of the day in a language(DM)
+!remind at [date*] >[message]		remind by date (DM)
+!remind in [amount**] >[message]	remind in given time (DM)
+!remind list				your reminders (DM)
+!remind remove [position]		remove a reminder (DM)
+*use timezone in the following format:
+*22.01.01 01:01 +12 or 01.01 01:01 +12
+**years to minutes (e.g. !remind in 15 days >...)
+
+Voice Commands:
+
+!p [url/keyword]	Play music
+!join			Join to your channel
+!leave			Leaves your channel
+!queue			Current queue
+!np			Now playing
+!clear			Clears queue
+!skip			Skip song
+!remove	[position]	Remove song from queue
+!shuffle		Shuffles current playlist
+
+Last.fm commands:
+
+!lf conn [username]			connect last.fm username to you (DM)
+!lf del					disconnect last.fm username from you(DM)
+!lf np					song you are currently playing (DM)
+!lf rc [length(1-30)]			your most recent song (DM)
+!lf tar [length(1-30)] [*period]	your top artists (DM)
+!lf tal [length(1-30)] [*period]	your top albums (DM)
+!lf tt [length(1-30)] [*period]		your top tracks (DM)
+!lf artist [artist]			your stats for an artist (DM)
+!lf wk [artist]>[track]			ranking on a song or artist
+*overall, 7day, 1month, 3month, 6month, 12month
+
+Bias Commands:
+
+!ping [name],[name],...	ping everyone with this bias
+!bias add [name]	add bias to your list (DM)
+!bias remove [name]	remove bias from your list (DM)
+!bias clear		clear your bias list (DM)
+!bias list [group]	list all available biases (DM)
+!my biases [group]	list my biases (DM)
+
+Admin Commands:
+
+!help admin				Sends in a txt containing all the commands
+!command add [command name] [link]	Adding custom commands
+!command remove [command name]		Removes custom command with given name
+!setting set [type] [name]		Set a certain server setting (music, role, notif, notifrole, twitchchannel)
+!setting unset [type]			Unset a certain server setting (music, role, notif, notifrole, twitchchannel)
+!self role add [role]			Adds a role from the server's self role list
+!self role remove [role]		Removes a role from the server's self role list
+!keyword add `[keyword]` `[response]`	Adds new keyword to list
+!keyword remove [keyword]		Removes keyword from list
+!server settings			Lists the current settings of the server
+!biaslist add [name]-[group]		Add bias to global list of biases
+!biaslist remove [name]-[group]		Remove bias from global list of biases
+!game ping				Pong (DM too)
+
+Owner Commands:
+!help owner			Includes owner commands too
+!say [channel name] [message]	Sends the message to the channel you want to like the bot wrote it, deletes your message
+!dbmanagement [query]		Do the SQL query written by user (DM too)
+!greeting add [url]		Add new greeting url (DM too)
+!greeting remove [id]		Remove greeting url (DM too)
+
+
+Features:
+-Replying to messages starting with "I think" in agreement
+-replying to someone saying "I am" or "I'm"
+-If someone types "@(bot name)" in a message it replies with a gif
+-Replying to pre defined list of keywords
+-Adding roles to users from pre-defined list
+-Very rare random responses
+-Instagram embeds beyond discord's capabilities

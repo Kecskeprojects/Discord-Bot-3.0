@@ -7,6 +7,6 @@ namespace Discord_Bot.Interfaces.DBServices
     public interface ICustomCommandService
     {
         Task<CustomCommandResource> GetCustomCommandAsync(ulong id, string commandName);
-        List<CustomCommandResource> GetServerCustomCommandListAsync(ulong id);
+        Task<List<CustomCommandResource>> GetServerCustomCommandListAsync(ulong id);
     }
 }

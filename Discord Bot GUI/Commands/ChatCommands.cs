@@ -60,7 +60,7 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                List<CustomCommandResource> list = customCommandService.GetServerCustomCommandListAsync(Context.Guild.Id);
+                List<CustomCommandResource> list = await customCommandService.GetServerCustomCommandListAsync(Context.Guild.Id);
                 if (CollectionTools.IsNullOrEmpty(list))
                 {
                     await ReplyAsync("There are no custom commands on this server!");
@@ -145,7 +145,6 @@ namespace Discord_Bot.Commands
         #endregion
 
         #region Word of the day command
-        //Sends an embed with the word of the day
         [Command("wotd")]
         [Alias(new string[] { "word of the day" })]
         [Summary("Learn a word a day command")]

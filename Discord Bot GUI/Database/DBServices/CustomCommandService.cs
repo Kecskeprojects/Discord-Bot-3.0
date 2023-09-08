@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Discord_Bot.Commands;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Database.Models;
@@ -32,6 +33,19 @@ namespace Discord_Bot.Database.DBServices
             return result;
         }
 
-        public List<CustomCommandResource> GetServerCustomCommandListAsync(ulong id) => throw new NotImplementedException();
+        public async Task<List<CustomCommandResource>> GetServerCustomCommandListAsync(ulong id)
+        {
+            List<CustomCommandResource> result = null;
+            try
+            {
+                List<CustomCommand> commands = await customCommandRepository.GetCustomCommandAsync(id);
+                result = mapper.Map<List<CustomCommand>, List<CustomCommandResource>>(commands);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("CustomCommandService.cs GetServerCustomCommandListAsync", ex.ToString());
+            }
+            return result;
+        }
     }
 }
