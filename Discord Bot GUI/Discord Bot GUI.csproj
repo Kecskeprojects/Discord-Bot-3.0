@@ -51,16 +51,6 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 			<TargetPath>%(RecursiveDir)\%(Filename)%(Extension)</TargetPath>
 		</Content>
-		<Compile Remove="External Files\NewFolder1\**" />
-		<Compile Remove="External Files\NewFolder\**" />
-		<Content Remove="External Files\NewFolder1\**" />
-		<Content Remove="External Files\NewFolder\**" />
-		<EmbeddedResource Remove="External Files\NewFolder1\**" />
-		<EmbeddedResource Remove="External Files\NewFolder\**" />
-		<None Remove="External Files\NewFolder1\**" />
-		<None Remove="External Files\NewFolder\**" />
-		<Page Remove="External Files\NewFolder1\**" />
-		<Page Remove="External Files\NewFolder\**" />
 		<Resource Include="Kim_Synthji.ico" />
 		<Compile Update="Properties\Resource.Designer.cs">
 			<DesignTime>True</DesignTime>
