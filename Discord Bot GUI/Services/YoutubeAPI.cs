@@ -296,7 +296,7 @@ namespace Discord_Bot.Services
                     await PlaylistSearch(youtubeService, queryPart["list"], username, serverId);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("YoutubeAPI.cs AddPlaylistAsync", ex.ToString());
             }

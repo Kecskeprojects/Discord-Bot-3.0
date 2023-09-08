@@ -216,7 +216,7 @@ namespace Discord_Bot
                 await client.Rest.CurrentUser.UpdateAsync();
                 logger.Log("Current user data updated!");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("App.xaml.cs OnWebSocketReady", ex.ToString());
             }

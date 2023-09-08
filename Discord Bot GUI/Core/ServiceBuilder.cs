@@ -68,6 +68,7 @@ namespace Discord_Bot.Core
             collection.AddSingleton<IYoutubeAPI, YoutubeAPI>();
             collection.AddSingleton<IPictureHandler, PictureHandler>();
             collection.AddSingleton<IInstaLoader, InstaLoader>();
+            collection.AddSingleton<IWordOfTheDayService, WordOfTheDayService>();
 
             //Database
             collection.AddScoped<IServerRepository, ServerRepository>();

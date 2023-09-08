@@ -10,10 +10,7 @@ namespace Discord_Bot.Services
     {
         private readonly Logging logger;
 
-        public InstaLoader(Logging logger)
-        {
-            this.logger = logger;
-        }
+        public InstaLoader(Logging logger) => this.logger = logger;
 
         //https://instaloader.github.io/basic-usage.html
         //https://github.com/instaloader/instaloader
@@ -38,7 +35,7 @@ namespace Discord_Bot.Services
                 Process process = Process.Start(instaloader);
                 process.WaitForExit();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("InstaLoader.cs DownloadFromInstagram", ex.ToString());
             }

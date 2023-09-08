@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.Net;
 using Discord_Bot.CommandsService;
 using Discord_Bot.Communication;
+using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Services;
 using Discord_Bot.Tools;
@@ -15,7 +16,7 @@ namespace Discord_Bot.Commands
 {
     public class TwitterScraperCommands : CommandBase
     {
-        public TwitterScraperCommands(Logging logger) : base(logger)
+        public TwitterScraperCommands(Logging logger, Config config) : base(logger, config)
         {
         }
 

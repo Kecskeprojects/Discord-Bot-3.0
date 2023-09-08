@@ -15,31 +15,6 @@ namespace Discord_Bot.Core
     {
         #region Global Variables
         public static Dictionary<ulong, ServerAudioResource> ServerAudioResources { get; set; } = new();
-        public static string[] EasterEggMessages { get; } = new string[]
-            {
-                "I know where you live",
-                "It is so dark in here",
-                "Who are you?",
-                "It is time",
-                "Are you sure about this?",
-                "Meow...?",
-                "I love you all",
-                "I so so want to get some takeout for dinner",
-                ":rabbit:",
-                "Happy birthday",
-                "I could go for some macarons rn",
-                "Yes baby yes",
-                "I am sorry?",
-                "It's so over for you",
-                "Sus",
-                "I will not let you off that easy",
-                "I hear voices while you sleep"
-            };
-
-        //Array for 8ball answers
-        public static string[] Answers8ball { get;  } = { "It is certain", "It is decidedly so", "Without a doubt", "Yes, definitely", "You may rely on it", "As I see it, yes", "Most likely"
-                                                 , "Outlook good", "Yes", "Signs point to yes", "Reply hazy try again", "Ask again later", "Better not tell you now", "Cannot predict now"
-                                                 , "Concentrate and ask again", "Don't count on it", "My reply is no", "My sources say no", "Outlook not so good", "Very doubtful" };
         #endregion
 
         #region Global Functions

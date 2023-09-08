@@ -59,7 +59,7 @@ namespace Discord_Bot
                     mainPanelBorder.Margin = new Thickness(0);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("MainWindow.xaml.cs ToolBar_Loaded", ex.ToString());
             }
@@ -71,7 +71,7 @@ namespace Discord_Bot
             {
                 logger.Log("Logged action!\nNew Line");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("MainWindow.xaml.cs WriteLog", ex.ToString());
             }

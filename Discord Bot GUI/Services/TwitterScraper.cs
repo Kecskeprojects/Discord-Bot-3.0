@@ -187,7 +187,7 @@ namespace Discord_Bot.Services
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Exceptions.Add(ex.Message);
             }

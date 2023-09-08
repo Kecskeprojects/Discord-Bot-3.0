@@ -6,6 +6,7 @@ using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices
@@ -30,5 +31,7 @@ namespace Discord_Bot.Database.DBServices
             }
             return result;
         }
+
+        public List<CustomCommandResource> GetServerCustomCommandListAsync(ulong id) => throw new NotImplementedException();
     }
 }

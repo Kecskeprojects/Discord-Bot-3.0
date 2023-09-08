@@ -199,7 +199,7 @@ namespace Discord_Bot.Services
             {
                 logger.Log("Twitch monitoring started!");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("TwitchAPI.cs MonitorOnServiceStarted", ex.ToString());
             }

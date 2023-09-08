@@ -106,7 +106,7 @@ namespace Discord_Bot.Core
                 //Easter egg messages
                 if (r.Next(0, 5000) == 0)
                 {
-                    await channel.SendMessageAsync(Global.EasterEggMessages[r.Next(0, Global.EasterEggMessages.Length)]);
+                    await channel.SendMessageAsync(StaticLists.EasterEggMessages[r.Next(0, StaticLists.EasterEggMessages.Length)]);
                     return;
                 }
                 else if (r.Next(1, 101) < 10)
@@ -226,7 +226,7 @@ namespace Discord_Bot.Core
                     });
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("CoreLogic.cs InstagramEmbed", ex.ToString());
             }
@@ -294,7 +294,7 @@ namespace Discord_Bot.Core
                     logger.Log(string.Join('\n', logs));
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("CoreLogic.css CheckFolder", ex.ToString());
             }
