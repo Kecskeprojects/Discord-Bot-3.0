@@ -7,15 +7,14 @@ using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.Instagram;
 using Discord_Bot.Tools;
-using Google.Apis.YouTube.v3.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive.Joins;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
@@ -24,12 +23,14 @@ namespace Discord_Bot.Commands
     {
         private readonly IServerService serverService;
         private readonly DiscordSocketClient client;
+        private readonly IInstaLoader instaLoader;
         private readonly Logging logger;
 
-        public ServiceDiscordCommunication(IServerService serverService, DiscordSocketClient client, Logging logger)
+        public ServiceDiscordCommunication(IServerService serverService, DiscordSocketClient client, IInstaLoader instaLoader, Logging logger)
         {
             this.serverService = serverService;
             this.client = client;
+            this.instaLoader = instaLoader;
             this.logger = logger;
         }
 
@@ -41,7 +42,7 @@ namespace Discord_Bot.Commands
             List<FileAttachment> attachments = null;
             try
             {
-                ServiceDiscordCommunicationService.DownloadFromInstagram(uri, logger);
+                instaLoader.DownloadFromInstagram(uri);
 
                 string[] files = Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), $"Instagram\\{uri.Segments[2][..^1]}"));
                 string caption = "";
@@ -64,7 +65,7 @@ namespace Discord_Bot.Commands
                         logger.Warning("InstagramDownloader.cs GetImagesFromPost", ex.ToString(), LogOnly: true);
 
                         attachments = ServiceDiscordCommunicationService.ReadFiles(files, ref caption, ref metadata, true);
-                        if (attachments.Count > 0)
+                        if (!CollectionTools.IsNullOrEmpty(attachments))
                         {
                             await channel.SendFilesAsync(attachments, caption, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
                             shouldMessageBeSuppressed = true;

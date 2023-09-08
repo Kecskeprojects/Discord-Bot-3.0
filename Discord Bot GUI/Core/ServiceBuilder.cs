@@ -62,11 +62,12 @@ namespace Discord_Bot.Core
 
             collection.AddTransient(typeof(MainWindow));
 
-            //API
+            //Services
             collection.AddSingleton<ITwitchAPI, TwitchAPI>();
             collection.AddSingleton<ISpotifyAPI, Services.SpotifyAPI>();
             collection.AddSingleton<IYoutubeAPI, YoutubeAPI>();
             collection.AddSingleton<IPictureHandler, PictureHandler>();
+            collection.AddSingleton<IInstaLoader, InstaLoader>();
 
             //Database
             collection.AddScoped<IServerRepository, ServerRepository>();

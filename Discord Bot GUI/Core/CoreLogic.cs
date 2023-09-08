@@ -147,7 +147,7 @@ namespace Discord_Bot.Core
                 //Get the list of reminders that are before or exactly set to this minute
                 DateTime dateTime = DateTime.Parse(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm"));
                 List<ReminderResource> result = await reminderService.GetCurrentRemindersAsync(dateTime);
-                if (result.Count > 0)
+                if (!CollectionTools.IsNullOrEmpty(result))
                 {
                     foreach (ReminderResource reminder in result)
                     {
@@ -170,16 +170,24 @@ namespace Discord_Bot.Core
         //3 second time limit to event by default
         public void Closing()
         {
-            logger.Log("Application closing...");
-            LogToFile();
-            TwitterScraper.CloseBrowser();
+            try
+            {
+                logger.Log("Application closing...");
+                LogToFile();
+                TwitterScraper.CloseBrowser();
+            }
+            catch (Exception) { }
         }
 
         public void Closing(object sender, EventArgs e)
         {
-            logger.Log("Application closing...");
-            LogToFile();
-            TwitterScraper.CloseBrowser();
+            try
+            {
+                logger.Log("Application closing...");
+                LogToFile();
+                TwitterScraper.CloseBrowser();
+            }
+            catch (Exception) { }
         }
         #endregion
 
@@ -187,33 +195,40 @@ namespace Discord_Bot.Core
         //Check if message is an instagram link and has an embed or not
         public void InstagramEmbed(string message, ulong messageId, ulong channelId, ulong? guildId)
         {
-            List<Uri> urls = UrlTools.LinkSearch(message, false, "https://instagram.com/");
-
-            //Check if message is an instagram link
-            if (urls != null && urls.Count > 0)
+            try
             {
-                //Run link embedding in separate thread
-                _ = Task.Run(async () =>
+                List<Uri> urls = UrlTools.LinkSearch(message, false, "https://instagram.com/");
+
+                //Check if message is an instagram link
+                if (!CollectionTools.IsNullOrEmpty(urls))
                 {
-                    try
+                    //Run link embedding in separate thread
+                    _ = Task.Run(async () =>
                     {
-                        for (int i = 0; i < urls.Count; i++)
+                        try
                         {
-                            logger.Log($"Embed message from following link: {urls[i]}");
-                            if (urls[i].Segments.Length != 2 &&
-                                urls[i].Segments[1][..^1] != "stories" &&
-                                urls[i].Segments[1][..^1] != "live" &&
-                                urls[i].Segments[2][..^1] != "live")
+                            for (int i = 0; i < urls.Count; i++)
                             {
-                                await serviceDiscordCommunication.SendInstagramPostEmbed(urls[i], messageId, channelId, guildId);
+                                logger.Log($"Embed message from following link: {urls[i]}");
+                                if (urls[i].Segments.Length != 2 &&
+                                    urls[i].Segments[1][..^1] != "stories" &&
+                                    urls[i].Segments[1][..^1] != "live" &&
+                                    urls[i].Segments[2][..^1] != "live")
+                                {
+                                    await serviceDiscordCommunication.SendInstagramPostEmbed(urls[i], messageId, channelId, guildId);
+                                }
                             }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Error("CoreLogic.cs InstagramEmbed", ex.ToString());
-                    }
-                });
+                        catch (Exception ex)
+                        {
+                            logger.Error("CoreLogic.cs InstagramEmbed AsyncTask", ex.ToString());
+                        }
+                    });
+                }
+            }
+            catch(Exception ex)
+            {
+                logger.Error("CoreLogic.cs InstagramEmbed", ex.ToString());
             }
         }
         #endregion
@@ -222,9 +237,9 @@ namespace Discord_Bot.Core
         //For logging messages, errors, and messages to log files
         public void LogToFile()
         {
-            StreamWriter logFileWriter = null;
             try
             {
+                StreamWriter logFileWriter = null;
                 if (logger.Logs.Count != 0 && logFileWriter == null)
                 {
                     string file_location = $"Logs\\logs[{Global.CurrentDate()}].txt";
@@ -251,30 +266,37 @@ namespace Discord_Bot.Core
         //Check if folders for long term storage exist
         public void CheckFolders()
         {
-            List<string> logs = new();
-
-            string currentDir = Directory.GetCurrentDirectory();
-            if (!Directory.Exists(Path.Combine(currentDir, "Logs")))
+            try
             {
-                Directory.CreateDirectory(Path.Combine(currentDir, "Logs"));
-                logs.Add("Logs folder created!");
+                List<string> logs = new();
+
+                string currentDir = Directory.GetCurrentDirectory();
+                if (!Directory.Exists(Path.Combine(currentDir, "Logs")))
+                {
+                    Directory.CreateDirectory(Path.Combine(currentDir, "Logs"));
+                    logs.Add("Logs folder created!");
+                }
+
+                if (!Directory.Exists(Path.Combine(currentDir, "Assets")))
+                {
+                    Directory.CreateDirectory(Path.Combine(currentDir, "Assets"));
+                    logs.Add("Assets folder created!");
+                }
+
+                if (!Directory.Exists(Path.Combine(currentDir, "Assets\\Commands")))
+                {
+                    Directory.CreateDirectory(Path.Combine(currentDir, "Assets\\Commands"));
+                    logs.Add("Commands folder created!");
+                }
+
+                if (logs.Count != 0)
+                {
+                    logger.Log(string.Join('\n', logs));
+                }
             }
-
-            if (!Directory.Exists(Path.Combine(currentDir, "Assets")))
+            catch(Exception ex)
             {
-                Directory.CreateDirectory(Path.Combine(currentDir, "Assets"));
-                logs.Add("Assets folder created!");
-            }
-
-            if (!Directory.Exists(Path.Combine(currentDir, "Assets\\Commands")))
-            {
-                Directory.CreateDirectory(Path.Combine(currentDir, "Assets\\Commands"));
-                logs.Add("Commands folder created!");
-            }
-
-            if (logs.Count != 0)
-            {
-                logger.Log(string.Join('\n', logs));
+                logger.Error("CoreLogic.css CheckFolder", ex.ToString());
             }
         }
         #endregion

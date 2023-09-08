@@ -103,69 +103,107 @@ namespace Discord_Bot.Services
         //Make announcement when stream comes online
         private async void MonitorOnStreamOnline(object sender, OnStreamOnlineArgs e)
         {
-            logger.Query($"Streamer turned online: {e.Stream.UserName} with id: {e.Stream.Id}");
-            List<TwitchChannelResource> channels = await twitchChannelService.GetChannelsAsync();
-            foreach (TwitchChannelResource channel in channels)
+            try
             {
-                if (channelStatuses.ContainsKey(channel.TwitchId) &&
-                    !channelStatuses[channel.TwitchId] &&
-                    channel.TwitchId == e.Stream.UserId)
+                logger.Query($"Streamer turned online: {e.Stream.UserName} with id: {e.Stream.Id}");
+                List<TwitchChannelResource> channels = await twitchChannelService.GetChannelsAsync();
+                foreach (TwitchChannelResource channel in channels)
                 {
-                    await serviceDiscordCommunication.SendTwitchEmbed(channel, e.Stream.ThumbnailUrl, e.Stream.Title);
-                    channelStatuses[channel.TwitchId] = true;
+                    if (channelStatuses.ContainsKey(channel.TwitchId) &&
+                        !channelStatuses[channel.TwitchId] &&
+                        channel.TwitchId == e.Stream.UserId)
+                    {
+                        await serviceDiscordCommunication.SendTwitchEmbed(channel, e.Stream.ThumbnailUrl, e.Stream.Title);
+                        channelStatuses[channel.TwitchId] = true;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("TwitchAPI.cs MonitorOnStreamOnline", ex.ToString());
             }
         }
 
         //Make console message when stream goes offline
         private async void MonitorOnStreamOffline(object sender, OnStreamOfflineArgs e)
         {
-            logger.Query($"Streamer turned offline: {e.Stream.UserName} with id: {e.Stream.Id}");
-
-            List<TwitchChannelResource> channels = await twitchChannelService.GetChannelsAsync();
-            foreach (TwitchChannelResource channel in channels)
+            try
             {
-                if (channelStatuses.ContainsKey(channel.TwitchId) &&
-                    channelStatuses[channel.TwitchId] &&
-                    channel.TwitchId == e.Stream.UserId)
+                logger.Query($"Streamer turned offline: {e.Stream.UserName} with id: {e.Stream.Id}");
+
+                List<TwitchChannelResource> channels = await twitchChannelService.GetChannelsAsync();
+                foreach (TwitchChannelResource channel in channels)
                 {
-                    channelStatuses[channel.TwitchId] = false;
+                    if (channelStatuses.ContainsKey(channel.TwitchId) &&
+                        channelStatuses[channel.TwitchId] &&
+                        channel.TwitchId == e.Stream.UserId)
+                    {
+                        channelStatuses[channel.TwitchId] = false;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("TwitchAPI.cs MonitorOnStreamOffline", ex.ToString());
             }
         }
 
         //Every 2 hours, send message on console, every 24 hours, refresh token and reset counter
         private async void MonitorOnServiceTick(object sender, OnServiceTickArgs e)
         {
-            TokenTick++;
-            if (TokenTick > 1440)
+            try
             {
-                Token = GenerateToken();
-                TokenTick = 0;
+                TokenTick++;
+                if (TokenTick > 1440)
+                {
+                    Token = GenerateToken();
+                    TokenTick = 0;
+                }
+
+                if (TokenTick % 120 == 0)
+                {
+                    logger.Log("===================================");
+                    logger.Log("120 queries have been completed!");
+                    logger.Log("===================================");
+                }
+
+                if (TokenTick % 5 == 0)
+                {
+                    List<string> lst = await GetChannels();
+
+                    if (Monitor.ChannelsToMonitor.Except(lst).Any()) Monitor.SetChannelsById(lst);
+                }
             }
-
-            if (TokenTick % 120 == 0)
+            catch (Exception ex)
             {
-                logger.Log("===================================");
-                logger.Log("120 queries have been completed!");
-                logger.Log("===================================");
-            }
-
-            if (TokenTick % 5 == 0)
-            {
-                List<string> lst = await GetChannels();
-
-                if (Monitor.ChannelsToMonitor.Except(lst).Any()) Monitor.SetChannelsById(lst);
+                logger.Error("TwitchAPI.cs MonitorOnServiceTick", ex.ToString());
             }
         }
 
         private void MonitorOnChannelsSet(object sender, OnChannelsSetArgs e)
         {
-            string channels = string.Join(", ", e.Channels);
-            logger.Query("Now listening to twitch channel ids: " + channels);
+            try
+            {
+                string channels = string.Join(", ", e.Channels);
+                logger.Query("Now listening to twitch channel ids: " + channels);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("TwitchAPI.cs MonitorOnChannelsSet", ex.ToString());
+            }
         }
 
-        private void MonitorOnServiceStarted(object sender, OnServiceStartedArgs e) => logger.Log("Twitch monitoring started!");
+        private void MonitorOnServiceStarted(object sender, OnServiceStartedArgs e)
+        {
+            try
+            {
+                logger.Log("Twitch monitoring started!");
+            }
+            catch(Exception ex)
+            {
+                logger.Error("TwitchAPI.cs MonitorOnServiceStarted", ex.ToString());
+            }
+        }
         #endregion
 
         #region Helper Methods
@@ -196,36 +234,27 @@ namespace Discord_Bot.Services
         //Get user data by username
         public UserData GetChannel(string username)
         {
-            try
+            Process process = new()
             {
-                Process process = new()
+                StartInfo = new ProcessStartInfo()
                 {
-                    StartInfo = new ProcessStartInfo()
-                    {
-                        UseShellExecute = false,
-                        CreateNoWindow = true,
-                        FileName = "cmd.exe",
-                        Arguments = $"/C twitch.exe api get users?login={username.ToLower()}",
-                        RedirectStandardError = true,
-                        RedirectStandardOutput = true
-                    }
-                };
-                process.Start();
-                string response = process.StandardOutput.ReadToEnd();
-                process.WaitForExit();
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    FileName = "cmd.exe",
+                    Arguments = $"/C twitch.exe api get users?login={username.ToLower()}",
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true
+                }
+            };
+            process.Start();
+            string response = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
 
-                User twitchUser = JsonConvert.DeserializeObject<User>(response);
+            User twitchUser = JsonConvert.DeserializeObject<User>(response);
 
-                logger.Query($"Twitch user found: {twitchUser.Response[0].DisplayName}");
+            logger.Query($"Twitch user found: {twitchUser.Response[0].DisplayName}");
 
-                return twitchUser.Response[0];
-            }
-            catch (Exception ex)
-            {
-                logger.Error("TwitchAPI.cs GetChannel", ex.ToString());
-            }
-
-            return null;
+            return twitchUser.Response[0];
         }
 
         private async Task<List<string>> GetChannels()

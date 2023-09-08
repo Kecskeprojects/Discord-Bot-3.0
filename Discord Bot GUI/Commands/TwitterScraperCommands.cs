@@ -30,7 +30,7 @@ namespace Discord_Bot.Commands
                 if (urls != null)
                 {
                     urls = urls.Where(x => x.Segments.Length >= 3 && x.Segments[2] == "status/").ToList();
-                    if (urls.Count > 0)
+                    if (!CollectionTools.IsNullOrEmpty(urls))
                     {
                         logger.Log($"Embed message from following links: \n{string.Join("\n", urls)}");
 
@@ -38,13 +38,17 @@ namespace Discord_Bot.Commands
 
                         MessageReference refer = new(Context.Message.Id, Context.Channel.Id, Context.Guild.Id, false);
 
-                        if (!string.IsNullOrEmpty(result.ErrorMessage))
+                        if (!string.IsNullOrEmpty(result.ErrorMessage) && result.ErrorMessage.Length < 100)
                         {
                             await ReplyAsync(result.ErrorMessage);
                         }
+                        else
+                        {
+                            logger.Log(result.ErrorMessage);
+                        }
 
                         List<FileAttachment> attachments = TwitterScraperService.AllContentInRegularMessage(result.Videos, result.Images);
-                        if (attachments.Count > 0)
+                        if (!CollectionTools.IsNullOrEmpty(attachments))
                         {
                             try
                             {
@@ -58,7 +62,7 @@ namespace Discord_Bot.Commands
                                     logger.Warning("ServiceDiscordCommunication.cs SendTwitterMessage", ex.ToString(), LogOnly: true);
 
                                     attachments = TwitterScraperService.AllContentInRegularMessage(result.Videos, result.Images, false);
-                                    if (attachments.Count > 0)
+                                    if (!CollectionTools.IsNullOrEmpty(attachments))
                                     {
                                         await Context.Channel.SendFilesAsync(attachments, messageReference: refer);
                                         await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);

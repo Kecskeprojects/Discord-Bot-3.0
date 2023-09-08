@@ -24,6 +24,7 @@ namespace Discord_Bot.Services
         //The standard image url is the following:
         //https://pbs.twimg.com/media/[image_id]?format=[image_format]&name=[width]x[height]
         private List<Uri> Images { get; set; } = new();
+        private List<string> Exceptions { get; } = new List<string>();
         #endregion
 
         #region Main Methods
@@ -84,6 +85,7 @@ namespace Discord_Bot.Services
 
                 await mainPage.CloseAsync();
 
+                messages += string.Join("\n", Exceptions);
                 return string.IsNullOrEmpty(messages)
                     ? new TwitterScrapingResult(Videos, Images)
                     : new TwitterScrapingResult(Videos, Images, messages);
@@ -168,19 +170,26 @@ namespace Discord_Bot.Services
 
         private void TwitterScraperResponse(object sender, ResponseCreatedEventArgs e)
         {
-            //The standard video url we want is the following:
-            //https://video.twimg.com/ext_tw_video/[folder_id]/pu/vid/[width]x[height]/[video_id].mp4?tag=12
-            //https://video.twimg.com/amplify_video/[folder_id]/vid/[width]x[height]/[video_id].mp4?tag=14
-            //https://video.twimg.com/tweet_video/[video_id].mp4
-            if (e.Response.Url.StartsWith("https://video.twimg.com/") && e.Response.Url.Contains(".mp4"))
+            try
             {
-                Uri currUrl = new(e.Response.Url);
-
-                //Links get repeatedly sent by twitter, so we only want to save one of each
-                if (TempVideos.FirstOrDefault(x => x.Segments[2] == currUrl.Segments[2]) == null)
+                //The standard video url we want is the following:
+                //https://video.twimg.com/ext_tw_video/[folder_id]/pu/vid/[width]x[height]/[video_id].mp4?tag=12
+                //https://video.twimg.com/amplify_video/[folder_id]/vid/[width]x[height]/[video_id].mp4?tag=14
+                //https://video.twimg.com/tweet_video/[video_id].mp4
+                if (e.Response.Url.StartsWith("https://video.twimg.com/") && e.Response.Url.Contains(".mp4"))
                 {
-                    TempVideos.Add(currUrl);
+                    Uri currUrl = new(e.Response.Url);
+
+                    //Links get repeatedly sent by twitter, so we only want to save one of each
+                    if (TempVideos.FirstOrDefault(x => x.Segments[2] == currUrl.Segments[2]) == null)
+                    {
+                        TempVideos.Add(currUrl);
+                    }
                 }
+            }
+            catch(Exception ex)
+            {
+                Exceptions.Add(ex.Message);
             }
         }
         #endregion

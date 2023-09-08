@@ -2,6 +2,7 @@
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Tools;
 using SpotifyAPI.Web;
 using System;
 using System.Collections.Generic;
@@ -102,7 +103,7 @@ namespace Discord_Bot.Services
                         list = album.Items.Select(n => $"{n.Name.Trim()} {n.Artists[0].Name.Trim()}").ToArray();
                     }
 
-                    if (list.Length > 0)
+                    if (CollectionTools.IsNullOrEmpty(list))
                     {
                         foreach (string track in list)
                         {

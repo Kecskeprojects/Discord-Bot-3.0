@@ -1,10 +1,8 @@
 ﻿using Discord;
-using Discord_Bot.Core.Logger;
 using Discord_Bot.Services.Models.Instagram;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 
 namespace Discord_Bot.CommandsService
@@ -30,33 +28,10 @@ namespace Discord_Bot.CommandsService
             return message;
         }
 
-        //https://instaloader.github.io/basic-usage.html
-        //https://github.com/instaloader/instaloader
-        //instaloader.exe --quiet --filename-pattern={date_utc}_{shortcode} --dirname-pattern={ shortcode} --no-video-thumbnails --no-compress-json -- -CfGa5x0FCak -Cppwn5qjMJA
-        public static void DownloadFromInstagram(Uri uri, Logging logger)
-        {
-            ProcessStartInfo instaloader = new()
-            {
-                FileName = "cmd.exe",
-                Arguments = @"/C instaloader.exe " +
-                            @"--quiet --no-video-thumbnails --no-compress-json " +
-                            @"--filename-pattern={date_utc}_{shortcode} --dirname-pattern={shortcode} -- -" +
-                            uri.Segments[2][..^1],
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true,
-                WorkingDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Instagram")
-            };
-            logger.Log("Downloading images");
-            Process process = Process.Start(instaloader);
-            process.WaitForExit();
-        }
-
         public static List<FileAttachment> ReadFiles(string[] files, ref string caption, ref Node metadata, bool ignoreVideos)
         {
             List<FileAttachment> attachments = new();
-            int maxCount = files.Length < 10 ? files.Length : 10;
-            for (int i = 0; i < maxCount; i++)
+            for (int i = 0; i < files.Length; i++)
             {
                 if (files[i].EndsWith(".txt"))
                 {
@@ -67,7 +42,7 @@ namespace Discord_Bot.CommandsService
                 {
                     metadata = JsonConvert.DeserializeObject<InstaLoaderBase>(File.ReadAllText(files[i])).Node;
                 }
-                else if (!ignoreVideos || files[i].EndsWith(".jpg") || files[i].EndsWith(".png"))
+                else if (attachments.Count <= 10 && (!ignoreVideos || files[i].EndsWith(".jpg") || files[i].EndsWith(".png")))
                 {
                     attachments.Add(new FileAttachment(files[i]));
                 }

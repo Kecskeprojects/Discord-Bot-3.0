@@ -25,7 +25,8 @@ namespace Discord_Bot.Services
         public EditPictureResult EditPicture(Stream originalImg, Dictionary<string, int> plays, string HeadText)
         {
             try
-            {//Get two instances of the same picture
+            {
+                //Get two instances of the same picture
                 using Image mainImage = Image.Load(originalImg);
                 using Image AlbumImage = mainImage.CloneAs<Rgba32>();
 

@@ -47,9 +47,10 @@ namespace Discord_Bot.Database.DBServices
             ServerResource result = null;
             try
             {
-                if (cache.ServerCache.ContainsKey(id))
+                ServerResource cachedServer = cache.TryGetValue(id);
+                if (cachedServer != null)
                 {
-                    return cache.ServerCache[id];
+                    return cachedServer;
                 }
 
                 Server server = await serverRepository.GetByDiscordIdAsync(id);
@@ -58,7 +59,7 @@ namespace Discord_Bot.Database.DBServices
                 result = mapper.Map<Server, ServerResource>(server);
                 await FillWithChannels(result);
 
-                cache.ServerCache.Add(result.DiscordId, result);
+                cache.TryAddValue(result.DiscordId, result);
             }
             catch (Exception ex)
             {

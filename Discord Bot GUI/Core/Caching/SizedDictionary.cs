@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Discord_Bot.Tools;
+using System.Collections.Generic;
 
 namespace Discord_Bot.Core.Caching
 {
@@ -27,7 +28,7 @@ namespace Discord_Bot.Core.Caching
             if (key == null) throw new();
             if (!keys.Contains(key)) return false;
             Queue<TKey> newQueue = new();
-            while (keys.Count > 0)
+            while (!CollectionTools.IsNullOrEmpty(keys))
             {
                 TKey thisKey = keys.Dequeue();
                 if (!thisKey.Equals(key)) newQueue.Enqueue(thisKey);

@@ -5,6 +5,7 @@ using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Tools;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
@@ -275,7 +276,7 @@ namespace Discord_Bot.Services
             if (!filterWords.Any(query.ToLower().Contains))
             {
                 List<SearchResult> filteredList = items.Where(result => !filterWords.Any(result.Snippet.Title.ToLower().Contains)).ToList();
-                if (filteredList.Count > 0)
+                if (CollectionTools.IsNullOrEmpty(filteredList))
                 {
                     items = filteredList;
                 }
@@ -287,10 +288,17 @@ namespace Discord_Bot.Services
         //Checking if user wants to add playlist
         private async Task AddPlaylistAsync(YouTubeService youtubeService, NameValueCollection queryPart, string username, ulong serverId, ulong channelId)
         {
-            bool result = await serviceDiscordCommunication.YoutubeAddPlaylistMessage(channelId);
-            if (result)
+            try
             {
-                await PlaylistSearch(youtubeService, queryPart["list"], username, serverId);
+                bool result = await serviceDiscordCommunication.YoutubeAddPlaylistMessage(channelId);
+                if (result)
+                {
+                    await PlaylistSearch(youtubeService, queryPart["list"], username, serverId);
+                }
+            }
+            catch(Exception ex)
+            {
+                logger.Error("YoutubeAPI.cs AddPlaylistAsync", ex.ToString());
             }
         }
 
