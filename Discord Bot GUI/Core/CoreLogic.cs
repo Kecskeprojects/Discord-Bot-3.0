@@ -157,7 +157,7 @@ namespace Discord_Bot.Core
 
                     List<int> reminderIds = result.Select(r => r.ReminderId).ToList();
                     DbProcessResultEnum reminderResult = await reminderService.RemoveCurrentRemindersAsync(reminderIds);
-                    if(reminderResult == DbProcessResultEnum.Failure)
+                    if (reminderResult == DbProcessResultEnum.Failure)
                     {
                         logger.Error("CoreLogic.cs ReminderCheck", "Failure during reminder check!");
                     }

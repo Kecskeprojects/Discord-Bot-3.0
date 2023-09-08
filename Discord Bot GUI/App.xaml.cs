@@ -291,7 +291,7 @@ namespace Discord_Bot
                     if (server == null)
                     {
                         DbProcessResultEnum result = await serverService.AddServerAsync(context.Guild.Id);
-                        if(result == DbProcessResultEnum.Success)
+                        if (result == DbProcessResultEnum.Success)
                         {
                             server = await serverService.GetByDiscordIdAsync(context.Guild.Id);
                         }

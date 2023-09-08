@@ -51,7 +51,7 @@ namespace Discord_Bot.Services
 
         public static async void CloseBrowser()
         {
-            if(Browser != null && !Browser.IsClosed)
+            if (Browser != null && !Browser.IsClosed)
             {
                 await Browser.CloseAsync();
             }

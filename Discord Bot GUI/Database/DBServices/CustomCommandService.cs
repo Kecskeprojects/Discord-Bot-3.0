@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Discord_Bot.Commands;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Database.Models;

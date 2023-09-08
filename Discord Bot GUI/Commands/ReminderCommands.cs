@@ -1,16 +1,16 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord_Bot.CommandsService;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
+using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Resources;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
-using Discord_Bot.CommandsService;
-using Discord_Bot.Enums;
-using Discord_Bot.Resources;
-using Discord_Bot.Interfaces.Commands;
 
 namespace Discord_Bot.Commands
 {
@@ -18,10 +18,7 @@ namespace Discord_Bot.Commands
     {
         private readonly IReminderService reminderService;
 
-        public ReminderCommands(IReminderService reminderService, Logging logger, Config config) : base(logger, config)
-        {
-            this.reminderService = reminderService;
-        }
+        public ReminderCommands(IReminderService reminderService, Logging logger, Config config) : base(logger, config) => this.reminderService = reminderService;
 
         [Command("remind at")]
         [Alias(new string[] { "reminder at" })]
@@ -63,7 +60,7 @@ namespace Discord_Bot.Commands
                     {
                         DbProcessResultEnum result = await reminderService.AddReminderAsync(Context.User.Id, ConvertedDate, remindMessage);
 
-                        if(result == DbProcessResultEnum.Success)
+                        if (result == DbProcessResultEnum.Success)
                         {
                             await ReplyAsync($"Alright, I will remind you at `{date}`!");
                         }
@@ -115,7 +112,7 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                if (message.Split(">").Length < 2) 
+                if (message.Split(">").Length < 2)
                 {
                     return;
                 }
@@ -206,7 +203,7 @@ namespace Discord_Bot.Commands
                 {
                     await ReplyAsync($"Reminder with the ID {reminderId} has been removed!");
                 }
-                else if(result == DbProcessResultEnum.NotFound)
+                else if (result == DbProcessResultEnum.NotFound)
                 {
                     await ReplyAsync("Reminder doesn't exist with that ID or it is not yours!");
                 }

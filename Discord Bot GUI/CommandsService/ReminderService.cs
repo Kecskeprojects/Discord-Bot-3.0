@@ -51,7 +51,7 @@ namespace Discord_Bot.CommandsService
 
         public static bool TryAddValuesToDate(List<string> amounts, out DateTime modifiedDate)
         {
-            DateTime temp = DateTime.UtcNow; 
+            DateTime temp = DateTime.UtcNow;
             modifiedDate = new DateTime(temp.Year, temp.Month, temp.Day, temp.Hour, temp.Minute, 0, temp.Kind);
             //Go through the list 2 elements at a time
             for (int i = 0; i < amounts.Count; i += 2)

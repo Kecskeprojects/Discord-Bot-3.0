@@ -9,7 +9,6 @@ using Discord_Bot.Resources;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Discord_Bot.Database.DBServices
 {
@@ -108,7 +107,7 @@ namespace Discord_Bot.Database.DBServices
             {
                 Reminder reminder = await reminderRepository.GetUserReminderById(userId, reminderId);
 
-                if(reminder != null)
+                if (reminder != null)
                 {
                     await reminderRepository.RemoveReminderAsync(reminder);
 
