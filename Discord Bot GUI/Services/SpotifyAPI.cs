@@ -63,12 +63,12 @@ namespace Discord_Bot.Services
                 string id = "";
                 if (uri.Segments.Length >= 4)
                 {
-                    type = uri.Segments[2][..^1];
+                    type = uri.Segments[2].EndsWith('/') ? uri.Segments[2][..^1] : uri.Segments[2];
                     id = uri.Segments[3];
                 }
                 else if (uri.Segments.Length >= 3)
                 {
-                    type = uri.Segments[1][..^1];
+                    type = uri.Segments[1].EndsWith('/') ? uri.Segments[1][..^1] : uri.Segments[1];
                     id = uri.Segments[2];
                 }
 
@@ -141,6 +141,12 @@ namespace Discord_Bot.Services
                     SearchRequest request = new(SearchRequest.Types.Artist, artist);
                     SearchResponse result = await spotify.Search.Item(request);
 
+                    if (result.Artists.Items.Count == 0)
+                    {
+                        logger.Query("No results for artist!");
+                        return "";
+                    }
+
                     if (tags != null)
                     {
                         foreach (FullArtist item in result.Artists.Items)
@@ -186,6 +192,12 @@ namespace Discord_Bot.Services
                 {
                     SearchRequest request = new(SearchRequest.Types.Track, song + " " + artist);
                     SearchResponse result = await spotify.Search.Item(request);
+
+                    if (result.Tracks.Items.Count == 0)
+                    {
+                        logger.Query("No results for track!");
+                        return "";
+                    }
 
                     if (tags != null)
                     {

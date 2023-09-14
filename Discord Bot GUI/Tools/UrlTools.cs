@@ -8,6 +8,8 @@ namespace Discord_Bot.Tools
     {
         public static List<Uri> LinkSearch(string message, bool ignoreEmbedSuppress, params string[] baseURLs)
         {
+            if (string.IsNullOrWhiteSpace(message)) return null;
+
             message = message.Replace("www.", "");
 
             if (baseURLs.Any(message.Contains))
@@ -18,7 +20,7 @@ namespace Discord_Bot.Tools
                 foreach (string baseURL in baseURLs)
                 {
                     int startIndex = 0;
-                    while (startIndex != -1)
+                    while (startIndex != -1 && message.Length - 1 > startIndex)
                     {
                         startIndex = message.IndexOf(baseURL, startIndex);
 

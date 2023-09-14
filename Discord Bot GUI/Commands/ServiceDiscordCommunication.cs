@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Windows.Forms.LinkLabel;
 
 namespace Discord_Bot.Commands
 {
@@ -38,18 +39,21 @@ namespace Discord_Bot.Commands
         {
             IMessageChannel channel = client.GetChannel(channelId) as IMessageChannel;
             bool shouldMessageBeSuppressed = false;
+            bool hasFileDownloadHappened = false;
 
             List<FileAttachment> attachments = null;
+            string postId = uri.Segments[2].EndsWith('/') ? uri.Segments[2][..^1] : uri.Segments[2];
             try
             {
-                instaLoader.DownloadFromInstagram(uri);
+                instaLoader.DownloadFromInstagram(postId);
 
-                string[] files = Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), $"Instagram\\{uri.Segments[2][..^1]}"));
+                string[] files = Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), $"Instagram\\{postId}"));
                 string caption = "";
                 Node metadata = null;
 
                 attachments = ServiceDiscordCommunicationService.ReadFiles(files, ref caption, ref metadata, false);
                 string message = ServiceDiscordCommunicationService.GetCaption(uri, caption, metadata);
+                hasFileDownloadHappened = true;
 
                 MessageReference refer = new(messageId, channelId, guildId, false);
                 try
@@ -61,8 +65,8 @@ namespace Discord_Bot.Commands
                 {
                     if (ex.Message.Contains("40005"))
                     {
-                        logger.Warning("InstagramDownloader.cs GetImagesFromPost", "Embed too large, only sending images!", LogOnly: true);
-                        logger.Warning("InstagramDownloader.cs GetImagesFromPost", ex.ToString(), LogOnly: true);
+                        logger.Warning("ServiceDiscordCommunication.cs GetImagesFromPost", "Embed too large, only sending images!", LogOnly: true);
+                        logger.Warning("ServiceDiscordCommunication.cs GetImagesFromPost", ex.ToString(), LogOnly: true);
 
                         attachments = ServiceDiscordCommunicationService.ReadFiles(files, ref caption, ref metadata, true);
                         if (!CollectionTools.IsNullOrEmpty(attachments))
@@ -77,20 +81,37 @@ namespace Discord_Bot.Commands
                     }
                     else
                     {
-                        logger.Error("InstagramDownloader.cs GetImagesFromPost HttpException", ex.ToString());
+                        logger.Error("ServiceDiscordCommunication.cs GetImagesFromPost HttpException", ex.ToString());
+                    }
+                }
+                catch (ArgumentOutOfRangeException ex)
+                {
+                    logger.Warning("ServiceDiscordCommunication.cs GetImagesFromPost", "Embed too large, only sending images!", LogOnly: true);
+                    logger.Warning("ServiceDiscordCommunication.cs GetImagesFromPost", ex.ToString(), LogOnly: true);
+
+                    attachments = ServiceDiscordCommunicationService.ReadFiles(files, ref caption, ref metadata, true);
+                    if (attachments.Count > 0)
+                    {
+                        await channel.SendFilesAsync(attachments, caption, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
+                    }
+                    else
+                    {
+                        await channel.SendMessageAsync("Post content too large to send!");
                     }
                 }
             }
             catch (Exception ex)
             {
-                logger.Error("InstagramDownloader.cs GetImagesFromPost", ex.ToString());
+                logger.Error("ServiceDiscordCommunication.cs GetImagesFromPost", ex.ToString());
                 await channel.SendMessageAsync("Unexpected exception occured.");
             }
 
-
-            attachments.ForEach(x => x.Dispose());
-            attachments.Clear();
-            Directory.Delete(Path.Combine(Directory.GetCurrentDirectory(), $"Instagram/{uri.Segments[2][..^1]}"), true);
+            if (hasFileDownloadHappened)
+            {
+                attachments.ForEach(x => x.Dispose());
+                attachments.Clear();
+                Directory.Delete(Path.Combine(Directory.GetCurrentDirectory(), $"Instagram/{postId}"), true);
+            }
 
             if (shouldMessageBeSuppressed)
             {

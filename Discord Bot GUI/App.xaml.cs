@@ -176,15 +176,22 @@ namespace Discord_Bot
                     switch (arg.Exception.Message)
                     {
                         case "Server requested a reconnect":
+                        case "Unable to connect to the remote server":
                             {
                                 logger.Client($"{arg.Exception.Message}!");
                                 break;
                             }
                         case "WebSocket connection was closed":
                         case "WebSocket session expired":
-                        case "A task was canceled":
+                        case "A task was canceled.":
                             {
-                                logger.Warning("App.xaml.cs ClientLog", $"{arg.Exception.Message}!", ConsoleOnly: true);
+                                string message = arg.Exception.Message;
+                                if (message.EndsWith("."))
+                                {
+                                    message = message[..^1];
+                                }
+
+                                logger.Warning("App.xaml.cs ClientLog", $"{message}!", ConsoleOnly: true);
                                 logger.Warning("App.xaml.cs ClientLog", arg.Exception.ToString(), LogOnly: true);
                                 break;
                             }

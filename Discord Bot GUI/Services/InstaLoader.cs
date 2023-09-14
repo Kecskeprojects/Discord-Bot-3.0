@@ -15,7 +15,7 @@ namespace Discord_Bot.Services
         //https://instaloader.github.io/basic-usage.html
         //https://github.com/instaloader/instaloader
         //instaloader.exe --quiet --filename-pattern={date_utc}_{shortcode} --dirname-pattern={ shortcode} --no-video-thumbnails --no-compress-json -- -CfGa5x0FCak -Cppwn5qjMJA
-        public void DownloadFromInstagram(Uri uri)
+        public void DownloadFromInstagram(string postId)
         {
             try
             {
@@ -25,7 +25,7 @@ namespace Discord_Bot.Services
                     Arguments = @"/C instaloader.exe " +
                                 @"--quiet --no-video-thumbnails --no-compress-json " +
                                 @"--filename-pattern={date_utc}_{shortcode} --dirname-pattern={shortcode} -- -" +
-                                uri.Segments[2][..^1],
+                                postId,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     CreateNoWindow = true,
