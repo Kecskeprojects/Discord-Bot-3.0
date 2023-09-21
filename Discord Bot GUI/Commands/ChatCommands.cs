@@ -29,56 +29,6 @@ namespace Discord_Bot.Commands
             this.wordOfTheDayService = wordOfTheDayService;
         }
 
-        #region 8ball command
-        [Command("8ball")]
-        [Summary("8ball game, takes in the whole message, returns random 8ball answer from array")]
-        public async Task Eightball([Remainder] string question)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(question))
-                {
-                    await ReplyAsync("Ask me about something!");
-                    return;
-                }
-
-                await ReplyAsync(StaticLists.Answers8ball[new Random().Next(0, StaticLists.Answers8ball.Length)]);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("ChatCommands.cs Eightball", ex.ToString());
-            }
-        }
-        #endregion
-
-        #region Custom command list command
-        [Command("custom list")]
-        [RequireContext(ContextType.Guild)]
-        [Alias(new string[] { "customlist", "customcommands" })]
-        [Summary("Command to list out all the currently available commands")]
-        public async Task CustomList()
-        {
-            try
-            {
-                List<CustomCommandResource> list = await customCommandService.GetServerCustomCommandListAsync(Context.Guild.Id);
-                if (CollectionTools.IsNullOrEmpty(list))
-                {
-                    await ReplyAsync("There are no custom commands on this server!");
-                    return;
-                }
-
-                EmbedBuilder builder = ChatService.BuildCustomListEmbed(list);
-
-                await ReplyAsync("", false, builder.Build());
-            }
-            catch (Exception ex)
-            {
-                logger.Error("ChatCommands.cs CustomList", ex.ToString());
-            }
-        }
-        #endregion
-
-        #region Help command
         [Command("help")]
         [Summary("List out commands everybody has access to")]
         public async Task Help()
@@ -103,9 +53,52 @@ namespace Discord_Bot.Commands
                 logger.Error("ChatCommands.cs Help", ex.ToString());
             }
         }
-        #endregion
 
-        #region Coin flip command
+        [Command("8ball")]
+        [Summary("8ball game, takes in the whole message, returns random 8ball answer from array")]
+        public async Task Eightball([Remainder] string question)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(question))
+                {
+                    await ReplyAsync("Ask me about something!");
+                    return;
+                }
+
+                await ReplyAsync(StaticLists.Answers8ball[new Random().Next(0, StaticLists.Answers8ball.Length)]);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("ChatCommands.cs Eightball", ex.ToString());
+            }
+        }
+
+        [Command("custom list")]
+        [RequireContext(ContextType.Guild)]
+        [Alias(new string[] { "customlist", "customcommands" })]
+        [Summary("Command to list out all the currently available commands")]
+        public async Task CustomList()
+        {
+            try
+            {
+                List<CustomCommandResource> list = await customCommandService.GetServerCustomCommandListAsync(Context.Guild.Id);
+                if (CollectionTools.IsNullOrEmpty(list))
+                {
+                    await ReplyAsync("There are no custom commands on this server!");
+                    return;
+                }
+
+                EmbedBuilder builder = ChatService.BuildCustomListEmbed(list);
+
+                await ReplyAsync("", false, builder.Build());
+            }
+            catch (Exception ex)
+            {
+                logger.Error("ChatCommands.cs CustomList", ex.ToString());
+            }
+        }
+
         [Command("coin flip")]
         [Alias(new string[] { "flip a coin", "flip coin", "flipcoin", "cf", "fc", "cofl", "flco", "coin", "flip", "coinflip", "50/50", "pick" })]
         [Summary("A 50/50 type decision maker")]
@@ -142,9 +135,7 @@ namespace Discord_Bot.Commands
                 logger.Error("ChatCommands.cs CoinFlip", ex.ToString());
             }
         }
-        #endregion
 
-        #region Word of the day command
         [Command("wotd")]
         [Alias(new string[] { "word of the day" })]
         [Summary("Learn a word a day command")]
@@ -174,6 +165,5 @@ namespace Discord_Bot.Commands
                 logger.Error("ChatCommands.cs WotDFunction", ex.ToString());
             }
         }
-        #endregion
     }
 }

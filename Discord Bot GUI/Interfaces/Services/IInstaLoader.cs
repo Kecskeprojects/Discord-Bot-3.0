@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Discord_Bot.Interfaces.Services
+﻿namespace Discord_Bot.Interfaces.Services
 {
     public interface IInstaLoader
     {

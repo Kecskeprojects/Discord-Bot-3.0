@@ -191,7 +191,7 @@ namespace Discord_Bot
                                     message = message[..^1];
                                 }
 
-                                logger.Warning("App.xaml.cs ClientLog", $"{message}!", ConsoleOnly: true);
+                                logger.Client($"{message}!", ConsoleOnly: true);
                                 logger.Warning("App.xaml.cs ClientLog", arg.Exception.ToString(), LogOnly: true);
                                 break;
                             }

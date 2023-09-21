@@ -1,17 +1,21 @@
-!!Update Admin_Commands.txt and Commands.txt in Jiubot/Modules if you update this list!!
+!!Update Admin_Commands.txt and Commands.txt in Assets/Commands if you update this list!!
 
 Text Commands:
 
-.twt [links]				twitter embed(DM)
-!help					List of commands (DM)
-!8ball [question]			8ball game (DM)
-!custom list				List of custom commands
-!coin flip				Flip a coin(DM)
-!wotd [language]			Word of the day in a language(DM)
-!remind at [date*] >[message]		remind by date (DM)
-!remind in [amount**] >[message]	remind in given time (DM)
-!remind list				your reminders (DM)
-!remind remove [id]		remove a reminder (DM)
+!help							List of commands (DM)
+!8ball [question]				8ball game (DM)
+!custom list					List of custom commands
+!coin flip [head] or [tails]	Flip a coin(DM)
+!wotd [language]				Word of the day in a language(DM)
+.twt [links]					twitter embed(DM)
+
+Remind Commands:
+
+!remind at [date*]>[message]		remind by date (DM)
+!remind in [amount**]>[message]		remind in given time (DM)
+!remind list						your reminders (DM)
+!remind remove [id]					remove a reminder (DM)
+
 *use timezone in the following format:
 *22.01.01 01:01 +12 or 01.01 01:01 +12
 **years to minutes (e.g. !remind in 15 days >...)
@@ -19,14 +23,14 @@ Text Commands:
 Voice Commands:
 
 !p [url/keyword]	Play music
-!join			Join to your channel
-!leave			Leaves your channel
-!queue			Current queue
-!np			Now playing
-!clear			Clears queue
-!skip			Skip song
+!join				Join to your channel
+!leave				Leaves your channel
+!queue				Current queue
+!np					Now playing
+!clear				Clears queue
+!skip				Skip song
 !remove	[position]	Remove song from queue
-!shuffle		Shuffles current playlist
+!shuffle			Shuffles current playlist
 
 Last.fm commands:
 
@@ -81,4 +85,4 @@ Features:
 -Replying to pre defined list of keywords
 -Adding roles to users from pre-defined list
 -Very rare random responses
--Instagram embeds beyond discord's capabilities
+-Reliable automatic instagram embeds
