@@ -141,10 +141,8 @@ namespace Discord_Bot
                 }
 
                 //Logic to be done once a day
-                if (minutesCount == 1440)
-                {
-                    minutesCount = 0;
-                }
+                if (minutesCount == 1440) minutesCount = 0;
+
                 minutesCount++;
 
                 //Youtube api key reset function
@@ -171,40 +169,39 @@ namespace Discord_Bot
         {
             try
             {
-                if (arg.Exception != null)
-                {
-                    switch (arg.Exception.Message)
-                    {
-                        case "Server requested a reconnect":
-                        case "Unable to connect to the remote server":
-                            {
-                                logger.Client($"{arg.Exception.Message}!");
-                                break;
-                            }
-                        case "WebSocket connection was closed":
-                        case "WebSocket session expired":
-                        case "A task was canceled.":
-                            {
-                                string message = arg.Exception.Message;
-                                if (message.EndsWith("."))
-                                {
-                                    message = message[..^1];
-                                }
-
-                                logger.Client($"{message}!", ConsoleOnly: true);
-                                logger.Warning("App.xaml.cs ClientLog", arg.Exception.ToString(), LogOnly: true);
-                                break;
-                            }
-                        default:
-                            {
-                                logger.Error("App.xaml.cs ClientLog", arg.Exception.ToString());
-                                break;
-                            }
-                    }
-                }
-                else
+                if (arg.Exception == null)
                 {
                     logger.Client(arg.ToString());
+                    return Task.CompletedTask;
+                }
+
+                switch (arg.Exception.Message)
+                {
+                    case "Server requested a reconnect":
+                    case "Unable to connect to the remote server":
+                        {
+                            logger.Client($"{arg.Exception.Message}!");
+                            break;
+                        }
+                    case "WebSocket connection was closed":
+                    case "WebSocket session expired":
+                    case "A task was canceled.":
+                        {
+                            string message = arg.Exception.Message;
+                            if (message.EndsWith("."))
+                            {
+                                message = message[..^1];
+                            }
+
+                            logger.Client($"{message}!", ConsoleOnly: true);
+                            logger.Warning("App.xaml.cs ClientLog", arg.Exception.ToString(), LogOnly: true);
+                            break;
+                        }
+                    default:
+                        {
+                            logger.Error("App.xaml.cs ClientLog", arg.Exception.ToString());
+                            break;
+                        }
                 }
             }
             catch (Exception ex)
@@ -327,7 +324,10 @@ namespace Discord_Bot
                         }
 
                         if (result.Error.Equals(CommandError.UnmetPrecondition))
+                        {
                             await context.Channel.SendMessageAsync(result.ErrorReason);
+                            return;
+                        }
 
                         logger.Warning("App.xaml.cs HandleCommandAsync", result.ErrorReason);
                     }

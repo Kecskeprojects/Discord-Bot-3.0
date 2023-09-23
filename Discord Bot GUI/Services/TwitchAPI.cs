@@ -173,7 +173,10 @@ namespace Discord_Bot.Services
                 {
                     List<string> lst = await GetChannels();
 
-                    if (Monitor.ChannelsToMonitor.Except(lst).Any()) Monitor.SetChannelsById(lst);
+                    if (!CollectionTools.IsNullOrEmpty(lst) && Monitor.ChannelsToMonitor.Except(lst).Any())
+                    {
+                        Monitor.SetChannelsById(lst);
+                    }
                 }
             }
             catch (Exception ex)
@@ -262,15 +265,17 @@ namespace Discord_Bot.Services
         private async Task<List<string>> GetChannels()
         {
             List<TwitchChannelResource> channels = await twitchChannelService.GetChannelsAsync();
-            if (channels == null) return;
             List<string> lst = new();
-            foreach (TwitchChannelResource channel in channels)
+            if (!CollectionTools.IsNullOrEmpty(channels))
             {
-                if (!channelStatuses.ContainsKey(channel.TwitchId))
-                    channelStatuses.Add(channel.TwitchId, false);
-                lst.Add(channel.TwitchId);
-            }
+                foreach (TwitchChannelResource channel in channels)
+                {
+                    if (!channelStatuses.ContainsKey(channel.TwitchId))
+                        channelStatuses.Add(channel.TwitchId, false);
+                    lst.Add(channel.TwitchId);
+                }
 
+            }
             return lst;
         }
         #endregion

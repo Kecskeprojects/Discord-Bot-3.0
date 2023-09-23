@@ -6,6 +6,7 @@ using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
+using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -25,7 +26,6 @@ namespace Discord_Bot.Database.DBServices
 
         public async Task<DbProcessResultEnum> AddReminderAsync(ulong userId, DateTime date, string remindMessage)
         {
-            //INSERT INTO `reminder` (`userId`,`date`,`message`) VALUES ('{userId}','{date}','{message}');
             try
             {
                 User user = await userRepository.GetUserByDiscordId(userId);
@@ -89,9 +89,16 @@ namespace Discord_Bot.Database.DBServices
             {
                 List<Reminder> reminders = await reminderRepository.GetRemindersByIds(reminderIds);
 
-                await reminderRepository.RemoveCurrentRemindersAsync(reminders);
+                if (CollectionTools.IsNullOrEmpty(reminders))
+                {
+                    await reminderRepository.RemoveCurrentRemindersAsync(reminders);
 
-                logger.Log($"Reminders removed with the following IDs: {string.Join(",", reminderIds)}");
+                    logger.Log($"Reminders removed with the following IDs: {string.Join(",", reminderIds)}");
+                }
+                else
+                {
+                    logger.Log("No reminders to remove currently");
+                }
                 return DbProcessResultEnum.Success;
             }
             catch (Exception ex)

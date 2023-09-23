@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Core.Logger;
+using Discord_Bot.Database.DBRepositories;
 using Discord_Bot.Database.Models;
+using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
@@ -29,6 +31,51 @@ namespace Discord_Bot.Database.DBServices
                 logger.Error("GreetingService.cs GetAllGreetingAsync", ex.ToString());
             }
             return result;
+        }
+
+        public async Task<DbProcessResultEnum> AddGreetingAsync(string url)
+        {
+            try
+            {
+                Greeting greeting = new()
+                {
+                    Url = url
+                };
+                await greetingRepository.AddGreetingAsync(greeting);
+
+                logger.Log($"Greeting added successfully!");
+                return DbProcessResultEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("GreetingService.cs AddGreetingAsync", ex.ToString());
+            }
+            return DbProcessResultEnum.Failure;
+        }
+
+        public async Task<DbProcessResultEnum> RemoveGreetingAsync(int id)
+        {
+            try
+            {
+                Greeting greeting = await greetingRepository.GetGreetingByIdAsync(id);
+                if (greeting != null)
+                {
+                    await greetingRepository.RemoveGreetingAsync(greeting);
+
+                    logger.Log($"Greeting with ID: {id} removed successfully!");
+                    return DbProcessResultEnum.Success;
+                }
+                else
+                {
+                    logger.Log($"Greeting with ID: {id} not found!");
+                    return DbProcessResultEnum.NotFound;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("GreetingService.cs RemoveGreetingAsync", ex.ToString());
+            }
+            return DbProcessResultEnum.Failure;
         }
     }
 }

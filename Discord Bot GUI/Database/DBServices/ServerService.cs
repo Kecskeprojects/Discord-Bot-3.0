@@ -50,10 +50,7 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 ServerResource cachedServer = cache.TryGetValue(serverId);
-                if (cachedServer != null)
-                {
-                    return cachedServer;
-                }
+                if (cachedServer != null) return cachedServer;
 
                 Server server = await serverRepository.GetByDiscordIdAsync(serverId);
                 if (server == null) return null;

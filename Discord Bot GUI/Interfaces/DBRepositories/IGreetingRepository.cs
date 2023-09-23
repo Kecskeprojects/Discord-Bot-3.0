@@ -6,6 +6,9 @@ namespace Discord_Bot.Interfaces.DBRepositories
 {
     public interface IGreetingRepository
     {
+        Task AddGreetingAsync(Greeting greeting);
         Task<List<Greeting>> GetAllGreetingAsync();
+        Task<Greeting> GetGreetingByIdAsync(int id);
+        Task RemoveGreetingAsync(Greeting greeting);
     }
 }
