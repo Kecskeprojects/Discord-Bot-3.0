@@ -31,6 +31,7 @@ namespace Discord_Bot.Database.DBServices
                 User user = await userRepository.GetUserByDiscordId(userId);
                 Reminder reminder = new()
                 {
+                    ReminderId = 0,
                     User = user,
                     Date = date,
                     Message = remindMessage

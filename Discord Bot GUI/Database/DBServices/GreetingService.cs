@@ -39,6 +39,7 @@ namespace Discord_Bot.Database.DBServices
             {
                 Greeting greeting = new()
                 {
+                    GreetingId = 0,
                     Url = url
                 };
                 await greetingRepository.AddGreetingAsync(greeting);
