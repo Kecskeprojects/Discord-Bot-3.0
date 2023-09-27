@@ -11,6 +11,8 @@ public partial class User
 
     public string LastFmusername { get; set; }
 
+    public virtual ICollection<Birthday> Birthdays { get; set; } = new List<Birthday>();
+
     public virtual ICollection<Reminder> Reminders { get; set; } = new List<Reminder>();
 
     public virtual ICollection<UserBias> UserBiases { get; set; } = new List<UserBias>();

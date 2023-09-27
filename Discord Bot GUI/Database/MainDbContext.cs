@@ -12,6 +12,8 @@ public partial class MainDbContext : DbContext
     {
     }
 
+    public virtual DbSet<Birthday> Birthdays { get; set; }
+
     public virtual DbSet<Channel> Channels { get; set; }
 
     public virtual DbSet<ChannelType> ChannelTypes { get; set; }
@@ -45,6 +47,25 @@ public partial class MainDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.UseCollation("SQL_Latin1_General_CP1_CI_AS");
+
+        modelBuilder.Entity<Birthday>(entity =>
+        {
+            entity.HasKey(e => e.BirthdayId).HasName("PK_BirthdayId");
+
+            entity.ToTable("Birthday");
+
+            entity.Property(e => e.Date).HasColumnType("date");
+
+            entity.HasOne(d => d.Server).WithMany(p => p.Birthdays)
+                .HasForeignKey(d => d.ServerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Birthday_Server");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Birthdays)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Birthday_User");
+        });
 
         modelBuilder.Entity<Channel>(entity =>
         {

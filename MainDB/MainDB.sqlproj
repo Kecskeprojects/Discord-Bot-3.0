@@ -90,6 +90,7 @@
     <None Include="Post-deployment\PostDeployment\Inserts\TwitchChannel_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\ServerSettingChannel_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\IdolAlias_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\Birthday_Inserts.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\User.sql" />
@@ -98,6 +99,7 @@
     <Build Include="Views\ServerChannelView.sql" />
     <Build Include="Tables\IdolAlias.sql" />
     <None Include="Post-deployment\ChannelType_Inserts.sql" />
+    <Build Include="Tables\Birthday.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="MainDB.refactorlog" />

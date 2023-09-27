@@ -9,6 +9,8 @@ public partial class Server
 
     public string DiscordId { get; set; }
 
+    public virtual ICollection<Birthday> Birthdays { get; set; } = new List<Birthday>();
+
     public virtual ICollection<Channel> Channels { get; set; } = new List<Channel>();
 
     public virtual ICollection<CustomCommand> CustomCommands { get; set; } = new List<CustomCommand>();

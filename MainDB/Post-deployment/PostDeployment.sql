@@ -17,6 +17,7 @@ BEGIN
     PRINT '***** Creating Test Data for Debug configuration *****';
     :r .\PostDeployment\Inserts\Server_Inserts.sql
     :r .\PostDeployment\Inserts\User_Inserts.sql
+    :r .\PostDeployment\Inserts\Birthday_Inserts.sql
     :r .\PostDeployment\Inserts\Reminder_Inserts.sql
     :r .\PostDeployment\Inserts\Greeting_Inserts.sql
     :r .\PostDeployment\Inserts\IdolGroup_Inserts.sql
