@@ -2,7 +2,6 @@
 using Discord.Commands;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
-using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
