@@ -28,6 +28,8 @@ public partial class MainDbContext : DbContext
 
     public virtual DbSet<IdolGroup> IdolGroups { get; set; }
 
+    public virtual DbSet<IdolImage> IdolImages { get; set; }
+
     public virtual DbSet<Keyword> Keywords { get; set; }
 
     public virtual DbSet<Reminder> Reminders { get; set; }
@@ -193,6 +195,24 @@ public partial class MainDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(100)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<IdolImage>(entity =>
+        {
+            entity.HasKey(e => e.ImageId).HasName("PK_ImageId");
+
+            entity.ToTable("IdolImage");
+
+            entity.Property(e => e.ImageUrl)
+                .IsRequired()
+                .HasMaxLength(200)
+                .IsUnicode(false)
+                .HasColumnName("ImageURL");
+
+            entity.HasOne(d => d.Idol).WithMany(p => p.IdolImages)
+                .HasForeignKey(d => d.IdolId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_IdolImage_Idol");
         });
 
         modelBuilder.Entity<Keyword>(entity =>

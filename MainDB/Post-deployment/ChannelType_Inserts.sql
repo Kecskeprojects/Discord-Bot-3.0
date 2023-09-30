@@ -15,3 +15,6 @@ IF NOT EXISTS ( SELECT * FROM [dbo].[ChannelType] WHERE [ChannelTypeId] = 4 )
 
 IF NOT EXISTS ( SELECT * FROM [dbo].[ChannelType] WHERE [ChannelTypeId] = 5 )
 	INSERT INTO [dbo].[ChannelType] VALUES  (5, 'CommandText');
+
+IF NOT EXISTS ( SELECT * FROM [dbo].[ChannelType] WHERE [ChannelTypeId] = 6 )
+	INSERT INTO [dbo].[ChannelType] VALUES  (6, 'BirthdayText');

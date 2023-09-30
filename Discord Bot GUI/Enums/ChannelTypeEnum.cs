@@ -7,6 +7,7 @@
         TwitchNotificationText = 2,
         MusicText = 3,
         MusicVoice = 4,
-        CommandText = 5
+        CommandText = 5,
+        BirthdayText = 6,
     }
 }

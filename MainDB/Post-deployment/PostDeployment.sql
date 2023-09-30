@@ -10,7 +10,7 @@ Post-Deployment Script Template
 --------------------------------------------------------------------------------------
 */
 
-:r .\PostDeployment\Inserts\ChannelType_Inserts.sql
+:r .\ChannelType_Inserts.sql
 
 IF ('$(BuildConfiguration)' = 'Debug')
 BEGIN
@@ -27,6 +27,7 @@ BEGIN
     :r .\PostDeployment\Inserts\CustomCommand_Inserts.sql
     :r .\PostDeployment\Inserts\Idol_Inserts.sql
     :r .\PostDeployment\Inserts\IdolAlias_Inserts.sql
+    :r .\PostDeployment\Inserts\IdolImage_Inserts.sql
     :r .\PostDeployment\Inserts\Keyword_Inserts.sql
     :r .\PostDeployment\Inserts\TwitchChannel_Inserts.sql
     :r .\PostDeployment\Inserts\UserBias_Inserts.sql
