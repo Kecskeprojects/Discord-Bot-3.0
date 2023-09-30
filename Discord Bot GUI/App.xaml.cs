@@ -118,7 +118,7 @@ namespace Discord_Bot
 
             if (string.IsNullOrEmpty(config.Token))
             {
-                logger.Error("App.xaml.cs RunBotAsync", "Bot cannot start without a valid token, fill out it's filled in the config!");
+                logger.Error("App.xaml.cs RunBotAsync", "Bot cannot start without a valid token, fill out the proper fields in the config file!");
                 return;
             }
 

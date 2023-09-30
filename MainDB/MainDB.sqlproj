@@ -118,7 +118,6 @@
     <Build Include="Tables\TwitchChannel.sql" />
     <Build Include="Tables\Channel.sql" />
     <Build Include="Tables\ChannelType.sql" />
-    <None Include="Post-deployment\PostDeployment\Inserts\ChannelType_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\User_Inserts.sql" />
   </ItemGroup>
 </Project>
