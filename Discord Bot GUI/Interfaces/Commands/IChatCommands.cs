@@ -5,9 +5,8 @@ namespace Discord_Bot.Interfaces.Commands
 {
     public interface IChatCommands
     {
-        Task Eightball([Remainder] string question);
-        Task CustomList();
         Task Help();
+        Task Eightball([Remainder] string question);
         Task CoinFlip([Remainder] string choice = "");
         Task WotdFunction(string language = "korean");
     }

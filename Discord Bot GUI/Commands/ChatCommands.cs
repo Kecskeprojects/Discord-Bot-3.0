@@ -74,31 +74,6 @@ namespace Discord_Bot.Commands
             }
         }
 
-        [Command("custom list")]
-        [RequireContext(ContextType.Guild)]
-        [Alias(new string[] { "customlist", "customcommands" })]
-        [Summary("Command to list out all the currently available commands")]
-        public async Task CustomList()
-        {
-            try
-            {
-                List<CustomCommandResource> list = await customCommandService.GetServerCustomCommandListAsync(Context.Guild.Id);
-                if (CollectionTools.IsNullOrEmpty(list))
-                {
-                    await ReplyAsync("There are no custom commands on this server!");
-                    return;
-                }
-
-                EmbedBuilder builder = ChatService.BuildCustomListEmbed(list);
-
-                await ReplyAsync("", false, builder.Build());
-            }
-            catch (Exception ex)
-            {
-                logger.Error("ChatCommands.cs CustomList", ex.ToString());
-            }
-        }
-
         [Command("coin flip")]
         [Alias(new string[] { "flip a coin", "flip coin", "flipcoin", "cf", "fc", "cofl", "flco", "coin", "flip", "coinflip", "50/50", "pick" })]
         [Summary("A 50/50 type decision maker")]

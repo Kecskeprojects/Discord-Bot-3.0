@@ -7,6 +7,7 @@ namespace Discord_Bot.Resources
     {
         public int ServerId { get; set; }
         public ulong DiscordId { get; set; }
+        public List<TwitchChannelResource> TwitchChannels { get; set; }
         public Dictionary<ChannelTypeEnum, List<ulong>> SettingsChannels { get; set; }
     }
 }

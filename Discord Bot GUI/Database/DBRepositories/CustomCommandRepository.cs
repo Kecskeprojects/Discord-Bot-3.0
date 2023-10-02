@@ -13,6 +13,20 @@ namespace Discord_Bot.Database.DBRepositories
         {
         }
 
+        public async Task AddCustomCommandAsync(CustomCommand command)
+        {
+            context.CustomCommands.Add(command);
+            await context.SaveChangesAsync();
+        }
+
+        public Task<bool> CustomCommandExistsAsync(ulong serverId, string commandName)
+        {
+            return context.CustomCommands
+                .Include(cc => cc.Server)
+                .Where(cc => cc.Server.DiscordId == serverId.ToString() && cc.Command.Trim().ToLower() == commandName.Trim().ToLower())
+                .AnyAsync();
+        }
+
         public Task<CustomCommand> GetCustomCommandAsync(ulong serverId, string commandName)
         {
             return context.CustomCommands
@@ -20,12 +34,19 @@ namespace Discord_Bot.Database.DBRepositories
                 .FirstOrDefaultAsync(cc => cc.Server.DiscordId == serverId.ToString() && cc.Command.Trim().ToLower() == commandName.Trim().ToLower());
         }
 
-        public Task<List<CustomCommand>> GetCustomCommandAsync(ulong serverId)
+        public Task<List<CustomCommand>> GetCustomCommandListAsync(ulong serverId)
         {
             return context.CustomCommands
                 .Include(cc => cc.Server)
                 .Where(cc => cc.Server.DiscordId == serverId.ToString())
+                .OrderBy(cc => cc.Command)
                 .ToListAsync();
+        }
+
+        public async Task RemoveCustomCommandAsync(CustomCommand customCommand)
+        {
+            context.CustomCommands.Remove(customCommand);
+            await context.SaveChangesAsync();
         }
     }
 }

@@ -18,9 +18,12 @@ namespace Discord_Bot.Database.DBRepositories
             context.Greetings.Add(greeting);
             await context.SaveChangesAsync();
         }
+
         public Task<List<Greeting>> GetAllGreetingAsync() =>
             context.Greetings.ToListAsync();
+
         public Task<Greeting> GetGreetingByIdAsync(int id) => context.Greetings.SingleOrDefaultAsync(g => g.GreetingId == id);
+
         public async Task RemoveGreetingAsync(Greeting greeting)
         {
             context.Greetings.Remove(greeting);

@@ -111,7 +111,7 @@ namespace Discord_Bot.Services
                             await youtubeAPI.Searching(track, username, serverId, channelId);
                         }
 
-                        //Todo: Move to command level
+                        //Todo: Move message to command level
                         //await context.Channel.SendMessageAsync("Playlist added!");
 
                         return SearchResultEnum.SpotifyPlaylistFound;

@@ -5,6 +5,9 @@ namespace Discord_Bot.Interfaces.DBRepositories
 {
     public interface IKeywordRepository
     {
-        Task<Keyword> GetRoleAsync(ulong serverId, string trigger);
+        Task AddCustomCommandAsync(Keyword keyword);
+        Task<Keyword> GetKeywordAsync(ulong serverId, string trigger);
+        Task<bool> KeywordExistsAsync(ulong serverId, string trigger);
+        Task RemoveKeywordAsync(Keyword keyword);
     }
 }

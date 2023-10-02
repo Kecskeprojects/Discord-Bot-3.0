@@ -43,7 +43,7 @@ namespace Discord_Bot.Database.DBServices
                 };
                 await greetingRepository.AddGreetingAsync(greeting);
 
-                logger.Log($"Greeting added successfully!");
+                logger.Log("Greeting added successfully!");
                 return DbProcessResultEnum.Success;
             }
             catch (Exception ex)
