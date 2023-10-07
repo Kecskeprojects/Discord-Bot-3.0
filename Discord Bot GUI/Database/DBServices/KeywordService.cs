@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
-using Discord_Bot.Commands;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Core.Logger;
-using Discord_Bot.Database.DBRepositories;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBRepositories;
@@ -10,7 +8,6 @@ using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using System;
 using System.Threading.Tasks;
-using static System.Windows.Forms.LinkLabel;
 
 namespace Discord_Bot.Database.DBServices
 {

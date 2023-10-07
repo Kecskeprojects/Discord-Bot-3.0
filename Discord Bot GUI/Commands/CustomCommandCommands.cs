@@ -1,15 +1,15 @@
-﻿using Discord.Commands;
-using Discord;
-using Discord_Bot.Enums;
-using System;
-using System.Threading.Tasks;
-using Discord_Bot.Core.Logger;
-using Discord_Bot.Core.Config;
-using Discord_Bot.Interfaces.DBServices;
+﻿using Discord;
+using Discord.Commands;
 using Discord_Bot.CommandsService;
+using Discord_Bot.Core.Config;
+using Discord_Bot.Core.Logger;
+using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
@@ -17,10 +17,7 @@ namespace Discord_Bot.Commands
     {
         private readonly ICustomCommandService customCommandService;
 
-        public CustomCommandCommands(Logging logger, Config config, ICustomCommandService customCommandService) : base(logger, config)
-        {
-            this.customCommandService = customCommandService;
-        }
+        public CustomCommandCommands(Logging logger, Config config, ICustomCommandService customCommandService) : base(logger, config) => this.customCommandService = customCommandService;
 
         [Command("custom list")]
         [RequireContext(ContextType.Guild)]
@@ -72,7 +69,10 @@ namespace Discord_Bot.Commands
                         await ReplyAsync("Command could not be added!");
                     }
                 }
-                else await ReplyAsync("That link is invalid!");
+                else
+                {
+                    await ReplyAsync("That link is invalid!");
+                }
             }
             catch (Exception ex)
             {

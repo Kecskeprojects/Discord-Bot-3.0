@@ -1,18 +1,18 @@
-﻿using System;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
-using System.IO;
-using Discord_Bot.Core.Logger;
 using Discord_Bot.Core.Config;
+using Discord_Bot.Core.Logger;
+using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
-using Discord_Bot.Enums;
-using System.Linq;
 using Discord_Bot.Resources;
 using Discord_Bot.Services;
 using Discord_Bot.Services.Models.Twitch;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
@@ -40,14 +40,14 @@ namespace Discord_Bot.Commands
             try
             {
                 if (!File.Exists("Assets\\Commands\\Admin_Commands.txt"))
-                { 
-                    await ReplyAsync("Command file missing!"); 
+                {
+                    await ReplyAsync("Command file missing!");
                     return;
                 }
 
                 await Context.Channel.SendFileAsync(Directory.GetCurrentDirectory() + "\\Assets\\Commands\\Admin_Commands.txt");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("AdminCommands.cs Help", ex.ToString());
             }
@@ -76,7 +76,7 @@ namespace Discord_Bot.Commands
                         string.Join(", ", ChannelTypeNameDictionary.NameEnum.Keys.Select(x => $"`{x}`")));
                     return;
                 }
-               
+
                 ChannelTypeEnum channelType = ChannelTypeNameDictionary.NameEnum[type];
 
                 //Adds channel onto list of channels for server, unless conditions say there can only be one of a type of chat, removes server from cache
@@ -199,7 +199,7 @@ namespace Discord_Bot.Commands
                 }
                 else if (result == DbProcessResultEnum.AlreadyExists)
                 {
-                    if(type == "role")
+                    if (type == "role")
                     {
                         await ReplyAsync("Notification role is the currently set one in the database for your server!");
                     }
@@ -303,7 +303,7 @@ namespace Discord_Bot.Commands
                     }
                 }
 
-                if(server.TwitchChannels.Count > 0)
+                if (server.TwitchChannels.Count > 0)
                 {
                     embed.AddField("Notification role:", $"`{server.TwitchChannels[0].RoleName}`");
                     embed.AddField("Notified Twitch Channel IDs:", $"`{string.Join(",", server.TwitchChannels.Select(x => x.TwitchId))}`");
@@ -315,7 +315,7 @@ namespace Discord_Bot.Commands
                     embed.AddField("Notified Twitch Channel IDs:", $"`none`");
                     embed.AddField("Notified Twitch channel URLs:", $"`none`");
                 }
-                
+
                 embed.WithThumbnailUrl(config.Img);
                 embed.WithTimestamp(DateTime.Now);
                 embed.WithColor(Color.Teal);

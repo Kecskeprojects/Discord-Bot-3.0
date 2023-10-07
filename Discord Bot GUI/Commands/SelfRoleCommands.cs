@@ -1,13 +1,13 @@
-﻿using Discord.Commands;
-using Discord;
+﻿using Discord;
+using Discord.Commands;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
+using Discord_Bot.Interfaces.DBServices;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord_Bot.Interfaces.DBServices;
 
 namespace Discord_Bot.Commands
 {
@@ -15,10 +15,7 @@ namespace Discord_Bot.Commands
     {
         private readonly IRoleService roleService;
 
-        public SelfRoleCommands(IRoleService roleService, Logging logger, Config config) : base(logger, config)
-        {
-            this.roleService = roleService;
-        }
+        public SelfRoleCommands(IRoleService roleService, Logging logger, Config config) : base(logger, config) => this.roleService = roleService;
 
         [Command("self role add")]
         [RequireUserPermission(ChannelPermission.ManageRoles)]
@@ -47,7 +44,10 @@ namespace Discord_Bot.Commands
                         await ReplyAsync("Role could not be added!");
                     }
                 }
-                else await ReplyAsync("Role not found!");
+                else
+                {
+                    await ReplyAsync("Role not found!");
+                }
             }
             catch (Exception ex)
             {

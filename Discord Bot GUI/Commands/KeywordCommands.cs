@@ -1,12 +1,12 @@
-﻿using Discord.Commands;
-using Discord;
+﻿using Discord;
+using Discord.Commands;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
-using System.Threading.Tasks;
 using System;
+using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
@@ -14,10 +14,7 @@ namespace Discord_Bot.Commands
     {
         private readonly IKeywordService keywordService;
 
-        public KeywordCommands(IKeywordService keywordService, Logging logger, Config config) : base(logger, config)
-        {
-            this.keywordService = keywordService;
-        }
+        public KeywordCommands(IKeywordService keywordService, Logging logger, Config config) : base(logger, config) => this.keywordService = keywordService;
 
         [Command("keyword add")]
         [RequireUserPermission(ChannelPermission.ManageMessages)]
