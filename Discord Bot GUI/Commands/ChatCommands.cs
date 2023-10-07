@@ -18,12 +18,10 @@ namespace Discord_Bot.Commands
 {
     public class ChatCommands : CommandBase, IChatCommands
     {
-        private readonly ICustomCommandService customCommandService;
         private readonly IWordOfTheDayService wordOfTheDayService;
 
-        public ChatCommands(ICustomCommandService customCommandService, IWordOfTheDayService wordOfTheDayService, Logging logger, Config config) : base(logger, config)
+        public ChatCommands(IWordOfTheDayService wordOfTheDayService, Logging logger, Config config) : base(logger, config)
         {
-            this.customCommandService = customCommandService;
             this.wordOfTheDayService = wordOfTheDayService;
         }
 

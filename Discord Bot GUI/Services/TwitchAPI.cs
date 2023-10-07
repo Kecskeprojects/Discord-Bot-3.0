@@ -257,6 +257,8 @@ namespace Discord_Bot.Services
 
             User twitchUser = JsonConvert.DeserializeObject<User>(response);
 
+            if (twitchUser == null || CollectionTools.IsNullOrEmpty(twitchUser.Response)) return null;
+
             logger.Query($"Twitch user found: {twitchUser.Response[0].DisplayName}");
 
             return twitchUser.Response[0];

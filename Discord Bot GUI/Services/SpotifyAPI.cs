@@ -103,7 +103,7 @@ namespace Discord_Bot.Services
                         list = album.Items.Select(n => $"{n.Name.Trim()} {n.Artists[0].Name.Trim()}").ToArray();
                     }
 
-                    if (CollectionTools.IsNullOrEmpty(list))
+                    if (!CollectionTools.IsNullOrEmpty(list))
                     {
                         foreach (string track in list)
                         {

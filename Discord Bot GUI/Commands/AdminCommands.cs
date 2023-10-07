@@ -5,8 +5,8 @@ using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
-using Discord_Bot.Services;
 using Discord_Bot.Services.Models.Twitch;
 using System;
 using System.Collections.Generic;
@@ -21,9 +21,9 @@ namespace Discord_Bot.Commands
         private readonly IServerService serverService;
         private readonly IChannelService channelService;
         private readonly ITwitchChannelService twitchChannelService;
-        private readonly TwitchAPI twitchAPI;
+        private readonly ITwitchAPI twitchAPI;
 
-        public AdminCommands(IServerService serverService, IChannelService channelService, ITwitchChannelService twitchChannelService, TwitchAPI twitchAPI, Logging logger, Config config) : base(logger, config)
+        public AdminCommands(IServerService serverService, IChannelService channelService, ITwitchChannelService twitchChannelService, ITwitchAPI twitchAPI, Logging logger, Config config) : base(logger, config)
         {
             this.serverService = serverService;
             this.channelService = channelService;
@@ -242,7 +242,7 @@ namespace Discord_Bot.Commands
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(name) || name == "all")
+                    if (!string.IsNullOrEmpty(name) && name == "all")
                     {
                         //Removes the twitch channel with the given name, removes server from cache
                         result = await twitchChannelService.RemoveTwitchChannelAsync(Context.Guild.Id, name);
@@ -299,13 +299,13 @@ namespace Discord_Bot.Commands
                     }
                     else
                     {
-                        embed.AddField($"{item.Value}:", "none");
+                        embed.AddField($"{item.Value}:", "`none`");
                     }
                 }
 
                 if (server.TwitchChannels.Count > 0)
                 {
-                    embed.AddField("Notification role:", $"`{server.TwitchChannels[0].RoleName}`");
+                    embed.AddField("Notification role:", $"`{(server.TwitchChannels[0].RoleName != null ? server.TwitchChannels[0].RoleName : "none")}`");
                     embed.AddField("Notified Twitch Channel IDs:", $"`{string.Join(",", server.TwitchChannels.Select(x => x.TwitchId))}`");
                     embed.AddField("Notified Twitch channel URLs:", $"`{string.Join(",", server.TwitchChannels.Select(x => x.TwitchLink))}`");
                 }

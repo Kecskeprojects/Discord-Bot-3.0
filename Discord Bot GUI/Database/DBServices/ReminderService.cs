@@ -90,7 +90,7 @@ namespace Discord_Bot.Database.DBServices
             {
                 List<Reminder> reminders = await reminderRepository.GetRemindersByIds(reminderIds);
 
-                if (CollectionTools.IsNullOrEmpty(reminders))
+                if (!CollectionTools.IsNullOrEmpty(reminders))
                 {
                     await reminderRepository.RemoveCurrentRemindersAsync(reminders);
 
@@ -98,7 +98,7 @@ namespace Discord_Bot.Database.DBServices
                 }
                 else
                 {
-                    logger.Log("No reminders to remove currently");
+                    logger.Log("No reminders to remove currently.");
                 }
                 return DbProcessResultEnum.Success;
             }

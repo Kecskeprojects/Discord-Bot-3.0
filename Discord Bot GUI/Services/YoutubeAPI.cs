@@ -276,7 +276,7 @@ namespace Discord_Bot.Services
             if (!filterWords.Any(query.ToLower().Contains))
             {
                 List<SearchResult> filteredList = items.Where(result => !filterWords.Any(result.Snippet.Title.ToLower().Contains)).ToList();
-                if (CollectionTools.IsNullOrEmpty(filteredList))
+                if (!CollectionTools.IsNullOrEmpty(filteredList))
                 {
                     items = filteredList;
                 }
