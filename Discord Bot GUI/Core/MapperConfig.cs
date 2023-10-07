@@ -21,7 +21,8 @@ namespace Discord_Bot.Core
             CreateMap<TwitchChannel, TwitchChannelResource>();
             CreateMap<Greeting, GreetingResource>();
             CreateMap<TwitchChannel, TwitchChannelResource>()
-                .ForMember(dest => dest.ServerDiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.Server.DiscordId)));
+                .ForMember(dest => dest.ServerDiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.Server.DiscordId)))
+                .ForMember(dest => dest.RoleName, opt => opt.MapFrom(scv => scv.Role.RoleName));
             CreateMap<CustomCommand, CustomCommandResource>();
             CreateMap<Role, RoleResource>()
                 .ForMember(dest => dest.DiscordId, opt => opt.MapFrom(r => ulong.Parse(r.DiscordId)));

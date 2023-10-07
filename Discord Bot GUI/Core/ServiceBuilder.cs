@@ -87,6 +87,8 @@ namespace Discord_Bot.Core
             collection.AddScoped<IReminderService, ReminderService>();
             collection.AddScoped<IReminderRepository, ReminderRepository>();
             collection.AddScoped<IUserRepository, UserRepository>();
+            collection.AddScoped<IChannelRepository, ChannelRepository>();
+            collection.AddScoped<IChannelService, ChannelService>();
 
             //Commands
             collection.AddScoped<IServiceDiscordCommunication, ServiceDiscordCommunication>();
