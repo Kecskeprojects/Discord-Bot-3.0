@@ -23,10 +23,10 @@ namespace Discord_Bot.Enums
             { ChannelTypeEnum.BirthdayText, "Birthday Channel" },
         };
 
-        public static ChannelTypeEnum[] RestrictedChannelTypes { get; } = new ChannelTypeEnum[] 
-        { 
-            ChannelTypeEnum.BirthdayText, 
-            ChannelTypeEnum.TwitchNotificationText, 
+        public static ChannelTypeEnum[] RestrictedChannelTypes { get; } = new ChannelTypeEnum[]
+        {
+            ChannelTypeEnum.BirthdayText,
+            ChannelTypeEnum.TwitchNotificationText,
             ChannelTypeEnum.RoleText
         };
     }

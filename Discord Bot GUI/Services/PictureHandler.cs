@@ -18,7 +18,10 @@ namespace Discord_Bot.Services
     {
         private readonly Logging logger;
 
-        public PictureHandler(Logging logger) => this.logger = logger;
+        public PictureHandler(Logging logger)
+        {
+            this.logger = logger;
+        }
 
         #region Main function
         //Our image size will be 800*500 in the end

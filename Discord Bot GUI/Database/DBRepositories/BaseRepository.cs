@@ -4,6 +4,9 @@
     {
         protected readonly MainDbContext context;
 
-        public BaseRepository(MainDbContext context) => this.context = context;
+        public BaseRepository(MainDbContext context)
+        {
+            this.context = context;
+        }
     }
 }

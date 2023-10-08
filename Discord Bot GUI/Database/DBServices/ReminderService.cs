@@ -54,7 +54,10 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 List<Reminder> reminders = await reminderRepository.GetCurrentRemindersAsync(dateTime);
-                if (reminders == null) return null;
+                if (reminders == null)
+                {
+                    return null;
+                }
 
                 result = mapper.Map<List<Reminder>, List<ReminderResource>>(reminders);
             }
@@ -72,7 +75,10 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 List<Reminder> server = await reminderRepository.GetUserReminderListAsync(userId);
-                if (server == null) return null;
+                if (server == null)
+                {
+                    return null;
+                }
 
                 result = mapper.Map<List<Reminder>, List<ReminderResource>>(server);
             }

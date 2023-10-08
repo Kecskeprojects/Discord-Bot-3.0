@@ -72,7 +72,10 @@ namespace Discord_Bot.CommandsService
                     _ => DateTime.MinValue
                 };
 
-                if (modifiedDate == DateTime.MinValue) return false;
+                if (modifiedDate == DateTime.MinValue)
+                {
+                    return false;
+                }
             }
             return true;
         }

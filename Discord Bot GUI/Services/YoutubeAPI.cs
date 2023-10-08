@@ -306,7 +306,10 @@ namespace Discord_Bot.Services
         public static void KeyReset(string[] configKeys)
         {
             keys.Clear();
-            foreach (string item in configKeys) keys.Add(item, 0);
+            foreach (string item in configKeys)
+            {
+                keys.Add(item, 0);
+            }
 
             youtubeIndex = new Random().Next(0, keys.Count);
         }

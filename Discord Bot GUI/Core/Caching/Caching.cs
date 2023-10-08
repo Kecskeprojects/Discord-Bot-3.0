@@ -14,8 +14,15 @@ namespace Discord_Bot.Core.Caching
             }
         }
 
-        public void ClearCachedEntityManually() => ServerCache.Clear();
-        public ServerResource TryGetValue(ulong key) => ServerCache.TryGetValue(key, out ServerResource server) ? server : null;
+        public void ClearCachedEntityManually()
+        {
+            ServerCache.Clear();
+        }
+
+        public ServerResource TryGetValue(ulong key)
+        {
+            return ServerCache.TryGetValue(key, out ServerResource server) ? server : null;
+        }
 
         public void TryAddValue(ulong discordId, ServerResource result)
         {

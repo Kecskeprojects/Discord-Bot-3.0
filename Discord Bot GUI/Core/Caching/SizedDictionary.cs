@@ -17,12 +17,19 @@ namespace Discord_Bot.Core.Caching
 
         new public bool TryAdd(TKey key, TValue value)
         {
-            if (key == null) throw new();
+            if (key == null)
+            {
+                throw new();
+            }
 
-            if(base.TryAdd(key, value))
+            if (base.TryAdd(key, value))
             {
                 keys.Enqueue(key);
-                if (keys.Count > maxSize) base.Remove(keys.Dequeue());
+                if (keys.Count > maxSize)
+                {
+                    base.Remove(keys.Dequeue());
+                }
+
                 return true;
             }
             else
@@ -33,17 +40,30 @@ namespace Discord_Bot.Core.Caching
 
         new public void Add(TKey key, TValue value)
         {
-            if (key == null) throw new();
+            if (key == null)
+            {
+                throw new();
+            }
 
             base.Add(key, value);
             keys.Enqueue(key);
-            if (keys.Count > maxSize) base.Remove(keys.Dequeue());
+            if (keys.Count > maxSize)
+            {
+                base.Remove(keys.Dequeue());
+            }
         }
 
         new public bool Remove(TKey key)
         {
-            if (key == null) throw new();
-            if (!keys.Contains(key)) return false;
+            if (key == null)
+            {
+                throw new();
+            }
+
+            if (!keys.Contains(key))
+            {
+                return false;
+            }
 
             Queue<TKey> newQueue = new();
             while (!CollectionTools.IsNullOrEmpty(keys))

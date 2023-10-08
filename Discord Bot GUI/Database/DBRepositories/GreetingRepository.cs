@@ -19,10 +19,15 @@ namespace Discord_Bot.Database.DBRepositories
             await context.SaveChangesAsync();
         }
 
-        public Task<List<Greeting>> GetAllGreetingAsync() =>
-            context.Greetings.ToListAsync();
+        public Task<List<Greeting>> GetAllGreetingAsync()
+        {
+            return context.Greetings.ToListAsync();
+        }
 
-        public Task<Greeting> GetGreetingByIdAsync(int id) => context.Greetings.SingleOrDefaultAsync(g => g.GreetingId == id);
+        public Task<Greeting> GetGreetingByIdAsync(int id)
+        {
+            return context.Greetings.SingleOrDefaultAsync(g => g.GreetingId == id);
+        }
 
         public async Task RemoveGreetingAsync(Greeting greeting)
         {

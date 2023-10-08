@@ -14,7 +14,10 @@ namespace Discord_Bot.Commands
     {
         private readonly IKeywordService keywordService;
 
-        public KeywordCommands(IKeywordService keywordService, Logging logger, Config config) : base(logger, config) => this.keywordService = keywordService;
+        public KeywordCommands(IKeywordService keywordService, Logging logger, Config config) : base(logger, config)
+        {
+            this.keywordService = keywordService;
+        }
 
         [Command("keyword add")]
         [RequireUserPermission(ChannelPermission.ManageMessages)]

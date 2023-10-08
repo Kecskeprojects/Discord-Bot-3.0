@@ -2,7 +2,10 @@
 {
     public class LogType
     {
-        private LogType(string value) => Value = value;
+        private LogType(string value)
+        {
+            Value = value;
+        }
 
         public string Value { get; private set; }
 

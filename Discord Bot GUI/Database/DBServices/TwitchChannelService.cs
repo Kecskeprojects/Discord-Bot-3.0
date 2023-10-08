@@ -16,10 +16,20 @@ namespace Discord_Bot.Database.DBServices
     {
         private readonly ITwitchChannelRepository twitchChannelRepository;
 
-        public TwitchChannelService(IMapper mapper, Logging logger, Cache cache, ITwitchChannelRepository twitchChannelRepository) : base(mapper, logger, cache) => this.twitchChannelRepository = twitchChannelRepository;
+        public TwitchChannelService(IMapper mapper, Logging logger, Cache cache, ITwitchChannelRepository twitchChannelRepository) : base(mapper, logger, cache)
+        {
+            this.twitchChannelRepository = twitchChannelRepository;
+        }
 
-        public Task<DbProcessResultEnum> AddNotificationRoleAsync(ulong serverId, ulong roleId) => throw new NotImplementedException();
-        public Task<DbProcessResultEnum> AddTwitchChannelAsync(ulong serverId, string userId, string url) => throw new NotImplementedException();
+        public Task<DbProcessResultEnum> AddNotificationRoleAsync(ulong serverId, ulong roleId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<DbProcessResultEnum> AddTwitchChannelAsync(ulong serverId, string userId, string url)
+        {
+            throw new NotImplementedException();
+        }
 
         public async Task<List<TwitchChannelResource>> GetChannelsAsync()
         {
@@ -27,7 +37,10 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 List<TwitchChannel> channels = await twitchChannelRepository.GetChannelsAsync();
-                if (channels == null) return null;
+                if (channels == null)
+                {
+                    return null;
+                }
 
                 result = mapper.Map<List<TwitchChannel>, List<TwitchChannelResource>>(channels);
             }
@@ -39,8 +52,19 @@ namespace Discord_Bot.Database.DBServices
             return result;
         }
 
-        public Task<DbProcessResultEnum> RemoveNotificationRoleAsync(ulong serverId) => throw new NotImplementedException();
-        public Task<DbProcessResultEnum> RemoveTwitchChannelAsync(ulong serverId, string name) => throw new NotImplementedException();
-        public Task<DbProcessResultEnum> RemoveTwitchChannelsAsync(ulong serverId) => throw new NotImplementedException();
+        public Task<DbProcessResultEnum> RemoveNotificationRoleAsync(ulong serverId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<DbProcessResultEnum> RemoveTwitchChannelAsync(ulong serverId, string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<DbProcessResultEnum> RemoveTwitchChannelsAsync(ulong serverId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

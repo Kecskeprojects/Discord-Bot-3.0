@@ -140,7 +140,10 @@ namespace Discord_Bot.Services
                     if (img != null)
                     {
                         Uri newUri = new(img.GetAttribute("src"));
-                        if (newUri.Segments[1] == "media/") currImages.Add(new Uri(img.GetAttribute("src")));
+                        if (newUri.Segments[1] == "media/")
+                        {
+                            currImages.Add(new Uri(img.GetAttribute("src")));
+                        }
                     }
                 }
 

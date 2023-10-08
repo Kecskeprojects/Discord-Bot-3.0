@@ -20,7 +20,10 @@ namespace Discord_Bot.Commands
     {
         private readonly IGreetingService greetingService;
 
-        public OwnerCommands(IGreetingService greetingService, Logging logger, Config config) : base(logger, config) => this.greetingService = greetingService;
+        public OwnerCommands(IGreetingService greetingService, Logging logger, Config config) : base(logger, config)
+        {
+            this.greetingService = greetingService;
+        }
 
         [Command("help owner")]
         [RequireOwner]

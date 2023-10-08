@@ -15,7 +15,10 @@ namespace Discord_Bot.Services
     {
         private readonly Logging logger;
 
-        public WordOfTheDayService(Logging logger) => this.logger = logger;
+        public WordOfTheDayService(Logging logger)
+        {
+            this.logger = logger;
+        }
 
         private static string BaseUrl { get; } = "http://wotd.transparent.com/rss/";
 

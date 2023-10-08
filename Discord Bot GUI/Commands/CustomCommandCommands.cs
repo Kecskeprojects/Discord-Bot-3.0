@@ -17,7 +17,10 @@ namespace Discord_Bot.Commands
     {
         private readonly ICustomCommandService customCommandService;
 
-        public CustomCommandCommands(Logging logger, Config config, ICustomCommandService customCommandService) : base(logger, config) => this.customCommandService = customCommandService;
+        public CustomCommandCommands(Logging logger, Config config, ICustomCommandService customCommandService) : base(logger, config)
+        {
+            this.customCommandService = customCommandService;
+        }
 
         [Command("custom list")]
         [RequireContext(ContextType.Guild)]

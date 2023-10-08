@@ -18,7 +18,10 @@ namespace Discord_Bot.Commands
     {
         private readonly IReminderService reminderService;
 
-        public ReminderCommands(IReminderService reminderService, Logging logger, Config config) : base(logger, config) => this.reminderService = reminderService;
+        public ReminderCommands(IReminderService reminderService, Logging logger, Config config) : base(logger, config)
+        {
+            this.reminderService = reminderService;
+        }
 
         [Command("remind at")]
         [Alias(new string[] { "reminder at" })]
@@ -27,7 +30,10 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                if (message.Split(">").Length < 2) return;
+                if (message.Split(">").Length < 2)
+                {
+                    return;
+                }
 
                 //Take the message apart and clear trailing whitespaces
                 string datestring = message.Split(">")[0].Trim();
@@ -109,7 +115,10 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                if (message.Split(">").Length < 2) return;
+                if (message.Split(">").Length < 2)
+                {
+                    return;
+                }
 
                 //Take the message apart and clear trailing whitespaces
                 string amountstring = message.Split(">")[0].Trim();
@@ -127,7 +136,10 @@ namespace Discord_Bot.Commands
                 if (amounts.Count % 2 == 0)
                 {
                     //Check what lengths of time we need to deal with and add it to the current date
-                    if (!ReminderService.TryAddValuesToDate(amounts, out DateTime date)) return;
+                    if (!ReminderService.TryAddValuesToDate(amounts, out DateTime date))
+                    {
+                        return;
+                    }
 
                     DbProcessResultEnum result = await reminderService.AddReminderAsync(Context.User.Id, date, remindMessage);
 

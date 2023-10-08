@@ -15,7 +15,10 @@ namespace Discord_Bot.Commands
     {
         private readonly IRoleService roleService;
 
-        public SelfRoleCommands(IRoleService roleService, Logging logger, Config config) : base(logger, config) => this.roleService = roleService;
+        public SelfRoleCommands(IRoleService roleService, Logging logger, Config config) : base(logger, config)
+        {
+            this.roleService = roleService;
+        }
 
         [Command("self role add")]
         [RequireUserPermission(ChannelPermission.ManageRoles)]

@@ -33,7 +33,7 @@ namespace Discord_Bot.Database.DBServices
                 Channel channel = await channelRepository.GetChannelByDiscordIdAsync(serverId, channelId);
 
                 ChannelType channelType = await channelTypeRepository.GetChannelTypeByIdAsync(channelTypeId);
-                if(channelType == null)
+                if (channelType == null)
                 {
                     return DbProcessResultEnum.NotFound;
                 }
@@ -63,7 +63,7 @@ namespace Discord_Bot.Database.DBServices
                 }
                 else
                 {
-                    if(channel.ChannelTypes.Contains(channelType))
+                    if (channel.ChannelTypes.Contains(channelType))
                     {
                         return DbProcessResultEnum.AlreadyExists;
                     }

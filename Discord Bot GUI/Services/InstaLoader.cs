@@ -10,7 +10,10 @@ namespace Discord_Bot.Services
     {
         private readonly Logging logger;
 
-        public InstaLoader(Logging logger) => this.logger = logger;
+        public InstaLoader(Logging logger)
+        {
+            this.logger = logger;
+        }
 
         //https://instaloader.github.io/basic-usage.html
         //https://github.com/instaloader/instaloader

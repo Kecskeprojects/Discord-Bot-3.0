@@ -107,7 +107,11 @@ namespace Discord_Bot.Services
             {
                 logger.Query($"Streamer turned online: {e.Stream.UserName} with id: {e.Stream.Id}");
                 List<TwitchChannelResource> channels = await twitchChannelService.GetChannelsAsync();
-                if (channels == null) return;
+                if (channels == null)
+                {
+                    return;
+                }
+
                 foreach (TwitchChannelResource channel in channels)
                 {
                     if (channelStatuses.ContainsKey(channel.TwitchId) &&
@@ -133,7 +137,11 @@ namespace Discord_Bot.Services
                 logger.Query($"Streamer turned offline: {e.Stream.UserName} with id: {e.Stream.Id}");
 
                 List<TwitchChannelResource> channels = await twitchChannelService.GetChannelsAsync();
-                if (channels == null) return;
+                if (channels == null)
+                {
+                    return;
+                }
+
                 foreach (TwitchChannelResource channel in channels)
                 {
                     if (channelStatuses.ContainsKey(channel.TwitchId) &&
@@ -257,7 +265,10 @@ namespace Discord_Bot.Services
 
             User twitchUser = JsonConvert.DeserializeObject<User>(response);
 
-            if (twitchUser == null || CollectionTools.IsNullOrEmpty(twitchUser.Response)) return null;
+            if (twitchUser == null || CollectionTools.IsNullOrEmpty(twitchUser.Response))
+            {
+                return null;
+            }
 
             logger.Query($"Twitch user found: {twitchUser.Response[0].DisplayName}");
 
@@ -273,7 +284,10 @@ namespace Discord_Bot.Services
                 foreach (TwitchChannelResource channel in channels)
                 {
                     if (!channelStatuses.ContainsKey(channel.TwitchId))
+                    {
                         channelStatuses.Add(channel.TwitchId, false);
+                    }
+
                     lst.Add(channel.TwitchId);
                 }
 

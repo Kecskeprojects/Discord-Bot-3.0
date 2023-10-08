@@ -109,7 +109,10 @@ namespace Discord_Bot
         //Main Bot Startup Logic
         public async Task RunBotAsync()
         {
-            if (!Global.Connection()) return;
+            if (!Global.Connection())
+            {
+                return;
+            }
 
             client.Log += ClientLog;
 
@@ -262,7 +265,10 @@ namespace Discord_Bot
         {
             try
             {
-                if (string.IsNullOrEmpty(arg.Content)) return;
+                if (string.IsNullOrEmpty(arg.Content))
+                {
+                    return;
+                }
 
                 //In case the message was a system message (eg. the message seen when someone a pin is made), a webhook's or a bot's message, the function stops as it would cause an infinite loop
                 if (arg.Source == MessageSource.System || arg.Source == MessageSource.Webhook || arg.Source == MessageSource.Bot)

@@ -175,7 +175,10 @@ namespace Discord_Bot.Commands
             {
                 IEnumerable<IUser> result = await message.GetReactionUsersAsync(new Emoji("\U00002705"), 5).FlattenAsync();
 
-                if (result.Count() > 1) break;
+                if (result.Count() > 1)
+                {
+                    break;
+                }
 
                 await Task.Delay(1000);
                 timer++;

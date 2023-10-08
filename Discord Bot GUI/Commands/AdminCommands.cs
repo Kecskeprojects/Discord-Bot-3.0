@@ -84,7 +84,7 @@ namespace Discord_Bot.Commands
 
                 if (result == DbProcessResultEnum.Success)
                 {
-                    if(ChannelTypeNameCollections.RestrictedChannelTypes.Contains(channelType))
+                    if (ChannelTypeNameCollections.RestrictedChannelTypes.Contains(channelType))
                     {
                         await ReplyAsync("Server settings updated! Previous channel (if there was one) was overwritten as only one of it's type is allowed.");
                     }

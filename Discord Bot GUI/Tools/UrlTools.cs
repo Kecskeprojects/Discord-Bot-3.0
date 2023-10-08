@@ -8,7 +8,10 @@ namespace Discord_Bot.Tools
     {
         public static List<Uri> LinkSearch(string message, bool ignoreEmbedSuppress, params string[] baseURLs)
         {
-            if (string.IsNullOrWhiteSpace(message)) return null;
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                return null;
+            }
 
             message = message.Replace("www.", "");
 
@@ -24,7 +27,10 @@ namespace Discord_Bot.Tools
                     {
                         startIndex = message.IndexOf(baseURL, startIndex);
 
-                        if (startIndex == -1) break;
+                        if (startIndex == -1)
+                        {
+                            break;
+                        }
 
                         string beginningCut = message[startIndex..];
 
