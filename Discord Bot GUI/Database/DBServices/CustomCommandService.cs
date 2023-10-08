@@ -98,7 +98,7 @@ namespace Discord_Bot.Database.DBServices
                 }
                 else
                 {
-                    logger.Log($"Custom command {commandName} could not found!");
+                    logger.Log($"Custom command {commandName} could not be found!");
                     return DbProcessResultEnum.NotFound;
                 }
             }

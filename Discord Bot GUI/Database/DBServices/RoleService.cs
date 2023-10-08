@@ -82,7 +82,7 @@ namespace Discord_Bot.Database.DBServices
                 }
                 else
                 {
-                    logger.Log($"Role {roleName} could not found!");
+                    logger.Log($"Role {roleName} could not be found!");
                     return DbProcessResultEnum.NotFound;
                 }
             }

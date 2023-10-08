@@ -70,25 +70,33 @@ namespace Discord_Bot.Commands
                     return;
                 }
 
-                if (!ChannelTypeNameDictionary.NameEnum.ContainsKey(type))
+                if (!ChannelTypeNameCollections.NameEnum.ContainsKey(type))
                 {
                     await ReplyAsync("Channel type does not currently exist\nCurrent types: " +
-                        string.Join(", ", ChannelTypeNameDictionary.NameEnum.Keys.Select(x => $"`{x}`")));
+                        string.Join(", ", ChannelTypeNameCollections.NameEnum.Keys.Select(x => $"`{x}`")));
                     return;
                 }
 
-                ChannelTypeEnum channelType = ChannelTypeNameDictionary.NameEnum[type];
+                ChannelTypeEnum channelType = ChannelTypeNameCollections.NameEnum[type];
 
                 //Adds channel onto list of channels for server, unless conditions say there can only be one of a type of chat, removes server from cache
                 DbProcessResultEnum result = await channelService.AddSettingChannelAsync(Context.Guild.Id, channelType, channel.Id);
 
                 if (result == DbProcessResultEnum.Success)
                 {
+                    if(ChannelTypeNameCollections.RestrictedChannelTypes.Contains(channelType))
+                    {
+                        await ReplyAsync("Server settings updated! Previous channel (if there was one) was overwritten as only one of it's type is allowed.");
+                    }
                     await ReplyAsync("Server settings updated!");
                 }
                 else if (result == DbProcessResultEnum.AlreadyExists)
                 {
                     await ReplyAsync("Channel and type combination already in database!");
+                }
+                else if (result == DbProcessResultEnum.NotFound)
+                {
+                    await ReplyAsync("ChannelType or Server not found!");
                 }
                 else
                 {
@@ -110,7 +118,7 @@ namespace Discord_Bot.Commands
             try
             {
                 DbProcessResultEnum result;
-                ChannelTypeEnum channelType = ChannelTypeNameDictionary.NameEnum[type];
+                ChannelTypeEnum channelType = ChannelTypeNameCollections.NameEnum[type];
 
                 if (channelName == "all")
                 {
@@ -126,14 +134,14 @@ namespace Discord_Bot.Commands
                         await ReplyAsync("Channel not found!");
                     }
 
-                    if (!ChannelTypeNameDictionary.NameEnum.ContainsKey(type))
+                    if (!ChannelTypeNameCollections.NameEnum.ContainsKey(type))
                     {
                         await ReplyAsync("Channel type does not currently exist\nCurrent types: " +
-                            string.Join(", ", ChannelTypeNameDictionary.NameEnum.Keys.Select(x => $"`{x}`")));
+                            string.Join(", ", ChannelTypeNameCollections.NameEnum.Keys.Select(x => $"`{x}`")));
                     }
 
                     //Removes the given channel of the given type from the settings for the server, removes server from cache
-                    result = await channelService.RemovelSettingChanneAsync(Context.Guild.Id, channelType, channel.Id);
+                    result = await channelService.RemovelSettingChannelAsync(Context.Guild.Id, channelType, channel.Id);
                 }
 
                 if (result == DbProcessResultEnum.Success)
@@ -285,7 +293,7 @@ namespace Discord_Bot.Commands
                 EmbedBuilder embed = new();
 
                 embed.WithTitle("The server's settings are the following:");
-                foreach (KeyValuePair<ChannelTypeEnum, string> item in ChannelTypeNameDictionary.EnumName)
+                foreach (KeyValuePair<ChannelTypeEnum, string> item in ChannelTypeNameCollections.EnumName)
                 {
                     if (server.SettingsChannels.ContainsKey(item.Key))
                     {

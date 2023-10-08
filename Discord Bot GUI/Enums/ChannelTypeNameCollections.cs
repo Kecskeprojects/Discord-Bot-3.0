@@ -2,7 +2,7 @@
 
 namespace Discord_Bot.Enums
 {
-    public class ChannelTypeNameDictionary
+    public class ChannelTypeNameCollections
     {
         public static Dictionary<string, ChannelTypeEnum> NameEnum { get; } = new()
         {
@@ -17,10 +17,17 @@ namespace Discord_Bot.Enums
         {
             { ChannelTypeEnum.RoleText, "Role Channel" },
             { ChannelTypeEnum.TwitchNotificationText, "Notification Channel" },
-            { ChannelTypeEnum.MusicText, "Music Channels" },
-            { ChannelTypeEnum.MusicVoice, "Music Voice Channels" },
-            { ChannelTypeEnum.CommandText, "Command Channels" },
+            { ChannelTypeEnum.MusicText, "Music Channel" },
+            { ChannelTypeEnum.MusicVoice, "Music Voice Channel" },
+            { ChannelTypeEnum.CommandText, "Command Channel" },
             { ChannelTypeEnum.BirthdayText, "Birthday Channel" },
+        };
+
+        public static ChannelTypeEnum[] RestrictedChannelTypes { get; } = new ChannelTypeEnum[] 
+        { 
+            ChannelTypeEnum.BirthdayText, 
+            ChannelTypeEnum.TwitchNotificationText, 
+            ChannelTypeEnum.RoleText
         };
     }
 }

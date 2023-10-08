@@ -81,7 +81,7 @@ namespace Discord_Bot.Database.DBServices
                 }
                 else
                 {
-                    logger.Log($"Keyword '{trigger}' removed successfully!");
+                    logger.Log($"Keyword '{trigger}' could not be found!");
                     return DbProcessResultEnum.NotFound;
                 }
             }

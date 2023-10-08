@@ -15,6 +15,22 @@ namespace Discord_Bot.Core.Caching
             keys = new Queue<TKey>();
         }
 
+        new public bool TryAdd(TKey key, TValue value)
+        {
+            if (key == null) throw new();
+
+            if(base.TryAdd(key, value))
+            {
+                keys.Enqueue(key);
+                if (keys.Count > maxSize) base.Remove(keys.Dequeue());
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         new public void Add(TKey key, TValue value)
         {
             if (key == null) throw new();
