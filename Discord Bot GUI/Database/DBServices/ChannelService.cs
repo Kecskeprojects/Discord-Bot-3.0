@@ -39,7 +39,7 @@ namespace Discord_Bot.Database.DBServices
                 }
 
                 Server server = await serverRepository.GetByDiscordIdAsync(serverId);
-                if (channelType == null)
+                if (server == null)
                 {
                     return DbProcessResultEnum.NotFound;
                 }
@@ -90,6 +90,10 @@ namespace Discord_Bot.Database.DBServices
             {
                 Channel channel = await channelRepository.GetChannelByDiscordIdAsync(serverId, channelId);
                 ChannelType channelType = await channelTypeRepository.GetChannelTypeByIdAsync(channelTypeId);
+                if (channelType == null)
+                {
+                    return DbProcessResultEnum.NotFound;
+                }
                 if (channel != null)
                 {
                     if (!channel.ChannelTypes.Remove(channelType))
@@ -123,6 +127,10 @@ namespace Discord_Bot.Database.DBServices
             {
                 List<Channel> channels = await channelRepository.GetChannelsByTypeAsync(serverId, channelTypeId);
                 ChannelType channelType = await channelTypeRepository.GetChannelTypeByIdAsync(channelTypeId);
+                if (channelType == null)
+                {
+                    return DbProcessResultEnum.NotFound;
+                }
                 if (!CollectionTools.IsNullOrEmpty(channels))
                 {
                     channels.ForEach((channel) => { channel.ChannelTypes.Remove(channelType); });

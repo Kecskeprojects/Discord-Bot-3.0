@@ -34,6 +34,11 @@ namespace Discord_Bot.Commands
             this.logger = logger;
         }
 
+        public Task SendBirthdayMessage(BirthdayResource birthday)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task SendInstagramPostEmbed(Uri uri, ulong messageId, ulong channelId, ulong? guildId)
         {
             IMessageChannel channel = client.GetChannel(channelId) as IMessageChannel;

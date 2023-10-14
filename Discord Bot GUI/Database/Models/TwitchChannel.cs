@@ -11,6 +11,8 @@ public partial class TwitchChannel
 
     public string TwitchLink { get; set; }
 
+    public string TwitchName { get; set; }
+
     public int ServerId { get; set; }
 
     public int? RoleId { get; set; }

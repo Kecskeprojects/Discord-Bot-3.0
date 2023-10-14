@@ -146,7 +146,7 @@ namespace Discord_Bot
                 //Logic to be done once a day
                 if (minutesCount == 1440)
                 {
-                    //Todo: Add logic to check daily for birthdays
+                    await coreLogic.BirthdayCheck();
                     minutesCount = 0;
                 }
 

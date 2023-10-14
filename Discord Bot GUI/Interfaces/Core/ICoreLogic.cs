@@ -10,6 +10,7 @@ namespace Discord_Bot.Interfaces.Core
         Task SelfRole(ulong serverId, string message, ISocketMessageChannel channel, SocketUser user);
         Task FeatureChecks(ulong serverId, string message, ISocketMessageChannel channel);
         Task ReminderCheck();
+        Task BirthdayCheck();
         void Closing();
         void Closing(object sender, EventArgs e);
         void InstagramEmbed(string message, ulong messageId, ulong channelId, ulong? guildId);

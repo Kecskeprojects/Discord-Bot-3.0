@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-
+//Todo: Move every command sending messages and such completely into ServiceDiscordComminucation.cs or multiple different dummy commands files depending on usage
 namespace Discord_Bot.Core
 {
     public class CoreLogic : ICoreLogic
@@ -24,15 +24,17 @@ namespace Discord_Bot.Core
         private readonly IRoleService roleService;
         private readonly IKeywordService keywordService;
         private readonly IReminderService reminderService;
+        private readonly IBirthdayService birthdayService;
         private readonly IServiceDiscordCommunication serviceDiscordCommunication;
 
-        public CoreLogic(Logging logger, ICustomCommandService customCommandService, IRoleService roleService, IKeywordService keywordService, IReminderService reminderService, IServiceDiscordCommunication serviceDiscordCommunication)
+        public CoreLogic(Logging logger, ICustomCommandService customCommandService, IRoleService roleService, IKeywordService keywordService, IReminderService reminderService, IBirthdayService birthdayService, IServiceDiscordCommunication serviceDiscordCommunication)
         {
             this.logger = logger;
             this.customCommandService = customCommandService;
             this.roleService = roleService;
             this.keywordService = keywordService;
             this.reminderService = reminderService;
+            this.birthdayService = birthdayService;
             this.serviceDiscordCommunication = serviceDiscordCommunication;
         }
 
@@ -166,6 +168,28 @@ namespace Discord_Bot.Core
             catch (Exception ex)
             {
                 logger.Error("CoreLogic.cs Log ReminderCheck", ex.ToString());
+            }
+        }
+
+        //Checking and sending out birthday messages
+        public async Task BirthdayCheck()
+        {
+            try
+            {
+                //Get the list of birthdays that are on this date
+                DateTime dateTime = DateTime.Parse(DateTime.UtcNow.ToString("yyyy-MM-dd"));
+                List<BirthdayResource> result = await birthdayService.GetBirthdaysByDateAsync(dateTime);
+                if (!CollectionTools.IsNullOrEmpty(result))
+                {
+                    foreach (BirthdayResource birthday in result)
+                    {
+                        await serviceDiscordCommunication.SendBirthdayMessage(birthday);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("CoreLogic.cs Log BirthdayCheck", ex.ToString());
             }
         }
         #endregion

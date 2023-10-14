@@ -90,6 +90,8 @@ namespace Discord_Bot.Core
             collection.AddScoped<IChannelRepository, ChannelRepository>();
             collection.AddScoped<IChannelService, ChannelService>();
             collection.AddScoped<IChannelTypeRepository, ChannelTypeRepository>();
+            collection.AddScoped<IBirthdayService, BirthdayService>();
+            collection.AddScoped<IBirthdayRepository, BirthdayRepository>();
 
             //Commands
             collection.AddScoped<IServiceDiscordCommunication, ServiceDiscordCommunication>();

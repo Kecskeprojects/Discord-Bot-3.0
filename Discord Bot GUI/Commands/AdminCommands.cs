@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord_Bot.CommandsService;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
@@ -9,7 +10,6 @@ using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.Twitch;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -282,6 +282,7 @@ namespace Discord_Bot.Commands
         }
 
         [Command("server settings")]
+        [Alias(new string[] { "serversettings", "serversetting", "server setting" })]
         [RequireUserPermission(ChannelPermission.ManageChannels)]
         [RequireContext(ContextType.Guild)]
         [Summary("Lists server settings")]
@@ -290,43 +291,7 @@ namespace Discord_Bot.Commands
             try
             {
                 ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                EmbedBuilder embed = new();
-
-                embed.WithTitle("The server's settings are the following:");
-                foreach (KeyValuePair<ChannelTypeEnum, string> item in ChannelTypeNameCollections.EnumName)
-                {
-                    if (server.SettingsChannels.ContainsKey(item.Key))
-                    {
-                        IEnumerable<string> channels = server.SettingsChannels[item.Key]
-                                                        .Select(x => Context.Guild.TextChannels
-                                                                            .FirstOrDefault(n => n.Id == x))
-                                                        .Where(x => x != null)
-                                                        .Select(x => $"`{x.Name}`");
-
-                        embed.AddField($"{item.Value}:", $"`{string.Join(", ", channels)}`");
-                    }
-                    else
-                    {
-                        embed.AddField($"{item.Value}:", "`none`");
-                    }
-                }
-
-                if (server.TwitchChannels.Count > 0)
-                {
-                    embed.AddField("Notification role:", $"`{(server.TwitchChannels[0].RoleName != null ? server.TwitchChannels[0].RoleName : "none")}`");
-                    embed.AddField("Notified Twitch Channel IDs:", $"`{string.Join(",", server.TwitchChannels.Select(x => x.TwitchId))}`");
-                    embed.AddField("Notified Twitch channel URLs:", $"`{string.Join(",", server.TwitchChannels.Select(x => x.TwitchLink))}`");
-                }
-                else
-                {
-                    embed.AddField("Notification role:", $"`none`");
-                    embed.AddField("Notified Twitch Channel IDs:", $"`none`");
-                    embed.AddField("Notified Twitch channel URLs:", $"`none`");
-                }
-
-                embed.WithThumbnailUrl(config.Img);
-                embed.WithTimestamp(DateTime.Now);
-                embed.WithColor(Color.Teal);
+                EmbedBuilder embed = AdminService.CreateServerSettingEmbed(server, config, Context.Guild.TextChannels);
 
                 await ReplyAsync("", false, embed.Build());
             }

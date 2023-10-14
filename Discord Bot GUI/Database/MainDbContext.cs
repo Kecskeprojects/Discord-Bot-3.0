@@ -321,6 +321,10 @@ public partial class MainDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(100)
                 .IsUnicode(false);
+            entity.Property(e => e.TwitchName)
+                .IsRequired()
+                .HasMaxLength(75)
+                .IsUnicode(false);
 
             entity.HasOne(d => d.Role).WithMany(p => p.TwitchChannels)
                 .HasForeignKey(d => d.RoleId)

@@ -29,6 +29,9 @@ namespace Discord_Bot.Core
             CreateMap<Keyword, KeywordResource>();
             CreateMap<Reminder, ReminderResource>()
                 .ForMember(dest => dest.UserDiscordId, opt => opt.MapFrom(r => ulong.Parse(r.User.DiscordId)));
+            CreateMap<Birthday, BirthdayResource>()
+                .ForMember(dest => dest.UserDiscordId, opt => opt.MapFrom(r => ulong.Parse(r.User.DiscordId)))
+                .ForMember(dest => dest.ServerDiscordId, opt => opt.MapFrom(r => ulong.Parse(r.Server.DiscordId)));
         }
     }
 }
