@@ -7,14 +7,11 @@ using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Core;
-using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
 using Discord_Bot.Services;
-using Discord_Bot.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,11 +32,9 @@ namespace Discord_Bot
         private static DiscordSocketClient client;
         private InteractionService interactions;
         private CommandService commands;
-        private ICoreLogic coreLogic;
-        private IServerService serverService;
-        private IGreetingService greetingService;
         private MainWindow mainWindow;
         private Thread twitchThread;
+        private ICoreLogic coreLogic;
         private static int minutesCount = 0;
         #endregion
 
@@ -57,10 +52,8 @@ namespace Discord_Bot
             client = services.GetService<DiscordSocketClient>();
             interactions = services.GetService<InteractionService>();
             commands = services.GetService<CommandService>();
-            coreLogic = services.GetService<ICoreLogic>();
-            serverService = services.GetService<IServerService>();
-            greetingService = services.GetService<IGreetingService>();
             mainWindow = services.GetRequiredService<MainWindow>();
+            coreLogic = services.GetService<ICoreLogic>();
 
             mainWindow.Show();
 
@@ -73,9 +66,9 @@ namespace Discord_Bot
 
             YoutubeAPI.KeyReset(config.Youtube_API_Keys);
 
-            twitchThread = new Thread(() =>
+            twitchThread = new Thread(async () =>
             {
-                services.GetService<ITwitchAPI>().Start();
+                await services.GetService<ITwitchAPI>().Start();
             });
             twitchThread.Start();
 
@@ -301,19 +294,10 @@ namespace Discord_Bot
                 ServerResource server = null;
                 if (context.Channel.GetChannelType() != ChannelType.DM)
                 {
-                    server = await serverService.GetByDiscordIdAsync(context.Guild.Id);
-                    if (server == null)
+                    server = await coreLogic.GetServerAsync(context.Guild.Id, context.Guild.Name);
+                    if(server == null)
                     {
-                        DbProcessResultEnum result = await serverService.AddServerAsync(context.Guild.Id);
-                        if (result == DbProcessResultEnum.Success)
-                        {
-                            server = await serverService.GetByDiscordIdAsync(context.Guild.Id);
-                        }
-                        else
-                        {
-                            logger.Log($"{context.Guild.Name} could not be added to list!");
-                            return;
-                        }
+                        return;
                     }
                 }
 
@@ -361,11 +345,7 @@ namespace Discord_Bot
                     //Response to mention
                     if (context.Message.Content.Contains(client.CurrentUser.Mention) || context.Message.Content.Contains(client.CurrentUser.Mention.Remove(2, 1)))
                     {
-                        List<GreetingResource> list = await greetingService.GetAllGreetingAsync();
-                        if (!CollectionTools.IsNullOrEmpty(list))
-                        {
-                            await context.Channel.SendMessageAsync(list[new Random().Next(0, list.Count)].Url);
-                        }
+                        await coreLogic.GreetAsync(context.Channel);
                     }
 
                     await coreLogic.FeatureChecks(context.Guild.Id, context.Message.Content, context.Channel);

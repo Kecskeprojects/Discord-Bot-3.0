@@ -14,9 +14,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-//Todo: Move every command sending messages and such completely into ServiceDiscordComminucation.cs or multiple different dummy commands files depending on usage
+
 namespace Discord_Bot.Core
 {
+    //Todo: Move every command sending messages and such completely into ServiceDiscordComminucation.cs or multiple different dummy commands files depending on usage
     public class CoreLogic : ICoreLogic
     {
         private readonly Logging logger;
@@ -26,8 +27,10 @@ namespace Discord_Bot.Core
         private readonly IReminderService reminderService;
         private readonly IBirthdayService birthdayService;
         private readonly IServiceDiscordCommunication serviceDiscordCommunication;
+        private readonly IServerService serverService;
+        private IGreetingService greetingService;
 
-        public CoreLogic(Logging logger, ICustomCommandService customCommandService, IRoleService roleService, IKeywordService keywordService, IReminderService reminderService, IBirthdayService birthdayService, IServiceDiscordCommunication serviceDiscordCommunication)
+        public CoreLogic(Logging logger, ICustomCommandService customCommandService, IRoleService roleService, IKeywordService keywordService, IReminderService reminderService, IBirthdayService birthdayService, IServiceDiscordCommunication serviceDiscordCommunication, IServerService serverService, IGreetingService greetingService)
         {
             this.logger = logger;
             this.customCommandService = customCommandService;
@@ -36,8 +39,28 @@ namespace Discord_Bot.Core
             this.reminderService = reminderService;
             this.birthdayService = birthdayService;
             this.serviceDiscordCommunication = serviceDiscordCommunication;
+            this.serverService = serverService;
+            this.greetingService = greetingService;
         }
 
+        public async Task<ServerResource> GetServerAsync(ulong serverId, string serverName)
+        {
+            ServerResource server = await serverService.GetByDiscordIdAsync(serverId);
+            if (server == null)
+            {
+                DbProcessResultEnum result = await serverService.AddServerAsync(serverId);
+                if (result == DbProcessResultEnum.Success)
+                {
+                    server = await serverService.GetByDiscordIdAsync(serverId);
+                }
+                else
+                {
+                    logger.Log($"{serverName} could not be added to list!");
+                }
+            }
+
+            return server;
+        }
 
         #region Feature handle methods
         //Check the list of custom commands on the server
@@ -96,6 +119,15 @@ namespace Discord_Bot.Core
             catch (Exception ex)
             {
                 logger.Error("CoreLogic.cs SelfRole", ex.ToString());
+            }
+        }
+
+        public async Task GreetAsync(ISocketMessageChannel channel)
+        {
+            List<GreetingResource> list = await greetingService.GetAllGreetingAsync();
+            if (!CollectionTools.IsNullOrEmpty(list))
+            {
+                await channel.SendMessageAsync(list[new Random().Next(0, list.Count)].Url);
             }
         }
 
@@ -197,24 +229,24 @@ namespace Discord_Bot.Core
         #region OnClose logic
         //Things to do when app is closing
         //3 second time limit to event by default
-        public void Closing()
+        public async void Closing()
         {
             try
             {
                 logger.Log("Application closing...");
                 LogToFile();
-                TwitterScraper.CloseBrowser();
+                await TwitterScraper.CloseBrowser();
             }
             catch (Exception) { }
         }
 
-        public void Closing(object sender, EventArgs e)
+        public async void Closing(object sender, EventArgs e)
         {
             try
             {
                 logger.Log("Application closing...");
                 LogToFile();
-                TwitterScraper.CloseBrowser();
+                await TwitterScraper.CloseBrowser();
             }
             catch (Exception) { }
         }

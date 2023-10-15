@@ -44,7 +44,7 @@ namespace Discord_Bot.Services
 
         #region Base Methods
         //Running the Twitch api request and catching errors
-        public async void Start()
+        public async Task Start()
         {
             try
             {
