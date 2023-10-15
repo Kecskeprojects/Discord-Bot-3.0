@@ -32,7 +32,7 @@ namespace Discord_Bot.Database.DBRepositories
             return context.Birthdays
                 .Include(b => b.User)
                 .Include(b => b.Server)
-                .Where(b => b.Date == dateTime)
+                .Where(b => b.Date.Month == dateTime.Month && b.Date.Day == dateTime.Day)
                 .ToListAsync();
         }
 

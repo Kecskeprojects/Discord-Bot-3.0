@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Discord_Bot.Core
+namespace Discord_Bot.Enums
 {
     public class StaticLists
     {
@@ -22,7 +22,10 @@ namespace Discord_Bot.Core
                 "It's so over for you",
                 "Sus",
                 "I will not let you off that easy",
-                "I hear voices while you sleep"
+                "I hear voices while you sleep",
+                "I am what you are most afraid of",
+                "I watch you sleep",
+                "Do you want me to tell you a joke?"
             };
 
         //Array for 8ball answers
@@ -78,5 +81,18 @@ namespace Discord_Bot.Core
             {"pashto", "pashto-widget.xml"},
             {"japanese", "ja-widget.xml"}
         };
+
+        //Array for birthday messages
+        public static string[] BirthdayMessage { get; } =
+            {
+                "Hey look, {0} has their birthday today! Send some nice wishes!\n{1}",
+                "Oh wow, it's birthday time! Happy birthday {0}!\n{1}",
+                "It's {0} day today!\n{1}",
+                "Happy birthday {0}!\n{1}",
+                "The day of reckoning is upon us, it's {0}'s birthday today!\n{1}",
+                "Get the cakes out bitches, it's {0} day!\n{1}",
+                "Happy birthday {0}! I am suddenly hungry for some cakes...\n{1}",
+                "Yay, what a special day, it's {0}'s birthday!\n{1}"
+            };
     }
 }

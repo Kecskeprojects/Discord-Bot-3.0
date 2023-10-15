@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.Net;
 using Discord.WebSocket;
 using Discord_Bot.CommandsService;
+using Discord_Bot.Core;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
@@ -34,9 +35,27 @@ namespace Discord_Bot.Commands
             this.logger = logger;
         }
 
-        public Task SendBirthdayMessage(BirthdayResource birthday)
+        public async Task SendBirthdayMessage(BirthdayResource birthday)
         {
-            throw new NotImplementedException();
+            ServerResource server = await serverService.GetByDiscordIdAsync(birthday.ServerDiscordId);
+
+            if (server.SettingsChannels[ChannelTypeEnum.BirthdayText].Count > 0)
+            {
+                ulong channelId = server.SettingsChannels[ChannelTypeEnum.BirthdayText][0];
+                ISocketMessageChannel channel = client.GetChannel(channelId) as ISocketMessageChannel;
+
+                SocketGuild guild = client.GetGuild(birthday.ServerDiscordId);
+                await guild.DownloadUsersAsync();
+                SocketGuildUser user = guild.GetUser(birthday.UserDiscordId);
+
+                Random r = new();
+                string baseMessage = StaticLists.BirthdayMessage[r.Next(0, StaticLists.BirthdayMessage.Length)];
+                string name = Global.GetNickName(channel, user);
+
+                string message = string.Format(baseMessage, new string[] { name, user.Mention });
+
+                await channel.SendMessageAsync(message);
+            }
         }
 
         public async Task SendInstagramPostEmbed(Uri uri, ulong messageId, ulong channelId, ulong? guildId)
