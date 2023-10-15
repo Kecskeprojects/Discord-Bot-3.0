@@ -288,6 +288,10 @@ public partial class MainDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
+
+            entity.HasOne(d => d.Role).WithMany(p => p.Servers)
+                .HasForeignKey(d => d.RoleId)
+                .HasConstraintName("FK_Server_Role");
         });
 
         modelBuilder.Entity<ServerChannelView>(entity =>
@@ -325,10 +329,6 @@ public partial class MainDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(75)
                 .IsUnicode(false);
-
-            entity.HasOne(d => d.Role).WithMany(p => p.TwitchChannels)
-                .HasForeignKey(d => d.RoleId)
-                .HasConstraintName("FK_TwitchChannel_Role");
 
             entity.HasOne(d => d.Server).WithMany(p => p.TwitchChannels)
                 .HasForeignKey(d => d.ServerId)

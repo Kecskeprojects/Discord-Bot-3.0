@@ -7,5 +7,6 @@ namespace Discord_Bot.Interfaces.DBRepositories
     {
         Task AddServerAsync(Server server);
         Task<Server> GetByDiscordIdAsync(ulong serverId);
+        Task UpdateServerAsync(Server server);
     }
 }

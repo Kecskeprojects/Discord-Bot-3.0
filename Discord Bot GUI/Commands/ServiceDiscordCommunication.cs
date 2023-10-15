@@ -161,7 +161,7 @@ namespace Discord_Bot.Commands
                     builder.WithColor(Color.Purple);
 
                     //If there is no notification role set on the server, we just send a message without the role ping
-                    string notifRole = !NumberTools.IsNullOrZero(twitchChannel.RoleDiscordId) ? $"<@&{twitchChannel.RoleDiscordId}>" : "";
+                    string notifRole = !NumberTools.IsNullOrZero(twitchChannel.NotificationRoleDiscordId) ? $"<@&{twitchChannel.NotificationRoleDiscordId}>" : "";
 
                     await channel.SendMessageAsync(notifRole, false, builder.Build());
                 }

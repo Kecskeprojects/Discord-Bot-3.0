@@ -15,5 +15,5 @@ public partial class Role
 
     public virtual Server Server { get; set; }
 
-    public virtual ICollection<TwitchChannel> TwitchChannels { get; set; } = new List<TwitchChannel>();
+    public virtual ICollection<Server> Servers { get; set; } = new List<Server>();
 }

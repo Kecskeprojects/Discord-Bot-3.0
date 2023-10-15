@@ -13,7 +13,9 @@ namespace Discord_Bot.Core
         {
             //Provide all the Mapping Configuration
             CreateMap<Server, ServerResource>()
-                .ForMember(dest => dest.DiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.DiscordId)));
+                .ForMember(dest => dest.DiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.DiscordId)))
+                .ForMember(dest => dest.NotificationRoleDiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.Role.DiscordId)))
+                .ForMember(dest => dest.NotificationRoleName, opt => opt.MapFrom(scv => scv.Role.RoleName));
             CreateMap<IGrouping<int?, ServerChannelView>, KeyValuePair<ChannelTypeEnum, List<ulong>>>()
             .ConstructUsing(scv => new KeyValuePair<ChannelTypeEnum, List<ulong>>(
                 scv.Key != null ? (ChannelTypeEnum)scv.Key : ChannelTypeEnum.None,
@@ -22,7 +24,8 @@ namespace Discord_Bot.Core
             CreateMap<Greeting, GreetingResource>();
             CreateMap<TwitchChannel, TwitchChannelResource>()
                 .ForMember(dest => dest.ServerDiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.Server.DiscordId)))
-                .ForMember(dest => dest.RoleName, opt => opt.MapFrom(scv => scv.Role.RoleName));
+                .ForMember(dest => dest.NotificationRoleDiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.Server.Role.DiscordId)))
+                .ForMember(dest => dest.NotificationRoleName, opt => opt.MapFrom(scv => scv.Server.Role.RoleName));
             CreateMap<CustomCommand, CustomCommandResource>();
             CreateMap<Role, RoleResource>()
                 .ForMember(dest => dest.DiscordId, opt => opt.MapFrom(r => ulong.Parse(r.DiscordId)));

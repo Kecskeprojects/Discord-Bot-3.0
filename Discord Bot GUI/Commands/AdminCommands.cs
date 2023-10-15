@@ -182,7 +182,7 @@ namespace Discord_Bot.Commands
                         return;
                     }
                     //Adds the notification role for every checked channel, as of now it will overwrite the previous one, there cannot be multiple, removes server from cache
-                    result = await twitchChannelService.AddNotificationRoleAsync(Context.Guild.Id, role.Id);
+                    result = await twitchChannelService.AddNotificationRoleAsync(Context.Guild.Id, role.Id, role.Name);
                 }
                 else
                 {
@@ -194,11 +194,10 @@ namespace Discord_Bot.Commands
                         return;
                     }
 
-                    string userId = response.Id;
-                    string url = $"https://www.twitch.tv/{response.Login}";
+                    string twitchUserId = response.Id;
 
                     //Adds the twitch channel to the checked channel's list for the server, removes server from cache
-                    result = await twitchChannelService.AddTwitchChannelAsync(Context.Guild.Id, userId, url);
+                    result = await twitchChannelService.AddTwitchChannelAsync(Context.Guild.Id, twitchUserId, response.Login);
                 }
 
                 if (result == DbProcessResultEnum.Success)
@@ -237,7 +236,7 @@ namespace Discord_Bot.Commands
             {
                 DbProcessResultEnum result;
 
-                if (type == "role" && !string.IsNullOrEmpty(name))
+                if (type == "role" && !string.IsNullOrEmpty(name) && name != "all")
                 {
                     IRole role = Context.Guild.Roles.Where(x => x.Name.ToLower() == name).FirstOrDefault();
                     if (role == null)
@@ -250,7 +249,7 @@ namespace Discord_Bot.Commands
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(name) && name == "all")
+                    if (!string.IsNullOrEmpty(name) && name != "all")
                     {
                         //Removes the twitch channel with the given name, removes server from cache
                         result = await twitchChannelService.RemoveTwitchChannelAsync(Context.Guild.Id, name);
@@ -268,7 +267,14 @@ namespace Discord_Bot.Commands
                 }
                 else if (result == DbProcessResultEnum.NotFound)
                 {
-                    await ReplyAsync("Twitch channel with that name not found in database!");
+                    if (type == "role")
+                    {
+                        await ReplyAsync("Notification role currently not set in database!");
+                    }
+                    else
+                    {
+                        await ReplyAsync("Twitch channel with that name not found in database!");
+                    }
                 }
                 else
                 {
