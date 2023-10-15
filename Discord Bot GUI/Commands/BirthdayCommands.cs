@@ -1,11 +1,11 @@
 ﻿using Discord.Commands;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
-using Discord_Bot.Interfaces.Commands;
-using System.Threading.Tasks;
-using System;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
+using System;
+using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
@@ -25,12 +25,12 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                if(!string.IsNullOrEmpty(month) && string.IsNullOrEmpty(day))
+                if (!string.IsNullOrEmpty(month) && string.IsNullOrEmpty(day))
                 {
                     return;
                 }
 
-                if(string.IsNullOrEmpty(month) && string.IsNullOrEmpty(day))
+                if (string.IsNullOrEmpty(month) && string.IsNullOrEmpty(day))
                 {
                     string[] strings = year.Split(new string[] { ",", "/", "\\", "-" }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                     year = strings[0];
@@ -38,7 +38,7 @@ namespace Discord_Bot.Commands
                     day = strings[2];
                 }
 
-                if(DateTime.TryParse($"{year}.{month}.{day}", out DateTime date))
+                if (DateTime.TryParse($"{year}.{month}.{day}", out DateTime date))
                 {
                     DbProcessResultEnum result = await birthdayService.AddBirthdayAsync(Context.Guild.Id, Context.User.Id, date);
                     if (result == DbProcessResultEnum.Success)

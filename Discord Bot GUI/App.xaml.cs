@@ -295,7 +295,7 @@ namespace Discord_Bot
                 if (context.Channel.GetChannelType() != ChannelType.DM)
                 {
                     server = await coreLogic.GetServerAsync(context.Guild.Id, context.Guild.Name);
-                    if(server == null)
+                    if (server == null)
                     {
                         return;
                     }

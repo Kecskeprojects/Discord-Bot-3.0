@@ -23,7 +23,7 @@ namespace Discord_Bot.Database.DBRepositories
         public Task<Birthday> GetBirthdayAsync(ulong serverId, ulong userId)
         {
             return context.Birthdays
-                .FirstOrDefaultAsync(b => b.Server.DiscordId == serverId.ToString() && 
+                .FirstOrDefaultAsync(b => b.Server.DiscordId == serverId.ToString() &&
                                           b.User.DiscordId == userId.ToString());
         }
 

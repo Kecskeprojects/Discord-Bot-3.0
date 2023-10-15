@@ -28,7 +28,7 @@ namespace Discord_Bot.Core
         private readonly IBirthdayService birthdayService;
         private readonly IServiceDiscordCommunication serviceDiscordCommunication;
         private readonly IServerService serverService;
-        private IGreetingService greetingService;
+        private readonly IGreetingService greetingService;
 
         public CoreLogic(Logging logger, ICustomCommandService customCommandService, IRoleService roleService, IKeywordService keywordService, IReminderService reminderService, IBirthdayService birthdayService, IServiceDiscordCommunication serviceDiscordCommunication, IServerService serverService, IGreetingService greetingService)
         {

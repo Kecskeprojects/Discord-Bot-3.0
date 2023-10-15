@@ -51,7 +51,7 @@ namespace Discord_Bot.Commands
                                 logger.Log(result.ErrorMessage);
                             }
 
-                            if(CollectionTools.IsNullOrEmpty(result.Images) && CollectionTools.IsNullOrEmpty(result.Videos))
+                            if (CollectionTools.IsNullOrEmpty(result.Images) && CollectionTools.IsNullOrEmpty(result.Videos))
                             {
                                 return;
                             }

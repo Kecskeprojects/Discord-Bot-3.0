@@ -31,9 +31,9 @@ namespace Discord_Bot.Database.DBServices
             {
                 Birthday birthday = await birthdayRepository.GetBirthdayAsync(serverId, userId);
 
-                if(birthday != null)
+                if (birthday != null)
                 {
-                    if(birthday.Date != date)
+                    if (birthday.Date != date)
                     {
                         birthday.Date = date;
                         await birthdayRepository.UpdateBirthdayAsync(birthday);
