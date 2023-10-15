@@ -6,6 +6,7 @@
         Success = 1,
         PartialSuccess = 2,
         NotFound = 3,
-        AlreadyExists = 4
+        AlreadyExists = 4,
+        UpdatedExisting = 5
     }
 }
