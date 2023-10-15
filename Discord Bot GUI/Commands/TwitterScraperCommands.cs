@@ -39,13 +39,22 @@ namespace Discord_Bot.Commands
 
                         MessageReference refer = new(Context.Message.Id, Context.Channel.Id, Context.Guild.Id, false);
 
-                        if (!string.IsNullOrEmpty(result.ErrorMessage) && result.ErrorMessage.Length < 100)
+                        if (!string.IsNullOrEmpty(result.ErrorMessage))
                         {
-                            await ReplyAsync(result.ErrorMessage);
-                        }
-                        else
-                        {
-                            logger.Log(result.ErrorMessage);
+                            if (result.ErrorMessage.Length < 150)
+                            {
+                                await ReplyAsync(result.ErrorMessage);
+                            }
+                            else
+                            {
+                                await ReplyAsync("Error message too long to display!");
+                                logger.Log(result.ErrorMessage);
+                            }
+
+                            if(CollectionTools.IsNullOrEmpty(result.Images) && CollectionTools.IsNullOrEmpty(result.Videos))
+                            {
+                                return;
+                            }
                         }
 
                         List<FileAttachment> attachments = TwitterScraperService.AllContentInRegularMessage(result.Videos, result.Images);

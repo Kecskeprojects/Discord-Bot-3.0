@@ -28,7 +28,7 @@ namespace Discord_Bot.Services
         #endregion
 
         #region Main Methods
-        public static async void OpenBroser()
+        public static async Task OpenBroser()
         {
             BrowserFetcher browserFetcher = new(SupportedBrowser.Chrome);
             await browserFetcher.DownloadAsync(PuppeteerSharp.BrowserData.Chrome.DefaultBuildId);
@@ -49,7 +49,7 @@ namespace Discord_Bot.Services
             Browser = browser;
         }
 
-        public static async void CloseBrowser()
+        public static async Task CloseBrowser()
         {
             if (Browser != null && !Browser.IsClosed)
             {
@@ -61,13 +61,38 @@ namespace Discord_Bot.Services
         {
             try
             {
-                if (Browser.IsClosed)
+                if (Browser == null || Browser.IsClosed)
                 {
-                    OpenBroser();
+                    await OpenBroser();
                 }
 
-                IPage mainPage = await Browser.NewPageAsync();
-                Dictionary<string, string> headers = new()
+                IPage mainPage = await CreateNewPage();
+
+                string messages = "";
+                for (int i = 0; i < uris.Count; i++)
+                {
+                    string mess = await ExtractFromUrl(mainPage, uris[i]);
+                    if (mess != "")
+                    {
+                        messages += $"{i + 1}. link could not be embedded:\n{mess}\n";
+                    }
+                }
+
+                await mainPage.CloseAsync();
+
+                messages += string.Join("\n", Exceptions);
+                return new TwitterScrapingResult(Videos, Images, messages);
+            }
+            catch (Exception ex)
+            {
+                return new TwitterScrapingResult(ex.Message);
+            }
+        }
+
+        private async Task<IPage> CreateNewPage()
+        {
+            IPage mainPage = await Browser.NewPageAsync();
+            Dictionary<string, string> headers = new()
                 {
                     { "user-agent", "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36" },
                     { "upgrade-insecure-requests", "1" },
@@ -75,35 +100,12 @@ namespace Discord_Bot.Services
                     { "accept-encoding", "gzip, deflate, br" },
                     { "accept-language", "en-US,en;q=0.9,en;q=0.8" }
                 };
-                await mainPage.SetExtraHttpHeadersAsync(headers);
+            await mainPage.SetExtraHttpHeadersAsync(headers);
 
-                mainPage.Response += TwitterScraperResponse;
-
-                string messages = "";
-                foreach (Uri uri in uris)
-                {
-                    string mess = await ExtractFromUrl(mainPage, uri);
-                    if (mess != "")
-                    {
-                        messages += $"\n<{uri.OriginalString}> could not be embedded:\n{mess}\n";
-                    }
-                }
-
-                await mainPage.CloseAsync();
-
-                messages += string.Join("\n", Exceptions);
-                return string.IsNullOrEmpty(messages)
-                    ? new TwitterScrapingResult(Videos, Images)
-                    : new TwitterScrapingResult(Videos, Images, messages);
-            }
-            catch (Exception ex)
-            {
-                return new TwitterScrapingResult(ex.Message);
-            }
+            mainPage.Response += TwitterScraperResponse;
+            return mainPage;
         }
         #endregion
-
-
 
         #region Helper functions
         private async Task<string> ExtractFromUrl(IPage page, Uri uri)
@@ -112,14 +114,7 @@ namespace Discord_Bot.Services
             {
                 int videosBeforeMainCount = 0;
                 int videoCount = 0;
-
-                await page.DeleteCookieAsync();
-                await page.GoToAsync(uri.OriginalString, 15000, new WaitUntilNavigation[] { WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded, WaitUntilNavigation.Networkidle2, WaitUntilNavigation.Networkidle0 });
-                await Task.Delay(1000);
-                string content = await page.GetContentAsync();
-
-                IBrowsingContext context = BrowsingContext.New(Configuration.Default);
-                IDocument document = await context.OpenAsync(req => req.Content(content));
+                IDocument document = await OpenPage(page, uri);
 
                 IHtmlCollection<IElement> articles = document.QuerySelectorAll("article");
 
@@ -132,39 +127,9 @@ namespace Discord_Bot.Services
                     return "Post is flagged as potentially sensitive content!";
                 }
 
-                //Getting the Images, if there are any
-                List<Uri> currImages = new();
-                foreach (IElement element in main.QuerySelectorAll("a"))
-                {
-                    IElement img = element.QuerySelector("img");
-                    if (img != null)
-                    {
-                        Uri newUri = new(img.GetAttribute("src"));
-                        if (newUri.Segments[1] == "media/")
-                        {
-                            currImages.Add(new Uri(img.GetAttribute("src")));
-                        }
-                    }
-                }
+                List<Uri> currImages = GetImages(main);
 
-                //We also search for Videos in the post
-                videoCount = main.QuerySelectorAll("div[data-testid]").Where(e => e.GetAttribute("data-testid") == "videoPlayer").Count();
-
-                //Checking any articles before main post
-                for (int i = 0; i < mainPos; i++)
-                {
-                    int tempCount = articles[i].QuerySelectorAll("div[data-testid]").Where(e => e.GetAttribute("data-testid") == "videoPlayer").Count();
-                    videosBeforeMainCount += tempCount;
-                }
-
-                //As the video links are caught in the TwitterScraper_Response event handler,
-                //the only way to verify if we got them all is to wait until the right amount of links are stored in the list
-                int count = 0;
-                while (Videos.Count < videoCount + videosBeforeMainCount && count < 10)
-                {
-                    await Task.Delay(500);
-                    count++;
-                }
+                await GetVideos(main, articles, mainPos, videosBeforeMainCount, videoCount);
 
                 Images.AddRange(currImages);
                 Videos.AddRange(TempVideos.Skip(videosBeforeMainCount).Take(videoCount));
@@ -175,6 +140,60 @@ namespace Discord_Bot.Services
             }
 
             return "";
+        }
+
+        private async Task GetVideos(IElement main, IHtmlCollection<IElement> articles, int mainPos, int videosBeforeMainCount, int videoCount)
+        {
+            //We also search for Videos in the post
+            videoCount = main.QuerySelectorAll("div[data-testid]").Where(e => e.GetAttribute("data-testid") == "videoPlayer").Count();
+
+            //Checking any articles before main post
+            for (int i = 0; i < mainPos; i++)
+            {
+                int tempCount = articles[i].QuerySelectorAll("div[data-testid]").Where(e => e.GetAttribute("data-testid") == "videoPlayer").Count();
+                videosBeforeMainCount += tempCount;
+            }
+
+            //As the video links are caught in the TwitterScraper_Response event handler,
+            //the only way to verify if we got them all is to wait until the right amount of links are stored in the list
+            int count = 0;
+            while (Videos.Count < videoCount + videosBeforeMainCount && count < 10)
+            {
+                await Task.Delay(500);
+                count++;
+            }
+        }
+
+        private static async Task<IDocument> OpenPage(IPage page, Uri uri)
+        {
+            await page.DeleteCookieAsync();
+            await page.GoToAsync(uri.OriginalString, 15000, new WaitUntilNavigation[] { WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded, WaitUntilNavigation.Networkidle2, WaitUntilNavigation.Networkidle0 });
+            //await Task.Delay(1000);
+            string content = await page.GetContentAsync();
+
+            IBrowsingContext context = BrowsingContext.New(Configuration.Default);
+            IDocument document = await context.OpenAsync(req => req.Content(content));
+            return document;
+        }
+
+        private static List<Uri> GetImages(IElement main)
+        {
+            //Getting the Images, if there are any
+            List<Uri> currImages = new();
+            foreach (IElement element in main.QuerySelectorAll("a"))
+            {
+                IElement img = element.QuerySelector("img");
+                if (img != null)
+                {
+                    Uri newUri = new(img.GetAttribute("src"));
+                    if (newUri.Segments[1] == "media/")
+                    {
+                        currImages.Add(new Uri(img.GetAttribute("src")));
+                    }
+                }
+            }
+
+            return currImages;
         }
 
         private void TwitterScraperResponse(object sender, ResponseCreatedEventArgs e)
