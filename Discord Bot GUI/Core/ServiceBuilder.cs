@@ -54,7 +54,7 @@ namespace Discord_Bot.Core
             collection.AddSingleton(config);
             collection.AddSingleton(new Logging());
             collection.AddSingleton(new Cache());
-            collection.AddSingleton<ICoreLogic, CoreLogic>();
+            collection.AddScoped<ICoreLogic, CoreLogic>();
 
             collection.AddDbContext<MainDbContext>(options => options.UseSqlServer(config.SqlConnectionString));
 
@@ -63,12 +63,12 @@ namespace Discord_Bot.Core
             collection.AddTransient(typeof(MainWindow));
 
             //Services
-            collection.AddSingleton<ITwitchAPI, TwitchAPI>();
-            collection.AddSingleton<ISpotifyAPI, Services.SpotifyAPI>();
-            collection.AddSingleton<IYoutubeAPI, YoutubeAPI>();
-            collection.AddSingleton<IPictureHandler, PictureHandler>();
-            collection.AddSingleton<IInstaLoader, InstaLoader>();
-            collection.AddSingleton<IWordOfTheDayService, WordOfTheDayService>();
+            collection.AddScoped<ITwitchAPI, TwitchAPI>();
+            collection.AddScoped<ISpotifyAPI, Services.SpotifyAPI>();
+            collection.AddScoped<IYoutubeAPI, YoutubeAPI>();
+            collection.AddScoped<IPictureHandler, PictureHandler>();
+            collection.AddScoped<IInstaLoader, InstaLoader>();
+            collection.AddScoped<IWordOfTheDayService, WordOfTheDayService>();
 
             //Database
             collection.AddScoped<IServerRepository, ServerRepository>();
