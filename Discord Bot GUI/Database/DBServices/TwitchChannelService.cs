@@ -97,7 +97,7 @@ namespace Discord_Bot.Database.DBServices
 
                 return DbProcessResultEnum.Success;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("TwitchChannelService.cs AddTwitchChannelAsync", ex.ToString());
             }

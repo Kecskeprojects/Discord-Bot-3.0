@@ -30,7 +30,7 @@ namespace Discord_Bot.Database.DBRepositories
         public Task<List<TwitchChannel>> GetChannelsByServerIdAsync(ulong serverId)
         {
             return context.TwitchChannels
-                .Where(tc => tc.Server.DiscordId  == serverId.ToString())
+                .Where(tc => tc.Server.DiscordId == serverId.ToString())
                 .ToListAsync();
         }
 

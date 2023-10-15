@@ -35,7 +35,7 @@ namespace Discord_Bot.CommandsService
 
             if (server.TwitchChannels.Count > 0)
             {
-                embed.AddField("Notification role:", $"`{(server.NotificationRoleName != null ? server.NotificationRoleName : "none")}`");
+                embed.AddField("Notification role:", $"`{server.NotificationRoleName ?? "none"}`");
                 embed.AddField("Notified Twitch Channel IDs:", $"`{string.Join(",", server.TwitchChannels.Select(x => x.TwitchId))}`");
                 embed.AddField("Notified Twitch channel URLs:", $"`{string.Join(",", server.TwitchChannels.Select(x => x.TwitchLink))}`");
             }
