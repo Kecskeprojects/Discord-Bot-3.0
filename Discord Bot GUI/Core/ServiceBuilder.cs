@@ -95,6 +95,7 @@ namespace Discord_Bot.Core
 
             //Commands
             collection.AddScoped<IServiceDiscordCommunication, ServiceDiscordCommunication>();
+            collection.AddScoped<ICoreDiscordCommunication, CoreDiscordCommunication>();
 
             return collection.BuildServiceProvider();
         }

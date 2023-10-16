@@ -6,6 +6,7 @@ using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
@@ -35,6 +36,7 @@ namespace Discord_Bot
         private MainWindow mainWindow;
         private Thread twitchThread;
         private ICoreLogic coreLogic;
+        private ICoreDiscordCommunication discordCommunication;
         private static int minutesCount = 0;
         #endregion
 
@@ -54,6 +56,7 @@ namespace Discord_Bot
             commands = services.GetService<CommandService>();
             mainWindow = services.GetRequiredService<MainWindow>();
             coreLogic = services.GetService<ICoreLogic>();
+            discordCommunication = services.GetService<ICoreDiscordCommunication>();
 
             mainWindow.Show();
 
@@ -139,7 +142,7 @@ namespace Discord_Bot
                 //Logic to be done once a day
                 if (minutesCount == 1440)
                 {
-                    await coreLogic.BirthdayCheck();
+                    await discordCommunication.SendBirthdayMessages();
                     minutesCount = 0;
                 }
 
@@ -154,7 +157,7 @@ namespace Discord_Bot
 
                 coreLogic.LogToFile();
 
-                await coreLogic.ReminderCheck();
+                await discordCommunication.SendReminders();
             }
             catch (Exception ex)
             {
@@ -312,7 +315,7 @@ namespace Discord_Bot
                         {
                             if (context.Channel.GetChannelType() != ChannelType.DM)
                             {
-                                await coreLogic.CustomCommands(context.Guild.Id, context.Message.Content, context.Channel);
+                                await discordCommunication.CustomCommands(context);
                                 return;
                             }
                         }
@@ -335,7 +338,7 @@ namespace Discord_Bot
                     if (context.Message.HasCharPrefix('+', ref argPos) || context.Message.HasCharPrefix('-', ref argPos))
                     {
                         //self roles
-                        await coreLogic.SelfRole(context.Guild.Id, context.Message.Content, context.Channel, context.User);
+                        await discordCommunication.SelfRole(context);
                     }
 
                     await context.Message.DeleteAsync();
@@ -345,10 +348,10 @@ namespace Discord_Bot
                     //Response to mention
                     if (context.Message.Content.Contains(client.CurrentUser.Mention) || context.Message.Content.Contains(client.CurrentUser.Mention.Remove(2, 1)))
                     {
-                        await coreLogic.GreetAsync(context.Channel);
+                        await discordCommunication.GreetAsync(context);
                     }
 
-                    await coreLogic.FeatureChecks(context.Guild.Id, context.Message.Content, context.Channel);
+                    await discordCommunication.FeatureChecksAsync(context);
 
                     //Make embed independently from main thread
                     if (config.Enable_Instagram_Embed)
