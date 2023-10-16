@@ -89,6 +89,6 @@ Owner Commands:
 
 !help owner						Includes owner commands too
 !say [channel name] [message]	Sends the message to the channel you want to like the bot wrote it, deletes your message
-!dbmanagement [query]			Do the SQL query written by user (DM too)
-!greeting add [url]				Add new greeting url (DM too)
-!greeting remove [id]			Remove greeting url (DM too)
+!greeting list					Give a list of current greetings (DM)
+!greeting add [url]				Add new greeting url (DM)
+!greeting remove [id]			Remove greeting url (DM)
