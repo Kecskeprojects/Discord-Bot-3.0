@@ -11,9 +11,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.CommandsService
+namespace Discord_Bot.CommandsService.Communication
 {
-    public class CoreDiscordCommunicationService
+    public class CoreToDiscordService
     {
         public static string CreateBirthdayMessage(BirthdayResource birthday, ISocketMessageChannel channel, SocketGuild guild)
         {

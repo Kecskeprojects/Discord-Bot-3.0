@@ -1,6 +1,6 @@
 ﻿using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
-using Discord_Bot.Interfaces.Commands;
+using Discord_Bot.Interfaces.Commands.Communication;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
@@ -31,10 +31,10 @@ namespace Discord_Bot.Services
         private readonly Logging logger;
         private readonly Config config;
         private readonly ITwitchChannelService twitchChannelService;
-        private readonly IServiceDiscordCommunication serviceDiscordCommunication;
+        private readonly IServiceToDiscordCommunication serviceDiscordCommunication;
         #endregion
 
-        public TwitchAPI(Logging logger, Config config, ITwitchChannelService twitchChannelService, IServiceDiscordCommunication serviceDiscordCommunication)
+        public TwitchAPI(Logging logger, Config config, ITwitchChannelService twitchChannelService, IServiceToDiscordCommunication serviceDiscordCommunication)
         {
             this.logger = logger;
             this.config = config;

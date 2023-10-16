@@ -6,7 +6,7 @@ using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.Commands;
+using Discord_Bot.Interfaces.Commands.Communication;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
@@ -36,7 +36,7 @@ namespace Discord_Bot
         private MainWindow mainWindow;
         private Thread twitchThread;
         private ICoreLogic coreLogic;
-        private ICoreDiscordCommunication discordCommunication;
+        private ICoreToDiscordCommunication discordCommunication;
         private static int minutesCount = 0;
         #endregion
 
@@ -56,7 +56,7 @@ namespace Discord_Bot
             commands = services.GetService<CommandService>();
             mainWindow = services.GetRequiredService<MainWindow>();
             coreLogic = services.GetService<ICoreLogic>();
-            discordCommunication = services.GetService<ICoreDiscordCommunication>();
+            discordCommunication = services.GetService<ICoreToDiscordCommunication>();
 
             mainWindow.Show();
 

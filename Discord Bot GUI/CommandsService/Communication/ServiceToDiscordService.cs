@@ -1,9 +1,9 @@
 ﻿using Discord;
 using Discord_Bot.Resources;
 
-namespace Discord_Bot.CommandsService
+namespace Discord_Bot.CommandsService.Communication
 {
-    public class ServiceDiscordCommunicationService
+    public class ServiceToDiscordService
     {
 
         public static EmbedBuilder BuildTwitchEmbed(TwitchChannelResource twitchChannel, string thumbnailUrl, string title)

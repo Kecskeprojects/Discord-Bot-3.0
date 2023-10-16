@@ -2,13 +2,13 @@
 using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Discord_Bot.Commands;
+using Discord_Bot.Commands.Communication;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Database;
 using Discord_Bot.Database.DBRepositories;
 using Discord_Bot.Database.DBServices;
-using Discord_Bot.Interfaces.Commands;
+using Discord_Bot.Interfaces.Commands.Communication;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
@@ -94,8 +94,8 @@ namespace Discord_Bot.Core
             collection.AddScoped<IBirthdayRepository, BirthdayRepository>();
 
             //Commands
-            collection.AddScoped<IServiceDiscordCommunication, ServiceDiscordCommunication>();
-            collection.AddScoped<ICoreDiscordCommunication, CoreDiscordCommunication>();
+            collection.AddScoped<IServiceToDiscordCommunication, ServiceDiscordCommunication>();
+            collection.AddScoped<ICoreToDiscordCommunication, CoreDiscordCommunication>();
 
             return collection.BuildServiceProvider();
         }

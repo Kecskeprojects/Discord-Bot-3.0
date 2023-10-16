@@ -2,9 +2,9 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Interfaces.Commands
+namespace Discord_Bot.Interfaces.Commands.Communication
 {
-    public interface ICoreDiscordCommunication
+    public interface ICoreToDiscordCommunication
     {
         Task SendBirthdayMessages();
         Task SendReminders();

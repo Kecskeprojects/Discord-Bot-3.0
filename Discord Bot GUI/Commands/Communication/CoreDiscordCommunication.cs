@@ -3,11 +3,11 @@ using Discord.Commands;
 using Discord.Net;
 using Discord.Rest;
 using Discord.WebSocket;
-using Discord_Bot.CommandsService;
+using Discord_Bot.CommandsService.Communication;
 using Discord_Bot.Communication;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.Commands;
+using Discord_Bot.Interfaces.Commands.Communication;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
@@ -18,9 +18,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Commands
+namespace Discord_Bot.Commands.Communication
 {
-    internal class CoreDiscordCommunication : ICoreDiscordCommunication
+    internal class CoreDiscordCommunication : ICoreToDiscordCommunication
     {
         private readonly IServerService serverService;
         private readonly IReminderService reminderService;
@@ -78,7 +78,7 @@ namespace Discord_Bot.Commands
                             SocketGuild guild = client.GetGuild(birthday.ServerDiscordId);
                             await guild.DownloadUsersAsync();
 
-                            string message = CoreDiscordCommunicationService.CreateBirthdayMessage(birthday, channel, guild);
+                            string message = CoreToDiscordService.CreateBirthdayMessage(birthday, channel, guild);
 
                             await channel.SendMessageAsync(message);
                         }
@@ -112,7 +112,7 @@ namespace Discord_Bot.Commands
                         //If user exists send a direct message to the user
                         if (user != null)
                         {
-                            await UserExtensions.SendMessageAsync(user, reminder.Message);
+                            await user.SendMessageAsync(reminder.Message);
                         }
                     }
 
@@ -166,7 +166,7 @@ namespace Discord_Bot.Commands
                     {
                         await context.Channel.SendMessageAsync("I agree wholeheartedly!");
                     }
-                    else if ((mess.StartsWith("i am") && mess != "i am") || (mess.StartsWith("i'm") && mess != "i'm"))
+                    else if (mess.StartsWith("i am") && mess != "i am" || mess.StartsWith("i'm") && mess != "i'm")
                     {
                         await context.Channel.SendMessageAsync(string.Concat("Hey ", context.Message.Content.AsSpan(mess.StartsWith("i am") ? 5 : 4), ", I'm Kim Synthji!"));
                     }
@@ -256,21 +256,21 @@ namespace Discord_Bot.Commands
 
                 try
                 {
-                    result = await CoreDiscordCommunicationService.SendInstagramMessageAsync(attachments, files, uri.OriginalString, refer, channel, false);
+                    result = await CoreToDiscordService.SendInstagramMessageAsync(attachments, files, uri.OriginalString, refer, channel, false);
                 }
                 catch (HttpException ex)
                 {
                     logger.Warning("ServiceDiscordCommunication.cs GetImagesFromPost", "Embed too large, only sending images!", LogOnly: true);
                     logger.Warning("ServiceDiscordCommunication.cs GetImagesFromPost", ex.ToString(), LogOnly: true);
 
-                    result = await CoreDiscordCommunicationService.SendInstagramMessageAsync(attachments, files, uri.OriginalString, refer, channel, true);
+                    result = await CoreToDiscordService.SendInstagramMessageAsync(attachments, files, uri.OriginalString, refer, channel, true);
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {
                     logger.Warning("ServiceDiscordCommunication.cs GetImagesFromPost", "Embed too large, only sending images!", LogOnly: true);
                     logger.Warning("ServiceDiscordCommunication.cs GetImagesFromPost", ex.ToString(), LogOnly: true);
 
-                    result = await CoreDiscordCommunicationService.SendInstagramMessageAsync(attachments, files, uri.OriginalString, refer, channel, true);
+                    result = await CoreToDiscordService.SendInstagramMessageAsync(attachments, files, uri.OriginalString, refer, channel, true);
                 }
             }
             catch (Exception ex)
@@ -288,7 +288,7 @@ namespace Discord_Bot.Commands
 
             if (result.ShouldMessageBeSuppressed)
             {
-                IUserMessage discordMessage = (await channel.GetMessageAsync(messageId)) as IUserMessage;
+                IUserMessage discordMessage = await channel.GetMessageAsync(messageId) as IUserMessage;
                 await discordMessage.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
             }
         }

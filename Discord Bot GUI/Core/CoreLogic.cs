@@ -1,6 +1,6 @@
 ﻿using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.Commands;
+using Discord_Bot.Interfaces.Commands.Communication;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
@@ -17,10 +17,10 @@ namespace Discord_Bot.Core
     public class CoreLogic : ICoreLogic
     {
         private readonly Logging logger;
-        private readonly ICoreDiscordCommunication coreDiscordCommunication;
+        private readonly ICoreToDiscordCommunication coreDiscordCommunication;
         private readonly IServerService serverService;
 
-        public CoreLogic(Logging logger, IServerService serverService, ICoreDiscordCommunication coreDiscordCommunication)
+        public CoreLogic(Logging logger, IServerService serverService, ICoreToDiscordCommunication coreDiscordCommunication)
         {
             this.logger = logger;
             this.coreDiscordCommunication = coreDiscordCommunication;

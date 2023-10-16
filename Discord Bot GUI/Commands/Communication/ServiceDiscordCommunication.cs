@@ -1,8 +1,8 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Discord_Bot.CommandsService;
+using Discord_Bot.CommandsService.Communication;
 using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.Commands;
+using Discord_Bot.Interfaces.Commands.Communication;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
@@ -10,9 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Commands
+namespace Discord_Bot.Commands.Communication
 {
-    public class ServiceDiscordCommunication : IServiceDiscordCommunication
+    public class ServiceDiscordCommunication : IServiceToDiscordCommunication
     {
         private readonly IServerService serverService;
         private readonly DiscordSocketClient client;
@@ -33,7 +33,7 @@ namespace Discord_Bot.Commands
                 foreach (ulong channelId in server.SettingsChannels[ChannelTypeEnum.TwitchNotificationText])
                 {
                     IMessageChannel channel = client.GetChannel(channelId) as IMessageChannel;
-                    EmbedBuilder builder = ServiceDiscordCommunicationService.BuildTwitchEmbed(twitchChannel, thumbnailUrl, title);
+                    EmbedBuilder builder = ServiceToDiscordService.BuildTwitchEmbed(twitchChannel, thumbnailUrl, title);
 
                     //If there is no notification role set on the server, we just send a message without the role ping
                     string notifRole = !NumberTools.IsNullOrZero(twitchChannel.NotificationRoleDiscordId) ? $"<@&{twitchChannel.NotificationRoleDiscordId}>" : "";

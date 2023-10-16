@@ -3,7 +3,7 @@ using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.Commands;
+using Discord_Bot.Interfaces.Commands.Communication;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Tools;
 using Google.Apis.Services;
@@ -26,10 +26,10 @@ namespace Discord_Bot.Services
         private static int youtubeIndex = 0;
         private readonly Logging logger;
         private readonly Config config;
-        private readonly IServiceDiscordCommunication serviceDiscordCommunication;
+        private readonly IServiceToDiscordCommunication serviceDiscordCommunication;
         #endregion
 
-        public YoutubeAPI(Logging logger, Config config, IServiceDiscordCommunication serviceDiscordCommunication)
+        public YoutubeAPI(Logging logger, Config config, IServiceToDiscordCommunication serviceDiscordCommunication)
         {
             this.logger = logger;
             this.config = config;
