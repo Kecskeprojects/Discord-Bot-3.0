@@ -90,6 +90,7 @@ namespace Discord_Bot.Commands.Communication
                 logger.Error("CoreDiscordCommunication.cs Log BirthdayCheck", ex.ToString());
             }
         }
+        #endregion
 
         #region Core Interaction Communication
         public async Task SendReminders()
@@ -129,7 +130,6 @@ namespace Discord_Bot.Commands.Communication
                 logger.Error("CoreLogic.cs Log ReminderCheck", ex.ToString());
             }
         }
-        #endregion
 
         public async Task CustomCommands(SocketCommandContext context)
         {
@@ -166,7 +166,7 @@ namespace Discord_Bot.Commands.Communication
                     {
                         await context.Channel.SendMessageAsync("I agree wholeheartedly!");
                     }
-                    else if (mess.StartsWith("i am") && mess != "i am" || mess.StartsWith("i'm") && mess != "i'm")
+                    else if ((mess.StartsWith("i am") && mess != "i am") || (mess.StartsWith("i'm") && mess != "i'm"))
                     {
                         await context.Channel.SendMessageAsync(string.Concat("Hey ", context.Message.Content.AsSpan(mess.StartsWith("i am") ? 5 : 4), ", I'm Kim Synthji!"));
                     }
