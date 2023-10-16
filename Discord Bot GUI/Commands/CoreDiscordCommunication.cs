@@ -1,22 +1,22 @@
-﻿using Discord.Net;
+﻿using Discord;
+using Discord.Commands;
+using Discord.Net;
+using Discord.Rest;
 using Discord.WebSocket;
-using Discord;
 using Discord_Bot.CommandsService;
+using Discord_Bot.Communication;
+using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Commands;
+using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
-using Discord_Bot.Core.Logger;
-using Discord_Bot.Interfaces.DBServices;
-using Discord_Bot.Interfaces.Services;
-using Discord_Bot.Interfaces.Commands;
 using System.Linq;
-using Discord_Bot.Communication;
-using Discord.Rest;
-using Discord.Commands;
+using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
@@ -35,14 +35,14 @@ namespace Discord_Bot.Commands
 
         public CoreDiscordCommunication(
             IServerService serverService,
-            IReminderService reminderService, 
-            IBirthdayService birthdayService, 
-            IKeywordService keywordService, 
-            ICustomCommandService customCommandService, 
-            IRoleService roleService, 
-            IGreetingService greetingService, 
-            DiscordSocketClient client, 
-            IInstaLoader instaLoader, 
+            IReminderService reminderService,
+            IBirthdayService birthdayService,
+            IKeywordService keywordService,
+            ICustomCommandService customCommandService,
+            IRoleService roleService,
+            IGreetingService greetingService,
+            DiscordSocketClient client,
+            IInstaLoader instaLoader,
             Logging logger)
         {
             this.serverService = serverService;

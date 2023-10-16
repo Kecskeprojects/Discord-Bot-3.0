@@ -1,8 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Discord_Bot.CommandsService;
-using Discord_Bot.Core.Config;
-using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;

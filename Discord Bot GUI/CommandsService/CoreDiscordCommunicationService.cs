@@ -42,7 +42,7 @@ namespace Discord_Bot.CommandsService
                 result.ShouldMessageBeSuppressed = true;
             }
             //Ignore videos is a second try at sending so that is when we can know if the post is too large to send
-            else if(ignoreVideos == true)
+            else if (ignoreVideos == true)
             {
                 await channel.SendMessageAsync("Post content too large to send!");
             }
@@ -71,7 +71,7 @@ namespace Discord_Bot.CommandsService
 
         public static void ReadFiles(List<FileAttachment> attachments, string[] files, ref string caption, ref Node metadata, bool ignoreVideos)
         {
-            if(attachments.Count > 0)
+            if (attachments.Count > 0)
             {
                 attachments.ForEach(x => x.Dispose());
                 attachments.Clear();
