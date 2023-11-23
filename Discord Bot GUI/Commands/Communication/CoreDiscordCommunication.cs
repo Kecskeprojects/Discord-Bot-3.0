@@ -246,7 +246,7 @@ namespace Discord_Bot.Commands.Communication
                     }
                 }
 
-                string[] files = Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), $"Instagram\\{postId}"));
+                string[] files = Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), $"Dependencies\\Instagram\\{postId}"));
                 MessageReference refer = new(messageId, channelId, guildId, false);
 
                 try
@@ -278,7 +278,7 @@ namespace Discord_Bot.Commands.Communication
             {
                 attachments.ForEach(x => x.Dispose());
                 attachments.Clear();
-                Directory.Delete(Path.Combine(Directory.GetCurrentDirectory(), $"Instagram/{postId}"), true);
+                Directory.Delete(Path.Combine(Directory.GetCurrentDirectory(), $"Dependencies\\Instagram\\{postId}"), true);
             }
 
             if (result.ShouldMessageBeSuppressed)

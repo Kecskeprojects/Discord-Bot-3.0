@@ -222,7 +222,7 @@ namespace Discord_Bot.Services
                     UseShellExecute = false,
                     CreateNoWindow = true,
                     FileName = "cmd.exe",
-                    Arguments = "/C twitch.exe token",
+                    Arguments = "/C Dependencies\\twitch.exe token",
                     RedirectStandardError = true,
                     RedirectStandardOutput = true
                 }
@@ -246,7 +246,7 @@ namespace Discord_Bot.Services
                     UseShellExecute = false,
                     CreateNoWindow = true,
                     FileName = "cmd.exe",
-                    Arguments = $"/C twitch.exe api get users?login={username.ToLower()}",
+                    Arguments = $"/C Dependencies\\twitch.exe api get users?login={username.ToLower()}",
                     RedirectStandardError = true,
                     RedirectStandardOutput = true
                 }

@@ -28,7 +28,7 @@ namespace Discord_Bot.Services
                     UseShellExecute = false,
                     RedirectStandardError = true,
                     CreateNoWindow = true,
-                    WorkingDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Instagram")
+                    WorkingDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Dependencies\\Instagram")
                 };
                 logger.Log("Downloading images");
                 Process process = Process.Start(instaloader);
