@@ -4,8 +4,8 @@ namespace Discord_Bot.Enums
 {
     public class StaticLists
     {
-        public static string[] EasterEggMessages { get; } = new string[]
-            {
+        public static string[] EasterEggMessages { get; } =
+            [
                 "I know where you live",
                 "It is so dark in here",
                 "Who are you?",
@@ -26,11 +26,11 @@ namespace Discord_Bot.Enums
                 "I am what you are most afraid of",
                 "I watch you sleep",
                 "Do you want me to tell you a joke?"
-            };
+            ];
 
         //Array for 8ball answers
         public static string[] Answers8ball { get; } =
-            {
+            [
                 "It is certain",
                 "It is decidedly so",
                 "Without a doubt",
@@ -51,7 +51,7 @@ namespace Discord_Bot.Enums
                 "My sources say no",
                 "Outlook not so good",
                 "Very doubtful"
-            };
+            ];
 
         public static Dictionary<string, string> WotdLanguages { get; } = new()
         {
@@ -84,7 +84,7 @@ namespace Discord_Bot.Enums
 
         //Array for birthday messages
         public static string[] BirthdayMessage { get; } =
-            {
+            [
                 "Hey look, {0} has their birthday today! Send some nice wishes!\n{1}",
                 "Oh wow, it's birthday time! Happy birthday {0}!\n{1}",
                 "It's {0} day today!\n{1}",
@@ -93,6 +93,6 @@ namespace Discord_Bot.Enums
                 "Get the cakes out bitches, it's {0} day!\n{1}",
                 "Happy birthday {0}! I am suddenly hungry for some cakes...\n{1}",
                 "Yay, what a special day, it's {0}'s birthday!\n{1}"
-            };
+            ];
     }
 }

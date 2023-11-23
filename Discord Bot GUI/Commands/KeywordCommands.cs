@@ -10,14 +10,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class KeywordCommands : CommandBase, IKeywordCommands
+    public class KeywordCommands(IKeywordService keywordService, Logging logger, Config config) : CommandBase(logger, config), IKeywordCommands
     {
-        private readonly IKeywordService keywordService;
-
-        public KeywordCommands(IKeywordService keywordService, Logging logger, Config config) : base(logger, config)
-        {
-            this.keywordService = keywordService;
-        }
+        private readonly IKeywordService keywordService = keywordService;
 
         [Command("keyword add")]
         [RequireUserPermission(ChannelPermission.ManageMessages)]

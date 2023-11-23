@@ -1,25 +1,15 @@
 ﻿namespace Discord_Bot.Communication
 {
-    public class MusicRequest
+    public class MusicRequest(string uRL, string title, string thumbnail, string duration, string user)
     {
-        public string URL { get; set; }
+        public string URL { get; set; } = uRL;
 
-        public string Title { get; set; }
+        public string Title { get; set; } = title;
 
-        public string Thumbnail { get; set; }
+        public string Thumbnail { get; set; } = thumbnail;
 
-        public string Duration { get; set; }
+        public string Duration { get; set; } = duration;
 
-        public string User { get; set; }
-
-
-        public MusicRequest(string uRL, string title, string thumbnail, string duration, string user)
-        {
-            URL = uRL;
-            Title = title;
-            Thumbnail = thumbnail;
-            Duration = duration;
-            User = user;
-        }
+        public string User { get; set; } = user;
     }
 }

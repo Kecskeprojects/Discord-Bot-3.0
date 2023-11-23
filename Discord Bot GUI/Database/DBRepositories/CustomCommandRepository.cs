@@ -7,12 +7,8 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBRepositories
 {
-    public class CustomCommandRepository : BaseRepository, ICustomCommandRepository
+    public class CustomCommandRepository(MainDbContext context) : BaseRepository(context), ICustomCommandRepository
     {
-        public CustomCommandRepository(MainDbContext context) : base(context)
-        {
-        }
-
         public async Task AddCustomCommandAsync(CustomCommand command)
         {
             context.CustomCommands.Add(command);
@@ -23,7 +19,7 @@ namespace Discord_Bot.Database.DBRepositories
         {
             return context.CustomCommands
                 .Include(cc => cc.Server)
-                .Where(cc => cc.Server.DiscordId == serverId.ToString() && cc.Command.Trim().ToLower() == commandName.Trim().ToLower())
+                .Where(cc => cc.Server.DiscordId == serverId.ToString() && cc.Command.Trim().Equals(commandName.Trim(), System.StringComparison.OrdinalIgnoreCase))
                 .AnyAsync();
         }
 
@@ -31,7 +27,7 @@ namespace Discord_Bot.Database.DBRepositories
         {
             return context.CustomCommands
                 .Include(cc => cc.Server)
-                .FirstOrDefaultAsync(cc => cc.Server.DiscordId == serverId.ToString() && cc.Command.Trim().ToLower() == commandName.Trim().ToLower());
+                .FirstOrDefaultAsync(cc => cc.Server.DiscordId == serverId.ToString() && cc.Command.Trim().Equals(commandName.Trim(), System.StringComparison.OrdinalIgnoreCase));
         }
 
         public Task<List<CustomCommand>> GetCustomCommandListAsync(ulong serverId)

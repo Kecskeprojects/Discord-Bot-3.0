@@ -16,20 +16,18 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class AdminCommands : CommandBase, IAdminCommands
+    public class AdminCommands(
+        IServerService serverService, 
+        IChannelService channelService, 
+        ITwitchChannelService twitchChannelService, 
+        ITwitchAPI twitchAPI, 
+        Logging logger, 
+        Config config) : CommandBase(logger, config), IAdminCommands
     {
-        private readonly IServerService serverService;
-        private readonly IChannelService channelService;
-        private readonly ITwitchChannelService twitchChannelService;
-        private readonly ITwitchAPI twitchAPI;
-
-        public AdminCommands(IServerService serverService, IChannelService channelService, ITwitchChannelService twitchChannelService, ITwitchAPI twitchAPI, Logging logger, Config config) : base(logger, config)
-        {
-            this.serverService = serverService;
-            this.channelService = channelService;
-            this.twitchChannelService = twitchChannelService;
-            this.twitchAPI = twitchAPI;
-        }
+        private readonly IServerService serverService = serverService;
+        private readonly IChannelService channelService = channelService;
+        private readonly ITwitchChannelService twitchChannelService = twitchChannelService;
+        private readonly ITwitchAPI twitchAPI = twitchAPI;
 
         [Command("help admin")]
         [RequireUserPermission(ChannelPermission.ManageChannels)]
@@ -62,7 +60,7 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                IMessageChannel channel = Context.Guild.TextChannels.Where(x => x.Name.ToLower() == channelName.Trim().ToLower()).FirstOrDefault();
+                IMessageChannel channel = Context.Guild.TextChannels.Where(x => x.Name.Equals(channelName.Trim(), StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
                 if (channel == null)
                 {
@@ -70,14 +68,12 @@ namespace Discord_Bot.Commands
                     return;
                 }
 
-                if (!ChannelTypeNameCollections.NameEnum.ContainsKey(type))
+                if (!ChannelTypeNameCollections.NameEnum.TryGetValue(type, out ChannelTypeEnum channelType))
                 {
                     await ReplyAsync("Channel type does not currently exist\nCurrent types: " +
                         string.Join(", ", ChannelTypeNameCollections.NameEnum.Keys.Select(x => $"`{x}`")));
                     return;
                 }
-
-                ChannelTypeEnum channelType = ChannelTypeNameCollections.NameEnum[type];
 
                 //Adds channel onto list of channels for server, unless conditions say there can only be one of a type of chat, removes server from cache
                 DbProcessResultEnum result = await channelService.AddSettingChannelAsync(Context.Guild.Id, channelType, channel.Id);
@@ -127,7 +123,7 @@ namespace Discord_Bot.Commands
                 }
                 else
                 {
-                    IMessageChannel channel = Context.Guild.TextChannels.Where(x => x.Name.ToLower() == channelName.Trim().ToLower()).FirstOrDefault();
+                    IMessageChannel channel = Context.Guild.TextChannels.Where(x => x.Name.Equals(channelName.Trim(), StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
                     if (channel == null)
                     {
@@ -175,7 +171,7 @@ namespace Discord_Bot.Commands
 
                 if (type == "role")
                 {
-                    IRole role = Context.Guild.Roles.Where(x => x.Name.ToLower() == name).FirstOrDefault();
+                    IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
                     if (role == null)
                     {
                         await ReplyAsync("Role not found!");
@@ -238,7 +234,7 @@ namespace Discord_Bot.Commands
 
                 if (type == "role" && !string.IsNullOrEmpty(name) && name != "all")
                 {
-                    IRole role = Context.Guild.Roles.Where(x => x.Name.ToLower() == name).FirstOrDefault();
+                    IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
                     if (role == null)
                     {
                         await ReplyAsync("Role not found!");
@@ -288,7 +284,7 @@ namespace Discord_Bot.Commands
         }
 
         [Command("server settings")]
-        [Alias(new string[] { "serversettings", "serversetting", "server setting" })]
+        [Alias(["serversettings", "serversetting", "server setting"])]
         [RequireUserPermission(ChannelPermission.ManageChannels)]
         [RequireContext(ContextType.Guild)]
         [Summary("Lists server settings")]

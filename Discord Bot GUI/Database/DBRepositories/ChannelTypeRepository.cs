@@ -6,12 +6,8 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBRepositories
 {
-    public class ChannelTypeRepository : BaseRepository, IChannelTypeRepository
+    public class ChannelTypeRepository(MainDbContext context) : BaseRepository(context), IChannelTypeRepository
     {
-        public ChannelTypeRepository(MainDbContext context) : base(context)
-        {
-        }
-
         public Task<ChannelType> GetChannelTypeByIdAsync(ChannelTypeEnum channelTypeId)
         {
             return context.ChannelTypes

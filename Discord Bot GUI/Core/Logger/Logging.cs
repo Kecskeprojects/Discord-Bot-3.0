@@ -10,7 +10,7 @@ namespace Discord_Bot.Core.Logger
     public class Logging
     {
         //List of logs, before they are cleared
-        public readonly List<Log> Logs = new();
+        public readonly List<Log> Logs = [];
 
 
         #region Bot Logging

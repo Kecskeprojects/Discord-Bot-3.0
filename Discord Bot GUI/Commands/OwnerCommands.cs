@@ -16,14 +16,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class OwnerCommands : CommandBase, IOwnerCommands
+    public class OwnerCommands(IGreetingService greetingService, Logging logger, Config config) : CommandBase(logger, config), IOwnerCommands
     {
-        private readonly IGreetingService greetingService;
-
-        public OwnerCommands(IGreetingService greetingService, Logging logger, Config config) : base(logger, config)
-        {
-            this.greetingService = greetingService;
-        }
+        private readonly IGreetingService greetingService = greetingService;
 
         [Command("help owner")]
         [RequireOwner]

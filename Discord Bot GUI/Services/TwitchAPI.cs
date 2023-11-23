@@ -18,29 +18,21 @@ using TwitchLib.Api.Services.Events.LiveStreamMonitor;
 
 namespace Discord_Bot.Services
 {
-    public class TwitchAPI : ITwitchAPI
+    public class TwitchAPI(Logging logger, Config config, ITwitchChannelService twitchChannelService, IServiceToDiscordCommunication serviceDiscordCommunication) : ITwitchAPI
     {
         #region Variables
         //Saved variables
         private LiveStreamMonitorService Monitor;
         private TwitchLib.Api.TwitchAPI API;
-        private static readonly Dictionary<string, bool> channelStatuses = new();
+        private static readonly Dictionary<string, bool> channelStatuses = [];
         private static string Token;
         private static int TokenTick = 0;
 
-        private readonly Logging logger;
-        private readonly Config config;
-        private readonly ITwitchChannelService twitchChannelService;
-        private readonly IServiceToDiscordCommunication serviceDiscordCommunication;
+        private readonly Logging logger = logger;
+        private readonly Config config = config;
+        private readonly ITwitchChannelService twitchChannelService = twitchChannelService;
+        private readonly IServiceToDiscordCommunication serviceDiscordCommunication = serviceDiscordCommunication;
         #endregion
-
-        public TwitchAPI(Logging logger, Config config, ITwitchChannelService twitchChannelService, IServiceToDiscordCommunication serviceDiscordCommunication)
-        {
-            this.logger = logger;
-            this.config = config;
-            this.twitchChannelService = twitchChannelService;
-            this.serviceDiscordCommunication = serviceDiscordCommunication;
-        }
 
         #region Base Methods
         //Running the Twitch api request and catching errors
@@ -114,8 +106,8 @@ namespace Discord_Bot.Services
 
                 foreach (TwitchChannelResource channel in channels)
                 {
-                    if (channelStatuses.ContainsKey(channel.TwitchId) &&
-                        !channelStatuses[channel.TwitchId] &&
+                    if (channelStatuses.TryGetValue(channel.TwitchId, out bool channelStatus) &&
+                        !channelStatus &&
                         channel.TwitchId == e.Stream.UserId)
                     {
                         await serviceDiscordCommunication.SendTwitchEmbed(channel, e.Stream.ThumbnailUrl, e.Stream.Title);
@@ -144,8 +136,8 @@ namespace Discord_Bot.Services
 
                 foreach (TwitchChannelResource channel in channels)
                 {
-                    if (channelStatuses.ContainsKey(channel.TwitchId) &&
-                        channelStatuses[channel.TwitchId] &&
+                    if (channelStatuses.TryGetValue(channel.TwitchId, out bool channelStatus) &&
+                        channelStatus &&
                         channel.TwitchId == e.Stream.UserId)
                     {
                         channelStatuses[channel.TwitchId] = false;
@@ -278,16 +270,12 @@ namespace Discord_Bot.Services
         private async Task<List<string>> GetChannels()
         {
             List<TwitchChannelResource> channels = await twitchChannelService.GetChannelsAsync();
-            List<string> lst = new();
+            List<string> lst = [];
             if (!CollectionTools.IsNullOrEmpty(channels))
             {
                 foreach (TwitchChannelResource channel in channels)
                 {
-                    if (!channelStatuses.ContainsKey(channel.TwitchId))
-                    {
-                        channelStatuses.Add(channel.TwitchId, false);
-                    }
-
+                    channelStatuses.TryAdd(channel.TwitchId, false);
                     lst.Add(channel.TwitchId);
                 }
 

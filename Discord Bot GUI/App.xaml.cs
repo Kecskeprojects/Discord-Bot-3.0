@@ -191,7 +191,7 @@ namespace Discord_Bot
                     case "A task was canceled.":
                         {
                             string message = arg.Exception.Message;
-                            if (message.EndsWith("."))
+                            if (message.EndsWith('.'))
                             {
                                 message = message[..^1];
                             }

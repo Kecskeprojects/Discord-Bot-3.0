@@ -4,15 +4,9 @@ using Discord_Bot.Core.Logger;
 
 namespace Discord_Bot.Commands
 {
-    public class CommandBase : ModuleBase<SocketCommandContext>
+    public class CommandBase(Logging logger, Config config) : ModuleBase<SocketCommandContext>
     {
-        protected readonly Logging logger;
-        protected readonly Config config;
-
-        public CommandBase(Logging logger, Config config)
-        {
-            this.logger = logger;
-            this.config = config;
-        }
+        protected readonly Logging logger = logger;
+        protected readonly Config config = config;
     }
 }

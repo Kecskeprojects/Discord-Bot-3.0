@@ -14,7 +14,7 @@ namespace Discord_Bot.Core
     public static class Global
     {
         #region Global Variables
-        public static Dictionary<ulong, ServerAudioResource> ServerAudioResources { get; set; } = new();
+        public static Dictionary<ulong, ServerAudioResource> ServerAudioResources { get; set; } = [];
         #endregion
 
         #region Global Functions
@@ -29,9 +29,8 @@ namespace Discord_Bot.Core
         //Check if server has a type of channel, and if yes, is it on the list
         public static bool IsTypeOfChannel(ServerResource server, ChannelTypeEnum type, ulong channelId, bool allowLackOfType = false)
         {
-            return !server.SettingsChannels.ContainsKey(type) ?
-                        allowLackOfType :
-                        server.SettingsChannels[type].Contains(channelId);
+            return !server.SettingsChannels.TryGetValue(type, out List<ulong> value) ?
+                        allowLackOfType : value.Contains(channelId);
         }
 
         public static Stream GetStream(string url)

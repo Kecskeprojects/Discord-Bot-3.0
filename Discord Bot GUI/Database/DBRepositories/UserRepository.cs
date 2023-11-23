@@ -5,12 +5,8 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBRepositories
 {
-    public class UserRepository : BaseRepository, IUserRepository
+    public class UserRepository(MainDbContext context) : BaseRepository(context), IUserRepository
     {
-        public UserRepository(MainDbContext context) : base(context)
-        {
-        }
-
         public Task<User> GetUserByDiscordId(ulong userId)
         {
             return context.Users

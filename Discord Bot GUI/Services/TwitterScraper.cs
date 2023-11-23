@@ -16,27 +16,27 @@ namespace Discord_Bot.Services
 
         //The standard video url is the following:
         //https://video.twimg.com/[folder_type]/[folder_id]/pu/vid/[width]x[height]/[video_id].mp4?tag=12
-        private List<Uri> Videos { get; set; } = new();
+        private List<Uri> Videos { get; set; } = [];
 
         //Storing all video links before filtering
-        private List<Uri> TempVideos { get; set; } = new();
+        private List<Uri> TempVideos { get; set; } = [];
 
         //The standard image url is the following:
         //https://pbs.twimg.com/media/[image_id]?format=[image_format]&name=[width]x[height]
-        private List<Uri> Images { get; set; } = new();
-        private List<string> Exceptions { get; } = new List<string>();
+        private List<Uri> Images { get; set; } = [];
+        private List<string> Exceptions { get; } = [];
         #endregion
 
         #region Main Methods
         public static async Task OpenBroser()
         {
             BrowserFetcher browserFetcher = new(SupportedBrowser.Chrome);
-            await browserFetcher.DownloadAsync(PuppeteerSharp.BrowserData.Chrome.DefaultBuildId);
+            await browserFetcher.DownloadAsync("117.0.5938.62"); //Todo: PuppeteerSharp.BrowserData.Chrome.DefaultBuildId should be revisited in future, new builds remove option to download the way it is currently done
             IBrowser browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
                 Headless = true,
-                Args = new string[]
-                {
+                Args =
+                [
                         "--no-sandbox",
                         "--disable-setuid-sandbox",
                         "--disable-web-security",
@@ -44,7 +44,8 @@ namespace Discord_Bot.Services
                         "--disable-site-isolation-trials",
                         "--disable-features=BlockInsecurePrivateNetworkRequests",
                         "--ignore-certificate-errors"
-                },
+                ],
+                ExecutablePath = "Chrome\\Win64-117.0.5938.62\\chrome-win64\\chrome.exe"
             });
             Browser = browser;
         }
@@ -119,7 +120,7 @@ namespace Discord_Bot.Services
                 IHtmlCollection<IElement> articles = document.QuerySelectorAll("article");
 
                 //The timestamp link contains the post's relative path, we can find the post's article by that, we also get it's index in the list
-                IElement main = articles.First(x => x.QuerySelectorAll("a[href]").FirstOrDefault(e => e.GetAttribute("href").ToLower().Contains(uri.AbsolutePath.ToLower())) != null);
+                IElement main = articles.First(x => x.QuerySelectorAll("a[href]").FirstOrDefault(e => e.GetAttribute("href").Contains(uri.AbsolutePath, StringComparison.OrdinalIgnoreCase)) != null);
                 int mainPos = articles.Index(main);
 
                 if (main.Text().Contains("sensitive content"))
@@ -167,7 +168,7 @@ namespace Discord_Bot.Services
         private static async Task<IDocument> OpenPage(IPage page, Uri uri)
         {
             await page.DeleteCookieAsync();
-            await page.GoToAsync(uri.OriginalString, 15000, new WaitUntilNavigation[] { WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded, WaitUntilNavigation.Networkidle2, WaitUntilNavigation.Networkidle0 });
+            await page.GoToAsync(uri.OriginalString, 15000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded, WaitUntilNavigation.Networkidle2, WaitUntilNavigation.Networkidle0]);
             //await Task.Delay(1000);
             string content = await page.GetContentAsync();
 
@@ -179,7 +180,7 @@ namespace Discord_Bot.Services
         private static List<Uri> GetImages(IElement main)
         {
             //Getting the Images, if there are any
-            List<Uri> currImages = new();
+            List<Uri> currImages = [];
             foreach (IElement element in main.QuerySelectorAll("a"))
             {
                 IElement img = element.QuerySelector("img");

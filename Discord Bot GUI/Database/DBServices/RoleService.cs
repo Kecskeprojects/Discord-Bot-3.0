@@ -11,16 +11,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices
 {
-    public class RoleService : BaseService, IRoleService
+    public class RoleService(IMapper mapper, Logging logger, Cache cache, IRoleRepository roleRepository, IServerRepository serverRepository) : BaseService(mapper, logger, cache), IRoleService
     {
-        private readonly IRoleRepository roleRepository;
-        private readonly IServerRepository serverRepository;
-
-        public RoleService(IMapper mapper, Logging logger, Cache cache, IRoleRepository roleRepository, IServerRepository serverRepository) : base(mapper, logger, cache)
-        {
-            this.roleRepository = roleRepository;
-            this.serverRepository = serverRepository;
-        }
+        private readonly IRoleRepository roleRepository = roleRepository;
+        private readonly IServerRepository serverRepository = serverRepository;
 
         public async Task<DbProcessResultEnum> AddSelfRoleAsync(ulong serverId, string roleName, ulong roleId)
         {

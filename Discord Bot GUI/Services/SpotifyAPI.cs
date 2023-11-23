@@ -11,18 +11,11 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Services
 {
-    class SpotifyAPI : ISpotifyAPI
+    class SpotifyAPI(Logging logger, Config config, IYoutubeAPI youtubeAPI) : ISpotifyAPI
     {
-        private readonly Logging logger;
-        private readonly Config config;
-        private readonly IYoutubeAPI youtubeAPI;
-
-        public SpotifyAPI(Logging logger, Config config, IYoutubeAPI youtubeAPI)
-        {
-            this.logger = logger;
-            this.config = config;
-            this.youtubeAPI = youtubeAPI;
-        }
+        private readonly Logging logger = logger;
+        private readonly Config config = config;
+        private readonly IYoutubeAPI youtubeAPI = youtubeAPI;
 
         #region Main functions
         //Main function starting the query and catching errors
@@ -153,7 +146,7 @@ namespace Discord_Bot.Services
                         {
                             List<string> artist_genres = item.Genres;
                             IEnumerable<string> union = artist_genres.Select(x => x.ToLower()).Intersect(tags.Select(x => x.ToLower()));
-                            if (union.Any() && item.Name.ToLower() == artist.ToLower())
+                            if (union.Any() && item.Name.Equals(artist, StringComparison.OrdinalIgnoreCase))
                             {
                                 spotifyArtist = item.Name;
                                 spotifyImage = item.Images[0].Url;
@@ -171,7 +164,7 @@ namespace Discord_Bot.Services
                     {
                         foreach (FullArtist item in result.Artists.Items)
                         {
-                            if (item.Name.ToLower() == artist.ToLower())
+                            if (item.Name.Equals(artist, StringComparison.OrdinalIgnoreCase))
                             {
                                 spotifyArtist = item.Name;
                                 spotifyImage = item.Images[0].Url;
@@ -207,7 +200,7 @@ namespace Discord_Bot.Services
 
                             List<string> artist_genres = temp_artist.Genres;
                             IEnumerable<string> union = artist_genres.Select(x => x.ToLower()).Intersect(tags.Select(x => x.ToLower()));
-                            if (union.Any() && item.Artists[0].Name.ToLower() == artist.ToLower())
+                            if (union.Any() && item.Artists[0].Name.Equals(artist, StringComparison.OrdinalIgnoreCase))
                             {
                                 spotifyArtist = item.Artists[0].Name;
                                 spotifyImage = item.Album.Images[0].Url;
@@ -225,7 +218,7 @@ namespace Discord_Bot.Services
                     {
                         foreach (FullTrack item in result.Tracks.Items)
                         {
-                            if (item.Artists[0].Name.ToLower() == artist.ToLower())
+                            if (item.Artists[0].Name.Equals(artist, StringComparison.OrdinalIgnoreCase))
                             {
                                 spotifyArtist = item.Artists[0].Name;
                                 spotifyImage = item.Album.Images[0].Url;

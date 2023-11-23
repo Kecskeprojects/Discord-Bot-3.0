@@ -7,12 +7,8 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBRepositories
 {
-    public class GreetingRepository : BaseRepository, IGreetingRepository
+    public class GreetingRepository(MainDbContext context) : BaseRepository(context), IGreetingRepository
     {
-        public GreetingRepository(MainDbContext context) : base(context)
-        {
-        }
-
         public async Task AddGreetingAsync(Greeting greeting)
         {
             context.Greetings.Add(greeting);

@@ -8,12 +8,8 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBRepositories
 {
-    public class BirthdayRepository : BaseRepository, IBirthdayRepository
+    public class BirthdayRepository(MainDbContext context) : BaseRepository(context), IBirthdayRepository
     {
-        public BirthdayRepository(MainDbContext context) : base(context)
-        {
-        }
-
         public async Task AddBirthdayAsync(Birthday birthday)
         {
             context.Birthdays.Add(birthday);

@@ -8,12 +8,8 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBRepositories
 {
-    public class ChannelRepository : BaseRepository, IChannelRepository
+    public class ChannelRepository(MainDbContext context) : BaseRepository(context), IChannelRepository
     {
-        public ChannelRepository(MainDbContext context) : base(context)
-        {
-        }
-
         public async Task AddChannelAsync(Channel channel)
         {
             context.Channels.Add(channel);

@@ -13,18 +13,11 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices
 {
-    public class ChannelService : BaseService, IChannelService
+    public class ChannelService(IChannelRepository channelRepository, IServerRepository serverRepository, IChannelTypeRepository channelTypeRepository, IMapper mapper, Logging logger, Cache cache) : BaseService(mapper, logger, cache), IChannelService
     {
-        private readonly IChannelRepository channelRepository;
-        private readonly IServerRepository serverRepository;
-        private readonly IChannelTypeRepository channelTypeRepository;
-
-        public ChannelService(IChannelRepository channelRepository, IServerRepository serverRepository, IChannelTypeRepository channelTypeRepository, IMapper mapper, Logging logger, Cache cache) : base(mapper, logger, cache)
-        {
-            this.channelRepository = channelRepository;
-            this.serverRepository = serverRepository;
-            this.channelTypeRepository = channelTypeRepository;
-        }
+        private readonly IChannelRepository channelRepository = channelRepository;
+        private readonly IServerRepository serverRepository = serverRepository;
+        private readonly IChannelTypeRepository channelTypeRepository = channelTypeRepository;
 
         public async Task<DbProcessResultEnum> AddSettingChannelAsync(ulong serverId, ChannelTypeEnum channelTypeId, ulong channelId)
         {

@@ -12,25 +12,19 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Communication
 {
-    public class ServiceDiscordCommunication : IServiceToDiscordCommunication
+    public class ServiceDiscordCommunication(IServerService serverService, DiscordSocketClient client) : IServiceToDiscordCommunication
     {
-        private readonly IServerService serverService;
-        private readonly DiscordSocketClient client;
-
-        public ServiceDiscordCommunication(IServerService serverService, DiscordSocketClient client)
-        {
-            this.serverService = serverService;
-            this.client = client;
-        }
+        private readonly IServerService serverService = serverService;
+        private readonly DiscordSocketClient client = client;
 
         public async Task SendTwitchEmbed(TwitchChannelResource twitchChannel, string thumbnailUrl, string title)
         {
             ServerResource server = await serverService.GetByDiscordIdAsync(twitchChannel.ServerDiscordId);
 
             //Do not send a message if a channel was not set
-            if (server.SettingsChannels.ContainsKey(ChannelTypeEnum.TwitchNotificationText))
+            if (server.SettingsChannels.TryGetValue(ChannelTypeEnum.TwitchNotificationText, out List<ulong> notificationChannels))
             {
-                foreach (ulong channelId in server.SettingsChannels[ChannelTypeEnum.TwitchNotificationText])
+                foreach (ulong channelId in notificationChannels)
                 {
                     IMessageChannel channel = client.GetChannel(channelId) as IMessageChannel;
                     EmbedBuilder builder = ServiceToDiscordService.BuildTwitchEmbed(twitchChannel, thumbnailUrl, title);

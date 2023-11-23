@@ -5,12 +5,8 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBRepositories
 {
-    public class ServerRepository : BaseRepository, IServerRepository
+    public class ServerRepository(MainDbContext context) : BaseRepository(context), IServerRepository
     {
-        public ServerRepository(MainDbContext context) : base(context)
-        {
-        }
-
         public async Task AddServerAsync(Server server)
         {
             await context.Servers.AddAsync(server);

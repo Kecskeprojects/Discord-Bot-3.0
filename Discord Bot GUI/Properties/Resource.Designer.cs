@@ -61,12 +61,12 @@ namespace Discord_Bot.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static System.Drawing.Icon Kim_Synthji {
+        internal static byte[] Kim_Synthji {
             get {
                 object obj = ResourceManager.GetObject("Kim_Synthji", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                return ((byte[])(obj));
             }
         }
     }

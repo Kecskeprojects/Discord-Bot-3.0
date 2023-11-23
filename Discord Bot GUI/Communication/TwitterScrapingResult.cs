@@ -8,8 +8,8 @@ namespace Discord_Bot.Communication
         public TwitterScrapingResult(string message)
         {
             ErrorMessage = message;
-            Videos = new();
-            Images = new();
+            Videos = [];
+            Images = [];
         }
         public TwitterScrapingResult(List<Uri> videos, List<Uri> images)
         {

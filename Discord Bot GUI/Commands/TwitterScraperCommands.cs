@@ -14,18 +14,16 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class TwitterScraperCommands : CommandBase
+    public class TwitterScraperCommands(Logging logger, Config config) : CommandBase(logger, config)
     {
-        public TwitterScraperCommands(Logging logger, Config config) : base(logger, config)
-        {
-        }
+        private static readonly string[] baseURLs = ["https://twitter.com/", "https://x.com/"];
 
         [Command("twt")]
         public async Task ScrapeFromUrl([Remainder] string message)
         {
             try
             {
-                List<Uri> urls = UrlTools.LinkSearch(message, true, new string[] { "https://twitter.com/", "https://x.com/" });
+                List<Uri> urls = UrlTools.LinkSearch(message, true, baseURLs);
 
                 //Check if message is an instagram link
                 if (urls != null)

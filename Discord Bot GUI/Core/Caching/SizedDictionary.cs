@@ -3,17 +3,11 @@ using System.Collections.Generic;
 
 namespace Discord_Bot.Core.Caching
 {
-    public sealed class SizedDictionary<TKey, TValue> : Dictionary<TKey, TValue>
+    public sealed class SizedDictionary<TKey, TValue>(int size) : Dictionary<TKey, TValue>
     {
 
-        private readonly int maxSize;
-        private Queue<TKey> keys;
-
-        public SizedDictionary(int size)
-        {
-            maxSize = size;
-            keys = new Queue<TKey>();
-        }
+        private readonly int maxSize = size;
+        private Queue<TKey> keys = new();
 
         new public bool TryAdd(TKey key, TValue value)
         {

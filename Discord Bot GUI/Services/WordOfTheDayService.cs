@@ -11,14 +11,9 @@ using System.Xml.Serialization;
 
 namespace Discord_Bot.Services
 {
-    public class WordOfTheDayService : IWordOfTheDayService
+    public class WordOfTheDayService(Logging logger) : IWordOfTheDayService
     {
-        private readonly Logging logger;
-
-        public WordOfTheDayService(Logging logger)
-        {
-            this.logger = logger;
-        }
+        private readonly Logging logger = logger;
 
         private static string BaseUrl { get; } = "http://wotd.transparent.com/rss/";
 

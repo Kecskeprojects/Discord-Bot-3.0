@@ -34,10 +34,10 @@ namespace Discord_Bot.CommandsService.Communication
             string caption = "";
             ReadFiles(attachments, files, ref caption, ref metadata, ignoreVideos);
             string message = GetCaption(url, caption, metadata);
-            result.HasFileDownloadHappened = true;
 
             if (attachments.Count > 0)
             {
+                result.HasFileDownloadHappened = true;
                 await channel.SendFilesAsync(attachments, message, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
                 result.ShouldMessageBeSuppressed = true;
             }

@@ -6,6 +6,8 @@ namespace Discord_Bot.Tools
 {
     public class UrlTools
     {
+        private static readonly char[] whiteSpaceSeparator = [' ', '\n'];
+
         public static List<Uri> LinkSearch(string message, bool ignoreEmbedSuppress, params string[] baseURLs)
         {
             if (string.IsNullOrWhiteSpace(message))
@@ -17,7 +19,7 @@ namespace Discord_Bot.Tools
 
             if (baseURLs.Any(message.Contains))
             {
-                List<Uri> urls = new();
+                List<Uri> urls = [];
 
                 //We check for each baseURL for each that was sent, one is expected
                 foreach (string baseURL in baseURLs)
@@ -34,7 +36,7 @@ namespace Discord_Bot.Tools
 
                         string beginningCut = message[startIndex..];
 
-                        string url = beginningCut.Split(new char[] { ' ', '\n' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)[0];
+                        string url = beginningCut.Split(whiteSpaceSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)[0];
 
                         urls.Add(GetCleanUrl(url, ignoreEmbedSuppress));
 

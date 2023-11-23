@@ -4,16 +4,10 @@ using Discord_Bot.Core.Logger;
 
 namespace Discord_Bot.Database.DBServices
 {
-    public class BaseService
+    public class BaseService(IMapper mapper, Logging logger, Cache cache)
     {
-        protected readonly IMapper mapper;
-        protected readonly Logging logger;
-        protected readonly Cache cache;
-        public BaseService(IMapper mapper, Logging logger, Cache cache)
-        {
-            this.mapper = mapper;
-            this.logger = logger;
-            this.cache = cache;
-        }
+        protected readonly IMapper mapper = mapper;
+        protected readonly Logging logger = logger;
+        protected readonly Cache cache = cache;
     }
 }

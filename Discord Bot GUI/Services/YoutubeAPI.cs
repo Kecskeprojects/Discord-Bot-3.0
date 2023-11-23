@@ -19,22 +19,15 @@ using System.Web;
 namespace Discord_Bot.Services
 {
 
-    public class YoutubeAPI : IYoutubeAPI
+    public class YoutubeAPI(Logging logger, Config config, IServiceToDiscordCommunication serviceDiscordCommunication) : IYoutubeAPI
     {
         #region Variables
-        private static readonly Dictionary<string, int> keys = new();
+        private static readonly Dictionary<string, int> keys = [];
         private static int youtubeIndex = 0;
-        private readonly Logging logger;
-        private readonly Config config;
-        private readonly IServiceToDiscordCommunication serviceDiscordCommunication;
+        private readonly Logging logger = logger;
+        private readonly Config config = config;
+        private readonly IServiceToDiscordCommunication serviceDiscordCommunication = serviceDiscordCommunication;
         #endregion
-
-        public YoutubeAPI(Logging logger, Config config, IServiceToDiscordCommunication serviceDiscordCommunication)
-        {
-            this.logger = logger;
-            this.config = config;
-            this.serviceDiscordCommunication = serviceDiscordCommunication;
-        }
 
         #region Base Methods
         //Main function starting the api request
@@ -166,13 +159,15 @@ namespace Discord_Bot.Services
 
             Video video = searchListResponse.Items[0];
 
-            string[] temp = { "https://www.youtube.com/watch?v=" + video.Id, video.Snippet.Title.Replace("&#39;", "'"), video.Snippet.Thumbnails.Default__.Url, video.ContentDetails.Duration };
+            string[] temp = ["https://www.youtube.com/watch?v=" + video.Id, video.Snippet.Title.Replace("&#39;", "'"), video.Snippet.Thumbnails.Default__.Url, video.ContentDetails.Duration];
 
-            if (!Global.ServerAudioResources.ContainsKey(serverId))
+            if (!Global.ServerAudioResources.TryGetValue(serverId, out ServerAudioResource audioResource))
             {
-                Global.ServerAudioResources.Add(serverId, new(serverId));
+                audioResource = new(serverId);
+                Global.ServerAudioResources.Add(serverId, audioResource);
             }
-            Global.ServerAudioResources[serverId].MusicRequests.Add(new MusicRequest(temp[0], temp[1], temp[2], temp[3], username));
+
+            audioResource.MusicRequests.Add(new MusicRequest(temp[0], temp[1], temp[2], temp[3], username));
 
             logger.Query("Youtube video query Complete!");
             logger.Query($"{temp[0]}\n{temp[1]}");

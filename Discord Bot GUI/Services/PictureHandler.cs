@@ -14,14 +14,9 @@ using System.Linq;
 namespace Discord_Bot.Services
 {
 
-    public class PictureHandler : IPictureHandler
+    public class PictureHandler(Logging logger) : IPictureHandler
     {
-        private readonly Logging logger;
-
-        public PictureHandler(Logging logger)
-        {
-            this.logger = logger;
-        }
+        private readonly Logging logger = logger;
 
         #region Main function
         //Our image size will be 800*500 in the end

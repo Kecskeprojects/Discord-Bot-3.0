@@ -15,14 +15,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class ChatCommands : CommandBase, IChatCommands
+    public class ChatCommands(IWordOfTheDayService wordOfTheDayService, Logging logger, Config config) : CommandBase(logger, config), IChatCommands
     {
-        private readonly IWordOfTheDayService wordOfTheDayService;
-
-        public ChatCommands(IWordOfTheDayService wordOfTheDayService, Logging logger, Config config) : base(logger, config)
-        {
-            this.wordOfTheDayService = wordOfTheDayService;
-        }
+        private readonly IWordOfTheDayService wordOfTheDayService = wordOfTheDayService;
 
         [Command("help")]
         [Summary("List out commands everybody has access to")]
@@ -30,7 +25,7 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                Dictionary<string, string> commands = new();
+                Dictionary<string, string> commands = [];
 
                 if (!File.Exists("Assets\\Commands\\Commands.txt"))
                 {
@@ -70,7 +65,7 @@ namespace Discord_Bot.Commands
         }
 
         [Command("coin flip")]
-        [Alias(new string[] { "flip a coin", "flip coin", "flipcoin", "cf", "fc", "cofl", "flco", "coin", "flip", "coinflip", "50/50", "pick" })]
+        [Alias(["flip a coin", "flip coin", "flipcoin", "cf", "fc", "cofl", "flco", "coin", "flip", "coinflip", "50/50", "pick"])]
         [Summary("A 50/50 type decision maker")]
         public async Task CoinFlip([Remainder] string choice = "")
         {
@@ -79,7 +74,7 @@ namespace Discord_Bot.Commands
                 Random r = new();
                 int chance = r.Next(1, 101);
 
-                string[] choices = new string[] { "Heads", "Tails" };
+                string[] choices = ["Heads", "Tails"];
 
                 //If choice options are given, we switch out the original strings
                 if (choice != "" && choice.Contains(" or "))
@@ -107,7 +102,7 @@ namespace Discord_Bot.Commands
         }
 
         [Command("wotd")]
-        [Alias(new string[] { "word of the day" })]
+        [Alias(["word of the day"])]
         [Summary("Learn a word a day command")]
         public async Task WotdFunction(string language = "korean")
         {

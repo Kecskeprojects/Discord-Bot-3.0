@@ -7,12 +7,8 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBRepositories
 {
-    public class ServerChannelViewRepository : BaseRepository, IServerChannelViewRepository
+    public class ServerChannelViewRepository(MainDbContext context) : BaseRepository(context), IServerChannelViewRepository
     {
-        public ServerChannelViewRepository(MainDbContext context) : base(context)
-        {
-        }
-
         public Task<List<ServerChannelView>> GetServerChannels(int serverId)
         {
             return context.ServerChannelViews

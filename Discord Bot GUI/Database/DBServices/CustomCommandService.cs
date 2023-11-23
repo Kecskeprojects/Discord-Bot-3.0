@@ -12,16 +12,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices
 {
-    public class CustomCommandService : BaseService, ICustomCommandService
+    public class CustomCommandService(IMapper mapper, Logging logger, Cache cache, ICustomCommandRepository customCommandRepository, IServerRepository serverRepository) : BaseService(mapper, logger, cache), ICustomCommandService
     {
-        private readonly ICustomCommandRepository customCommandRepository;
-        private readonly IServerRepository serverRepository;
-
-        public CustomCommandService(IMapper mapper, Logging logger, Cache cache, ICustomCommandRepository customCommandRepository, IServerRepository serverRepository) : base(mapper, logger, cache)
-        {
-            this.customCommandRepository = customCommandRepository;
-            this.serverRepository = serverRepository;
-        }
+        private readonly ICustomCommandRepository customCommandRepository = customCommandRepository;
+        private readonly IServerRepository serverRepository = serverRepository;
 
         public async Task<DbProcessResultEnum> AddCustomCommandAsync(ulong serverId, string commandName, string link)
         {

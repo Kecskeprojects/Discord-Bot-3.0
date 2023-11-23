@@ -14,17 +14,12 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class ReminderCommands : CommandBase, IReminderCommands
+    public class ReminderCommands(IReminderService reminderService, Logging logger, Config config) : CommandBase(logger, config), IReminderCommands
     {
-        private readonly IReminderService reminderService;
-
-        public ReminderCommands(IReminderService reminderService, Logging logger, Config config) : base(logger, config)
-        {
-            this.reminderService = reminderService;
-        }
+        private readonly IReminderService reminderService = reminderService;
 
         [Command("remind at")]
-        [Alias(new string[] { "reminder at" })]
+        [Alias(["reminder at"])]
         [Summary("Adding reminding messages to database via dates")]
         public async Task RemindAt([Remainder] string message)
         {
@@ -109,7 +104,7 @@ namespace Discord_Bot.Commands
         }
 
         [Command("remind in")]
-        [Alias(new string[] { "reminder in" })]
+        [Alias(["reminder in"])]
         [Summary("Adding reminding messages to database via amounts of time from current date")]
         public async Task RemindIn([Remainder] string message)
         {
@@ -165,7 +160,7 @@ namespace Discord_Bot.Commands
         }
 
         [Command("remind list")]
-        [Alias(new string[] { "reminder list" })]
+        [Alias(["reminder list"])]
         [Summary("Remove a reminder from their list of reminders")]
         public async Task RemindList()
         {
@@ -195,12 +190,13 @@ namespace Discord_Bot.Commands
         }
 
         [Command("remind remove")]
-        [Alias(new string[] { "reminder remove" })]
+        [Alias(["reminder remove"])]
         [Summary("Remove a reminder from the user's list of reminders")]
         public async Task RemindRemove(int reminderId)
         {
             try
             {
+                //Todo: Remake logic to be based on per person, ordered by date in ascending, and their order in that (e.g. 1 would be the 0th element after ordering
                 DbProcessResultEnum result = await reminderService.RemoveUserReminderAsync(Context.User.Id, reminderId);
                 if (result == DbProcessResultEnum.Success)
                 {

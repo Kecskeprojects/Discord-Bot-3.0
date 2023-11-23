@@ -13,18 +13,11 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices
 {
-    public class TwitchChannelService : BaseService, ITwitchChannelService
+    public class TwitchChannelService(IMapper mapper, Logging logger, Cache cache, ITwitchChannelRepository twitchChannelRepository, IServerRepository serverRepository, IRoleRepository roleRepository) : BaseService(mapper, logger, cache), ITwitchChannelService
     {
-        private readonly ITwitchChannelRepository twitchChannelRepository;
-        private readonly IServerRepository serverRepository;
-        private readonly IRoleRepository roleRepository;
-
-        public TwitchChannelService(IMapper mapper, Logging logger, Cache cache, ITwitchChannelRepository twitchChannelRepository, IServerRepository serverRepository, IRoleRepository roleRepository) : base(mapper, logger, cache)
-        {
-            this.twitchChannelRepository = twitchChannelRepository;
-            this.serverRepository = serverRepository;
-            this.roleRepository = roleRepository;
-        }
+        private readonly ITwitchChannelRepository twitchChannelRepository = twitchChannelRepository;
+        private readonly IServerRepository serverRepository = serverRepository;
+        private readonly IRoleRepository roleRepository = roleRepository;
 
         public async Task<DbProcessResultEnum> AddNotificationRoleAsync(ulong serverId, ulong roleId, string roleName)
         {

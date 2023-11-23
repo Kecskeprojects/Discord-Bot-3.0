@@ -12,18 +12,11 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices
 {
-    public class BirthdayService : BaseService, IBirthdayService
+    public class BirthdayService(IServerRepository serverRepository, IUserRepository userRepository, IBirthdayRepository birthdayRepository, IMapper mapper, Logging logger, Cache cache) : BaseService(mapper, logger, cache), IBirthdayService
     {
-        private readonly IServerRepository serverRepository;
-        private readonly IUserRepository userRepository;
-        private readonly IBirthdayRepository birthdayRepository;
-
-        public BirthdayService(IServerRepository serverRepository, IUserRepository userRepository, IBirthdayRepository birthdayRepository, IMapper mapper, Logging logger, Cache cache) : base(mapper, logger, cache)
-        {
-            this.serverRepository = serverRepository;
-            this.userRepository = userRepository;
-            this.birthdayRepository = birthdayRepository;
-        }
+        private readonly IServerRepository serverRepository = serverRepository;
+        private readonly IUserRepository userRepository = userRepository;
+        private readonly IBirthdayRepository birthdayRepository = birthdayRepository;
 
         public async Task<DbProcessResultEnum> AddBirthdayAsync(ulong serverId, ulong userId, DateTime date)
         {

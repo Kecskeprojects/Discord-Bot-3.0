@@ -44,11 +44,11 @@ namespace Discord_Bot.CommandsService
 
                     if (line == "") { continue; }
 
-                    if (line.StartsWith("!") || line.StartsWith("."))
+                    if (line.StartsWith('!') || line.StartsWith('.'))
                     {
                         commands[curr] += "`" + line.Split('\t')[0] + " ` " + line.Split('\t')[1] + "\n";
                     }
-                    else if (line.StartsWith("*"))
+                    else if (line.StartsWith('*'))
                     {
                         commands[curr] += line + "\n";
                     }

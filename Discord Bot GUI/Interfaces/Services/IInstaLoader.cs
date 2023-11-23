@@ -2,6 +2,6 @@
 {
     public interface IInstaLoader
     {
-        void DownloadFromInstagram(string postId);
+        string DownloadFromInstagram(string postId);
     }
 }

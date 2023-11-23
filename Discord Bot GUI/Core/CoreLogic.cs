@@ -14,18 +14,11 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Core
 {
-    public class CoreLogic : ICoreLogic
+    public class CoreLogic(Logging logger, IServerService serverService, ICoreToDiscordCommunication coreDiscordCommunication) : ICoreLogic
     {
-        private readonly Logging logger;
-        private readonly ICoreToDiscordCommunication coreDiscordCommunication;
-        private readonly IServerService serverService;
-
-        public CoreLogic(Logging logger, IServerService serverService, ICoreToDiscordCommunication coreDiscordCommunication)
-        {
-            this.logger = logger;
-            this.coreDiscordCommunication = coreDiscordCommunication;
-            this.serverService = serverService;
-        }
+        private readonly Logging logger = logger;
+        private readonly ICoreToDiscordCommunication coreDiscordCommunication = coreDiscordCommunication;
+        private readonly IServerService serverService = serverService;
 
         public async Task<ServerResource> GetServerAsync(ulong serverId, string serverName)
         {
@@ -159,7 +152,7 @@ namespace Discord_Bot.Core
         {
             try
             {
-                List<string> logs = new();
+                List<string> logs = [];
 
                 string currentDir = Directory.GetCurrentDirectory();
                 if (!Directory.Exists(Path.Combine(currentDir, "Logs")))

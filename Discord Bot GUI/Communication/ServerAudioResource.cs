@@ -2,17 +2,10 @@
 
 namespace Discord_Bot.Communication
 {
-    public class ServerAudioResource
+    public class ServerAudioResource(ulong serverDiscordId)
     {
-        public ServerAudioResource(ulong serverDiscordId)
-        {
-            ServerDiscordId = serverDiscordId;
-            AudioVariables = new();
-            MusicRequests = new();
-        }
-
-        public ulong ServerDiscordId { get; set; }
-        public AudioVariables AudioVariables { get; set; }
-        public List<MusicRequest> MusicRequests { get; set; }
+        public ulong ServerDiscordId { get; set; } = serverDiscordId;
+        public AudioVariables AudioVariables { get; set; } = new();
+        public List<MusicRequest> MusicRequests { get; set; } = [];
     }
 }

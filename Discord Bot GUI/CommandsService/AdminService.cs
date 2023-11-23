@@ -18,10 +18,9 @@ namespace Discord_Bot.CommandsService
             embed.WithTitle("The server's settings are the following:");
             foreach (KeyValuePair<ChannelTypeEnum, string> item in ChannelTypeNameCollections.EnumName)
             {
-                if (server.SettingsChannels.ContainsKey(item.Key))
+                if (server.SettingsChannels.TryGetValue(item.Key, out List<ulong> settingsChannels))
                 {
-                    IEnumerable<string> channels = server.SettingsChannels[item.Key]
-                                                    .Select(x => textChannels.FirstOrDefault(n => n.Id == x))
+                    IEnumerable<string> channels = settingsChannels.Select(x => textChannels.FirstOrDefault(n => n.Id == x))
                                                     .Where(x => x != null)
                                                     .Select(x => $"`{x.Name}`");
 

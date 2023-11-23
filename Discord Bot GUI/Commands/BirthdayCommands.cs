@@ -10,14 +10,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class BirthdayCommands : CommandBase, IBirthdayCommands
+    public class BirthdayCommands(Logging logger, Config config, IBirthdayService birthdayService) : CommandBase(logger, config), IBirthdayCommands
     {
-        private readonly IBirthdayService birthdayService;
-
-        public BirthdayCommands(Logging logger, Config config, IBirthdayService birthdayService) : base(logger, config)
-        {
-            this.birthdayService = birthdayService;
-        }
+        private readonly IBirthdayService birthdayService = birthdayService;
+        private static readonly string[] dateSeparator = [",", "/", "\\", "-"];
 
         [Command("birthday add user")]
         [RequireContext(ContextType.Guild)]
@@ -42,7 +38,7 @@ namespace Discord_Bot.Commands
 
                 if (string.IsNullOrEmpty(month) && string.IsNullOrEmpty(day))
                 {
-                    string[] strings = year.Split(new string[] { ",", "/", "\\", "-" }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    string[] strings = year.Split(dateSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                     year = strings[0];
                     month = strings[1];
                     day = strings[2];
@@ -128,7 +124,7 @@ namespace Discord_Bot.Commands
 
                 if (string.IsNullOrEmpty(month) && string.IsNullOrEmpty(day))
                 {
-                    string[] strings = year.Split(new string[] { ",", "/", "\\", "-" }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    string[] strings = year.Split(dateSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                     year = strings[0];
                     month = strings[1];
                     day = strings[2];

@@ -8,12 +8,8 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBRepositories
 {
-    public class ReminderRepository : BaseRepository, IReminderRepository
+    public class ReminderRepository(MainDbContext context) : BaseRepository(context), IReminderRepository
     {
-        public ReminderRepository(MainDbContext context) : base(context)
-        {
-        }
-
         public async Task AddReminderAsync(Reminder reminder)
         {
             context.Reminders.Add(reminder);

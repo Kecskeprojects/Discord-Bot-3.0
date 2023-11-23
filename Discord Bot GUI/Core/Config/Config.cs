@@ -40,8 +40,8 @@ namespace Discord_Bot.Core.Config
                     spotify_Client_Secret = "",
                     lastfm_API_Key = "",
                     lastfm_API_Secret = "",
-                    youtube_API_Keys = Array.Empty<string>(),
-                    youtube_Filter_Words = Array.Empty<string>(),
+                    youtube_API_Keys = [],
+                    youtube_Filter_Words = [],
                     enable_Instagram_Embed = false,
                     enable_Twitter_Embed = false
                 };

@@ -9,7 +9,7 @@ namespace Discord_Bot.CommandsService
     {
         public static List<FileAttachment> AllContentInRegularMessage(List<Uri> videos, List<Uri> images, bool sendVideos = true)
         {
-            List<FileAttachment> Embeds = new();
+            List<FileAttachment> Embeds = [];
             string commonFileName = $"twitter_{DateTime.Now:yyMMdd}_{DateTime.Now:HHmmss}";
 
             for (int i = 0; i < (images.Count < 10 ? images.Count : 10) && Embeds.Count < 10; i++)

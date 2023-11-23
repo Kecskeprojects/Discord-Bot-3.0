@@ -13,16 +13,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices
 {
-    public class ReminderService : BaseService, IReminderService
+    public class ReminderService(IMapper mapper, Logging logger, Cache cache, IReminderRepository reminderRepository, IUserRepository userRepository) : BaseService(mapper, logger, cache), IReminderService
     {
-        private readonly IReminderRepository reminderRepository;
-        private readonly IUserRepository userRepository;
-
-        public ReminderService(IMapper mapper, Logging logger, Cache cache, IReminderRepository reminderRepository, IUserRepository userRepository) : base(mapper, logger, cache)
-        {
-            this.reminderRepository = reminderRepository;
-            this.userRepository = userRepository;
-        }
+        private readonly IReminderRepository reminderRepository = reminderRepository;
+        private readonly IUserRepository userRepository = userRepository;
 
         public async Task<DbProcessResultEnum> AddReminderAsync(ulong userId, DateTime date, string remindMessage)
         {

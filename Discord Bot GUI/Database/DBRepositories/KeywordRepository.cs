@@ -6,12 +6,8 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBRepositories
 {
-    public class KeywordRepository : BaseRepository, IKeywordRepository
+    public class KeywordRepository(MainDbContext context) : BaseRepository(context), IKeywordRepository
     {
-        public KeywordRepository(MainDbContext context) : base(context)
-        {
-        }
-
         public async Task AddCustomCommandAsync(Keyword keyword)
         {
             context.Keywords.Add(keyword);
@@ -22,14 +18,14 @@ namespace Discord_Bot.Database.DBRepositories
         {
             return context.Keywords
                 .Include(kw => kw.Server)
-                .FirstOrDefaultAsync(kw => kw.Server.DiscordId == serverId.ToString() && kw.Trigger.Trim().ToLower() == trigger.Trim().ToLower());
+                .FirstOrDefaultAsync(kw => kw.Server.DiscordId == serverId.ToString() && kw.Trigger.Trim().Equals(trigger.Trim(), System.StringComparison.OrdinalIgnoreCase));
         }
 
         public Task<bool> KeywordExistsAsync(ulong serverId, string trigger)
         {
             return context.Keywords
                 .Include(kw => kw.Server)
-                .Where(kw => kw.Server.DiscordId == serverId.ToString() && kw.Trigger.Trim().ToLower() == trigger.Trim().ToLower())
+                .Where(kw => kw.Server.DiscordId == serverId.ToString() && kw.Trigger.Trim().Equals(trigger.Trim(), System.StringComparison.OrdinalIgnoreCase))
                 .AnyAsync();
         }
 

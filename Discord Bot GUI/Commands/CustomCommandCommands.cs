@@ -13,18 +13,13 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    internal class CustomCommandCommands : CommandBase
+    internal class CustomCommandCommands(Logging logger, Config config, ICustomCommandService customCommandService) : CommandBase(logger, config)
     {
-        private readonly ICustomCommandService customCommandService;
-
-        public CustomCommandCommands(Logging logger, Config config, ICustomCommandService customCommandService) : base(logger, config)
-        {
-            this.customCommandService = customCommandService;
-        }
+        private readonly ICustomCommandService customCommandService = customCommandService;
 
         [Command("custom list")]
         [RequireContext(ContextType.Guild)]
-        [Alias(new string[] { "customlist", "customcommands" })]
+        [Alias(["customlist", "customcommands"])]
         [Summary("Command to list out all the currently available commands")]
         public async Task CustomList()
         {

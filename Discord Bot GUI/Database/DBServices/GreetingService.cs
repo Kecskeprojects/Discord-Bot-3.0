@@ -12,13 +12,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices
 {
-    public class GreetingService : BaseService, IGreetingService
+    public class GreetingService(IGreetingRepository greetingRepository, IMapper mapper, Logging logger, Cache cache) : BaseService(mapper, logger, cache), IGreetingService
     {
-        private readonly IGreetingRepository greetingRepository;
-        public GreetingService(IGreetingRepository greetingRepository, IMapper mapper, Logging logger, Cache cache) : base(mapper, logger, cache)
-        {
-            this.greetingRepository = greetingRepository;
-        }
+        private readonly IGreetingRepository greetingRepository = greetingRepository;
 
         public async Task<List<GreetingResource>> GetAllGreetingAsync()
         {

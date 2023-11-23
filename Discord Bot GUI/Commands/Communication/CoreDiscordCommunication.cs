@@ -20,42 +20,28 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Communication
 {
-    internal class CoreDiscordCommunication : ICoreToDiscordCommunication
+    internal class CoreDiscordCommunication(
+        IServerService serverService,
+        IReminderService reminderService,
+        IBirthdayService birthdayService,
+        IKeywordService keywordService,
+        ICustomCommandService customCommandService,
+        IRoleService roleService,
+        IGreetingService greetingService,
+        DiscordSocketClient client,
+        IInstaLoader instaLoader,
+        Logging logger) : ICoreToDiscordCommunication
     {
-        private readonly IServerService serverService;
-        private readonly IReminderService reminderService;
-        private readonly IBirthdayService birthdayService;
-        private readonly IKeywordService keywordService;
-        private readonly ICustomCommandService customCommandService;
-        private readonly IRoleService roleService;
-        private readonly IGreetingService greetingService;
-        private readonly DiscordSocketClient client;
-        private readonly IInstaLoader instaLoader;
-        private readonly Logging logger;
-
-        public CoreDiscordCommunication(
-            IServerService serverService,
-            IReminderService reminderService,
-            IBirthdayService birthdayService,
-            IKeywordService keywordService,
-            ICustomCommandService customCommandService,
-            IRoleService roleService,
-            IGreetingService greetingService,
-            DiscordSocketClient client,
-            IInstaLoader instaLoader,
-            Logging logger)
-        {
-            this.serverService = serverService;
-            this.reminderService = reminderService;
-            this.birthdayService = birthdayService;
-            this.keywordService = keywordService;
-            this.customCommandService = customCommandService;
-            this.roleService = roleService;
-            this.greetingService = greetingService;
-            this.client = client;
-            this.instaLoader = instaLoader;
-            this.logger = logger;
-        }
+        private readonly IServerService serverService = serverService;
+        private readonly IReminderService reminderService = reminderService;
+        private readonly IBirthdayService birthdayService = birthdayService;
+        private readonly IKeywordService keywordService = keywordService;
+        private readonly ICustomCommandService customCommandService = customCommandService;
+        private readonly IRoleService roleService = roleService;
+        private readonly IGreetingService greetingService = greetingService;
+        private readonly DiscordSocketClient client = client;
+        private readonly IInstaLoader instaLoader = instaLoader;
+        private readonly Logging logger = logger;
 
         #region Timer Based Communication
         public async Task SendBirthdayMessages()
@@ -244,12 +230,21 @@ namespace Discord_Bot.Commands.Communication
             IMessageChannel channel = client.GetChannel(channelId) as IMessageChannel;
             InstagramMessageResult result = new();
 
-            List<FileAttachment> attachments = new();
+            List<FileAttachment> attachments = [];
             string postId = uri.Segments[2].EndsWith('/') ? uri.Segments[2][..^1] : uri.Segments[2];
 
             try
             {
-                instaLoader.DownloadFromInstagram(postId);
+                string errorDuringDownload = instaLoader.DownloadFromInstagram(postId);
+
+                if (!string.IsNullOrEmpty(errorDuringDownload))
+                {
+                    logger.Error("ServiceDiscordCommunication.cs GetImagesFromPost", errorDuringDownload);
+                    if (errorDuringDownload.Contains("Fetching Post metadata failed"))
+                    {
+                        await channel.SendMessageAsync("Posts cannot be accessed anonymously from this account.");
+                    }
+                }
 
                 string[] files = Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), $"Instagram\\{postId}"));
                 MessageReference refer = new(messageId, channelId, guildId, false);

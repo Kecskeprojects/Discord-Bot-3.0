@@ -11,14 +11,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class SelfRoleCommands : CommandBase, ISelfRoleCommands
+    public class SelfRoleCommands(IRoleService roleService, Logging logger, Config config) : CommandBase(logger, config), ISelfRoleCommands
     {
-        private readonly IRoleService roleService;
-
-        public SelfRoleCommands(IRoleService roleService, Logging logger, Config config) : base(logger, config)
-        {
-            this.roleService = roleService;
-        }
+        private readonly IRoleService roleService = roleService;
 
         [Command("self role add")]
         [RequireUserPermission(ChannelPermission.ManageRoles)]
@@ -29,7 +24,7 @@ namespace Discord_Bot.Commands
             try
             {
                 //Check if role with that name exists
-                IRole role = Context.Guild.Roles.Where(x => x.Name.ToLower() == name.ToLower()).FirstOrDefault();
+                IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
                 if (role != null)
                 {
@@ -67,7 +62,7 @@ namespace Discord_Bot.Commands
             try
             {
                 //Check if role with that name exists
-                IRole role = Context.Guild.Roles.Where(x => x.Name.ToLower() == name.ToLower()).FirstOrDefault();
+                IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
                 if (role != null)
                 {

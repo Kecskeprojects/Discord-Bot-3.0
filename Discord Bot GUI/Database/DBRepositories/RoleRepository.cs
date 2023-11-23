@@ -6,12 +6,8 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBRepositories
 {
-    public class RoleRepository : BaseRepository, IRoleRepository
+    public class RoleRepository(MainDbContext context) : BaseRepository(context), IRoleRepository
     {
-        public RoleRepository(MainDbContext context) : base(context)
-        {
-        }
-
         public async Task AddSelfRoleAsync(Role role)
         {
             context.Roles.Add(role);
@@ -22,7 +18,7 @@ namespace Discord_Bot.Database.DBRepositories
         {
             return context.Roles
                 .Include(r => r.Server)
-                .FirstOrDefaultAsync(r => r.Server.DiscordId == serverId.ToString() && r.RoleName.Trim().ToLower() == roleName.Trim().ToLower());
+                .FirstOrDefaultAsync(r => r.Server.DiscordId == serverId.ToString() && r.RoleName.Trim().Equals(roleName.Trim(), System.StringComparison.OrdinalIgnoreCase));
         }
 
         public async Task RemoveSelfRoleAsync(Role role)
