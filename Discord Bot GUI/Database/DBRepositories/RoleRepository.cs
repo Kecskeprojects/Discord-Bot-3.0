@@ -18,7 +18,7 @@ namespace Discord_Bot.Database.DBRepositories
         {
             return context.Roles
                 .Include(r => r.Server)
-                .FirstOrDefaultAsync(r => r.Server.DiscordId == serverId.ToString() && r.RoleName.Trim().Equals(roleName.Trim(), System.StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefaultAsync(r => r.Server.DiscordId == serverId.ToString() && r.RoleName.Trim().ToLower().Equals(roleName.Trim().ToLower()));
         }
 
         public async Task RemoveSelfRoleAsync(Role role)

@@ -19,7 +19,7 @@ namespace Discord_Bot.Database.DBRepositories
         {
             return context.CustomCommands
                 .Include(cc => cc.Server)
-                .Where(cc => cc.Server.DiscordId == serverId.ToString() && cc.Command.Trim().Equals(commandName.Trim(), System.StringComparison.OrdinalIgnoreCase))
+                .Where(cc => cc.Server.DiscordId == serverId.ToString() && cc.Command.Trim().ToLower().Equals(commandName.Trim().ToLower()))
                 .AnyAsync();
         }
 
@@ -27,7 +27,7 @@ namespace Discord_Bot.Database.DBRepositories
         {
             return context.CustomCommands
                 .Include(cc => cc.Server)
-                .FirstOrDefaultAsync(cc => cc.Server.DiscordId == serverId.ToString() && cc.Command.Trim().Equals(commandName.Trim(), System.StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefaultAsync(cc => cc.Server.DiscordId == serverId.ToString() && cc.Command.Trim().ToLower().Equals(commandName.Trim().ToLower()));
         }
 
         public Task<List<CustomCommand>> GetCustomCommandListAsync(ulong serverId)

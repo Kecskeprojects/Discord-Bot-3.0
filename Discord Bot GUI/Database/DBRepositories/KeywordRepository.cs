@@ -18,14 +18,14 @@ namespace Discord_Bot.Database.DBRepositories
         {
             return context.Keywords
                 .Include(kw => kw.Server)
-                .FirstOrDefaultAsync(kw => kw.Server.DiscordId == serverId.ToString() && kw.Trigger.Trim().Equals(trigger.Trim(), System.StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefaultAsync(kw => kw.Server.DiscordId == serverId.ToString() && kw.Trigger.Trim().ToLower().Equals(trigger.Trim().ToLower()));
         }
 
         public Task<bool> KeywordExistsAsync(ulong serverId, string trigger)
         {
             return context.Keywords
                 .Include(kw => kw.Server)
-                .Where(kw => kw.Server.DiscordId == serverId.ToString() && kw.Trigger.Trim().Equals(trigger.Trim(), System.StringComparison.OrdinalIgnoreCase))
+                .Where(kw => kw.Server.DiscordId == serverId.ToString() && kw.Trigger.Trim().ToLower().Equals(trigger.Trim().ToLower()))
                 .AnyAsync();
         }
 

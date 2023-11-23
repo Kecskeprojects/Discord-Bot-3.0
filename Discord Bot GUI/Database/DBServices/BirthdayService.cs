@@ -23,12 +23,13 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 Birthday birthday = await birthdayRepository.GetBirthdayAsync(serverId, userId);
+                DateOnly datePart = DateOnly.FromDateTime(date);
 
                 if (birthday != null)
                 {
-                    if (birthday.Date != date)
+                    if (birthday.Date != datePart)
                     {
-                        birthday.Date = date;
+                        birthday.Date = datePart;
                         await birthdayRepository.UpdateBirthdayAsync(birthday);
                         logger.Log("Birthday updated successfully!");
                         return DbProcessResultEnum.UpdatedExisting;
@@ -44,7 +45,7 @@ namespace Discord_Bot.Database.DBServices
                 birthday = new()
                 {
                     BirthdayId = 0,
-                    Date = date,
+                    Date = datePart,
                     User = user ?? new User() { DiscordId = userId.ToString() },
                     Server = server ?? new Server() { DiscordId = serverId.ToString() },
                 };

@@ -130,7 +130,7 @@ namespace Discord_Bot.Services
 
                 List<Uri> currImages = GetImages(main);
 
-                await GetVideos(main, articles, mainPos, videosBeforeMainCount, videoCount);
+                GetVideos(main, articles, mainPos, ref videosBeforeMainCount, ref videoCount);
 
                 Images.AddRange(currImages);
                 Videos.AddRange(TempVideos.Skip(videosBeforeMainCount).Take(videoCount));
@@ -143,7 +143,7 @@ namespace Discord_Bot.Services
             return "";
         }
 
-        private async Task GetVideos(IElement main, IHtmlCollection<IElement> articles, int mainPos, int videosBeforeMainCount, int videoCount)
+        private void GetVideos(IElement main, IHtmlCollection<IElement> articles, int mainPos, ref int videosBeforeMainCount, ref int videoCount)
         {
             //We also search for Videos in the post
             videoCount = main.QuerySelectorAll("div[data-testid]").Where(e => e.GetAttribute("data-testid") == "videoPlayer").Count();
@@ -158,9 +158,9 @@ namespace Discord_Bot.Services
             //As the video links are caught in the TwitterScraper_Response event handler,
             //the only way to verify if we got them all is to wait until the right amount of links are stored in the list
             int count = 0;
-            while (Videos.Count < videoCount + videosBeforeMainCount && count < 10)
+            while (TempVideos.Count < videoCount + videosBeforeMainCount && count < 10)
             {
-                await Task.Delay(500);
+                Task.Delay(500).Wait();
                 count++;
             }
         }
