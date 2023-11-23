@@ -31,11 +31,14 @@ namespace Discord_Bot.Database.DBRepositories
                 .ToListAsync();
         }
 
-        public Task<Reminder> GetUserReminderById(ulong userId, int reminderId)
+        public Task<Reminder> GetUserReminderById(ulong userId, int reminderOrderId)
         {
             return context.Reminders
                 .Include(r => r.User)
-                .FirstOrDefaultAsync(r => r.User.DiscordId == userId.ToString() && r.ReminderId == reminderId);
+                .Where(r => r.User.DiscordId == userId.ToString())
+                .OrderBy(r => r.Date)
+                .Skip(reminderOrderId - 1)
+                .FirstAsync();
         }
 
         public Task<List<Reminder>> GetUserReminderListAsync(ulong userId)
@@ -43,6 +46,7 @@ namespace Discord_Bot.Database.DBRepositories
             return context.Reminders
                 .Include(r => r.User)
                 .Where(r => r.User.DiscordId == userId.ToString())
+                .OrderBy(r => r.Date)
                 .ToListAsync();
         }
 

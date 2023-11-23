@@ -176,7 +176,7 @@ namespace Discord_Bot.Commands
                     int i = 1;
                     foreach (ReminderResource reminder in list)
                     {
-                        builder.AddField($"ID:{reminder.ReminderId}  {reminder.Date}", reminder.Message);
+                        builder.AddField($"#{i} {reminder.Date}", reminder.Message);
                         i++;
                     }
 
@@ -192,15 +192,14 @@ namespace Discord_Bot.Commands
         [Command("remind remove")]
         [Alias(["reminder remove"])]
         [Summary("Remove a reminder from the user's list of reminders")]
-        public async Task RemindRemove(int reminderId)
+        public async Task RemindRemove(int reminderOrderId)
         {
             try
             {
-                //Todo: Remake logic to be based on per person, ordered by date in ascending, and their order in that (e.g. 1 would be the 0th element after ordering
-                DbProcessResultEnum result = await reminderService.RemoveUserReminderAsync(Context.User.Id, reminderId);
+                DbProcessResultEnum result = await reminderService.RemoveUserReminderAsync(Context.User.Id, reminderOrderId);
                 if (result == DbProcessResultEnum.Success)
                 {
-                    await ReplyAsync($"Reminder with the ID {reminderId} has been removed!");
+                    await ReplyAsync($"Reminder in position #{reminderOrderId} has been removed!");
                 }
                 else if (result == DbProcessResultEnum.NotFound)
                 {

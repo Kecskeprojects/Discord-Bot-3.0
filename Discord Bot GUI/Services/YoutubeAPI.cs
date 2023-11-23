@@ -15,6 +15,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using System.Windows.Media;
 
 namespace Discord_Bot.Services
 {
@@ -220,6 +221,7 @@ namespace Discord_Bot.Services
         }
 
         //Searching by playlist ID
+        //Todo: Be able to choose where to start the 25 songs from
         private async Task<SearchResultEnum> PlaylistSearch(YouTubeService youtubeService, string query, string username, ulong serverId)
         {
             string currentKey = config.Youtube_API_Keys[youtubeIndex];
@@ -286,6 +288,8 @@ namespace Discord_Bot.Services
             try
             {
                 bool result = await serviceDiscordCommunication.YoutubeAddPlaylistMessage(channelId);
+
+                //Todo: Check if the given song is part of the first 25 songs that will be imported, and do not import it twice
                 if (result)
                 {
                     await PlaylistSearch(youtubeService, queryPart["list"], username, serverId);

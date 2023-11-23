@@ -109,22 +109,22 @@ namespace Discord_Bot.Database.DBServices
             return DbProcessResultEnum.Failure;
         }
 
-        public async Task<DbProcessResultEnum> RemoveUserReminderAsync(ulong userId, int reminderId)
+        public async Task<DbProcessResultEnum> RemoveUserReminderAsync(ulong userId, int reminderOrderId)
         {
             try
             {
-                Reminder reminder = await reminderRepository.GetUserReminderById(userId, reminderId);
+                Reminder reminder = await reminderRepository.GetUserReminderById(userId, reminderOrderId);
 
                 if (reminder != null)
                 {
                     await reminderRepository.RemoveReminderAsync(reminder);
 
-                    logger.Log($"Reminders removed by the following user: {userId}\nwith the following ID: {reminderId}");
+                    logger.Log($"Reminders removed by the following user: {userId}\nwith the following ID: {reminderOrderId}");
                     return DbProcessResultEnum.Success;
                 }
                 else
                 {
-                    logger.Log($"Reminder was not found with the following user: {userId}\nand reminder ID: {reminderId}");
+                    logger.Log($"Reminder was not found with the following user: {userId}\nand reminder ID: {reminderOrderId}");
                     return DbProcessResultEnum.NotFound;
                 }
             }
