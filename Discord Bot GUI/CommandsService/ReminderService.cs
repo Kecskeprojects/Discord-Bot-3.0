@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Discord_Bot.CommandsService
 {
@@ -10,7 +9,7 @@ namespace Discord_Bot.CommandsService
         public static List<string> GetAmountsList(string amountstring)
         {
             //Split amounts into a string list, accounting for accidental spaces
-            List<string> amounts = [..amountstring.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
+            List<string> amounts = [.. amountstring.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
 
             //Go through every element in the list and check
             //if the user missed a space between the number and the corresponding type

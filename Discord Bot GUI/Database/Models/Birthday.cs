@@ -11,7 +11,7 @@ public partial class Birthday
 
     public int UserId { get; set; }
 
-    public DateTime Date { get; set; }
+    public DateOnly Date { get; set; }
 
     public virtual Server Server { get; set; }
 

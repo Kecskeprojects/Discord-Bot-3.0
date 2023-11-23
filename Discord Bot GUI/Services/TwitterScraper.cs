@@ -37,13 +37,13 @@ namespace Discord_Bot.Services
                 Headless = true,
                 Args =
                 [
-                        "--no-sandbox",
-                        "--disable-setuid-sandbox",
-                        "--disable-web-security",
-                        "--disable-features=IsolateOrigins",
-                        "--disable-site-isolation-trials",
-                        "--disable-features=BlockInsecurePrivateNetworkRequests",
-                        "--ignore-certificate-errors"
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--disable-web-security",
+                    "--disable-features=IsolateOrigins",
+                    "--disable-site-isolation-trials",
+                    "--disable-features=BlockInsecurePrivateNetworkRequests",
+                    "--ignore-certificate-errors"
                 ],
                 ExecutablePath = "Chrome\\Win64-117.0.5938.62\\chrome-win64\\chrome.exe"
             });

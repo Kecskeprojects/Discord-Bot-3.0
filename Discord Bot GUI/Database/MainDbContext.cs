@@ -5,13 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Discord_Bot.Database;
 
-public partial class MainDbContext : DbContext
+public partial class MainDbContext(DbContextOptions<MainDbContext> options) : DbContext(options)
 {
-    public MainDbContext(DbContextOptions<MainDbContext> options)
-        : base(options)
-    {
-    }
-
     public virtual DbSet<Birthday> Birthdays { get; set; }
 
     public virtual DbSet<Channel> Channels { get; set; }
@@ -55,8 +50,6 @@ public partial class MainDbContext : DbContext
             entity.HasKey(e => e.BirthdayId).HasName("PK_BirthdayId");
 
             entity.ToTable("Birthday");
-
-            entity.Property(e => e.Date).HasColumnType("date");
 
             entity.HasOne(d => d.Server).WithMany(p => p.Birthdays)
                 .HasForeignKey(d => d.ServerId)

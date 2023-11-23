@@ -17,11 +17,11 @@ using System.Threading.Tasks;
 namespace Discord_Bot.Commands
 {
     public class AdminCommands(
-        IServerService serverService, 
-        IChannelService channelService, 
-        ITwitchChannelService twitchChannelService, 
-        ITwitchAPI twitchAPI, 
-        Logging logger, 
+        IServerService serverService,
+        IChannelService channelService,
+        ITwitchChannelService twitchChannelService,
+        ITwitchAPI twitchAPI,
+        Logging logger,
         Config config) : CommandBase(logger, config), IAdminCommands
     {
         private readonly IServerService serverService = serverService;
