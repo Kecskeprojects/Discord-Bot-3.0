@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Bot.CommandsService;
-using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
@@ -77,12 +75,12 @@ namespace Discord_Bot.Commands
             {
                 ulong sId = Context.Guild.Id;
                 ServerResource server = await serverService.GetByDiscordIdAsync(sId);
-                if (!Global.IsTypeOfChannel(server, Enums.ChannelTypeEnum.MusicText, Context.Channel.Id))
+                if (!Global.IsTypeOfChannel(server, Enums.ChannelTypeEnum.MusicText, sId))
                 {
                     return;
                 }
 
-                await audioService.ConnectBot(Context, server, Context.Guild.Id);
+                await audioService.ConnectBot(Context, server, sId);
             }
             catch (Exception ex)
             {
@@ -167,14 +165,7 @@ namespace Discord_Bot.Commands
                     return;
                 }
 
-                int elapsed = Convert.ToInt32(Global.ServerAudioResources[sId].AudioVariables.Stopwatch.Elapsed.TotalSeconds);
-                int hour = elapsed / 3600;
-                int minute = elapsed / 60 - hour * 60;
-                int second = elapsed - minute * 60 - hour * 3600;
-
-                string elapsed_time = "" + (hour > 0 ? hour + "h" : "") + minute + "m" + second + "s";
-
-                await VoiceService.NpEmbed(Context, Global.ServerAudioResources[sId].MusicRequests[0], elapsed_time);
+                await VoiceService.NpEmbed(Context.Channel, sId);
             }
             catch (Exception ex)
             {
@@ -259,38 +250,21 @@ namespace Discord_Bot.Commands
             }
         }
 
-
-
-        //Shuffle the current playlist
         [Command("shuffle")]
         [RequireContext(ContextType.Guild)]
+        [Summary("Shuffle the current playlist")]
         public async Task Shuffle()
         {
             try
             {
-                //Get the server's playlist, and remove the currently playing song, but saving it for later
-                List<MusicRequest> current = Global.ServerAudioResources[Context.Guild.Id].MusicRequests;
-                MusicRequest nowPlaying = current[0];
-                current.RemoveAt(0);
-
-                List<MusicRequest> shuffled = [];
-                int length = current.Count;
-                Random r = new();
-
-                //Go through the entire playlist once
-                for (int i = 0; i < length; i++)
+                ulong sId = Context.Guild.Id;
+                ServerResource server = await serverService.GetByDiscordIdAsync(sId);
+                if (!Global.IsTypeOfChannel(server, Enums.ChannelTypeEnum.MusicText, Context.Channel.Id) || Global.ServerAudioResources[sId].MusicRequests.Count < 2)
                 {
-                    //generate a random number, accounting for the slowly depleting current playlist
-                    int index = r.Next(0, current.Count);
-
-                    //Adding the randomly chosen song and removing it from the original list
-                    shuffled.Add(current[index]);
-                    current.RemoveAt(index);
+                    return;
                 }
 
-                //Adding back the currently playing song to the beginning and switching it out with the unshuffled one
-                shuffled.Insert(0, nowPlaying);
-                Global.ServerAudioResources[Context.Guild.Id].MusicRequests = shuffled;
+                VoiceService.ShufflePlaylist(sId);
 
                 await ReplyAsync("Shuffle complete!");
             }

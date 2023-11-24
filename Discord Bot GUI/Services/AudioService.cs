@@ -60,7 +60,7 @@ namespace Discord_Bot.Services
                 //Make embedded message if result was not a playlist and it's not the first song
                 if (Global.ServerAudioResources[context.Guild.Id].MusicRequests.Count > 1)
                 {
-                    await VoiceService.RequestEmbed(context, context.Guild.Id);
+                    await VoiceService.RequestEmbed(context.Channel, context.Guild.Id);
                 }
             }
             catch (Exception ex)
@@ -99,7 +99,7 @@ namespace Discord_Bot.Services
 
                         if (length > 3000)
                         {
-                            await Stream(context, current.URL.Split('&')[0]);
+                            await Stream(context.Guild.Id, current.URL.Split('&')[0]);
                         }
                         else
                         {
@@ -207,9 +207,8 @@ namespace Discord_Bot.Services
             return false;
         }
 
-        private async Task Stream(SocketCommandContext context, string url)
+        private async Task Stream(ulong sId, string url)
         {
-            ulong sId = context.Guild.Id;
             try
             {
                 Global.ServerAudioResources[sId].AudioVariables.FFmpeg = youtubeDownloadService.CreateYoutubeStream(url);

@@ -1,9 +1,10 @@
 ﻿using Discord;
-using Discord.Commands;
+using Discord.WebSocket;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Enums;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
@@ -12,7 +13,7 @@ namespace Discord_Bot.CommandsService
 {
     public class VoiceService
     {
-        public static async Task RequestEmbed(SocketCommandContext context, ulong sId)
+        public static async Task RequestEmbed(ISocketMessageChannel channel, ulong sId)
         {
             MusicRequest request = Global.ServerAudioResources[sId].MusicRequests.Last();
             int count = Global.ServerAudioResources[sId].MusicRequests.Count;
@@ -34,24 +35,33 @@ namespace Discord_Bot.CommandsService
             builder.WithTimestamp(DateTime.Now);
             builder.WithColor(Color.Red);
 
-            await context.Channel.SendMessageAsync("", false, builder.Build());
+            await channel.SendMessageAsync("", false, builder.Build());
         }
 
-        public static async Task NpEmbed(SocketCommandContext Context, MusicRequest item, string elapsed_time)
+        public static async Task NpEmbed(ISocketMessageChannel channel, ulong sId)
         {
+            MusicRequest nowPlaying = Global.ServerAudioResources[sId].MusicRequests[0];
+
+            int elapsed = Convert.ToInt32(Global.ServerAudioResources[sId].AudioVariables.Stopwatch.Elapsed.TotalSeconds);
+            int hour = elapsed / 3600;
+            int minute = elapsed / 60 - hour * 60;
+            int second = elapsed - minute * 60 - hour * 3600;
+
+            string elapsed_time = "" + (hour > 0 ? hour + "h" : "") + minute + "m" + second + "s";
+
             EmbedBuilder builder = new();
-            builder.WithTitle(item.Title);
-            builder.WithUrl(item.URL);
+            builder.WithTitle(nowPlaying.Title);
+            builder.WithUrl(nowPlaying.URL);
 
-            builder.WithThumbnailUrl(item.Thumbnail);
+            builder.WithThumbnailUrl(nowPlaying.Thumbnail);
 
-            builder.AddField("Requested by:", item.User, false);
-            builder.AddField("Song duration:", elapsed_time + " / " + item.Duration[2..].ToLower(), false);
+            builder.AddField("Requested by:", nowPlaying.User, false);
+            builder.AddField("Song duration:", elapsed_time + " / " + nowPlaying.Duration[2..].ToLower(), false);
 
             builder.WithTimestamp(DateTime.Now);
             builder.WithColor(Color.DarkBlue);
 
-            await Context.Channel.SendMessageAsync("", false, builder.Build());
+            await channel.SendMessageAsync("", false, builder.Build());
         }
 
         public static EmbedBuilder CreateQueueEmbed(int index, ulong sId, int songcount)
@@ -106,6 +116,33 @@ namespace Discord_Bot.CommandsService
                 SearchResultEnum.YoutubeSearchNotFound => "Youtube video/playlist not found!",
                 _ => "Unexpected result for search!"
             };
+        }
+
+        public static void ShufflePlaylist(ulong sId)
+        {
+            //Get the server's playlist, and remove the currently playing song, but saving it for later
+            List<MusicRequest> current = [.. Global.ServerAudioResources[sId].MusicRequests];
+            MusicRequest nowPlaying = current[0];
+            current.RemoveAt(0);
+
+            List<MusicRequest> shuffled = [];
+            int length = current.Count;
+            Random r = new();
+
+            //Go through the entire playlist once
+            for (int i = 0; i < length; i++)
+            {
+                //generate a random number, accounting for the slowly depleting current playlist
+                int index = r.Next(0, current.Count);
+
+                //Adding the randomly chosen song and removing it from the original list
+                shuffled.Add(current[index]);
+                current.RemoveAt(index);
+            }
+
+            //Adding back the currently playing song to the beginning and switching it out with the unshuffled one
+            shuffled.Insert(0, nowPlaying);
+            Global.ServerAudioResources[sId].MusicRequests = shuffled;
         }
     }
 }
