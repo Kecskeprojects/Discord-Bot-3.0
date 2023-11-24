@@ -15,7 +15,6 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
-using System.Windows.Media;
 
 namespace Discord_Bot.Services
 {
@@ -34,7 +33,7 @@ namespace Discord_Bot.Services
         //Main function starting the api request
         public async Task<SearchResultEnum> Searching(string query, string username, ulong serverId, ulong channelId)
         {
-            logger.Query("=======================================================================");
+            logger.Query("============================================================================");
             logger.Query("YouTube Data API: Search");
             SearchResultEnum result = SearchResultEnum.YoutubeNotFound;
 
@@ -48,7 +47,7 @@ namespace Discord_Bot.Services
                 {
                     logger.Query("All api key's limits have been exceeded!");
                 }
-                logger.Query("=======================================================================");
+                logger.Query("============================================================================");
             }
             catch (Exception ex)
             {
@@ -152,9 +151,6 @@ namespace Discord_Bot.Services
 
             if (searchListResponse.Items == null || searchListResponse.Items.Count < 1)
             {
-                logger.Query("No videos found or it is unlisted/private!");
-                //Todo: Move message to Command level
-                //await context.Channel.SendMessageAsync("No videos found or it is unlisted/private!");
                 return SearchResultEnum.YoutubeNotFound;
             }
 
@@ -199,10 +195,7 @@ namespace Discord_Bot.Services
 
             if (searchListResponse.Items == null || searchListResponse.Items.Count < 1)
             {
-                logger.Query("No videos/playlists found or it is unlisted/private!");
-                //Todo: Move message to Command level
-                //await context.Channel.SendMessageAsync("No videos/playlists found or it is unlisted/private!");
-                return SearchResultEnum.YoutubeNotFound;
+                return SearchResultEnum.YoutubeSearchNotFound;
             }
 
             logger.Query("Youtube keyword query Complete!");
@@ -245,9 +238,6 @@ namespace Discord_Bot.Services
 
             if (searchListResponse.Items == null || searchListResponse.Items.Count < 1)
             {
-                logger.Query("No playlist found or it is unlisted/private!");
-                //Todo: Move message to Command level
-                //await context.Channel.SendMessageAsync("No playlist found or it is unlisted/private!");
                 return SearchResultEnum.YoutubeNotFound;
             }
 
@@ -255,10 +245,6 @@ namespace Discord_Bot.Services
             {
                 await VideoSearch(youtubeService, item.ContentDetails.VideoId, username, serverId);
             }
-
-            logger.Query("Youtube playlist query Complete!");
-            //Todo: Move message to Command level
-            //await context.Channel.SendMessageAsync("Playlist added!");
 
             return SearchResultEnum.YoutubePlaylistFound;
         }
@@ -270,7 +256,7 @@ namespace Discord_Bot.Services
 
             //Filter for trigger words
             string[] filterWords = config.Youtube_Filter_Words;
-            if (!filterWords.Any(query.ToLower().Contains))
+            if (filterWords != null && !filterWords.Any(query.ToLower().Contains))
             {
                 List<SearchResult> filteredList = items.Where(result => !filterWords.Any(result.Snippet.Title.ToLower().Contains)).ToList();
                 if (!CollectionTools.IsNullOrEmpty(filteredList))

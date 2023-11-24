@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TwitchLib.Api.Services;
@@ -164,9 +165,7 @@ namespace Discord_Bot.Services
 
                 if (TokenTick % 120 == 0)
                 {
-                    logger.Log("===================================");
                     logger.Log("120 queries have been completed!");
-                    logger.Log("===================================");
                 }
 
                 if (TokenTick % 5 == 0)
@@ -222,9 +221,10 @@ namespace Discord_Bot.Services
                     UseShellExecute = false,
                     CreateNoWindow = true,
                     FileName = "cmd.exe",
-                    Arguments = "/C Dependencies\\twitch.exe token",
+                    Arguments = "/C twitch.exe token",
                     RedirectStandardError = true,
-                    RedirectStandardOutput = true
+                    RedirectStandardOutput = true,
+                    WorkingDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Dependencies")
                 }
             };
             process.Start();
@@ -246,9 +246,10 @@ namespace Discord_Bot.Services
                     UseShellExecute = false,
                     CreateNoWindow = true,
                     FileName = "cmd.exe",
-                    Arguments = $"/C Dependencies\\twitch.exe api get users?login={username.ToLower()}",
+                    Arguments = $"/C twitch.exe api get users?login={username.ToLower()}",
                     RedirectStandardError = true,
-                    RedirectStandardOutput = true
+                    RedirectStandardOutput = true,
+                    WorkingDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Dependencies")
                 }
             };
             process.Start();

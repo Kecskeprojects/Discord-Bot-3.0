@@ -4,17 +4,17 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Kim Synthji" Height="450" Width="800">
+        Title="Kim Synthji" Height="600" Width="1000">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="450*"/>
+            <RowDefinition Height="600*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="440*"/>
-            <ColumnDefinition Width="360*"/>
+            <ColumnDefinition Width="700*"/>
+            <ColumnDefinition Width="300*"/>
         </Grid.ColumnDefinitions>
         <ScrollViewer x:Name="MainLog" Background="Black" CanContentScroll="True" Grid.Column="0" Grid.Row="0" ScrollChanged="ScrollViewer_ScrollChanged" Margin="0,0,0,0">
-            <TextBlock x:Name="MainLogText" TextWrapping="Wrap" Foreground="White"/>
+            <TextBlock x:Name="MainLogText" TextWrapping="Wrap" Foreground="White" />
         </ScrollViewer>
         <ToolBar x:Name="MainToolBar" Grid.Column="1" Grid.Row="0" Height="20" VerticalAlignment="Top" ToolBarTray.IsLocked="True" Loaded="ToolBar_Loaded"/>
         <Button Grid.Column="1" Grid.Row="0" Content="Button" Click="WriteLog" Margin="0,0,10,10" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="40"/>

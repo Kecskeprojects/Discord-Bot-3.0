@@ -8,6 +8,7 @@
         SpotifyVideoFound = 3,
         YoutubePlaylistFound = 4,
         SpotifyPlaylistFound = 5,
-        SpotifyFoundYoutubeNotFound = 6
+        SpotifyFoundYoutubeNotFound = 6,
+        YoutubeSearchNotFound = 7
     }
 }

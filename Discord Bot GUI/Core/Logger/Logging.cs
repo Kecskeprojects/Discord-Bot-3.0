@@ -12,7 +12,6 @@ namespace Discord_Bot.Core.Logger
         //List of logs, before they are cleared
         public readonly List<Log> Logs = [];
 
-
         #region Bot Logging
         public void Log(string message, bool ConsoleOnly = false, bool LogOnly = false)
         {
@@ -71,7 +70,6 @@ namespace Discord_Bot.Core.Logger
         }
         #endregion
 
-
         #region Message Logging
         public void MesUser(string message, string server = "DM")
         {
@@ -93,7 +91,6 @@ namespace Discord_Bot.Core.Logger
             Logs.Add(log);
         }
         #endregion
-
 
         #region Error Logging
         public void Error(string location, string message, bool ConsoleOnly = false, bool LogOnly = false)

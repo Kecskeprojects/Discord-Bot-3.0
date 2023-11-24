@@ -69,6 +69,8 @@ namespace Discord_Bot.Core
             collection.AddScoped<IPictureHandler, PictureHandler>();
             collection.AddScoped<IInstaLoader, InstaLoader>();
             collection.AddScoped<IWordOfTheDayService, WordOfTheDayService>();
+            collection.AddScoped<IAudioService, AudioService>();
+            collection.AddScoped<IYoutubeDownloadService, YoutubeDownloadService>();
 
             //Database
             collection.AddScoped<IServerRepository, ServerRepository>();
