@@ -25,7 +25,7 @@ Voice Commands:
 !p [url/keyword]	Play music
 !join				Join to your channel
 !leave				Leaves your channel
-!queue				Current queue
+!queue [page]		Current queue
 !np					Now playing
 !clear				Clears queue
 !skip				Skip song
@@ -66,6 +66,7 @@ Admin Commands:
 !twitch remove [type] [channel name/role name]	Unset a channel for a given type, some only allow one per server
 !self role add [role]							Adds a role from the server's self role list
 !self role remove [role]						Removes a role from the server's self role list
+!update role message							Updates the message found in the roles channel, if one is currently set
 !keyword add `[keyword]` `[response]`			Adds new keyword to list
 !keyword remove [keyword]						Removes keyword from list
 !server settings								Lists the current settings of the server

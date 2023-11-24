@@ -7,7 +7,7 @@ namespace Discord_Bot.Database;
 
 public partial class MainDbContext : DbContext
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0290:Use primary constructor", Justification = "<Pending>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0290:Use primary constructor", Justification = "Generated file")]
     public MainDbContext(DbContextOptions<MainDbContext> options)
         : base(options)
     {
@@ -285,9 +285,12 @@ public partial class MainDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
+            entity.Property(e => e.RoleMessageDiscordId)
+                .HasMaxLength(20)
+                .IsUnicode(false);
 
-            entity.HasOne(d => d.Role).WithMany(p => p.Servers)
-                .HasForeignKey(d => d.RoleId)
+            entity.HasOne(d => d.NotificationRole).WithMany(p => p.Servers)
+                .HasForeignKey(d => d.NotificationRoleId)
                 .HasConstraintName("FK_Server_Role");
         });
 

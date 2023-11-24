@@ -39,12 +39,12 @@ namespace Discord_Bot.Database.DBServices
                     Servers = new List<Server>()
                 };
 
-                if (role.RoleId == server.RoleId)
+                if (role.RoleId == server.NotificationRoleId)
                 {
                     return DbProcessResultEnum.AlreadyExists;
                 }
 
-                server.Role = role;
+                server.NotificationRole = role;
 
                 await serverRepository.UpdateServerAsync(server);
 
@@ -123,12 +123,12 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 Server server = await serverRepository.GetByDiscordIdAsync(serverId);
-                if (server == null || server.RoleId == null)
+                if (server == null || server.NotificationRoleId == null)
                 {
                     return DbProcessResultEnum.NotFound;
                 }
 
-                server.Role = null;
+                server.NotificationRole = null;
 
                 await serverRepository.UpdateServerAsync(server);
 

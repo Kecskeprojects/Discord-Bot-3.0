@@ -7,6 +7,7 @@ using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices
@@ -58,6 +59,21 @@ namespace Discord_Bot.Database.DBServices
             catch (Exception ex)
             {
                 logger.Error("RoleService.cs GetRoleAsync", ex.ToString());
+            }
+            return result;
+        }
+
+        public async Task<List<RoleResource>> GetServerRolesAsync(ulong serverId)
+        {
+            List<RoleResource> result = null;
+            try
+            {
+                List<Role> role = await roleRepository.GetServerRolesAsync(serverId);
+                result = mapper.Map<List<Role>, List<RoleResource>>(role);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("RoleService.cs GetServerRolesAsync", ex.ToString());
             }
             return result;
         }

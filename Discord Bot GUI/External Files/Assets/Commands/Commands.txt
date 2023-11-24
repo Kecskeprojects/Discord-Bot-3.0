@@ -24,7 +24,7 @@ Voice Commands:
 !p [url/keyword]	Play music
 !join	Join to your channel
 !leave	Leaves your channel
-!queue	Current queue
+!queue [page]	Current queue
 !np	Now playing
 !clear	Clears queue
 !skip	Skip song

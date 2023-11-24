@@ -1,6 +1,7 @@
 ﻿using Discord_Bot.Database.Models;
 using Discord_Bot.Interfaces.DBRepositories;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,6 +20,14 @@ namespace Discord_Bot.Database.DBRepositories
             return context.Roles
                 .Include(r => r.Server)
                 .FirstOrDefaultAsync(r => r.Server.DiscordId == serverId.ToString() && r.RoleName.Trim().ToLower().Equals(roleName.Trim().ToLower()));
+        }
+
+        public Task<List<Role>> GetServerRolesAsync(ulong serverId)
+        {
+            return context.Roles
+                .Include(r => r.Server)
+                .Where(r => r.Server.DiscordId == serverId.ToString())
+                .ToListAsync();
         }
 
         public async Task RemoveSelfRoleAsync(Role role)

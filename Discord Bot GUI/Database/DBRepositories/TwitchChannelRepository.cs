@@ -19,7 +19,7 @@ namespace Discord_Bot.Database.DBRepositories
         {
             return context.TwitchChannels
                 .Include(tc => tc.Server)
-                .ThenInclude(tc => tc.Role)
+                .ThenInclude(tc => tc.NotificationRole)
                 .ToListAsync();
         }
 

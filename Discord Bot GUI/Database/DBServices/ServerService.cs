@@ -38,6 +38,28 @@ namespace Discord_Bot.Database.DBServices
             return DbProcessResultEnum.Failure;
         }
 
+        public async Task<DbProcessResultEnum> ChangeRoleMessageIdAsync(ulong serverId, ulong messageId)
+        {
+            try
+            {
+                Server server = await serverRepository.GetByDiscordIdAsync(serverId);
+
+                server.RoleMessageDiscordId = messageId.ToString();
+
+                await serverRepository.UpdateServerAsync(server);
+
+                cache.RemoveCachedEntityManually(serverId);
+
+                return DbProcessResultEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("ServerService.cs ChangeRoleMessageIdAsync", ex.ToString());
+            }
+
+            return DbProcessResultEnum.Failure;
+        }
+
         public async Task<ServerResource> GetByDiscordIdAsync(ulong serverId)
         {
             ServerResource result = null;

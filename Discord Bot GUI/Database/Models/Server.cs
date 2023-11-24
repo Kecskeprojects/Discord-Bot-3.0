@@ -9,7 +9,9 @@ public partial class Server
 
     public string DiscordId { get; set; }
 
-    public int? RoleId { get; set; }
+    public int? NotificationRoleId { get; set; }
+
+    public string RoleMessageDiscordId { get; set; }
 
     public virtual ICollection<Birthday> Birthdays { get; set; } = new List<Birthday>();
 
@@ -19,7 +21,7 @@ public partial class Server
 
     public virtual ICollection<Keyword> Keywords { get; set; } = new List<Keyword>();
 
-    public virtual Role Role { get; set; }
+    public virtual Role NotificationRole { get; set; }
 
     public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
 

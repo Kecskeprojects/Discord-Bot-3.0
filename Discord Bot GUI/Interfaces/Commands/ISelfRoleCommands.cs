@@ -7,5 +7,6 @@ namespace Discord_Bot.Interfaces.Commands
     {
         Task SelfRoleAdd([Remainder] string name);
         Task SelfRoleRemove([Remainder] string name);
+        Task SendSelfRoleMessage();
     }
 }

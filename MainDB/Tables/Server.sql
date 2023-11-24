@@ -2,8 +2,9 @@
 (
 	[ServerId] INT NOT NULL IDENTITY, 
     [DiscordId] VARCHAR(20) NOT NULL,
-    [RoleId] INT NULL, 
+    [NotificationRoleId] INT NULL, 
+    [RoleMessageDiscordId] VARCHAR(20) NULL, 
     CONSTRAINT [PK_ServerId] PRIMARY KEY ([ServerId]),
     CONSTRAINT [UQ_ServerDiscordId] UNIQUE ([DiscordId]),
-    CONSTRAINT [FK_Server_Role] FOREIGN KEY ([RoleId]) REFERENCES [Role]([RoleId])
+    CONSTRAINT [FK_Server_Role] FOREIGN KEY ([NotificationRoleId]) REFERENCES [Role]([RoleId])
 )

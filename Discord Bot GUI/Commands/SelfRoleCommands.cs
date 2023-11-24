@@ -1,19 +1,26 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Rest;
+using Discord.WebSocket;
+using Discord_Bot.CommandsService;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Resources;
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class SelfRoleCommands(IRoleService roleService, Logging logger, Config config) : CommandBase(logger, config), ISelfRoleCommands
+    public class SelfRoleCommands(IRoleService roleService, IServerService serverService, Logging logger, Config config) : CommandBase(logger, config), ISelfRoleCommands
     {
         private readonly IRoleService roleService = roleService;
+        private readonly IServerService serverService = serverService;
 
         [Command("self role add")]
         [RequireUserPermission(ChannelPermission.ManageRoles)]
@@ -88,6 +95,52 @@ namespace Discord_Bot.Commands
             catch (Exception ex)
             {
                 logger.Error("AdminCommands.cs SelfRoleRemove", ex.ToString());
+            }
+        }
+
+        [Command("update role message")]
+        [RequireUserPermission(ChannelPermission.ManageRoles)]
+        [RequireContext(ContextType.Guild)]
+        [Summary("Sends a message of the roles that currently can be self assigned")]
+        public async Task SendSelfRoleMessage()
+        {
+            try
+            {
+                ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+
+                if (!server.SettingsChannels.TryGetValue(ChannelTypeEnum.RoleText, out List<ulong> roleChannels))
+                {
+                    return;
+                }
+
+                ISocketMessageChannel channel = Context.Client.GetChannel(roleChannels[0]) as ISocketMessageChannel;
+                if (server.RoleMessageDiscordId.HasValue)
+                {
+                    IMessage previousMessage = await channel.GetMessageAsync(server.RoleMessageDiscordId.Value);
+                    if(previousMessage != null)
+                    {
+                        await channel.DeleteMessageAsync(previousMessage);
+                    }
+                }
+
+                List<RoleResource> roles = await roleService.GetServerRolesAsync(Context.Guild.Id);
+
+                string message = RoleService.CreateRoleMessage(roles);
+                RestUserMessage newMessage = await channel.SendMessageAsync(message);
+
+                DbProcessResultEnum result = await serverService.ChangeRoleMessageIdAsync(Context.Guild.Id, newMessage.Id);
+                if (result == DbProcessResultEnum.Success)
+                {
+                    await ReplyAsync($"The role message has been updated.");
+                }
+                else
+                {
+                    await ReplyAsync("Role could not be updated!");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("AdminCommands.cs SendSelfRoleMessage", ex.ToString());
             }
         }
     }
