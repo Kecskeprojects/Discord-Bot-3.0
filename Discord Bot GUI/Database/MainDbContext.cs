@@ -5,8 +5,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Discord_Bot.Database;
 
-public partial class MainDbContext(DbContextOptions<MainDbContext> options) : DbContext(options)
+public partial class MainDbContext : DbContext
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0290:Use primary constructor", Justification = "<Pending>")]
+    public MainDbContext(DbContextOptions<MainDbContext> options)
+        : base(options)
+    {
+    }
+
     public virtual DbSet<Birthday> Birthdays { get; set; }
 
     public virtual DbSet<Channel> Channels { get; set; }
@@ -38,8 +44,6 @@ public partial class MainDbContext(DbContextOptions<MainDbContext> options) : Db
     public virtual DbSet<TwitchChannel> TwitchChannels { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
-
-    public virtual DbSet<UserBias> UserBiases { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -345,23 +349,23 @@ public partial class MainDbContext(DbContextOptions<MainDbContext> options) : Db
                 .HasMaxLength(100)
                 .IsUnicode(false)
                 .HasColumnName("LastFMUsername");
-        });
 
-        modelBuilder.Entity<UserBias>(entity =>
-        {
-            entity.HasKey(e => e.UserBiasId).HasName("PK_UserBiasId");
-
-            entity.ToTable("UserBias");
-
-            entity.HasOne(d => d.Idol).WithMany(p => p.UserBiases)
-                .HasForeignKey(d => d.IdolId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_UserBias_Idol");
-
-            entity.HasOne(d => d.User).WithMany(p => p.UserBiases)
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_UserBias_User");
+            entity.HasMany(d => d.Idols).WithMany(p => p.Users)
+                .UsingEntity<Dictionary<string, object>>(
+                    "UserBias",
+                    r => r.HasOne<Idol>().WithMany()
+                        .HasForeignKey("IdolId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_UserBias_Idol"),
+                    l => l.HasOne<User>().WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_UserBias_User"),
+                    j =>
+                    {
+                        j.HasKey("UserId", "IdolId").HasName("PK_UserId_IdolId");
+                        j.ToTable("UserBias");
+                    });
         });
 
         OnModelCreatingPartial(modelBuilder);

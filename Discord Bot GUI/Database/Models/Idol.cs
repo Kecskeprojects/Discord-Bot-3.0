@@ -17,5 +17,5 @@ public partial class Idol
 
     public virtual ICollection<IdolImage> IdolImages { get; set; } = new List<IdolImage>();
 
-    public virtual ICollection<UserBias> UserBiases { get; set; } = new List<UserBias>();
+    public virtual ICollection<User> Users { get; set; } = new List<User>();
 }

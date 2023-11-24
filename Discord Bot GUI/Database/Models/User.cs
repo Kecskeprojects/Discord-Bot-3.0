@@ -15,5 +15,5 @@ public partial class User
 
     public virtual ICollection<Reminder> Reminders { get; set; } = new List<Reminder>();
 
-    public virtual ICollection<UserBias> UserBiases { get; set; } = new List<UserBias>();
+    public virtual ICollection<Idol> Idols { get; set; } = new List<Idol>();
 }
