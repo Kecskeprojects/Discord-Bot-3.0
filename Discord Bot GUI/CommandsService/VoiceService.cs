@@ -44,8 +44,8 @@ namespace Discord_Bot.CommandsService
 
             int elapsed = Convert.ToInt32(Global.ServerAudioResources[sId].AudioVariables.Stopwatch.Elapsed.TotalSeconds);
             int hour = elapsed / 3600;
-            int minute = elapsed / 60 - hour * 60;
-            int second = elapsed - minute * 60 - hour * 3600;
+            int minute = (elapsed / 60) - (hour * 60);
+            int second = elapsed - (minute * 60) - (hour * 3600);
 
             string elapsed_time = "" + (hour > 0 ? hour + "h" : "") + minute + "m" + second + "s";
 
@@ -93,8 +93,8 @@ namespace Discord_Bot.CommandsService
             }
 
             int hour = time / 3600;
-            int minute = time / 60 - hour * 60; ;
-            int second = time - minute * 60 - hour * 3600;
+            int minute = (time / 60) - (hour * 60); ;
+            int second = time - (minute * 60) - (hour * 3600);
             builder.AddField("Full duration:", "" + (hour > 0 ? hour + "h" : "") + minute + "m" + second + "s", true);
 
             builder.WithTimestamp(DateTime.Now);

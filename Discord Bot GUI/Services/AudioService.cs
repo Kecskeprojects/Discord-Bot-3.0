@@ -1,17 +1,17 @@
-﻿using Discord.Commands;
+﻿using Discord.Audio;
+using Discord.Commands;
 using Discord.WebSocket;
-using Discord_Bot.Communication;
-using Discord_Bot.Core.Logger;
-using Discord_Bot.Core;
-using System;
-using System.Threading.Tasks;
-using Discord_Bot.Interfaces.Services;
-using Discord.Audio;
-using System.Diagnostics;
 using Discord_Bot.CommandsService;
-using Discord_Bot.Enums;
+using Discord_Bot.Communication;
+using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
+using Discord_Bot.Core.Logger;
+using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Discord_Bot.Services
 {
@@ -32,21 +32,19 @@ namespace Discord_Bot.Services
         {
             try
             {
-                if (input == "" || (context.User as SocketGuildUser).VoiceChannel == null) return;
+                if (input == "" || (context.User as SocketGuildUser).VoiceChannel == null)
+                {
+                    return;
+                }
 
                 input = input.Replace("<", "").Replace(">", "");
 
                 //In case of a spotify link, do a spotify API query before the youtube API query
                 SearchResultEnum result;
                 string username = Global.GetNickName(context.Channel, context.User);
-                if (input.Contains("spotify.com"))
-                {
-                    result = await spotifyAPI.SpotifySearch(input, context.Guild.Id, context.Channel.Id, username);
-                }
-                else
-                {
-                    result = await youtubeAPI.Searching(input, username, context.Guild.Id, context.Channel.Id);
-                }
+                result = input.Contains("spotify.com")
+                    ? await spotifyAPI.SpotifySearch(input, context.Guild.Id, context.Channel.Id, username)
+                    : await youtubeAPI.Searching(input, username, context.Guild.Id, context.Channel.Id);
 
                 string resultMessage = VoiceService.GetResultMessage(result);
 
@@ -74,7 +72,10 @@ namespace Discord_Bot.Services
             try
             {
                 //If function returns false, it means it could not connect correctly for some reason
-                if (!await ConnectBot(context, server, sId)) return;
+                if (!await ConnectBot(context, server, sId))
+                {
+                    return;
+                }
 
                 while (Global.ServerAudioResources[sId].MusicRequests.Count > 0)
                 {
@@ -82,8 +83,8 @@ namespace Discord_Bot.Services
                     {
                         await Task.Delay(5000);
 
-                        if (!await ReConnectBot(context.Guild, sId)) 
-                        { 
+                        if (!await ReConnectBot(context.Guild, sId))
+                        {
                             throw new Exception("Bot could not reconnect after gateway disconnect");
                         }
                     }
@@ -161,7 +162,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                var clientUser = await context.Channel.GetUserAsync(context.Client.CurrentUser.Id) as SocketGuildUser;
+                SocketGuildUser clientUser = await context.Channel.GetUserAsync(context.Client.CurrentUser.Id) as SocketGuildUser;
                 if (clientUser.VoiceChannel != null)
                 {
                     logger.Log("Disconnected due to Error.");
@@ -176,9 +177,9 @@ namespace Discord_Bot.Services
         {
             try
             {
-                var clientUser = await context.Channel.GetUserAsync(context.Client.CurrentUser.Id) as SocketGuildUser;
+                SocketGuildUser clientUser = await context.Channel.GetUserAsync(context.Client.CurrentUser.Id) as SocketGuildUser;
 
-                var channel = (context.User as SocketGuildUser).VoiceChannel;
+                SocketVoiceChannel channel = (context.User as SocketGuildUser).VoiceChannel;
 
                 if (clientUser.VoiceChannel != null)
                 {
@@ -260,7 +261,7 @@ namespace Discord_Bot.Services
         {
             try
             {
-                var channel = guild.GetVoiceChannel(Global.ServerAudioResources[sId].AudioVariables.FallbackVoiceChannelId);
+                SocketVoiceChannel channel = guild.GetVoiceChannel(Global.ServerAudioResources[sId].AudioVariables.FallbackVoiceChannelId);
 
                 Global.ServerAudioResources[sId].AudioVariables.AudioClient = await channel.ConnectAsync();
 

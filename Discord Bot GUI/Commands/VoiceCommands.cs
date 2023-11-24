@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Bot.CommandsService;
@@ -11,6 +9,8 @@ using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
+using System;
+using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
@@ -105,13 +105,13 @@ namespace Discord_Bot.Commands
 
                 Global.ServerAudioResources[sId].MusicRequests.Clear();
 
-                var clientUser = await Context.Channel.GetUserAsync(Context.Client.CurrentUser.Id);
+                IUser clientUser = await Context.Channel.GetUserAsync(Context.Client.CurrentUser.Id);
                 await (clientUser as SocketGuildUser).VoiceChannel.DisconnectAsync();
 
                 Global.ServerAudioResources[sId].AudioVariables.FFmpeg.Kill();
                 Global.ServerAudioResources[sId].AudioVariables.Output.Dispose();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("VoiceCommands.cs Leave", ex.ToString());
             }
@@ -137,14 +137,14 @@ namespace Discord_Bot.Commands
                 int songcount = Global.ServerAudioResources[sId].MusicRequests.Count;
 
                 //If queue does not have songs on that page, do not show a queue
-                if (index * 10 <= songcount || (index - 1) * 10 < songcount && index * 10 >= songcount)
+                if (index * 10 <= songcount || ((index - 1) * 10 < songcount && index * 10 >= songcount))
                 {
                     EmbedBuilder builder = VoiceService.CreateQueueEmbed(index, sId, songcount);
 
                     await ReplyAsync("", false, builder.Build());
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("VoiceCommands.cs Queue", ex.ToString());
             }
