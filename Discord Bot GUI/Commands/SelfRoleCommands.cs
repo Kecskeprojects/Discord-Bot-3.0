@@ -117,7 +117,7 @@ namespace Discord_Bot.Commands
                 if (server.RoleMessageDiscordId.HasValue)
                 {
                     IMessage previousMessage = await channel.GetMessageAsync(server.RoleMessageDiscordId.Value);
-                    if(previousMessage != null)
+                    if (previousMessage != null)
                     {
                         await channel.DeleteMessageAsync(previousMessage);
                     }
