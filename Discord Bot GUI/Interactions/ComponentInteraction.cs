@@ -19,7 +19,10 @@ namespace Discord_Bot.Interactions
             try
             {
                 logger.Log($"Bias menu item selected with following parameters: {count}, {string.Join(",", selectedBiasGroups)}", LogOnly: true);
-                if (count > 1) return;
+                if (count > 1)
+                {
+                    return;
+                }
 
                 List<IdolResource> biases;
                 if (selectedBiasGroups[0].Contains("><"))

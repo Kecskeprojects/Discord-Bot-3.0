@@ -33,7 +33,10 @@ namespace Discord_Bot.Commands
                 string biasName = biasData.ToLower().Split('-')[0].Trim();
                 string biasGroup = biasData.ToLower().Split('-')[1].Trim();
 
-                if (string.IsNullOrEmpty(biasName) || string.IsNullOrEmpty(biasGroup)) return;
+                if (string.IsNullOrEmpty(biasName) || string.IsNullOrEmpty(biasGroup))
+                {
+                    return;
+                }
 
                 DbProcessResultEnum result = await idolService.AddBiasAsync(biasName, biasGroup);
                 if (result == DbProcessResultEnum.Success)

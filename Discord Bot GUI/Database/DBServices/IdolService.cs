@@ -2,7 +2,6 @@
 using Discord_Bot.Communication;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Core.Logger;
-using Discord_Bot.Database.DBRepositories;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBRepositories;
@@ -35,10 +34,10 @@ namespace Discord_Bot.Database.DBServices
                 IdolGroup group = await idolGroupRepository.GetGroupAsync(biasGroup);
 
                 group ??= new()
-                    {
-                        GroupId = 0,
-                        Name = biasGroup,
-                    };
+                {
+                    GroupId = 0,
+                    Name = biasGroup,
+                };
 
                 Idol idol = new()
                 {
@@ -64,12 +63,12 @@ namespace Discord_Bot.Database.DBServices
             {
                 List<Idol> idols = await idolRepository.GetBiasesByNameAndGroupAsync(biasName, biasGroup);
 
-                if(idols.Count == 0)
+                if (idols.Count == 0)
                 {
                     logger.Log($"Idol [{biasName}]-[{biasGroup}] could not be found!");
                     return DbProcessResultEnum.NotFound;
                 }
-                else if(idols.Count > 1)
+                else if (idols.Count > 1)
                 {
                     logger.Log($"Idol [{biasName}]-[{biasGroup}] returned multiple results!");
                     return DbProcessResultEnum.MultipleResults;
