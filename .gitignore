@@ -398,8 +398,7 @@ FodyWeavers.xsd
 *.sln.iml
 
 #Personal
-/database.sql
 /Kim_Synthji.ico
-/Last_Release.sql
 Patch/
 PostDeployment/
+/Latest_Release.sql

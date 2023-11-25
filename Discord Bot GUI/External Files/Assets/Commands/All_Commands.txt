@@ -72,6 +72,8 @@ Admin Commands:
 !server settings								Lists the current settings of the server
 !biaslist add [name]-[group]					Add bias to global list of biases
 !biaslist remove [name]-[group]					Remove bias from global list of biases
+!bias alias add [alias]-[name]-[group]			Add bias alias to global list of bias aliases
+!bias alias remove [alias]-[name]-[group]		Remove bias alias from global list of bias aliases
 !birthday add [user ID] [date]					Add birthday for server
 !birthday remove [user ID]						Remove birthday from server
 

@@ -9,20 +9,20 @@ namespace Discord_Bot.Database.DBRepositories
 {
     public class IdolRepository(MainDbContext context) : BaseRepository(context), IIdolRepository
     {
-        public async Task AddBiasAsync(Idol idol)
+        public async Task AddIdolAsync(Idol idol)
         {
             context.Idols.Add(idol);
             await context.SaveChangesAsync();
         }
 
-        public Task<List<Idol>> GetBiasesByGroupAsync(string groupName)
+        public Task<List<Idol>> GetIdolsByGroupAsync(string groupName)
         {
             return context.Idols
                 .Include(i => i.Group)
                 .Where(i => string.IsNullOrEmpty(groupName) || i.Group.Name == groupName)
                 .ToListAsync();
         }
-        public Task<List<Idol>> GetBiasesByNamesAsync(string[] nameList)
+        public Task<List<Idol>> GetIdolsByNamesAsync(string[] nameList)
         {
             return context.Idols
                 .Include(i => i.Users)
@@ -32,17 +32,17 @@ namespace Discord_Bot.Database.DBRepositories
                 .ToListAsync();
         }
 
-        public Task<List<Idol>> GetBiasesByNameAndGroupAsync(string biasName, string biasGroup)
+        public Task<List<Idol>> GetIdolsByNameAndGroupAsync(string idolName, string idolGroup)
         {
             return context.Idols
                 .Include(i => i.Users)
                 .Include(i => i.IdolAliases)
                 .Include(i => i.Group)
-                .Where(i => (string.IsNullOrEmpty(biasGroup) || biasGroup == i.Group.Name) && (i.Name == biasName || i.IdolAliases.FirstOrDefault(ia => ia.Alias == biasName) != null))
+                .Where(i => (string.IsNullOrEmpty(idolGroup) || idolGroup == i.Group.Name) && (i.Name == idolName || i.IdolAliases.FirstOrDefault(ia => ia.Alias == idolName) != null))
                 .ToListAsync();
         }
 
-        public Task<List<Idol>> GetUserBiasesListAsync(ulong userId, string groupName)
+        public Task<List<Idol>> GetUserIdolsListAsync(ulong userId, string groupName)
         {
             return context.Idols
                 .Include(i => i.Users)
@@ -51,11 +51,11 @@ namespace Discord_Bot.Database.DBRepositories
                 .ToListAsync();
         }
 
-        public Task<bool> IdolExistsAsync(string biasName, string biasGroup)
+        public Task<bool> IdolExistsAsync(string idolName, string idolGroup)
         {
             return context.Idols
                 .Include(i => i.Group)
-                .Where(i => i.Name == biasName && i.Group.Name == biasGroup)
+                .Where(i => i.Name == idolName && i.Group.Name == idolGroup)
                 .AnyAsync();
 
         }
@@ -66,11 +66,25 @@ namespace Discord_Bot.Database.DBRepositories
             await context.SaveChangesAsync();
         }
 
-        public Task<Idol> GetBiasByNameAndGroupAsync(string biasName, string biasGroup)
+        public Task<Idol> GetIdolByNameAndGroupAsync(string idolName, string idolGroup)
         {
             return context.Idols
                 .Include(i => i.Group)
-                .FirstOrDefaultAsync(i => i.Name == biasName && i.Group.Name == biasGroup);
+                .FirstOrDefaultAsync(i => i.Name == idolName && i.Group.Name == idolGroup);
+        }
+
+        public Task<Idol> GetIdolWithAliasesAsync(string idolName, string idolGroup)
+        {
+            return context.Idols
+                .Include(i => i.IdolAliases)
+                .Include(i => i.Group)
+                .FirstOrDefaultAsync(i => idolGroup == i.Group.Name && i.Name == idolName);
+        }
+
+        public async Task UpdateIdolAsync(Idol idol)
+        {
+            context.Idols.Update(idol);
+            await context.SaveChangesAsync();
         }
     }
 }

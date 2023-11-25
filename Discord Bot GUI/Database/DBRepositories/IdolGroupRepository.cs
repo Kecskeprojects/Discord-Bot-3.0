@@ -7,10 +7,10 @@ namespace Discord_Bot.Database.DBRepositories
 {
     public class IdolGroupRepository(MainDbContext context) : BaseRepository(context), IIdolGroupRepository
     {
-        public Task<IdolGroup> GetGroupAsync(string biasGroup)
+        public Task<IdolGroup> GetGroupAsync(string idolGroup)
         {
             return context.IdolGroups
-                .FirstOrDefaultAsync(ig => ig.Name == biasGroup);
+                .FirstOrDefaultAsync(ig => ig.Name == idolGroup);
         }
     }
 }

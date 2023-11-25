@@ -8,13 +8,13 @@ namespace Discord_Bot.Interfaces.DBServices
 {
     public interface IIdolService
     {
-        Task<DbProcessResultEnum> AddBiasAsync(string biasName, string biasGroup);
-        Task<DbProcessResultEnum> AddUserBiasAsync(ulong userId, string biasName, string biasGroup);
-        Task<DbProcessResultEnum> ClearUserBiasAsync(ulong userId);
-        Task<List<IdolResource>> GetBiasesByGroupAsync(string groupName);
-        Task<ListWithDbResult<UserResource>> GetUsersWithBiasesAsync(string[] nameList);
-        Task<DbProcessResultEnum> RemoveBiasAsync(string biasName, string biasGroup);
-        Task<List<IdolResource>> GetUserBiasesListAsync(ulong userId, string groupName);
-        Task<DbProcessResultEnum> RemoveUserBiasAsync(ulong userId, string biasName, string biasGroup);
+        Task<DbProcessResultEnum> AddIdolAsync(string idolName, string idolGroup);
+        Task<DbProcessResultEnum> AddUserIdolAsync(ulong userId, string idolName, string idolGroup);
+        Task<DbProcessResultEnum> ClearUserIdolAsync(ulong userId);
+        Task<List<IdolResource>> GetIdolsByGroupAsync(string groupName);
+        Task<ListWithDbResult<UserResource>> GetUsersWithIdolsAsync(string[] nameList);
+        Task<DbProcessResultEnum> RemoveIdolAsync(string idolName, string idolGroup);
+        Task<List<IdolResource>> GetUserIdolsListAsync(ulong userId, string groupName);
+        Task<DbProcessResultEnum> RemoveUserIdolAsync(ulong userId, string idolName, string idolGroup);
     }
 }

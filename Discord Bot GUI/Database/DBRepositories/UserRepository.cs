@@ -13,7 +13,7 @@ namespace Discord_Bot.Database.DBRepositories
                 .FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
         }
 
-        public Task<User> GetUserWithBiasesByDiscordIdAsync(ulong userId)
+        public Task<User> GetUserWithIdolsByDiscordIdAsync(ulong userId)
         {
             return context.Users
                 .Include(u => u.Idols)

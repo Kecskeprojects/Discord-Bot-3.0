@@ -5,6 +5,6 @@ namespace Discord_Bot.Interfaces.DBRepositories
 {
     public interface IIdolGroupRepository
     {
-        Task<IdolGroup> GetGroupAsync(string biasGroup);
+        Task<IdolGroup> GetGroupAsync(string idolGroup);
     }
 }

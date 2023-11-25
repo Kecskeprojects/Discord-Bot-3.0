@@ -17,9 +17,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class BiasCommands(Logging logger, Config config, IIdolService biasService) : BaseCommand(logger, config), IBiasCommands
+    public class BiasCommands(Logging logger, Config config, IIdolService idolService) : BaseCommand(logger, config), IBiasCommands
     {
-        private readonly IIdolService idolService = biasService;
+        private readonly IIdolService idolService = idolService;
 
         #region Admin permission bias commands
         [Command("biaslist add")]
@@ -38,7 +38,7 @@ namespace Discord_Bot.Commands
                     return;
                 }
 
-                DbProcessResultEnum result = await idolService.AddBiasAsync(biasName, biasGroup);
+                DbProcessResultEnum result = await idolService.AddIdolAsync(biasName, biasGroup);
                 if (result == DbProcessResultEnum.Success)
                 {
                     await ReplyAsync("Bias added to list!");
@@ -71,7 +71,7 @@ namespace Discord_Bot.Commands
                 string biasGroup = biasData.ToLower().Split('-')[1].Trim();
 
                 //Try removing them from the database
-                DbProcessResultEnum result = await idolService.RemoveBiasAsync(biasName, biasGroup);
+                DbProcessResultEnum result = await idolService.RemoveIdolAsync(biasName, biasGroup);
                 if (result == DbProcessResultEnum.Success)
                 {
                     await ReplyAsync("Bias removed from list!");
@@ -113,7 +113,7 @@ namespace Discord_Bot.Commands
                     biasName = biasData.ToLower().Trim();
                 }
 
-                DbProcessResultEnum result = await idolService.AddUserBiasAsync(Context.User.Id, biasName, biasGroup);
+                DbProcessResultEnum result = await idolService.AddUserIdolAsync(Context.User.Id, biasName, biasGroup);
                 if (result == DbProcessResultEnum.Success)
                 {
                     await ReplyAsync("Bias added to your list of biases!");
@@ -165,7 +165,7 @@ namespace Discord_Bot.Commands
                     biasName = biasData.ToLower().Trim();
                 }
 
-                DbProcessResultEnum result = await idolService.RemoveUserBiasAsync(Context.User.Id, biasName, biasGroup);
+                DbProcessResultEnum result = await idolService.RemoveUserIdolAsync(Context.User.Id, biasName, biasGroup);
                 if (result == DbProcessResultEnum.Success)
                 {
                     await ReplyAsync("Bias removed from your list of biases!");
@@ -195,7 +195,7 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                DbProcessResultEnum result = await idolService.ClearUserBiasAsync(Context.User.Id);
+                DbProcessResultEnum result = await idolService.ClearUserIdolAsync(Context.User.Id);
                 if (result == DbProcessResultEnum.Success)
                 {
                     await ReplyAsync("Your biases have been cleared!");
@@ -219,7 +219,7 @@ namespace Discord_Bot.Commands
             try
             {
                 //Get your list of biases
-                List<IdolResource> list = await idolService.GetUserBiasesListAsync(Context.User.Id, groupName.ToLower().Trim());
+                List<IdolResource> list = await idolService.GetUserIdolsListAsync(Context.User.Id, groupName.ToLower().Trim());
 
                 //Check if you have any
                 if (CollectionTools.IsNullOrEmpty(list))
@@ -280,7 +280,7 @@ namespace Discord_Bot.Commands
             try
             {
                 //Get the global list of biases
-                List<IdolResource> idols = await idolService.GetBiasesByGroupAsync(groupName.ToLower().Trim());
+                List<IdolResource> idols = await idolService.GetIdolsByGroupAsync(groupName.ToLower().Trim());
 
                 //Check if we have any items on the list
                 if (idols.Count == 0)
@@ -319,7 +319,7 @@ namespace Discord_Bot.Commands
                 string[] nameList = biasNames.ToLower().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
                 //Get the users that have the bias with the following names, if the bias exists
-                ListWithDbResult<UserResource> result = await idolService.GetUsersWithBiasesAsync(nameList);
+                ListWithDbResult<UserResource> result = await idolService.GetUsersWithIdolsAsync(nameList);
 
                 if (result.ProcessResultEnum == DbProcessResultEnum.NotFound)
                 {
