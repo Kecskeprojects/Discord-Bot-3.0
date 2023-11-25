@@ -33,10 +33,7 @@ namespace Discord_Bot
         private static DiscordSocketClient client;
         private InteractionService interactions;
         private CommandService commands;
-        private MainWindow mainWindow;
         private Thread twitchThread;
-        private ICoreLogic coreLogic;
-        private ICoreToDiscordCommunication discordCommunication;
         private static int minutesCount = 0;
         #endregion
 
@@ -54,10 +51,11 @@ namespace Discord_Bot
             client = services.GetService<DiscordSocketClient>();
             interactions = services.GetService<InteractionService>();
             commands = services.GetService<CommandService>();
-            mainWindow = services.GetRequiredService<MainWindow>();
-            coreLogic = services.GetService<ICoreLogic>();
-            discordCommunication = services.GetService<ICoreToDiscordCommunication>();
 
+            using IServiceScope scope = services.CreateScope();
+            ICoreLogic coreLogic = scope.ServiceProvider.GetService<ICoreLogic>();
+
+            MainWindow mainWindow = scope.ServiceProvider.GetRequiredService<MainWindow>();
             mainWindow.Show();
 
             logger.Log("App started!");
@@ -85,6 +83,9 @@ namespace Discord_Bot
         {
             try
             {
+                using IServiceScope scope = services.CreateScope();
+                ICoreLogic coreLogic = scope.ServiceProvider.GetService<ICoreLogic>();
+
                 coreLogic.Closing();
                 base.OnExit(e);
             }
@@ -96,6 +97,9 @@ namespace Discord_Bot
 
             try
             {
+                using IServiceScope scope = services.CreateScope();
+                ICoreLogic coreLogic = scope.ServiceProvider.GetService<ICoreLogic>();
+
                 coreLogic.Closing();
                 base.OnSessionEnding(e);
             }
@@ -133,6 +137,9 @@ namespace Discord_Bot
         {
             try
             {
+                using IServiceScope scope = services.CreateScope();
+                ICoreLogic coreLogic = scope.ServiceProvider.GetService<ICoreLogic>();
+                ICoreToDiscordCommunication discordCommunication = scope.ServiceProvider.GetService<ICoreToDiscordCommunication>();
                 if (client.LoginState == LoginState.LoggedOut)
                 {
                     logger.Log("Attempting to connect bot after disconnect.");
@@ -292,6 +299,10 @@ namespace Discord_Bot
                 {
                     logger.MesUser(context.Message.Content);
                 }
+
+                using IServiceScope scope = services.CreateScope();
+                ICoreLogic coreLogic = scope.ServiceProvider.GetService<ICoreLogic>();
+                ICoreToDiscordCommunication discordCommunication = scope.ServiceProvider.GetService<ICoreToDiscordCommunication>();
 
                 //If message is not private message, and the server is not in our database, add it
                 ServerResource server = null;
