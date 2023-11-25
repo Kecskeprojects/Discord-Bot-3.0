@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Discord.Interactions;
+﻿using Discord.Interactions;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
-using Discord_Bot.Interactions;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Discord_Bot.Modules.Interactions
+namespace Discord_Bot.Interactions
 {
     public class ComponentInteraction(Logging logger, Config config, IIdolService biasService) : BaseInteraction(logger, config)
     {
@@ -37,16 +36,19 @@ namespace Discord_Bot.Modules.Interactions
                 message += $"{selectedBiasGroups[0].Split("><")[0].ToUpper()}:\n";
 
                 //Add individual members
-                foreach (var member in biases)
+                foreach (IdolResource member in biases)
                 {
-                    if (member != biases[0]) message += ", ";
+                    if (member != biases[0])
+                    {
+                        message += ", ";
+                    }
 
                     message += $"`{member.Name.ToUpper()}`";
                 }
 
                 await Context.Interaction.RespondAsync(message);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("ComponentInteraction.cs BiasMenuHandler", ex.ToString());
             }

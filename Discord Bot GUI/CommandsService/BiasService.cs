@@ -11,12 +11,15 @@ namespace Discord_Bot.CommandsService
         public static BiasMessageResult BuildBiasMessage(List<IdolResource> list, string groupName, string headMessage, ulong userId, bool isUser)
         {
             SortedDictionary<string, List<string>> groups = [];
-            foreach (var bias in list)
+            foreach (IdolResource bias in list)
             {
                 if (bias.Group != null)
                 {
                     //Check if key exists for group, if not, make it
-                    if (!groups.ContainsKey(bias.Group.Name)) groups.Add(bias.Group.Name, []);
+                    if (!groups.ContainsKey(bias.Group.Name))
+                    {
+                        groups.Add(bias.Group.Name, []);
+                    }
 
                     //We make the name uppercase when adding
                     groups[bias.Group.Name].Add(bias.Name.ToUpper());
@@ -24,7 +27,10 @@ namespace Discord_Bot.CommandsService
                 else
                 {
                     //Check if key exists for group, if not, make it
-                    if (!groups.ContainsKey("unsorted")) groups.Add("unsorted", []);
+                    if (!groups.ContainsKey("unsorted"))
+                    {
+                        groups.Add("unsorted", []);
+                    }
 
                     //We make the name uppercase when adding
                     groups["unsorted"].Add(bias.Name.ToUpper());
@@ -35,15 +41,18 @@ namespace Discord_Bot.CommandsService
             {
                 //Make a list out of all the groups and their members
                 string message = "";
-                foreach (var group in groups)
+                foreach (KeyValuePair<string, List<string>> group in groups)
                 {
                     //Add Group name
                     message += $"{group.Key.ToUpper()}:\n";
 
                     //Add individual members
-                    foreach (var member in group.Value)
+                    foreach (string member in group.Value)
                     {
-                        if (member != group.Value[0]) message += ", ";
+                        if (member != group.Value[0])
+                        {
+                            message += ", ";
+                        }
 
                         message += $"`{member}`";
                     }
@@ -56,12 +65,12 @@ namespace Discord_Bot.CommandsService
             {
                 int selectCount = 0;
                 List<string> keys = [.. groups.Keys];
-                var builder = new ComponentBuilder();
+                ComponentBuilder builder = new();
                 while (Math.Ceiling(keys.Count / 25.0) > selectCount)
                 {
-                    int remaininglistCount = (groups.Keys.Count - selectCount * 25) > 25 ? (selectCount + 1 * 25) : selectCount * 25 + (groups.Keys.Count - selectCount * 25);
+                    int remaininglistCount = (groups.Keys.Count - (selectCount * 25)) > 25 ? (selectCount + (1 * 25)) : (selectCount * 25) + (groups.Keys.Count - (selectCount * 25));
                     //Make a selector out of all the groups and their members
-                    var menuBuilder = new SelectMenuBuilder()
+                    SelectMenuBuilder menuBuilder = new SelectMenuBuilder()
                     .WithPlaceholder("Select a group")
                     .WithCustomId($"biasMenu_{selectCount + 1}");
 

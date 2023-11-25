@@ -1,19 +1,18 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using System;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Linq;
-using Discord_Bot.Interfaces.Commands;
-using Discord_Bot.Core.Logger;
-using Discord_Bot.Core.Config;
-using Discord_Bot.Resources;
-using Discord_Bot.Communication;
-using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.CommandsService;
+using Discord_Bot.Communication;
 using Discord_Bot.Core;
+using Discord_Bot.Core.Config;
+using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Commands;
+using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Resources;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
@@ -222,13 +221,19 @@ namespace Discord_Bot.Commands
                 groupName = groupName.ToLower();
 
                 //Get your list of biases
-                var list = idolService.UserBiasesListAsync(Context.User.Id, groupName);
+                List<IdolResource> list = idolService.UserBiasesListAsync(Context.User.Id, groupName);
 
                 //Check if you have any
                 if (list == null)
                 {
-                    if (groupName != "") await ReplyAsync("No biases from that group are in your list!");
-                    else await ReplyAsync("You do not have any biases set yet!");
+                    if (groupName != "")
+                    {
+                        await ReplyAsync("No biases from that group are in your list!");
+                    }
+                    else
+                    {
+                        await ReplyAsync("You do not have any biases set yet!");
+                    }
 
                     return;
                 }
@@ -287,7 +292,7 @@ namespace Discord_Bot.Commands
                 }
 
                 BiasMessageResult result = BiasService.BuildBiasMessage(idols, groupName, "Which group do you want to see?", Context.User.Id, false);
-                if(result.Builder == null)
+                if (result.Builder == null)
                 {
                     await ReplyAsync(result.Message);
                 }
@@ -317,7 +322,7 @@ namespace Discord_Bot.Commands
 
                 //Get the users that have the bias with the following names, if the bias exists
                 ListWithDbResult<UserResource> result = idolService.GetUsersWithBiasesAsync(nameList);
-                
+
                 if (result.ProcessResultEnum == Enums.DbProcessResultEnum.NotFound)
                 {
                     await ReplyAsync("No bias found with that name/those names!");
@@ -354,7 +359,10 @@ namespace Discord_Bot.Commands
                         {
                             message += user.Mention + " ";
                         }
-                        else continue;
+                        else
+                        {
+                            continue;
+                        }
                     }
 
                     //delete command and send mentions
