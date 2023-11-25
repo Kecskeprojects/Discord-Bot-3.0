@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Communication
 {
-    internal class CoreDiscordCommunication(
+    public class CoreDiscordCommunication(
         IServerService serverService,
         IReminderService reminderService,
         IBirthdayService birthdayService,

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBRepositories
 {
-    internal class TwitchChannelRepository(MainDbContext context) : BaseRepository(context), ITwitchChannelRepository
+    public class TwitchChannelRepository(MainDbContext context) : BaseRepository(context), ITwitchChannelRepository
     {
         public async Task AddTwitchChannelAsync(TwitchChannel channel)
         {
