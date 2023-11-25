@@ -23,7 +23,7 @@ namespace Discord_Bot.Interactions
                 {
                     string name = selectedBiasGroups[0].Split("><")[0];
                     ulong userId = ulong.Parse(selectedBiasGroups[0].Split("><")[1]);
-                    biases = await biasService.GetUserBiasesByGroupAsync(name, userId);
+                    biases = await biasService.GetUserBiasesListAsync(userId, name);
                 }
                 else
                 {

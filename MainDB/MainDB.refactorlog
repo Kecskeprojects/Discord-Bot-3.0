@@ -217,4 +217,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="NotificationRoleId" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="a02117af-ec52-4c04-ac61-345129bf4fe3" ChangeDateTime="11/25/2023 12:06:53">
+    <Property Name="ElementName" Value="[dbo].[Birthday].[CreatedOn]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Birthday]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Createdn" />
+  </Operation>
 </Operations>

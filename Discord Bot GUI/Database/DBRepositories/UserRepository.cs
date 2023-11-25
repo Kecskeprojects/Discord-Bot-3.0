@@ -12,5 +12,18 @@ namespace Discord_Bot.Database.DBRepositories
             return context.Users
                 .FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
         }
+
+        public Task<User> getUserWithBiasesByDiscordIdAsync(ulong userId)
+        {
+            return context.Users
+                .Include(u => u.Idols)
+                .FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
+        }
+
+        public async Task UpdateUserAsync(User user)
+        {
+            context.Users.Update(user);
+            await context.SaveChangesAsync();
+        }
     }
 }

@@ -13,27 +13,25 @@ namespace Discord_Bot.CommandsService
             SortedDictionary<string, List<string>> groups = [];
             foreach (IdolResource bias in list)
             {
-                if (bias.Group != null)
+                if (bias.GroupName != null)
                 {
                     //Check if key exists for group, if not, make it
-                    if (!groups.ContainsKey(bias.Group.Name))
+                    if (!groups.TryGetValue(bias.GroupName, out List<string> memberList))
                     {
-                        groups.Add(bias.Group.Name, []);
+                        groups.Add(bias.GroupName, []);
                     }
 
-                    //We make the name uppercase when adding
-                    groups[bias.Group.Name].Add(bias.Name.ToUpper());
+                    memberList.Add(bias.Name.ToUpper());
                 }
                 else
                 {
                     //Check if key exists for group, if not, make it
-                    if (!groups.ContainsKey("unsorted"))
+                    if (!groups.TryGetValue("unsorted", out List<string> memberList))
                     {
                         groups.Add("unsorted", []);
                     }
 
-                    //We make the name uppercase when adding
-                    groups["unsorted"].Add(bias.Name.ToUpper());
+                    memberList.Add(bias.Name.ToUpper());
                 }
             }
 

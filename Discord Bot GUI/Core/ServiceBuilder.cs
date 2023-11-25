@@ -96,6 +96,7 @@ namespace Discord_Bot.Core
             collection.AddScoped<IBirthdayRepository, BirthdayRepository>();
             collection.AddScoped<IIdolService, IdolService>();
             collection.AddScoped<IIdolRepository, IdolRepository>();
+            collection.AddScoped<IIdolGroupRepository, IdolGroupRepository>();
 
             //Commands
             collection.AddScoped<IServiceToDiscordCommunication, ServiceDiscordCommunication>();

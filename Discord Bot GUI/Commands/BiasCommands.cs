@@ -29,11 +29,8 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                //Make the name lowercase and clear and accidental spaces
-                biasData = biasData.ToLower().Trim();
-
-                string biasName = biasData.Split('-')[0];
-                string biasGroup = biasData.Split('-')[1];
+                string biasName = biasData.ToLower().Split('-')[0].Trim();
+                string biasGroup = biasData.ToLower().Split('-')[1].Trim();
 
                 DbProcessResultEnum result = await idolService.AddBiasAsync(biasName, biasGroup);
                 if (result == DbProcessResultEnum.Success)
@@ -64,11 +61,8 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                //Make the name lowercase and clear and accidental spaces
-                biasData = biasData.ToLower().Trim();
-
-                string biasName = biasData.Split('-')[0];
-                string biasGroup = biasData.Split('-')[1];
+                string biasName = biasData.ToLower().Split('-')[0].Trim();
+                string biasGroup = biasData.ToLower().Split('-')[1].Trim();
 
                 //Try removing them from the database
                 DbProcessResultEnum result = await idolService.RemoveBiasAsync(biasName, biasGroup);
@@ -124,7 +118,14 @@ namespace Discord_Bot.Commands
                 }
                 else if (result == DbProcessResultEnum.AlreadyExists)
                 {
-                    await ReplyAsync("You already have this bias on your list!");
+                    if (string.IsNullOrEmpty(biasGroup))
+                    {
+                        await ReplyAsync("You already have this bias on your list!");
+                    }
+                    else
+                    {
+                        await ReplyAsync("A bias with that name was found in your list, but you did not specify a group! (format: [name]-[group])");
+                    }
                 }
                 else if (result == DbProcessResultEnum.NotFound)
                 {
@@ -161,7 +162,7 @@ namespace Discord_Bot.Commands
                     biasName = biasData.ToLower().Trim();
                 }
 
-                DbProcessResultEnum result = await idolService.AddUserBiasAsync(Context.User.Id, biasName, biasGroup);
+                DbProcessResultEnum result = await idolService.RemoveUserBiasAsync(Context.User.Id, biasName, biasGroup);
                 if (result == DbProcessResultEnum.Success)
                 {
                     await ReplyAsync("Bias removed from your list of biases!");
@@ -173,10 +174,6 @@ namespace Discord_Bot.Commands
                 else if (result == DbProcessResultEnum.PartialNotFound)
                 {
                     await ReplyAsync("You do not have this bias on your list!");
-                }
-                else if (result == DbProcessResultEnum.NotFound)
-                {
-                    await ReplyAsync("Bias not in database!");
                 }
                 else
                 {
@@ -218,10 +215,8 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                groupName = groupName.ToLower();
-
                 //Get your list of biases
-                List<IdolResource> list = idolService.UserBiasesListAsync(Context.User.Id, groupName);
+                List<IdolResource> list = await idolService.GetUserBiasesListAsync(Context.User.Id, groupName.ToLower().Trim());
 
                 //Check if you have any
                 if (list == null)
@@ -282,13 +277,13 @@ namespace Discord_Bot.Commands
             try
             {
                 //Get the global list of biases
-                List<IdolResource> idols = await idolService.GetBiasesByGroupAsync(groupName.ToLower());
+                List<IdolResource> idols = await idolService.GetBiasesByGroupAsync(groupName.ToLower().Trim());
 
                 //Check if we have any items on the list
                 if (idols.Count == 0)
                 {
                     if (groupName != "") { await ReplyAsync("No biases from that group are in the database!"); }
-                    else { await ReplyAsync("No biases have been added yet!"); }
+                    else { await ReplyAsync("No biases have been added to database yet!"); }
                 }
 
                 BiasMessageResult result = BiasService.BuildBiasMessage(idols, groupName, "Which group do you want to see?", Context.User.Id, false);
@@ -317,17 +312,16 @@ namespace Discord_Bot.Commands
             try
             {
                 //Make the name lowercase and split up names
-                biasNames = biasNames.ToLower();
-                string[] nameList = biasNames.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                string[] nameList = biasNames.ToLower().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
                 //Get the users that have the bias with the following names, if the bias exists
-                ListWithDbResult<UserResource> result = idolService.GetUsersWithBiasesAsync(nameList);
+                ListWithDbResult<UserResource> result = await idolService.GetUsersWithBiasesAsync(nameList);
 
-                if (result.ProcessResultEnum == Enums.DbProcessResultEnum.NotFound)
+                if (result.ProcessResultEnum == DbProcessResultEnum.NotFound)
                 {
                     await ReplyAsync("No bias found with that name/those names!");
                 }
-                else if (result.ProcessResultEnum == Enums.DbProcessResultEnum.Failure || result.List == null)
+                else if (result.ProcessResultEnum == DbProcessResultEnum.Failure || result.List == null)
                 {
                     await ReplyAsync("Exception during search for users!");
                 }
