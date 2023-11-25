@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class ChatCommands(IWordOfTheDayService wordOfTheDayService, Logging logger, Config config) : CommandBase(logger, config), IChatCommands
+    public class ChatCommands(IWordOfTheDayService wordOfTheDayService, Logging logger, Config config) : BaseCommand(logger, config), IChatCommands
     {
         private readonly IWordOfTheDayService wordOfTheDayService = wordOfTheDayService;
 

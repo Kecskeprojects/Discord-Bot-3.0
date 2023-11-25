@@ -4,7 +4,7 @@ using Discord_Bot.Core.Logger;
 
 namespace Discord_Bot.Commands
 {
-    public class CommandBase(Logging logger, Config config) : ModuleBase<SocketCommandContext>
+    public class BaseCommand(Logging logger, Config config) : ModuleBase<SocketCommandContext>
     {
         protected readonly Logging logger = logger;
         protected readonly Config config = config;

@@ -14,11 +14,12 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class TwitterScraperCommands(Logging logger, Config config) : CommandBase(logger, config)
+    public class TwitterScraperCommands(Logging logger, Config config) : BaseCommand(logger, config)
     {
         private static readonly string[] baseURLs = ["https://twitter.com/", "https://x.com/"];
 
         [Command("twt")]
+        [Summary("For embedding twitter messages, replacing the built in discord embeds")]
         public async Task ScrapeFromUrl([Remainder] string message)
         {
             try

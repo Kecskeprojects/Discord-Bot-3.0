@@ -22,7 +22,7 @@ namespace Discord_Bot.Commands
         ITwitchChannelService twitchChannelService,
         ITwitchAPI twitchAPI,
         Logging logger,
-        Config config) : CommandBase(logger, config), IAdminCommands
+        Config config) : BaseCommand(logger, config), IAdminCommands
     {
         private readonly IServerService serverService = serverService;
         private readonly IChannelService channelService = channelService;

@@ -36,6 +36,19 @@ namespace Discord_Bot.Core
             CreateMap<Birthday, BirthdayResource>()
                 .ForMember(dest => dest.UserDiscordId, opt => opt.MapFrom(r => ulong.Parse(r.User.DiscordId)))
                 .ForMember(dest => dest.ServerDiscordId, opt => opt.MapFrom(r => ulong.Parse(r.Server.DiscordId)));
+            CreateMap<Idol, IdolResource>()
+                .ForMember(dest => dest.IdolId, opt => opt.MapFrom(i => i.IdolId))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(i => i.Name));
+            CreateMap<IdolGroup, IdolGroupResource>()
+                .ForMember(dest => dest.GroupId, opt => opt.MapFrom(ig => ig.GroupId))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(ig => ig.Name));
+            CreateMap<IdolAlias, IdolAliasResource>()
+                .ForMember(dest => dest.IdolAliasId, opt => opt.MapFrom(ia => ia.IdolAliasId))
+                .ForMember(dest => dest.Alias, opt => opt.MapFrom(ia => ia.Alias));
+            CreateMap<User, UserResource>()
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(u => u.UserId))
+                .ForMember(dest => dest.DiscordId, opt => opt.MapFrom(u => ulong.Parse(u.DiscordId)))
+                .ForMember(dest => dest.LastFmusername, opt => opt.MapFrom(u => u.LastFmusername));
         }
     }
 }

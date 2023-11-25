@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class OwnerCommands(IGreetingService greetingService, Logging logger, Config config) : CommandBase(logger, config), IOwnerCommands
+    public class OwnerCommands(IGreetingService greetingService, Logging logger, Config config) : BaseCommand(logger, config), IOwnerCommands
     {
         private readonly IGreetingService greetingService = greetingService;
 

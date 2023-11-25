@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class KeywordCommands(IKeywordService keywordService, Logging logger, Config config) : CommandBase(logger, config), IKeywordCommands
+    public class KeywordCommands(IKeywordService keywordService, Logging logger, Config config) : BaseCommand(logger, config), IKeywordCommands
     {
         private readonly IKeywordService keywordService = keywordService;
 
@@ -29,7 +29,7 @@ namespace Discord_Bot.Commands
                 {
                     await ReplyAsync("Keyword added to database!");
                 }
-                else if (result == DbProcessResultEnum.NotFound)
+                else if (result == DbProcessResultEnum.AlreadyExists)
                 {
                     await ReplyAsync("Keyword already in database!");
                 }

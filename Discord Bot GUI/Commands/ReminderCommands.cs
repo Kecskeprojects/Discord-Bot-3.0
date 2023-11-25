@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class ReminderCommands(IReminderService reminderService, Logging logger, Config config) : CommandBase(logger, config), IReminderCommands
+    public class ReminderCommands(IReminderService reminderService, Logging logger, Config config) : BaseCommand(logger, config), IReminderCommands
     {
         private readonly IReminderService reminderService = reminderService;
 

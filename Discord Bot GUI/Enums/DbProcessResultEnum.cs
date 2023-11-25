@@ -7,6 +7,8 @@
         PartialSuccess = 2,
         NotFound = 3,
         AlreadyExists = 4,
-        UpdatedExisting = 5
+        UpdatedExisting = 5,
+        MultipleResults = 6,
+        PartialNotFound = 7
     }
 }

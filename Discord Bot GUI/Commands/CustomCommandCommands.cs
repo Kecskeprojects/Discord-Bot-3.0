@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    internal class CustomCommandCommands(Logging logger, Config config, ICustomCommandService customCommandService) : CommandBase(logger, config)
+    internal class CustomCommandCommands(Logging logger, Config config, ICustomCommandService customCommandService) : BaseCommand(logger, config)
     {
         private readonly ICustomCommandService customCommandService = customCommandService;
 

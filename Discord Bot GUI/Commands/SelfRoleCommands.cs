@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class SelfRoleCommands(IRoleService roleService, IServerService serverService, Logging logger, Config config) : CommandBase(logger, config), ISelfRoleCommands
+    public class SelfRoleCommands(IRoleService roleService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config), ISelfRoleCommands
     {
         private readonly IRoleService roleService = roleService;
         private readonly IServerService serverService = serverService;
