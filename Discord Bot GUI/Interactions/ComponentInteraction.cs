@@ -14,10 +14,13 @@ namespace Discord_Bot.Interactions
         private readonly IIdolService biasService = biasService;
 
         [ComponentInteraction("biasMenu_*")]
-        public async Task BiasMenuHandler(string[] selectedBiasGroups)
+        public async Task BiasMenuHandler(int count, string[] selectedBiasGroups)
         {
             try
             {
+                logger.Log($"Bias menu item selected with following parameters: {count}, {string.Join(",", selectedBiasGroups)}", LogOnly: true);
+                if (count > 1) return;
+
                 List<IdolResource> biases;
                 if (selectedBiasGroups[0].Contains("><"))
                 {

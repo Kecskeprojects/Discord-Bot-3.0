@@ -37,7 +37,7 @@ namespace Discord_Bot.Database.DBServices
                 group ??= new()
                     {
                         GroupId = 0,
-                        Name = biasName,
+                        Name = biasGroup,
                     };
 
                 Idol idol = new()
@@ -46,7 +46,7 @@ namespace Discord_Bot.Database.DBServices
                     Group = group,
                     Name = biasName,
                 };
-                await idolRepository.AddCustomCommandAsync(idol);
+                await idolRepository.AddBiasAsync(idol);
 
                 logger.Log($"Idol [{biasName}]-[{biasGroup}] added successfully!");
                 return DbProcessResultEnum.Success;
@@ -77,11 +77,12 @@ namespace Discord_Bot.Database.DBServices
 
                 Idol idol = idols[0];
 
-                User user = await userRepository.getUserWithBiasesByDiscordIdAsync(userId);
-                if (user.Idols.FirstOrDefault(i => i.Name == biasName && (string.IsNullOrEmpty(biasGroup) || biasGroup == i.Group.Name)) != null)
+                User user = await userRepository.GetUserWithBiasesByDiscordIdAsync(userId);
+                List<Idol> userBiases = user.Idols.Where(i => i.Name == biasName && (string.IsNullOrEmpty(biasGroup) || biasGroup == i.Group.Name)).ToList();
+                if (userBiases.Count > 0)
                 {
                     logger.Log($"{userId} user's with bias [{biasName}]-[{biasGroup}] is already connected an existing connection!");
-                    return DbProcessResultEnum.AlreadyExists;
+                    return userBiases.Count == 1 ? DbProcessResultEnum.AlreadyExists : DbProcessResultEnum.MultipleExists;
                 }
 
                 user.Idols.Add(idol);
@@ -102,7 +103,7 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                User user = await userRepository.getUserWithBiasesByDiscordIdAsync(userId);
+                User user = await userRepository.GetUserWithBiasesByDiscordIdAsync(userId);
 
                 user.Idols = [];
 
@@ -188,7 +189,7 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                User user = await userRepository.getUserWithBiasesByDiscordIdAsync(userId);
+                User user = await userRepository.GetUserWithBiasesByDiscordIdAsync(userId);
                 List<Idol> idols = user.Idols.Where(i => i.Name == biasName && (string.IsNullOrEmpty(biasGroup) || biasGroup == i.Group.Name)).ToList();
                 if (idols.Count == 0)
                 {

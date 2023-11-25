@@ -1,5 +1,6 @@
 ﻿using Discord_Bot.Database.Models;
 using Discord_Bot.Interfaces.DBRepositories;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBRepositories
@@ -8,7 +9,8 @@ namespace Discord_Bot.Database.DBRepositories
     {
         public Task<IdolGroup> GetGroupAsync(string biasGroup)
         {
-            throw new System.NotImplementedException();
+            return context.IdolGroups
+                .FirstOrDefaultAsync(ig => ig.Name == biasGroup);
         }
     }
 }

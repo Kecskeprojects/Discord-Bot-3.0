@@ -6,7 +6,7 @@ namespace Discord_Bot.Interfaces.DBRepositories
 {
     public interface IIdolRepository
     {
-        Task AddCustomCommandAsync(Idol idol);
+        Task AddBiasAsync(Idol idol);
         Task<List<Idol>> GetBiasesByGroupAsync(string groupName);
         Task<List<Idol>> GetBiasesByNamesAsync(string[] nameList);
         Task<List<Idol>> GetBiasesByNameAndGroupAsync(string biasName, string biasGroup);

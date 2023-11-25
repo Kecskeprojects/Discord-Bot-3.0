@@ -18,7 +18,8 @@ namespace Discord_Bot.CommandsService
                     //Check if key exists for group, if not, make it
                     if (!groups.TryGetValue(bias.GroupName, out List<string> memberList))
                     {
-                        groups.Add(bias.GroupName, []);
+                        groups.Add(bias.GroupName, [bias.Name.ToUpper()]);
+                        continue;
                     }
 
                     memberList.Add(bias.Name.ToUpper());
@@ -28,7 +29,8 @@ namespace Discord_Bot.CommandsService
                     //Check if key exists for group, if not, make it
                     if (!groups.TryGetValue("unsorted", out List<string> memberList))
                     {
-                        groups.Add("unsorted", []);
+                        groups.Add("unsorted", [bias.Name.ToUpper()]);
+                        continue;
                     }
 
                     memberList.Add(bias.Name.ToUpper());

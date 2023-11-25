@@ -9,6 +9,7 @@
         AlreadyExists = 4,
         UpdatedExisting = 5,
         MultipleResults = 6,
-        PartialNotFound = 7
+        PartialNotFound = 7,
+        MultipleExists = 8
     }
 }

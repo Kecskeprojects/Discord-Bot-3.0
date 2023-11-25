@@ -89,7 +89,6 @@ public partial class MainDbContext : DbContext
                     "ServerSettingChannel",
                     r => r.HasOne<ChannelType>().WithMany()
                         .HasForeignKey("ChannelTypeId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("FK_ServerSettingChannel_ChannelType"),
                     l => l.HasOne<Channel>().WithMany()
                         .HasForeignKey("ChannelId")
@@ -161,7 +160,6 @@ public partial class MainDbContext : DbContext
 
             entity.HasOne(d => d.Group).WithMany(p => p.Idols)
                 .HasForeignKey(d => d.GroupId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Idol_IdolGroup");
         });
 
@@ -178,7 +176,6 @@ public partial class MainDbContext : DbContext
 
             entity.HasOne(d => d.Idol).WithMany(p => p.IdolAliases)
                 .HasForeignKey(d => d.IdolId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IdolAlias_Idol");
         });
 
@@ -208,7 +205,6 @@ public partial class MainDbContext : DbContext
 
             entity.HasOne(d => d.Idol).WithMany(p => p.IdolImages)
                 .HasForeignKey(d => d.IdolId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_IdolImage_Idol");
         });
 
@@ -291,6 +287,7 @@ public partial class MainDbContext : DbContext
 
             entity.HasOne(d => d.NotificationRole).WithMany(p => p.Servers)
                 .HasForeignKey(d => d.NotificationRoleId)
+                .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK_Server_Role");
         });
 
@@ -358,7 +355,6 @@ public partial class MainDbContext : DbContext
                     "UserBias",
                     r => r.HasOne<Idol>().WithMany()
                         .HasForeignKey("IdolId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("FK_UserBias_Idol"),
                     l => l.HasOne<User>().WithMany()
                         .HasForeignKey("UserId")

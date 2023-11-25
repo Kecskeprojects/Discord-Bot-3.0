@@ -4,22 +4,22 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.Gaming.Preview.GamesEnumeration;
 
 namespace Discord_Bot.Database.DBRepositories
 {
     public class IdolRepository(MainDbContext context) : BaseRepository(context), IIdolRepository
     {
-        public Task AddCustomCommandAsync(Idol idol)
+        public async Task AddBiasAsync(Idol idol)
         {
-            throw new System.NotImplementedException();
+            context.Idols.Add(idol);
+            await context.SaveChangesAsync();
         }
 
         public Task<List<Idol>> GetBiasesByGroupAsync(string groupName)
         {
             return context.Idols
                 .Include(i => i.Group)
-                .Where(i => i.Group.Name == groupName)
+                .Where(i => string.IsNullOrEmpty(groupName) || i.Group.Name == groupName)
                 .ToListAsync();
         }
         public Task<List<Idol>> GetBiasesByNamesAsync(string[] nameList)

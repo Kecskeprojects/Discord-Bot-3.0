@@ -10,6 +10,7 @@ using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
+using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -31,6 +32,8 @@ namespace Discord_Bot.Commands
             {
                 string biasName = biasData.ToLower().Split('-')[0].Trim();
                 string biasGroup = biasData.ToLower().Split('-')[1].Trim();
+
+                if (string.IsNullOrEmpty(biasName) || string.IsNullOrEmpty(biasGroup)) return;
 
                 DbProcessResultEnum result = await idolService.AddBiasAsync(biasName, biasGroup);
                 if (result == DbProcessResultEnum.Success)
@@ -118,14 +121,11 @@ namespace Discord_Bot.Commands
                 }
                 else if (result == DbProcessResultEnum.AlreadyExists)
                 {
-                    if (string.IsNullOrEmpty(biasGroup))
-                    {
-                        await ReplyAsync("You already have this bias on your list!");
-                    }
-                    else
-                    {
-                        await ReplyAsync("A bias with that name was found in your list, but you did not specify a group! (format: [name]-[group])");
-                    }
+                    await ReplyAsync("You already have this bias on your list!");
+                }
+                else if (result == DbProcessResultEnum.MultipleExists)
+                {
+                    await ReplyAsync("A bias with that name was found in your list, but you did not specify a group! (format: [name]-[group])");
                 }
                 else if (result == DbProcessResultEnum.NotFound)
                 {
@@ -219,7 +219,7 @@ namespace Discord_Bot.Commands
                 List<IdolResource> list = await idolService.GetUserBiasesListAsync(Context.User.Id, groupName.ToLower().Trim());
 
                 //Check if you have any
-                if (list == null)
+                if (CollectionTools.IsNullOrEmpty(list))
                 {
                     if (groupName != "")
                     {
@@ -284,6 +284,7 @@ namespace Discord_Bot.Commands
                 {
                     if (groupName != "") { await ReplyAsync("No biases from that group are in the database!"); }
                     else { await ReplyAsync("No biases have been added to database yet!"); }
+                    return;
                 }
 
                 BiasMessageResult result = BiasService.BuildBiasMessage(idols, groupName, "Which group do you want to see?", Context.User.Id, false);
