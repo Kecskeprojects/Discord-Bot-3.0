@@ -9,42 +9,42 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions
 {
-    public class ComponentInteraction(Logging logger, Config config, IIdolService biasService) : BaseInteraction(logger, config)
+    public class ComponentInteraction(Logging logger, Config config, IIdolService idolService) : BaseInteraction(logger, config)
     {
-        private readonly IIdolService biasService = biasService;
+        private readonly IIdolService idolService = idolService;
 
-        [ComponentInteraction("biasMenu_*")]
-        public async Task BiasMenuHandler(int count, string[] selectedBiasGroups)
+        [ComponentInteraction("idolMenu_*")]
+        public async Task IdolMenuHandler(int count, string[] selectedIdolGroups)
         {
             try
             {
-                logger.Log($"Bias menu item selected with following parameters: {count}, {string.Join(",", selectedBiasGroups)}", LogOnly: true);
+                logger.Log($"Idol menu item selected with following parameters: {count}, {string.Join(",", selectedIdolGroups)}", LogOnly: true);
                 if (count > 1)
                 {
                     return;
                 }
 
-                List<IdolResource> biases;
-                if (selectedBiasGroups[0].Contains("><"))
+                List<IdolResource> idoles;
+                if (selectedIdolGroups[0].Contains("><"))
                 {
-                    string name = selectedBiasGroups[0].Split("><")[0];
-                    ulong userId = ulong.Parse(selectedBiasGroups[0].Split("><")[1]);
-                    biases = await biasService.GetUserBiasesListAsync(userId, name);
+                    string name = selectedIdolGroups[0].Split("><")[0];
+                    ulong userId = ulong.Parse(selectedIdolGroups[0].Split("><")[1]);
+                    idoles = await idolService.GetUserIdolsListAsync(userId, name);
                 }
                 else
                 {
-                    biases = await biasService.GetBiasesByGroupAsync(selectedBiasGroups[0]);
+                    idoles = await idolService.GetIdolsByGroupAsync(selectedIdolGroups[0]);
                 }
 
                 string message = "";
 
                 //Add Group name
-                message += $"{selectedBiasGroups[0].Split("><")[0].ToUpper()}:\n";
+                message += $"{selectedIdolGroups[0].Split("><")[0].ToUpper()}:\n";
 
                 //Add individual members
-                foreach (IdolResource member in biases)
+                foreach (IdolResource member in idoles)
                 {
-                    if (member != biases[0])
+                    if (member != idoles[0])
                     {
                         message += ", ";
                     }
@@ -56,7 +56,7 @@ namespace Discord_Bot.Interactions
             }
             catch (Exception ex)
             {
-                logger.Error("ComponentInteraction.cs BiasMenuHandler", ex.ToString());
+                logger.Error("ComponentInteraction.cs IdolMenuHandler", ex.ToString());
             }
         }
     }
