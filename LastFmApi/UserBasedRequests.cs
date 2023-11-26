@@ -119,7 +119,7 @@ namespace LastFmApi
 
                 //Getting data from api
                 RestResponse restResultJSON = await UserBasedRequestHandler(request);
-                var deserialized = JsonConvert.DeserializeObject<Recent>(restResultJSON.Content);
+                Recent deserialized = JsonConvert.DeserializeObject<Recent>(restResultJSON.Content);
 
                 if (deserialized.RecentTracks != null)
                 {
@@ -151,7 +151,7 @@ namespace LastFmApi
 
                 //Getting data from api
                 RestResponse restResultJSON = await UserBasedRequestHandler(request);
-                var deserialized = JsonConvert.DeserializeObject<Recent>(restResultJSON.Content);
+                Recent deserialized = JsonConvert.DeserializeObject<Recent>(restResultJSON.Content);
 
                 if (deserialized.RecentTracks != null && deserialized.RecentTracks.Track.Count > 0)
                 {

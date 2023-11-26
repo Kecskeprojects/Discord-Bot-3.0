@@ -3,6 +3,7 @@ using LastFmApi.Enum;
 using LastFmApi.Models.ArtistInfo;
 using LastFmApi.Models.TrackInfo;
 using Newtonsoft.Json;
+using RestSharp;
 
 namespace LastFmApi
 {
@@ -25,7 +26,7 @@ namespace LastFmApi
                 InfoBasedRequestItem request = new("artist.getInfo", apiKey, username, artistName);
 
                 //Getting data from api
-                var restResultJSON = await InfoBasedRequestHandler(request);
+                RestResponse restResultJSON = await InfoBasedRequestHandler(request);
                 ArtistInfo deserialized = JsonConvert.DeserializeObject<ArtistInfo>(restResultJSON.Content);
 
                 if (deserialized.Artist != null)
@@ -57,8 +58,8 @@ namespace LastFmApi
                 InfoBasedRequestItem request = new("track.getInfo", apiKey, username, artistName) { Track = trackName };
 
                 //Getting data from api
-                var temp = await InfoBasedRequestHandler(request);
-                var deserialized = JsonConvert.DeserializeObject<TrackInfo>(temp.Content);
+                RestResponse restResultJSON = await InfoBasedRequestHandler(request);
+                TrackInfo deserialized = JsonConvert.DeserializeObject<TrackInfo>(restResultJSON.Content);
 
                 if (deserialized.Track != null)
                 {

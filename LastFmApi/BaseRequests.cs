@@ -1,5 +1,4 @@
 ﻿using LastFmApi.Communication;
-using LastFmApi.Enum;
 using RestSharp;
 
 namespace LastFmApi
@@ -12,7 +11,7 @@ namespace LastFmApi
         {
             string query = $"?method={item.Type}&user={Uri.EscapeDataString(item.Username)}&api_key={item.ApiKey}";
 
-            if(item.Limit.HasValue && item.Limit > 0)
+            if (item.Limit.HasValue && item.Limit > 0)
             {
                 query += $"&limit={item.Limit.Value}";
             }
@@ -29,7 +28,7 @@ namespace LastFmApi
 
             query += "&format=json";
 
-            RestRequest request = new (query);
+            RestRequest request = new(query);
             return await _client.GetAsync(request);
         }
 
