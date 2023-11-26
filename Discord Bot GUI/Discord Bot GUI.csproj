@@ -50,6 +50,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <TargetPath>%(RecursiveDir)\%(Filename)%(Extension)</TargetPath>
     </Content>
+    <ProjectReference Include="..\LastFmApi\LastFmApi.csproj" />
     <Resource Include="Kim_Synthji.ico" />
     <Compile Update="Properties\Resource.Designer.cs">
       <DesignTime>True</DesignTime>

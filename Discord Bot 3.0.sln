@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.6.33712.159
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord Bot GUI", "Discord Bot GUI\Discord Bot GUI.csproj", "{825EF005-AF72-48E4-930A-4B7D6A349390}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2C41D1D3-4344-4843-8B4C-3BC67181F6B5} = {2C41D1D3-4344-4843-8B4C-3BC67181F6B5}
+	EndProjectSection
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "MainDB", "MainDB\MainDB.sqlproj", "{009FC268-6F36-4EA3-A37F-0DAEDE86279C}"
 EndProject
