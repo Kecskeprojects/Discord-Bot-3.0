@@ -48,7 +48,7 @@ namespace Discord_Bot.Core
             CreateMap<User, UserResource>()
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(u => u.UserId))
                 .ForMember(dest => dest.DiscordId, opt => opt.MapFrom(u => ulong.Parse(u.DiscordId)))
-                .ForMember(dest => dest.LastFmusername, opt => opt.MapFrom(u => u.LastFmusername));
+                .ForMember(dest => dest.LastFmUsername, opt => opt.MapFrom(u => u.LastFmusername));
         }
     }
 }

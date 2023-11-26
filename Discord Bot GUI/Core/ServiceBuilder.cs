@@ -71,6 +71,8 @@ namespace Discord_Bot.Core
             collection.AddScoped<IWordOfTheDayService, WordOfTheDayService>();
             collection.AddScoped<IAudioService, AudioService>();
             collection.AddScoped<IYoutubeDownloadService, YoutubeDownloadService>();
+            collection.AddScoped<ILastFmAPI, LastFmAPI>();
+            collection.AddScoped<IMusicBrainzAPI, MusicBrainzAPI>();
 
             //Database
             collection.AddScoped<IServerRepository, ServerRepository>();
@@ -97,6 +99,7 @@ namespace Discord_Bot.Core
             collection.AddScoped<IIdolService, IdolService>();
             collection.AddScoped<IIdolRepository, IdolRepository>();
             collection.AddScoped<IIdolGroupRepository, IdolGroupRepository>();
+            collection.AddScoped<IUserService, UserService>();
 
             //Commands
             collection.AddScoped<IServiceToDiscordCommunication, ServiceDiscordCommunication>();

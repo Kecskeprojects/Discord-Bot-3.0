@@ -2,6 +2,7 @@
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Services.Models.SpotifyAPI;
 using Discord_Bot.Tools;
 using SpotifyAPI.Web;
 using System;
@@ -11,11 +12,12 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Services
 {
-    class SpotifyAPI(Logging logger, Config config, IYoutubeAPI youtubeAPI) : ISpotifyAPI
+    class SpotifyAPI(Logging logger, Config config, IYoutubeAPI youtubeAPI, IMusicBrainzAPI musicBrainzAPI) : ISpotifyAPI
     {
         private readonly Logging logger = logger;
         private readonly Config config = config;
         private readonly IYoutubeAPI youtubeAPI = youtubeAPI;
+        private readonly IMusicBrainzAPI musicBrainzAPI = musicBrainzAPI;
 
         #region Main functions
         //Main function starting the query and catching errors
@@ -113,6 +115,7 @@ namespace Discord_Bot.Services
         #endregion
 
         #region Image search
+        //Todo: Rewrite as per notes
         //Lastfm complimentary function
         public async Task<string> ImageSearch(string artist, string song = "", string[] tags = null)
         {
@@ -243,6 +246,73 @@ namespace Discord_Bot.Services
                 logger.Error("SpotifyAPI.cs ImageSearch", ex.ToString());
             }
             return "";
+        }
+
+        public async Task<SpotifyImageSearchResult> SearchItemAsync(string artistMbid, string artistName, string songName = "")
+        {
+            try
+            {
+                string url = await musicBrainzAPI.GetArtistSpotifyUrlAsync(artistMbid);
+                if (string.IsNullOrEmpty(url)) return null;
+                string artistId = new Uri(url).Segments[^1].Replace("/", "");
+
+                SpotifyClientConfig configuration = SpotifyClientConfig.CreateDefault().WithAuthenticator(new ClientCredentialsAuthenticator(config.Spotify_Client_Id, config.Spotify_Client_Secret));
+                SpotifyClient spotify = new(configuration);
+
+                string spotifyArtist = "", spotifyImage = "";
+
+                logger.Query("============================================================================");
+                logger.Query("Spotify image search:");
+
+                SpotifyImageSearchResult result = new();
+                if (songName == "")
+                {
+                    FullArtist artist = await spotify.Artists.Get(artistId);
+
+                    if(artist == null)
+                    {
+                        logger.Query("Artist not found!");
+                        return null;
+                    }
+
+                    spotifyArtist = artist.Name;
+                    result.ImageUrl= artist.Images[0].Url;
+                    result.EntityUrl = artist.ExternalUrls["spotify"];
+                }
+                else
+                {
+                    SearchRequest request = new(SearchRequest.Types.Track, $"{songName} {artistName}");
+                    SearchResponse searchResult = await spotify.Search.Item(request);
+
+                    if (searchResult.Tracks.Items.Count == 0)
+                    {
+                        logger.Query("No results for track!");
+                        return null;
+                    }
+
+                    FullTrack track = searchResult.Tracks.Items.FirstOrDefault(x => x.Artists.Any(y => y.Id == artistId));
+
+                    if(track == null)
+                    {
+                        logger.Query("Track not found!");
+                        return null;
+                    }
+
+                    spotifyArtist = track.Name;
+                    result.ImageUrl = track.Album.Images[0].Url;
+                    result.EntityUrl = track.ExternalUrls["spotify"];
+                }
+
+                logger.Query($"Artist found by Last.fm: {artistName}\nArtist found by Spotify: {spotifyArtist}\nWith image link: {spotifyImage}");
+                logger.Query("============================================================================");
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("SpotifyAPI.cs SearchItemAsync", ex.ToString());
+            }
+            return null;
         }
         #endregion
     }

@@ -11,7 +11,7 @@ namespace LastFmApi
 {
     public class UserBasedRequests : BaseRequests
     {
-        public static async Task<GenericResponseItem<Toptracks>> TopTracks(string apiKey, string username, int limit, int page, string period)
+        public static async Task<GenericResponseItem<Toptracks>> TopTracks(string apiKey, string username, int? limit, int? page, string period)
         {
             GenericResponseItem<Toptracks> response = new() { ResultCode = LastFmRequestResultEnum.Failure };
             try
@@ -41,7 +41,7 @@ namespace LastFmApi
             return response;
         }
 
-        public static async Task<GenericResponseItem<Topalbums>> TopAlbums(string apiKey, string username, int limit, int page, string period)
+        public static async Task<GenericResponseItem<Topalbums>> TopAlbums(string apiKey, string username, int? limit, int? page, string period)
         {
             GenericResponseItem<Topalbums> response = new() { ResultCode = LastFmRequestResultEnum.Failure };
             try
@@ -72,7 +72,7 @@ namespace LastFmApi
             return response;
         }
 
-        public static async Task<GenericResponseItem<Topartists>> TopArtists(string apiKey, string username, int limit, int page, string period)
+        public static async Task<GenericResponseItem<Topartists>> TopArtists(string apiKey, string username, int? limit, int? page, string period)
         {
             GenericResponseItem<Topartists> response = new() { ResultCode = LastFmRequestResultEnum.Failure };
             try
@@ -103,7 +103,7 @@ namespace LastFmApi
             return response;
         }
 
-        public static async Task<GenericResponseItem<Recenttracks>> Recents(string apiKey, string username, int limit)
+        public static async Task<GenericResponseItem<Recenttracks>> Recents(string apiKey, string username, int? limit)
         {
             GenericResponseItem<Recenttracks> response = new() { ResultCode = LastFmRequestResultEnum.Failure };
             try

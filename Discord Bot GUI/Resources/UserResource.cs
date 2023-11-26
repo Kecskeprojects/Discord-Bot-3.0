@@ -6,6 +6,6 @@
 
         public ulong DiscordId { get; set; }
 
-        public string LastFmusername { get; set; }
+        public string LastFmUsername { get; set; }
     }
 }
