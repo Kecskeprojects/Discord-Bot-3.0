@@ -24,15 +24,13 @@ namespace LastFmApi
                 }
                 UserBasedRequestItem request = new("user.gettoptracks", username, apiKey, limit, page, period);
 
-                //Getting data from api
                 RestResponse restResultJSON = await UserBasedRequestHandler(request);
                 TopTrack deserialized = JsonConvert.DeserializeObject<TopTrack>(restResultJSON.Content);
 
-                if (deserialized.TopTracks != null)
-                {
-                    response.Response = deserialized.TopTracks;
-                    response.ResultCode = LastFmRequestResultEnum.Success;
-                }
+                response.Response = deserialized.TopTracks;
+                response.ResultCode = deserialized.TopTracks != null ?
+                                        LastFmRequestResultEnum.Success :
+                                        LastFmRequestResultEnum.EmptyResponse;
             }
             catch (Exception ex)
             {
@@ -59,11 +57,10 @@ namespace LastFmApi
                 RestResponse restResultJSON = await UserBasedRequestHandler(request);
                 TopAlbum deserialized = JsonConvert.DeserializeObject<TopAlbum>(restResultJSON.Content);
 
-                if (deserialized.TopAlbums != null)
-                {
-                    response.Response = deserialized.TopAlbums;
-                    response.ResultCode = LastFmRequestResultEnum.Success;
-                }
+                response.Response = deserialized.TopAlbums;
+                response.ResultCode = deserialized.TopAlbums != null ?
+                                        LastFmRequestResultEnum.Success :
+                                        LastFmRequestResultEnum.EmptyResponse;
             }
             catch (Exception ex)
             {
@@ -90,11 +87,10 @@ namespace LastFmApi
                 RestResponse restResultJSON = await UserBasedRequestHandler(request);
                 TopArtist deserialized = JsonConvert.DeserializeObject<TopArtist>(restResultJSON.Content);
 
-                if (deserialized.TopArtists != null)
-                {
-                    response.Response = deserialized.TopArtists;
-                    response.ResultCode = LastFmRequestResultEnum.Success;
-                }
+                response.Response = deserialized.TopArtists;
+                response.ResultCode = deserialized.TopArtists != null ?
+                                        LastFmRequestResultEnum.Success :
+                                        LastFmRequestResultEnum.EmptyResponse;
             }
             catch (Exception ex)
             {
@@ -121,11 +117,10 @@ namespace LastFmApi
                 RestResponse restResultJSON = await UserBasedRequestHandler(request);
                 Recent deserialized = JsonConvert.DeserializeObject<Recent>(restResultJSON.Content);
 
-                if (deserialized.RecentTracks != null)
-                {
-                    response.Response = deserialized.RecentTracks;
-                    response.ResultCode = LastFmRequestResultEnum.Success;
-                }
+                response.Response = deserialized.RecentTracks;
+                response.ResultCode = deserialized.RecentTracks != null ?
+                                        LastFmRequestResultEnum.Success :
+                                        LastFmRequestResultEnum.EmptyResponse;
             }
             catch (Exception ex)
             {
@@ -153,12 +148,12 @@ namespace LastFmApi
                 RestResponse restResultJSON = await UserBasedRequestHandler(request);
                 Recent deserialized = JsonConvert.DeserializeObject<Recent>(restResultJSON.Content);
 
-                if (deserialized.RecentTracks != null && deserialized.RecentTracks.Track.Count > 0)
-                {
-                    //If the Attr is not empty in the first index, it means the first song is a song that is currently playing
-                    response.Response = deserialized.RecentTracks.Track[0];
-                    response.ResultCode = LastFmRequestResultEnum.Success;
-                }
+                //If the Attr is not empty in the first index, it means the first song is a song that is currently playing
+                response.Response = deserialized.RecentTracks?.Track.Count > 0 ?
+                                    deserialized.RecentTracks?.Track[0] : null;
+                response.ResultCode = deserialized.RecentTracks != null ?
+                                        LastFmRequestResultEnum.Success :
+                                        LastFmRequestResultEnum.EmptyResponse;
             }
             catch (Exception ex)
             {
