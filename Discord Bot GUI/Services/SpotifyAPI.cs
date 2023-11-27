@@ -253,7 +253,11 @@ namespace Discord_Bot.Services
             try
             {
                 string url = await musicBrainzAPI.GetArtistSpotifyUrlAsync(artistMbid);
-                if (string.IsNullOrEmpty(url)) return null;
+                if (string.IsNullOrEmpty(url))
+                {
+                    return null;
+                }
+
                 string artistId = new Uri(url).Segments[^1].Replace("/", "");
 
                 SpotifyClientConfig configuration = SpotifyClientConfig.CreateDefault().WithAuthenticator(new ClientCredentialsAuthenticator(config.Spotify_Client_Id, config.Spotify_Client_Secret));
@@ -269,14 +273,14 @@ namespace Discord_Bot.Services
                 {
                     FullArtist artist = await spotify.Artists.Get(artistId);
 
-                    if(artist == null)
+                    if (artist == null)
                     {
                         logger.Query("Artist not found!");
                         return null;
                     }
 
                     spotifyArtist = artist.Name;
-                    result.ImageUrl= artist.Images[0].Url;
+                    result.ImageUrl = artist.Images[0].Url;
                     result.EntityUrl = artist.ExternalUrls["spotify"];
                 }
                 else
@@ -292,7 +296,7 @@ namespace Discord_Bot.Services
 
                     FullTrack track = searchResult.Tracks.Items.FirstOrDefault(x => x.Artists.Any(y => y.Id == artistId));
 
-                    if(track == null)
+                    if (track == null)
                     {
                         logger.Query("Track not found!");
                         return null;

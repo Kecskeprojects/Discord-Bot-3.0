@@ -13,36 +13,25 @@
                 //If only one of them is given, we figure out the other and give default value to the other
                 case 2:
                     {
-                        if (int.TryParse(parameters[0], out _) && LastfmTimePeriod(parameters[1], out parameters[1]))
-                        {
-                            outarray = [parameters[0], parameters[1]];
-                        }
-                        else if (int.TryParse(parameters[1], out _) && LastfmTimePeriod(parameters[0], out parameters[0]))
-                        {
-                            outarray = [parameters[1], parameters[0]];
-                        }
-                        else throw new Exception("Wrong input format!");
+                        outarray = int.TryParse(parameters[0], out _) && LastfmTimePeriod(parameters[1], out parameters[1])
+                            ? ([parameters[0], parameters[1]])
+                            : int.TryParse(parameters[1], out _) && LastfmTimePeriod(parameters[0], out parameters[0])
+                                ? ([parameters[1], parameters[0]])
+                                : throw new Exception("Wrong input format!");
                         break;
                     }
                 case 1:
                     {
-                        if (int.TryParse(parameters[0], out _))
-                        {
-                            outarray[0] = parameters[0];
-                            outarray[1] = "overall";
-                        }
-                        else if (LastfmTimePeriod(parameters[0], out parameters[0]))
-                        {
-                            outarray[0] = "10";
-                            outarray[1] = parameters[0];
-                        }
-                        else throw new Exception("Wrong input format!");
+                        outarray = int.TryParse(parameters[0], out _)
+                            ? [parameters[0], "overall"]
+                            : LastfmTimePeriod(parameters[0], out parameters[0])
+                                ? ["10", parameters[0]]
+                                : throw new Exception("Wrong input format!");
                         break;
                     }
                 case 0:
                     {
-                        outarray[0] = "10";
-                        outarray[1] = "overall";
+                        outarray = ["10", "overall"];
                         break;
                     }
                 default:

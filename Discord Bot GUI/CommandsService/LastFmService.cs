@@ -32,7 +32,7 @@ namespace Discord_Bot.CommandsService
             foreach (UserResource item in users)
             {
                 //Check if user is in given server
-                var temp_user = context.Guild.GetUser(item.DiscordId);
+                Discord.WebSocket.SocketGuildUser temp_user = context.Guild.GetUser(item.DiscordId);
                 if (temp_user != null)
                 {
                     //Get their nickname if they have one

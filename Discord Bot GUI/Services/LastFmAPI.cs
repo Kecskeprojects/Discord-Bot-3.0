@@ -1,24 +1,21 @@
-﻿using Discord_Bot.Core.Config;
+﻿using Discord.Commands;
+using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Resources;
+using Discord_Bot.Services.Models.LastFm;
+using Discord_Bot.Services.Models.SpotifyAPI;
+using Discord_Bot.Tools;
 using LastFmApi;
 using LastFmApi.Communication;
-using System.Net.Http;
-using System;
-using System.Threading.Tasks;
-using LastFmApi.Models.TopTrack;
-using Discord_Bot.Services.Models.LastFm;
-using LastFmApi.Models.TopArtist;
-using LastFmApi.Models.TopAlbum;
-using Discord_Bot.Tools;
-using Discord_Bot.Services.Models.SpotifyAPI;
 using LastFmApi.Models.Recent;
-using Discord.Commands;
+using LastFmApi.Models.TopAlbum;
+using LastFmApi.Models.TopArtist;
+using LastFmApi.Models.TopTrack;
+using System;
 using System.Collections.Generic;
-using Discord.Interactions;
-using System.Linq;
-using Discord_Bot.Resources;
-using SpotifyAPI.Web;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Discord_Bot.Services
 {
@@ -44,7 +41,7 @@ namespace Discord_Bot.Services
                     result.ArtistMbid = restResult.Response.Artist.Mbid;
 
                     SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(restResult.Response.Artist.Mbid, restResult.Response.Artist.Text, restResult.Response.Name);
-                    if(spotifySearch != null)
+                    if (spotifySearch != null)
                     {
                         result.ImageUrl = spotifySearch.ImageUrl;
                         result.Url = spotifySearch.EntityUrl;
@@ -106,7 +103,10 @@ namespace Discord_Bot.Services
                         result.EmbedFields[index] += $"`#{i}`**{album.Name}** by **{album.Artist.Name}** - *{Math.Round(double.Parse(album.PlayCount) / result.TotalPlays * 100)}%* (*{album.PlayCount} plays*)\n";
 
                         //If we went through 10 results, start filling a new list page
-                        if (i % 10 == 0) index++;
+                        if (i % 10 == 0)
+                        {
+                            index++;
+                        }
                     }
                 }
                 else if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.RequiredParameterEmpty)
@@ -158,7 +158,10 @@ namespace Discord_Bot.Services
                         result.EmbedFields[index] += $"`#{i}`**{artist.Name}** - *{Math.Round(double.Parse(artist.PlayCount) / result.TotalPlays * 100)}%* (*{artist.PlayCount} plays*)\n";
 
                         //If we went through 10 results, start filling a new list page
-                        if (i % 10 == 0) index++;
+                        if (i % 10 == 0)
+                        {
+                            index++;
+                        }
                     }
                 }
                 else if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.RequiredParameterEmpty)
@@ -210,7 +213,10 @@ namespace Discord_Bot.Services
                         result.EmbedFields[index] += $"`#{i}`**{track.Name}** by **{track.Artist.Name}** - *{Math.Round(double.Parse(track.PlayCount) / result.TotalPlays * 100)}%* (*{track.PlayCount} plays*)\n";
 
                         //If we went through 10 results, start filling a new list page
-                        if (i % 10 == 0) index++;
+                        if (i % 10 == 0)
+                        {
+                            index++;
+                        }
                     }
                 }
                 else if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.RequiredParameterEmpty)
@@ -262,7 +268,10 @@ namespace Discord_Bot.Services
                         result.EmbedFields[index] += "\n";
 
                         //If we went through 10 results, start filling a new list page
-                        if (i % 10 == 0) index++;
+                        if (i % 10 == 0)
+                        {
+                            index++;
+                        }
                     }
                 }
                 else if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.RequiredParameterEmpty)
@@ -321,7 +330,7 @@ namespace Discord_Bot.Services
                 }
 
                 //Assembling list of top albums
-                for(int i = 0; i < 5 && i < albums.Count; i++)
+                for (int i = 0; i < 5 && i < albums.Count; i++)
                 {
                     result.AlbumField += $"`#{i}` **{albums[i].Name}**  (*{albums[i].PlayCount} plays*)\n";
                 }
@@ -340,7 +349,7 @@ namespace Discord_Bot.Services
                 logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
                 return result;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
             }
@@ -366,10 +375,10 @@ namespace Discord_Bot.Services
             string artist_name = nowPlaying.ArtistName;
             string track_name = nowPlaying.TrackName;
 
-            foreach (var item in wk.Users)
+            foreach (UserResource item in wk.Users)
             {
                 //Get their number of plays on given song
-                var request = await GetTrackPlaysAsync(item.LastFmUsername, artist_name, track_name);
+                LastFmApi.Models.TrackInfo.Track request = await GetTrackPlaysAsync(item.LastFmUsername, artist_name, track_name);
 
                 if (request != null)
                 {
@@ -379,7 +388,7 @@ namespace Discord_Bot.Services
                         wk.Searched = $"{request.Name} by {request.Artist.Name}";
 
                         SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(nowPlaying.ArtistMbid, artist_name, track_name);
-                        if(spotifySearch != null)
+                        if (spotifySearch != null)
                         {
                             wk.ImageUrl = spotifySearch.ImageUrl;
                         }
@@ -406,7 +415,7 @@ namespace Discord_Bot.Services
             string artist_name = input.Split('>')[0].Trim().ToLower();
             string track_name = input.Split('>')[1].Trim().ToLower();
 
-            foreach (var item in wk.Users)
+            foreach (UserResource item in wk.Users)
             {
                 //Get their number of plays on given song
                 LastFmApi.Models.TrackInfo.Track request = await GetTrackPlaysAsync(item.LastFmUsername, artist_name, track_name);
@@ -446,7 +455,7 @@ namespace Discord_Bot.Services
             //Get artist's name for search
             string artist_name = input.Trim().ToLower();
 
-            foreach (var item in wk.Users)
+            foreach (UserResource item in wk.Users)
             {
                 //Get their number of plays on given artists
                 LastFmApi.Models.ArtistInfo.Artist request = await GetArtistPlaysAsync(item.Username, artist_name);
@@ -484,12 +493,9 @@ namespace Discord_Bot.Services
         {
             GenericResponseItem<LastFmApi.Models.ArtistInfo.Artist> restResult = await InfoBasedRequests.ArtistPlays(config.Lastfm_API_Key, lastFmUsername, artistName);
 
-            if (restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success)
-            {
-                throw restResult.Exception ?? new Exception("Track plays request resulted in an error!");
-            }
-
-            return restResult.Response;
+            return restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success
+                ? throw restResult.Exception ?? new Exception("Track plays request resulted in an error!")
+                : restResult.Response;
         }
 
         #region Helper API calls
@@ -497,12 +503,9 @@ namespace Discord_Bot.Services
         {
             GenericResponseItem<LastFmApi.Models.TrackInfo.Track> restResult = await InfoBasedRequests.TrackPlays(config.Lastfm_API_Key, lastFmUsername, artistName, trackName);
 
-            if (restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success)
-            {
-                throw restResult.Exception ?? new Exception("Track plays request resulted in an error!");
-            }
-
-            return restResult.Response;
+            return restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success
+                ? throw restResult.Exception ?? new Exception("Track plays request resulted in an error!")
+                : restResult.Response;
         }
 
         //Checking the total plays of a user using the topartist part of the api, as it has the least amount of entries in any case
@@ -518,7 +521,7 @@ namespace Discord_Bot.Services
                     throw restResult.Exception ?? new Exception("Total plays request resulted in an error!");
                 }
 
-                foreach (var artist in restResult.Response.Artist)
+                foreach (LastFmApi.Models.TopArtist.Artist artist in restResult.Response.Artist)
                 {
                     totalplays += int.Parse(artist.PlayCount);
                 }
@@ -546,7 +549,7 @@ namespace Discord_Bot.Services
 
                 for (int i = 0; i < restResult.Response.Track.Count; i++)
                 {
-                    var track = restResult.Response.Track[i];
+                    LastFmApi.Models.TopTrack.Track track = restResult.Response.Track[i];
                     if (track.Name == track_name && track.Artist.Name == artist_name)
                     {
                         position = $"{i + ((page - 1) * 1000)}";
@@ -584,9 +587,12 @@ namespace Discord_Bot.Services
                     throw restResult.Exception ?? new Exception("Top albums request resulted in an error!");
                 }
 
-                foreach (var album in restResult.Response.Album)
+                foreach (LastFmApi.Models.TopAlbum.Album album in restResult.Response.Album)
                 {
-                    if (album.Artist.Name.Equals(artistName, StringComparison.OrdinalIgnoreCase)) albums.Add(album);
+                    if (album.Artist.Name.Equals(artistName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        albums.Add(album);
+                    }
                 }
 
                 totalpage = int.Parse(restResult.Response.Attr.TotalPages);
@@ -611,9 +617,12 @@ namespace Discord_Bot.Services
                     throw restResult.Exception ?? new Exception("Top tracks request resulted in an error!");
                 }
 
-                foreach (var track in restResult.Response.Track)
+                foreach (LastFmApi.Models.TopTrack.Track track in restResult.Response.Track)
                 {
-                    if (track.Artist.Name.Equals(artistName, StringComparison.OrdinalIgnoreCase)) tracks.Add(track);
+                    if (track.Artist.Name.Equals(artistName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        tracks.Add(track);
+                    }
                 }
 
                 totalpage = int.Parse(restResult.Response.Attr.TotalPages);

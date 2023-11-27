@@ -1,12 +1,11 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord_Bot.Commands;
 using Discord_Bot.CommandsService;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
-using Discord_Bot.Interfaces;
+using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
@@ -19,7 +18,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Modules.Commands
+namespace Discord_Bot.Commands
 {
     public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, IPictureHandler pictureHandler, Logging logger, Config config) : BaseCommand(logger, config), ILastfmCommands
     {
@@ -105,7 +104,7 @@ namespace Discord_Bot.Modules.Commands
 
                 LastFmListResult response = await lastFmAPI.GetTopTracksAsync(user.LastFmUsername, limit, null, period);
 
-                if(response == null)
+                if (response == null)
                 {
                     await ReplyAsync("Unexpected error occured.");
                 }
@@ -119,7 +118,10 @@ namespace Discord_Bot.Modules.Commands
                     //Make each part of the text into separate fields, thus going around the 1024 character limit of a single field
                     foreach (string item in response.EmbedFields)
                     {
-                        if (item != "") builder.AddField("\u200b", item, false);
+                        if (item != "")
+                        {
+                            builder.AddField("\u200b", item, false);
+                        }
                     }
 
                     await ReplyAsync("", false, builder.Build());
@@ -175,7 +177,10 @@ namespace Discord_Bot.Modules.Commands
                     //Make each part of the text into separate fields, thus going around the 1024 character limit of a single field
                     foreach (string item in response.EmbedFields)
                     {
-                        if (item != "") builder.AddField("\u200b", item, false);
+                        if (item != "")
+                        {
+                            builder.AddField("\u200b", item, false);
+                        }
                     }
 
                     await ReplyAsync("", false, builder.Build());
@@ -200,7 +205,7 @@ namespace Discord_Bot.Modules.Commands
                 int limit = int.Parse(parameters[0]);
                 string period = parameters[1];
 
-                UserResource user = await  userService.GetUserAsync(Context.User.Id);
+                UserResource user = await userService.GetUserAsync(Context.User.Id);
 
                 if (user == null)
                 {
@@ -224,7 +229,10 @@ namespace Discord_Bot.Modules.Commands
                     //Make each part of the text into separate fields, thus going around the 1024 character limit of a single field
                     foreach (string item in response.EmbedFields)
                     {
-                        if (item != "") builder.AddField("\u200b", item, false);
+                        if (item != "")
+                        {
+                            builder.AddField("\u200b", item, false);
+                        }
                     }
 
                     await ReplyAsync("", false, builder.Build());
@@ -318,9 +326,12 @@ namespace Discord_Bot.Modules.Commands
                     EmbedBuilder builder = LastFmService.BaseEmbed($"{Global.GetNickName(Context.Channel, Context.User)} recently listened to...", response.ImageUrl);
 
                     //Make each part of the text into separate fields, thus going around the 1024 character limit of a single field
-                    foreach (var item in response.EmbedFields)
+                    foreach (string item in response.EmbedFields)
                     {
-                        if (item != "") builder.AddField("\u200b", item, false);
+                        if (item != "")
+                        {
+                            builder.AddField("\u200b", item, false);
+                        }
                     }
 
                     await ReplyAsync("", false, builder.Build());
@@ -338,15 +349,15 @@ namespace Discord_Bot.Modules.Commands
         #region Advanced last.fm commands
         [Command("lf artist")]
         [Alias(["lf a"])]
-        public async Task LfArtist([Remainder]string artist)
+        public async Task LfArtist([Remainder] string artist)
         {
             try
             {
                 UserResource user = await userService.GetUserAsync(Context.User.Id);
 
-                if (user == null) 
-                { 
-                    await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!"); 
+                if (user == null)
+                {
+                    await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
                     return;
                 }
 
@@ -437,9 +448,9 @@ namespace Discord_Bot.Modules.Commands
                         Stream originalImage = Global.GetStream(wk.ImageUrl); //PictureHandler.DownloadImageAsync(Directory.GetCurrentDirectory(), new Random().Next(0, int.MaxValue).ToString(), new Uri(wk.ImageUrl));
 
                         //Edit the picture to the list format
-                        var modifiedImage = pictureHandler.EditPicture(originalImage, wk.Plays, wk.Searched);
+                        Discord_Bot.Communication.EditPictureResult modifiedImage = pictureHandler.EditPicture(originalImage, wk.Plays, wk.Searched);
 
-                        if(modifiedImage != null)
+                        if (modifiedImage != null)
                         {
                             //Add it to the embed
                             builder.WithImageUrl($"attachment://{modifiedImage.Item1}");
@@ -451,22 +462,28 @@ namespace Discord_Bot.Modules.Commands
                     else
                     {
                         string[] list = { "", "", "" }; int i = 1; int index = 0;
-                        foreach (var userplays in wk.Plays)
+                        foreach (KeyValuePair<string, int> userplays in wk.Plays)
                         {
                             //One line in embed
                             list[index] += $"`#{i}` **{userplays.Key}** with *{userplays.Value} plays*";
                             list[index] += "\n";
 
                             //If we went through 15 results, start filling a new list page
-                            if (i % 15 == 0) index++;
+                            if (i % 15 == 0)
+                            {
+                                index++;
+                            }
 
                             i++;
                         }
 
                         //Make each part of the text into separate fields, thus going around the 1024 character limit of a single field
-                        foreach (var item in list)
+                        foreach (string item in list)
                         {
-                            if (item != "") builder.AddField("\u200b", item, false);
+                            if (item != "")
+                            {
+                                builder.AddField("\u200b", item, false);
+                            }
                         }
 
                         await ReplyAsync("", false, builder.Build());

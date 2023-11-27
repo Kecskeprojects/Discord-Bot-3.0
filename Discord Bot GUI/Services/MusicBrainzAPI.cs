@@ -25,7 +25,7 @@ namespace Discord_Bot.Services
                 Url spotifyUrl = deserialized.Relations.FirstOrDefault(x => x.Url != null && x.Url.Resource.Contains("spotify"))?.Url;
                 return spotifyUrl.Resource;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("MusicBrainzAPI.cs GetArtistSpotifyUrl", ex.ToString());
             }
