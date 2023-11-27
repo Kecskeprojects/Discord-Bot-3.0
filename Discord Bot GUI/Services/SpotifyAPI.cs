@@ -115,7 +115,6 @@ namespace Discord_Bot.Services
         #endregion
 
         #region Image search
-        //Todo: Rewrite as per notes
         //Lastfm complimentary function
         public async Task<string> ImageSearch(string artist, string song = "", string[] tags = null)
         {
@@ -248,6 +247,7 @@ namespace Discord_Bot.Services
             return "";
         }
 
+        //Lastfm complimentary function
         public async Task<SpotifyImageSearchResult> SearchItemAsync(string artistMbid, string artistName, string songName = "")
         {
             try

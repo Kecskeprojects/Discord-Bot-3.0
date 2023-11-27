@@ -22,7 +22,7 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                User user = await userRepository.GetUserByDiscordId(userId);
+                User user = await userRepository.GetUserByDiscordIdAsync(userId);
                 Reminder reminder = new()
                 {
                     ReminderId = 0,

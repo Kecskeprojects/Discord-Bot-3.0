@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Interfaces
 {
-    internal interface ILastfmCommands
+    public interface ILastfmCommands
     {
         public Task LfConnect(string name);
         public Task LfDisconnect();

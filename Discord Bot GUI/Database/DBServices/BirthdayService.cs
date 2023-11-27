@@ -40,7 +40,7 @@ namespace Discord_Bot.Database.DBServices
                     }
                 }
                 Server server = await serverRepository.GetByDiscordIdAsync(serverId);
-                User user = await userRepository.GetUserByDiscordId(userId);
+                User user = await userRepository.GetUserByDiscordIdAsync(userId);
 
                 birthday = new()
                 {
