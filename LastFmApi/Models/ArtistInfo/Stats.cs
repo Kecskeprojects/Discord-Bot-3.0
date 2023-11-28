@@ -1,16 +1,16 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.ArtistInfo
 {
     public class Stats
     {
-        [JsonPropertyName("listeners")]
+        [JsonProperty("listeners")]
         public string Listeners { get; set; }
 
-        [JsonPropertyName("playcount")]
+        [JsonProperty("playcount")]
         public string Playcount { get; set; }
 
-        [JsonPropertyName("userplaycount")]
+        [JsonProperty("userplaycount")]
         public string Userplaycount { get; set; }
     }
 }

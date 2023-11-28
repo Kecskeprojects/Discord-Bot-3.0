@@ -1,16 +1,16 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.ArtistInfo
 {
     public class Link
     {
-        [JsonPropertyName("#text")]
+        [JsonProperty("#text")]
         public string Text { get; set; }
 
-        [JsonPropertyName("rel")]
+        [JsonProperty("rel")]
         public string Rel { get; set; }
 
-        [JsonPropertyName("href")]
+        [JsonProperty("href")]
         public string Href { get; set; }
     }
 }

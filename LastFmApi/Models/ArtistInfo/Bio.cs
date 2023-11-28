@@ -1,19 +1,19 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.ArtistInfo
 {
     public class Bio
     {
-        [JsonPropertyName("links")]
+        [JsonProperty("links")]
         public Links Links { get; set; }
 
-        [JsonPropertyName("published")]
+        [JsonProperty("published")]
         public string Published { get; set; }
 
-        [JsonPropertyName("summary")]
+        [JsonProperty("summary")]
         public string Summary { get; set; }
 
-        [JsonPropertyName("content")]
+        [JsonProperty("content")]
         public string Content { get; set; }
     }
 }

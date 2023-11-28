@@ -1,25 +1,25 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.TrackInfo
 {
     public class Album
     {
-        [JsonPropertyName("artist")]
+        [JsonProperty("artist")]
         public string Artist { get; set; }
 
-        [JsonPropertyName("title")]
+        [JsonProperty("title")]
         public string Title { get; set; }
 
-        [JsonPropertyName("mbid")]
+        [JsonProperty("mbid")]
         public string Mbid { get; set; }
 
-        [JsonPropertyName("url")]
+        [JsonProperty("url")]
         public string Url { get; set; }
 
-        [JsonPropertyName("image")]
+        [JsonProperty("image")]
         public List<Image> Image { get; set; }
 
-        [JsonPropertyName("@attr")]
+        [JsonProperty("@attr")]
         public Attr Attr { get; set; }
     }
 }

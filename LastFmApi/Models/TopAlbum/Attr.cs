@@ -1,25 +1,25 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.TopAlbum
 {
     public class Attr
     {
-        [JsonPropertyName("rank")]
+        [JsonProperty("rank")]
         public string Rank { get; set; }
 
-        [JsonPropertyName("perPage")]
+        [JsonProperty("perPage")]
         public string PerPage { get; set; }
 
-        [JsonPropertyName("totalPages")]
+        [JsonProperty("totalPages")]
         public string TotalPages { get; set; }
 
-        [JsonPropertyName("page")]
+        [JsonProperty("page")]
         public string Page { get; set; }
 
-        [JsonPropertyName("total")]
+        [JsonProperty("total")]
         public string Total { get; set; }
 
-        [JsonPropertyName("user")]
+        [JsonProperty("user")]
         public string User { get; set; }
     }
 }

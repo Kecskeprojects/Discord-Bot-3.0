@@ -1,13 +1,13 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.Recent
 {
     public class Album
     {
-        [JsonPropertyName("mbid")]
+        [JsonProperty("mbid")]
         public string Mbid { get; set; }
 
-        [JsonPropertyName("#text")]
+        [JsonProperty("#text")]
         public string Text { get; set; }
     }
 }

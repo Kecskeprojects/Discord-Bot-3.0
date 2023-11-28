@@ -1,37 +1,37 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.ArtistInfo
 {
     public class Artist
     {
-        [JsonPropertyName("name")]
+        [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonPropertyName("mbid")]
+        [JsonProperty("mbid")]
         public string Mbid { get; set; }
 
-        [JsonPropertyName("url")]
+        [JsonProperty("url")]
         public string Url { get; set; }
 
-        [JsonPropertyName("image")]
+        [JsonProperty("image")]
         public List<Image> Image { get; set; }
 
-        [JsonPropertyName("streamable")]
+        [JsonProperty("streamable")]
         public string Streamable { get; set; }
 
-        [JsonPropertyName("ontour")]
+        [JsonProperty("ontour")]
         public string Ontour { get; set; }
 
-        [JsonPropertyName("stats")]
+        [JsonProperty("stats")]
         public Stats Stats { get; set; }
 
-        [JsonPropertyName("similar")]
+        [JsonProperty("similar")]
         public Similar Similar { get; set; }
 
-        [JsonPropertyName("tags")]
+        [JsonProperty("tags")]
         public Tags Tags { get; set; }
 
-        [JsonPropertyName("bio")]
+        [JsonProperty("bio")]
         public Bio Bio { get; set; }
     }
 }

@@ -1,10 +1,10 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.ArtistInfo
 {
     public class Similar
     {
-        [JsonPropertyName("artist")]
+        [JsonProperty("artist")]
         public List<Artist> Artist { get; set; }
     }
 }

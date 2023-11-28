@@ -1,13 +1,13 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.TrackInfo
 {
     public class Image
     {
-        [JsonPropertyName("#text")]
+        [JsonProperty("#text")]
         public string Text { get; set; }
 
-        [JsonPropertyName("size")]
+        [JsonProperty("size")]
         public string Size { get; set; }
     }
 }

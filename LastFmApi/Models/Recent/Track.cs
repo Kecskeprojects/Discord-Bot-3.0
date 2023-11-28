@@ -1,34 +1,34 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.Recent
 {
     public class Track
     {
-        [JsonPropertyName("artist")]
+        [JsonProperty("artist")]
         public Artist Artist { get; set; }
 
-        [JsonPropertyName("streamable")]
+        [JsonProperty("streamable")]
         public string Streamable { get; set; }
 
-        [JsonPropertyName("image")]
+        [JsonProperty("image")]
         public List<Image> Image { get; set; }
 
-        [JsonPropertyName("mbid")]
+        [JsonProperty("mbid")]
         public string Mbid { get; set; }
 
-        [JsonPropertyName("album")]
+        [JsonProperty("album")]
         public Album Album { get; set; }
 
-        [JsonPropertyName("name")]
+        [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonPropertyName("@attr")]
+        [JsonProperty("@attr")]
         public Attr Attr { get; set; }
 
-        [JsonPropertyName("url")]
+        [JsonProperty("url")]
         public string Url { get; set; }
 
-        [JsonPropertyName("date")]
+        [JsonProperty("date")]
         public Date Date { get; set; }
     }
 }

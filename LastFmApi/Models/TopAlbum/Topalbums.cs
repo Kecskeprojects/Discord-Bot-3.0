@@ -1,13 +1,13 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.TopAlbum
 {
     public class Topalbums
     {
-        [JsonPropertyName("album")]
+        [JsonProperty("album")]
         public List<Album> Album { get; set; }
 
-        [JsonPropertyName("@attr")]
+        [JsonProperty("@attr")]
         public Attr Attr { get; set; }
     }
 }

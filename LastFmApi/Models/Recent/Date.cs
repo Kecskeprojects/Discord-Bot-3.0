@@ -1,13 +1,13 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.Recent
 {
     public class Date
     {
-        [JsonPropertyName("uts")]
+        [JsonProperty("uts")]
         public string Uts { get; set; }
 
-        [JsonPropertyName("#text")]
+        [JsonProperty("#text")]
         public string Text { get; set; }
     }
 }

@@ -1,10 +1,10 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.TrackInfo
 {
     public class TrackInfo
     {
-        [JsonPropertyName("track")]
+        [JsonProperty("track")]
         public Track Track { get; set; }
     }
 }

@@ -1,10 +1,10 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.TopArtist
 {
     public class TopArtist
     {
-        [JsonPropertyName("topartists")]
+        [JsonProperty("topartists")]
         public Topartists TopArtists { get; set; }
     }
 }

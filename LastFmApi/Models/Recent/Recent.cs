@@ -1,10 +1,10 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.Recent
 {
     public class Recent
     {
-        [JsonPropertyName("recenttracks")]
+        [JsonProperty("recenttracks")]
         public Recenttracks RecentTracks { get; set; }
     }
 }
