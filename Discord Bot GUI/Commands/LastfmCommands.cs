@@ -107,6 +107,7 @@ namespace Discord_Bot.Commands
                 if (response == null)
                 {
                     await ReplyAsync("Unexpected error occured.");
+                    return;
                 }
 
                 if (string.IsNullOrEmpty(response.Message))
@@ -166,6 +167,7 @@ namespace Discord_Bot.Commands
                 if (response == null)
                 {
                     await ReplyAsync("Unexpected error occured.");
+                    return;
                 }
 
                 if (string.IsNullOrEmpty(response.Message))
@@ -218,6 +220,7 @@ namespace Discord_Bot.Commands
                 if (response == null)
                 {
                     await ReplyAsync("Unexpected error occured.");
+                    return;
                 }
 
                 if (string.IsNullOrEmpty(response.Message))
@@ -267,6 +270,7 @@ namespace Discord_Bot.Commands
                 if (nowPlaying == null)
                 {
                     await ReplyAsync("Unexpected error occured.");
+                    return;
                 }
 
                 if (string.IsNullOrEmpty(nowPlaying.Message))
@@ -319,6 +323,7 @@ namespace Discord_Bot.Commands
                 if (response == null)
                 {
                     await ReplyAsync("Unexpected error occured.");
+                    return;
                 }
 
                 if (string.IsNullOrEmpty(response.Message))
@@ -366,8 +371,10 @@ namespace Discord_Bot.Commands
                 if (response == null)
                 {
                     await ReplyAsync("Unexpected error occured during request.");
+                    return;
                 }
-                else if (string.IsNullOrEmpty(response.Message))
+
+                if (string.IsNullOrEmpty(response.Message))
                 {
                     //Getting base of lastfm embed
                     EmbedBuilder builder = LastFmService.BaseEmbed($"{Global.GetNickName(Context.Channel, Context.User)}'s stats for {response.ArtistName}", response.ImageUrl);
@@ -423,11 +430,11 @@ namespace Discord_Bot.Commands
                 }
                 else if (input.Contains('>'))
                 {
-                    await lastFmAPI.WhoKnowsByTrack(Context, wk, input);
+                    await lastFmAPI.WhoKnowsByTrack(wk, input);
                 }
                 else
                 {
-                    await lastFmAPI.WhoKnowsByArtist(Context, wk, input);
+                    await lastFmAPI.WhoKnowsByArtist(wk, input);
                 }
 
                 if (!string.IsNullOrEmpty(wk.Message))
@@ -453,15 +460,17 @@ namespace Discord_Bot.Commands
                         if (modifiedImage != null)
                         {
                             //Add it to the embed
-                            builder.WithImageUrl($"attachment://{modifiedImage.Item1}");
+                            builder.WithImageUrl($"attachment://{modifiedImage.FileName}");
 
                             //Must send it as a file upload
-                            await Context.Channel.SendFileAsync(modifiedImage.Item2, modifiedImage.Item1, "", embed: builder.Build());
+                            await Context.Channel.SendFileAsync(modifiedImage.Stream, modifiedImage.FileName, "", embed: builder.Build());
                         }
                     }
                     else
                     {
-                        string[] list = { "", "", "" }; int i = 1; int index = 0;
+                        string[] list = ["", "", ""];
+                        int i = 1;
+                        int index = 0;
                         foreach (KeyValuePair<string, int> userplays in wk.Plays)
                         {
                             //One line in embed
@@ -493,11 +502,6 @@ namespace Discord_Bot.Commands
                 {
                     await ReplyAsync("No one has played this song according to last.fm!");
                 }
-            }
-            catch (HttpRequestException ex)
-            {
-                await ReplyAsync("Last.fm is temporarily unavailable!");
-                logger.Error("LastfmCommands.cs LfTopTrack", ex.ToString());
             }
             catch (Exception ex)
             {

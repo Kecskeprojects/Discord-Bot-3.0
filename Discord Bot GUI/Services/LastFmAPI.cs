@@ -1,5 +1,4 @@
-﻿using Discord.Commands;
-using Discord_Bot.Core.Config;
+﻿using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
@@ -54,13 +53,13 @@ namespace Discord_Bot.Services
 
                     result.Ranking = await GetSongMonthlyRankingAsync(lastFmUsername, restResult.Response.Artist.Text, restResult.Response.Name);
                 }
-                else if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.RequiredParameterEmpty)
+                else if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.EmptyResponse)
                 {
-                    result.Message = "Error during request!\nCheck to make sure if you set your lastfm username correctly!";
+                    result.Message = "Check to make sure if you set your lastfm username correctly!";
                 }
                 else
                 {
-                    result.Message = "Unexpected exception occured!";
+                    result.Message = "Unexpected exception during request!";
                     logger.Error("LastFmAPI.cs GetNowPlayingAsync", restResult.Exception.ToString());
                 }
                 return result;
@@ -109,13 +108,13 @@ namespace Discord_Bot.Services
                         }
                     }
                 }
-                else if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.RequiredParameterEmpty)
+                else if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.EmptyResponse)
                 {
-                    result.Message = "Error during request!\nCheck to make sure if you set your lastfm username correctly!";
+                    result.Message = "Check to make sure if you set your lastfm username correctly!";
                 }
                 else
                 {
-                    result.Message = "Unexpected exception occured!";
+                    result.Message = "Unexpected exception during request!";
                     logger.Error("LastFmAPI.cs GetTopAlbumsAsync", restResult.Exception.ToString());
                 }
                 return result;
@@ -164,13 +163,13 @@ namespace Discord_Bot.Services
                         }
                     }
                 }
-                else if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.RequiredParameterEmpty)
+                else if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.EmptyResponse)
                 {
-                    result.Message = "Error during request!\nCheck to make sure if you set your lastfm username correctly!";
+                    result.Message = "Check to make sure if you set your lastfm username correctly!";
                 }
                 else
                 {
-                    result.Message = "Unexpected exception occured!";
+                    result.Message = "Unexpected exception during request!";
                     logger.Error("LastFmAPI.cs GetTopArtistsAsync", restResult.Exception.ToString());
                 }
                 return result;
@@ -219,13 +218,13 @@ namespace Discord_Bot.Services
                         }
                     }
                 }
-                else if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.RequiredParameterEmpty)
+                else if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.EmptyResponse)
                 {
-                    result.Message = "Error during request!\nCheck to make sure if you set your lastfm username correctly!";
+                    result.Message = "Check to make sure if you set your lastfm username correctly!";
                 }
                 else
                 {
-                    result.Message = "Error during request!\nCheck to make sure if you set your lastfm username correctly!";
+                    result.Message = "Unexpected exception during request!";
                     logger.Error("LastFmAPI.cs GetNowPlayingAsync", restResult.Exception.ToString());
                 }
                 return result;
@@ -274,13 +273,13 @@ namespace Discord_Bot.Services
                         }
                     }
                 }
-                else if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.RequiredParameterEmpty)
+                else if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.EmptyResponse)
                 {
-                    result.Message = "Error during request!\nCheck to make sure if you set your lastfm username correctly!";
+                    result.Message = "Check to make sure if you set your lastfm username correctly!";
                 }
                 else
                 {
-                    result.Message = "Error during request!\nCheck to make sure if you set your lastfm username correctly!";
+                    result.Message = "Unexpected exception during request!";
                     logger.Error("LastFmAPI.cs GetRecentsAsync", restResult.Exception.ToString());
                 }
                 return result;
@@ -356,159 +355,191 @@ namespace Discord_Bot.Services
 
             return null;
         }
+
         public async Task WhoKnowsByCurrentlyPlaying(WhoKnows wk, UserResource user)
         {
-            //Check if they are playing something
-            NowPlayingResult nowPlaying = await GetNowPlayingAsync(user.LastFmUsername);
-            if (nowPlaying == null)
+            try
             {
-                wk.Message = "Unexpected error occured during request!";
-                return;
-            }
-            else if (!string.IsNullOrEmpty(nowPlaying.Message))
-            {
-                wk.Message = nowPlaying.Message;
-                return;
-            }
-
-            //Get artist's name and the track for search
-            string artist_name = nowPlaying.ArtistName;
-            string track_name = nowPlaying.TrackName;
-
-            foreach (UserResource item in wk.Users)
-            {
-                //Get their number of plays on given song
-                LastFmApi.Models.TrackInfo.Track request = await GetTrackPlaysAsync(item.LastFmUsername, artist_name, track_name);
-
-                if (request != null)
+                //Check if they are playing something
+                NowPlayingResult nowPlaying = await GetNowPlayingAsync(user.LastFmUsername);
+                if (nowPlaying == null)
                 {
-                    if (item == wk.Users[0])
-                    {
-                        //Save the names for use in embed
-                        wk.Searched = $"{request.Name} by {request.Artist.Name}";
+                    wk.Message = "Unexpected error occured during request!";
+                    return;
+                }
+                else if (!string.IsNullOrEmpty(nowPlaying.Message))
+                {
+                    wk.Message = nowPlaying.Message;
+                    return;
+                }
 
-                        SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(nowPlaying.ArtistMbid, artist_name, track_name);
-                        if (spotifySearch != null)
+                //Get artist's name and the track for search
+                string artist_name = nowPlaying.ArtistName;
+                string track_name = nowPlaying.TrackName;
+
+                foreach (UserResource item in wk.Users)
+                {
+                    //Get their number of plays on given song
+                    LastFmApi.Models.TrackInfo.Track request = await GetTrackPlaysAsync(item.LastFmUsername, artist_name, track_name);
+
+                    if (request != null)
+                    {
+                        if (item == wk.Users[0])
                         {
-                            wk.ImageUrl = spotifySearch.ImageUrl;
+                            //Save the names for use in embed
+                            wk.Searched = $"{request.Name} by {request.Artist.Name}";
+
+                            SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(nowPlaying.ArtistMbid, artist_name, track_name);
+                            if (spotifySearch != null)
+                            {
+                                wk.ImageUrl = spotifySearch.ImageUrl;
+                            }
+                        }
+
+                        if (int.TryParse(request.Userplaycount, out int playcount) && playcount > 0)
+                        {
+                            //Add user to dictionary
+                            wk.Plays.Add(item.Username, playcount);
                         }
                     }
-
-                    if (int.TryParse(request.Userplaycount, out int playcount) && playcount > 0)
+                    else
                     {
-                        //Add user to dictionary
-                        wk.Plays.Add(item.Username, playcount);
+                        wk.Message = "No track found!";
+                        break;
                     }
                 }
-                else
-                {
-                    wk.Message = "No track found!";
-                    break;
-                }
+            }
+            catch (HttpRequestException ex)
+            {
+                wk.Message = "Last.fm is temporarily unavailable!";
+                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
+            }
+            catch (Exception ex)
+            {
+                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
             }
         }
 
 
-        public async Task<WhoKnows> WhoKnowsByTrack(SocketCommandContext Context, WhoKnows wk, string input)
+        public async Task WhoKnowsByTrack(WhoKnows wk, string input)
         {
-            //Get artist's name and the track for search
-            string artist_name = input.Split('>')[0].Trim().ToLower();
-            string track_name = input.Split('>')[1].Trim().ToLower();
-
-            foreach (UserResource item in wk.Users)
+            try
             {
-                //Get their number of plays on given song
-                LastFmApi.Models.TrackInfo.Track request = await GetTrackPlaysAsync(item.LastFmUsername, artist_name, track_name);
+                //Get artist's name and the track for search
+                string artist_name = input.Split('>')[0].Trim().ToLower();
+                string track_name = input.Split('>')[1].Trim().ToLower();
 
-                if (request != null)
+                foreach (UserResource item in wk.Users)
                 {
-                    if (item == wk.Users[0])
-                    {
-                        //Save the names for use in embed
-                        wk.Searched = $"{request.Name} by {request.Artist.Name}";
+                    //Get their number of plays on given song
+                    LastFmApi.Models.TrackInfo.Track request = await GetTrackPlaysAsync(item.LastFmUsername, artist_name, track_name);
 
-                        SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(request.Artist.Mbid, artist_name, track_name);
-                        if (spotifySearch != null)
+                    if (request != null)
+                    {
+                        if (item == wk.Users[0])
                         {
-                            wk.ImageUrl = spotifySearch.ImageUrl;
+                            //Save the names for use in embed
+                            wk.Searched = $"{request.Name} by {request.Artist.Name}";
+
+                            SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(request.Artist.Mbid, artist_name, track_name);
+                            if (spotifySearch != null)
+                            {
+                                wk.ImageUrl = spotifySearch.ImageUrl;
+                            }
+                        }
+
+                        if (int.TryParse(request.Userplaycount, out int playcount) && playcount > 0)
+                        {
+                            //Add user to dictionary
+                            wk.Plays.Add(item.Username, playcount);
                         }
                     }
-
-                    if (int.TryParse(request.Userplaycount, out int playcount) && playcount > 0)
+                    else
                     {
-                        //Add user to dictionary
-                        wk.Plays.Add(item.Username, playcount);
+                        wk.Message = "No track found!";
+                        break;
                     }
                 }
-                else
-                {
-                    wk.Message = "No track found!";
-                    break;
-                }
             }
-
-            return wk;
+            catch (HttpRequestException ex)
+            {
+                wk.Message = "Last.fm is temporarily unavailable!";
+                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
+            }
+            catch (Exception ex)
+            {
+                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
+            }
         }
 
-        public async Task<WhoKnows> WhoKnowsByArtist(SocketCommandContext Context, WhoKnows wk, string input)
+        public async Task WhoKnowsByArtist(WhoKnows wk, string input)
         {
-            //Get artist's name for search
-            string artist_name = input.Trim().ToLower();
-
-            foreach (UserResource item in wk.Users)
+            try
             {
-                //Get their number of plays on given artists
-                LastFmApi.Models.ArtistInfo.Artist request = await GetArtistPlaysAsync(item.Username, artist_name);
-                if (request != null)
-                {
-                    if (item == wk.Users[0])
-                    {
-                        //Save the name for use in embed
-                        wk.Searched = request.Name;
+                //Get artist's name for search
+                string artist_name = input.Trim().ToLower();
 
-                        SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(request.Mbid, artist_name);
-                        if (spotifySearch != null)
+                foreach (UserResource item in wk.Users)
+                {
+                    //Get their number of plays on given artists
+                    LastFmApi.Models.ArtistInfo.Artist request = await GetArtistPlaysAsync(item.Username, artist_name);
+                    if (request != null)
+                    {
+                        if (item == wk.Users[0])
                         {
-                            wk.ImageUrl = spotifySearch.ImageUrl;
+                            //Save the name for use in embed
+                            wk.Searched = request.Name;
+
+                            SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(request.Mbid, artist_name);
+                            if (spotifySearch != null)
+                            {
+                                wk.ImageUrl = spotifySearch.ImageUrl;
+                            }
+                        }
+
+                        if (int.TryParse(request.Stats.Userplaycount, out int playcount) && playcount > 0)
+                        {
+                            //Add user to dictionary
+                            wk.Plays.Add(item.Username, playcount);
                         }
                     }
-
-                    if (int.TryParse(request.Stats.Userplaycount, out int playcount) && playcount > 0)
+                    else
                     {
-                        //Add user to dictionary
-                        wk.Plays.Add(item.Username, playcount);
+                        wk.Message = "No artist found!";
+                        break;
                     }
                 }
-                else
-                {
-                    wk.Message = "No artist found!";
-                    break;
-                }
             }
-
-            return wk;
+            catch (HttpRequestException ex)
+            {
+                wk.Message = "Last.fm is temporarily unavailable!";
+                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
+            }
+            catch (Exception ex)
+            {
+                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
+            }
         }
 
+        #region Helper API calls
         private async Task<LastFmApi.Models.ArtistInfo.Artist> GetArtistPlaysAsync(string lastFmUsername, string artistName)
         {
             GenericResponseItem<LastFmApi.Models.ArtistInfo.Artist> restResult = await InfoBasedRequests.ArtistPlays(config.Lastfm_API_Key, lastFmUsername, artistName);
 
             return restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success
-                ? throw restResult.Exception ?? new Exception("Track plays request resulted in an error!")
+                ? throw restResult.Exception ?? new Exception($"Track plays request resulted in an error! (Type:{restResult.ResultCode}")
                 : restResult.Response;
         }
 
-        #region Helper API calls
         private async Task<LastFmApi.Models.TrackInfo.Track> GetTrackPlaysAsync(string lastFmUsername, string artistName, string trackName)
         {
             GenericResponseItem<LastFmApi.Models.TrackInfo.Track> restResult = await InfoBasedRequests.TrackPlays(config.Lastfm_API_Key, lastFmUsername, artistName, trackName);
 
             return restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success
-                ? throw restResult.Exception ?? new Exception("Track plays request resulted in an error!")
+                ? throw restResult.Exception ?? new Exception($"Track plays request resulted in an error! (Type:{restResult.ResultCode}")
                 : restResult.Response;
         }
 
-        //Checking the total plays of a user using the topartist part of the api, as it has the least amount of entries in any case
         private async Task<int> TotalPlays(string lastFmUsername, string period)
         {
             int page = 1, totalpage, totalplays = 0;
@@ -518,7 +549,7 @@ namespace Discord_Bot.Services
 
                 if (restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success)
                 {
-                    throw restResult.Exception ?? new Exception("Total plays request resulted in an error!");
+                    throw restResult.Exception ?? new Exception($"Total plays request resulted in an error! (Type:{restResult.ResultCode}");
                 }
 
                 foreach (LastFmApi.Models.TopArtist.Artist artist in restResult.Response.Artist)
@@ -535,8 +566,8 @@ namespace Discord_Bot.Services
 
         private async Task<string> GetSongMonthlyRankingAsync(string username, string artist_name, string track_name)
         {
-            int page = 1, totalpage;
             LastFmApi.Models.TopTrack.Attr attr;
+            int page = 1, totalpage;
             string position = "";
             do
             {
@@ -544,7 +575,7 @@ namespace Discord_Bot.Services
 
                 if (restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success)
                 {
-                    throw restResult.Exception ?? new Exception("Monthly ranking request resulted in an error!");
+                    throw restResult.Exception ?? new Exception($"Monthly ranking request resulted in an error! (Type:{restResult.ResultCode}");
                 }
 
                 for (int i = 0; i < restResult.Response.Track.Count; i++)
@@ -579,12 +610,11 @@ namespace Discord_Bot.Services
 
             do
             {
-                //Getting data from api
                 GenericResponseItem<Topalbums> restResult = await UserBasedRequests.TopAlbums(config.Lastfm_API_Key, username, 1000, page, null);
 
                 if (restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success)
                 {
-                    throw restResult.Exception ?? new Exception("Top albums request resulted in an error!");
+                    throw restResult.Exception ?? new Exception($"Top albums request resulted in an error! (Type:{restResult.ResultCode}");
                 }
 
                 foreach (LastFmApi.Models.TopAlbum.Album album in restResult.Response.Album)
@@ -609,12 +639,11 @@ namespace Discord_Bot.Services
 
             do
             {
-                //Getting data from api
                 GenericResponseItem<Toptracks> restResult = await UserBasedRequests.TopTracks(config.Lastfm_API_Key, username, 1000, page, null);
 
                 if (restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success)
                 {
-                    throw restResult.Exception ?? new Exception("Top tracks request resulted in an error!");
+                    throw restResult.Exception ?? new Exception($"Top tracks request resulted in an error! (Type:{restResult.ResultCode}");
                 }
 
                 foreach (LastFmApi.Models.TopTrack.Track track in restResult.Response.Track)
