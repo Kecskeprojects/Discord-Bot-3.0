@@ -6,7 +6,6 @@ using Discord_Bot.Services.Models.SpotifyAPI;
 using Discord_Bot.Tools;
 using SpotifyAPI.Web;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -115,6 +114,7 @@ namespace Discord_Bot.Services
         #endregion
 
         #region Image search
+        /*
         //Lastfm complimentary function
         public async Task<string> ImageSearch(string artist, string song = "", string[] tags = null)
         {
@@ -246,19 +246,23 @@ namespace Discord_Bot.Services
             }
             return "";
         }
-
+        */
         //Lastfm complimentary function
         public async Task<SpotifyImageSearchResult> SearchItemAsync(string artistMbid, string artistName, string songName = "")
         {
             try
             {
+                if(artistMbid == null)
+                {
+                    return null;
+                }
                 string url = await musicBrainzAPI.GetArtistSpotifyUrlAsync(artistMbid);
                 if (string.IsNullOrEmpty(url))
                 {
                     return null;
                 }
 
-                string artistId = new Uri(url).Segments[^1].Replace("/", "");
+                string artistId = new Uri(url).Segments[^1];
 
                 SpotifyClientConfig configuration = SpotifyClientConfig.CreateDefault().WithAuthenticator(new ClientCredentialsAuthenticator(config.Spotify_Client_Id, config.Spotify_Client_Secret));
                 SpotifyClient spotify = new(configuration);
@@ -276,6 +280,7 @@ namespace Discord_Bot.Services
                     if (artist == null)
                     {
                         logger.Query("Artist not found!");
+                        logger.Query("============================================================================");
                         return null;
                     }
 
@@ -291,6 +296,7 @@ namespace Discord_Bot.Services
                     if (searchResult.Tracks.Items.Count == 0)
                     {
                         logger.Query("No results for track!");
+                        logger.Query("============================================================================");
                         return null;
                     }
 
@@ -299,6 +305,7 @@ namespace Discord_Bot.Services
                     if (track == null)
                     {
                         logger.Query("Track not found!");
+                        logger.Query("============================================================================");
                         return null;
                     }
 
@@ -307,7 +314,7 @@ namespace Discord_Bot.Services
                     result.EntityUrl = track.ExternalUrls["spotify"];
                 }
 
-                logger.Query($"Artist found by Last.fm: {artistName}\nArtist found by Spotify: {spotifyArtist}\nWith image link: {spotifyImage}");
+                logger.Query($"Artist found by Last.fm: {artistName}\nArtist found by Spotify: {spotifyArtist}\nWith image link: {result.ImageUrl}");
                 logger.Query("============================================================================");
 
                 return result;

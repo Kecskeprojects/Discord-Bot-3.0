@@ -28,42 +28,14 @@ namespace Discord_Bot.Services
                 using Image mainImage = Image.Load(originalImg);
                 using Image AlbumImage = mainImage.CloneAs<Rgba32>();
 
-                //If the Cover image is too wide or high, we crop it depending on which of the two it is
-                if (mainImage.Height / mainImage.Width > 1.2 || mainImage.Height / mainImage.Width < 0.8)
-                {
-                    int difference;
-                    if (mainImage.Width > mainImage.Height)
-                    {
-                        difference = mainImage.Width - mainImage.Height;
-
-                        mainImage.Mutate(x => x.Crop(new Rectangle(difference / 2, 0, mainImage.Width - difference, mainImage.Height)));
-                        AlbumImage.Mutate(x => x.Crop(new Rectangle(difference / 2, 0, AlbumImage.Width - difference, AlbumImage.Height)));
-                    }
-                    else
-                    {
-                        difference = mainImage.Height - mainImage.Width;
-
-                        mainImage.Mutate(x => x.Crop(new Rectangle(0, difference / 2, mainImage.Width, mainImage.Height - difference)));
-                        AlbumImage.Mutate(x => x.Crop(new Rectangle(0, difference / 2, AlbumImage.Width, AlbumImage.Height - difference)));
-                    }
-
-                }
+                CorrectImageRatio(mainImage, AlbumImage);
 
                 //Get the dominant and contrast colors for the album image
                 Tuple<Color, Color> Colors = GetContrastAndDominantColors(mainImage.CloneAs<Rgba32>());
                 Color DominantColor = Colors.Item1;
                 Color ContrastColor = Colors.Item2;
 
-                //Resize the album picture that is not blurred, 1 pixel less on each side so it can have a proper border
-                AlbumImage.Mutate(x => x.Resize(348, 348));
-
-                //Resize the blurred image, cut it to size, cutting off 150pixels from the top and the bottom
-                //Then lastly do a heavy blur on it
-                mainImage.Mutate(x =>
-                    x.Resize(800, 800)
-                    .Crop(new Rectangle(0, 150, 800, 500))
-                    .GaussianBlur(15)
-                );
+                ResizeImages(mainImage, AlbumImage);
 
                 //Set oppacity of drawn single color rectangles
                 DrawingOptions options = new();
@@ -88,21 +60,7 @@ namespace Discord_Bot.Services
                 //Get what color should be used for head text
                 Color TextColor = BlackOrWhite(DominantColor);
 
-                //We write the artist and the song in separate lines in case it turns out too long
-                string[] HeadTextparts = HeadText.Replace(" by ", "\nby ").Split("\n");
-                for (int i = 0; i < HeadTextparts.Length; i++)
-                {
-                    //Measure the length of the text so we can put it in the middle
-                    FontRectangle textsize = TextMeasurer.MeasureBounds(HeadTextparts[i], new TextOptions(font));
-
-                    int X = (mainImage.Width - (int)textsize.Width) / 2;
-                    int Y = ((125 - ((int)textsize.Height * HeadTextparts.Length)) / 2) + ((int)textsize.Height * i);
-
-                    //Put Top text on image
-                    mainImage.Mutate(x =>
-                        x.DrawText(HeadTextparts[i], font, TextColor, new Point(X, Y))
-                    );
-                }
+                WriteHeader(HeadText, mainImage, font, TextColor);
 
                 //Modify graphics option to have a higher oppacity
                 options.GraphicsOptions.BlendPercentage = 0.8F;
@@ -115,50 +73,7 @@ namespace Discord_Bot.Services
 
                 int length = plays.Count > 12 ? 12 : plays.Count;
 
-                for (int i = 0; i < length; i++)
-                {
-                    //Put dictionary values into temporary variables
-                    string user = $"{i + 1}# {plays.Keys.ToArray()[i]}";
-                    int playCount = plays[plays.Keys.ToArray()[i]];
-
-                    //Place slightly less see through rectangle behind text
-                    mainImage.Mutate(x =>
-                        x.Fill(options, ContrastColor, new Rectangle(425, 132 + (i * 28), 300, 25))
-                    );
-
-                    //Check the length of the user string
-                    FontRectangle textsize = TextMeasurer.MeasureBounds(string.Format("{0, 12}", user), new TextOptions(font));
-
-                    //If it is longer than 210 it will collide with the plays
-                    if (textsize.Width > 210)
-                    {
-                        //We check character by character when it is shorter than that limit
-                        for (int ch = user.Length; ch > 0; ch--)
-                        {
-                            //We check the currently shortened string's length
-                            float tempwidth = TextMeasurer.MeasureBounds(string.Format("{0, 12}", user[..ch]), new TextOptions(font)).Width;
-
-                            //When it is short enough, we shorten the original text to this version and move on
-                            if (tempwidth < 210)
-                            {
-                                user = user[..ch];
-                                break;
-                            }
-                        }
-                    }
-
-                    //Place tranking and name of user
-                    mainImage.Mutate(x => x.DrawText(user, font, TextColor, new Point(427, 137 + (i * 28))));
-
-                    //Placeholder text, formatting is permanent though
-                    string points = string.Format("{0,12}", $"{playCount} plays");
-                    textsize = TextMeasurer.MeasureBounds(string.Format("{0, 12}", points), new TextOptions(font));
-
-                    //Amount of plays the user has
-                    mainImage.Mutate(x =>
-                        x.DrawText(points, font, TextColor, new Point(722 - (int)textsize.Width, 137 + (i * 28)))
-                    );
-                }
+                WriteUserNames(plays, mainImage, ContrastColor, options, font, TextColor, length);
 
                 string fileName = $"{new Random().Next(0, int.MaxValue)}.png";
 
@@ -176,9 +91,119 @@ namespace Discord_Bot.Services
         }
         #endregion
 
-
         #region Helper methods
-        public static Tuple<Color, Color> GetContrastAndDominantColors(Image<Rgba32> image)
+        private static void WriteUserNames(Dictionary<string, int> plays, Image mainImage, Color ContrastColor, DrawingOptions options, Font font, Color TextColor, int length)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                //Put dictionary values into temporary variables
+                string user = $"{i + 1}# {plays.Keys.ToArray()[i]}";
+                int playCount = plays[plays.Keys.ToArray()[i]];
+
+                //Place slightly less see through rectangle behind text
+                mainImage.Mutate(x =>
+                    x.Fill(options, ContrastColor, new Rectangle(425, 132 + (i * 28), 300, 25))
+                );
+
+                //Check the length of the user string
+                FontRectangle textsize = TextMeasurer.MeasureBounds(string.Format("{0, 12}", user), new TextOptions(font));
+                user = ShortenUsername(font, user, textsize);
+
+                //Place tranking and name of user
+                mainImage.Mutate(x => x.DrawText(user, font, TextColor, new Point(427, 137 + (i * 28))));
+
+                //Placeholder text, formatting is permanent though
+                string points = string.Format("{0,12}", $"{playCount} plays");
+                textsize = TextMeasurer.MeasureBounds(string.Format("{0, 12}", points), new TextOptions(font));
+
+                //Amount of plays the user has
+                mainImage.Mutate(x =>
+                    x.DrawText(points, font, TextColor, new Point(722 - (int)textsize.Width, 137 + (i * 28)))
+                );
+            }
+        }
+
+        private static string ShortenUsername(Font font, string user, FontRectangle textsize)
+        {
+            //If it is longer than 210 it will collide with the plays
+            if (textsize.Width > 210)
+            {
+                //We check character by character when it is shorter than that limit
+                for (int ch = user.Length; ch > 0; ch--)
+                {
+                    //We check the currently shortened string's length
+                    float tempwidth = TextMeasurer.MeasureBounds(string.Format("{0, 12}", user[..ch]), new TextOptions(font)).Width;
+
+                    //When it is short enough, we shorten the original text to this version and move on
+                    if (tempwidth < 210)
+                    {
+                        user = user[..ch];
+                        break;
+                    }
+                }
+            }
+
+            return user;
+        }
+
+        private static void WriteHeader(string HeadText, Image mainImage, Font font, Color TextColor)
+        {
+            //We write the artist and the song in separate lines in case it turns out too long
+            string[] HeadTextparts = HeadText.Replace(" by ", "\nby ").Split("\n");
+            for (int i = 0; i < HeadTextparts.Length; i++)
+            {
+                //Measure the length of the text so we can put it in the middle
+                FontRectangle textsize = TextMeasurer.MeasureBounds(HeadTextparts[i], new TextOptions(font));
+
+                int X = (mainImage.Width - (int)textsize.Width) / 2;
+                int Y = ((125 - ((int)textsize.Height * HeadTextparts.Length)) / 2) + ((int)textsize.Height * i);
+
+                //Put Top text on image
+                mainImage.Mutate(x =>
+                    x.DrawText(HeadTextparts[i], font, TextColor, new Point(X, Y))
+                );
+            }
+        }
+
+        private static void ResizeImages(Image mainImage, Image AlbumImage)
+        {
+            //Resize the album picture that is not blurred, 1 pixel less on each side so it can have a proper border
+            AlbumImage.Mutate(x => x.Resize(348, 348));
+
+            //Resize the blurred image, cut it to size, cutting off 150pixels from the top and the bottom
+            //Then lastly do a heavy blur on it
+            mainImage.Mutate(x =>
+                x.Resize(800, 800)
+                .Crop(new Rectangle(0, 150, 800, 500))
+                .GaussianBlur(15)
+            );
+        }
+
+        private static void CorrectImageRatio(Image mainImage, Image AlbumImage)
+        {
+            //If the Cover image is too wide or high, we crop it depending on which of the two it is
+            if (mainImage.Height / mainImage.Width > 1.2 || mainImage.Height / mainImage.Width < 0.8)
+            {
+                int difference;
+                if (mainImage.Width > mainImage.Height)
+                {
+                    difference = mainImage.Width - mainImage.Height;
+
+                    mainImage.Mutate(x => x.Crop(new Rectangle(difference / 2, 0, mainImage.Width - difference, mainImage.Height)));
+                    AlbumImage.Mutate(x => x.Crop(new Rectangle(difference / 2, 0, AlbumImage.Width - difference, AlbumImage.Height)));
+                }
+                else
+                {
+                    difference = mainImage.Height - mainImage.Width;
+
+                    mainImage.Mutate(x => x.Crop(new Rectangle(0, difference / 2, mainImage.Width, mainImage.Height - difference)));
+                    AlbumImage.Mutate(x => x.Crop(new Rectangle(0, difference / 2, AlbumImage.Width, AlbumImage.Height - difference)));
+                }
+
+            }
+        }
+
+        private static Tuple<Color, Color> GetContrastAndDominantColors(Image<Rgba32> image)
         {
             //Use nearest neighbor sampling to simplify image and resize it to a 100 pixel wide image with near equal aspect ratio
             image.Mutate(x => x
@@ -225,8 +250,7 @@ namespace Discord_Bot.Services
             return new Tuple<Color, Color>(DominantColor, ContrastColor);
         }
 
-
-        public static Rgba32 BlackOrWhite(Rgba32 color)
+        private static Rgba32 BlackOrWhite(Rgba32 color)
         {
             //Formula deciding whether black or white would look more visible
             double l = (0.2126 * color.R) + (0.7152 * color.G) + (0.0722 * color.B);

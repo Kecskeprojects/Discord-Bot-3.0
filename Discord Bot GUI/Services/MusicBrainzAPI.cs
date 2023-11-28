@@ -23,7 +23,7 @@ namespace Discord_Bot.Services
                 ArtistLookup deserialized = JsonConvert.DeserializeObject<ArtistLookup>(resultJSON.Content);
 
                 Url spotifyUrl = deserialized.Relations.FirstOrDefault(x => x.Url != null && x.Url.Resource.Contains("spotify"))?.Url;
-                return spotifyUrl.Resource;
+                return spotifyUrl?.Resource;
             }
             catch (Exception ex)
             {

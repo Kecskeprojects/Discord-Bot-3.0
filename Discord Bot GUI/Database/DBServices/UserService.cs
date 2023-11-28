@@ -22,7 +22,7 @@ namespace Discord_Bot.Database.DBServices
             {
                 User user = await userRepository.GetUserByDiscordIdAsync(userId);
 
-                if (string.IsNullOrEmpty(user.LastFmusername))
+                if (!string.IsNullOrEmpty(user.LastFmusername))
                 {
                     return DbProcessResultEnum.AlreadyExists;
                 }

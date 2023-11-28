@@ -54,7 +54,7 @@ namespace LastFmApi
                     return response;
                 }
 
-                InfoBasedRequestItem request = new("track.getInfo", apiKey, username, artistName) { Track = trackName };
+                InfoBasedRequestItem request = new("track.getInfo", username, apiKey, artistName) { Track = trackName };
 
                 RestResponse restResultJSON = await InfoBasedRequestHandler(request);
                 TrackInfo deserialized = JsonConvert.DeserializeObject<TrackInfo>(restResultJSON.Content);

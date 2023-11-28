@@ -36,12 +36,12 @@ namespace LastFmApi
         {
             string query = $"?method={item.Type}&api_key={item.ApiKey}&artist={Uri.EscapeDataString(item.Artist)}&username={Uri.EscapeDataString(item.Username)}";
 
-            if (string.IsNullOrEmpty(item.Track))
+            if (!string.IsNullOrEmpty(item.Track))
             {
                 query += $"&track={Uri.EscapeDataString(item.Track)}";
             }
 
-            if (string.IsNullOrEmpty(item.Album))
+            if (!string.IsNullOrEmpty(item.Album))
             {
                 query += $"&track={Uri.EscapeDataString(item.Album)}";
             }

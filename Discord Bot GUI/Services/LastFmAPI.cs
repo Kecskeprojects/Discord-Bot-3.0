@@ -13,6 +13,7 @@ using LastFmApi.Models.TopArtist;
 using LastFmApi.Models.TopTrack;
 using System;
 using System.Collections.Generic;
+using System.IO.Pipelines;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -44,6 +45,11 @@ namespace Discord_Bot.Services
                     {
                         result.ImageUrl = spotifySearch.ImageUrl;
                         result.Url = spotifySearch.EntityUrl;
+                    }
+                    else
+                    {
+                        result.ImageUrl = restResult.Response.Image?[^1].Text;
+                        result.Url = restResult.Response.Url;
                     }
 
                     LastFmApi.Models.TrackInfo.Track track = await GetTrackPlaysAsync(lastFmUsername, restResult.Response.Artist.Text, restResult.Response.Name);
@@ -93,16 +99,20 @@ namespace Discord_Bot.Services
                     {
                         result.ImageUrl = spotifySearch.ImageUrl;
                     }
+                    else
+                    {
+                        result.ImageUrl = restResult.Response.Album[0].Image?[^1].Text;
+                    }
 
                     int index = 0;
                     for (int i = 0; i < restResult.Response.Album.Count && i < limit; i++)
                     {
                         LastFmApi.Models.TopAlbum.Album album = restResult.Response.Album[i];
                         //One line in the embed
-                        result.EmbedFields[index] += $"`#{i}`**{album.Name}** by **{album.Artist.Name}** - *{Math.Round(double.Parse(album.PlayCount) / result.TotalPlays * 100)}%* (*{album.PlayCount} plays*)\n";
+                        result.EmbedFields[index] += $"`#{i + 1}`**{album.Name}** by **{album.Artist.Name}** - *{Math.Round(double.Parse(album.PlayCount) / result.TotalPlays * 100)}%* (*{album.PlayCount} plays*)\n";
 
                         //If we went through 10 results, start filling a new list page
-                        if (i % 10 == 0)
+                        if (i > 0 && i % 10 == 0)
                         {
                             index++;
                         }
@@ -148,16 +158,20 @@ namespace Discord_Bot.Services
                     {
                         result.ImageUrl = spotifySearch.ImageUrl;
                     }
+                    else
+                    {
+                        result.ImageUrl = restResult.Response.Artist[0].Image?[^1].Text;
+                    }
 
                     int index = 0;
                     for (int i = 0; i < restResult.Response.Artist.Count && i < limit; i++)
                     {
                         LastFmApi.Models.TopArtist.Artist artist = restResult.Response.Artist[i];
                         //One line in the embed
-                        result.EmbedFields[index] += $"`#{i}`**{artist.Name}** - *{Math.Round(double.Parse(artist.PlayCount) / result.TotalPlays * 100)}%* (*{artist.PlayCount} plays*)\n";
+                        result.EmbedFields[index] += $"`#{i + 1}`**{artist.Name}** - *{Math.Round(double.Parse(artist.PlayCount) / result.TotalPlays * 100)}%* (*{artist.PlayCount} plays*)\n";
 
                         //If we went through 10 results, start filling a new list page
-                        if (i % 10 == 0)
+                        if (i > 0 && i % 10 == 0)
                         {
                             index++;
                         }
@@ -203,16 +217,20 @@ namespace Discord_Bot.Services
                     {
                         result.ImageUrl = spotifySearch.ImageUrl;
                     }
+                    else
+                    {
+                        result.ImageUrl = restResult.Response.Track[0].Image?[^1].Text;
+                    }
 
                     int index = 0;
                     for (int i = 0; i < restResult.Response.Track.Count && i < limit; i++)
                     {
                         LastFmApi.Models.TopTrack.Track track = restResult.Response.Track[i];
                         //One line in the embed
-                        result.EmbedFields[index] += $"`#{i}`**{track.Name}** by **{track.Artist.Name}** - *{Math.Round(double.Parse(track.PlayCount) / result.TotalPlays * 100)}%* (*{track.PlayCount} plays*)\n";
+                        result.EmbedFields[index] += $"`#{i + 1}`**{track.Name}** by **{track.Artist.Name}** - *{Math.Round(double.Parse(track.PlayCount) / result.TotalPlays * 100)}%* (*{track.PlayCount} plays*)\n";
 
                         //If we went through 10 results, start filling a new list page
-                        if (i % 10 == 0)
+                        if (i > 0 && i % 10 == 0)
                         {
                             index++;
                         }
@@ -256,18 +274,22 @@ namespace Discord_Bot.Services
                     {
                         result.ImageUrl = spotifySearch.ImageUrl;
                     }
+                    else
+                    {
+                        result.ImageUrl = restResult.Response.Track[0].Image?[^1].Text;
+                    }
 
                     int index = 0;
                     for (int i = 0; i < restResult.Response.Track.Count && i < limit; i++)
                     {
                         LastFmApi.Models.Recent.Track track = restResult.Response.Track[i];
 
-                        result.EmbedFields[index] += $"`#{i}` **{track.Name}** by **{track.Artist.Text}** - *";
+                        result.EmbedFields[index] += $"`#{i + 1}` **{track.Name}** by **{track.Artist.Text}** - *";
                         result.EmbedFields[index] += track.Attr != null ? "Now playing*" : track.Date.Text.Replace(DateTime.Now.Year.ToString(), "") + "*";
                         result.EmbedFields[index] += "\n";
 
                         //If we went through 10 results, start filling a new list page
-                        if (i % 10 == 0)
+                        if (i > 0 && i % 10 == 0)
                         {
                             index++;
                         }
@@ -313,11 +335,16 @@ namespace Discord_Bot.Services
 
                 List<LastFmApi.Models.TopTrack.Track> tracks = await GetEveryTrackUserListenedToFromArtist(username, artistName);
 
-                SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(tracks[0].Artist.Mbid, tracks[0].Artist.Name, tracks[0].Name);
+                SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(albums[0].Artist.Mbid, tracks[0].Artist.Name, tracks[0].Name);
                 if (spotifySearch != null)
                 {
                     result.ImageUrl = spotifySearch.ImageUrl;
                 }
+                else
+                {
+                    result.ImageUrl = albums[0].Image?[^1].Text;
+                }
+
                 result.ArtistName = albums[0].Artist.Name;
                 result.AlbumCount = albums.Count;
                 result.TrackCount = tracks.Count;
@@ -331,13 +358,13 @@ namespace Discord_Bot.Services
                 //Assembling list of top albums
                 for (int i = 0; i < 5 && i < albums.Count; i++)
                 {
-                    result.AlbumField += $"`#{i}` **{albums[i].Name}**  (*{albums[i].PlayCount} plays*)\n";
+                    result.AlbumField += $"`#{i + 1}` **{albums[i].Name}**  (*{albums[i].PlayCount} plays*)\n";
                 }
 
                 //Assembling list of top tracks
                 for (int i = 0; i < 8 && i < tracks.Count; i++)
                 {
-                    result.TrackField += $"`#{i}` **{tracks[i].Name}**  (*{tracks[i].PlayCount} plays*)\n";
+                    result.TrackField += $"`#{i + 1}` **{tracks[i].Name}**  (*{tracks[i].PlayCount} plays*)\n";
                 }
 
                 return result;
@@ -388,12 +415,7 @@ namespace Discord_Bot.Services
                         {
                             //Save the names for use in embed
                             wk.Searched = $"{request.Name} by {request.Artist.Name}";
-
-                            SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(nowPlaying.ArtistMbid, artist_name, track_name);
-                            if (spotifySearch != null)
-                            {
-                                wk.ImageUrl = spotifySearch.ImageUrl;
-                            }
+                            wk.ImageUrl = nowPlaying.ImageUrl;
                         }
 
                         if (int.TryParse(request.Userplaycount, out int playcount) && playcount > 0)
@@ -446,6 +468,10 @@ namespace Discord_Bot.Services
                             {
                                 wk.ImageUrl = spotifySearch.ImageUrl;
                             }
+                            else
+                            {
+                                wk.ImageUrl = request.Album.Image?[^1].Text;
+                            }
                         }
 
                         if (int.TryParse(request.Userplaycount, out int playcount) && playcount > 0)
@@ -494,6 +520,10 @@ namespace Discord_Bot.Services
                             if (spotifySearch != null)
                             {
                                 wk.ImageUrl = spotifySearch.ImageUrl;
+                            }
+                            else
+                            {
+                                wk.ImageUrl = request.Image?[^1].Text;
                             }
                         }
 
@@ -583,7 +613,7 @@ namespace Discord_Bot.Services
                     LastFmApi.Models.TopTrack.Track track = restResult.Response.Track[i];
                     if (track.Name == track_name && track.Artist.Name == artist_name)
                     {
-                        position = $"{i + ((page - 1) * 1000)}";
+                        position = $"({i + 1 + ((page - 1) * 1000)}";
                     }
                 }
 

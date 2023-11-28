@@ -37,7 +37,7 @@ namespace Discord_Bot.Commands
                 DbProcessResultEnum result = await userService.AddLastfmUsernameAsync(Context.User.Id, name);
                 if (result == DbProcessResultEnum.Success)
                 {
-                    await ReplyAsync($"Username {name} connected to account!");
+                    await ReplyAsync($"Username connected to account!");
                 }
                 else if (result == DbProcessResultEnum.AlreadyExists)
                 {
@@ -125,7 +125,7 @@ namespace Discord_Bot.Commands
                         }
                     }
 
-                    await ReplyAsync("", false, builder.Build());
+                    await ReplyAsync("", false, embed: builder.Build());
                     return;
                 }
                 await ReplyAsync(response.Message);
@@ -185,7 +185,7 @@ namespace Discord_Bot.Commands
                         }
                     }
 
-                    await ReplyAsync("", false, builder.Build());
+                    await ReplyAsync("", false, embed: builder.Build());
                     return;
                 }
                 await ReplyAsync(response.Message);
@@ -238,7 +238,7 @@ namespace Discord_Bot.Commands
                         }
                     }
 
-                    await ReplyAsync("", false, builder.Build());
+                    await ReplyAsync("", false, embed: builder.Build());
                     return;
                 }
             }
@@ -287,7 +287,7 @@ namespace Discord_Bot.Commands
 
                     builder.WithFooter($"{nowPlaying.TrackPlays} listen \u2022 {nowPlaying.Ranking} most played this month");
 
-                    await ReplyAsync("", false, builder.Build());
+                    await ReplyAsync("", false, embed: builder.Build());
                     return;
                 }
                 await ReplyAsync(nowPlaying.Message);
@@ -339,7 +339,7 @@ namespace Discord_Bot.Commands
                         }
                     }
 
-                    await ReplyAsync("", false, builder.Build());
+                    await ReplyAsync("", false, embed: builder.Build());
                     return;
                 }
                 await ReplyAsync(response.Message);
@@ -381,10 +381,10 @@ namespace Discord_Bot.Commands
 
                     builder.WithDescription($"You have listened to this artist **{response.Playcount}** times.\nYou listened to **{response.AlbumCount}** of their albums and **{response.TrackCount}** of their tracks.");
 
-                    builder.AddField("Top Albums", response.AlbumField, false);
                     builder.AddField("Top Tracks", response.TrackField, false);
+                    builder.AddField("Top Albums", response.AlbumField, false);
 
-                    await ReplyAsync("", false, builder.Build());
+                    await ReplyAsync("", false, embed: builder.Build());
                 }
                 await ReplyAsync(response.Message);
             }
@@ -495,7 +495,7 @@ namespace Discord_Bot.Commands
                             }
                         }
 
-                        await ReplyAsync("", false, builder.Build());
+                        await ReplyAsync("", false, embed: builder.Build());
                     }
                 }
                 else
