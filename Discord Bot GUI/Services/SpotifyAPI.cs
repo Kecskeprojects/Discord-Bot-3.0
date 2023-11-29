@@ -267,7 +267,7 @@ namespace Discord_Bot.Services
                 SpotifyClientConfig configuration = SpotifyClientConfig.CreateDefault().WithAuthenticator(new ClientCredentialsAuthenticator(config.Spotify_Client_Id, config.Spotify_Client_Secret));
                 SpotifyClient spotify = new(configuration);
 
-                string spotifyArtist = "", spotifyImage = "";
+                string spotifyArtist = "";
 
                 logger.Query("============================================================================");
                 logger.Query("Spotify image search:");

@@ -1,6 +1,8 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Rest;
 using Discord_Bot.CommandsService;
+using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
@@ -10,14 +12,16 @@ using Discord_Bot.Services.Models.Wotd;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class ChatCommands(IWordOfTheDayService wordOfTheDayService, Logging logger, Config config) : BaseCommand(logger, config), IChatCommands
+    public class ChatCommands(IWordOfTheDayService wordOfTheDayService, IPictureHandler pictureHandler, Logging logger, Config config) : BaseCommand(logger, config), IChatCommands
     {
         private readonly IWordOfTheDayService wordOfTheDayService = wordOfTheDayService;
+        private readonly IPictureHandler pictureHandler = pictureHandler;
 
         [Command("help")]
         [Summary("List out commands everybody has access to")]
@@ -128,6 +132,46 @@ namespace Discord_Bot.Commands
             catch (Exception ex)
             {
                 logger.Error("ChatCommands.cs WotDFunction", ex.ToString());
+            }
+        }
+
+        [Command("bonk")]
+        [RequireContext(ContextType.Guild)]
+        [Alias(["hornyjail, hit me please"])]
+        [Summary("Inserts a gif with the user's local profile picture")]
+        public async Task Bonk(string userName = "", int delay = 10)
+        {
+            try
+            {
+                string url = "";
+                if (string.IsNullOrEmpty(userName))
+                {
+                    url = Context.User.GetDisplayAvatarUrl(ImageFormat.Png, 512);
+                    userName = Global.GetNickName(Context.Channel, Context.User);
+                }
+                else
+                {
+                    await Context.Guild.DownloadUsersAsync();
+
+                    IReadOnlyCollection<RestGuildUser> users = await Context.Guild.SearchUsersAsync(userName, 1);
+                    if(users.Count > 0)
+                    {
+                        RestGuildUser user = users.First();
+                        url = user.GetDisplayAvatarUrl(ImageFormat.Png, 512);
+                    }
+                }
+
+                if(!string.IsNullOrEmpty(url))
+                {
+                    Stream stream = Global.GetStream(url);
+                    MemoryStream gifStream = pictureHandler.CreateBonkImage(stream, delay);
+
+                    await Context.Channel.SendFileAsync(gifStream, $"bonk_{userName}.gif");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("ChatCommands.cs Bonk", ex.ToString());
             }
         }
     }

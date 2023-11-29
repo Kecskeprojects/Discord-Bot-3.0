@@ -6,7 +6,7 @@
     <Nullable>disable</Nullable>
     <UseWPF>true</UseWPF>
     <PlatformTarget>x64</PlatformTarget>
-    <ApplicationIcon>Kim_Synthji.ico</ApplicationIcon>
+    <ApplicationIcon>ResourceFiles\Kim_Synthji.ico</ApplicationIcon>
     <AssemblyName>Discord Bot</AssemblyName>
     <FileVersion>1.0.0.0</FileVersion>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
@@ -51,7 +51,7 @@
       <TargetPath>%(RecursiveDir)\%(Filename)%(Extension)</TargetPath>
     </Content>
     <ProjectReference Include="..\LastFmApi\LastFmApi.csproj" />
-    <Resource Include="Kim_Synthji.ico" />
+    <Resource Include="ResourceFiles\Kim_Synthji.ico" />
     <Compile Update="Properties\Resource.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
