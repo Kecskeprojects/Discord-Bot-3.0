@@ -125,9 +125,9 @@ namespace Discord_Bot.Services
             }
 
             // Create empty image.
-            using Image<Rgba32> gif = new(width, height, new Rgba32(0,0,0,0));
+            using Image<Rgba32> gif = new(width, height, new Rgba32(0, 0, 0, 0));
 
-            var gifMetaData = gif.Metadata.GetGifMetadata();
+            GifMetadata gifMetaData = gif.Metadata.GetGifMetadata();
             gifMetaData.RepeatCount = 0;
 
             // Set the delay until the next image is displayed.

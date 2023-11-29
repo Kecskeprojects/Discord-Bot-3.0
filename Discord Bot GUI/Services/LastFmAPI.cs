@@ -13,7 +13,6 @@ using LastFmApi.Models.TopArtist;
 using LastFmApi.Models.TopTrack;
 using System;
 using System.Collections.Generic;
-using System.IO.Pipelines;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -95,14 +94,7 @@ namespace Discord_Bot.Services
                     result.TotalPlays = await TotalPlays(lastFmUsername, period);
 
                     SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(restResult.Response.Album[0].Artist.Mbid, restResult.Response.Album[0].Artist.Name, restResult.Response.Album[0].Name);
-                    if (spotifySearch != null)
-                    {
-                        result.ImageUrl = spotifySearch.ImageUrl;
-                    }
-                    else
-                    {
-                        result.ImageUrl = restResult.Response.Album[0].Image?[^1].Text;
-                    }
+                    result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (restResult.Response.Album[0].Image?[^1].Text);
 
                     int index = 0;
                     for (int i = 0; i < restResult.Response.Album.Count && i < limit; i++)
@@ -154,14 +146,7 @@ namespace Discord_Bot.Services
                     result.TotalPlays = await TotalPlays(lastFmUsername, period);
 
                     SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(restResult.Response.Artist[0].Mbid, restResult.Response.Artist[0].Name);
-                    if (spotifySearch != null)
-                    {
-                        result.ImageUrl = spotifySearch.ImageUrl;
-                    }
-                    else
-                    {
-                        result.ImageUrl = restResult.Response.Artist[0].Image?[^1].Text;
-                    }
+                    result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (restResult.Response.Artist[0].Image?[^1].Text);
 
                     int index = 0;
                     for (int i = 0; i < restResult.Response.Artist.Count && i < limit; i++)
@@ -213,14 +198,7 @@ namespace Discord_Bot.Services
                     result.TotalPlays = await TotalPlays(lastFmUsername, period);
 
                     SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(restResult.Response.Track[0].Artist.Mbid, restResult.Response.Track[0].Artist.Name, restResult.Response.Track[0].Name);
-                    if (spotifySearch != null)
-                    {
-                        result.ImageUrl = spotifySearch.ImageUrl;
-                    }
-                    else
-                    {
-                        result.ImageUrl = restResult.Response.Track[0].Image?[^1].Text;
-                    }
+                    result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (restResult.Response.Track[0].Image?[^1].Text);
 
                     int index = 0;
                     for (int i = 0; i < restResult.Response.Track.Count && i < limit; i++)
@@ -270,14 +248,7 @@ namespace Discord_Bot.Services
                 if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.Success)
                 {
                     SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(restResult.Response.Track[0].Artist.Mbid, restResult.Response.Track[0].Artist.Text, restResult.Response.Track[0].Name);
-                    if (spotifySearch != null)
-                    {
-                        result.ImageUrl = spotifySearch.ImageUrl;
-                    }
-                    else
-                    {
-                        result.ImageUrl = restResult.Response.Track[0].Image?[^1].Text;
-                    }
+                    result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (restResult.Response.Track[0].Image?[^1].Text);
 
                     int index = 0;
                     for (int i = 0; i < restResult.Response.Track.Count && i < limit; i++)
@@ -336,14 +307,7 @@ namespace Discord_Bot.Services
                 List<LastFmApi.Models.TopTrack.Track> tracks = await GetEveryTrackUserListenedToFromArtist(username, artistName);
 
                 SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(albums[0].Artist.Mbid, tracks[0].Artist.Name, tracks[0].Name);
-                if (spotifySearch != null)
-                {
-                    result.ImageUrl = spotifySearch.ImageUrl;
-                }
-                else
-                {
-                    result.ImageUrl = albums[0].Image?[^1].Text;
-                }
+                result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (albums[0].Image?[^1].Text);
 
                 result.ArtistName = albums[0].Artist.Name;
                 result.AlbumCount = albums.Count;
@@ -464,14 +428,7 @@ namespace Discord_Bot.Services
                             wk.Searched = $"{request.Name} by {request.Artist.Name}";
 
                             SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(request.Artist.Mbid, artist_name, track_name);
-                            if (spotifySearch != null)
-                            {
-                                wk.ImageUrl = spotifySearch.ImageUrl;
-                            }
-                            else
-                            {
-                                wk.ImageUrl = request.Album.Image?[^1].Text;
-                            }
+                            wk.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (request.Album.Image?[^1].Text);
                         }
 
                         if (int.TryParse(request.Userplaycount, out int playcount) && playcount > 0)
@@ -517,14 +474,7 @@ namespace Discord_Bot.Services
                             wk.Searched = request.Name;
 
                             SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(request.Mbid, artist_name);
-                            if (spotifySearch != null)
-                            {
-                                wk.ImageUrl = spotifySearch.ImageUrl;
-                            }
-                            else
-                            {
-                                wk.ImageUrl = request.Image?[^1].Text;
-                            }
+                            wk.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (request.Image?[^1].Text);
                         }
 
                         if (int.TryParse(request.Stats.Userplaycount, out int playcount) && playcount > 0)

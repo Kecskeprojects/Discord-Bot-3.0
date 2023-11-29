@@ -100,7 +100,7 @@ namespace Discord_Bot.Core
             collection.AddScoped<IIdolRepository, IdolRepository>();
             collection.AddScoped<IIdolGroupRepository, IdolGroupRepository>();
             collection.AddScoped<IUserService, UserService>();
-            collection.AddScoped<IIdolAliasService,  IdolAliasService>();
+            collection.AddScoped<IIdolAliasService, IdolAliasService>();
             collection.AddScoped<IIdolAliasRepository, IdolAliasRepository>();
 
             //Commands

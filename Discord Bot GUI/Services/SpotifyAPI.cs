@@ -252,7 +252,7 @@ namespace Discord_Bot.Services
         {
             try
             {
-                if(artistMbid == null)
+                if (artistMbid == null)
                 {
                     return null;
                 }

@@ -1,8 +1,8 @@
-﻿using SixLabors.ImageSharp.Drawing;
+﻿using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing;
+using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing.Processing;
 
 namespace Discord_Bot.Tools
 {
@@ -38,7 +38,7 @@ namespace Discord_Bot.Tools
         public static PathCollection BuildCorners(int imageWidth, int imageHeight, float cornerRadius)
         {
             // First create a square
-            var rect = new RectangularPolygon(-0.5f, -0.5f, cornerRadius, cornerRadius);
+            RectangularPolygon rect = new(-0.5f, -0.5f, cornerRadius, cornerRadius);
 
             // Then cut out of the square a circle so we are left with a corner
             IPath cornerTopLeft = rect.Clip(new EllipsePolygon(cornerRadius - 0.5f, cornerRadius - 0.5f, cornerRadius));

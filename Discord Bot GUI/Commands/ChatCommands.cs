@@ -154,14 +154,14 @@ namespace Discord_Bot.Commands
                     await Context.Guild.DownloadUsersAsync();
 
                     IReadOnlyCollection<RestGuildUser> users = await Context.Guild.SearchUsersAsync(userName, 1);
-                    if(users.Count > 0)
+                    if (users.Count > 0)
                     {
                         RestGuildUser user = users.First();
                         url = user.GetDisplayAvatarUrl(ImageFormat.Png, 512);
                     }
                 }
 
-                if(!string.IsNullOrEmpty(url))
+                if (!string.IsNullOrEmpty(url))
                 {
                     Stream stream = Global.GetStream(url);
                     MemoryStream gifStream = pictureHandler.CreateBonkImage(stream, delay);
