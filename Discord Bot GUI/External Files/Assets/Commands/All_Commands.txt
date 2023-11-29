@@ -78,6 +78,14 @@ Admin Commands:
 !birthday add [user ID] [date]					Add birthday for server
 !birthday remove [user ID]						Remove birthday from server
 
+Owner Commands:
+
+!help owner						Includes owner commands too
+!say [channel name] [message]	Sends the message to the channel you want to like the bot wrote it, deletes your message
+!greeting list					Give a list of current greetings (DM)
+!greeting add [url]				Add new greeting url (DM)
+!greeting remove [id]			Remove greeting url (DM)
+
 Features:
 
 -Replying to messages starting with "I think" in agreement
@@ -88,11 +96,3 @@ Features:
 -Very rare random responses
 -Reliable automatic instagram embeds
 -Send birthday messages for users that have it set on the day of
-
-Owner Commands:
-
-!help owner						Includes owner commands too
-!say [channel name] [message]	Sends the message to the channel you want to like the bot wrote it, deletes your message
-!greeting list					Give a list of current greetings (DM)
-!greeting add [url]				Add new greeting url (DM)
-!greeting remove [id]			Remove greeting url (DM)

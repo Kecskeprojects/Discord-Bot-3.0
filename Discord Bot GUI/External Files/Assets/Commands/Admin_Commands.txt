@@ -79,6 +79,7 @@ Admin Commands:
 !birthday remove [user ID]						Remove birthday from server
 
 Features:
+
 -Replying to messages starting with "I think" in agreement
 -Replying to someone saying "I am" or "I'm"
 -If someone types "@(bot name)" in a message it replies with a gif
