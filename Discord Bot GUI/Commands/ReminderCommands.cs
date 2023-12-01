@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord_Bot.CommandsService;
+using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
@@ -14,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class ReminderCommands(IReminderService reminderService, Logging logger, Config config) : BaseCommand(logger, config), IReminderCommands
+    public class ReminderCommands(IReminderService reminderService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), IReminderCommands
     {
         private readonly IReminderService reminderService = reminderService;
 
@@ -25,6 +26,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if(Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 if (message.Split(">").Length < 2)
                 {
                     return;
@@ -110,6 +120,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 if (message.Split(">").Length < 2)
                 {
                     return;
@@ -166,6 +185,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 List<ReminderResource> list = await reminderService.GetUserReminderListAsync(Context.User.Id);
 
                 if (list.Count > 0)
@@ -196,6 +224,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 DbProcessResultEnum result = await reminderService.RemoveUserReminderAsync(Context.User.Id, reminderOrderId);
                 if (result == DbProcessResultEnum.Success)
                 {

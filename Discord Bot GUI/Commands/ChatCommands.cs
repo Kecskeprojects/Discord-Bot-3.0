@@ -7,7 +7,9 @@ using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
+using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.Wotd;
 using System;
 using System.Collections.Generic;
@@ -18,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class ChatCommands(IWordOfTheDayService wordOfTheDayService, IPictureHandler pictureHandler, Logging logger, Config config) : BaseCommand(logger, config), IChatCommands
+    public class ChatCommands(IWordOfTheDayService wordOfTheDayService, IPictureHandler pictureHandler, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), IChatCommands
     {
         private readonly IWordOfTheDayService wordOfTheDayService = wordOfTheDayService;
         private readonly IPictureHandler pictureHandler = pictureHandler;
@@ -29,6 +31,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 Dictionary<string, string> commands = [];
 
                 if (!File.Exists("Assets\\Commands\\Commands.txt"))
@@ -54,6 +65,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 if (string.IsNullOrWhiteSpace(question))
                 {
                     await ReplyAsync("Ask me about something!");
@@ -75,6 +95,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 Random r = new();
                 int chance = r.Next(1, 101);
 
@@ -112,6 +141,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 WotdBase result = await wordOfTheDayService.GetDataAsync(language);
 
                 if (result != null)
@@ -143,6 +181,12 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                {
+                    return;
+                }
+
                 string url = "";
                 if (string.IsNullOrEmpty(userName))
                 {

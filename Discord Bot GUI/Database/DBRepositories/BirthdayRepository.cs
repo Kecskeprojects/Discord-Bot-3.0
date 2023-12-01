@@ -23,12 +23,12 @@ namespace Discord_Bot.Database.DBRepositories
                                           b.User.DiscordId == userId.ToString());
         }
 
-        public Task<List<Birthday>> GetBirthdaysByDateAsync(DateTime dateTime)
+        public Task<List<Birthday>> GetBirthdaysByDateAsync()
         {
             return context.Birthdays
                 .Include(b => b.User)
                 .Include(b => b.Server)
-                .Where(b => b.Date.Month == dateTime.Month && b.Date.Day == dateTime.Day)
+                .Where(b => b.Date.Month == DateTime.UtcNow.Month && b.Date.Day == DateTime.UtcNow.Day)
                 .ToListAsync();
         }
 

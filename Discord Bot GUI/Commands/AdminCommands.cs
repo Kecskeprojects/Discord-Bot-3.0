@@ -22,9 +22,8 @@ namespace Discord_Bot.Commands
         ITwitchChannelService twitchChannelService,
         ITwitchAPI twitchAPI,
         Logging logger,
-        Config config) : BaseCommand(logger, config), IAdminCommands
+        Config config) : BaseCommand(logger, config, serverService), IAdminCommands
     {
-        private readonly IServerService serverService = serverService;
         private readonly IChannelService channelService = channelService;
         private readonly ITwitchChannelService twitchChannelService = twitchChannelService;
         private readonly ITwitchAPI twitchAPI = twitchAPI;
@@ -56,10 +55,22 @@ namespace Discord_Bot.Commands
         [RequireUserPermission(ChannelPermission.ManageChannels)]
         [RequireContext(ContextType.Guild)]
         [Summary("Server setting channel modification")]
-        public async Task ChannelAdd(string type, [Remainder] string channelName)
+        public async Task ChannelAdd(string type = "", [Remainder] string channelName = "")
         {
             try
             {
+                if(type == "" && channelName == "")
+                {
+                    await ReplyAsync("Current types: " +
+                        string.Join(", ", ChannelTypeNameCollections.NameEnum.Keys.Select(x => $"`{x}`")));
+                    return;
+                }
+
+                if(channelName == "")
+                {
+                    return;
+                }
+
                 IMessageChannel channel = Context.Guild.TextChannels.Where(x => x.Name.Equals(channelName.Trim(), StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
                 if (channel == null)
@@ -109,10 +120,17 @@ namespace Discord_Bot.Commands
         [RequireUserPermission(ChannelPermission.ManageChannels)]
         [RequireContext(ContextType.Guild)]
         [Summary("Server setting channel modification")]
-        public async Task ChannelRemove(string type, [Remainder] string channelName = "all")
+        public async Task ChannelRemove(string type = "", [Remainder] string channelName = "all")
         {
             try
             {
+                if (type == "" && channelName == "all")
+                {
+                    await ReplyAsync("Current types: " +
+                        string.Join(", ", ChannelTypeNameCollections.NameEnum.Keys.Select(x => $"`{x}`")));
+                    return;
+                }
+
                 DbProcessResultEnum result;
                 ChannelTypeEnum channelType = ChannelTypeNameCollections.NameEnum[type];
 

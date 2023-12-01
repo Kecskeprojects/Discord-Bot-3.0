@@ -23,11 +23,6 @@ namespace Discord_Bot.Services
         private readonly ISpotifyAPI spotifyAPI = spotifyAPI;
         private readonly IYoutubeDownloadService youtubeDownloadService = youtubeDownloadService;
 
-        //Possible result values 
-        //-2 : spotify result found, youtube result not found
-        //-1 : Result not found
-        //0 : Result found
-        //1 : Playlist found
         public async Task RequestHandler(SocketCommandContext context, string input)
         {
             try

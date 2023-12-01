@@ -5,6 +5,7 @@ using Discord_Bot.CommandsService;
 using Discord_Bot.Communication;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
+using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Services;
 using Discord_Bot.Tools;
 using System;
@@ -14,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class TwitterScraperCommands(Logging logger, Config config) : BaseCommand(logger, config)
+    public class TwitterScraperCommands(IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
     {
         private static readonly string[] baseURLs = ["https://twitter.com/", "https://x.com/"];
 

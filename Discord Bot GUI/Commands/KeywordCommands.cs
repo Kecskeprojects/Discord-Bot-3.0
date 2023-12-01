@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class KeywordCommands(IKeywordService keywordService, Logging logger, Config config) : BaseCommand(logger, config), IKeywordCommands
+    public class KeywordCommands(IKeywordService keywordService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), IKeywordCommands
     {
         private readonly IKeywordService keywordService = keywordService;
 

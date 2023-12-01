@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class BirthdayCommands(Logging logger, Config config, IBirthdayService birthdayService) : BaseCommand(logger, config), IBirthdayCommands
+    public class BirthdayCommands(IBirthdayService birthdayService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), IBirthdayCommands
     {
         private readonly IBirthdayService birthdayService = birthdayService;
         private static readonly string[] dateSeparator = [",", "/", "\\", "-"];

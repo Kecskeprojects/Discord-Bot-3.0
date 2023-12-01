@@ -55,7 +55,7 @@ namespace Discord_Bot.Services
                 );
 
                 //Place Album image, 1 pixel lower and to the right
-                mainImage.Mutate(x => x.DrawImage(AlbumImage, location: new Point(76, 126), 1));
+                mainImage.Mutate(x => x.DrawImage(AlbumImage, backgroundLocation: new Point(76, 126), 1));
 
                 //Base font for top text
                 Font font = SystemFonts.CreateFont("Bot Font", 40, FontStyle.Regular);
@@ -118,8 +118,8 @@ namespace Discord_Bot.Services
             for (int i = 0; i < 2; i++)
             {
                 Image background = new Image<Rgba32>(width, height, new Rgba32(1, 1, 1, 0.5f));
-                background.Mutate(x => x.DrawImage(profile, location: new Point(10, 500), 1));
-                background.Mutate(x => x.DrawImage(winterFrame[i], location: new Point(0, 0), 1));
+                background.Mutate(x => x.DrawImage(profile, backgroundLocation: new Point(10, 500), 1));
+                background.Mutate(x => x.DrawImage(winterFrame[i], backgroundLocation: new Point(0, 0), 1));
 
                 images[i] = background;
             }

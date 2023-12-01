@@ -61,9 +61,9 @@ namespace Discord_Bot.Database.DBServices
             return DbProcessResultEnum.Failure;
         }
 
-        public async Task<List<BirthdayResource>> GetBirthdaysByDateAsync(DateTime dateTime)
+        public async Task<List<BirthdayResource>> GetBirthdaysByDateAsync()
         {
-            List<Birthday> birthday = await birthdayRepository.GetBirthdaysByDateAsync(dateTime);
+            List<Birthday> birthday = await birthdayRepository.GetBirthdaysByDateAsync();
             return mapper.Map<List<BirthdayResource>>(birthday);
         }
 

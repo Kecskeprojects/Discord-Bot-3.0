@@ -49,8 +49,7 @@ namespace Discord_Bot.Commands.Communication
             try
             {
                 //Get the list of birthdays that are on this date
-                DateTime dateTime = DateTime.Parse(DateTime.UtcNow.ToString("yyyy-MM-dd"));
-                List<BirthdayResource> result = await birthdayService.GetBirthdaysByDateAsync(dateTime);
+                List<BirthdayResource> result = await birthdayService.GetBirthdaysByDateAsync();
                 if (!CollectionTools.IsNullOrEmpty(result))
                 {
                     foreach (BirthdayResource birthday in result)

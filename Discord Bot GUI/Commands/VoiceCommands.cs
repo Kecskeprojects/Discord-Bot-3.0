@@ -18,9 +18,8 @@ namespace Discord_Bot.Commands
         IServerService serverService,
         IAudioService audioService,
         Logging logger,
-        Config config) : BaseCommand(logger, config), IVoiceCommands
+        Config config) : BaseCommand(logger, config, serverService), IVoiceCommands
     {
-        private readonly IServerService serverService = serverService;
         private readonly IAudioService audioService = audioService;
 
         #region Main request command

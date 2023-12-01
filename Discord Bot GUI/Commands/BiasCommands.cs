@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class BiasCommands(Logging logger, Config config, IIdolService idolService) : BaseCommand(logger, config), IBiasCommands
+    public class BiasCommands(IIdolService idolService, IServerService serverService,Logging logger, Config config) : BaseCommand(logger, config, serverService), IBiasCommands
     {
         private readonly IIdolService idolService = idolService;
 
@@ -99,6 +99,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 //Make the name lowercase and clear and accidental spaces
                 string biasName = "";
                 string biasGroup = "";
@@ -151,6 +160,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 //Make the name lowercase and clear and accidental spaces
                 string biasName = "";
                 string biasGroup = "";
@@ -195,6 +213,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 DbProcessResultEnum result = await idolService.ClearUserIdolAsync(Context.User.Id);
                 if (result == DbProcessResultEnum.Success)
                 {
@@ -218,6 +245,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 //Get your list of biases
                 List<IdolResource> list = await idolService.GetUserIdolsListAsync(Context.User.Id, groupName.ToLower().Trim());
 
@@ -279,6 +315,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 //Get the global list of biases
                 List<IdolResource> idols = await idolService.GetIdolsByGroupAsync(groupName.ToLower().Trim());
 

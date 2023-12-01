@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, IPictureHandler pictureHandler, Logging logger, Config config) : BaseCommand(logger, config), ILastfmCommands
+    public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, IPictureHandler pictureHandler, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), ILastfmCommands
     {
         private readonly IUserService userService = userService;
         private readonly ILastFmAPI lastFmAPI = lastFmAPI;
@@ -34,6 +34,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 DbProcessResultEnum result = await userService.AddLastfmUsernameAsync(Context.User.Id, name);
                 if (result == DbProcessResultEnum.Success)
                 {
@@ -61,6 +70,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 DbProcessResultEnum result = await userService.RemoveLastfmUsernameAsync(Context.User.Id);
                 if (result == DbProcessResultEnum.Success)
                 {
@@ -90,6 +108,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 LastFmHelper.LastfmParameterCheck(ref parameters);
                 int limit = int.Parse(parameters[0]);
                 string period = parameters[1];
@@ -150,6 +177,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 LastFmHelper.LastfmParameterCheck(ref parameters);
                 int limit = int.Parse(parameters[0]);
                 string period = parameters[1];
@@ -203,6 +239,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 LastFmHelper.LastfmParameterCheck(ref parameters);
                 int limit = int.Parse(parameters[0]);
                 string period = parameters[1];
@@ -257,6 +302,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 UserResource user = await userService.GetUserAsync(Context.User.Id);
 
                 if (user == null)
@@ -310,6 +364,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 UserResource user = await userService.GetUserAsync(Context.User.Id);
 
                 if (user == null)
@@ -358,6 +421,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 UserResource user = await userService.GetUserAsync(Context.User.Id);
 
                 if (user == null)
@@ -406,6 +478,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
                 List<UserResource> users = await userService.GetAllLastFmUsersAsync();
                 users = LastFmService.FilterToOnlyServerMembers(Context, users);
 

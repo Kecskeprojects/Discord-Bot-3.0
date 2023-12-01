@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class BiasAliasCommands(Logging logger, Config config, IIdolAliasService idolAliasService) : BaseCommand(logger, config), IBiasAliasCommands
+    public class BiasAliasCommands(IIdolAliasService idolAliasService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), IBiasAliasCommands
     {
         private readonly IIdolAliasService idolAliasService = idolAliasService;
 
