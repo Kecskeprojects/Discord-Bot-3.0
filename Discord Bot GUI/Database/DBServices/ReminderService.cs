@@ -26,7 +26,7 @@ namespace Discord_Bot.Database.DBServices
                 Reminder reminder = new()
                 {
                     ReminderId = 0,
-                    User = user,
+                    User = user ?? new User() { DiscordId = userId.ToString() },
                     Date = date,
                     Message = remindMessage
                 };

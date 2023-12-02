@@ -7,6 +7,6 @@ namespace Discord_Bot.Resources
         public int BirthdayId { get; set; }
         public ulong ServerDiscordId { get; set; }
         public ulong UserDiscordId { get; set; }
-        public DateTime Date { get; set; }
+        public DateOnly Date { get; set; }
     }
 }

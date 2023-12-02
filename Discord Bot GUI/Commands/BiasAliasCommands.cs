@@ -1,5 +1,4 @@
-﻿using Discord;
-using Discord.Commands;
+﻿using Discord.Commands;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
@@ -13,10 +12,8 @@ namespace Discord_Bot.Commands
     public class BiasAliasCommands(IIdolAliasService idolAliasService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), IBiasAliasCommands
     {
         private readonly IIdolAliasService idolAliasService = idolAliasService;
-
         [Command("bias alias add")]
-        [RequireUserPermission(ChannelPermission.ManageChannels)]
-        [RequireContext(ContextType.Guild)]
+        [RequireOwner]
         [Summary("Admin command for adding a new bias alias into our lists")]
         public async Task AddBiasAlias([Remainder] string biasData)
         {
@@ -34,15 +31,15 @@ namespace Discord_Bot.Commands
                 DbProcessResultEnum result = await idolAliasService.AddIdolAliasAsync(biasAlias, biasName, biasGroup);
                 if (result == DbProcessResultEnum.Success)
                 {
-                    await ReplyAsync("Bias added to list!");
+                    await ReplyAsync("Bias alias added to list!");
                 }
                 else if (result == DbProcessResultEnum.AlreadyExists)
                 {
-                    await ReplyAsync("Bias already in database!");
+                    await ReplyAsync("Bias alias already in database!");
                 }
                 else
                 {
-                    await ReplyAsync("Bias could not be added!");
+                    await ReplyAsync("Bias alias could not be added!");
                 }
             }
             catch (Exception ex)
@@ -53,8 +50,7 @@ namespace Discord_Bot.Commands
         }
 
         [Command("bias alias remove")]
-        [RequireUserPermission(ChannelPermission.ManageChannels)]
-        [RequireContext(ContextType.Guild)]
+        [RequireOwner]
         [Summary("Admin command for removing a bias alias from our lists")]
         public async Task RemoveBiasAlias([Remainder] string biasData)
         {
@@ -72,15 +68,15 @@ namespace Discord_Bot.Commands
                 DbProcessResultEnum result = await idolAliasService.RemoveIdolAliasAsync(biasAlias, biasName, biasGroup);
                 if (result == DbProcessResultEnum.Success)
                 {
-                    await ReplyAsync("Bias alias added to list!");
+                    await ReplyAsync("Bias alias removed from list!");
                 }
-                else if (result == DbProcessResultEnum.AlreadyExists)
+                else if (result == DbProcessResultEnum.NotFound)
                 {
-                    await ReplyAsync("Bias alias already in database!");
+                    await ReplyAsync("Bias alias not in database!");
                 }
                 else
                 {
-                    await ReplyAsync("Bias alias could not be added!");
+                    await ReplyAsync("Bias alias could not be removed!");
                 }
             }
             catch (Exception ex)

@@ -286,6 +286,7 @@ namespace Discord_Bot.Commands
                     await ReplyAsync("", false, embed: builder.Build());
                     return;
                 }
+                await ReplyAsync(response.Message);
             }
             catch (Exception ex)
             {
@@ -453,10 +454,17 @@ namespace Discord_Bot.Commands
 
                     builder.WithDescription($"You have listened to this artist **{response.Playcount}** times.\nYou listened to **{response.AlbumCount}** of their albums and **{response.TrackCount}** of their tracks.");
 
-                    builder.AddField("Top Tracks", response.TrackField, false);
-                    builder.AddField("Top Albums", response.AlbumField, false);
+                    if(!string.IsNullOrEmpty(response.TrackField)) builder.AddField("Top Tracks", response.TrackField, false);
+                    if (!string.IsNullOrEmpty(response.AlbumField)) builder.AddField("Top Albums", response.AlbumField, false);
+
+                    if(builder.Fields.Count == 0)
+                    {
+                        await ReplyAsync("Exception during embed building!");
+                        return;
+                    }
 
                     await ReplyAsync("", false, embed: builder.Build());
+                    return;
                 }
                 await ReplyAsync(response.Message);
             }
@@ -533,7 +541,7 @@ namespace Discord_Bot.Commands
                     if (wk.ImageUrl != "")
                     {
                         //Download image and get back it's filepath
-                        Stream originalImage = Global.GetStream(wk.ImageUrl); //PictureHandler.DownloadImageAsync(Directory.GetCurrentDirectory(), new Random().Next(0, int.MaxValue).ToString(), new Uri(wk.ImageUrl));
+                        Stream originalImage = Global.GetStream(wk.ImageUrl);
 
                         //Edit the picture to the list format
                         Discord_Bot.Communication.EditPictureResult modifiedImage = pictureHandler.EditPicture(originalImage, wk.Plays, wk.Searched);

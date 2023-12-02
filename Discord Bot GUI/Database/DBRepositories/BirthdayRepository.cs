@@ -32,6 +32,18 @@ namespace Discord_Bot.Database.DBRepositories
                 .ToListAsync();
         }
 
+        public Task<List<Birthday>> GetBirthdaysByServerAsync(ulong serverId)
+        {
+            return context.Birthdays
+                .Include(b => b.User)
+                .Include(b => b.Server)
+                .Where(b => b.Server.DiscordId == serverId.ToString())
+                .OrderBy(b => b.Date.Month)
+                .ThenBy(b => b.Date.Day)
+                .ThenBy(b => b.Date.Year)
+                .ToListAsync();
+        }
+
         public async Task RemoveBirthdayAsync(Birthday birthday)
         {
             context.Birthdays.Remove(birthday);

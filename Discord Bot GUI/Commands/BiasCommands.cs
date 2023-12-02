@@ -23,8 +23,7 @@ namespace Discord_Bot.Commands
 
         #region Admin permission bias commands
         [Command("biaslist add")]
-        [RequireUserPermission(ChannelPermission.ManageChannels)]
-        [RequireContext(ContextType.Guild)]
+        [RequireOwner]
         [Summary("Admin command for adding a new bias into our lists")]
         public async Task AddBiasList([Remainder] string biasData)
         {
@@ -60,8 +59,7 @@ namespace Discord_Bot.Commands
         }
 
         [Command("biaslist remove")]
-        [RequireUserPermission(ChannelPermission.ManageChannels)]
-        [RequireContext(ContextType.Guild)]
+        [RequireOwner]
         [Summary("Admin command for removing a bias from our lists")]
         public async Task RemoveBiasList([Remainder] string biasData)
         {

@@ -99,7 +99,7 @@ namespace Discord_Bot.Services
             const int width = 1000;
             const int height = 1000;
 
-            using Image profile = Image.Load(stream);
+            using Image profile = Image.Load<Rgba32>(stream);
             profile.Mutate(x => x.Resize(400, 400).ApplyRoundedCorners(200));
 
             MemoryStream winter0Stream = new();

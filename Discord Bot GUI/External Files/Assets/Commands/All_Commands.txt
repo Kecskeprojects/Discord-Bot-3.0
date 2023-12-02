@@ -4,11 +4,12 @@ Text Commands:
 !8ball [question]				8ball game (DM)
 !custom list					List of custom commands
 !coin flip [head] or [tails]	Flip a coin(DM)
-!wotd [language]				Word of the day in a language(DM)
-!birthday add [date]			Add birthday for server
-!birthday remove				Remove birthday from server
+!wotd [language]				Word of the day in a language (DM)
+!birthday add [date]			Add your birthday for server
+!birthday remove				Remove your birthday from server
+!birthday list					List all birthdays from server
 !bonk [user] [delay]			bonk
-.twt [links]					Twitter embed(DM)
+.twt [links]					Twitter embed (DM)
 
 Remind Commands:
 
@@ -36,7 +37,7 @@ Voice Commands:
 Last.fm commands:
 
 !lf conn [username]					Connect last.fm username to you (DM)
-!lf del								Disconnect last.fm username from you(DM)
+!lf del								Disconnect last.fm username from you (DM)
 !lf np								Song you are currently playing (DM)
 !lf rc [length(1-30)]				Your most recent song (DM)
 !lf tar [length(1-30)] [*period]	Your top artists (DM)
@@ -50,11 +51,11 @@ Last.fm commands:
 Bias Commands:
 
 !ping [name],[name],...		Ping everyone with this bias
-!bias add [name]			Add bias to your list
-!bias remove [name]			Remove bias from your list
-!bias clear					Clear your bias list
-!bias list [group]			List all available biases
-!my biases [group]			List my biases
+!bias add [name]			Add bias to your list (DM)
+!bias remove [name]			Remove bias from your list (DM)
+!bias clear					Clear your bias list (DM)
+!bias list [group]			List all available biases (DM)
+!my biases [group]			List my biases (DM)
 
 Admin Commands:
 
@@ -71,20 +72,20 @@ Admin Commands:
 !keyword add `[keyword]` `[response]`			Adds new keyword to list
 !keyword remove [keyword]						Removes keyword from list
 !server settings								Lists the current settings of the server
-!biaslist add [name]-[group]					Add bias to global list of biases
-!biaslist remove [name]-[group]					Remove bias from global list of biases
-!bias alias add [alias]-[name]-[group]			Add bias alias to global list of bias aliases
-!bias alias remove [alias]-[name]-[group]		Remove bias alias from global list of bias aliases
 !birthday add [user ID] [date]					Add birthday for server
 !birthday remove [user ID]						Remove birthday from server
 
 Owner Commands:
 
-!help owner						Includes owner commands too
-!say [channel name] [message]	Sends the message to the channel you want to like the bot wrote it, deletes your message
-!greeting list					Give a list of current greetings (DM)
-!greeting add [url]				Add new greeting url (DM)
-!greeting remove [id]			Remove greeting url (DM)
+!help owner										Includes owner commands too
+!say [channel name] [message]					Sends the message to the channel you want to like the bot wrote it, deletes your message
+!biaslist add [name]-[group]					Add bias to global list of biases (DM)
+!biaslist remove [name]-[group]					Remove bias from global list of biases (DM)
+!bias alias add [alias]-[name]-[group]			Add bias alias to global list of bias aliases (DM)
+!bias alias remove [alias]-[name]-[group]		Remove bias alias from global list of bias aliases (DM)
+!greeting list									Give a list of current greetings (DM)
+!greeting add [url]								Add new greeting url (DM)
+!greeting remove [id]							Remove greeting url (DM)
 
 Features:
 

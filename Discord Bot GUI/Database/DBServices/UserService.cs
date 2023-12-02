@@ -22,6 +22,8 @@ namespace Discord_Bot.Database.DBServices
             {
                 User user = await userRepository.GetUserByDiscordIdAsync(userId);
 
+                user ??= new User() { DiscordId = userId.ToString() };
+
                 if (!string.IsNullOrEmpty(user.LastFmusername))
                 {
                     return DbProcessResultEnum.AlreadyExists;
@@ -75,9 +77,9 @@ namespace Discord_Bot.Database.DBServices
             {
                 User user = await userRepository.GetUserByDiscordIdAsync(userId);
 
-                if (string.IsNullOrEmpty(user.LastFmusername))
+                if (user != null || string.IsNullOrEmpty(user.LastFmusername))
                 {
-                    return DbProcessResultEnum.AlreadyExists;
+                    return DbProcessResultEnum.NotFound;
                 }
                 user.LastFmusername = null;
                 await userRepository.UpdateUserAsync(user);

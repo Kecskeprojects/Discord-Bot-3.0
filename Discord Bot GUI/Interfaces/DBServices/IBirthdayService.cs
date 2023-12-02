@@ -10,6 +10,7 @@ namespace Discord_Bot.Interfaces.DBServices
     {
         Task<DbProcessResultEnum> AddBirthdayAsync(ulong serverId, ulong userId, DateTime date);
         Task<List<BirthdayResource>> GetBirthdaysByDateAsync();
+        Task<List<BirthdayResource>> GetServerBirthdayListAsync(ulong serverId);
         Task<DbProcessResultEnum> RemoveBirthdayAsync(ulong serverId, ulong userId);
     }
 }

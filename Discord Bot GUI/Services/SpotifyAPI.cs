@@ -114,145 +114,12 @@ namespace Discord_Bot.Services
         #endregion
 
         #region Image search
-        /*
-        //Lastfm complimentary function
-        public async Task<string> ImageSearch(string artist, string song = "", string[] tags = null)
-        {
-            try
-            {
-                SpotifyClientConfig configuration = SpotifyClientConfig.CreateDefault().WithAuthenticator(new ClientCredentialsAuthenticator(config.Spotify_Client_Id, config.Spotify_Client_Secret));
-                SpotifyClient spotify = new(configuration);
-
-                string spotifyArtist = "", spotifyImage = "";
-
-                logger.Query("============================================================================");
-                logger.Query("Spotify image search:");
-
-                if (song == "")
-                {
-                    SearchRequest request = new(SearchRequest.Types.Artist, artist);
-                    SearchResponse result = await spotify.Search.Item(request);
-
-                    if (result.Artists.Items.Count == 0)
-                    {
-                        logger.Query("No results for artist!");
-                        return "";
-                    }
-
-                    if (tags != null)
-                    {
-                        foreach (FullArtist item in result.Artists.Items)
-                        {
-                            List<string> artist_genres = item.Genres;
-                            IEnumerable<string> union = artist_genres.Select(x => x.ToLower()).Intersect(tags.Select(x => x.ToLower()));
-                            if (union.Any() && item.Name.Equals(artist, StringComparison.OrdinalIgnoreCase))
-                            {
-                                spotifyArtist = item.Name;
-                                spotifyImage = item.Images[0].Url;
-                                break;
-                            }
-                        }
-
-                        if (spotifyArtist == "")
-                        {
-                            logger.Query("Genre and name check failed, finding first artist with just the same name");
-                        }
-                    }
-
-                    if (spotifyArtist == "")
-                    {
-                        foreach (FullArtist item in result.Artists.Items)
-                        {
-                            if (item.Name.Equals(artist, StringComparison.OrdinalIgnoreCase))
-                            {
-                                spotifyArtist = item.Name;
-                                spotifyImage = item.Images[0].Url;
-                                break;
-                            }
-                        }
-
-                        if (spotifyArtist == "")
-                        {
-                            logger.Query("Name only search also failed, returning first item on list");
-
-                            spotifyArtist = result.Artists.Items[0].Name;
-                            spotifyImage = result.Artists.Items[0].Images[0].Url;
-                        }
-                    }
-                }
-                else
-                {
-                    SearchRequest request = new(SearchRequest.Types.Track, song + " " + artist);
-                    SearchResponse result = await spotify.Search.Item(request);
-
-                    if (result.Tracks.Items.Count == 0)
-                    {
-                        logger.Query("No results for track!");
-                        return "";
-                    }
-
-                    if (tags != null)
-                    {
-                        foreach (FullTrack item in result.Tracks.Items)
-                        {
-                            FullArtist temp_artist = await spotify.Artists.Get(item.Album.Artists[0].Id);
-
-                            List<string> artist_genres = temp_artist.Genres;
-                            IEnumerable<string> union = artist_genres.Select(x => x.ToLower()).Intersect(tags.Select(x => x.ToLower()));
-                            if (union.Any() && item.Artists[0].Name.Equals(artist, StringComparison.OrdinalIgnoreCase))
-                            {
-                                spotifyArtist = item.Artists[0].Name;
-                                spotifyImage = item.Album.Images[0].Url;
-                                break;
-                            }
-                        }
-
-                        if (spotifyArtist == "")
-                        {
-                            logger.Query("Genre and name check failed, finding first artist with just the same name");
-                        }
-                    }
-
-                    if (spotifyArtist == "")
-                    {
-                        foreach (FullTrack item in result.Tracks.Items)
-                        {
-                            if (item.Artists[0].Name.Equals(artist, StringComparison.OrdinalIgnoreCase))
-                            {
-                                spotifyArtist = item.Artists[0].Name;
-                                spotifyImage = item.Album.Images[0].Url;
-                                break;
-                            }
-                        }
-
-                        if (spotifyArtist == "")
-                        {
-                            logger.Query("Name only search also failed, returning first item on list");
-
-                            spotifyArtist = result.Tracks.Items[0].Name;
-                            spotifyImage = result.Tracks.Items[0].Album.Images[0].Url;
-                        }
-                    }
-                }
-
-                logger.Query($"Artist found by Last.fm: {artist}\nArtist found by Spotify: {spotifyArtist}\nWith image link: {spotifyImage}");
-                logger.Query("============================================================================");
-
-                return spotifyImage;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("SpotifyAPI.cs ImageSearch", ex.ToString());
-            }
-            return "";
-        }
-        */
         //Lastfm complimentary function
         public async Task<SpotifyImageSearchResult> SearchItemAsync(string artistMbid, string artistName, string songName = "")
         {
             try
             {
-                if (artistMbid == null)
+                if (string.IsNullOrEmpty(artistMbid))
                 {
                     return null;
                 }
@@ -309,7 +176,7 @@ namespace Discord_Bot.Services
                         return null;
                     }
 
-                    spotifyArtist = track.Name;
+                    spotifyArtist = track.Artists[0].Name;
                     result.ImageUrl = track.Album.Images[0].Url;
                     result.EntityUrl = track.ExternalUrls["spotify"];
                 }

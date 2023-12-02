@@ -77,6 +77,7 @@ namespace Discord_Bot.Database.DBServices
                 Idol idol = idols[0];
 
                 User user = await userRepository.GetUserWithIdolsByDiscordIdAsync(userId);
+                user ??= new User() { DiscordId = userId.ToString(), Idols = [] };
                 List<Idol> userIdols = user.Idols.Where(i => i.Name == idolName && (string.IsNullOrEmpty(idolGroup) || idolGroup == i.Group.Name)).ToList();
                 if (userIdols.Count > 0)
                 {
@@ -103,6 +104,7 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 User user = await userRepository.GetUserWithIdolsByDiscordIdAsync(userId);
+                user ??= new User() { DiscordId = userId.ToString() };
 
                 user.Idols = [];
 
@@ -189,6 +191,7 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 User user = await userRepository.GetUserWithIdolsByDiscordIdAsync(userId);
+                user ??= new User() { DiscordId = userId.ToString() };
                 List<Idol> idols = user.Idols.Where(i => i.Name == idolName && (string.IsNullOrEmpty(idolGroup) || idolGroup == i.Group.Name)).ToList();
                 if (idols.Count == 0)
                 {

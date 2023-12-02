@@ -297,26 +297,28 @@ namespace Discord_Bot.Services
             {
                 List<LastFmApi.Models.TopAlbum.Album> albums = await GetEveryAlbumUserListenedToFromArtist(username, artistName);
 
+                List<LastFmApi.Models.TopTrack.Track> tracks = await GetEveryTrackUserListenedToFromArtist(username, artistName);
+
                 //if there are no albums found, they have not listened to the artist
-                if (albums.Count == 0)
+                if (albums.Count == 0 && tracks.Count == 0)
                 {
                     result.Message = "You haven't listened to this artist!";
                     return result;
                 }
 
-                List<LastFmApi.Models.TopTrack.Track> tracks = await GetEveryTrackUserListenedToFromArtist(username, artistName);
+                string mbid = albums.Count == 0 ? tracks[0].Artist.Mbid : albums[0].Artist.Mbid;
 
-                SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(albums[0].Artist.Mbid, tracks[0].Artist.Name, tracks[0].Name);
-                result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (albums[0].Image?[^1].Text);
+                SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(mbid, tracks[0].Artist.Name, tracks[0].Name);
+                result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (albums.Count == 0 ? tracks[0].Image?[^1].Text : albums[0].Image?[^1].Text);
 
-                result.ArtistName = albums[0].Artist.Name;
+                result.ArtistName = albums.Count == 0 ? tracks[0].Artist.Name : albums[0].Artist.Name;
                 result.AlbumCount = albums.Count;
                 result.TrackCount = tracks.Count;
 
                 //Total plays of artist
-                foreach (LastFmApi.Models.TopAlbum.Album album in albums)
+                foreach (LastFmApi.Models.TopTrack.Track track in tracks)
                 {
-                    result.Playcount += int.Parse(album.PlayCount);
+                    result.Playcount += int.Parse(track.PlayCount);
                 }
 
                 //Assembling list of top albums
@@ -465,7 +467,7 @@ namespace Discord_Bot.Services
                 foreach (UserResource item in wk.Users)
                 {
                     //Get their number of plays on given artists
-                    LastFmApi.Models.ArtistInfo.Artist request = await GetArtistPlaysAsync(item.Username, artist_name);
+                    LastFmApi.Models.ArtistInfo.Artist request = await GetArtistPlaysAsync(item.LastFmUsername, artist_name);
                     if (request != null)
                     {
                         if (item == wk.Users[0])
@@ -563,7 +565,7 @@ namespace Discord_Bot.Services
                     LastFmApi.Models.TopTrack.Track track = restResult.Response.Track[i];
                     if (track.Name == track_name && track.Artist.Name == artist_name)
                     {
-                        position = $"({i + 1 + ((page - 1) * 1000)}";
+                        position = $"{i + 1 + ((page - 1) * 1000)}";
                     }
                 }
 

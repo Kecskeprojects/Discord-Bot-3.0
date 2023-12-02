@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.Rest;
+using Discord.WebSocket;
 using Discord_Bot.CommandsService;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
@@ -177,10 +178,31 @@ namespace Discord_Bot.Commands
         [RequireContext(ContextType.Guild)]
         [Alias(["hornyjail, hit me please"])]
         [Summary("Inserts a gif with the user's local profile picture")]
-        public async Task Bonk(string userName = "", int delay = 10)
+        public async Task Bonk([Remainder] string parameters = "")
         {
             try
             {
+                List<string> paramParts = [.. parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
+                string userName = "";
+                int frameDelay = 10;
+                if (paramParts.Count > 0)
+                {
+                    if (int.TryParse(paramParts[^1], out frameDelay))
+                    {
+                        if (frameDelay < 1 || frameDelay > 1000)
+                        {
+                            await ReplyAsync("Invalid frame delay length. (1-1000)");
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        frameDelay = 10;
+                    }
+                    paramParts.Remove(frameDelay.ToString());
+                    userName = string.Join(" ", paramParts);
+                }
+
                 ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
                 if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
                 {
@@ -197,18 +219,27 @@ namespace Discord_Bot.Commands
                 {
                     await Context.Guild.DownloadUsersAsync();
 
-                    IReadOnlyCollection<RestGuildUser> users = await Context.Guild.SearchUsersAsync(userName, 1);
-                    if (users.Count > 0)
+                    if(ulong.TryParse(userName, out ulong userId))
                     {
-                        RestGuildUser user = users.First();
+                        SocketGuildUser user = Context.Guild.GetUser(userId);
                         url = user.GetDisplayAvatarUrl(ImageFormat.Png, 512);
+                    }
+                    else
+                    {
+                        IReadOnlyCollection<RestGuildUser> users = await Context.Guild.SearchUsersAsync(userName, 1);
+                        if (users.Count > 0)
+                        {
+                            RestGuildUser user = users.First();
+                            url = user.GetDisplayAvatarUrl(ImageFormat.Png, 512);
+                        }
                     }
                 }
 
                 if (!string.IsNullOrEmpty(url))
                 {
                     Stream stream = Global.GetStream(url);
-                    MemoryStream gifStream = pictureHandler.CreateBonkImage(stream, delay);
+
+                    MemoryStream gifStream = pictureHandler.CreateBonkImage(stream, frameDelay);
 
                     await Context.Channel.SendFileAsync(gifStream, $"bonk_{userName}.gif");
                 }

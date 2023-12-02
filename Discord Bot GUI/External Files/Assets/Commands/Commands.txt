@@ -3,12 +3,13 @@ Text Commands:
 !help	List of commands (DM)
 !8ball [question]	8ball game (DM)
 !custom list	List of custom commands
-!coin flip [head] or [tails]	Flip a coin(DM)
-!wotd [language]	Word of the day in a language(DM)
-!birthday add [date]	Add birthday for server
-!birthday remove	Remove birthday from server
+!coin flip [head] or [tails]	Flip a coin (DM)
+!wotd [language]	Word of the day in a language (DM)
+!birthday add [date]	Add your birthday for server
+!birthday remove	Remove your birthday from server
+!birthday list	List all birthdays from server
 !bonk [user] [delay]	bonk
-.twt [links]	Twitter embed(DM)
+.twt [links]	Twitter embed (DM)
 
 Remind Commands:
 
@@ -35,7 +36,7 @@ Voice Commands:
 Last.fm commands:
 
 !lf conn [username]	Connect last.fm username to you (DM)
-!lf del	Disconnect last.fm username from you(DM)
+!lf del	Disconnect last.fm username from you (DM)
 !lf np	Song you are currently playing (DM)
 !lf rc [length(1-30)]	Your most recent song (DM)
 !lf tar [length(1-30)] [*period]	Your top artists (DM)

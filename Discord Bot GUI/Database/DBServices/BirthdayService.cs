@@ -64,7 +64,13 @@ namespace Discord_Bot.Database.DBServices
         public async Task<List<BirthdayResource>> GetBirthdaysByDateAsync()
         {
             List<Birthday> birthday = await birthdayRepository.GetBirthdaysByDateAsync();
-            return mapper.Map<List<BirthdayResource>>(birthday);
+            return mapper.Map<List<Birthday>, List<BirthdayResource>>(birthday);
+        }
+
+        public async Task<List<BirthdayResource>> GetServerBirthdayListAsync(ulong serverId)
+        {
+            List<Birthday> birthday = await birthdayRepository.GetBirthdaysByServerAsync(serverId);
+            return mapper.Map<List<Birthday>, List<BirthdayResource>>(birthday);
         }
 
         public async Task<DbProcessResultEnum> RemoveBirthdayAsync(ulong serverId, ulong userId)

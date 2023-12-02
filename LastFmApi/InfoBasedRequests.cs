@@ -23,7 +23,7 @@ namespace LastFmApi
                     return response;
                 }
 
-                InfoBasedRequestItem request = new("artist.getInfo", apiKey, username, artistName);
+                InfoBasedRequestItem request = new("artist.getInfo", username, apiKey, artistName);
 
                 RestResponse restResultJSON = await InfoBasedRequestHandler(request);
                 ArtistInfo deserialized = JsonConvert.DeserializeObject<ArtistInfo>(restResultJSON.Content);
