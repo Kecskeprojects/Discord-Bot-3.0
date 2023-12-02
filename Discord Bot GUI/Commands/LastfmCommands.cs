@@ -454,10 +454,17 @@ namespace Discord_Bot.Commands
 
                     builder.WithDescription($"You have listened to this artist **{response.Playcount}** times.\nYou listened to **{response.AlbumCount}** of their albums and **{response.TrackCount}** of their tracks.");
 
-                    if(!string.IsNullOrEmpty(response.TrackField)) builder.AddField("Top Tracks", response.TrackField, false);
-                    if (!string.IsNullOrEmpty(response.AlbumField)) builder.AddField("Top Albums", response.AlbumField, false);
+                    if (!string.IsNullOrEmpty(response.TrackField))
+                    {
+                        builder.AddField("Top Tracks", response.TrackField, false);
+                    }
 
-                    if(builder.Fields.Count == 0)
+                    if (!string.IsNullOrEmpty(response.AlbumField))
+                    {
+                        builder.AddField("Top Albums", response.AlbumField, false);
+                    }
+
+                    if (builder.Fields.Count == 0)
                     {
                         await ReplyAsync("Exception during embed building!");
                         return;

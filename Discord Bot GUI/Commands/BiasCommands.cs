@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class BiasCommands(IIdolService idolService, IServerService serverService,Logging logger, Config config) : BaseCommand(logger, config, serverService), IBiasCommands
+    public class BiasCommands(IIdolService idolService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), IBiasCommands
     {
         private readonly IIdolService idolService = idolService;
 

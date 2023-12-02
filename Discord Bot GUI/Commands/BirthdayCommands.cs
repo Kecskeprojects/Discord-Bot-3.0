@@ -2,7 +2,6 @@
 using Discord.Commands;
 using Discord.Rest;
 using Discord_Bot.CommandsService;
-using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
@@ -31,7 +30,7 @@ namespace Discord_Bot.Commands
             try
             {
                 IUser user = null;
-                if(ulong.TryParse(userIdOrName, out ulong id))
+                if (ulong.TryParse(userIdOrName, out ulong id))
                 {
                     user = await Context.Client.GetUserAsync(id);
                 }

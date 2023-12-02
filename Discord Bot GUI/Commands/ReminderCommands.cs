@@ -26,7 +26,7 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                if(Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
                 {
                     ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
                     if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))

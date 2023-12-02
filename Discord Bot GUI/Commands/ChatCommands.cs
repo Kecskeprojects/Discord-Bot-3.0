@@ -219,7 +219,7 @@ namespace Discord_Bot.Commands
                 {
                     await Context.Guild.DownloadUsersAsync();
 
-                    if(ulong.TryParse(userName, out ulong userId))
+                    if (ulong.TryParse(userName, out ulong userId))
                     {
                         SocketGuildUser user = Context.Guild.GetUser(userId);
                         url = user.GetDisplayAvatarUrl(ImageFormat.Png, 512);

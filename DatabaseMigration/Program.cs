@@ -1,6 +1,5 @@
-﻿using System.Data.SQLite;
-using System.Data;
-using System.Data.Entity;
+﻿using System.Data;
+using System.Data.SQLite;
 using System.Text;
 
 namespace DatabaseMigration
@@ -26,7 +25,7 @@ namespace DatabaseMigration
                 Sqlite_conn.StateChange += new StateChangeEventHandler(OpenConnection);
 
                 Console.WriteLine("Do you want to export the tables into txts? (y/n)");
-                if(Console.ReadKey().Key == ConsoleKey.Y)
+                if (Console.ReadKey().Key == ConsoleKey.Y)
                 {
                     string[] queries = File.ReadAllLines("sql\\base_requests.txt");
 
@@ -78,7 +77,10 @@ namespace DatabaseMigration
                 for (int i = 0; i < maxwidth; i++)
                 {
                     text += row[i].ToString();
-                    if(i + 1 != maxwidth) text += "\', \'";
+                    if (i + 1 != maxwidth)
+                    {
+                        text += "\', \'";
+                    }
                 }
                 text += "');\n";
             }

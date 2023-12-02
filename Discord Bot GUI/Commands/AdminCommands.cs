@@ -59,14 +59,14 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                if(type == "" && channelName == "")
+                if (type == "" && channelName == "")
                 {
                     await ReplyAsync("Current types: " +
                         string.Join(", ", ChannelTypeNameCollections.NameEnum.Keys.Select(x => $"`{x}`")));
                     return;
                 }
 
-                if(channelName == "")
+                if (channelName == "")
                 {
                     return;
                 }
