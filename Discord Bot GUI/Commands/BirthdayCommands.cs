@@ -100,7 +100,7 @@ namespace Discord_Bot.Commands
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(ChannelPermission.ManageRoles)]
         [Summary("Removing a birthday to be reminded about on a given server for a given user")]
-        public async Task BirthdayRemoveForUser(string userIdOrName)
+        public async Task BirthdayRemoveForUser([Remainder] string userIdOrName)
         {
             try
             {
