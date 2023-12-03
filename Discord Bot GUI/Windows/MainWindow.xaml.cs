@@ -65,6 +65,8 @@ namespace Discord_Bot
             }
         }
 
+        //Test button function
+        /*
         private void WriteLog(object sender, RoutedEventArgs e)
         {
             try
@@ -76,5 +78,6 @@ namespace Discord_Bot
                 logger.Error("MainWindow.xaml.cs WriteLog", ex.ToString());
             }
         }
+        */
     }
 }
