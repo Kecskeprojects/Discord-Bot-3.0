@@ -6,7 +6,7 @@ using Discord_Bot.Communication;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Interfaces.DBServices;
-using Discord_Bot.Services;
+using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
@@ -15,9 +15,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class TwitterScraperCommands(IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
+    public class TwitterScraperCommands(ITwitterScraper twitterScraper, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
     {
         private static readonly string[] baseURLs = ["https://twitter.com/", "https://x.com/"];
+        private readonly ITwitterScraper twitterScraper = twitterScraper;
 
         [Command("twt")]
         [Summary("For embedding twitter messages, replacing the built in discord embeds")]
@@ -35,7 +36,7 @@ namespace Discord_Bot.Commands
                     {
                         logger.Log($"Embed message from following links: \n{string.Join("\n", urls)}");
 
-                        TwitterScrapingResult result = await new TwitterScraper().GetDataFromUrls(urls);
+                        TwitterScrapingResult result = await twitterScraper.GetDataFromUrls(urls);
 
                         MessageReference refer = new(Context.Message.Id, Context.Channel.Id, Context.Guild.Id, false);
 

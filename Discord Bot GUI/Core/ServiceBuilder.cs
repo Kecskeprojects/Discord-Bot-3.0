@@ -73,6 +73,7 @@ namespace Discord_Bot.Core
             collection.AddScoped<IYoutubeDownloadService, YoutubeDownloadService>();
             collection.AddScoped<ILastFmAPI, LastFmAPI>();
             collection.AddScoped<IMusicBrainzAPI, MusicBrainzAPI>();
+            collection.AddScoped<ITwitterScraper, TwitterScraper>();
 
             //Database
             collection.AddScoped<IServerRepository, ServerRepository>();

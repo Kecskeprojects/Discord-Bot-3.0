@@ -1,6 +1,8 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
 using Discord_Bot.Communication;
+using Discord_Bot.Core.Logger;
+using Discord_Bot.Interfaces.Services;
 using PuppeteerSharp;
 using System;
 using System.Collections.Generic;
@@ -9,8 +11,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Services
 {
-    public class TwitterScraper
+    public class TwitterScraper(Logging logger) : ITwitterScraper
     {
+        private readonly Logging logger = logger;
+
         #region Variables
         private static IBrowser Browser { get; set; }
 
@@ -84,9 +88,15 @@ namespace Discord_Bot.Services
                 messages += string.Join("\n", Exceptions);
                 return new TwitterScrapingResult(Videos, Images, messages);
             }
+            catch (NavigationException ex)
+            {
+                logger.Warning("TwitterScraper.cs GetDataFromUrls", ex.ToString());
+                return new TwitterScrapingResult("Open link operation timed out after 15 seconds.");
+            }
             catch (Exception ex)
             {
-                return new TwitterScrapingResult(ex.Message);
+                logger.Error("TwitterScraper.cs GetDataFromUrls", ex.ToString());
+                return new TwitterScrapingResult("Unexpected error occured");
             }
         }
 
@@ -168,8 +178,7 @@ namespace Discord_Bot.Services
         private static async Task<IDocument> OpenPage(IPage page, Uri uri)
         {
             await page.DeleteCookieAsync();
-            await page.GoToAsync(uri.OriginalString, 15000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded, WaitUntilNavigation.Networkidle2, WaitUntilNavigation.Networkidle0]);
-            //await Task.Delay(1000);
+            await page.GoToAsync(uri.OriginalString, 15000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded/*, WaitUntilNavigation.Networkidle2, WaitUntilNavigation.Networkidle0 */]);
             string content = await page.GetContentAsync();
 
             IBrowsingContext context = BrowsingContext.New(Configuration.Default);
