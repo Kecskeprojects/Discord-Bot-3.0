@@ -2,11 +2,14 @@
 using Discord_Bot.Core;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord_Bot.CommandsService
 {
     public class TwitterScraperService
     {
+        private static readonly string[] smallSizingStrings = ["thumb", "small", "medium" ];
+        private static readonly string[] largeSizingStrings = ["large", "orig"];
         public static List<FileAttachment> AllContentInRegularMessage(List<Uri> videos, List<Uri> images, bool sendVideos = true)
         {
             List<FileAttachment> Embeds = [];
@@ -14,7 +17,12 @@ namespace Discord_Bot.CommandsService
 
             for (int i = 0; i < (images.Count < 10 ? images.Count : 10) && Embeds.Count < 10; i++)
             {
-                images[i] = new Uri(images[i].OriginalString.Split("?")[0] + "?format=jpg");
+                string query = images[i].Query;
+                query = smallSizingStrings.Any(query.Contains)
+                        ? "?format=jpg&name=medium"
+                        : "?format=jpg&name=orig";
+
+                images[i] = new Uri(images[i].OriginalString.Split("?")[0] + query);
                 Embeds.Add(new FileAttachment(Global.GetStream(images[i].OriginalString), $"{commonFileName}_image_{i + 1}.png"));
             }
 
