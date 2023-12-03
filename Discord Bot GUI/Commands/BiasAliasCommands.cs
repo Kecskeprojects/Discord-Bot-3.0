@@ -37,6 +37,10 @@ namespace Discord_Bot.Commands
                 {
                     await ReplyAsync("Bias alias already in database!");
                 }
+                else if (result == DbProcessResultEnum.NotFound)
+                {
+                    await ReplyAsync("Bias with that name not found in database!");
+                }
                 else
                 {
                     await ReplyAsync("Bias alias could not be added!");
