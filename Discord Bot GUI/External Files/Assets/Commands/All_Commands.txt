@@ -72,8 +72,8 @@ Admin Commands:
 !keyword add `[keyword]` `[response]`			Adds new keyword to list
 !keyword remove [keyword]						Removes keyword from list
 !server settings								Lists the current settings of the server
-!birthday add [user ID] [date]					Add birthday for server
-!birthday remove [user ID]						Remove birthday from server
+!birthday add [user ID/name]>[date]				Add birthday for server
+!birthday remove [user ID/name]					Remove birthday from server
 
 Owner Commands:
 

@@ -19,16 +19,20 @@ namespace Discord_Bot.Commands
     public class BirthdayCommands(IBirthdayService birthdayService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), IBirthdayCommands
     {
         private readonly IBirthdayService birthdayService = birthdayService;
-        private static readonly string[] dateSeparator = [",", "/", "\\", "-", "."];
+        private static readonly string[] dateSeparator = [",", "/", "\\", "-", ".", " "];
 
         [Command("birthday add user")]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(ChannelPermission.ManageRoles)]
         [Summary("Adding a birthday to be reminded about on a given server for a given user")]
-        public async Task BirthdayAddForUser(string userIdOrName, string year, string month = "", string day = "")
+        public async Task BirthdayAddForUser([Remainder] string inputParams)
         {
             try
             {
+                //Get artist's name and the track for search
+                string userIdOrName = inputParams.Split('>')[0].Trim().ToLower();
+                string dateString = inputParams.Split('>')[1].Trim().ToLower();
+
                 IUser user = null;
                 if (ulong.TryParse(userIdOrName, out ulong id))
                 {
@@ -50,19 +54,16 @@ namespace Discord_Bot.Commands
                     return;
                 }
 
-                if (!string.IsNullOrEmpty(month) && string.IsNullOrEmpty(day))
+                string[] strings = dateString.Split(dateSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                if(strings.Length != 3)
                 {
-                    await ReplyAsync("Incorrect input!");
+                    await ReplyAsync("Incorrect input parameters");
                     return;
                 }
 
-                if (string.IsNullOrEmpty(month) && string.IsNullOrEmpty(day))
-                {
-                    string[] strings = year.Split(dateSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                    year = strings[0];
-                    month = strings[1];
-                    day = strings[2];
-                }
+                string year = strings[0];
+                string month = strings[1];
+                string day = strings[2];
 
                 if (DateTime.TryParse($"{year}.{month}.{day}", out DateTime date))
                 {
