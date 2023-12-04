@@ -11,13 +11,16 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Services
 {
-    public class TwitterScraper(Logging logger) : ITwitterScraper
+    public class TwitterScraper : ITwitterScraper
     {
-        private readonly Logging logger = logger;
+        public TwitterScraper(Logging logger)
+        {
+            logger.Log("Initialized");
+            this.logger = logger;
+        }
+        private readonly Logging logger;
 
         #region Variables
-        private static IBrowser Browser { get; set; }
-
         //The standard video url is the following:
         //https://video.twimg.com/[folder_type]/[folder_id]/pu/vid/[width]x[height]/[video_id].mp4?tag=12
         private List<Uri> Videos { get; set; } = [];
@@ -29,46 +32,17 @@ namespace Discord_Bot.Services
         //https://pbs.twimg.com/media/[image_id]?format=[image_format]&name=[width]x[height]
         private List<Uri> Images { get; set; } = [];
         private List<string> Exceptions { get; } = [];
+        private bool HasVideo { get; set;  } = false;
         #endregion
 
         #region Main Methods
-        public static async Task OpenBroser()
-        {
-            BrowserFetcher browserFetcher = new(SupportedBrowser.Chrome);
-            await browserFetcher.DownloadAsync("117.0.5938.62"); //Todo: PuppeteerSharp.BrowserData.Chrome.DefaultBuildId should be revisited in future, new builds remove option to download the way it is currently done
-            IBrowser browser = await Puppeteer.LaunchAsync(new LaunchOptions
-            {
-                Headless = true,
-                Args =
-                [
-                    "--no-sandbox",
-                    "--disable-setuid-sandbox",
-                    "--disable-web-security",
-                    "--disable-features=IsolateOrigins",
-                    "--disable-site-isolation-trials",
-                    "--disable-features=BlockInsecurePrivateNetworkRequests",
-                    "--ignore-certificate-errors"
-                ],
-                ExecutablePath = "Chrome\\Win64-117.0.5938.62\\chrome-win64\\chrome.exe"
-            });
-            Browser = browser;
-        }
-
-        public static async Task CloseBrowser()
-        {
-            if (Browser != null && !Browser.IsClosed)
-            {
-                await Browser.CloseAsync();
-            }
-        }
-
         public async Task<TwitterScrapingResult> GetDataFromUrls(List<Uri> uris)
         {
             try
             {
-                if (Browser == null || Browser.IsClosed)
+                if (BrowserService.Browser == null || BrowserService.Browser.IsClosed)
                 {
-                    await OpenBroser();
+                    await BrowserService.OpenBroser();
                 }
 
                 IPage mainPage = await CreateNewPage();
@@ -102,7 +76,7 @@ namespace Discord_Bot.Services
 
         private async Task<IPage> CreateNewPage()
         {
-            IPage mainPage = await Browser.NewPageAsync();
+            IPage mainPage = await BrowserService.Browser.NewPageAsync();
             Dictionary<string, string> headers = new()
                 {
                     { "user-agent", "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36" },
@@ -140,14 +114,17 @@ namespace Discord_Bot.Services
 
                 List<Uri> currImages = GetImages(main);
 
-                GetVideos(main, articles, mainPos, ref videosBeforeMainCount, ref videoCount);
-
                 Images.AddRange(currImages);
-                Videos.AddRange(TempVideos.Skip(videosBeforeMainCount).Take(videoCount));
+
+                if (HasVideo)
+                {
+                    GetVideos(main, articles, mainPos, ref videosBeforeMainCount, ref videoCount);
+                    Videos.AddRange(TempVideos.Skip(videosBeforeMainCount).Take(videoCount));
+                }
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                logger.Error("TwitterScraper.cs ExtractFromUrl", ex.ToString());
             }
 
             return "";
@@ -175,10 +152,20 @@ namespace Discord_Bot.Services
             }
         }
 
-        private static async Task<IDocument> OpenPage(IPage page, Uri uri)
+        private async Task<IDocument> OpenPage(IPage page, Uri uri)
         {
             await page.DeleteCookieAsync();
-            await page.GoToAsync(uri.OriginalString, 15000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded/*, WaitUntilNavigation.Networkidle2, WaitUntilNavigation.Networkidle0 */]);
+            await page.GoToAsync(uri.OriginalString);
+            await page.WaitForSelectorAsync("div[data-testid=\"tweetPhoto\"]>img,div[data-testid=\"videoPlayer\"]", new WaitForSelectorOptions() { Timeout = 15000 });
+            try
+            {
+                await page.WaitForSelectorAsync("div[data-testid=\"videoPlayer\"]", new WaitForSelectorOptions() { Timeout = 2000 });
+                HasVideo = true;
+            }
+            catch (Exception)
+            {
+                HasVideo = true;
+            }
             string content = await page.GetContentAsync();
 
             IBrowsingContext context = BrowsingContext.New(Configuration.Default);

@@ -47,8 +47,8 @@ namespace Discord_Bot.Core
             try
             {
                 logger.Log("Application closing...");
+                await BrowserService.CloseBrowser();
                 LogToFile();
-                await TwitterScraper.CloseBrowser();
             }
             catch (Exception) { }
         }
@@ -58,8 +58,8 @@ namespace Discord_Bot.Core
             try
             {
                 logger.Log("Application closing...");
+                await BrowserService.CloseBrowser();
                 LogToFile();
-                await TwitterScraper.CloseBrowser();
             }
             catch (Exception) { }
         }

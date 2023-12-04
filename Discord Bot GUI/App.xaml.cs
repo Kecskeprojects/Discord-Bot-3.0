@@ -340,7 +340,7 @@ namespace Discord_Bot
                         logger.Warning("App.xaml.cs HandleCommandAsync", result.ErrorReason);
                     }
                 }
-                else if (config.Enable_Twitter_Embed && context.Message.HasStringPrefix(".", ref argPos))
+                else if (config.Enable_Twitter_Embed && context.Message.HasCharPrefix('.', ref argPos))
                 {
                     await commands.ExecuteAsync(context, argPos, services);
                 }

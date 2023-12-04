@@ -5,9 +5,11 @@ using Discord_Bot.CommandsService;
 using Discord_Bot.Communication;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
+using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Tools;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +17,11 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class TwitterScraperCommands(ITwitterScraper twitterScraper, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
+    //Todo: Only one instance is created, figure out why
+    public class TwitterScraperCommands(IServiceProvider services, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), ITwitterScraperCommands
     {
         private static readonly string[] baseURLs = ["https://twitter.com/", "https://x.com/"];
-        private readonly ITwitterScraper twitterScraper = twitterScraper;
+        private readonly IServiceProvider services = services;
 
         [Command("twt")]
         [Summary("For embedding twitter messages, replacing the built in discord embeds")]
@@ -36,7 +39,10 @@ namespace Discord_Bot.Commands
                     {
                         logger.Log($"Embed message from following links: \n{string.Join("\n", urls)}");
 
-                        TwitterScrapingResult result = await twitterScraper.GetDataFromUrls(urls);
+                        //Todo: Remove this once reason has been found
+                        using IServiceScope scope = services.CreateScope();
+                        ITwitterScraper scraper = scope.ServiceProvider.GetService<ITwitterScraper>();
+                        TwitterScrapingResult result = await scraper.GetDataFromUrls(urls);
 
                         MessageReference refer = new(Context.Message.Id, Context.Channel.Id, Context.Guild.Id, false);
 
