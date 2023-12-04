@@ -55,7 +55,7 @@ namespace Discord_Bot.Commands
                 }
 
                 string[] strings = dateString.Split(dateSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                if(strings.Length != 3)
+                if (strings.Length != 3)
                 {
                     await ReplyAsync("Incorrect input parameters");
                     return;

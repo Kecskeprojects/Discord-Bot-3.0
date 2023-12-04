@@ -27,7 +27,7 @@ namespace Discord_Bot.Services
         //https://pbs.twimg.com/media/[image_id]?format=[image_format]&name=[width]x[height]
         private List<Uri> Images { get; set; } = [];
         private List<string> Exceptions { get; } = [];
-        private bool HasVideo { get; set;  } = false;
+        private bool HasVideo { get; set; } = false;
         #endregion
 
         #region Main Methods

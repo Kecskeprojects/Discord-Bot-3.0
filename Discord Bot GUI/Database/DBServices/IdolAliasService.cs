@@ -27,7 +27,7 @@ namespace Discord_Bot.Database.DBServices
 
                 Idol idol = await idolRepository.GetIdolWithAliasesAsync(idolName, idolGroup);
 
-                if(idol == null)
+                if (idol == null)
                 {
                     return DbProcessResultEnum.NotFound;
                 }

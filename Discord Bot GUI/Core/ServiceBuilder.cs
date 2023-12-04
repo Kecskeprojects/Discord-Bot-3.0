@@ -54,12 +54,12 @@ namespace Discord_Bot.Core
             collection.AddSingleton(config);
             collection.AddSingleton(new Logging());
             collection.AddSingleton(new Cache());
-            collection.AddScoped<ICoreLogic, CoreLogic>();
 
             collection.AddDbContext<MainDbContext>(options => options.UseSqlServer(config.SqlConnectionString));
 
             collection.AddAutoMapper(x => x.AddProfile<MapperConfig>());
 
+            collection.AddTransient<ICoreLogic, CoreLogic>();
             collection.AddTransient(typeof(MainWindow));
 
             //Services
@@ -107,8 +107,8 @@ namespace Discord_Bot.Core
             collection.AddScoped<IIdolAliasRepository, IdolAliasRepository>();
 
             //Commands
-            collection.AddScoped<IServiceToDiscordCommunication, ServiceDiscordCommunication>();
-            collection.AddScoped<ICoreToDiscordCommunication, CoreDiscordCommunication>();
+            collection.AddTransient<IServiceToDiscordCommunication, ServiceDiscordCommunication>();
+            collection.AddTransient<ICoreToDiscordCommunication, CoreDiscordCommunication>();
 
             return collection.BuildServiceProvider();
         }

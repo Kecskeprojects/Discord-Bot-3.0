@@ -13,7 +13,7 @@ namespace Discord_Bot.Services
     {
         private static readonly RestClient _client = new("https://musicbrainz.org/ws/2/");
         private readonly Logging logger = logger;
-        
+
         //https://musicbrainz.org/ws/2/artist/[artistMBID]?inc=url-rels&fmt=json
         public async Task<string> GetArtistSpotifyUrlAsync(string mbid)
         {
