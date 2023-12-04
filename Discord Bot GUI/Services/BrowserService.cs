@@ -12,7 +12,7 @@ namespace Discord_Bot.Services
             await browserFetcher.DownloadAsync("117.0.5938.62"); //Todo: PuppeteerSharp.BrowserData.Chrome.DefaultBuildId should be revisited in future, new builds remove option to download the way it is currently done
             IBrowser browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
-                Headless = false,
+                Headless = true,
                 Args =
                 [
                     "--no-sandbox",

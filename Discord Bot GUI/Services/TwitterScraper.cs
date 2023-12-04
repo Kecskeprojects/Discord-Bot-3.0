@@ -11,14 +11,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Services
 {
-    public class TwitterScraper : ITwitterScraper
+    public class TwitterScraper(Logging logger) : ITwitterScraper
     {
-        public TwitterScraper(Logging logger)
-        {
-            logger.Log("Initialized");
-            this.logger = logger;
-        }
-        private readonly Logging logger;
+        private readonly Logging logger = logger;
 
         #region Variables
         //The standard video url is the following:

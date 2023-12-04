@@ -63,45 +63,47 @@ namespace Discord_Bot.Core
             collection.AddTransient(typeof(MainWindow));
 
             //Services
-            collection.AddScoped<ITwitchAPI, TwitchAPI>();
-            collection.AddScoped<ISpotifyAPI, Services.SpotifyAPI>();
-            collection.AddScoped<IYoutubeAPI, YoutubeAPI>();
-            collection.AddScoped<IPictureHandler, PictureHandler>();
-            collection.AddScoped<IInstaLoader, InstaLoader>();
-            collection.AddScoped<IWordOfTheDayService, WordOfTheDayService>();
-            collection.AddScoped<IAudioService, AudioService>();
-            collection.AddScoped<IYoutubeDownloadService, YoutubeDownloadService>();
-            collection.AddScoped<ILastFmAPI, LastFmAPI>();
-            collection.AddScoped<IMusicBrainzAPI, MusicBrainzAPI>();
-            collection.AddScoped<ITwitterScraper, TwitterScraper>();
+            collection.AddTransient<ITwitchAPI, TwitchAPI>();
+            collection.AddTransient<ISpotifyAPI, Services.SpotifyAPI>();
+            collection.AddTransient<IYoutubeAPI, YoutubeAPI>();
+            collection.AddTransient<IPictureHandler, PictureHandler>();
+            collection.AddTransient<IInstaLoader, InstaLoader>();
+            collection.AddTransient<IWordOfTheDayService, WordOfTheDayService>();
+            collection.AddTransient<IAudioService, AudioService>();
+            collection.AddTransient<IYoutubeDownloadService, YoutubeDownloadService>();
+            collection.AddTransient<ILastFmAPI, LastFmAPI>();
+            collection.AddTransient<IMusicBrainzAPI, MusicBrainzAPI>();
+            collection.AddTransient<ITwitterScraper, TwitterScraper>();
 
-            //Database
+            //Database Services
+            collection.AddTransient<IServerService, ServerService>();
+            collection.AddTransient<IGreetingService, GreetingService>();
+            collection.AddTransient<ITwitchChannelService, TwitchChannelService>();
+            collection.AddTransient<ICustomCommandService, CustomCommandService>();
+            collection.AddTransient<IRoleService, RoleService>();
+            collection.AddTransient<IKeywordService, KeywordService>();
+            collection.AddTransient<IReminderService, ReminderService>();
+            collection.AddTransient<IChannelService, ChannelService>();
+            collection.AddTransient<IBirthdayService, BirthdayService>();
+            collection.AddTransient<IIdolService, IdolService>();
+            collection.AddTransient<IUserService, UserService>();
+            collection.AddTransient<IIdolAliasService, IdolAliasService>();
+
+            //Database Repositories
             collection.AddScoped<IServerRepository, ServerRepository>();
-            collection.AddScoped<IServerService, ServerService>();
             collection.AddScoped<IServerChannelViewRepository, ServerChannelViewRepository>();
             collection.AddScoped<IGreetingRepository, GreetingRepository>();
-            collection.AddScoped<IGreetingService, GreetingService>();
-            collection.AddScoped<ITwitchChannelService, TwitchChannelService>();
             collection.AddScoped<ITwitchChannelRepository, TwitchChannelRepository>();
-            collection.AddScoped<ICustomCommandService, CustomCommandService>();
             collection.AddScoped<ICustomCommandRepository, CustomCommandRepository>();
-            collection.AddScoped<IRoleService, RoleService>();
             collection.AddScoped<IRoleRepository, RoleRepository>();
-            collection.AddScoped<IKeywordService, KeywordService>();
             collection.AddScoped<IKeywordRepository, KeywordRepository>();
-            collection.AddScoped<IReminderService, ReminderService>();
             collection.AddScoped<IReminderRepository, ReminderRepository>();
             collection.AddScoped<IUserRepository, UserRepository>();
             collection.AddScoped<IChannelRepository, ChannelRepository>();
-            collection.AddScoped<IChannelService, ChannelService>();
             collection.AddScoped<IChannelTypeRepository, ChannelTypeRepository>();
-            collection.AddScoped<IBirthdayService, BirthdayService>();
             collection.AddScoped<IBirthdayRepository, BirthdayRepository>();
-            collection.AddScoped<IIdolService, IdolService>();
             collection.AddScoped<IIdolRepository, IdolRepository>();
             collection.AddScoped<IIdolGroupRepository, IdolGroupRepository>();
-            collection.AddScoped<IUserService, UserService>();
-            collection.AddScoped<IIdolAliasService, IdolAliasService>();
             collection.AddScoped<IIdolAliasRepository, IdolAliasRepository>();
 
             //Commands

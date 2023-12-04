@@ -503,13 +503,14 @@ namespace Discord_Bot.Commands
                 }
 
                 List<UserResource> users = await userService.GetAllLastFmUsersAsync();
+
+                //Download inactive users
+                await Context.Guild.DownloadUsersAsync();
+
                 users = LastFmService.FilterToOnlyServerMembers(Context, users);
 
                 //Variable declarations
                 WhoKnows wk = new(users);
-
-                //Download inactive users
-                await Context.Guild.DownloadUsersAsync();
 
                 //In case user doesn't give a song, we check if they are playing something
                 if (input == "")
