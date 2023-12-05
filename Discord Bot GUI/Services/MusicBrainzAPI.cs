@@ -22,6 +22,7 @@ namespace Discord_Bot.Services
             {
                 string query = $"artist/{mbid}?inc=url-rels&fmt=json";
                 logger.Query("Musicbrainz query Url:\n" + BaseUrl + query);
+
                 RestRequest request = new(query);
                 RestResponse resultJSON = await _client.GetAsync(request);
                 ArtistLookup deserialized = JsonConvert.DeserializeObject<ArtistLookup>(resultJSON.Content);
