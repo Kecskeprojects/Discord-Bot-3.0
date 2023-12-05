@@ -13,7 +13,7 @@ namespace Discord_Bot.Interactions
     {
         private readonly IIdolService idolService = idolService;
 
-        [ComponentInteraction("idolMenu_*")]
+        [ComponentInteraction("biasMenu_*")]
         public async Task IdolMenuHandler(int count, string[] selectedIdolGroups)
         {
             try
