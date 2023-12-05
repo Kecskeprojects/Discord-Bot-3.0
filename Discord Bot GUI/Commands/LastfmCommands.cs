@@ -597,7 +597,7 @@ namespace Discord_Bot.Commands
                 }
                 else
                 {
-                    await ReplyAsync("No one has played this song according to last.fm!");
+                    await ReplyAsync("No one has listened to this song/artist according to last.fm!");
                 }
             }
             catch (Exception ex)

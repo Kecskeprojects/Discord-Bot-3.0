@@ -61,16 +61,18 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
+                bool noGroup = string.IsNullOrEmpty(idolGroup);
+
                 List<Idol> idols = await idolRepository.GetIdolsByNameAndGroupAsync(idolName, idolGroup);
 
                 if (idols.Count == 0)
                 {
-                    logger.Log($"Idol [{idolName}]-[{idolGroup}] could not be found!");
+                    logger.Log($"Idol [{idolName}]-[{(noGroup ? "No group specified" :idolGroup)}] could not be found!");
                     return DbProcessResultEnum.NotFound;
                 }
                 else if (idols.Count > 1)
                 {
-                    logger.Log($"Idol [{idolName}]-[{idolGroup}] returned multiple results!");
+                    logger.Log($"Idol [{idolName}]-[{(noGroup ? "No group specified" : idolGroup)}] returned multiple results!");
                     return DbProcessResultEnum.MultipleResults;
                 }
 
@@ -81,7 +83,7 @@ namespace Discord_Bot.Database.DBServices
                 List<Idol> userIdols = user.Idols.Where(i => i.Name == idolName && (string.IsNullOrEmpty(idolGroup) || idolGroup == i.Group.Name)).ToList();
                 if (userIdols.Count > 0)
                 {
-                    logger.Log($"{userId} user's with idol [{idolName}]-[{idolGroup}] is already connected an existing connection!");
+                    logger.Log($"{userId} user's with idol [{idolName}]-[{(noGroup ? "No group specified" : idolGroup)}] is already connected an existing connection!");
                     return userIdols.Count == 1 ? DbProcessResultEnum.AlreadyExists : DbProcessResultEnum.MultipleExists;
                 }
 
@@ -89,7 +91,7 @@ namespace Discord_Bot.Database.DBServices
 
                 await userRepository.UpdateUserAsync(user);
 
-                logger.Log($"{userId} user's idol [{idolName}]-[{idolGroup}] added successfully!");
+                logger.Log($"{userId} user's idol [{idolName}]-[{(noGroup ? "No group specified" : idolGroup)}] added successfully!");
                 return DbProcessResultEnum.Success;
             }
             catch (Exception ex)
@@ -190,17 +192,19 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
+                bool noGroup = string.IsNullOrEmpty(idolGroup);
+
                 User user = await userRepository.GetUserWithIdolsByDiscordIdAsync(userId);
                 user ??= new User() { DiscordId = userId.ToString() };
                 List<Idol> idols = user.Idols.Where(i => i.Name == idolName && (string.IsNullOrEmpty(idolGroup) || idolGroup == i.Group.Name)).ToList();
                 if (idols.Count == 0)
                 {
-                    logger.Log($"{userId} user's with idol [{idolName}]-[{idolGroup}] are not connected currently!");
+                    logger.Log($"{userId} user's with idol [{idolName}]-[{(noGroup ? "No group specified" : idolGroup)}] are not connected currently!");
                     return DbProcessResultEnum.PartialNotFound;
                 }
                 else if (idols.Count > 1)
                 {
-                    logger.Log($"Idol [{idolName}]-[{idolGroup}] returned multiple results for {userId} user's idols!");
+                    logger.Log($"Idol [{idolName}]-[{(noGroup ? "No group specified" : idolGroup)}] returned multiple results for {userId} user's idols!");
                     return DbProcessResultEnum.MultipleResults;
                 }
 
@@ -210,7 +214,7 @@ namespace Discord_Bot.Database.DBServices
 
                 await userRepository.UpdateUserAsync(user);
 
-                logger.Log($"{userId} user's idol [{idolName}]-[{idolGroup}] removed successfully!");
+                logger.Log($"{userId} user's idol [{idolName}]-[{(noGroup ? "No group specified" : idolGroup)}] removed successfully!");
                 return DbProcessResultEnum.Success;
             }
             catch (Exception ex)

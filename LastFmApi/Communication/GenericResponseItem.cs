@@ -7,5 +7,6 @@ namespace LastFmApi.Communication
         public T Response { get; set; }
         public LastFmRequestResultEnum ResultCode { get; set; }
         public Exception Exception { get; set; }
+        public LastFmRequestDetails RequestDetails { get; internal set; }
     }
 }

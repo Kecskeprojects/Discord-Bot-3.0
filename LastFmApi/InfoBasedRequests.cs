@@ -24,6 +24,7 @@ namespace LastFmApi
                 }
 
                 InfoBasedRequestItem request = new("artist.getInfo", username, apiKey, artistName);
+                response.RequestDetails = new LastFmRequestDetails(request);
 
                 RestResponse restResultJSON = await InfoBasedRequestHandler(request);
                 ArtistInfo deserialized = JsonConvert.DeserializeObject<ArtistInfo>(restResultJSON.Content);
@@ -55,6 +56,7 @@ namespace LastFmApi
                 }
 
                 InfoBasedRequestItem request = new("track.getInfo", username, apiKey, artistName) { Track = trackName };
+                response.RequestDetails = new LastFmRequestDetails(request);
 
                 RestResponse restResultJSON = await InfoBasedRequestHandler(request);
                 TrackInfo deserialized = JsonConvert.DeserializeObject<TrackInfo>(restResultJSON.Content);

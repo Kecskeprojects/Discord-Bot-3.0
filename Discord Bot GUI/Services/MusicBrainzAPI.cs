@@ -11,7 +11,8 @@ namespace Discord_Bot.Services
 {
     public class MusicBrainzAPI(Logging logger) : IMusicBrainzAPI
     {
-        private static readonly RestClient _client = new("https://musicbrainz.org/ws/2/");
+        private static string BaseUrl { get; } = "https://musicbrainz.org/ws/2/";
+        private static readonly RestClient _client = new(BaseUrl);
         private readonly Logging logger = logger;
 
         //https://musicbrainz.org/ws/2/artist/[artistMBID]?inc=url-rels&fmt=json
@@ -19,7 +20,9 @@ namespace Discord_Bot.Services
         {
             try
             {
-                RestRequest request = new($"artist/{mbid}?inc=url-rels&fmt=json");
+                string query = $"artist/{mbid}?inc=url-rels&fmt=json";
+                logger.Query("Musicbrainz query Url:\n" + BaseUrl + query);
+                RestRequest request = new(query);
                 RestResponse resultJSON = await _client.GetAsync(request);
                 ArtistLookup deserialized = JsonConvert.DeserializeObject<ArtistLookup>(resultJSON.Content);
 

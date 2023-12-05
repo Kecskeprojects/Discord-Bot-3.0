@@ -23,6 +23,7 @@ namespace LastFmApi
                     return response;
                 }
                 UserBasedRequestItem request = new("user.gettoptracks", username, apiKey, limit, page, period);
+                response.RequestDetails = new LastFmRequestDetails(request);
 
                 RestResponse restResultJSON = await UserBasedRequestHandler(request);
                 TopTrack deserialized = JsonConvert.DeserializeObject<TopTrack>(restResultJSON.Content);
@@ -52,6 +53,7 @@ namespace LastFmApi
                 }
 
                 UserBasedRequestItem request = new("user.gettopalbums", username, apiKey, limit, page, period);
+                response.RequestDetails = new LastFmRequestDetails(request);
 
                 //Getting data from api
                 RestResponse restResultJSON = await UserBasedRequestHandler(request);
@@ -82,6 +84,7 @@ namespace LastFmApi
                 }
 
                 UserBasedRequestItem request = new("user.gettopartists", username, apiKey, limit, page, period);
+                response.RequestDetails = new LastFmRequestDetails(request);
 
                 //Getting data from api
                 RestResponse restResultJSON = await UserBasedRequestHandler(request);
@@ -112,6 +115,7 @@ namespace LastFmApi
                 }
 
                 UserBasedRequestItem request = new("user.getrecenttracks", username, apiKey) { Limit = limit };
+                response.RequestDetails = new LastFmRequestDetails(request);
 
                 //Getting data from api
                 RestResponse restResultJSON = await UserBasedRequestHandler(request);
@@ -142,7 +146,7 @@ namespace LastFmApi
                 }
 
                 UserBasedRequestItem request = new("user.getrecenttracks", username, apiKey) { Limit = 1 };
-
+                response.RequestDetails = new LastFmRequestDetails(request);
 
                 //Getting data from api
                 RestResponse restResultJSON = await UserBasedRequestHandler(request);

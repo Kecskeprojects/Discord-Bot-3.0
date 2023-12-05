@@ -30,6 +30,7 @@ namespace Discord_Bot.Services
             try
             {
                 GenericResponseItem<LastFmApi.Models.Recent.Track> restResult = await UserBasedRequests.NowPlaying(config.Lastfm_API_Key, lastFmUsername);
+                logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
 
                 if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.Success)
                 {
@@ -88,6 +89,7 @@ namespace Discord_Bot.Services
             try
             {
                 GenericResponseItem<Topalbums> restResult = await UserBasedRequests.TopAlbums(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
+                logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
 
                 if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.Success)
                 {
@@ -140,6 +142,7 @@ namespace Discord_Bot.Services
             try
             {
                 GenericResponseItem<Topartists> restResult = await UserBasedRequests.TopArtists(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
+                logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
 
                 if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.Success)
                 {
@@ -192,6 +195,7 @@ namespace Discord_Bot.Services
             try
             {
                 GenericResponseItem<Toptracks> restResult = await UserBasedRequests.TopTracks(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
+                logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
 
                 if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.Success)
                 {
@@ -244,6 +248,7 @@ namespace Discord_Bot.Services
             try
             {
                 GenericResponseItem<Recenttracks> restResult = await UserBasedRequests.Recents(config.Lastfm_API_Key, lastFmUsername, limit);
+                logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
 
                 if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.Success)
                 {
@@ -430,7 +435,7 @@ namespace Discord_Bot.Services
                             wk.Searched = $"{request.Name} by {request.Artist.Name}";
 
                             SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(request.Artist.Mbid, artist_name, track_name);
-                            wk.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (request.Album.Image?[^1].Text);
+                            wk.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (request.Album?.Image[^1].Text);
                         }
 
                         if (int.TryParse(request.Userplaycount, out int playcount) && playcount > 0)
@@ -507,6 +512,7 @@ namespace Discord_Bot.Services
         private async Task<LastFmApi.Models.ArtistInfo.Artist> GetArtistPlaysAsync(string lastFmUsername, string artistName)
         {
             GenericResponseItem<LastFmApi.Models.ArtistInfo.Artist> restResult = await InfoBasedRequests.ArtistPlays(config.Lastfm_API_Key, lastFmUsername, artistName);
+            logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
 
             return restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success
                 ? throw restResult.Exception ?? new Exception($"Track plays request resulted in an error! (Type:{restResult.ResultCode}")
@@ -516,6 +522,7 @@ namespace Discord_Bot.Services
         private async Task<LastFmApi.Models.TrackInfo.Track> GetTrackPlaysAsync(string lastFmUsername, string artistName, string trackName)
         {
             GenericResponseItem<LastFmApi.Models.TrackInfo.Track> restResult = await InfoBasedRequests.TrackPlays(config.Lastfm_API_Key, lastFmUsername, artistName, trackName);
+            logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
 
             return restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success
                 ? throw restResult.Exception ?? new Exception($"Track plays request resulted in an error! (Type:{restResult.ResultCode}")
@@ -528,6 +535,7 @@ namespace Discord_Bot.Services
             do
             {
                 GenericResponseItem<Topartists> restResult = await UserBasedRequests.TopArtists(config.Lastfm_API_Key, lastFmUsername, 1000, page, period);
+                logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
 
                 if (restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success)
                 {
@@ -554,6 +562,7 @@ namespace Discord_Bot.Services
             do
             {
                 GenericResponseItem<Toptracks> restResult = await UserBasedRequests.TopTracks(config.Lastfm_API_Key, username, 1000, page, "1month");
+                logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
 
                 if (restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success)
                 {
@@ -593,6 +602,7 @@ namespace Discord_Bot.Services
             do
             {
                 GenericResponseItem<Topalbums> restResult = await UserBasedRequests.TopAlbums(config.Lastfm_API_Key, username, 1000, page, null);
+                logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
 
                 if (restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success)
                 {
@@ -622,6 +632,7 @@ namespace Discord_Bot.Services
             do
             {
                 GenericResponseItem<Toptracks> restResult = await UserBasedRequests.TopTracks(config.Lastfm_API_Key, username, 1000, page, null);
+                logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
 
                 if (restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success)
                 {
