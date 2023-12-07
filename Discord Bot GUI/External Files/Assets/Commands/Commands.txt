@@ -1,56 +1,56 @@
 Text Commands:
 
-!help	List of commands (DM)
-!8ball [question]	8ball game (DM)
-!custom list	List of custom commands
-!coin flip [head] or [tails]	Flip a coin (DM)
-!wotd [language]	Word of the day in a language (DM)
-!birthday add [date]	Add your birthday for server
-!birthday remove	Remove your birthday from server
-!birthday list	List all birthdays from server
-!bonk [user] [delay]	bonk
-.twt [links]	Twitter embed (DM)
+!help		List of commands (DM)
+!8ball [question]		8ball game (DM)
+!custom list		List of custom commands
+!coin flip [head] or [tails]		Flip a coin (DM)
+!wotd [language]		Word of the day in a language (DM)
+!birthday add [date]		Add your birthday for server
+!birthday remove		Remove your birthday from server
+!birthday list		List all birthdays from server
+!bonk [user] [delay(ms)]		bonk
+.twt [links]		Twitter embed (DM)
 
 Remind Commands:
 
-!remind at [date*]>[message]	Remind by date (DM)
-!remind in [amount**]>[message]	Remind in given time (DM)
-!remind list	Your reminders (DM)
-!remind remove [id]	Remove a reminder (DM)
+!remind at [date*]>[message]		Remind by date (DM)
+!remind in [amount**]>[message]		Remind in given time (DM)
+!remind list		Your reminders (DM)
+!remind remove [id]		Remove a reminder (DM)
 *use timezone in the following format:
 *22.01.01 01:01 +12 or 01.01 01:01 +12
 **years to minutes (e.g. !remind in 15 days >...)
 
 Voice Commands:
 
-!p [url/keyword]	Play music
-!join	Join to your channel
-!leave	Leaves your channel
-!queue [page]	Current queue
-!np	Now playing
-!clear	Clears queue
-!skip	Skip song
-!remove [position]	Remove song from queue
-!shuffle	Shuffles current playlist
+!p [url/keyword]		Play music
+!join		Join to your channel
+!leave		Leaves your channel
+!queue [page]		Current queue
+!np		Now playing
+!clear		Clears queue
+!skip		Skip song
+!remove [position]		Remove song from queue
+!shuffle		Shuffles current playlist
 
 Last.fm commands:
 
-!lf conn [username]	Connect last.fm username to you (DM)
-!lf del	Disconnect last.fm username from you (DM)
-!lf np	Song you are currently playing (DM)
-!lf rc [length(1-30)]	Your most recent song (DM)
-!lf tar [length(1-30)] [*period]	Your top artists (DM)
-!lf tal [length(1-30)] [*period]	Your top albums (DM)
-!lf tt [length(1-30)] [*period]	Your top tracks (DM)
-!lf artist [artist]	Your stats for an artist (DM)
-!lf wk [artist]>[track]	Ranking on a song or artist
+!lf conn [username]		Connect last.fm username to you (DM)
+!lf del		Disconnect last.fm username from you (DM)
+!lf np		Song you are currently playing (DM)
+!lf rc [length(1-30)]		Your most recent song (DM)
+!lf tar [length(1-30)] [*period]		Your top artists (DM)
+!lf tal [length(1-30)] [*period]		Your top albums (DM)
+!lf tt [length(1-30)] [*period]		Your top tracks (DM)
+!lf artist [artist]		Your stats for an artist (DM)
+!lf wk [artist]>[track]		Ranking on a song or artist
 *overall, 7day, 1month, 3month, 6month, 12month
 
 Bias Commands:
 
-!ping [name],[name],...	Ping everyone with this bias
-!bias add [name]	Add bias to your list (DM)
-!bias remove [name]	Remove bias from your list (DM)
-!bias clear	Clear your bias list (DM)
-!bias list [group]	List all available biases (DM)
-!my biases [group]	List my biases (DM)
+!ping [name],[name],...		Ping everyone with this bias
+!bias add [name]		Add bias to your list (DM)
+!bias remove [name]		Remove bias from your list (DM)
+!bias clear		Clear your bias list (DM)
+!bias list [group]		List all available biases (DM)
+!my biases [group]		List my biases (DM)

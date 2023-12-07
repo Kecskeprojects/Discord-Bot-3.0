@@ -8,8 +8,10 @@ namespace Discord_Bot.Interfaces.Commands
         Task Help();
         Task ChannelAdd(string type, [Remainder] string channelName);
         Task ChannelRemove(string type, [Remainder] string channelName = "all");
-        Task TwitchAdd(string type, [Remainder] string name);
-        Task TwitchRemove(string type, [Remainder] string name = "all");
+        Task TwitchRoleAdd([Remainder] string name);
+        Task TwitchAdd([Remainder] string name);
+        Task TwitchRoleRemove([Remainder] string name);
+        Task TwitchRemove([Remainder] string name = "all");
         Task ServerSettings();
     }
 }

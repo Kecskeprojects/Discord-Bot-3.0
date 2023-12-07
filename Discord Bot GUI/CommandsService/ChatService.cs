@@ -46,11 +46,12 @@ namespace Discord_Bot.CommandsService
 
                     if (line.StartsWith('!') || line.StartsWith('.'))
                     {
-                        commands[curr] += "`" + line.Split('\t')[0] + " ` " + line.Split('\t')[1] + "\n";
+                        string[] parts = line.Split("\t\t");
+                        commands[curr] += $"`{parts[0]}` {parts[1]}\n";
                     }
                     else if (line.StartsWith('*'))
                     {
-                        commands[curr] += line + "\n";
+                        commands[curr] += $"{line}\n";
                     }
                     else
                     {

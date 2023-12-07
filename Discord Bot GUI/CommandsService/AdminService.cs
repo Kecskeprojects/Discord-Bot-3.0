@@ -5,6 +5,7 @@ using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Discord_Bot.CommandsService
@@ -24,7 +25,7 @@ namespace Discord_Bot.CommandsService
                                                     .Where(x => x != null)
                                                     .Select(x => $"`{x.Name}`");
 
-                    embed.AddField($"{item.Value}:", $"`{string.Join(", ", channels)}`");
+                    embed.AddField($"{item.Value}:", $"`{string.Join(", ", channels).Replace("`, `", ", ")}`");
                 }
                 else
                 {
@@ -50,5 +51,78 @@ namespace Discord_Bot.CommandsService
             embed.WithColor(Color.Teal);
             return embed;
         }
+
+        #region Help
+        public static void ReadCommandsFile(Dictionary<string, string> commands)
+        {
+            using (StreamReader reader = new("Assets\\Commands\\Admin_Commands.txt"))
+            {
+                while (!reader.EndOfStream)
+                {
+                    string line = reader.ReadLine();
+
+                    if (line.StartsWith('!') || line.StartsWith('.'))
+                    {
+                        string[] parts = line.Split("\t\t");
+                        commands.Add(parts[0], parts[1]);
+                    }
+                }
+            };
+        }
+
+        public static EmbedBuilder BuildHelpEmbed(Dictionary<string, string> commands, string imageUrl)
+        {
+            EmbedBuilder builder = new();
+            builder.WithTitle("Admin Commands");
+
+            int i = 1;
+            foreach (KeyValuePair<string, string> item in commands)
+            {
+                builder.AddField(item.Key, item.Value, false);
+                i++;
+            }
+            builder.WithThumbnailUrl(imageUrl);
+            builder.WithColor(Color.Orange);
+            return builder;
+        }
+
+        public static void ReadFeaturesFile(Dictionary<string, string> commands)
+        {
+            using (StreamReader reader = new("Assets\\Commands\\Features.txt"))
+            {
+                string curr = "";
+                while (!reader.EndOfStream)
+                {
+                    string line = reader.ReadLine();
+
+                    if (line.StartsWith('-'))
+                    {
+                        commands[curr] += $"{line}\n";
+                    }
+                    else if (line != "")
+                    {
+                        commands.Add(line, "");
+                        curr = line;
+                    }
+                }
+            };
+        }
+
+        public static EmbedBuilder BuildFeaturesEmbed(Dictionary<string, string> commands, string imageUrl)
+        {
+            EmbedBuilder builder = new();
+            builder.WithTitle("Passive processes");
+
+            int i = 1;
+            foreach (KeyValuePair<string, string> item in commands)
+            {
+                builder.AddField(item.Key, item.Value, false);
+                i++;
+            }
+            builder.WithThumbnailUrl(imageUrl);
+            builder.WithColor(Color.Orange);
+            return builder;
+        }
+        #endregion
     }
 }

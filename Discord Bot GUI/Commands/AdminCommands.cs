@@ -10,6 +10,7 @@ using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.Twitch;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,6 +30,7 @@ namespace Discord_Bot.Commands
         private readonly ITwitchAPI twitchAPI = twitchAPI;
 
         [Command("help admin")]
+        [Alias(["help a"])]
         [RequireUserPermission(ChannelPermission.ManageChannels)]
         [RequireContext(ContextType.Guild)]
         [Summary("Embed complete list of commands in a text file")]
@@ -36,17 +38,50 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                Dictionary<string, string> commands = [];
+
                 if (!File.Exists("Assets\\Commands\\Admin_Commands.txt"))
                 {
-                    await ReplyAsync("Command file missing!");
+                    await ReplyAsync("List of commands can't be found!");
                     return;
                 }
 
-                await Context.Channel.SendFileAsync(Directory.GetCurrentDirectory() + "\\Assets\\Commands\\Admin_Commands.txt");
+                AdminService.ReadCommandsFile(commands);
+                EmbedBuilder builder = AdminService.BuildHelpEmbed(commands, config.Img);
+
+                await ReplyAsync("", false, builder.Build());
             }
             catch (Exception ex)
             {
                 logger.Error("AdminCommands.cs Help", ex.ToString());
+            }
+        }
+
+        [Command("feature")]
+        [Alias(["features"])]
+        [RequireUserPermission(ChannelPermission.ManageChannels)]
+        [RequireContext(ContextType.Guild)]
+        [Summary("Embed complete list of features")]
+        public async Task Features()
+        {
+            try
+            {
+                Dictionary<string, string> commands = [];
+
+                if (!File.Exists("Assets\\Commands\\Features.txt"))
+                {
+                    await ReplyAsync("List of commands can't be found!");
+                    return;
+                }
+
+                AdminService.ReadFeaturesFile(commands);
+                EmbedBuilder builder = AdminService.BuildFeaturesEmbed(commands, config.Img);
+
+                await ReplyAsync("", false, builder.Build());
+            }
+            catch (Exception ex)
+            {
+                logger.Error("AdminCommands.cs Features", ex.ToString());
             }
         }
 
@@ -94,6 +129,7 @@ namespace Discord_Bot.Commands
                     if (ChannelTypeNameCollections.RestrictedChannelTypes.Contains(channelType))
                     {
                         await ReplyAsync("Server settings updated! Previous channel (if there was one) was overwritten as only one of it's type is allowed.");
+                        return;
                     }
                     await ReplyAsync("Server settings updated!");
                 }
@@ -177,61 +213,74 @@ namespace Discord_Bot.Commands
             }
         }
 
-        [Command("twitch add")]
+        [Command("twitch role add")]
         [RequireUserPermission(ChannelPermission.ManageChannels)]
         [RequireContext(ContextType.Guild)]
-        [Summary("Server setting twitch related modification")]
-        public async Task TwitchAdd(string type, [Remainder] string name)
+        [Summary("Server setting twitch role change")]
+        public async Task TwitchRoleAdd([Remainder] string name)
         {
             try
             {
-                DbProcessResultEnum result;
-
-                if (type == "role")
+                IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                if (role == null)
                 {
-                    IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-                    if (role == null)
-                    {
-                        await ReplyAsync("Role not found!");
-                        return;
-                    }
-                    //Adds the notification role for every checked channel, as of now it will overwrite the previous one, there cannot be multiple, removes server from cache
-                    result = await twitchChannelService.AddNotificationRoleAsync(Context.Guild.Id, role.Id, role.Name);
+                    await ReplyAsync("Role not found!");
+                    return;
                 }
-                else
-                {
-                    UserData response = twitchAPI.GetChannel(name);
-
-                    if (response == null)
-                    {
-                        await ReplyAsync("Twitch user not found!");
-                        return;
-                    }
-
-                    string twitchUserId = response.Id;
-
-                    //Adds the twitch channel to the checked channel's list for the server, removes server from cache
-                    result = await twitchChannelService.AddTwitchChannelAsync(Context.Guild.Id, twitchUserId, response.Login);
-                }
+                //Adds the notification role for every checked channel, as of now it will overwrite the previous one, there cannot be multiple, removes server from cache
+                DbProcessResultEnum result = await twitchChannelService.AddNotificationRoleAsync(Context.Guild.Id, role.Id, role.Name);
 
                 if (result == DbProcessResultEnum.Success)
                 {
-                    await ReplyAsync("Server settings updated!");
+                    await ReplyAsync("Notification role updated!");
                 }
                 else if (result == DbProcessResultEnum.AlreadyExists)
                 {
-                    if (type == "role")
-                    {
-                        await ReplyAsync("Notification role is the currently set one in the database for your server!");
-                    }
-                    else
-                    {
-                        await ReplyAsync("Twitch channel already in database for your server!");
-                    }
+                    await ReplyAsync("Notification role is the currently set one in the database for your server!");
                 }
                 else
                 {
-                    await ReplyAsync("Server settings could not be updated!");
+                    await ReplyAsync("Notification role could not be updated!");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("AdminCommands.cs TwitchRoleAdd", ex.ToString());
+            }
+        }
+
+        [Command("twitch add")]
+        [RequireUserPermission(ChannelPermission.ManageChannels)]
+        [RequireContext(ContextType.Guild)]
+        [Summary("Server setting twitch channel addition")]
+        public async Task TwitchAdd([Remainder] string name)
+        {
+            try
+            {
+                UserData response = twitchAPI.GetChannel(name);
+
+                if (response == null)
+                {
+                    await ReplyAsync("Twitch user not found!");
+                    return;
+                }
+
+                string twitchUserId = response.Id;
+
+                //Adds the twitch channel to the checked channel's list for the server, removes server from cache
+                DbProcessResultEnum result = await twitchChannelService.AddTwitchChannelAsync(Context.Guild.Id, twitchUserId, response.Login);
+
+                if (result == DbProcessResultEnum.Success)
+                {
+                    await ReplyAsync("Twitch channel added!");
+                }
+                else if (result == DbProcessResultEnum.AlreadyExists)
+                {
+                    await ReplyAsync("Twitch channel already in database for your server!");
+                }
+                else
+                {
+                    await ReplyAsync("Twitch channel could not be added!");
                 }
             }
             catch (Exception ex)
@@ -240,59 +289,73 @@ namespace Discord_Bot.Commands
             }
         }
 
+        [Command("twitch role remove")]
+        [RequireUserPermission(ChannelPermission.ManageChannels)]
+        [RequireContext(ContextType.Guild)]
+        [Summary("Server setting twitch role removal")]
+        public async Task TwitchRoleRemove([Remainder] string name)
+        {
+            try
+            {
+                IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                if (role == null)
+                {
+                    await ReplyAsync("Role not found!");
+                    return;
+                }
+                //Removes the currently set notification role, removes server from cache
+                DbProcessResultEnum result = await twitchChannelService.RemoveNotificationRoleAsync(Context.Guild.Id);
+
+                if (result == DbProcessResultEnum.Success)
+                {
+                    await ReplyAsync("Notification role removed!");
+                }
+                else if (result == DbProcessResultEnum.NotFound)
+                {
+                    await ReplyAsync("Notification role currently not set in database!");
+                }
+                else
+                {
+                    await ReplyAsync("Notification role could not be removed!");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("AdminCommands.cs TwitchRoleRemove", ex.ToString());
+            }
+        }
+
         [Command("twitch remove")]
         [RequireUserPermission(ChannelPermission.ManageChannels)]
         [RequireContext(ContextType.Guild)]
-        [Summary("Server setting twitch related modification")]
-        public async Task TwitchRemove(string type, [Remainder] string name = "all")
+        [Summary("Server setting twitch channel removal")]
+        public async Task TwitchRemove([Remainder] string name = "all")
         {
             try
             {
                 DbProcessResultEnum result;
-
-                if (type == "role" && !string.IsNullOrEmpty(name) && name != "all")
+                if (!string.IsNullOrEmpty(name) && name != "all")
                 {
-                    IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-                    if (role == null)
-                    {
-                        await ReplyAsync("Role not found!");
-                        return;
-                    }
-                    //Removes the currently set notification role, removes server from cache
-                    result = await twitchChannelService.RemoveNotificationRoleAsync(Context.Guild.Id);
+                    //Removes the twitch channel with the given name, removes server from cache
+                    result = await twitchChannelService.RemoveTwitchChannelAsync(Context.Guild.Id, name);
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(name) && name != "all")
-                    {
-                        //Removes the twitch channel with the given name, removes server from cache
-                        result = await twitchChannelService.RemoveTwitchChannelAsync(Context.Guild.Id, name);
-                    }
-                    else
-                    {
-                        //Removes every twitch channel tied to the server, removes server from cache
-                        result = await twitchChannelService.RemoveTwitchChannelsAsync(Context.Guild.Id);
-                    }
+                    //Removes every twitch channel tied to the server, removes server from cache
+                    result = await twitchChannelService.RemoveTwitchChannelsAsync(Context.Guild.Id);
                 }
 
                 if (result == DbProcessResultEnum.Success)
                 {
-                    await ReplyAsync("Server settings updated!");
+                    await ReplyAsync("Twitch channel(s) removed!");
                 }
                 else if (result == DbProcessResultEnum.NotFound)
                 {
-                    if (type == "role")
-                    {
-                        await ReplyAsync("Notification role currently not set in database!");
-                    }
-                    else
-                    {
-                        await ReplyAsync("Twitch channel with that name not found in database!");
-                    }
+                    await ReplyAsync("Twitch channel with that name not found in database!");
                 }
                 else
                 {
-                    await ReplyAsync("Server settings could not be updated!");
+                    await ReplyAsync("Twitch channel(s) could not be removed!");
                 }
             }
             catch (Exception ex)

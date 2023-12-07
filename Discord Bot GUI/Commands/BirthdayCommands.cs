@@ -1,7 +1,9 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.Rest;
+using Discord.WebSocket;
 using Discord_Bot.CommandsService;
+using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
@@ -21,7 +23,7 @@ namespace Discord_Bot.Commands
         private readonly IBirthdayService birthdayService = birthdayService;
         private static readonly string[] dateSeparator = [",", "/", "\\", "-", ".", " "];
 
-        [Command("birthday add user")]
+        [Command("birthday a add")]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(ChannelPermission.ManageRoles)]
         [Summary("Adding a birthday to be reminded about on a given server for a given user")]
@@ -67,7 +69,7 @@ namespace Discord_Bot.Commands
 
                 if (DateTime.TryParse($"{year}.{month}.{day}", out DateTime date))
                 {
-                    DbProcessResultEnum result = await birthdayService.AddBirthdayAsync(Context.Guild.Id, Context.User.Id, date);
+                    DbProcessResultEnum result = await birthdayService.AddBirthdayAsync(Context.Guild.Id, user.Id, date);
                     if (result == DbProcessResultEnum.Success)
                     {
                         await ReplyAsync("Birthday added to database!");
@@ -96,7 +98,7 @@ namespace Discord_Bot.Commands
             }
         }
 
-        [Command("birthday remove user")]
+        [Command("birthday a remove")]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(ChannelPermission.ManageRoles)]
         [Summary("Removing a birthday to be reminded about on a given server for a given user")]
@@ -119,7 +121,7 @@ namespace Discord_Bot.Commands
                     }
                 }
 
-                DbProcessResultEnum result = await birthdayService.RemoveBirthdayAsync(Context.Guild.Id, Context.User.Id);
+                DbProcessResultEnum result = await birthdayService.RemoveBirthdayAsync(Context.Guild.Id, user.Id);
                 if (result == DbProcessResultEnum.Success)
                 {
                     await ReplyAsync("Birthday removed from database!");
@@ -234,8 +236,9 @@ namespace Discord_Bot.Commands
                 List<string> users = [];
                 foreach (BirthdayResource birthday in list)
                 {
-                    IUser user = await Context.Client.GetUserAsync(birthday.UserDiscordId);
-                    users.Add(user.GlobalName ?? user.Username);
+                    IUser user = await Context.Channel.GetUserAsync(birthday.UserDiscordId);
+                    string name = Global.GetNickName(Context.Channel, user as SocketUser);
+                    users.Add(name);
                 }
 
                 EmbedBuilder builder = BirthdayService.BuildBirthdayListEmbed(list, users);

@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord_Bot.CommandsService;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Core.Logger;
 using Discord_Bot.Enums;
@@ -27,13 +28,18 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                if (!File.Exists("Assets\\Commands\\All_Commands.txt"))
+                Dictionary<string, string> commands = [];
+
+                if (!File.Exists("Assets\\Commands\\Owner_Commands.txt"))
                 {
-                    await ReplyAsync("Command file missing!");
+                    await ReplyAsync("List of commands can't be found!");
                     return;
                 }
 
-                await Context.Channel.SendFileAsync(Directory.GetCurrentDirectory() + "\\Assets\\Commands\\All_Commands.txt");
+                OwnerService.ReadCommandsFile(commands);
+                EmbedBuilder builder = OwnerService.BuildHelpEmbed(commands, config.Img);
+
+                await ReplyAsync("", false, builder.Build());
             }
             catch (Exception ex)
             {

@@ -22,7 +22,7 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                string[] array = keyword_response[1..^1].Split("` `");
+                string[] array = keyword_response.Split(">");
 
                 DbProcessResultEnum result = await keywordService.AddKeywordAsync(Context.Guild.Id, array[0], array[1]);
                 if (result == DbProcessResultEnum.Success)

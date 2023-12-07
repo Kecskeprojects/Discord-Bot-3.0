@@ -1,87 +1,18 @@
-Text Commands:
-
-!help							List of commands (DM)
-!8ball [question]				8ball game (DM)
-!custom list					List of custom commands
-!coin flip [head] or [tails]	Flip a coin (DM)
-!wotd [language]				Word of the day in a language (DM)
-!birthday add [date]			Add your birthday for server
-!birthday remove				Remove your birthday from server
-!birthday list					List all birthdays from server
-!bonk [user] [delay]			bonk
-.twt [links]					Twitter embed(DM)
-
-Remind Commands:
-
-!remind at [date*]>[message]			Remind by date (DM)
-!remind in [amount**]>[message]			Remind in given time (DM)
-!remind list							Your reminders (DM)
-!remind remove [id]						Remove a reminder (DM)
-
-*use timezone in the following format:
-*22.01.01 01:01 +12 or 01.01 01:01 +12
-**years to minutes (e.g. !remind in 15 days >...)
-
-Voice Commands:
-
-!p [url/keyword]	Play music
-!join				Join to your channel
-!leave				Leaves your channel
-!queue [page]		Current queue
-!np					Now playing
-!clear				Clears queue
-!skip				Skip song
-!remove	[position]	Remove song from queue
-!shuffle			Shuffles current playlist
-
-Last.fm commands:
-
-!lf conn [username]					Connect last.fm username to you (DM)
-!lf del								Disconnect last.fm username from you (DM)
-!lf np								Song you are currently playing (DM)
-!lf rc [length(1-30)]				Your most recent song (DM)
-!lf tar [length(1-30)] [*period]	Your top artists (DM)
-!lf tal [length(1-30)] [*period]	Your top albums (DM)
-!lf tt [length(1-30)] [*period]		Your top tracks (DM)
-!lf artist [artist]					Your stats for an artist (DM)
-!lf wk [artist]>[track]				Ranking on a song or artist
-
-*overall, 7day, 1month, 3month, 6month, 12month
-
-Bias Commands:
-
-!ping [name],[name],...		Ping everyone with this bias
-!bias add [name]			Add bias to your list (DM)
-!bias remove [name]			Remove bias from your list (DM)
-!bias clear					Clear your bias list (DM)
-!bias list [group]			List all available biases (DM)
-!my biases [group]			List my biases (DM)
-
 Admin Commands:
 
-!help admin										Sends in a txt containing all the commands
-!command add [command name] [link]				Adding custom commands
-!command remove [command name]					Removes custom command with given name
-!channel add [type] [channel name]				Set a channel for a given type, some only allow one per server
-!channel remove [type] [channel name]			Unset a channel for a given type, some only allow one per server
+!help admin		Sends in a txt containing all the commands
+!help feature		Sends in a txt containing all features
+!command add [command name] [link]		Adding custom commands
+!command remove [command name]		Removes custom command with given name
+!channel add [type] [channel name]		Set a channel for a given type, some only allow one per server
+!channel remove [type] [channel name]		Unset a channel for a given type, some only allow one per server
 !twitch add [type] [channel name/role name]		Set a channel for a given type, some only allow one per server
-!twitch remove [type] [channel name/role name]	Unset a channel for a given type, some only allow one per server
-!self role add [role]							Adds a role from the server's self role list
-!self role remove [role]						Removes a role from the server's self role list
-!update role message							Updates the message found in the roles channel, if one is currently set
-!keyword add `[keyword]` `[response]`			Adds new keyword to list
-!keyword remove [keyword]						Removes keyword from list
-!server settings								Lists the current settings of the server
-!birthday add [user ID/name]>[date]				Add birthday for server
-!birthday remove [user ID/name]					Remove birthday from server
-
-Features:
-
--Replying to messages starting with "I think" in agreement
--Replying to someone saying "I am" or "I'm"
--If someone types "@(bot name)" in a message it replies with a gif
--Replying to pre defined list of keywords
--Adding roles to users from pre-defined list
--Very rare random responses
--Reliable automatic instagram embeds
--Send birthday messages for users that have it set on the day of
+!twitch remove [type] [channel name/role name]		Unset a channel for a given type, some only allow one per server
+!self role add [role]		Adds a role from the server's self role list
+!self role remove [role]		Removes a role from the server's self role list
+!update role message		Updates the message found in the roles channel, if one is currently set
+!keyword add [keyword]>[response]		Adds new keyword to list
+!keyword remove [keyword]		Removes keyword from list
+!server settings		Lists the current settings of the server
+!birthday a add [user ID/name]>[date]		Add birthday for server
+!birthday a remove [user ID/name]		Remove birthday from server

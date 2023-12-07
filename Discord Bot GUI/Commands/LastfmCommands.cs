@@ -37,7 +37,7 @@ namespace Discord_Bot.Commands
                 if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
                 {
                     ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
                     {
                         return;
                     }
@@ -73,7 +73,7 @@ namespace Discord_Bot.Commands
                 if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
                 {
                     ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
                     {
                         return;
                     }
@@ -111,7 +111,7 @@ namespace Discord_Bot.Commands
                 if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
                 {
                     ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
                     {
                         return;
                     }
@@ -180,7 +180,7 @@ namespace Discord_Bot.Commands
                 if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
                 {
                     ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
                     {
                         return;
                     }
@@ -242,7 +242,7 @@ namespace Discord_Bot.Commands
                 if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
                 {
                     ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
                     {
                         return;
                     }
@@ -306,7 +306,7 @@ namespace Discord_Bot.Commands
                 if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
                 {
                     ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
                     {
                         return;
                     }
@@ -368,7 +368,7 @@ namespace Discord_Bot.Commands
                 if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
                 {
                     ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
                     {
                         return;
                     }
@@ -425,7 +425,7 @@ namespace Discord_Bot.Commands
                 if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
                 {
                     ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
                     {
                         return;
                     }
@@ -496,7 +496,7 @@ namespace Discord_Bot.Commands
                 if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
                 {
                     ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.MusicText, Context.Channel.Id))
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
                     {
                         return;
                     }

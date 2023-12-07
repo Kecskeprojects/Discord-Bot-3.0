@@ -1,0 +1,10 @@
+Features:
+
+-Replying to messages starting with "I think" in agreement
+-Replying to someone saying "I am" or "I'm"
+-If someone types "@(bot name)" in a message it replies with a gif
+-Replying to pre defined list of keywords
+-Adding roles to users from pre-defined list
+-Very rare random responses
+-Reliable automatic instagram embeds
+-Send birthday messages for users that have it set on the day of
