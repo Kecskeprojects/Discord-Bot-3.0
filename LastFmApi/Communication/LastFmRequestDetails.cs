@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LastFmApi.Communication
+﻿namespace LastFmApi.Communication
 {
     public class LastFmRequestDetails
     {
@@ -19,7 +13,7 @@ namespace LastFmApi.Communication
 
             if (!string.IsNullOrWhiteSpace(UserName))
             {
-                if(Type.EndsWith("getInfo"))
+                if (Type.EndsWith("getInfo"))
                 {
                     FinalUrl += $"&username={UserName}";
                 }

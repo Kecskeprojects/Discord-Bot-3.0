@@ -67,7 +67,7 @@ namespace Discord_Bot.Database.DBServices
 
                 if (idols.Count == 0)
                 {
-                    logger.Log($"Idol [{idolName}]-[{(noGroup ? "No group specified" :idolGroup)}] could not be found!");
+                    logger.Log($"Idol [{idolName}]-[{(noGroup ? "No group specified" : idolGroup)}] could not be found!");
                     return DbProcessResultEnum.NotFound;
                 }
                 else if (idols.Count > 1)
