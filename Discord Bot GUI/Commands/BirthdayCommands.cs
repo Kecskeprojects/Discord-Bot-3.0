@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace Discord_Bot.Commands
 {
@@ -236,7 +237,8 @@ namespace Discord_Bot.Commands
                 List<string> users = [];
                 foreach (BirthdayResource birthday in list)
                 {
-                    IUser user = await Context.Channel.GetUserAsync(birthday.UserDiscordId);
+                    await Context.Guild.DownloadUsersAsync();
+                    IUser user = Context.Guild.GetUser(birthday.UserDiscordId);
                     string name = Global.GetNickName(Context.Channel, user as SocketUser);
                     users.Add(name);
                 }
