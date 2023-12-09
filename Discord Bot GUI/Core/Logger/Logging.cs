@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Discord_Bot.Core.Logger
 {
@@ -137,8 +138,7 @@ namespace Discord_Bot.Core.Logger
             if (Application.Current != null)
             {
                 string mess = log.Content.Replace(":\t", ":    \t");
-
-                Application.Current.Dispatcher.Invoke(() =>
+                Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, () =>
                 {
                     if (Application.Current.MainWindow != null)
                     {
