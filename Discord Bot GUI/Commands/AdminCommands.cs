@@ -257,6 +257,11 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                if (Uri.IsWellFormedUriString(name, UriKind.Absolute))
+                {
+                    Uri uri = new(name);
+                    name = uri.Segments[1].Replace("/", "");
+                }
                 UserData response = twitchAPI.GetChannel(name);
 
                 if (response == null)
@@ -293,16 +298,10 @@ namespace Discord_Bot.Commands
         [RequireUserPermission(ChannelPermission.ManageChannels)]
         [RequireContext(ContextType.Guild)]
         [Summary("Server setting twitch role removal")]
-        public async Task TwitchRoleRemove([Remainder] string name)
+        public async Task TwitchRoleRemove()
         {
             try
             {
-                IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-                if (role == null)
-                {
-                    await ReplyAsync("Role not found!");
-                    return;
-                }
                 //Removes the currently set notification role, removes server from cache
                 DbProcessResultEnum result = await twitchChannelService.RemoveNotificationRoleAsync(Context.Guild.Id);
 
@@ -336,6 +335,11 @@ namespace Discord_Bot.Commands
                 DbProcessResultEnum result;
                 if (!string.IsNullOrEmpty(name) && name != "all")
                 {
+                    if (Uri.IsWellFormedUriString(name, UriKind.Absolute))
+                    {
+                        Uri uri = new(name);
+                        name = uri.Segments[1].Replace("/", "");
+                    }
                     //Removes the twitch channel with the given name, removes server from cache
                     result = await twitchChannelService.RemoveTwitchChannelAsync(Context.Guild.Id, name);
                 }

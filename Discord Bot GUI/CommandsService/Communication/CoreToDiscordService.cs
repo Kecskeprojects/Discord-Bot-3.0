@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Discord_Bot.Communication;
-using Discord_Bot.Core;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.Instagram;
@@ -15,15 +14,14 @@ namespace Discord_Bot.CommandsService.Communication
 {
     public class CoreToDiscordService
     {
-        public static string CreateBirthdayMessage(BirthdayResource birthday, ISocketMessageChannel channel, SocketGuild guild)
+        public static string CreateBirthdayMessage(BirthdayResource birthday, SocketGuild guild)
         {
             SocketGuildUser user = guild.GetUser(birthday.UserDiscordId);
 
             Random r = new();
             string baseMessage = StaticLists.BirthdayMessage[r.Next(0, StaticLists.BirthdayMessage.Length)];
-            string name = Global.GetNickName(channel, user);
 
-            string message = string.Format(baseMessage, new string[] { name, user.Mention });
+            string message = string.Format(baseMessage, user.Mention);
             return message;
         }
 

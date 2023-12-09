@@ -142,14 +142,13 @@ namespace Discord_Bot
                 ICoreToDiscordCommunication discordCommunication = scope.ServiceProvider.GetService<ICoreToDiscordCommunication>();
                 if (client.LoginState == LoginState.LoggedOut)
                 {
-                    logger.Log("Attempting to connect bot after disconnect.");
+                    logger.Log("Attempting to re-connect bot after disconnect.");
                     await RunBotAsync();
                 }
 
                 //Logic to be done once a day
                 if (minutesCount == 1440)
                 {
-                    await discordCommunication.SendBirthdayMessages();
                     minutesCount = 0;
                 }
 
@@ -158,6 +157,8 @@ namespace Discord_Bot
                 //Youtube api key reset function
                 if (DateTime.UtcNow.Hour == 8 && DateTime.UtcNow.Minute == 0)
                 {
+                    await discordCommunication.SendBirthdayMessages();
+
                     YoutubeAPI.KeyReset(config.Youtube_API_Keys);
                     logger.Log("Youtube keys reset!");
                 }

@@ -4,10 +4,12 @@ Admin Commands:
 !help feature		Sends in a txt containing all features
 !command add [command name] [link]		Adding custom commands
 !command remove [command name]		Removes custom command with given name
-!channel add [type] [channel name]		Set a channel for a given type, some only allow one per server
-!channel remove [type] [channel name]		Unset a channel for a given type, some only allow one per server
-!twitch add [type] [channel name/role name]		Set a channel for a given type, some only allow one per server
-!twitch remove [type] [channel name/role name]		Unset a channel for a given type, some only allow one per server
+!channel add [type] [channel name]		Set a channel for a given type, some types only allow one per server
+!channel remove [type] [channel name]		Unset a channel for a given type, some types only allow one per server
+!twitch role add [role name]		Set a role to be pinged on a stream coming online
+!twitch role remove		Unset a role to be pinged on a stream coming online
+!twitch add [channel name/url]		Set a channel for the server to watch
+!twitch remove  [channel name/url]		Unset a channel for the server to watch
 !self role add [role]		Adds a role from the server's self role list
 !self role remove [role]		Removes a role from the server's self role list
 !update role message		Updates the message found in the roles channel, if one is currently set

@@ -52,18 +52,18 @@ namespace Discord_Bot.Commands.Communication
                 List<BirthdayResource> result = await birthdayService.GetBirthdaysByDateAsync();
                 if (!CollectionTools.IsNullOrEmpty(result))
                 {
+                    logger.Log($"Sending birthday message to {result.Count} people.");
                     foreach (BirthdayResource birthday in result)
                     {
                         ServerResource server = await serverService.GetByDiscordIdAsync(birthday.ServerDiscordId);
 
-                        if (server.SettingsChannels[ChannelTypeEnum.BirthdayText].Count > 0)
+                        if (server.SettingsChannels.TryGetValue(ChannelTypeEnum.BirthdayText, out List<ulong> channels))
                         {
-                            ulong channelId = server.SettingsChannels[ChannelTypeEnum.BirthdayText][0];
-                            ISocketMessageChannel channel = client.GetChannel(channelId) as ISocketMessageChannel;
+                            ISocketMessageChannel channel = client.GetChannel(channels[0]) as ISocketMessageChannel;
                             SocketGuild guild = client.GetGuild(birthday.ServerDiscordId);
                             await guild.DownloadUsersAsync();
 
-                            string message = CoreToDiscordService.CreateBirthdayMessage(birthday, channel, guild);
+                            string message = CoreToDiscordService.CreateBirthdayMessage(birthday, guild);
 
                             await channel.SendMessageAsync(message);
                         }
@@ -72,7 +72,7 @@ namespace Discord_Bot.Commands.Communication
             }
             catch (Exception ex)
             {
-                logger.Error("CoreDiscordCommunication.cs Log BirthdayCheck", ex.ToString());
+                logger.Error("CoreDiscordCommunication.cs BirthdayCheck", ex.ToString());
             }
         }
         #endregion
