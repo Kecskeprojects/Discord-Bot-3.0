@@ -260,6 +260,11 @@ namespace Discord_Bot.Commands
                 if (Uri.IsWellFormedUriString(name, UriKind.Absolute))
                 {
                     Uri uri = new(name);
+                    if(uri.Segments.Length < 2)
+                    {
+                        await ReplyAsync("Url is not channel url!");
+                        return;
+                    }
                     name = uri.Segments[1].Replace("/", "");
                 }
                 UserData response = twitchAPI.GetChannel(name);
@@ -338,6 +343,11 @@ namespace Discord_Bot.Commands
                     if (Uri.IsWellFormedUriString(name, UriKind.Absolute))
                     {
                         Uri uri = new(name);
+                        if (uri.Segments.Length < 2)
+                        {
+                            await ReplyAsync("Url is not channel url!");
+                            return;
+                        }
                         name = uri.Segments[1].Replace("/", "");
                     }
                     //Removes the twitch channel with the given name, removes server from cache

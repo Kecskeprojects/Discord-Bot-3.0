@@ -137,6 +137,8 @@ namespace Discord_Bot
         {
             try
             {
+                minutesCount++;
+
                 using IServiceScope scope = services.CreateScope();
                 ICoreLogic coreLogic = scope.ServiceProvider.GetService<ICoreLogic>();
                 ICoreToDiscordCommunication discordCommunication = scope.ServiceProvider.GetService<ICoreToDiscordCommunication>();
@@ -151,8 +153,6 @@ namespace Discord_Bot
                 {
                     minutesCount = 0;
                 }
-
-                minutesCount++;
 
                 //Youtube api key reset function
                 if (DateTime.UtcNow.Hour == 8 && DateTime.UtcNow.Minute == 0)
