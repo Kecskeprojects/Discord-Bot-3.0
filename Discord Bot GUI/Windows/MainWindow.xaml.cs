@@ -1,7 +1,11 @@
-﻿using Discord_Bot.Core.Logger;
+﻿using Discord_Bot.Communication;
+using Discord_Bot.Core.Logger;
+using Discord_Bot.Tools;
 using System;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace Discord_Bot
 {
@@ -10,6 +14,7 @@ namespace Discord_Bot
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static Timer MainTimer;
         private bool AutoScroll = true;
 
         private readonly Logging logger;
@@ -18,6 +23,9 @@ namespace Discord_Bot
         {
             InitializeComponent();
             this.logger = logger;
+            MainTimer = new(750) { AutoReset = true }; //0.75 second
+            MainTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
+            MainTimer.Start();
         }
 
         private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
@@ -72,6 +80,30 @@ namespace Discord_Bot
             catch (Exception ex)
             {
                 logger.Error("MainWindow.xaml.cs ClearLog", ex.ToString());
+            }
+        }
+
+        public async void OnTimedEvent(object source, ElapsedEventArgs e)
+        {
+            try
+            {
+                ProcessMetrics result = await ProcessTools.GetStatistics();
+                Application.Current?.Dispatcher.Invoke(DispatcherPriority.DataBind, () =>
+                {
+                    if (Application.Current.MainWindow != null)
+                    {
+                        MainWindow main = Application.Current.MainWindow as MainWindow;
+                        main.TotalCPUUsage.Content = $"Avg. Total Processor Usage: {result.TotalCPUUsagePercent}%";
+                        main.TotalRAMUsage.Content = $"Total Memory Usage: {result.TotalRAMUsagePercent}%";
+                        main.ChildProcessCount.Content = $"Number of Child Processes: {result.ChildProcessCount}";
+                        main.CPUUsage.Content = $"Avg. Processor Usage: {result.CPUUsagePercent}%";
+                        main.RAMUsage.Content = $"Memory Usage: {result.RAMUsageInMB} MB";
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                logger.Error("MainWindow.xaml.cs OnTimedEvent", ex.ToString());
             }
         }
     }

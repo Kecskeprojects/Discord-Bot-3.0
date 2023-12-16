@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace Discord_Bot.CommandsService
 {
-    internal class BirthdayService
+    public class BirthdayService
     {
-        internal static EmbedBuilder BuildBirthdayListEmbed(List<BirthdayResource> list, List<string> users)
+        public static EmbedBuilder BuildBirthdayListEmbed(List<BirthdayResource> list, List<string> users)
         {
             EmbedBuilder builder = new();
             builder.WithTitle("Server birthdays:");

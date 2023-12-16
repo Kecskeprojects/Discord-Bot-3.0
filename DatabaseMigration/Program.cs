@@ -4,9 +4,9 @@ using System.Text;
 
 namespace DatabaseMigration
 {
-    internal class Program
+    public class Program
     {
-        protected static SQLiteConnection Sqlite_conn;
+        private static SQLiteConnection Sqlite_conn;
 
         static void Main()
         {
