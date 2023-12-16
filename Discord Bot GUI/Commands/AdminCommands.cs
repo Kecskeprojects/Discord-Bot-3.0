@@ -260,7 +260,7 @@ namespace Discord_Bot.Commands
                 if (Uri.IsWellFormedUriString(name, UriKind.Absolute))
                 {
                     Uri uri = new(name);
-                    if(uri.Segments.Length < 2)
+                    if (uri.Segments.Length < 2)
                     {
                         await ReplyAsync("Url is not channel url!");
                         return;
