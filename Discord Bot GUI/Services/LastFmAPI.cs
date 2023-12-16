@@ -78,7 +78,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs  GetNowPlayingAsync", ex.ToString());
             }
             return null;
         }
@@ -131,7 +131,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs GetTopAlbumsAsync", ex.ToString());
             }
             return null;
         }
@@ -184,7 +184,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs GetTopArtistsAsync", ex.ToString());
             }
             return null;
         }
@@ -225,19 +225,19 @@ namespace Discord_Bot.Services
                 else
                 {
                     result.Message = "Unexpected exception during request!";
-                    logger.Error("LastFmAPI.cs GetNowPlayingAsync", restResult.Exception.ToString());
+                    logger.Error("LastFmAPI.cs GetTopTracksAsync", restResult.Exception.ToString());
                 }
                 return result;
             }
             catch (HttpRequestException ex)
             {
                 result.Message = "Last.fm is temporarily unavailable!";
-                logger.Error("LastFmAPI.cs GetNowPlayingAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs GetTopTracksAsync", ex.ToString());
                 return result;
             }
             catch (Exception ex)
             {
-                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs GetTopTracksAsync", ex.ToString());
             }
             return null;
         }
@@ -343,12 +343,12 @@ namespace Discord_Bot.Services
             catch (HttpRequestException ex)
             {
                 result.Message = "Last.fm is temporarily unavailable!";
-                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs GetArtistDataAsync", ex.ToString());
                 return result;
             }
             catch (Exception ex)
             {
-                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs GetArtistDataAsync", ex.ToString());
             }
 
             return null;
@@ -405,11 +405,11 @@ namespace Discord_Bot.Services
             catch (HttpRequestException ex)
             {
                 wk.Message = "Last.fm is temporarily unavailable!";
-                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs WhoKnowsByCurrentlyPlaying", ex.ToString());
             }
             catch (Exception ex)
             {
-                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs WhoKnowsByCurrentlyPlaying", ex.ToString());
             }
         }
 
@@ -454,11 +454,11 @@ namespace Discord_Bot.Services
             catch (HttpRequestException ex)
             {
                 wk.Message = "Last.fm is temporarily unavailable!";
-                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs WhoKnowsByTrack", ex.ToString());
             }
             catch (Exception ex)
             {
-                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs WhoKnowsByTrack", ex.ToString());
             }
         }
 
@@ -500,11 +500,11 @@ namespace Discord_Bot.Services
             catch (HttpRequestException ex)
             {
                 wk.Message = "Last.fm is temporarily unavailable!";
-                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs WhoKnowsByArtist", ex.ToString());
             }
             catch (Exception ex)
             {
-                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs WhoKnowsByArtist", ex.ToString());
             }
         }
 

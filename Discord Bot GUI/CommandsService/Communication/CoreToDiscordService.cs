@@ -21,7 +21,7 @@ namespace Discord_Bot.CommandsService.Communication
             Random r = new();
             string baseMessage = StaticLists.BirthdayMessage[r.Next(0, StaticLists.BirthdayMessage.Length)];
 
-            string message = string.Format(baseMessage, user.Mention);
+            string message = string.Format(baseMessage, user.Mention, (DateTime.UtcNow.Year - birthday.Date.Year).ToString());
             return message;
         }
 

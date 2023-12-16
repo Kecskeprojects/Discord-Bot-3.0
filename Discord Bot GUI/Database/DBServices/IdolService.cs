@@ -80,10 +80,10 @@ namespace Discord_Bot.Database.DBServices
 
                 User user = await userRepository.GetUserWithIdolsByDiscordIdAsync(userId);
                 user ??= new User() { DiscordId = userId.ToString(), Idols = [] };
-                List<Idol> userIdols = user.Idols.Where(i => i.Name == idolName && (string.IsNullOrEmpty(idolGroup) || idolGroup == i.Group.Name)).ToList();
+                List<Idol> userIdols = await idolRepository.GetIdolsByNameAndGroupAndUserAsync(userId, idolName, idolGroup);
                 if (userIdols.Count > 0)
                 {
-                    logger.Log($"{userId} user's with idol [{idolName}]-[{(noGroup ? "No group specified" : idolGroup)}] is already connected an existing connection!");
+                    logger.Log($"{userId} user's with idol [{idolName}]-[{(noGroup ? "No group specified" : idolGroup)}] is already connected!");
                     return userIdols.Count == 1 ? DbProcessResultEnum.AlreadyExists : DbProcessResultEnum.MultipleExists;
                 }
 
@@ -143,7 +143,14 @@ namespace Discord_Bot.Database.DBServices
             ListWithDbResult<UserResource> result = new(null, DbProcessResultEnum.Failure);
             try
             {
-                List<Idol> idols = await idolRepository.GetIdolsByNamesAsync(nameList);
+                List<Idol> idols = [];
+                foreach (string item in nameList)
+                {
+                    string[] parts = item.Split("-");
+                    string idolName = parts[0];
+                    string groupName = parts.Length == 2 ? parts[1] : "";
+                    idols = idols.Union(await idolRepository.GetIdolsByNameAndGroupAsync(idolName, groupName)).ToList();
+                }
 
                 if (CollectionTools.IsNullOrEmpty(idols))
                 {

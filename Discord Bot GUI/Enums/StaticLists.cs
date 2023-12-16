@@ -87,12 +87,13 @@ namespace Discord_Bot.Enums
             [
                 "Hey look, {0} has their birthday today! Send some nice wishes!",
                 "Oh wow, it's birthday time! Happy birthday {0}!",
-                "It's {0} day today!",
                 "Happy birthday {0}!",
                 "The day of reckoning is upon us, it's {0}'s birthday today!",
-                "Get the cakes out bitches, it's {0} day!",
+                "Get the cakes out bitches, {0} is turning {1}!",
                 "Happy birthday {0}! I am suddenly hungry for some cakes...",
-                "Yay, what a special day, it's {0}'s birthday!"
+                "Yay, what a special day, it's {0}'s birthday!",
+                "Damn you are turning {1} huh, better get a crutch now {0}.",
+                "You are turning {1} {0}, you have the Big Bang on VHS don't you?"
             ];
     }
 }

@@ -367,10 +367,12 @@ namespace Discord_Bot.Commands
                 if (result.ProcessResultEnum == DbProcessResultEnum.NotFound)
                 {
                     await ReplyAsync("No bias found with that name/those names!");
+                    return;
                 }
                 else if (result.ProcessResultEnum == DbProcessResultEnum.Failure || result.List == null)
                 {
                     await ReplyAsync("Exception during search for users!");
+                    return;
                 }
                 else
                 {

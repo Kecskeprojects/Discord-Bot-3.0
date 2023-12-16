@@ -10,7 +10,6 @@ namespace Discord_Bot
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static TextBlock MainStaticLog { get; private set; }
         private bool AutoScroll = true;
 
         private readonly Logging logger;
@@ -19,7 +18,6 @@ namespace Discord_Bot
         {
             InitializeComponent();
             this.logger = logger;
-            MainStaticLog = MainLogText;
         }
 
         private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
@@ -65,19 +63,16 @@ namespace Discord_Bot
             }
         }
 
-        //Test button function
-        /*
-        private void WriteLog(object sender, RoutedEventArgs e)
+        private void ClearLog(object sender, RoutedEventArgs e)
         {
             try
             {
-                logger.Log("Logged action!\nNew Line");
+                MainLogText.Inlines.Clear();
             }
             catch (Exception ex)
             {
-                logger.Error("MainWindow.xaml.cs WriteLog", ex.ToString());
+                logger.Error("MainWindow.xaml.cs ClearLog", ex.ToString());
             }
         }
-        */
     }
 }

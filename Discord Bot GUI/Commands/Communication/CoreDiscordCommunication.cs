@@ -47,7 +47,7 @@ namespace Discord_Bot.Commands.Communication
         public async Task SendBirthdayMessages()
         {
             try
-            {//Todo: Make embed with facebook grandma gif
+            {
                 //Get the list of birthdays that are on this date
                 List<BirthdayResource> result = await birthdayService.GetBirthdaysByDateAsync();
                 if (!CollectionTools.IsNullOrEmpty(result))

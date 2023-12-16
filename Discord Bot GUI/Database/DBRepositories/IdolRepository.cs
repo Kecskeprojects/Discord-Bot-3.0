@@ -22,15 +22,6 @@ namespace Discord_Bot.Database.DBRepositories
                 .Where(i => string.IsNullOrEmpty(groupName) || i.Group.Name == groupName)
                 .ToListAsync();
         }
-        public Task<List<Idol>> GetIdolsByNamesAsync(string[] nameList)
-        {
-            return context.Idols
-                .Include(i => i.Users)
-                .Include(i => i.IdolAliases)
-                .Include(i => i.Group)
-                .Where(i => nameList.Contains(i.Name) || nameList.Contains(i.Group.Name) || nameList.Intersect(i.IdolAliases.Select(ia => ia.Alias)).Any())
-                .ToListAsync();
-        }
 
         public Task<List<Idol>> GetIdolsByNameAndGroupAsync(string idolName, string idolGroup)
         {
@@ -85,6 +76,16 @@ namespace Discord_Bot.Database.DBRepositories
         {
             context.Idols.Update(idol);
             await context.SaveChangesAsync();
+        }
+
+        public Task<List<Idol>> GetIdolsByNameAndGroupAndUserAsync(ulong userId, string idolName, string idolGroup)
+        {
+            return context.Idols
+                .Include(i => i.Users)
+                .Include(i => i.IdolAliases)
+                .Include(i => i.Group)
+                .Where(i => i.Users.FirstOrDefault(u => u.DiscordId == userId.ToString()) != null && (string.IsNullOrEmpty(idolGroup) || idolGroup == i.Group.Name) && (i.Name == idolName || i.IdolAliases.FirstOrDefault(ia => ia.Alias == idolName) != null))
+                .ToListAsync();
         }
     }
 }

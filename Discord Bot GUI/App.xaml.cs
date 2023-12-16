@@ -34,7 +34,6 @@ namespace Discord_Bot
         private InteractionService interactions;
         private CommandService commands;
         private Thread twitchThread;
-        private static int minutesCount = 0;
         #endregion
 
         #region Main Methods
@@ -137,8 +136,6 @@ namespace Discord_Bot
         {
             try
             {
-                minutesCount++;
-
                 using IServiceScope scope = services.CreateScope();
                 ICoreLogic coreLogic = scope.ServiceProvider.GetService<ICoreLogic>();
                 ICoreToDiscordCommunication discordCommunication = scope.ServiceProvider.GetService<ICoreToDiscordCommunication>();
@@ -149,9 +146,11 @@ namespace Discord_Bot
                 }
 
                 //Logic to be done once a day
-                if (minutesCount == 1440)
+
+                //Youtube api key reset function
+                if (DateTime.UtcNow.Hour == 0 && DateTime.UtcNow.Minute == 0)
                 {
-                    minutesCount = 0;
+                    Logging.ClearWindowLog();
                 }
 
                 //Youtube api key reset function

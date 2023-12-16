@@ -1,6 +1,7 @@
 ﻿using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -12,6 +13,20 @@ namespace Discord_Bot.Core.Logger
     {
         //List of logs, before they are cleared
         public readonly List<Log> Logs = [];
+
+        public static void ClearWindowLog()
+        {
+            Application.Current?.Dispatcher.Invoke(DispatcherPriority.Background, () =>
+                {
+                    if (Application.Current.MainWindow != null)
+                    {
+                        MainWindow main = Application.Current.MainWindow as MainWindow;
+                        IEnumerable<Inline> range = main.MainLogText.Inlines.TakeLast(20);
+                        main.MainLogText.Inlines.Clear();
+                        main.MainLogText.Inlines.AddRange(range);
+                    }
+                });
+        }
 
         #region Bot Logging
         public void Log(string message, bool ConsoleOnly = false, bool LogOnly = false)
@@ -135,10 +150,8 @@ namespace Discord_Bot.Core.Logger
         #region Helper Methods
         private static void LogToWindow(Log log, Brush color)
         {
-            if (Application.Current != null)
-            {
-                string mess = log.Content.Replace(":\t", ":    \t");
-                Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, () =>
+            string mess = log.Content.Replace(":\t", ":    \t");
+            Application.Current?.Dispatcher.Invoke(DispatcherPriority.Background, () =>
                 {
                     if (Application.Current.MainWindow != null)
                     {
@@ -150,7 +163,6 @@ namespace Discord_Bot.Core.Logger
                         main.MainLogText.Inlines.Add(run);
                     }
                 });
-            }
         }
 
         private static Log BaseLog(LogType type)
