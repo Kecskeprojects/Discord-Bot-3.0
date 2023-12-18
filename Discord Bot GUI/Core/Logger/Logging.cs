@@ -16,12 +16,12 @@ namespace Discord_Bot.Core.Logger
 
         public static void ClearWindowLog()
         {
-            Application.Current?.Dispatcher.Invoke(DispatcherPriority.DataBind, () =>
+            Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
                 {
                     if (Application.Current.MainWindow != null)
                     {
                         MainWindow main = Application.Current.MainWindow as MainWindow;
-                        IEnumerable<Inline> range = main.MainLogText.Inlines.TakeLast(20);
+                        List<Inline> range = main.MainLogText.Inlines.TakeLast(20).ToList();
                         main.MainLogText.Inlines.Clear();
                         main.MainLogText.Inlines.AddRange(range);
                     }
@@ -150,9 +150,8 @@ namespace Discord_Bot.Core.Logger
         #region Helper Methods
         private static void LogToWindow(Log log, Brush color)
         {
-            Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(() => { }));
             string mess = log.Content.Replace(":\t", ":    \t");
-            Application.Current?.Dispatcher.Invoke(DispatcherPriority.DataBind, () =>
+            Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
                 {
                     if (Application.Current.MainWindow != null)
                     {

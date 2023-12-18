@@ -88,7 +88,7 @@ namespace Discord_Bot
             try
             {
                 ProcessMetrics result = await ProcessTools.GetStatistics();
-                Application.Current?.Dispatcher.Invoke(DispatcherPriority.DataBind, () =>
+                Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
                 {
                     if (Application.Current.MainWindow != null)
                     {
