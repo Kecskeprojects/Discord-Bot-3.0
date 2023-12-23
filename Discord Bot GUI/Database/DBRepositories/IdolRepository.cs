@@ -23,13 +23,18 @@ namespace Discord_Bot.Database.DBRepositories
                 .ToListAsync();
         }
 
-        public Task<List<Idol>> GetIdolsByNameAndGroupAsync(string idolName, string idolGroup)
+        public Task<List<Idol>> GetIdolsByNameAndGroupAsync(string idolOrGroupName, string idolGroup)
         {
             return context.Idols
                 .Include(i => i.Users)
                 .Include(i => i.IdolAliases)
                 .Include(i => i.Group)
-                .Where(i => (string.IsNullOrEmpty(idolGroup) || idolGroup == i.Group.Name) && (i.Name == idolName || i.IdolAliases.FirstOrDefault(ia => ia.Alias == idolName) != null))
+                .Where(i => 
+                    (string.IsNullOrEmpty(idolGroup) || 
+                     idolGroup == i.Group.Name) && 
+                    (i.Name == idolOrGroupName || 
+                     i.IdolAliases.FirstOrDefault(ia => ia.Alias == idolOrGroupName) != null || 
+                     i.Group.Name == idolOrGroupName))
                 .ToListAsync();
         }
 

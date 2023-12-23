@@ -8,7 +8,7 @@ namespace Discord_Bot.Interfaces.DBRepositories
     {
         Task AddIdolAsync(Idol idol);
         Task<List<Idol>> GetIdolsByGroupAsync(string groupName);
-        Task<List<Idol>> GetIdolsByNameAndGroupAsync(string idolName, string idolGroup);
+        Task<List<Idol>> GetIdolsByNameAndGroupAsync(string idolOrGroupName, string idolGroup);
         Task<List<Idol>> GetUserIdolsListAsync(ulong userId, string groupName);
         Task<bool> IdolExistsAsync(string idolName, string idolGroup);
         Task RemoveIdolAsync(Idol idol);

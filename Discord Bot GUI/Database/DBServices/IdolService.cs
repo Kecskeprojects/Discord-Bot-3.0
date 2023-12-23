@@ -147,9 +147,9 @@ namespace Discord_Bot.Database.DBServices
                 foreach (string item in nameList)
                 {
                     string[] parts = item.Split("-");
-                    string idolName = parts[0];
+                    string idolOrGroupName = parts[0];
                     string groupName = parts.Length == 2 ? parts[1] : "";
-                    idols = idols.Union(await idolRepository.GetIdolsByNameAndGroupAsync(idolName, groupName)).ToList();
+                    idols = idols.Union(await idolRepository.GetIdolsByNameAndGroupAsync(idolOrGroupName, groupName)).ToList();
                 }
 
                 if (CollectionTools.IsNullOrEmpty(idols))
