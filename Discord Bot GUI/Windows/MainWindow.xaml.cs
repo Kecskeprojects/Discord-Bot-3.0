@@ -23,7 +23,7 @@ namespace Discord_Bot
         {
             InitializeComponent();
             this.logger = logger;
-            MainTimer = new(750) { AutoReset = true }; //0.75 second
+            MainTimer = new(1000) { AutoReset = true }; //1 second
             MainTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             MainTimer.Start();
         }

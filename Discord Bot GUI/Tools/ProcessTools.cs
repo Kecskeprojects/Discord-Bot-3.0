@@ -1,10 +1,7 @@
 ﻿using Discord_Bot.Communication;
 using Microsoft.VisualBasic.Devices;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Management;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Tools
@@ -42,27 +39,6 @@ namespace Discord_Bot.Tools
             };
 
             return result;
-        }
-
-        public static IList<Process> GetChildProcesses(this Process process)
-        {
-            return new ManagementObjectSearcher($"Select * From Win32_Process Where ParentProcessID={process.Id}")
-                        .Get()
-                        .Cast<ManagementObject>()
-                        .Select(mo =>
-                            Process.GetProcessById(Convert.ToInt32(mo["ProcessID"])))
-                        .ToList();
-        }
-
-        public static int GetChildProcessCount(this Process process)
-        {
-            return new ManagementObjectSearcher($"Select * From Win32_Process Where ParentProcessID={process.Id}")
-                        .Get()
-                        .Cast<ManagementObject>()
-                        .Select(mo =>
-                            Process.GetProcessById(Convert.ToInt32(mo["ProcessID"])))
-                        .ToList()
-                        .Count;
         }
     }
 }
