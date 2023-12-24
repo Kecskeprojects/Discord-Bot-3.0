@@ -31,7 +31,7 @@ namespace Discord_Bot.Tools
             int childProcessCount = process.GetChildProcessCount();
             ProcessMetrics result = new()
             {
-                CPUUsagePercent = Math.Round(cpu_usage / processorCount, 2), 
+                CPUUsagePercent = Math.Round(cpu_usage / processorCount, 2),
                 RAMUsageInMB = Math.Round(ram_usage / 1024 / 1024, 2),
                 TotalCPUUsagePercent = Math.Round(total_cpu_usage, 2),
                 TotalRAMUsagePercent = Math.Round((total_ram - total_ram_usage) / total_ram * 100, 2),

@@ -29,11 +29,11 @@ namespace Discord_Bot.Database.DBRepositories
                 .Include(i => i.Users)
                 .Include(i => i.IdolAliases)
                 .Include(i => i.Group)
-                .Where(i => 
-                    (string.IsNullOrEmpty(idolGroup) || 
-                     idolGroup == i.Group.Name) && 
-                    (i.Name == idolOrGroupName || 
-                     i.IdolAliases.FirstOrDefault(ia => ia.Alias == idolOrGroupName) != null || 
+                .Where(i =>
+                    (string.IsNullOrEmpty(idolGroup) ||
+                     idolGroup == i.Group.Name) &&
+                    (i.Name == idolOrGroupName ||
+                     i.IdolAliases.FirstOrDefault(ia => ia.Alias == idolOrGroupName) != null ||
                      i.Group.Name == idolOrGroupName))
                 .ToListAsync();
         }

@@ -13,6 +13,7 @@ using Discord_Bot.Resources;
 using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
@@ -376,37 +377,38 @@ namespace Discord_Bot.Commands
                 }
                 else
                 {
-                    //If only one person has the bias and it's the command sender, send unique message
-                    if (result.List.Count == 0)
-                    {
-                        await ReplyAsync("Not even you have this bias, that's just shameful really...");
-                        return;
-                    }
-                    else if (result.List.Count == 1 && result.List[0].DiscordId == Context.User.Id)
-                    {
-                        await ReplyAsync("Only you have that bias for now! Time to convert people.");
-                        return;
-                    }
-
                     await Context.Guild.DownloadUsersAsync();
 
-                    string message = "";
-                    //Make a list of mentions out of them
+                    List<SocketGuildUser> guildUsers = [];
+                    bool isUsersBias = false;
                     foreach (UserResource dbUser in result.List)
                     {
                         //Find user on server
                         SocketGuildUser user = Context.Guild.GetUser(dbUser.DiscordId);
 
                         //If user is not found or the user is the one sending the command, do not add their mention to the list
-                        if (user != null && user.Id != Context.User.Id)
+                        if (user != null)
                         {
-                            message += user.Mention + " ";
-                        }
-                        else
-                        {
-                            continue;
+                            if (user.Id != Context.User.Id)
+                            {
+                                guildUsers.Add(user);
+                                continue;
+                            }
+                            isUsersBias = true;
                         }
                     }
+
+                    //If only one person has the bias and it's the command sender, send unique message
+                    if (guildUsers.Count == 0)
+                    {
+                        await ReplyAsync(isUsersBias ?
+                                        "Only you have that bias for now! Time to convert people." :
+                                        "Not even you have this bias, that's just shameful really...");
+                        return;
+                    }
+
+                    //Make a list of mentions out of them
+                    string message = string.Join(" ", guildUsers.Select(u => u.Mention));
 
                     //delete command and send mentions
                     await Context.Message.DeleteAsync();
