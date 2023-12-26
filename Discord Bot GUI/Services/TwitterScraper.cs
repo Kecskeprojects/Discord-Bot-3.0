@@ -151,16 +151,20 @@ namespace Discord_Bot.Services
         {
             await page.DeleteCookieAsync();
             await page.GoToAsync(uri.OriginalString);
-            await page.WaitForSelectorAsync("div[data-testid=\"tweetPhoto\"]>img,div[data-testid=\"videoPlayer\"]", new WaitForSelectorOptions() { Timeout = 15000 });
             try
             {
-                await page.WaitForSelectorAsync("div[data-testid=\"videoPlayer\"]", new WaitForSelectorOptions() { Timeout = 2000 });
-                HasVideo = true;
+                await page.WaitForSelectorAsync("div[data-testid=\"tweetPhoto\"]>img,div[data-testid=\"videoPlayer\"],div[data-testid=\"tweetText\"]", new WaitForSelectorOptions() { Timeout = 15000 });
+                try
+                {
+                    await page.WaitForSelectorAsync("div[data-testid=\"videoPlayer\"]", new WaitForSelectorOptions() { Timeout = 2000 });
+                    HasVideo = true;
+                }
+                catch (Exception)
+                {
+                    HasVideo = true;
+                }
             }
-            catch (Exception)
-            {
-                HasVideo = true;
-            }
+            catch (Exception) { }
             string content = await page.GetContentAsync();
 
             IBrowsingContext context = BrowsingContext.New(Configuration.Default);
