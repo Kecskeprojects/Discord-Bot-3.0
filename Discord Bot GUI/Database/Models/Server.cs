@@ -13,6 +13,8 @@ public partial class Server
 
     public string RoleMessageDiscordId { get; set; }
 
+    public DateTime CreatedOn { get; set; }
+
     public virtual ICollection<Birthday> Birthdays { get; set; } = new List<Birthday>();
 
     public virtual ICollection<Channel> Channels { get; set; } = new List<Channel>();

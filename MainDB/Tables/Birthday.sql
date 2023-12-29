@@ -4,6 +4,7 @@
     [ServerId] INT NOT NULL, 
     [UserId] INT NOT NULL, 
     [Date] DATE NOT NULL, 
+    [CreatedOn] DATETIME NOT NULL DEFAULT GETDATE(), 
     CONSTRAINT [FK_Birthday_Server] FOREIGN KEY ([ServerId]) REFERENCES [Server]([ServerId]),
     CONSTRAINT [FK_Birthday_User] FOREIGN KEY ([UserId]) REFERENCES [User]([UserId]),
     CONSTRAINT [PK_BirthdayId] PRIMARY KEY ([BirthdayId])

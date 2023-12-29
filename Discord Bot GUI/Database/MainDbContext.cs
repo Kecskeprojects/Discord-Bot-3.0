@@ -7,7 +7,6 @@ namespace Discord_Bot.Database;
 
 public partial class MainDbContext : DbContext
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0290:Use primary constructor", Justification = "Generated file")]
     public MainDbContext(DbContextOptions<MainDbContext> options)
         : base(options)
     {
@@ -45,6 +44,8 @@ public partial class MainDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<UserIdolStatistic> UserIdolStatistics { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.UseCollation("SQL_Latin1_General_CP1_CI_AS");
@@ -54,6 +55,10 @@ public partial class MainDbContext : DbContext
             entity.HasKey(e => e.BirthdayId).HasName("PK_BirthdayId");
 
             entity.ToTable("Birthday");
+
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
 
             entity.HasOne(d => d.Server).WithMany(p => p.Birthdays)
                 .HasForeignKey(d => d.ServerId)
@@ -74,6 +79,9 @@ public partial class MainDbContext : DbContext
 
             entity.HasIndex(e => e.DiscordId, "UQ_ChannelDiscordId").IsUnique();
 
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.DiscordId)
                 .IsRequired()
                 .HasMaxLength(20)
@@ -108,6 +116,9 @@ public partial class MainDbContext : DbContext
             entity.ToTable("ChannelType");
 
             entity.Property(e => e.ChannelTypeId).ValueGeneratedNever();
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(100)
@@ -124,6 +135,9 @@ public partial class MainDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(50)
                 .IsUnicode(false);
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Url)
                 .IsRequired()
                 .HasMaxLength(500)
@@ -141,6 +155,9 @@ public partial class MainDbContext : DbContext
 
             entity.ToTable("Greeting");
 
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Url)
                 .IsRequired()
                 .HasMaxLength(500)
@@ -153,10 +170,24 @@ public partial class MainDbContext : DbContext
 
             entity.ToTable("Idol");
 
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.FullName).HasMaxLength(100);
+            entity.Property(e => e.Gender)
+                .HasMaxLength(10)
+                .IsUnicode(false);
+            entity.Property(e => e.KoreanFullName).HasMaxLength(100);
+            entity.Property(e => e.KoreanStageName).HasMaxLength(100);
+            entity.Property(e => e.ModifiedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(100)
                 .IsUnicode(false);
+            entity.Property(e => e.ProfileUrl).HasMaxLength(200);
+            entity.Property(e => e.StageName).HasMaxLength(100);
 
             entity.HasOne(d => d.Group).WithMany(p => p.Idols)
                 .HasForeignKey(d => d.GroupId)
@@ -173,6 +204,9 @@ public partial class MainDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(100)
                 .IsUnicode(false);
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
 
             entity.HasOne(d => d.Idol).WithMany(p => p.IdolAliases)
                 .HasForeignKey(d => d.IdolId)
@@ -185,6 +219,14 @@ public partial class MainDbContext : DbContext
 
             entity.ToTable("IdolGroup");
 
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.FullKoreanName).HasMaxLength(100);
+            entity.Property(e => e.FullName).HasMaxLength(100);
+            entity.Property(e => e.ModifiedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(100)
@@ -197,11 +239,16 @@ public partial class MainDbContext : DbContext
 
             entity.ToTable("IdolImage");
 
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.ImageUrl)
                 .IsRequired()
                 .HasMaxLength(200)
-                .IsUnicode(false)
                 .HasColumnName("ImageURL");
+            entity.Property(e => e.ModifiedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
 
             entity.HasOne(d => d.Idol).WithMany(p => p.IdolImages)
                 .HasForeignKey(d => d.IdolId)
@@ -214,6 +261,9 @@ public partial class MainDbContext : DbContext
 
             entity.ToTable("Keyword");
 
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Response)
                 .IsRequired()
                 .HasMaxLength(300)
@@ -235,6 +285,9 @@ public partial class MainDbContext : DbContext
 
             entity.ToTable("Reminder");
 
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Message)
                 .IsRequired()
                 .HasMaxLength(500)
@@ -254,6 +307,9 @@ public partial class MainDbContext : DbContext
 
             entity.HasIndex(e => e.DiscordId, "UQ_RoleDiscordId").IsUnique();
 
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.DiscordId)
                 .IsRequired()
                 .HasMaxLength(20)
@@ -277,6 +333,9 @@ public partial class MainDbContext : DbContext
 
             entity.HasIndex(e => e.DiscordId, "UQ_ServerDiscordId").IsUnique();
 
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.DiscordId)
                 .IsRequired()
                 .HasMaxLength(20)
@@ -314,6 +373,9 @@ public partial class MainDbContext : DbContext
 
             entity.ToTable("TwitchChannel");
 
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.TwitchId)
                 .IsRequired()
                 .HasMaxLength(12)
@@ -341,6 +403,9 @@ public partial class MainDbContext : DbContext
 
             entity.HasIndex(e => e.DiscordId, "UQ_UserDiscordId").IsUnique();
 
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.DiscordId)
                 .IsRequired()
                 .HasMaxLength(20)
@@ -365,6 +430,22 @@ public partial class MainDbContext : DbContext
                         j.HasKey("UserId", "IdolId").HasName("PK_UserId_IdolId");
                         j.ToTable("UserBias");
                     });
+        });
+
+        modelBuilder.Entity<UserIdolStatistic>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.IdolId }).HasName("PK_UserId_IdolId_UserIdolStatistic");
+
+            entity.ToTable("UserIdolStatistic");
+
+            entity.HasOne(d => d.Idol).WithMany(p => p.UserIdolStatistics)
+                .HasForeignKey(d => d.IdolId)
+                .HasConstraintName("FK_UserIdolStatistic_Idol");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserIdolStatistics)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_UserIdolStatistic_User");
         });
 
         OnModelCreatingPartial(modelBuilder);

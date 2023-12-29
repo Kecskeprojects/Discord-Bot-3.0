@@ -13,5 +13,7 @@ public partial class CustomCommand
 
     public string Url { get; set; }
 
+    public DateTime CreatedOn { get; set; }
+
     public virtual Server Server { get; set; }
 }

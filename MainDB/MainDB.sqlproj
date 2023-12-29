@@ -65,9 +65,6 @@
     <Folder Include="Views" />
   </ItemGroup>
   <ItemGroup>
-    <PostDeploy Include="Post-deployment\PostDeployment.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <SqlCmdVariable Include="BuildConfiguration">
       <DefaultValue>Release</DefaultValue>
       <Value>$(SqlCmdVar__1)</Value>
@@ -77,47 +74,51 @@
     <None Include="Local_Debug.publish.xml" />
     <None Include="Local_Release.publish.xml" />
     <None Include="Main_Release.publish.xml" />
-    <None Include="Post-deployment\PostDeployment\Inserts\Server_Inserts.sql" />
-    <None Include="Post-deployment\PostDeployment\Inserts\Role_Inserts.sql" />
-    <None Include="Post-deployment\PostDeployment\Inserts\Channel_Inserts.sql" />
-    <None Include="Post-deployment\PostDeployment\Inserts\Reminder_Inserts.sql" />
-    <None Include="Post-deployment\PostDeployment\Inserts\CustomCommand_Inserts.sql" />
-    <None Include="Post-deployment\PostDeployment\Inserts\Greeting_Inserts.sql" />
-    <None Include="Post-deployment\PostDeployment\Inserts\Idol_Inserts.sql" />
-    <None Include="Post-deployment\PostDeployment\Inserts\IdolGroup_Inserts.sql" />
-    <None Include="Post-deployment\PostDeployment\Inserts\Keyword_Inserts.sql" />
-    <None Include="Post-deployment\PostDeployment\Inserts\UserBias_Inserts.sql" />
-    <None Include="Post-deployment\PostDeployment\Inserts\TwitchChannel_Inserts.sql" />
-    <None Include="Post-deployment\PostDeployment\Inserts\ServerSettingChannel_Inserts.sql" />
-    <None Include="Post-deployment\PostDeployment\Inserts\IdolAlias_Inserts.sql" />
-    <None Include="Post-deployment\PostDeployment\Inserts\Birthday_Inserts.sql" />
-    <None Include="Post-deployment\PostDeployment\Inserts\IdolImage_Inserts.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <Build Include="Tables\User.sql" />
-    <Build Include="Tables\Reminder.sql" />
-    <Build Include="Tables\ServerSettingChannel.sql" />
-    <Build Include="Views\ServerChannelView.sql" />
-    <Build Include="Tables\IdolAlias.sql" />
-    <None Include="Post-deployment\ChannelType_Inserts.sql" />
-    <Build Include="Tables\Birthday.sql" />
-    <Build Include="Tables\IdolImage.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <RefactorLog Include="MainDB.refactorlog" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="Tables\Server.sql" />
-    <Build Include="Tables\Greeting.sql" />
-    <Build Include="Tables\Keyword.sql" />
-    <Build Include="Tables\CustomCommand.sql" />
-    <Build Include="Tables\Role.sql" />
-    <Build Include="Tables\IdolGroup.sql" />
-    <Build Include="Tables\Idol.sql" />
-    <Build Include="Tables\UserBias.sql" />
-    <Build Include="Tables\TwitchChannel.sql" />
-    <Build Include="Tables\Channel.sql" />
-    <Build Include="Tables\ChannelType.sql" />
+    <PostDeploy Include="Post-deployment\PostDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Post-deployment\PostDeployment\Inserts\Birthday_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\Channel_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\CustomCommand_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\Greeting_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\Idol_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\IdolAlias_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\IdolGroup_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\IdolImage_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\Keyword_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\Reminder_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\Role_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\Server_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\ServerSettingChannel_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\TwitchChannel_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\User_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\UserBias_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\UserIdolStatistic_Inserts.sql" />
+    <None Include="Post-deployment\ChannelType_Inserts.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Tables\Birthday.sql" />
+    <Build Include="Tables\Channel.sql" />
+    <Build Include="Tables\CustomCommand.sql" />
+    <Build Include="Tables\Greeting.sql" />
+    <Build Include="Tables\Idol.sql" />
+    <Build Include="Tables\IdolAlias.sql" />
+    <Build Include="Tables\IdolGroup.sql" />
+    <Build Include="Tables\IdolImage.sql" />
+    <Build Include="Tables\Keyword.sql" />
+    <Build Include="Tables\Reminder.sql" />
+    <Build Include="Tables\Role.sql" />
+    <Build Include="Tables\Server.sql" />
+    <Build Include="Tables\ServerSettingChannel.sql" />
+    <Build Include="Tables\TwitchChannel.sql" />
+    <Build Include="Tables\User.sql" />
+    <Build Include="Tables\UserBias.sql" />
+    <Build Include="Tables\UserIdolStatistic.sql" />
+    <Build Include="Tables\ChannelType.sql" />
+    <Build Include="Views\ServerChannelView.sql" />
+    <None Include="Patch\MainDB_Update_1.sql" />
   </ItemGroup>
 </Project>

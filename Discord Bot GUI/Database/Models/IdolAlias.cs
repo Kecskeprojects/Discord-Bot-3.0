@@ -11,5 +11,7 @@ public partial class IdolAlias
 
     public int IdolId { get; set; }
 
+    public DateTime CreatedOn { get; set; }
+
     public virtual Idol Idol { get; set; }
 }

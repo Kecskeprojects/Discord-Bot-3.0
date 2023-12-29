@@ -13,6 +13,8 @@ public partial class Role
 
     public string RoleName { get; set; }
 
+    public DateTime CreatedOn { get; set; }
+
     public virtual Server Server { get; set; }
 
     public virtual ICollection<Server> Servers { get; set; } = new List<Server>();

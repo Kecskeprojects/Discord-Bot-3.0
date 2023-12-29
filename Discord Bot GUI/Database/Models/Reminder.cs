@@ -13,5 +13,7 @@ public partial class Reminder
 
     public string Message { get; set; }
 
+    public DateTime CreatedOn { get; set; }
+
     public virtual User User { get; set; }
 }

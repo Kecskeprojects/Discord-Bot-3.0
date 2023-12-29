@@ -31,4 +31,5 @@ BEGIN
     :r .\PostDeployment\Inserts\Keyword_Inserts.sql
     :r .\PostDeployment\Inserts\TwitchChannel_Inserts.sql
     :r .\PostDeployment\Inserts\UserBias_Inserts.sql
+    :r .\PostDeployment\Inserts\UserIdolStatistic_Inserts.sql
 END

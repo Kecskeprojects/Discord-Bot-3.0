@@ -13,6 +13,8 @@ public partial class Birthday
 
     public DateOnly Date { get; set; }
 
+    public DateTime CreatedOn { get; set; }
+
     public virtual Server Server { get; set; }
 
     public virtual User User { get; set; }

@@ -11,9 +11,13 @@ public partial class User
 
     public string LastFmusername { get; set; }
 
+    public DateTime CreatedOn { get; set; }
+
     public virtual ICollection<Birthday> Birthdays { get; set; } = new List<Birthday>();
 
     public virtual ICollection<Reminder> Reminders { get; set; } = new List<Reminder>();
+
+    public virtual ICollection<UserIdolStatistic> UserIdolStatistics { get; set; } = new List<UserIdolStatistic>();
 
     public virtual ICollection<Idol> Idols { get; set; } = new List<Idol>();
 }

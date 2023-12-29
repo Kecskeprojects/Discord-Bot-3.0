@@ -15,5 +15,7 @@ public partial class TwitchChannel
 
     public int ServerId { get; set; }
 
+    public DateTime CreatedOn { get; set; }
+
     public virtual Server Server { get; set; }
 }

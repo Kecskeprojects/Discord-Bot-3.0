@@ -13,5 +13,7 @@ public partial class Keyword
 
     public string Response { get; set; }
 
+    public DateTime CreatedOn { get; set; }
+
     public virtual Server Server { get; set; }
 }

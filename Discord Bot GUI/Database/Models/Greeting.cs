@@ -8,4 +8,6 @@ public partial class Greeting
     public int GreetingId { get; set; }
 
     public string Url { get; set; }
+
+    public DateTime CreatedOn { get; set; }
 }
