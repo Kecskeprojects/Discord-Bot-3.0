@@ -1,4 +1,4 @@
-﻿using Discord_Bot.Core.Logger;
+﻿using Discord_Bot.Core;
 using Discord_Bot.Interfaces.Services;
 using System.Diagnostics;
 using System.IO;

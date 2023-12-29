@@ -1,6 +1,7 @@
 ﻿using System;
+using Discord_Bot.Enums;
 
-namespace Discord_Bot.Core.Logger
+namespace Discord_Bot.Communication
 {
     public class Log(DateTime time, LogType type, string completeLog)
     {

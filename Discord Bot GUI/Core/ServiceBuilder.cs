@@ -4,7 +4,6 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Discord_Bot.Commands.Communication;
 using Discord_Bot.Core.Caching;
-using Discord_Bot.Core.Logger;
 using Discord_Bot.Database;
 using Discord_Bot.Database.DBRepositories;
 using Discord_Bot.Database.DBServices;
@@ -74,6 +73,7 @@ namespace Discord_Bot.Core
             collection.AddTransient<ILastFmAPI, LastFmAPI>();
             collection.AddTransient<IMusicBrainzAPI, MusicBrainzAPI>();
             collection.AddTransient<ITwitterScraper, TwitterScraper>();
+            collection.AddTransient<IBiasDatabaseService, BiasDatabaseService>();
 
             //Database Services
             collection.AddTransient<IServerService, ServerService>();

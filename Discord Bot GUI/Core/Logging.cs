@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Tools;
+﻿using Discord_Bot.Communication;
+using Discord_Bot.Enums;
+using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +9,7 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Threading;
 
-namespace Discord_Bot.Core.Logger
+namespace Discord_Bot.Core
 {
     public class Logging
     {

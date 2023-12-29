@@ -1,5 +1,5 @@
 ﻿using Discord_Bot.Communication;
-using Discord_Bot.Core.Logger;
+using Discord_Bot.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Properties;
 using Discord_Bot.Tools;

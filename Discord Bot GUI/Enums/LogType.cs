@@ -1,4 +1,4 @@
-﻿namespace Discord_Bot.Core.Logger
+﻿namespace Discord_Bot.Enums
 {
     public class LogType
     {
