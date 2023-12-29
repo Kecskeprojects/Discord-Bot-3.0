@@ -9,4 +9,5 @@ Owner Commands:
 !greeting list		Give a list of current greetings (DM)
 !greeting add [url]		Add new greeting url (DM)
 !greeting remove [id]		Remove greeting url (DM)
+!manual update bias		Update bias data (DM)
 

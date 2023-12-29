@@ -40,7 +40,8 @@ namespace Discord_Bot.Services
                     await BrowserService.OpenBroser();
                 }
 
-                IPage mainPage = await CreateNewPage();
+                IPage mainPage = await BrowserService.CreateNewPage();
+                mainPage.Response += TwitterScraperResponse;
 
                 string messages = "";
                 for (int i = 0; i < uris.Count; i++)
@@ -67,23 +68,6 @@ namespace Discord_Bot.Services
                 logger.Error("TwitterScraper.cs GetDataFromUrls", ex.ToString());
                 return new TwitterScrapingResult("Unexpected error occured");
             }
-        }
-
-        private async Task<IPage> CreateNewPage()
-        {
-            IPage mainPage = await BrowserService.Browser.NewPageAsync();
-            Dictionary<string, string> headers = new()
-                {
-                    { "user-agent", "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36" },
-                    { "upgrade-insecure-requests", "1" },
-                    { "accept", "text/html,application/xhtml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3" },
-                    { "accept-encoding", "gzip, deflate, br" },
-                    { "accept-language", "en-US,en;q=0.9,en;q=0.8" }
-                };
-            await mainPage.SetExtraHttpHeadersAsync(headers);
-
-            mainPage.Response += TwitterScraperResponse;
-            return mainPage;
         }
         #endregion
 
@@ -125,28 +109,6 @@ namespace Discord_Bot.Services
             return "";
         }
 
-        private void GetVideos(IElement main, IHtmlCollection<IElement> articles, int mainPos, ref int videosBeforeMainCount, ref int videoCount)
-        {
-            //We also search for Videos in the post
-            videoCount = main.QuerySelectorAll("div[data-testid]").Where(e => e.GetAttribute("data-testid") == "videoPlayer").Count();
-
-            //Checking any articles before main post
-            for (int i = 0; i < mainPos; i++)
-            {
-                int tempCount = articles[i].QuerySelectorAll("div[data-testid]").Where(e => e.GetAttribute("data-testid") == "videoPlayer").Count();
-                videosBeforeMainCount += tempCount;
-            }
-
-            //As the video links are caught in the TwitterScraper_Response event handler,
-            //the only way to verify if we got them all is to wait until the right amount of links are stored in the list
-            int count = 0;
-            while (TempVideos.Count < videoCount + videosBeforeMainCount && count < 10)
-            {
-                Task.Delay(500).Wait();
-                count++;
-            }
-        }
-
         private async Task<IDocument> OpenPage(IPage page, Uri uri)
         {
             await page.DeleteCookieAsync();
@@ -170,6 +132,28 @@ namespace Discord_Bot.Services
             IBrowsingContext context = BrowsingContext.New(Configuration.Default);
             IDocument document = await context.OpenAsync(req => req.Content(content));
             return document;
+        }
+
+        private void GetVideos(IElement main, IHtmlCollection<IElement> articles, int mainPos, ref int videosBeforeMainCount, ref int videoCount)
+        {
+            //We also search for Videos in the post
+            videoCount = main.QuerySelectorAll("div[data-testid]").Where(e => e.GetAttribute("data-testid") == "videoPlayer").Count();
+
+            //Checking any articles before main post
+            for (int i = 0; i < mainPos; i++)
+            {
+                int tempCount = articles[i].QuerySelectorAll("div[data-testid]").Where(e => e.GetAttribute("data-testid") == "videoPlayer").Count();
+                videosBeforeMainCount += tempCount;
+            }
+
+            //As the video links are caught in the TwitterScraper_Response event handler,
+            //the only way to verify if we got them all is to wait until the right amount of links are stored in the list
+            int count = 0;
+            while (TempVideos.Count < videoCount + videosBeforeMainCount && count < 10)
+            {
+                Task.Delay(500).Wait();
+                count++;
+            }
         }
 
         private static List<Uri> GetImages(IElement main)

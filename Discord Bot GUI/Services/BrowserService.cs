@@ -1,4 +1,5 @@
 ﻿using PuppeteerSharp;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Services
@@ -12,7 +13,7 @@ namespace Discord_Bot.Services
             await browserFetcher.DownloadAsync("117.0.5938.62"); //Todo: PuppeteerSharp.BrowserData.Chrome.DefaultBuildId should be revisited in future, new builds remove option to download the way it is currently done
             IBrowser browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
-                Headless = true,
+                Headless = false,
                 Args =
                 [
                     "--no-sandbox",
@@ -34,6 +35,22 @@ namespace Discord_Bot.Services
             {
                 await Browser.CloseAsync();
             }
+        }
+
+        public static async Task<IPage> CreateNewPage()
+        {
+            IPage mainPage = await BrowserService.Browser.NewPageAsync();
+            Dictionary<string, string> headers = new()
+                {
+                    { "user-agent", "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36" },
+                    { "upgrade-insecure-requests", "1" },
+                    { "accept", "text/html,application/xhtml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3" },
+                    { "accept-encoding", "gzip, deflate, br" },
+                    { "accept-language", "en-US,en;q=0.9,en;q=0.8" }
+                };
+            await mainPage.SetExtraHttpHeadersAsync(headers);
+
+            return mainPage;
         }
     }
 }

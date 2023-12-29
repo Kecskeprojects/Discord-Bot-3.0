@@ -33,6 +33,7 @@ namespace Discord_Bot
         private InteractionService interactions;
         private CommandService commands;
         private Thread twitchThread;
+        private Thread biasUpdateThread;
         #endregion
 
         #region Main Methods
@@ -159,6 +160,15 @@ namespace Discord_Bot
 
                     YoutubeAPI.KeyReset(config.Youtube_API_Keys);
                     logger.Log("Youtube keys reset!");
+
+                    if(DateTime.UtcNow.DayOfWeek == DayOfWeek.Monday)
+                    {
+                        biasUpdateThread = new Thread(async () =>
+                        {
+                            await coreLogic.UpdateExtendedBiasData();
+                        });
+                        biasUpdateThread.Start();
+                    }
                 }
 
                 coreLogic.LogToFile();

@@ -1,7 +1,9 @@
-﻿using Discord_Bot.Enums;
+﻿using Discord_Bot.Communication;
+using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands.Communication;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
 using Discord_Bot.Services;
 using Discord_Bot.Tools;
@@ -13,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Core
 {
-    public class CoreLogic(Logging logger, IServerService serverService, ICoreToDiscordCommunication coreDiscordCommunication) : ICoreLogic
+    public class CoreLogic(Logging logger, IServerService serverService, ICoreToDiscordCommunication coreDiscordCommunication, IBiasDatabaseService biasDatabaseService) : ICoreLogic
     {
         private readonly Logging logger = logger;
         private readonly ICoreToDiscordCommunication coreDiscordCommunication = coreDiscordCommunication;
@@ -36,6 +38,11 @@ namespace Discord_Bot.Core
             }
 
             return server;
+        }
+
+        public async Task UpdateExtendedBiasData()
+        {
+            List<ExtendedBiasData> completeList = await biasDatabaseService.GetBiasDataAsync();
         }
 
         #region OnClose logic

@@ -12,5 +12,6 @@ namespace Discord_Bot.Interfaces.Core
         void InstagramEmbed(string message, ulong messageId, ulong channelId, ulong? guildId);
         void LogToFile();
         void CheckFolders();
+        Task UpdateExtendedBiasData();
     }
 }

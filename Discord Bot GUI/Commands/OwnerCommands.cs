@@ -5,6 +5,7 @@ using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
@@ -17,8 +18,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class OwnerCommands(IGreetingService greetingService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), IOwnerCommands
+    public class OwnerCommands(ICoreLogic coreLogic, IGreetingService greetingService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), IOwnerCommands
     {
+        private readonly ICoreLogic coreLogic = coreLogic;
         private readonly IGreetingService greetingService = greetingService;
 
         [Command("help owner")]
@@ -139,6 +141,24 @@ namespace Discord_Bot.Commands
                 await Context.Message.DeleteAsync();
 
                 await channel.SendMessageAsync(text);
+            }
+        }
+
+
+
+        [Command("manual update bias")]
+        [RequireOwner]
+        [Summary("Update the extended information of idols manually from www.dbkpop.com")]
+        public async Task ManualUpdateBias()
+        {
+            try
+            {
+                await coreLogic.UpdateExtendedBiasData();
+                logger.Log("Get bias data done");
+            }
+            catch (Exception ex)
+            {
+                logger.Error("OwnerCommands.cs ManualUpdateBias", ex.ToString());
             }
         }
     }
