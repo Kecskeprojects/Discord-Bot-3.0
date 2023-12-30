@@ -246,9 +246,6 @@ public partial class MainDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(200)
                 .HasColumnName("ImageURL");
-            entity.Property(e => e.ModifiedOn)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
 
             entity.HasOne(d => d.Idol).WithMany(p => p.IdolImages)
                 .HasForeignKey(d => d.IdolId)

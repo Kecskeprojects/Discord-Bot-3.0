@@ -13,7 +13,5 @@ public partial class IdolImage
 
     public DateTime CreatedOn { get; set; }
 
-    public DateTime ModifiedOn { get; set; }
-
     public virtual Idol Idol { get; set; }
 }
