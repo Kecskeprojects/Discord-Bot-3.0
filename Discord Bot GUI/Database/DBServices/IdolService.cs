@@ -277,12 +277,12 @@ namespace Discord_Bot.Database.DBServices
 
                 Idol idol = await idolRepository.FindByIdAsync(idolResource.IdolId);
 
-                if (string.IsNullOrEmpty(idol.ProfileUrl))
+                if (string.IsNullOrEmpty(idol.ProfileUrl) && data != null)
                 {
                     mapper.Map(data, idol);
                 }
 
-                if (idol.Group.DebutDate == null)
+                if (idol.Group.DebutDate == null && additional != null)
                 {
                     mapper.Map(additional, idol.Group);
                 }

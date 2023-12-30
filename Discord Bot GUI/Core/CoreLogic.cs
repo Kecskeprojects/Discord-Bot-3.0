@@ -60,6 +60,7 @@ namespace Discord_Bot.Core
 
                     if (string.IsNullOrEmpty(profileUrl))
                     {
+                        logger.Warning("CoreLogic.cs UpdateExtendedBiasData", $"ProfileUrl empty. DATA: {data?.StageName} of {data?.GroupName} | DB: {localIdols[i].Name} of {localIdols[i].GroupName}");
                         continue;
                     }
 
@@ -70,7 +71,13 @@ namespace Discord_Bot.Core
                         continue;
                     }
 
-                    logger.Log($"Updating {data.StageName} of {data.GroupName}'s details.");
+                    logger.Log($"Updating details. DATA: {data.StageName} of {data.GroupName} | DB: {localIdols[i].Name} of {localIdols[i].GroupName}");
+                    if (!localIdols[i].GroupName.Equals(data.GroupName.RemoveSpecialCharacters(), StringComparison.OrdinalIgnoreCase))
+                    {
+                        additional = null;
+                        logger.Warning("CoreLogic.cs UpdateExtendedBiasData", "Idol's group in database and site do not match, the result may be inconsistent.");
+                    }
+
                     count++;
                     await idolService.UpdateIdolDetailsAsync(localIdols[i], data, additional);
                 }
@@ -241,7 +248,8 @@ namespace Discord_Bot.Core
                 List<ExtendedBiasData> datas = completeList.Where(x => x.StageName.Equals(resource.Name, StringComparison.OrdinalIgnoreCase)).ToList();
                 if (datas.Count > 1)
                 {
-                    data = datas.FirstOrDefault(x => x.GroupName.RemoveSpecialCharacters().Equals(resource.GroupName, StringComparison.OrdinalIgnoreCase));
+                    data = datas.FirstOrDefault(x => x.GroupName.RemoveSpecialCharacters().Equals(resource.GroupName, StringComparison.OrdinalIgnoreCase) || 
+                                                    (resource.GroupName == "soloist" && string.IsNullOrEmpty(x.GroupName)));
                 }
                 else if (datas.Count == 1)
                 {

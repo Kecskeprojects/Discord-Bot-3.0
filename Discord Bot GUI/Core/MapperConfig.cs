@@ -41,7 +41,7 @@ namespace Discord_Bot.Core
             CreateMap<Idol, IdolResource>()
                 .ForMember(dest => dest.IdolId, opt => opt.MapFrom(i => i.IdolId))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(i => i.Name))
-                .ForMember(dest => dest.CurrentImageUrl, opt => opt.MapFrom(i => i.IdolImages.OrderByDescending(img => img.CreatedOn).First().ImageUrl));
+                .ForMember(dest => dest.CurrentImageUrl, opt => opt.MapFrom(i => i.IdolImages.Count > 0 ? i.IdolImages.OrderByDescending(img => img.CreatedOn).FirstOrDefault().ImageUrl : null));
             CreateMap<IdolGroup, IdolGroupResource>()
                 .ForMember(dest => dest.GroupId, opt => opt.MapFrom(ig => ig.GroupId))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(ig => ig.Name));

@@ -96,7 +96,6 @@ namespace Discord_Bot.Commands
                 logger.Error("BiasOwnerCommands.cs ManualUpdateBias", ex.ToString());
             }
         }
-
-        //Todo: Get the db links and get image links using that, if they turn out to be too old, a manual command will be in place to switch out the link origin
+        //Todo: Command to edit idol data manually, with an option to only change the profile link, command to change which group idol belongs to, command to edit group manually
     }
 }
