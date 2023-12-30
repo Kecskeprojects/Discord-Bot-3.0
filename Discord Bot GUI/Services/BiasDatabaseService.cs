@@ -1,17 +1,17 @@
-﻿using AngleSharp.Dom;
+﻿using AngleSharp;
+using AngleSharp.Dom;
+using Discord_Bot.Communication;
+using Discord_Bot.Core;
+using Discord_Bot.Interfaces.Services;
 using PuppeteerSharp;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Discord_Bot.Interfaces.Services;
-using AngleSharp;
-using Discord_Bot.Communication;
-using Discord_Bot.Core;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Discord_Bot.Services
 {
-    public class BiasDatabaseService (Logging logger) : IBiasDatabaseService
+    public class BiasDatabaseService(Logging logger) : IBiasDatabaseService
     {
         private const string BaseUrl = "https://dbkpop.com/db/all-k-pop-idols/";
         private readonly Logging logger = logger;

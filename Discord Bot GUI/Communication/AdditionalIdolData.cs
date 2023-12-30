@@ -4,7 +4,7 @@ namespace Discord_Bot.Communication
 {
     public class AdditionalIdolData
     {
-        public AdditionalIdolData() 
+        public AdditionalIdolData()
         {
         }
 

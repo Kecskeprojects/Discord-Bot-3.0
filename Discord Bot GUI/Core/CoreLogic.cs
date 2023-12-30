@@ -58,19 +58,26 @@ namespace Discord_Bot.Core
                 {
                     string profileUrl = GetProfileUrl(localIdols[i], completeList, out ExtendedBiasData data);
 
-                    if (string.IsNullOrEmpty(profileUrl)) continue;
+                    if (string.IsNullOrEmpty(profileUrl))
+                    {
+                        continue;
+                    }
 
                     AdditionalIdolData additional = await biasDatabaseService.GetAdditionalBiasDataAsync(profileUrl, localIdols[i].GroupDebutDate == null);
 
-                    if (localIdols[i].CurrentImageUrl == additional.ImageUrl) continue;
+                    if (localIdols[i].CurrentImageUrl == additional.ImageUrl)
+                    {
+                        continue;
+                    }
 
+                    logger.Log($"Updating {data.StageName} of {data.GroupName}'s details.");
                     count++;
                     await idolService.UpdateIdolDetailsAsync(localIdols[i], data, additional);
                 }
                 logger.Log($"Updated {count} idol's details.");
                 logger.Log("Update Bias Data Logic ended!");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("CoreLogic.cs UpdateExtendedBiasData", ex.ToString());
             }

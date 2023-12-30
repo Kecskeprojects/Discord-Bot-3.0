@@ -161,7 +161,7 @@ namespace Discord_Bot
                     YoutubeAPI.KeyReset(config.Youtube_API_Keys);
                     logger.Log("Youtube keys reset!");
 
-                    if(DateTime.UtcNow.DayOfWeek == DayOfWeek.Monday)
+                    if (DateTime.UtcNow.DayOfWeek == DayOfWeek.Monday)
                     {
                         biasUpdateThread = new Thread(async () =>
                         {
