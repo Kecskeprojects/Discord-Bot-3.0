@@ -66,6 +66,7 @@ namespace Discord_Bot.Database.DBRepositories
         {
             return context.Idols
                 .Include(i => i.Group)
+                .Include(i => i.IdolImages)
                 .FirstOrDefaultAsync(i => i.Name == idolName && i.Group.Name == idolGroup);
         }
 
@@ -91,6 +92,19 @@ namespace Discord_Bot.Database.DBRepositories
                 .Include(i => i.Group)
                 .Where(i => i.Users.FirstOrDefault(u => u.DiscordId == userId.ToString()) != null && (string.IsNullOrEmpty(idolGroup) || idolGroup == i.Group.Name) && (i.Name == idolName || i.IdolAliases.FirstOrDefault(ia => ia.Alias == idolName) != null))
                 .ToListAsync();
+        }
+
+        public Task<List<Idol>> GetAllIdolsAsync()
+        {
+            return context.Idols
+                .Include(i => i.Group)
+                .Include(i => i.IdolImages)
+                .ToListAsync();
+        }
+
+        public ValueTask<Idol> FindByIdAsync(int idolId)
+        {
+            return context.Idols.FindAsync(idolId);
         }
     }
 }

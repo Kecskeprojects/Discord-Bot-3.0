@@ -5,8 +5,6 @@ namespace Discord_Bot.Interfaces.Commands
 {
     public interface IBiasCommands
     {
-        public Task AddBiasList([Remainder] string biasName);
-        public Task RemoveBiasList([Remainder] string biasName);
         public Task AddBias([Remainder] string biasName);
         public Task RemoveBias([Remainder] string biasName);
         public Task ClearBias();

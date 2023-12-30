@@ -16,5 +16,7 @@ namespace Discord_Bot.Interfaces.DBRepositories
         Task<Idol> GetIdolWithAliasesAsync(string idolName, string idolGroup);
         Task UpdateIdolAsync(Idol idol);
         Task<List<Idol>> GetIdolsByNameAndGroupAndUserAsync(ulong userId, string idolName, string idolGroup);
+        Task<List<Idol>> GetAllIdolsAsync();
+        ValueTask<Idol> FindByIdAsync(int idolId);
     }
 }

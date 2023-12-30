@@ -15,11 +15,13 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Core
 {
-    public class CoreLogic(Logging logger, IServerService serverService, ICoreToDiscordCommunication coreDiscordCommunication, IBiasDatabaseService biasDatabaseService) : ICoreLogic
+    public class CoreLogic(Logging logger, IServerService serverService, ICoreToDiscordCommunication coreDiscordCommunication, IBiasDatabaseService biasDatabaseService, IIdolService idolService) : ICoreLogic
     {
         private readonly Logging logger = logger;
-        private readonly ICoreToDiscordCommunication coreDiscordCommunication = coreDiscordCommunication;
         private readonly IServerService serverService = serverService;
+        private readonly ICoreToDiscordCommunication coreDiscordCommunication = coreDiscordCommunication;
+        private readonly IBiasDatabaseService biasDatabaseService = biasDatabaseService;
+        private readonly IIdolService idolService = idolService;
 
         public async Task<ServerResource> GetServerAsync(ulong serverId, string serverName)
         {
@@ -42,7 +44,36 @@ namespace Discord_Bot.Core
 
         public async Task UpdateExtendedBiasData()
         {
-            List<ExtendedBiasData> completeList = await biasDatabaseService.GetBiasDataAsync();
+            try
+            {
+                logger.Log("Update Bias Data Logic started!");
+                List<ExtendedBiasData> completeList = await biasDatabaseService.GetBiasDataAsync();
+                logger.Log($"Found {completeList.Count} idols on site that have profile pages.");
+
+                List<IdolResource> localIdols = await idolService.GetAllIdolsAsync();
+                logger.Log($"Found {localIdols.Count} idols in our database.");
+
+                int count = 0;
+                for (int i = 0; i < localIdols.Count; i++)
+                {
+                    string profileUrl = GetProfileUrl(localIdols[i], completeList, out ExtendedBiasData data);
+
+                    if (string.IsNullOrEmpty(profileUrl)) continue;
+
+                    AdditionalIdolData additional = await biasDatabaseService.GetAdditionalBiasDataAsync(profileUrl, localIdols[i].GroupDebutDate == null);
+
+                    if (localIdols[i].CurrentImageUrl == additional.ImageUrl) continue;
+
+                    count++;
+                    await idolService.UpdateIdolDetailsAsync(localIdols[i], data, additional);
+                }
+                logger.Log($"Updated {count} idol's details.");
+                logger.Log("Update Bias Data Logic ended!");
+            }
+            catch(Exception ex)
+            {
+                logger.Error("CoreLogic.cs UpdateExtendedBiasData", ex.ToString());
+            }
         }
 
         #region OnClose logic
@@ -188,6 +219,30 @@ namespace Discord_Bot.Core
             {
                 logger.Error("CoreLogic.css CheckFolder", ex.ToString());
             }
+        }
+
+        public static string GetProfileUrl(IdolResource resource, List<ExtendedBiasData> completeList, out ExtendedBiasData data)
+        {
+            string profileUrl = "";
+            data = null;
+            if (!string.IsNullOrEmpty(resource.ProfileUrl))
+            {
+                profileUrl = resource.ProfileUrl;
+            }
+            else
+            {
+                List<ExtendedBiasData> datas = completeList.Where(x => x.StageName.Equals(resource.Name, StringComparison.OrdinalIgnoreCase)).ToList();
+                if (datas.Count > 1)
+                {
+                    data = datas.FirstOrDefault(x => x.GroupName.RemoveSpecialCharacters().Equals(resource.GroupName, StringComparison.OrdinalIgnoreCase));
+                }
+                else if (datas.Count == 1)
+                {
+                    data = datas[0];
+                }
+                profileUrl = data?.ProfileUrl;
+            }
+            return profileUrl;
         }
         #endregion
     }

@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Discord_Bot.Communication;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -38,7 +40,8 @@ namespace Discord_Bot.Core
                 .ForMember(dest => dest.ServerDiscordId, opt => opt.MapFrom(r => ulong.Parse(r.Server.DiscordId)));
             CreateMap<Idol, IdolResource>()
                 .ForMember(dest => dest.IdolId, opt => opt.MapFrom(i => i.IdolId))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(i => i.Name));
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(i => i.Name))
+                .ForMember(dest => dest.CurrentImageUrl, opt => opt.MapFrom(i => i.IdolImages.OrderByDescending(img => img.CreatedOn).First().ImageUrl));
             CreateMap<IdolGroup, IdolGroupResource>()
                 .ForMember(dest => dest.GroupId, opt => opt.MapFrom(ig => ig.GroupId))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(ig => ig.Name));
@@ -49,6 +52,16 @@ namespace Discord_Bot.Core
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(u => u.UserId))
                 .ForMember(dest => dest.DiscordId, opt => opt.MapFrom(u => ulong.Parse(u.DiscordId)))
                 .ForMember(dest => dest.LastFmUsername, opt => opt.MapFrom(u => u.LastFmusername));
+            CreateMap<ExtendedBiasData, Idol>()
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom(e => e.Gender.Value))
+                .ForMember(dest => dest.ModifiedOn, opt => opt.MapFrom(x => DateTime.Now));
+            CreateMap<ExtendedBiasData, IdolGroup>()
+                .ForMember(dest => dest.Name, opt => opt.Ignore());
+            CreateMap<AdditionalIdolData, IdolGroup>()
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(e => e.GroupFullName))
+                .ForMember(dest => dest.FullKoreanName, opt => opt.MapFrom(e => e.GroupFullKoreanName))
+                .ForMember(dest => dest.DebutDate, opt => opt.MapFrom(e => e.DebutDate))
+                .ForMember(dest => dest.ModifiedOn, opt => opt.MapFrom(x => DateTime.Now));
         }
     }
 }

@@ -16,5 +16,7 @@ namespace Discord_Bot.Interfaces.DBServices
         Task<DbProcessResultEnum> RemoveIdolAsync(string idolName, string idolGroup);
         Task<List<IdolResource>> GetUserIdolsListAsync(ulong userId, string groupName);
         Task<DbProcessResultEnum> RemoveUserIdolAsync(ulong userId, string idolName, string idolGroup);
+        Task<List<IdolResource>> GetAllIdolsAsync();
+        Task UpdateIdolDetailsAsync(IdolResource idolResource, ExtendedBiasData data, AdditionalIdolData additional);
     }
 }

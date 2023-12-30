@@ -6,6 +6,7 @@ namespace Discord_Bot.Interfaces.Services
 {
     public interface IBiasDatabaseService
     {
+        Task<AdditionalIdolData> GetAdditionalBiasDataAsync(string url, bool getGroupData);
         Task<List<ExtendedBiasData>> GetBiasDataAsync();
     }
 }

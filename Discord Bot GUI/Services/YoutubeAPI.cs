@@ -213,7 +213,7 @@ namespace Discord_Bot.Services
         }
 
         //Searching by playlist ID
-        //Todo: Be able to choose where to start the 25 songs from
+        //Todo: Be able to choose where to start the 25 songs from a given song/index
         private async Task<SearchResultEnum> PlaylistSearch(YouTubeService youtubeService, string query, string username, ulong serverId)
         {
             string currentKey = config.Youtube_API_Keys[youtubeIndex];

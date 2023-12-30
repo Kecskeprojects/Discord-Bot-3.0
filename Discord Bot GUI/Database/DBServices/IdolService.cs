@@ -15,7 +15,13 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices
 {
-    public class IdolService(IIdolRepository idolRepository, IIdolGroupRepository idolGroupRepository, IUserRepository userRepository, IMapper mapper, Logging logger, Cache cache) : BaseService(mapper, logger, cache), IIdolService
+    public class IdolService(
+        IIdolRepository idolRepository,
+        IIdolGroupRepository idolGroupRepository,
+        IUserRepository userRepository,
+        IMapper mapper,
+        Logging logger,
+        Cache cache) : BaseService(mapper, logger, cache), IIdolService
     {
         private readonly IIdolRepository idolRepository = idolRepository;
         private readonly IIdolGroupRepository idolGroupRepository = idolGroupRepository;
@@ -245,6 +251,50 @@ namespace Discord_Bot.Database.DBServices
                 logger.Error("IdolService.cs GetUserIdolsListAsync", ex.ToString());
             }
             return result;
+        }
+
+        public async Task<List<IdolResource>> GetAllIdolsAsync()
+        {
+            List<IdolResource> result = null;
+            try
+            {
+                List<Idol> idols = await idolRepository.GetAllIdolsAsync();
+
+                result = mapper.Map<List<Idol>, List<IdolResource>>(idols);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("IdolService.cs GetAllIdolsAsync", ex.ToString());
+            }
+            return result;
+        }
+
+        public async Task UpdateIdolDetailsAsync(IdolResource idolResource, ExtendedBiasData data, AdditionalIdolData additional)
+        {
+            try
+            {
+                //Todo: A removal method will potentially be needed for old images
+
+                Idol idol = await idolRepository.FindByIdAsync(idolResource.IdolId);
+
+                if (string.IsNullOrEmpty(idol.ProfileUrl))
+                {
+                    mapper.Map(data, idol);
+                }
+
+                if (idol.Group.DebutDate == null)
+                {
+                    mapper.Map(additional, idol.Group);
+                }
+
+                idol.IdolImages.Add(new IdolImage() { ImageUrl = additional.ImageUrl });
+
+                await idolRepository.UpdateIdolAsync(idol);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("IdolService.cs UpdateIdolDetailsAsync", ex.ToString());
+            }
         }
     }
 }
