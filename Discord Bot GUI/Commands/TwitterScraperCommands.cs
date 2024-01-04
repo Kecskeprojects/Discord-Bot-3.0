@@ -25,6 +25,11 @@ namespace Discord_Bot.Commands
         [Summary("For embedding twitter messages, replacing the built in discord embeds")]
         public async Task ScrapeFromUrl([Remainder] string message)
         {
+            if (!config.Enable_Twitter_Embed)
+            {
+                return;
+            }
+
             try
             {
                 List<Uri> urls = UrlTools.LinkSearch(message, true, baseURLs);
