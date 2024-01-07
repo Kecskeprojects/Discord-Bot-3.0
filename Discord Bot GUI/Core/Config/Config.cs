@@ -10,6 +10,7 @@ namespace Discord_Bot.Core.Config
         public struct ConfigModel
         {
             public string token;
+            public string environment;
             public string img;
             public int bitrate;
             public string twitch_Client_Id;
@@ -32,6 +33,7 @@ namespace Discord_Bot.Core.Config
                 ConfigModel conf = new()
                 {
                     token = "",
+                    environment = "testing",
                     img = "",
                     bitrate = 0,
                     twitch_Client_Id = "",
@@ -59,6 +61,8 @@ namespace Discord_Bot.Core.Config
 
         #region Config Values
         public string Token => Configuration.GetSection("token").Get<string>();
+
+        public string Environment => Configuration.GetSection("environment").Get<string>();
 
         public string Img => Configuration.GetSection("img").Get<string>();
 

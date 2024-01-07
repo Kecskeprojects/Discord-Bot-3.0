@@ -1,4 +1,5 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Enums;
@@ -48,7 +49,6 @@ namespace Discord_Bot.Commands
             {
                 logger.Error("BiasOwnerCommands.cs AddBiasList", ex.ToString());
             }
-
         }
 
         [Command("biaslist remove")]
@@ -96,6 +96,5 @@ namespace Discord_Bot.Commands
                 logger.Error("BiasOwnerCommands.cs ManualUpdateBias", ex.ToString());
             }
         }
-        //Todo: Command to edit idol data manually, with an option to only change the profile link, command to change which group idol belongs to, command to edit group manually
     }
 }

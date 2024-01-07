@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions
 {
-    public class ComponentInteraction(Logging logger, Config config, IIdolService idolService) : BaseInteraction(logger, config)
+    public class BiasListComponentInteraction(Logging logger, Config config, IIdolService idolService) : BaseInteraction(logger, config)
     {
         private readonly IIdolService idolService = idolService;
 
@@ -56,7 +56,7 @@ namespace Discord_Bot.Interactions
             }
             catch (Exception ex)
             {
-                logger.Error("ComponentInteraction.cs IdolMenuHandler", ex.ToString());
+                logger.Error("BiasListComponentInteraction.cs IdolMenuHandler", ex.ToString());
             }
         }
     }
