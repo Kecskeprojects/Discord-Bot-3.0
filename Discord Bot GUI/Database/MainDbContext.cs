@@ -7,7 +7,6 @@ namespace Discord_Bot.Database;
 
 public partial class MainDbContext : DbContext
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0290:Use primary constructor", Justification = "Generated file")]
     public MainDbContext(DbContextOptions<MainDbContext> options)
         : base(options)
     {
