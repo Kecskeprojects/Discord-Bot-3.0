@@ -65,7 +65,7 @@ namespace Discord_Bot.CommandsService.Communication
             string currDate = DateTimeOffset.FromUnixTimeSeconds(metadata.TakenAtTimestamp).ToString("yyyy\\.MM\\.dd");
             message = message.Insert(0, currDate);
 
-            if(message.Length > 2000)
+            if (message.Length > 2000)
             {
                 message = message[..2000];
             }

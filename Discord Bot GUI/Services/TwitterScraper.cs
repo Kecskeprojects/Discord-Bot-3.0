@@ -99,29 +99,6 @@ namespace Discord_Bot.Services
 
                 IHtmlCollection<IElement> articles = document.QuerySelectorAll("article");
 
-                IElement text = document.QuerySelector("div[data-testid=\"tweetText\"]");
-                if(text != null)
-                {
-                    if(text.Children.Any(x => x.TagName == "IMG"))
-                    {
-                        foreach (IElement textPart in text.Children)
-                        {
-                            if(textPart.TagName == "IMG")
-                            {
-                                TextContent += textPart.GetAttribute("alt");
-                            }
-                            else
-                            {
-                                TextContent += textPart.TextContent;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        TextContent = text.TextContent;
-                    }
-                }
-
                 //The timestamp link contains the post's relative path, we can find the post's article by that, we also get it's index in the list
                 IElement main = articles.First(x => x.QuerySelectorAll("a[href]").FirstOrDefault(e => e.GetAttribute("href").Contains(uri.AbsolutePath, StringComparison.OrdinalIgnoreCase)) != null);
                 int mainPos = articles.Index(main);
@@ -132,6 +109,7 @@ namespace Discord_Bot.Services
                 }
 
                 List<Uri> currImages = GetImages(main);
+                GetText(main);
 
                 Images.AddRange(currImages);
 
@@ -147,6 +125,32 @@ namespace Discord_Bot.Services
             }
 
             return "";
+        }
+
+        private void GetText(IElement main)
+        {
+            IElement text = main.QuerySelector("div[data-testid=\"tweetText\"]");
+            if (text != null)
+            {
+                if (text.Children.Any(x => x.TagName == "IMG"))
+                {
+                    foreach (IElement textPart in text.Children)
+                    {
+                        if (textPart.TagName == "IMG")
+                        {
+                            TextContent += textPart.GetAttribute("alt");
+                        }
+                        else
+                        {
+                            TextContent += textPart.TextContent;
+                        }
+                    }
+                }
+                else
+                {
+                    TextContent = text.TextContent;
+                }
+            }
         }
 
         private void GetVideos(IElement main, IHtmlCollection<IElement> articles, int mainPos, ref int videosBeforeMainCount, ref int videoCount)
@@ -183,7 +187,7 @@ namespace Discord_Bot.Services
                     await page.WaitForSelectorAsync("div[data-testid=\"videoPlayer\"]", new WaitForSelectorOptions() { Timeout = 1000 });
                     HasVideo = true;
                 }
-                catch (Exception) {}
+                catch (Exception) { }
             }
             catch (Exception e)
             {
