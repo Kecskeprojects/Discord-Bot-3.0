@@ -2,12 +2,25 @@
 using Microsoft.VisualBasic.Devices;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Tools
 {
     public static class ProcessTools
     {
+        static readonly ThreadState[] ActiveStates =
+        [
+            /*ThreadState.Initialized,*/
+            ThreadState.Ready,
+            ThreadState.Running,
+            ThreadState.Standby,
+            /*ThreadState.Terminated,*/
+            ThreadState.Wait,
+            ThreadState.Transition,
+            /*ThreadState.Unknown*/
+        ];
+
         public static async Task<ProcessMetrics> GetStatistics()
         {
             Process process = Process.GetCurrentProcess();
@@ -23,6 +36,7 @@ namespace Discord_Bot.Tools
             await Task.Delay(500);
 
             int processorCount = Environment.ProcessorCount;
+            int threadCount = GetActiveThreads();
             double total_ram = new ComputerInfo().TotalPhysicalMemory / 1024.0 / 1024.0;
             double cpu_usage = cpu.NextValue();
             double ram_usage = ram.NextValue();
@@ -35,10 +49,26 @@ namespace Discord_Bot.Tools
                 RAMUsageInMB = Math.Round(ram_usage / 1024 / 1024, 2),
                 TotalCPUUsagePercent = Math.Round(total_cpu_usage, 2),
                 TotalRAMUsagePercent = Math.Round((total_ram - total_ram_usage) / total_ram * 100, 2),
+                ThreadCount = threadCount,
                 ChildProcessCount = childProcessCount
             };
 
             return result;
+        }
+
+        private static int GetActiveThreads()
+        {
+            ProcessThreadCollection threads = Process.GetCurrentProcess().Threads;
+            int threadCount = 0;
+            for (int i = 0; i < threads.Count; i++)
+            {
+                if (ActiveStates.Contains(threads[i].ThreadState))
+                {
+                    threadCount++;
+                }
+            }
+
+            return threadCount;
         }
     }
 }

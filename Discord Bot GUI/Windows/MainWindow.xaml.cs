@@ -93,11 +93,12 @@ namespace Discord_Bot
                     if (Application.Current.MainWindow != null)
                     {
                         MainWindow main = Application.Current.MainWindow as MainWindow;
-                        main.TotalCPUUsage.Content = $"Avg. Total Processor Usage: {result.TotalCPUUsagePercent}%";
-                        main.TotalRAMUsage.Content = $"Total Memory Usage: {result.TotalRAMUsagePercent}%";
-                        main.ChildProcessCount.Content = $"Number of Child Processes: {result.ChildProcessCount}";
-                        main.CPUUsage.Content = $"Avg. Processor Usage: {result.CPUUsagePercent}%";
-                        main.RAMUsage.Content = $"Memory Usage: {result.RAMUsageInMB} MB";
+                        main.TotalCPUUsage.Content = $"{result.TotalCPUUsagePercent}%";
+                        main.TotalRAMUsage.Content = $"{result.TotalRAMUsagePercent}%";
+                        main.ThreadCount.Content = $"{result.ThreadCount}";
+                        main.ChildProcessCount.Content = $"{result.ChildProcessCount}";
+                        main.CPUUsage.Content = $"{result.CPUUsagePercent}%";
+                        main.RAMUsage.Content = $"{result.RAMUsageInMB} MB";
                     }
                 });
             }
