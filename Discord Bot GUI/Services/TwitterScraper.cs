@@ -26,6 +26,7 @@ namespace Discord_Bot.Services
         //The standard image url is the following:
         //https://pbs.twimg.com/media/[image_id]?format=[image_format]&name=[width]x[height]
         private List<Uri> Images { get; set; } = [];
+        private string TextContent { get; set; } = "";
         private List<string> Exceptions { get; } = [];
         private bool HasVideo { get; set; } = false;
         #endregion
@@ -55,7 +56,7 @@ namespace Discord_Bot.Services
                 await mainPage.CloseAsync();
 
                 messages += string.Join("\n", Exceptions);
-                return new TwitterScrapingResult(Videos, Images, messages);
+                return new TwitterScrapingResult(Videos, Images, uris.Count == 1 ? TextContent : "", messages);
             }
             catch (NavigationException ex)
             {
@@ -97,6 +98,29 @@ namespace Discord_Bot.Services
                 IDocument document = await OpenPage(page, uri);
 
                 IHtmlCollection<IElement> articles = document.QuerySelectorAll("article");
+
+                IElement text = document.QuerySelector("div[data-testid=\"tweetText\"]");
+                if(text != null)
+                {
+                    if(text.Children.Any(x => x.TagName == "IMG"))
+                    {
+                        foreach (IElement textPart in text.Children)
+                        {
+                            if(textPart.TagName == "IMG")
+                            {
+                                TextContent += textPart.GetAttribute("alt");
+                            }
+                            else
+                            {
+                                TextContent += textPart.TextContent;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        TextContent = text.TextContent;
+                    }
+                }
 
                 //The timestamp link contains the post's relative path, we can find the post's article by that, we also get it's index in the list
                 IElement main = articles.First(x => x.QuerySelectorAll("a[href]").FirstOrDefault(e => e.GetAttribute("href").Contains(uri.AbsolutePath, StringComparison.OrdinalIgnoreCase)) != null);
@@ -156,15 +180,15 @@ namespace Discord_Bot.Services
                 await page.WaitForSelectorAsync("div[data-testid=\"tweetPhoto\"]>img,div[data-testid=\"videoPlayer\"],div[data-testid=\"tweetText\"]", new WaitForSelectorOptions() { Timeout = 15000 });
                 try
                 {
-                    await page.WaitForSelectorAsync("div[data-testid=\"videoPlayer\"]", new WaitForSelectorOptions() { Timeout = 2000 });
+                    await page.WaitForSelectorAsync("div[data-testid=\"videoPlayer\"]", new WaitForSelectorOptions() { Timeout = 1000 });
                     HasVideo = true;
                 }
-                catch (Exception)
-                {
-                    HasVideo = true;
-                }
+                catch (Exception) {}
             }
-            catch (Exception) { }
+            catch (Exception e)
+            {
+                logger.Error("TwitterScraper.cs OpenPage", e.ToString(), LogOnly: true);
+            }
             string content = await page.GetContentAsync();
 
             IBrowsingContext context = BrowsingContext.New(Configuration.Default);

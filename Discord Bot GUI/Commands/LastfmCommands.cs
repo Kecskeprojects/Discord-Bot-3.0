@@ -545,7 +545,7 @@ namespace Discord_Bot.Commands
                     //Getting base of lastfm embed
                     EmbedBuilder builder = LastFmService.BaseEmbed($"Server ranking for:\n{wk.Searched}");
 
-                    if (wk.ImageUrl != "")
+                    if (!string.IsNullOrEmpty(wk.ImageUrl))
                     {
                         //Download image and get back it's filepath
                         Stream originalImage = Global.GetStream(wk.ImageUrl);
