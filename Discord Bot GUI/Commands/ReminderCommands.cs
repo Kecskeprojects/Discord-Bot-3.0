@@ -25,7 +25,7 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                if (Context.Channel.GetChannelType() != ChannelType.DM)
                 {
                     ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
                     if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
@@ -69,7 +69,7 @@ namespace Discord_Bot.Commands
 
                         if (result == DbProcessResultEnum.Success)
                         {
-                            await ReplyAsync($"Alright, I will remind you at `{date}`!");
+                            await ReplyAsync($"Alright, I will remind you at {TimestampTag.FromDateTime(date, TimestampTagStyles.ShortDateTime)}!");
                         }
                         else
                         {
@@ -92,7 +92,7 @@ namespace Discord_Bot.Commands
 
                             if (result == DbProcessResultEnum.Success)
                             {
-                                await ReplyAsync($"Alright, I will remind you at `{date}`!");
+                                await ReplyAsync($"Alright, I will remind you at {TimestampTag.FromDateTime(date, TimestampTagStyles.ShortDateTime)}!");
                             }
                             else
                             {
@@ -119,7 +119,7 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                if (Context.Channel.GetChannelType() != ChannelType.DM)
                 {
                     ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
                     if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
@@ -158,7 +158,7 @@ namespace Discord_Bot.Commands
 
                     if (result == DbProcessResultEnum.Success)
                     {
-                        await ReplyAsync($"Alright, I will remind you at `{date}`!");
+                        await ReplyAsync($"Alright, I will remind you at {TimestampTag.FromDateTime(date, TimestampTagStyles.Relative)}!");
                     }
                     else
                     {
@@ -184,7 +184,7 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                if (Context.Channel.GetChannelType() != ChannelType.DM)
                 {
                     ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
                     if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
@@ -203,7 +203,7 @@ namespace Discord_Bot.Commands
                     int i = 1;
                     foreach (ReminderResource reminder in list)
                     {
-                        builder.AddField($"#{i} {reminder.Date}", reminder.Message);
+                        builder.AddField($"#{i} {TimestampTag.FromDateTime(reminder.Date, TimestampTagStyles.ShortDateTime)}", reminder.Message);
                         i++;
                     }
 
@@ -223,7 +223,7 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                if (Context.Channel.GetChannelType() != ChannelType.DM)
                 {
                     ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
                     if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))

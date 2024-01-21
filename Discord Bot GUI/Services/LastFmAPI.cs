@@ -78,6 +78,10 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message.StartsWith("EmptyResponse"))
+                {
+                    result.Message = "A partial result was empty!";
+                }
                 logger.Error("LastFmAPI.cs  GetNowPlayingAsync", ex.ToString());
             }
             return null;
@@ -131,6 +135,10 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message.StartsWith("EmptyResponse"))
+                {
+                    result.Message = "A partial result was empty!";
+                }
                 logger.Error("LastFmAPI.cs GetTopAlbumsAsync", ex.ToString());
             }
             return null;
@@ -184,6 +192,10 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message.StartsWith("EmptyResponse"))
+                {
+                    result.Message = "A partial result was empty!";
+                }
                 logger.Error("LastFmAPI.cs GetTopArtistsAsync", ex.ToString());
             }
             return null;
@@ -237,6 +249,10 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message.StartsWith("EmptyResponse"))
+                {
+                    result.Message = "A partial result was empty!";
+                }
                 logger.Error("LastFmAPI.cs GetTopTracksAsync", ex.ToString());
             }
             return null;
@@ -348,6 +364,10 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message.StartsWith("EmptyResponse"))
+                {
+                    result.Message = "A partial result was empty!";
+                }
                 logger.Error("LastFmAPI.cs GetArtistDataAsync", ex.ToString());
             }
 
@@ -409,6 +429,10 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message.StartsWith("EmptyResponse"))
+                {
+                    wk.Message = "A partial result was empty!";
+                }
                 logger.Error("LastFmAPI.cs WhoKnowsByCurrentlyPlaying", ex.ToString());
             }
         }
@@ -458,6 +482,10 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message.StartsWith("EmptyResponse"))
+                {
+                    wk.Message = "A partial result was empty!";
+                }
                 logger.Error("LastFmAPI.cs WhoKnowsByTrack", ex.ToString());
             }
         }
@@ -504,6 +532,10 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message.StartsWith("EmptyResponse"))
+                {
+                    wk.Message = "A partial result was empty!";
+                }
                 logger.Error("LastFmAPI.cs WhoKnowsByArtist", ex.ToString());
             }
         }
@@ -515,7 +547,7 @@ namespace Discord_Bot.Services
             logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
 
             return restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success
-                ? throw restResult.Exception ?? new Exception($"Track plays request resulted in an error! (Type:{restResult.ResultCode}")
+                ? throw restResult.Exception ?? new Exception($"{restResult.ResultCode}: Artist plays request resulted in an error!")
                 : restResult.Response;
         }
 
@@ -525,7 +557,7 @@ namespace Discord_Bot.Services
             logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
 
             return restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success
-                ? throw restResult.Exception ?? new Exception($"Track plays request resulted in an error! (Type:{restResult.ResultCode}")
+                ? throw restResult.Exception ?? new Exception($"{restResult.ResultCode}: Track plays request resulted in an error!")
                 : restResult.Response;
         }
 
@@ -539,7 +571,7 @@ namespace Discord_Bot.Services
 
                 if (restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success)
                 {
-                    throw restResult.Exception ?? new Exception($"Total plays request resulted in an error! (Type:{restResult.ResultCode}");
+                    throw restResult.Exception ?? new Exception($"{restResult.ResultCode}: Total plays request resulted in an error!");
                 }
 
                 foreach (LastFmApi.Models.TopArtist.Artist artist in restResult.Response.Artist)
@@ -566,7 +598,7 @@ namespace Discord_Bot.Services
 
                 if (restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success)
                 {
-                    throw restResult.Exception ?? new Exception($"Monthly ranking request resulted in an error! (Type:{restResult.ResultCode}");
+                    throw restResult.Exception ?? new Exception($"{restResult.ResultCode}: Monthly ranking request resulted in an error!");
                 }
 
                 for (int i = 0; i < restResult.Response.Track.Count; i++)
@@ -606,7 +638,7 @@ namespace Discord_Bot.Services
 
                 if (restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success)
                 {
-                    throw restResult.Exception ?? new Exception($"Top albums request resulted in an error! (Type:{restResult.ResultCode}");
+                    throw restResult.Exception ?? new Exception($"{restResult.ResultCode}: Top Albums request resulted in an error!");
                 }
 
                 foreach (LastFmApi.Models.TopAlbum.Album album in restResult.Response.Album)
@@ -636,7 +668,7 @@ namespace Discord_Bot.Services
 
                 if (restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success)
                 {
-                    throw restResult.Exception ?? new Exception($"Top tracks request resulted in an error! (Type:{restResult.ResultCode}");
+                    throw restResult.Exception ?? new Exception($"{restResult.ResultCode}: Top tracks request resulted in an error!");
                 }
 
                 foreach (LastFmApi.Models.TopTrack.Track track in restResult.Response.Track)

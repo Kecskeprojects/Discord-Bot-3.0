@@ -3,6 +3,8 @@ using AngleSharp.Dom;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Services.Models.Twitter;
+using Newtonsoft.Json.Linq;
 using PuppeteerSharp;
 using System;
 using System.Collections.Generic;
@@ -29,6 +31,7 @@ namespace Discord_Bot.Services
         private string TextContent { get; set; } = "";
         private List<string> Exceptions { get; } = [];
         private bool HasVideo { get; set; } = false;
+        public bool SensitiveContent { get; set; } = false;
         #endregion
 
         #region Main Methods
@@ -47,9 +50,13 @@ namespace Discord_Bot.Services
                 for (int i = 0; i < uris.Count; i++)
                 {
                     string mess = await ExtractFromUrl(mainPage, uris[i]);
+                    if(uris.Count > 1)
+                    {
+                        messages += $"\n#{i + 1} ";
+                    }
                     if (mess != "")
                     {
-                        messages += $"{i + 1}. link could not be embedded:\n{mess}\n";
+                        messages += $"Link could not be embedded:\n{mess}";
                     }
                 }
 
@@ -97,13 +104,18 @@ namespace Discord_Bot.Services
                 int videoCount = 0;
                 IDocument document = await OpenPage(page, uri);
 
+                if (SensitiveContent)
+                {
+                    return "Post is flagged as potentially sensitive content!";
+                }
+
                 IHtmlCollection<IElement> articles = document.QuerySelectorAll("article");
 
                 //The timestamp link contains the post's relative path, we can find the post's article by that, we also get it's index in the list
                 IElement main = articles.First(x => x.QuerySelectorAll("a[href]").FirstOrDefault(e => e.GetAttribute("href").Contains(uri.AbsolutePath, StringComparison.OrdinalIgnoreCase)) != null);
                 int mainPos = articles.Index(main);
 
-                if (main.Text().Contains("sensitive content"))
+                if (main.Text().Contains("sensitive content") || SensitiveContent)
                 {
                     return "Post is flagged as potentially sensitive content!";
                 }
@@ -193,6 +205,7 @@ namespace Discord_Bot.Services
             {
                 logger.Error("TwitterScraper.cs OpenPage", e.ToString(), LogOnly: true);
             }
+
             string content = await page.GetContentAsync();
 
             IBrowsingContext context = BrowsingContext.New(Configuration.Default);
@@ -220,7 +233,7 @@ namespace Discord_Bot.Services
             return currImages;
         }
 
-        private void TwitterScraperResponse(object sender, ResponseCreatedEventArgs e)
+        private async void TwitterScraperResponse(object sender, ResponseCreatedEventArgs e)
         {
             try
             {
@@ -236,6 +249,18 @@ namespace Discord_Bot.Services
                     if (TempVideos.FirstOrDefault(x => x.Segments[2] == currUrl.Segments[2]) == null)
                     {
                         TempVideos.Add(currUrl);
+                    }
+                }
+                else if (e.Response.Url.Contains("TweetResultByRestId"))
+                {
+                    Root body = await e.Response.JsonAsync<Root>(); //Todo: investigate the possibility of using this body object to get the tweet data instead of web scraping
+                    string reason = body?.Data?.TweetResult?.Result?.Reason;
+                    if (!string.IsNullOrEmpty(reason))
+                    {
+                        if(reason == "NsfwLoggedOut")
+                        {
+                            SensitiveContent = true;
+                        }
                     }
                 }
             }
