@@ -1,6 +1,4 @@
 ﻿using Newtonsoft.Json;
-using TwitchLib.Api.Helix.Models.Extensions.ReleasedExtensions;
-using Windows.Media;
 
 namespace Discord_Bot.Services.Models.Twitter
 {

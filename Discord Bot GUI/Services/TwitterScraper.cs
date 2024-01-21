@@ -4,7 +4,6 @@ using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.Twitter;
-using Newtonsoft.Json.Linq;
 using PuppeteerSharp;
 using System;
 using System.Collections.Generic;
@@ -50,7 +49,7 @@ namespace Discord_Bot.Services
                 for (int i = 0; i < uris.Count; i++)
                 {
                     string mess = await ExtractFromUrl(mainPage, uris[i]);
-                    if(uris.Count > 1)
+                    if (uris.Count > 1)
                     {
                         messages += $"\n#{i + 1} ";
                     }
@@ -257,7 +256,7 @@ namespace Discord_Bot.Services
                     string reason = body?.Data?.TweetResult?.Result?.Reason;
                     if (!string.IsNullOrEmpty(reason))
                     {
-                        if(reason == "NsfwLoggedOut")
+                        if (reason == "NsfwLoggedOut")
                         {
                             SensitiveContent = true;
                         }
