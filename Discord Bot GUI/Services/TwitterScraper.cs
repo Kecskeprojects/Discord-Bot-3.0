@@ -49,7 +49,7 @@ namespace Discord_Bot.Services
                 for (int i = 0; i < uris.Count; i++)
                 {
                     string mess = await ExtractFromUrl(mainPage, uris[i]);
-                    if (uris.Count > 1)
+                    if (uris.Count > 1 && mess != "")
                     {
                         messages += $"\n#{i + 1} ";
                     }

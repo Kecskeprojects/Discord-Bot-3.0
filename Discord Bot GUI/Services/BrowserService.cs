@@ -9,7 +9,7 @@ namespace Discord_Bot.Services
         public static async Task OpenBroser()
         {
             BrowserFetcher browserFetcher = new(SupportedBrowser.Chrome);
-            await browserFetcher.DownloadAsync("117.0.5938.62"); //Todo: PuppeteerSharp.BrowserData.Chrome.DefaultBuildId should be revisited in future, new builds remove option to download the way it is currently done
+            await browserFetcher.DownloadAsync(PuppeteerSharp.BrowserData.Chrome.DefaultBuildId); //"117.0.5938.62" or "121.0.6167.85" as fallback versions if something doesn't work
             IBrowser browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
                 Headless = true,
