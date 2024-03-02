@@ -324,7 +324,7 @@ namespace Discord_Bot
                     }
                 }
 
-                if (context.Message.HasCharPrefix('!', ref argPos))
+                if (context.Message.HasCharPrefix('!', ref argPos) || context.Message.HasCharPrefix('.', ref argPos))
                 {
                     Discord.Commands.IResult result = await commands.ExecuteAsync(context, argPos, services);
 
@@ -348,10 +348,6 @@ namespace Discord_Bot
 
                         logger.Warning("App.xaml.cs HandleCommandAsync", result.ErrorReason);
                     }
-                }
-                else if (config.Enable_Twitter_Embed && context.Message.HasCharPrefix('.', ref argPos))
-                {
-                    await commands.ExecuteAsync(context, argPos, services);
                 }
                 else if (context.Channel.GetChannelType() != ChannelType.DM && Global.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id, false))
                 {

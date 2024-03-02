@@ -25,6 +25,11 @@ namespace Discord_Bot.Commands
         [Summary("For embedding twitter messages, replacing the built in discord embeds")]
         public async Task ScrapeFromUrl([Remainder] string message)
         {
+            if (!config.Enable_Twitter_Embed)
+            {
+                return;
+            }
+
             try
             {
                 List<Uri> urls = UrlTools.LinkSearch(message, true, baseURLs);
@@ -64,7 +69,7 @@ namespace Discord_Bot.Commands
                         {
                             try
                             {
-                                await Context.Channel.SendFilesAsync(attachments, messageReference: refer);
+                                await Context.Channel.SendFilesAsync(attachments, result.TextContent, messageReference: refer);
                             }
                             catch (HttpException ex)
                             {
@@ -76,7 +81,7 @@ namespace Discord_Bot.Commands
                                     attachments = TwitterScraperService.AllContentInRegularMessage(result.Videos, result.Images, false);
                                     if (!CollectionTools.IsNullOrEmpty(attachments))
                                     {
-                                        await Context.Channel.SendFilesAsync(attachments, messageReference: refer);
+                                        await Context.Channel.SendFilesAsync(attachments, result.TextContent, messageReference: refer);
                                         await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
                                     }
                                     else

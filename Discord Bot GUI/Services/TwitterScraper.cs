@@ -3,6 +3,7 @@ using AngleSharp.Dom;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Services.Models.Twitter;
 using PuppeteerSharp;
 using System;
 using System.Collections.Generic;
@@ -26,8 +27,10 @@ namespace Discord_Bot.Services
         //The standard image url is the following:
         //https://pbs.twimg.com/media/[image_id]?format=[image_format]&name=[width]x[height]
         private List<Uri> Images { get; set; } = [];
+        private string TextContent { get; set; } = "";
         private List<string> Exceptions { get; } = [];
         private bool HasVideo { get; set; } = false;
+        public bool SensitiveContent { get; set; } = false;
         #endregion
 
         #region Main Methods
@@ -47,16 +50,20 @@ namespace Discord_Bot.Services
                 for (int i = 0; i < uris.Count; i++)
                 {
                     string mess = await ExtractFromUrl(mainPage, uris[i]);
+                    if (uris.Count > 1 && mess != "")
+                    {
+                        messages += $"\n#{i + 1} ";
+                    }
                     if (mess != "")
                     {
-                        messages += $"{i + 1}. link could not be embedded:\n{mess}\n";
+                        messages += $"Link could not be embedded:\n{mess}";
                     }
                 }
 
                 await mainPage.CloseAsync();
 
                 messages += string.Join("\n", Exceptions);
-                return new TwitterScrapingResult(Videos, Images, messages);
+                return new TwitterScrapingResult(Videos, Images, uris.Count == 1 ? TextContent : "", messages);
             }
             catch (NavigationException ex)
             {
@@ -80,18 +87,24 @@ namespace Discord_Bot.Services
                 int videoCount = 0;
                 IDocument document = await OpenPage(page, uri);
 
+                if (SensitiveContent)
+                {
+                    return "Post is flagged as potentially sensitive content!";
+                }
+
                 IHtmlCollection<IElement> articles = document.QuerySelectorAll("article");
 
                 //The timestamp link contains the post's relative path, we can find the post's article by that, we also get it's index in the list
                 IElement main = articles.First(x => x.QuerySelectorAll("a[href]").FirstOrDefault(e => e.GetAttribute("href").Contains(uri.AbsolutePath, StringComparison.OrdinalIgnoreCase)) != null);
                 int mainPos = articles.Index(main);
 
-                if (main.Text().Contains("sensitive content"))
+                if (main.Text().Contains("sensitive content") || SensitiveContent)
                 {
                     return "Post is flagged as potentially sensitive content!";
                 }
 
                 List<Uri> currImages = GetImages(main);
+                GetText(main);
 
                 Images.AddRange(currImages);
 
@@ -109,6 +122,54 @@ namespace Discord_Bot.Services
             return "";
         }
 
+        private void GetText(IElement main)
+        {
+            IElement text = main.QuerySelector("div[data-testid=\"tweetText\"]");
+            if (text != null)
+            {
+                if (text.Children.Any(x => x.TagName == "IMG"))
+                {
+                    foreach (IElement textPart in text.Children)
+                    {
+                        if (textPart.TagName == "IMG")
+                        {
+                            TextContent += textPart.GetAttribute("alt");
+                        }
+                        else
+                        {
+                            TextContent += textPart.TextContent;
+                        }
+                    }
+                }
+                else
+                {
+                    TextContent = text.TextContent;
+                }
+            }
+        }
+
+        private void GetVideos(IElement main, IHtmlCollection<IElement> articles, int mainPos, ref int videosBeforeMainCount, ref int videoCount)
+        {
+            //We also search for Videos in the post
+            videoCount = main.QuerySelectorAll("div[data-testid]").Where(e => e.GetAttribute("data-testid") == "videoPlayer").Count();
+
+            //Checking any articles before main post
+            for (int i = 0; i < mainPos; i++)
+            {
+                int tempCount = articles[i].QuerySelectorAll("div[data-testid]").Where(e => e.GetAttribute("data-testid") == "videoPlayer").Count();
+                videosBeforeMainCount += tempCount;
+            }
+
+            //As the video links are caught in the TwitterScraper_Response event handler,
+            //the only way to verify if we got them all is to wait until the right amount of links are stored in the list
+            int count = 0;
+            while (TempVideos.Count < videoCount + videosBeforeMainCount && count < 10)
+            {
+                Task.Delay(500).Wait();
+                count++;
+            }
+        }
+
         private async Task<IDocument> OpenPage(IPage page, Uri uri)
         {
             await page.DeleteCookieAsync();
@@ -118,15 +179,16 @@ namespace Discord_Bot.Services
                 await page.WaitForSelectorAsync("div[data-testid=\"tweetPhoto\"]>img,div[data-testid=\"videoPlayer\"],div[data-testid=\"tweetText\"]", new WaitForSelectorOptions() { Timeout = 15000 });
                 try
                 {
-                    await page.WaitForSelectorAsync("div[data-testid=\"videoPlayer\"]", new WaitForSelectorOptions() { Timeout = 2000 });
+                    await page.WaitForSelectorAsync("div[data-testid=\"videoPlayer\"]", new WaitForSelectorOptions() { Timeout = 1000 });
                     HasVideo = true;
                 }
-                catch (Exception)
-                {
-                    HasVideo = true;
-                }
+                catch (Exception) { }
             }
-            catch (Exception) { }
+            catch (Exception e)
+            {
+                logger.Error("TwitterScraper.cs OpenPage", e.ToString(), LogOnly: true);
+            }
+
             string content = await page.GetContentAsync();
 
             IBrowsingContext context = BrowsingContext.New(Configuration.Default);
@@ -176,7 +238,7 @@ namespace Discord_Bot.Services
             return currImages;
         }
 
-        private void TwitterScraperResponse(object sender, ResponseCreatedEventArgs e)
+        private async void TwitterScraperResponse(object sender, ResponseCreatedEventArgs e)
         {
             try
             {
@@ -192,6 +254,18 @@ namespace Discord_Bot.Services
                     if (TempVideos.FirstOrDefault(x => x.Segments[2] == currUrl.Segments[2]) == null)
                     {
                         TempVideos.Add(currUrl);
+                    }
+                }
+                else if (e.Response.Url.Contains("TweetResultByRestId"))
+                {
+                    Root body = await e.Response.JsonAsync<Root>(); //Todo: investigate the possibility of using this body object to get the tweet data instead of web scraping
+                    string reason = body?.Data?.TweetResult?.Result?.Reason;
+                    if (!string.IsNullOrEmpty(reason))
+                    {
+                        if (reason == "NsfwLoggedOut")
+                        {
+                            SensitiveContent = true;
+                        }
                     }
                 }
             }

@@ -24,21 +24,26 @@
 		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="AngleSharp" Version="1.0.7" />
-		<PackageReference Include="AutoMapper" Version="12.0.1" />
-		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
-		<PackageReference Include="Discord.Net" Version="3.13.0" />
-		<PackageReference Include="Google.Apis.YouTube.v3" Version="1.64.0.3205" />
-		<PackageReference Include="PuppeteerSharp" Version="13.0.2" />
+		<PackageReference Include="AngleSharp" Version="1.1.1" />
+		<PackageReference Include="AutoMapper" Version="13.0.1" />
+		<PackageReference Include="Discord.Net" Version="3.13.1" />
+		<PackageReference Include="Google.Apis.YouTube.v3" Version="1.67.0.3343" />
+		<PackageReference Include="PuppeteerSharp" Version="14.1.0" />
 		<PackageReference Include="RestSharp" Version="110.2.0" />
-		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.1" />
-		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.0" />
-		<PackageReference Include="SpotifyAPI.Web" Version="7.0.2" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.2" />
+		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.1" />
+		<PackageReference Include="SpotifyAPI.Web" Version="7.1.1" />
 		<PackageReference Include="TwitchLib.Api" Version="3.9.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.2">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.2">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
 	</ItemGroup>

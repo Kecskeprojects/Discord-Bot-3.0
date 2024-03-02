@@ -106,13 +106,13 @@ namespace Discord_Bot.Commands.Communication
                     DbProcessResultEnum reminderResult = await reminderService.RemoveCurrentRemindersAsync(reminderIds);
                     if (reminderResult == DbProcessResultEnum.Failure)
                     {
-                        logger.Error("CoreLogic.cs ReminderCheck", "Failure during reminder check!");
+                        logger.Error("CoreDiscordCommunication.cs ReminderCheck", "Failure during reminder check!");
                     }
                 }
             }
             catch (Exception ex)
             {
-                logger.Error("CoreLogic.cs Log ReminderCheck", ex.ToString());
+                logger.Error("CoreDiscordCommunication.cs Log ReminderCheck", ex.ToString());
             }
         }
 
@@ -211,7 +211,7 @@ namespace Discord_Bot.Commands.Communication
             }
             catch (Exception ex)
             {
-                logger.Error("CoreLogic.cs SelfRole", ex.ToString());
+                logger.Error("CoreDiscordCommunication.cs SelfRole", ex.ToString());
             }
         }
 
@@ -254,22 +254,22 @@ namespace Discord_Bot.Commands.Communication
                 }
                 catch (HttpException ex)
                 {
-                    logger.Warning("ServiceDiscordCommunication.cs GetImagesFromPost", "Embed too large, only sending images!", LogOnly: true);
-                    logger.Warning("ServiceDiscordCommunication.cs GetImagesFromPost", ex.ToString(), LogOnly: true);
+                    logger.Warning("CoreDiscordCommunication.cs GetImagesFromPost", "Embed too large, only sending images!", LogOnly: true);
+                    logger.Warning("CoreDiscordCommunication.cs GetImagesFromPost", ex.ToString(), LogOnly: true);
 
                     result = await CoreToDiscordService.SendInstagramMessageAsync(attachments, files, uri.OriginalString, refer, channel, true);
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {
-                    logger.Warning("ServiceDiscordCommunication.cs GetImagesFromPost", "Embed too large, only sending images!", LogOnly: true);
-                    logger.Warning("ServiceDiscordCommunication.cs GetImagesFromPost", ex.ToString(), LogOnly: true);
+                    logger.Warning("CoreDiscordCommunication.cs GetImagesFromPost", "Embed too large, only sending images!", LogOnly: true);
+                    logger.Warning("CoreDiscordCommunication.cs GetImagesFromPost", ex.ToString(), LogOnly: true);
 
                     result = await CoreToDiscordService.SendInstagramMessageAsync(attachments, files, uri.OriginalString, refer, channel, true);
                 }
             }
             catch (Exception ex)
             {
-                logger.Error("ServiceDiscordCommunication.cs GetImagesFromPost", ex.ToString());
+                logger.Error("CoreDiscordCommunication.cs GetImagesFromPost", ex.ToString());
                 await channel.SendMessageAsync("Unexpected exception occured.");
             }
 

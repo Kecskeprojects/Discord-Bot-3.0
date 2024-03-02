@@ -7,5 +7,6 @@
         public double TotalCPUUsagePercent { get; set; }
         public double TotalRAMUsagePercent { get; set; }
         public int ChildProcessCount { get; set; }
+        public int ThreadCount { get; internal set; }
     }
 }

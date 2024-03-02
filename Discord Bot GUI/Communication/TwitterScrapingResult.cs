@@ -8,17 +8,20 @@ namespace Discord_Bot.Communication
         public TwitterScrapingResult(string message)
         {
             ErrorMessage = message;
+            TextContent = "";
             Videos = [];
             Images = [];
         }
-        public TwitterScrapingResult(List<Uri> videos, List<Uri> images)
+        public TwitterScrapingResult(List<Uri> videos, List<Uri> images, string textContent)
         {
+            TextContent = textContent;
             Videos = videos;
             Images = images;
         }
-        public TwitterScrapingResult(List<Uri> videos, List<Uri> images, string message)
+        public TwitterScrapingResult(List<Uri> videos, List<Uri> images, string textContent, string message)
         {
             ErrorMessage = message;
+            TextContent = textContent;
             Videos = videos;
             Images = images;
         }
@@ -26,5 +29,6 @@ namespace Discord_Bot.Communication
         public List<Uri> Videos { get; set; }
         public List<Uri> Images { get; set; }
         public string ErrorMessage { get; set; }
+        public string TextContent { get; set; }
     }
 }
