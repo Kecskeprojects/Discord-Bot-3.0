@@ -54,14 +54,14 @@ namespace Discord_Bot.Core
                 .ForMember(dest => dest.LastFmUsername, opt => opt.MapFrom(u => u.LastFmusername));
             CreateMap<ExtendedBiasData, Idol>()
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(e => e.Gender.Value))
-                .ForMember(dest => dest.ModifiedOn, opt => opt.MapFrom(x => DateTime.Now));
+                .ForMember(dest => dest.ModifiedOn, opt => opt.MapFrom(x => DateTime.UtcNow));
             CreateMap<ExtendedBiasData, IdolGroup>()
                 .ForMember(dest => dest.Name, opt => opt.Ignore());
             CreateMap<AdditionalIdolData, IdolGroup>()
                 .ForMember(dest => dest.FullName, opt => opt.MapFrom(e => e.GroupFullName))
                 .ForMember(dest => dest.FullKoreanName, opt => opt.MapFrom(e => e.GroupFullKoreanName))
                 .ForMember(dest => dest.DebutDate, opt => opt.MapFrom(e => e.DebutDate))
-                .ForMember(dest => dest.ModifiedOn, opt => opt.MapFrom(x => DateTime.Now));
+                .ForMember(dest => dest.ModifiedOn, opt => opt.MapFrom(x => DateTime.UtcNow));
         }
     }
 }

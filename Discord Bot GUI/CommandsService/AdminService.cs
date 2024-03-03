@@ -47,7 +47,7 @@ namespace Discord_Bot.CommandsService
             }
 
             embed.WithThumbnailUrl(config.Img);
-            embed.WithTimestamp(DateTime.Now);
+            embed.WithTimestamp(DateTime.UtcNow);
             embed.WithColor(Color.Teal);
             return embed;
         }

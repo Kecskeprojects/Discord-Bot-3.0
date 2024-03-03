@@ -53,7 +53,7 @@ namespace Discord_Bot.Commands
                 //Add last two digits of current year to beginning in case it was left off as the datetime parse doesn't always assume a year
                 if (datestring.Split(".").Length == 2)
                 {
-                    datestring = datestring.Insert(0, $"{DateTime.Now.Year.ToString()[2..]}.");
+                    datestring = datestring.Insert(0, $"{DateTime.UtcNow.Year.ToString()[2..]}.");
                 }
 
                 //Try parsing date into an exact format, in which case one can write timezones

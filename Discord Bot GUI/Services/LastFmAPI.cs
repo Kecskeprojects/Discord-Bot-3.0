@@ -1,4 +1,5 @@
-﻿using Discord_Bot.Core;
+﻿using Discord;
+using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
@@ -277,7 +278,7 @@ namespace Discord_Bot.Services
                         LastFmApi.Models.Recent.Track track = restResult.Response.Track[i];
 
                         result.EmbedFields[index] += $"`#{i + 1}` **{track.Name}** by **{track.Artist.Text}** - *";
-                        result.EmbedFields[index] += track.Attr != null ? "Now playing*" : track.Date.Text.Replace(DateTime.Now.Year.ToString(), "") + "*";
+                        result.EmbedFields[index] += track.Attr != null ? "Now playing*" : TimestampTag.FromDateTime(DateTime.Parse(track.Date.Text), TimestampTagStyles.Relative) + "*";
                         result.EmbedFields[index] += "\n";
 
                         //If we went through 10 results, start filling a new list page

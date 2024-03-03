@@ -32,7 +32,7 @@ namespace Discord_Bot.CommandsService
             builder.AddField("Position in queue:", count - 1, true);
 
 
-            builder.WithTimestamp(DateTime.Now);
+            builder.WithTimestamp(DateTime.UtcNow);
             builder.WithColor(Color.Red);
 
             await channel.SendMessageAsync("", false, builder.Build());
@@ -58,7 +58,7 @@ namespace Discord_Bot.CommandsService
             builder.AddField("Requested by:", nowPlaying.User, false);
             builder.AddField("Song duration:", elapsed_time + " / " + nowPlaying.Duration[2..].ToLower(), false);
 
-            builder.WithTimestamp(DateTime.Now);
+            builder.WithTimestamp(DateTime.UtcNow);
             builder.WithColor(Color.DarkBlue);
 
             await channel.SendMessageAsync("", false, builder.Build());
@@ -97,7 +97,7 @@ namespace Discord_Bot.CommandsService
             int second = time - (minute * 60) - (hour * 3600);
             builder.AddField("Full duration:", "" + (hour > 0 ? hour + "h" : "") + minute + "m" + second + "s", true);
 
-            builder.WithTimestamp(DateTime.Now);
+            builder.WithTimestamp(DateTime.UtcNow);
             builder.WithColor(Color.Blue);
             return builder;
         }
