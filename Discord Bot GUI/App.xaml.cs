@@ -147,13 +147,13 @@ namespace Discord_Bot
 
                 //Logic to be done once a day
 
-                //Youtube api key reset function
+                //Do at GMT+0 midnight every day
                 if (DateTime.UtcNow.Hour == 0 && DateTime.UtcNow.Minute == 0)
                 {
                     Logging.ClearWindowLog();
                 }
 
-                //Youtube api key reset function
+                //Do at GMT+0 8 am every day
                 if (DateTime.UtcNow.Hour == 8 && DateTime.UtcNow.Minute == 0)
                 {
                     await discordCommunication.SendBirthdayMessages();
@@ -161,11 +161,13 @@ namespace Discord_Bot
                     YoutubeAPI.KeyReset(config.Youtube_API_Keys);
                     logger.Log("Youtube keys reset!");
 
+                    //Only on a monday
                     if (DateTime.UtcNow.DayOfWeek == DayOfWeek.Monday)
                     {
+                        IBiasDatabaseService biasDatabaseService = scope.ServiceProvider.GetService<IBiasDatabaseService>();
                         biasUpdateThread = new Thread(async () =>
                         {
-                            await coreLogic.UpdateExtendedBiasData();
+                            await biasDatabaseService.RunUpdateBiasDataAsync();
                         });
                         biasUpdateThread.Start();
                     }

@@ -2,7 +2,10 @@
 using AngleSharp.Dom;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
+using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Resources;
+using Discord_Bot.Tools;
 using PuppeteerSharp;
 using System;
 using System.Collections.Generic;
@@ -11,13 +14,70 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Services
 {
-    public class BiasDatabaseService(Logging logger) : IBiasDatabaseService
+    public class BiasDatabaseService(Logging logger, IIdolService idolService) : IBiasDatabaseService
     {
         private const string BaseUrl = "https://dbkpop.com/db/all-k-pop-idols/";
         private readonly Logging logger = logger;
+        private readonly IIdolService idolService = idolService;
 
         #region Bias List methods
-        public async Task<List<ExtendedBiasData>> GetBiasDataAsync()
+        public async Task RunUpdateBiasDataAsync()
+        {
+            try
+            {
+                logger.Log("Update Bias Data Logic started!");
+                List<ExtendedBiasData> completeList = await GetBiasWebDataAsync();
+                logger.Log($"Found {completeList.Count} idols on site that have profile pages.");
+
+                List<IdolResource> localIdols = await idolService.GetAllIdolsAsync();
+                logger.Log($"Found {localIdols.Count} idols in our database.");
+
+                int count = 0;
+                for (int i = 0; i < localIdols.Count; i++)
+                {
+                    string profileUrl = GetProfileUrl(localIdols[i], completeList, out ExtendedBiasData data);
+
+                    if (string.IsNullOrEmpty(profileUrl))
+                    {
+                        logger.Warning("CoreLogic.cs UpdateExtendedBiasData", $"ProfileUrl empty. DATA: {data?.StageName} of {data?.GroupName} | DB: {localIdols[i].Name} of {localIdols[i].GroupName}");
+                        continue;
+                    }
+
+                    AdditionalIdolData additional = await GetAdditionalBiasDataAsync(profileUrl, getGroupData: localIdols[i].GroupDebutDate == null);
+
+                    if (localIdols[i].CurrentImageUrl == additional.ImageUrl)
+                    {
+                        continue;
+                    }
+
+                    if (data != null)
+                    {
+                        logger.Log($"Updating details. DATA: {data.StageName} of {data.GroupName} | DB: {localIdols[i].Name} of {localIdols[i].GroupName}");
+
+                        if (!localIdols[i].GroupName.Equals(data.GroupName.RemoveSpecialCharacters(), StringComparison.OrdinalIgnoreCase))
+                        {
+                            additional = null;
+                            logger.Warning("CoreLogic.cs UpdateExtendedBiasData", "Idol's group in database and site do not match, the result may be inconsistent.");
+                        }
+                    }
+                    else
+                    {
+                        logger.Log($"Updating details. DATA: Already gathered | DB: {localIdols[i].Name} of {localIdols[i].GroupName}");
+                    }
+
+                    count++;
+                    await idolService.UpdateIdolDetailsAsync(localIdols[i], data, additional);
+                }
+                logger.Log($"Updated {count} idol's details.");
+                logger.Log("Update Bias Data Logic ended!");
+            }
+            catch (Exception ex)
+            {
+                logger.Error("CoreLogic.cs UpdateExtendedBiasData", ex.ToString());
+            }
+        }
+
+        private async Task<List<ExtendedBiasData>> GetBiasWebDataAsync()
         {
             List<ExtendedBiasData> biasDataList = [];
             try
@@ -45,7 +105,61 @@ namespace Discord_Bot.Services
             return biasDataList;
         }
 
-        private async Task<List<ExtendedBiasData>> ExtractFromDatabaseTable(IPage page)
+        private async Task<AdditionalIdolData> GetAdditionalBiasDataAsync(string url, bool getGroupData)
+        {
+            AdditionalIdolData idolData = null;
+            try
+            {
+                if (BrowserService.Browser == null || BrowserService.Browser.IsClosed)
+                {
+                    await BrowserService.OpenBroser();
+                }
+
+                IPage mainPage = await BrowserService.CreateNewPage();
+
+                idolData = await GetProfileDataAsync(mainPage, url, getGroupData);
+
+                await mainPage.CloseAsync();
+            }
+            catch (NavigationException ex)
+            {
+                logger.Warning("BiasDatabaseService.cs GetAdditionalBiasDataAsync", ex.ToString());
+            }
+            catch (Exception ex)
+            {
+                logger.Error("BiasDatabaseService.cs GetAdditionalBiasDataAsync", ex.ToString());
+            }
+            return idolData;
+        }
+        #endregion
+
+        #region Helper
+        private static string GetProfileUrl(IdolResource resource, List<ExtendedBiasData> completeList, out ExtendedBiasData data)
+        {
+            string profileUrl = "";
+            data = null;
+            if (!string.IsNullOrEmpty(resource.ProfileUrl))
+            {
+                profileUrl = resource.ProfileUrl;
+            }
+            else
+            {
+                List<ExtendedBiasData> datas = completeList.Where(x => x.StageName.Equals(resource.Name, StringComparison.OrdinalIgnoreCase)).ToList();
+                if (datas.Count > 1)
+                {
+                    data = datas.FirstOrDefault(x => x.GroupName.RemoveSpecialCharacters().Equals(resource.GroupName, StringComparison.OrdinalIgnoreCase) ||
+                                                    (resource.GroupName == "soloist" && string.IsNullOrEmpty(x.GroupName)));
+                }
+                else if (datas.Count == 1)
+                {
+                    data = datas[0];
+                }
+                profileUrl = data?.ProfileUrl;
+            }
+            return profileUrl;
+        }
+
+        private static async Task<List<ExtendedBiasData>> ExtractFromDatabaseTable(IPage page)
         {
             Uri uri = new(BaseUrl);
             IDocument document = await GetFullList(page, uri);
@@ -63,7 +177,7 @@ namespace Discord_Bot.Services
             return biasDataList;
         }
 
-        private async Task<IDocument> GetFullList(IPage page, Uri uri)
+        private static async Task<IDocument> GetFullList(IPage page, Uri uri)
         {
             await page.DeleteCookieAsync();
             try
@@ -90,37 +204,8 @@ namespace Discord_Bot.Services
             IDocument document = await context.OpenAsync(req => req.Content(content));
             return document;
         }
-        #endregion
 
-        #region Bias Profile methods
-        public async Task<AdditionalIdolData> GetAdditionalBiasDataAsync(string url, bool getGroupData)
-        {
-            AdditionalIdolData idolData = null;
-            try
-            {
-                if (BrowserService.Browser == null || BrowserService.Browser.IsClosed)
-                {
-                    await BrowserService.OpenBroser();
-                }
-
-                IPage mainPage = await BrowserService.CreateNewPage();
-
-                idolData = await GetProfileDataAsync(mainPage, url, getGroupData);
-
-                await mainPage.CloseAsync();
-            }
-            catch (NavigationException ex)
-            {
-                logger.Warning("BiasDatabaseService.cs GetAdditionalBiasDataAsync", ex.ToString());
-            }
-            catch (Exception ex)
-            {
-                logger.Error("BiasDatabaseService.cs GetAdditionalBiasDataAsync", ex.ToString());
-            }
-            return idolData;
-        }
-
-        private async Task<AdditionalIdolData> GetProfileDataAsync(IPage page, string url, bool getGroupData)
+        private static async Task<AdditionalIdolData> GetProfileDataAsync(IPage page, string url, bool getGroupData)
         {
             Uri uri = new(url);
             IDocument document = await GetPageByUrl(page, uri);
@@ -129,7 +214,7 @@ namespace Discord_Bot.Services
             AdditionalIdolData data = new();
             if (!url.StartsWith("https://kprofiles.com/"))
             {
-                data.ImageUrl = document.QuerySelector(".attachment-post-thumbnail").GetAttribute("src");
+                data.ImageUrl = document.QuerySelector(".attachment-post-thumbnail")?.GetAttribute("src");
                 await GetGroupData(data, page, document, getGroupData);
             }
             else
@@ -140,7 +225,7 @@ namespace Discord_Bot.Services
             return data;
         }
 
-        private async Task GetGroupData(AdditionalIdolData data, IPage page, IDocument document, bool getGroupData)
+        private static async Task GetGroupData(AdditionalIdolData data, IPage page, IDocument document, bool getGroupData)
         {
             IHtmlCollection<IElement> groups = document.QuerySelectorAll("li>a[href*=\"https://dbkpop.com/group\"]");
             string groupUrl = "";
@@ -163,7 +248,7 @@ namespace Discord_Bot.Services
             }
         }
 
-        private async Task<IDocument> GetPageByUrl(IPage page, Uri uri)
+        private static async Task<IDocument> GetPageByUrl(IPage page, Uri uri)
         {
             await page.DeleteCookieAsync();
             try

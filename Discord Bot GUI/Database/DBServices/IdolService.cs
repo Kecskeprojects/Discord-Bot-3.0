@@ -285,9 +285,9 @@ namespace Discord_Bot.Database.DBServices
                 if (idol.Group.DebutDate == null && additional != null)
                 {
                     mapper.Map(additional, idol.Group);
-                }
 
-                idol.IdolImages.Add(new IdolImage() { ImageUrl = additional.ImageUrl });
+                    idol.IdolImages.Add(new IdolImage() { ImageUrl = additional.ImageUrl });
+                }
 
                 await idolRepository.UpdateIdolAsync(idol);
             }

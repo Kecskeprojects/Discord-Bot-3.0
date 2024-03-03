@@ -170,6 +170,26 @@ namespace Discord_Bot.Services
             }
         }
 
+        private static List<Uri> GetImages(IElement main)
+        {
+            //Getting the Images, if there are any
+            List<Uri> currImages = [];
+            foreach (IElement element in main.QuerySelectorAll("a"))
+            {
+                IElement img = element.QuerySelector("img");
+                if (img != null)
+                {
+                    Uri newUri = new(img.GetAttribute("src"));
+                    if (newUri.Segments[1] == "media/")
+                    {
+                        currImages.Add(new Uri(img.GetAttribute("src")));
+                    }
+                }
+            }
+
+            return currImages;
+        }
+
         private async Task<IDocument> OpenPage(IPage page, Uri uri)
         {
             await page.DeleteCookieAsync();
@@ -194,48 +214,6 @@ namespace Discord_Bot.Services
             IBrowsingContext context = BrowsingContext.New(Configuration.Default);
             IDocument document = await context.OpenAsync(req => req.Content(content));
             return document;
-        }
-
-        private void GetVideos(IElement main, IHtmlCollection<IElement> articles, int mainPos, ref int videosBeforeMainCount, ref int videoCount)
-        {
-            //We also search for Videos in the post
-            videoCount = main.QuerySelectorAll("div[data-testid]").Where(e => e.GetAttribute("data-testid") == "videoPlayer").Count();
-
-            //Checking any articles before main post
-            for (int i = 0; i < mainPos; i++)
-            {
-                int tempCount = articles[i].QuerySelectorAll("div[data-testid]").Where(e => e.GetAttribute("data-testid") == "videoPlayer").Count();
-                videosBeforeMainCount += tempCount;
-            }
-
-            //As the video links are caught in the TwitterScraper_Response event handler,
-            //the only way to verify if we got them all is to wait until the right amount of links are stored in the list
-            int count = 0;
-            while (TempVideos.Count < videoCount + videosBeforeMainCount && count < 10)
-            {
-                Task.Delay(500).Wait();
-                count++;
-            }
-        }
-
-        private static List<Uri> GetImages(IElement main)
-        {
-            //Getting the Images, if there are any
-            List<Uri> currImages = [];
-            foreach (IElement element in main.QuerySelectorAll("a"))
-            {
-                IElement img = element.QuerySelector("img");
-                if (img != null)
-                {
-                    Uri newUri = new(img.GetAttribute("src"));
-                    if (newUri.Segments[1] == "media/")
-                    {
-                        currImages.Add(new Uri(img.GetAttribute("src")));
-                    }
-                }
-            }
-
-            return currImages;
         }
 
         private async void TwitterScraperResponse(object sender, ResponseCreatedEventArgs e)
