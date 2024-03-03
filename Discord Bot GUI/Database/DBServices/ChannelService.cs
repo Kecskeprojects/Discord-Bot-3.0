@@ -49,7 +49,7 @@ namespace Discord_Bot.Database.DBServices
                     {
                         ChannelId = 0,
                         Server = server,
-                        ChannelTypes = new List<ChannelType>() { channelType },
+                        ChannelTypes = [channelType],
                         DiscordId = channelId.ToString()
                     };
                     await channelRepository.AddChannelAsync(channel);

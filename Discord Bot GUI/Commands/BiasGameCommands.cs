@@ -43,8 +43,8 @@ namespace Discord_Bot.Commands
                 file = new(Global.GetStream("https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg"), $"img2.jpg");
                 mainEmbed.WithImageUrl($"attachment://img2.jpg");
 
-                await message.ModifyAsync(x => 
-                { 
+                await message.ModifyAsync(x =>
+                {
                     x.Attachments = new[] { file };
                     x.Embed = mainEmbed.Build();
                 });
