@@ -17,7 +17,7 @@ namespace Discord_Bot.Communication
             DateOfBirth = DateOnly.TryParseExact(dateString, "yyyy-MM-dd", out DateOnly date) ? date : null;
             GroupName = row.QuerySelector(".column-grp").InnerHtml.Trim();
             string gender = row.QuerySelector(".column-gender").InnerHtml.Trim();
-            Gender = gender == GenderType.Male.Value ? GenderType.Male : gender == GenderType.Female.Value ? GenderType.Female : null;
+            Gender = gender == GenderType.Male ? GenderType.Male : gender == GenderType.Female ? GenderType.Female : null;
         }
 
         public string ProfileUrl { get; private set; }

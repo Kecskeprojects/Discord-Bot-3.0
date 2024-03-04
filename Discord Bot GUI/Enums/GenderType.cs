@@ -2,6 +2,13 @@
 {
     public class GenderType
     {
+        public static implicit operator string(GenderType en)
+        {
+            return en.Value;
+        }
+
+        public override string ToString() { return Value; }
+
         private GenderType(string value)
         {
             Value = value;

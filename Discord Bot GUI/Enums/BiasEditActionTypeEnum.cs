@@ -1,13 +1,15 @@
 ﻿namespace Discord_Bot.Enums
 {
-    public class BiasEditActionTypeEnum
+    public class BiasEditActionTypeEnum(string value)
     {
-        public BiasEditActionTypeEnum(string value)
+        public static implicit operator string(BiasEditActionTypeEnum en)
         {
-            Value = value;
+            return en.Value;
         }
 
-        public string Value { get; private set; }
+        public override string ToString() { return Value; }
+
+        public string Value { get; private set; } = value;
 
         public static BiasEditActionTypeEnum EditGroup => new("editgroup");
         public static BiasEditActionTypeEnum EditIdol => new("editidol");
