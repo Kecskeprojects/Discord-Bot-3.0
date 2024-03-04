@@ -1,4 +1,5 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Enums;
@@ -93,6 +94,52 @@ namespace Discord_Bot.Commands
             catch (Exception ex)
             {
                 logger.Error("BiasOwnerCommands.cs ManualUpdateBias", ex.ToString());
+            }
+        }
+
+        [Command("edit biasdata")]
+        [RequireOwner]
+        [Summary("Edit bias related data")]
+        public async Task EditBiasData([Remainder] string biasData)
+        {
+            try
+            {
+                //Make the name lowercase and clear and accidental spaces
+                string biasName = "";
+                string biasGroup = "";
+
+                if (biasData.Contains('-'))
+                {
+                    biasName = biasData.ToLower().Split('-')[0].Trim();
+                    biasGroup = biasData.ToLower().Split('-')[1].Trim();
+                }
+                else
+                {
+                    biasName = biasData.ToLower().Trim();
+                }
+
+                if (biasData.Split("-").Length > 2 || string.IsNullOrWhiteSpace(biasName) || string.IsNullOrWhiteSpace(biasGroup))
+                {
+                    return;
+                }
+
+                SelectMenuBuilder menuBuilder = new SelectMenuBuilder()
+                    .WithPlaceholder("Select edit type")
+                    .WithCustomId("editIdolData")
+                    .AddOption("Edit Group", $"{BiasEditActionTypeEnum.EditGroup};{biasName};{biasGroup}", "Edit group currently related to idol")
+                    .AddOption("Edit Idol", $"{BiasEditActionTypeEnum.EditIdol};{biasName};{biasGroup}", "Edit idol in question")
+                    .AddOption("Change Group", $"{BiasEditActionTypeEnum.ChangeGroup};{biasName};{biasGroup}", "Change the group the idol belongs to")
+                    .AddOption("Change Profile Link", $"{BiasEditActionTypeEnum.ChangeProfileLink};{biasName};{biasGroup}", "Edit idol's profile page link")
+                    .AddOption("Remove Images", $"{BiasEditActionTypeEnum.RemoveImage};{biasName};{biasGroup}", "Remove all images stored for idol");
+
+                ComponentBuilder builder = new();
+                builder.WithSelectMenu(menuBuilder);
+
+                await ReplyAsync("What action would you like to perform", components: builder.Build());
+            }
+            catch (Exception ex)
+            {
+                logger.Error("BiasOwnerCommands.cs EditIdolData", ex.ToString());
             }
         }
 
