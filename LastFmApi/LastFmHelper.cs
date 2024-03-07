@@ -5,7 +5,7 @@
         #region Input checks
         public static void LastfmParameterCheck(ref string[] parameters, bool defaultLimitTo10 = true)
         {
-            string[] outarray = ["", ""]; ;
+            string[] outarray;
 
             switch (parameters.Length)
             {
