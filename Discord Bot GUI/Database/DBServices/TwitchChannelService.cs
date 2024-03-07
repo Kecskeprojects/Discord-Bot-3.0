@@ -36,7 +36,7 @@ namespace Discord_Bot.Database.DBServices
                     DiscordId = roleId.ToString(),
                     RoleName = roleName,
                     Server = server,
-                    Servers = new List<Server>()
+                    Servers = []
                 };
 
                 if (role.RoleId == server.NotificationRoleId)
