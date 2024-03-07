@@ -374,7 +374,7 @@ namespace Discord_Bot
                     //Make embed independently from main thread
                     if (config.Enable_Instagram_Embed)
                     {
-                        coreLogic.InstagramEmbed(context.Message.Content, context.Message.Id, context.Channel.Id, context.Guild == null ? context.Guild.Id : null);
+                        coreLogic.InstagramEmbed(context.Message.Content, context.Message.Id, context.Channel.Id, context.Guild != null ? context.Guild.Id : null);
                     }
                 }
             }

@@ -29,8 +29,8 @@ namespace Discord_Bot.Core
         //Check if server has a type of channel, and if yes, is it on the list
         public static bool IsTypeOfChannel(ServerResource server, ChannelTypeEnum type, ulong channelId, bool allowLackOfType = true)
         {
-            return !server.SettingsChannels.TryGetValue(type, out List<ulong> value) ?
-                        allowLackOfType : value.Contains(channelId);
+            return server == null || (!server.SettingsChannels.TryGetValue(type, out List<ulong> value) ?
+                        allowLackOfType : value.Contains(channelId));
         }
 
         public static Stream GetStream(string url)
