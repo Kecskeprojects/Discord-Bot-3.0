@@ -129,7 +129,7 @@ namespace Discord_Bot.Database.DBServices
                     mapper.Map(data, idol);
                 }
 
-                if(additional != null)
+                if (additional != null)
                 {
                     idol.DebutDate = additional.DebutDate;
                     idol.IdolImages.Add(new IdolImage() { ImageUrl = additional.ImageUrl });
@@ -155,7 +155,7 @@ namespace Discord_Bot.Database.DBServices
             {
                 Idol idol = await idolRepository.GetIdolByNameAndGroupAsync(idolName, idolGroup);
 
-                if(idol == null)
+                if (idol == null)
                 {
                     return resource;
                 }

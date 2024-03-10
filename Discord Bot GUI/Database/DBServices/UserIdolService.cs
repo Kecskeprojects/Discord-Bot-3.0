@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Discord_Bot.Core.Caching;
 using Discord_Bot.Core;
+using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBRepositories;
