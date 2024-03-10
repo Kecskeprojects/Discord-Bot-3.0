@@ -74,6 +74,7 @@ namespace Discord_Bot.Core
             collection.AddTransient<IMusicBrainzAPI, MusicBrainzAPI>();
             collection.AddTransient<ITwitterScraper, TwitterScraper>();
             collection.AddTransient<IBiasDatabaseService, BiasDatabaseService>();
+            collection.AddTransient<IKpopDbScraper, KpopDbScraper>();
 
             //Database Services
             collection.AddTransient<IServerService, ServerService>();
