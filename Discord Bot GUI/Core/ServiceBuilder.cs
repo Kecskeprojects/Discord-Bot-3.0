@@ -88,6 +88,8 @@ namespace Discord_Bot.Core
             collection.AddTransient<IIdolService, IdolService>();
             collection.AddTransient<IUserService, UserService>();
             collection.AddTransient<IIdolAliasService, IdolAliasService>();
+            collection.AddTransient<IIdolGroupService, IdolGroupService>();
+            collection.AddTransient<IUserIdolService, UserIdolService>();
 
             //Database Repositories
             collection.AddScoped<IServerRepository, ServerRepository>();

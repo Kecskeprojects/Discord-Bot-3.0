@@ -1,6 +1,4 @@
-﻿using Discord_Bot.Enums;
-
-namespace Discord_Bot.Communication
+﻿namespace Discord_Bot.Communication
 {
     public class BiasEditData
     {
@@ -8,12 +6,12 @@ namespace Discord_Bot.Communication
         {
             string[] parts = data.Split(';');
 
-            Action = new BiasEditActionTypeEnum(parts[0]);
+            Action = parts[0];
             BiasName = parts[1];
             BiasGroupName = parts[2];
         }
 
-        public BiasEditActionTypeEnum Action { get; private set; }
+        public string Action { get; private set; }
         public string BiasName { get; private set; }
         public string BiasGroupName { get; private set; }
     }

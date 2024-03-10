@@ -62,6 +62,7 @@ namespace Discord_Bot.Core
                 .ForMember(dest => dest.FullKoreanName, opt => opt.MapFrom(e => e.GroupFullKoreanName))
                 .ForMember(dest => dest.DebutDate, opt => opt.MapFrom(e => e.DebutDate))
                 .ForMember(dest => dest.ModifiedOn, opt => opt.MapFrom(x => DateTime.UtcNow));
+            CreateMap<Idol, IdolExtendedResource>();
         }
     }
 }

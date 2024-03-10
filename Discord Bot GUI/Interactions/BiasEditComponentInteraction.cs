@@ -4,22 +4,29 @@ using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Resources;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions
 {
-    public class BiasEditComponentInteraction(Logging logger, Config config) : BaseInteraction(logger, config)
+    public class BiasEditComponentInteraction : BaseInteraction
     {
-        private static Dictionary<BiasEditActionTypeEnum, Func<SocketInteractionContext, string, string, Task>> Actions {get; } = new()
+        private readonly IIdolService idolService;
+
+        private Dictionary<string, Func<string, string, Task>> Actions { get; } = [];
+
+        public BiasEditComponentInteraction(IIdolService idolService, Logging logger, Config config) : base(logger, config)
         {
-            { BiasEditActionTypeEnum.EditIdol, CreateEditIdolModalAsync },
-            { BiasEditActionTypeEnum.EditGroup, CreateEditGroupModalAsync },
-            { BiasEditActionTypeEnum.ChangeProfileLink, CreateChangeProfileLinkModalAsync },
-            { BiasEditActionTypeEnum.ChangeGroup, CreateChangeGroupModalAsync },
-            { BiasEditActionTypeEnum.RemoveImage, RemoveImageAsync }
-        };
+            Actions.Add(BiasEditActionTypeEnum.EditIdol, CreateEditIdolModalAsync);
+            Actions.Add(BiasEditActionTypeEnum.EditGroup, CreateEditGroupModalAsync);
+            Actions.Add(BiasEditActionTypeEnum.ChangeProfileLink, CreateChangeProfileLinkModalAsync);
+            Actions.Add(BiasEditActionTypeEnum.ChangeGroup, CreateChangeGroupModalAsync);
+            Actions.Add(BiasEditActionTypeEnum.RemoveImage, RemoveImageAsync);
+            this.idolService = idolService;
+        }
 
         [ComponentInteraction("editIdolData")]
         public async Task EditIdolMenuHandler(string[] selectedAction)
@@ -30,10 +37,10 @@ namespace Discord_Bot.Interactions
 
                 BiasEditData data = new(selectedAction[0]);
 
-                if (Actions.TryGetValue(data.Action, out Func<SocketInteractionContext, string, string, Task> value))
+                if (Actions.TryGetValue(data.Action, out Func<string, string, Task> value))
                 {
                     //To streamline the process we use a dictionary instead of a switch
-                    await value.Invoke(Context, data.BiasName, data.BiasGroupName);
+                    await value.Invoke(data.BiasName, data.BiasGroupName);
                     return;
                 }
 
@@ -51,28 +58,42 @@ namespace Discord_Bot.Interactions
         //the other two will bring up modals to edit the idol's data, including which group they belong to, a new group name will result in an entirely new group item being created,
         //and another to edit the idol's current group's data, if the group is reassigned either way, all their extended data will be removed to get the entirely new data from the web
         //if possible the modal fields should show the current data, if any
+        private async Task CreateEditIdolModalAsync(string idol, string group)
+        {
+            IdolExtendedResource resource = await idolService.GetIdolDetailsAsync(idol, group);
 
-        private static async Task CreateEditIdolModalAsync(SocketInteractionContext context, string idol, string group)
+            ModalBuilder mb = new ModalBuilder()
+                .WithTitle("Edit Idol")
+                .WithCustomId("editIdolModal")
+                .AddTextInput("Profile URL", "profileurl", placeholder: resource.ProfileUrl, maxLength: 200, required: true)
+                .AddTextInput("Name", "name", placeholder: resource.Name, maxLength: 100, required: true)
+                .AddTextInput("Group", "group", placeholder: resource.GroupName, maxLength: 100, required: true)
+                .AddTextInput("Stage Name", "stagename", placeholder: resource.StageName, maxLength: 100)
+                .AddTextInput("Full Name", "fullname", placeholder: resource.StageName, maxLength: 100)
+                .AddTextInput("Korean Stage Name", "koreanstagename", placeholder: resource.KoreanStageName, maxLength: 100)
+                .AddTextInput("Korean Full name", "koreanfullname", placeholder: resource.KoreanFullName, maxLength: 100)
+                .AddTextInput("Date Of Birth", "dateofbirth", placeholder: resource.DateOfBirth.ToString())
+                .AddTextInput("Gender", "gender", placeholder: resource.Gender, maxLength: 10);
+
+            await Context.Interaction.RespondWithModalAsync(mb.Build());
+        }
+
+        private async Task CreateEditGroupModalAsync(string idol, string group)
         {
             throw new NotImplementedException();
         }
 
-        private static async Task CreateEditGroupModalAsync(SocketInteractionContext context, string idol, string group)
+        private async Task CreateChangeProfileLinkModalAsync(string idol, string group)
         {
             throw new NotImplementedException();
         }
 
-        private static async Task CreateChangeProfileLinkModalAsync(SocketInteractionContext context, string idol, string group)
+        private async Task CreateChangeGroupModalAsync(string idol, string group)
         {
             throw new NotImplementedException();
         }
 
-        private static async Task CreateChangeGroupModalAsync(SocketInteractionContext context, string idol, string group)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static async Task RemoveImageAsync(SocketInteractionContext context, string idol, string group)
+        private async Task RemoveImageAsync(string idol, string group)
         {
             throw new NotImplementedException();
         }

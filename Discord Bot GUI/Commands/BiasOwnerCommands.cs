@@ -99,6 +99,7 @@ namespace Discord_Bot.Commands
 
         [Command("edit biasdata")]
         [RequireOwner]
+        [Alias(["editbiasdata", "edit bias data"])]
         [Summary("Edit bias related data")]
         public async Task EditBiasData([Remainder] string biasData)
         {

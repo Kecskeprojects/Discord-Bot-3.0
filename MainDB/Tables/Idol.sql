@@ -12,6 +12,7 @@
     [Gender] VARCHAR(10) NULL, 
     [CreatedOn] DATETIME NOT NULL DEFAULT GETDATE(), 
     [ModifiedOn] DATETIME NOT NULL DEFAULT GETDATE(), 
+    [DebutDate] DATE NULL, 
     CONSTRAINT [FK_Idol_IdolGroup] FOREIGN KEY ([GroupId]) REFERENCES [IdolGroup]([GroupId]) ON DELETE CASCADE,
     CONSTRAINT [PK_IdolId] PRIMARY KEY ([IdolId])
 )

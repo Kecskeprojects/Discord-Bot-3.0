@@ -29,6 +29,8 @@ public partial class Idol
 
     public DateTime ModifiedOn { get; set; }
 
+    public DateOnly? DebutDate { get; set; }
+
     public virtual IdolGroup Group { get; set; }
 
     public virtual ICollection<IdolAlias> IdolAliases { get; set; } = new List<IdolAlias>();
