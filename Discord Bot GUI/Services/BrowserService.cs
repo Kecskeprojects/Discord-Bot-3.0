@@ -10,7 +10,7 @@ namespace Discord_Bot.Services
         public static async Task OpenBroser()
         {
             BrowserFetcher browserFetcher = new(SupportedBrowser.Chrome);
-            await browserFetcher.DownloadAsync("117.0.5938.62"); //Todo: PuppeteerSharp.BrowserData.Chrome.DefaultBuildId should be revisited in future, new builds remove option to download the way it is currently done
+            await browserFetcher.DownloadAsync(PuppeteerSharp.BrowserData.Chrome.DefaultBuildId); //117.0.5938.62 is the last version where videos were sent as media http responses
             IBrowser browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
                 Headless = true,
@@ -24,7 +24,8 @@ namespace Discord_Bot.Services
                     "--disable-features=BlockInsecurePrivateNetworkRequests",
                     "--ignore-certificate-errors"
                 ],
-                ExecutablePath = "Chrome\\Win64-117.0.5938.62\\chrome-win64\\chrome.exe"
+                //HeadlessMode = HeadlessMode.Shell
+                //ExecutablePath = "Chrome\\Win64-117.0.5938.62\\chrome-win64\\chrome.exe"
             });
             Browser = browser;
         }

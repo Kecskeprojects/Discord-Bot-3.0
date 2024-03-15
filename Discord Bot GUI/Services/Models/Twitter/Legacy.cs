@@ -77,6 +77,9 @@ namespace Discord_Bot.Services.Models.Twitter
         [JsonProperty("translator_type")]
         public string TranslatorType { get; set; }
 
+        [JsonProperty("url")]
+        public string Url { get; set; }
+
         [JsonProperty("verified")]
         public bool Verified { get; set; }
 
@@ -133,5 +136,11 @@ namespace Discord_Bot.Services.Models.Twitter
 
         [JsonProperty("id_str")]
         public string IdStr { get; set; }
+
+        [JsonProperty("quoted_status_id_str")]
+        public string QuotedStatusIdStr { get; set; }
+
+        [JsonProperty("quoted_status_permalink")]
+        public QuotedStatusPermalink QuotedStatusPermalink { get; set; }
     }
 }

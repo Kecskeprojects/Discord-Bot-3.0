@@ -28,6 +28,9 @@ namespace Discord_Bot.Services.Models.Twitter
         [JsonProperty("source")]
         public string Source { get; set; }
 
+        [JsonProperty("quoted_status_result")]
+        public QuotedStatusResult QuotedStatusResult { get; set; }
+
         [JsonProperty("legacy")]
         public Legacy Legacy { get; set; }
 
@@ -48,5 +51,8 @@ namespace Discord_Bot.Services.Models.Twitter
 
         [JsonProperty("reason")]
         public string Reason { get; set; }
+
+        [JsonProperty("media_key")]
+        public string MediaKey { get; set; }
     }
 }

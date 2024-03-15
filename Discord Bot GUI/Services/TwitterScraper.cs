@@ -49,6 +49,7 @@ namespace Discord_Bot.Services
                 string messages = "";
                 for (int i = 0; i < uris.Count; i++)
                 {
+                    ClearVariables();
                     string mess = await ExtractFromUrl(mainPage, uris[i]);
                     if (uris.Count > 1 && mess != "")
                     {
@@ -79,6 +80,13 @@ namespace Discord_Bot.Services
         #endregion
 
         #region Helper functions
+        private void ClearVariables()
+        {
+            TempVideos = [];
+            HasVideo = false;
+            SensitiveContent = false;
+        }
+
         private async Task<string> ExtractFromUrl(IPage page, Uri uri)
         {
             try
@@ -220,36 +228,61 @@ namespace Discord_Bot.Services
         {
             try
             {
+                //This logic is to be used if a fallback is needed to an older chrome version
                 //The standard video url we want is the following:
                 //https://video.twimg.com/ext_tw_video/[folder_id]/pu/vid/[width]x[height]/[video_id].mp4?tag=12
                 //https://video.twimg.com/amplify_video/[folder_id]/vid/[width]x[height]/[video_id].mp4?tag=14
                 //https://video.twimg.com/tweet_video/[video_id].mp4
-                if (e.Response.Url.StartsWith("https://video.twimg.com/") && e.Response.Url.Contains(".mp4"))
-                {
-                    Uri currUrl = new(e.Response.Url);
+                //if (e.Response.Url.StartsWith("https://video.twimg.com/") && e.Response.Url.Contains(".mp4"))
+                //{
+                //    Uri currUrl = new(e.Response.Url);
 
-                    //Links get repeatedly sent by twitter, so we only want to save one of each
-                    if (TempVideos.FirstOrDefault(x => x.Segments[2] == currUrl.Segments[2]) == null)
-                    {
-                        TempVideos.Add(currUrl);
-                    }
-                }
-                else if (e.Response.Url.Contains("TweetResultByRestId"))
+                //    //Links get repeatedly sent by twitter, so we only want to save one of each
+                //    if (TempVideos.FirstOrDefault(x => x.Segments[2] == currUrl.Segments[2]) == null)
+                //    {
+                //        TempVideos.Add(currUrl);
+                //    }
+                //}
+                //else
+                if (e.Response.Url.Contains("TweetResultByRestId"))
                 {
                     Root body = await e.Response.JsonAsync<Root>(); //Todo: investigate the possibility of using this body object to get the tweet data instead of web scraping
                     string reason = body?.Data?.TweetResult?.Result?.Reason;
-                    if (!string.IsNullOrEmpty(reason))
+                    string quoteReason = body?.Data?.TweetResult?.Result?.QuotedStatusResult?.Result?.Reason;
+                    if (!string.IsNullOrEmpty(reason) || !string.IsNullOrEmpty(quoteReason))
                     {
-                        if (reason == "NsfwLoggedOut")
+                        if (reason == "NsfwLoggedOut" || quoteReason == "NsfwLoggedOut")
                         {
                             SensitiveContent = true;
                         }
+                    }
+
+                    if (body?.Data?.TweetResult?.Result?.Legacy?.Entities?.Media?.Count > 0)
+                    {
+                        AddVideos(body?.Data?.TweetResult?.Result?.Legacy?.Entities?.Media);
+                    }
+
+                    if (body?.Data?.TweetResult?.Result?.QuotedStatusResult?.Result?.Legacy?.Entities?.Media?.Count > 0)
+                    {
+                        AddVideos(body?.Data?.TweetResult?.Result?.QuotedStatusResult?.Result?.Legacy?.Entities?.Media);
                     }
                 }
             }
             catch (Exception ex)
             {
                 Exceptions.Add(ex.Message);
+            }
+        }
+
+        private void AddVideos(List<Medium> list)
+        {
+            foreach (Medium item in list)
+            {
+                if (item.VideoInfo != null)
+                {
+                    Uri url = new(item.VideoInfo.Variants[^1].Url);
+                    TempVideos.Add(url);
+                }
             }
         }
         #endregion

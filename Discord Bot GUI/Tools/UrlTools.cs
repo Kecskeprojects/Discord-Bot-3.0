@@ -38,7 +38,17 @@ namespace Discord_Bot.Tools
 
                         string url = beginningCut.Split(whiteSpaceSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)[0];
 
-                        urls.Add(GetCleanUrl(url, ignoreEmbedSuppress));
+                        if (url.Contains('<') || url.Contains('>'))
+                        {
+                            if (!ignoreEmbedSuppress)
+                            {
+                                startIndex++;
+                                continue;
+                            }
+                            url = url.Replace("<", "").Replace(">", "");
+                        }
+
+                        urls.Add(new Uri(url.Split('?')[0]));
 
                         startIndex++;
                     }
@@ -50,14 +60,5 @@ namespace Discord_Bot.Tools
             return null;
         }
 
-        public static Uri GetCleanUrl(string url, bool ignoreEmbedSuppress = true)
-        {
-            if (!ignoreEmbedSuppress && !url.Contains('<') && !url.Contains('>'))
-            {
-                url = url.Replace("<", "").Replace(">", "");
-            }
-
-            return new Uri(url.Split('?')[0]);
-        }
     }
 }
