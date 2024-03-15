@@ -40,10 +40,10 @@ namespace Discord_Bot.Services
 
         public static async Task<IPage> CreateNewPage()
         {
-            IPage mainPage = await BrowserService.Browser.NewPageAsync();
+            IPage mainPage = await Browser.NewPageAsync();
             Dictionary<string, string> headers = new()
                 {
-                    { "user-agent", "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36" },
+                    { "user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" },
                     { "upgrade-insecure-requests", "1" },
                     { "accept", "text/html,application/xhtml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3" },
                     { "accept-encoding", "gzip, deflate, br" },
