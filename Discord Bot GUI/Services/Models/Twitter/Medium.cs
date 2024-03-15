@@ -41,7 +41,13 @@ namespace Discord_Bot.Services.Models.Twitter
         [JsonProperty("original_info")]
         public OriginalInfo OriginalInfo { get; set; }
 
+        [JsonProperty("allow_download_status")]
+        public AllowDownloadStatus AllowDownloadStatus { get; set; }
+
         [JsonProperty("video_info")]
         public VideoInfo VideoInfo { get; set; }
+
+        [JsonProperty("media_results")]
+        public MediaResults MediaResults { get; set; }
     }
 }
