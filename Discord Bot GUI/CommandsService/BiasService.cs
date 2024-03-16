@@ -72,7 +72,7 @@ namespace Discord_Bot.CommandsService
                     //Make a selector out of all the groups and their members
                     SelectMenuBuilder menuBuilder = new SelectMenuBuilder()
                     .WithPlaceholder("Select a group")
-                    .WithCustomId($"biasMenu_{selectCount + 1}");
+                    .WithCustomId($"BiasMenu_{selectCount + 1}");
 
                     for (int i = 25 * selectCount; i < remaininglistCount; i++)
                     {

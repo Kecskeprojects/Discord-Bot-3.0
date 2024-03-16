@@ -22,6 +22,8 @@ namespace Discord_Bot.Resources
 
         public DateOnly? DateOfBirth { get; set; }
 
+        public DateOnly? DebutDate { get; set; }
+
         public string Gender { get; set; }
     }
 }

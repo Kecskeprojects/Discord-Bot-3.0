@@ -16,5 +16,6 @@
         public static BiasEditActionTypeEnum ChangeGroup => new("changegroup");
         public static BiasEditActionTypeEnum ChangeProfileLink => new("changeprofilelink");
         public static BiasEditActionTypeEnum RemoveImage => new("removeimage");
+        public static BiasEditActionTypeEnum EditIdolExtended => new("editidolextended");
     }
 }

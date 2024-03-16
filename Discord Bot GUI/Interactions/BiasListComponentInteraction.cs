@@ -14,7 +14,7 @@ namespace Discord_Bot.Interactions
         private readonly IUserIdolService userIdolService = userIdolService;
         private readonly IIdolService idolService = idolService;
 
-        [ComponentInteraction("biasMenu_*")]
+        [ComponentInteraction("BiasMenu_*")]
         public async Task IdolMenuHandler(int count, string[] selectedIdolGroups)
         {
             try

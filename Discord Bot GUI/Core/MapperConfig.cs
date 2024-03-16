@@ -63,6 +63,7 @@ namespace Discord_Bot.Core
                 .ForMember(dest => dest.DebutDate, opt => opt.MapFrom(e => e.DebutDate))
                 .ForMember(dest => dest.ModifiedOn, opt => opt.MapFrom(x => DateTime.UtcNow));
             CreateMap<Idol, IdolExtendedResource>();
+            CreateMap<IdolGroup, IdolGroupExtendedResource>();
         }
     }
 }
