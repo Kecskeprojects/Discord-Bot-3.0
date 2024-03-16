@@ -1,0 +1,8 @@
+# top-most EditorConfig file
+root = true
+
+[/Models/**]
+generated_code = true
+
+[MainDbContext.cs]
+generated_code = true

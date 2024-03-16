@@ -1,12 +1,12 @@
-﻿using AngleSharp.Dom;
-using AngleSharp;
+﻿using AngleSharp;
+using AngleSharp.Dom;
 using Discord_Bot.Communication;
+using Discord_Bot.Interfaces.Services;
 using PuppeteerSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord_Bot.Interfaces.Services;
 
 namespace Discord_Bot.Services
 {

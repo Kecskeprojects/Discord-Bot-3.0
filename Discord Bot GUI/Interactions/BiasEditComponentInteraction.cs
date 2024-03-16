@@ -60,7 +60,7 @@ namespace Discord_Bot.Interactions
         private async Task CreateEditIdolModalAsync(string idol, string group)
         {
             IdolExtendedResource resource = await idolService.GetIdolDetailsAsync(idol, group);
-            
+
             ModalBuilder mb = new ModalBuilder()
                 .WithTitle("Edit Idol")
                 .WithCustomId("EditIdolModal")
@@ -132,11 +132,11 @@ namespace Discord_Bot.Interactions
         {
             DbProcessResultEnum result = await idolImageService.RemoveIdolImagesAsync(idol, group);
 
-            if(result == DbProcessResultEnum.Success)
+            if (result == DbProcessResultEnum.Success)
             {
                 await ReplyAsync("Images removed successfully!");
             }
-            else if(result == DbProcessResultEnum.NotFound)
+            else if (result == DbProcessResultEnum.NotFound)
             {
                 await ReplyAsync("Idol could not be found.");
             }
