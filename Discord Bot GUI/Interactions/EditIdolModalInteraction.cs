@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
+using Discord_Bot.Database.Models;
 using System;
 using System.Threading.Tasks;
 
@@ -21,6 +22,8 @@ namespace Discord_Bot.Interactions
         {
             try
             {
+                logger.Log($"Edit Idol Modal Submitted for idol with ID {idolId}", LogOnly: true);
+
                 await RespondAsync("Edit successful");
             }
             catch (Exception ex)
@@ -34,6 +37,8 @@ namespace Discord_Bot.Interactions
         {
             try
             {
+                logger.Log($"Edit Idol Extended Modal Submitted for idol with ID {idolId}", LogOnly: true);
+
                 await RespondAsync("Edit successful");
             }
             catch (Exception ex)
@@ -47,6 +52,8 @@ namespace Discord_Bot.Interactions
         {
             try
             {
+                logger.Log($"Edit Group Modal Submitted for group with ID {groupId}", LogOnly: true);
+
                 await RespondAsync("Edit successful");
             }
             catch (Exception ex)
@@ -60,6 +67,8 @@ namespace Discord_Bot.Interactions
         {
             try
             {
+                logger.Log($"Change Idol Profile Link Modal Submitted for idol with ID {idolId}", LogOnly: true);
+
                 await RespondAsync("Edit successful");
             }
             catch (Exception ex)
@@ -73,6 +82,8 @@ namespace Discord_Bot.Interactions
         {
             try
             {
+                logger.Log($"Change Idol Group Modal Submitted for idol with ID {idolId}", LogOnly: true);
+
                 await RespondAsync("Edit successful");
             }
             catch (Exception ex)
