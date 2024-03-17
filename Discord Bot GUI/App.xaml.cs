@@ -388,7 +388,7 @@ namespace Discord_Bot
                     }
                 default:
                     {
-                        logger.Warning("App.xaml.cs HandleCommandAsync", result.ErrorReason);
+                        logger.Warning("App.xaml.cs HandleCommandExecutionAsync", result.ErrorReason);
                         break;
                     }
             }
@@ -416,7 +416,7 @@ namespace Discord_Bot
                     break;
                 default:
                     {
-                        logger.Warning("App.xaml.cs HandleCommandAsync", result.ErrorReason);
+                        logger.Warning("App.xaml.cs HandleInteractionExecutionAsync", result.ErrorReason);
                         break;
                     }
             }
