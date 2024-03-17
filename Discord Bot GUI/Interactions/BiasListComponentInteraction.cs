@@ -53,7 +53,7 @@ namespace Discord_Bot.Interactions
                     message += $"`{member.Name.ToUpper()}`";
                 }
 
-                await Context.Interaction.RespondAsync(message);
+                await RespondAsync(message);
             }
             catch (Exception ex)
             {

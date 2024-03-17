@@ -50,7 +50,7 @@ namespace Discord_Bot.Interactions
                     return;
                 }
 
-                await Context.Interaction.RespondAsync("Something went wrong during the process.");
+                await RespondAsync("Something went wrong during the process.");
             }
             catch (Exception ex)
             {
@@ -69,7 +69,7 @@ namespace Discord_Bot.Interactions
                 .UpdateTextInput("dateofbirth", resource.DateOfBirth.ToString())
                 .UpdateTextInput("gender", resource.Gender);
 
-            await Context.Interaction.RespondWithModalAsync<EditIdolModal>($"EditIdolModal_{resource.IdolId}", modifyModal: Modify);
+            await RespondWithModalAsync<EditIdolModal>($"EditIdolModal_{resource.IdolId}", modifyModal: Modify);
         }
 
         private async Task CreateEditIdolExtendedModalAsync(string idol, string group)
@@ -83,7 +83,7 @@ namespace Discord_Bot.Interactions
                 .UpdateTextInput("koreanfullname", resource.KoreanFullName)
                 .UpdateTextInput("debutdate", resource.DebutDate.ToString());
 
-            await Context.Interaction.RespondWithModalAsync<EditIdolExtendedModal>($"EditIdolExtendedModal_{resource.IdolId}", modifyModal: Modify);
+            await RespondWithModalAsync<EditIdolExtendedModal>($"EditIdolExtendedModal_{resource.IdolId}", modifyModal: Modify);
         }
 
         private async Task CreateEditGroupModalAsync(string idol, string group)
@@ -96,7 +96,7 @@ namespace Discord_Bot.Interactions
                 .UpdateTextInput("fullkoreanname", resource.FullKoreanName)
                 .UpdateTextInput("debutdate", resource.DebutDate.ToString());
 
-            await Context.Interaction.RespondWithModalAsync<EditGroupModal>($"EditGroupModal_{resource.GroupId}", modifyModal: Modify);
+            await RespondWithModalAsync<EditGroupModal>($"EditGroupModal_{resource.GroupId}", modifyModal: Modify);
         }
 
         private async Task CreateChangeProfileLinkModalAsync(string idol, string group)
@@ -106,7 +106,7 @@ namespace Discord_Bot.Interactions
             void Modify(ModalBuilder builder) => builder
                 .UpdateTextInput("profileurl", resource.ProfileUrl);
 
-            await Context.Interaction.RespondWithModalAsync<ChangeIdolProfileLinkModal>($"ChangeIdolProfileLinkModal_{resource.IdolId}", modifyModal: Modify);
+            await RespondWithModalAsync<ChangeIdolProfileLinkModal>($"ChangeIdolProfileLinkModal_{resource.IdolId}", modifyModal: Modify);
         }
 
         private async Task CreateChangeGroupModalAsync(string idol, string group)
@@ -116,7 +116,7 @@ namespace Discord_Bot.Interactions
             void Modify(ModalBuilder builder) => builder
                 .UpdateTextInput("group", resource.GroupName);
 
-            await Context.Interaction.RespondWithModalAsync<ChangeIdolGroupModal>($"ChangeIdolGroupModal_{resource.IdolId}", modifyModal: Modify);
+            await RespondWithModalAsync<ChangeIdolGroupModal>($"ChangeIdolGroupModal_{resource.IdolId}", modifyModal: Modify);
         }
 
         private async Task RemoveImageAsync(string idol, string group)
@@ -125,15 +125,15 @@ namespace Discord_Bot.Interactions
 
             if (result == DbProcessResultEnum.Success)
             {
-                await ReplyAsync("Images removed successfully!");
+                await RespondAsync("Images removed successfully!");
             }
             else if (result == DbProcessResultEnum.NotFound)
             {
-                await ReplyAsync("Idol could not be found.");
+                await RespondAsync("Idol could not be found.");
             }
             else
             {
-                await ReplyAsync("Images could not be removed!");
+                await RespondAsync("Images could not be removed!");
             }
         }
     }
