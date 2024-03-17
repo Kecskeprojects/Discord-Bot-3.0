@@ -18,7 +18,7 @@ namespace Discord_Bot.Communication.Modal
 
         [RequiredInput(true)]
         [InputLabel("Group")]
-        [ModalTextInput("group", placeholder: "Current group of idol, 'soloist' if none",maxLength: 100)]
+        [ModalTextInput("group", placeholder: "Current group of idol, 'soloist' if none", maxLength: 100)]
         public string Group { get; set; }
 
         [RequiredInput(false)]

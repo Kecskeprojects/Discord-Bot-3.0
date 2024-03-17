@@ -372,20 +372,20 @@ namespace Discord_Bot
                 case null:
                     break;
                 case CommandError.UnmetPrecondition:
-                {
-                    await context.Channel.SendMessageAsync(result.ErrorReason);
-                    break;
-                }
-                case CommandError.UnknownCommand:
-                {
-                    if (context.Channel.GetChannelType() != ChannelType.DM)
                     {
-                        using IServiceScope scope = services.CreateScope();
-                        ICoreToDiscordCommunication discordCommunication = scope.ServiceProvider.GetService<ICoreToDiscordCommunication>();
-                        await discordCommunication.CustomCommands(context);
+                        await context.Channel.SendMessageAsync(result.ErrorReason);
+                        break;
                     }
-                    break;
-                }
+                case CommandError.UnknownCommand:
+                    {
+                        if (context.Channel.GetChannelType() != ChannelType.DM)
+                        {
+                            using IServiceScope scope = services.CreateScope();
+                            ICoreToDiscordCommunication discordCommunication = scope.ServiceProvider.GetService<ICoreToDiscordCommunication>();
+                            await discordCommunication.CustomCommands(context);
+                        }
+                        break;
+                    }
                 default:
                     {
                         logger.Warning("App.xaml.cs HandleCommandAsync", result.ErrorReason);
@@ -420,7 +420,7 @@ namespace Discord_Bot
                         break;
                     }
             }
-            var item = interactions.Modals;
+
             return Task.CompletedTask;
         }
         #endregion
