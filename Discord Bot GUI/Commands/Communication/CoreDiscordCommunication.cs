@@ -116,7 +116,7 @@ namespace Discord_Bot.Commands.Communication
             }
         }
 
-        public async Task CustomCommands(SocketCommandContext context)
+        public async Task CustomCommands(ICommandContext context)
         {
             try
             {

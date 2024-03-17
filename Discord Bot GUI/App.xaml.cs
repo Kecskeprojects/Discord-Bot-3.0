@@ -264,6 +264,7 @@ namespace Discord_Bot
         public async Task RegisterCommandsAsync()
         {
             client.MessageReceived += HandleCommandAsync;
+            commands.CommandExecuted += HandleCommandExecutionAsync;
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
         }
 
@@ -271,6 +272,7 @@ namespace Discord_Bot
         public async Task RegisterInteractionsAsync()
         {
             client.InteractionCreated += HandleInteractionAsync;
+            interactions.InteractionExecuted += HandleInteractionExecutionAsync;
             await interactions.AddModulesAsync(Assembly.GetEntryAssembly(), services);
         }
 
@@ -329,27 +331,6 @@ namespace Discord_Bot
                 if (context.Message.HasCharPrefix('!', ref argPos) || context.Message.HasCharPrefix('.', ref argPos))
                 {
                     Discord.Commands.IResult result = await commands.ExecuteAsync(context, argPos, services);
-
-                    //In case there is no such hard coded command, check the list of custom commands
-                    if (!result.IsSuccess)
-                    {
-                        if (result.ErrorReason == "Unknown command.")
-                        {
-                            if (context.Channel.GetChannelType() != ChannelType.DM)
-                            {
-                                await discordCommunication.CustomCommands(context);
-                                return;
-                            }
-                        }
-
-                        if (result.Error.Equals(CommandError.UnmetPrecondition))
-                        {
-                            await context.Channel.SendMessageAsync(result.ErrorReason);
-                            return;
-                        }
-
-                        logger.Warning("App.xaml.cs HandleCommandAsync", result.ErrorReason);
-                    }
                 }
                 else if (context.Channel.GetChannelType() != ChannelType.DM && Global.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id, false))
                 {
@@ -384,6 +365,35 @@ namespace Discord_Bot
             }
         }
 
+        private async Task HandleCommandExecutionAsync(Optional<CommandInfo> info, ICommandContext context, Discord.Commands.IResult result)
+        {
+            switch (result.Error)
+            {
+                case null:
+                    break;
+                case CommandError.UnmetPrecondition:
+                {
+                    await context.Channel.SendMessageAsync(result.ErrorReason);
+                    break;
+                }
+                case CommandError.UnknownCommand:
+                {
+                    if (context.Channel.GetChannelType() != ChannelType.DM)
+                    {
+                        using IServiceScope scope = services.CreateScope();
+                        ICoreToDiscordCommunication discordCommunication = scope.ServiceProvider.GetService<ICoreToDiscordCommunication>();
+                        await discordCommunication.CustomCommands(context);
+                    }
+                    break;
+                }
+                default:
+                    {
+                        logger.Warning("App.xaml.cs HandleCommandAsync", result.ErrorReason);
+                        break;
+                    }
+            }
+        }
+
         //Handling Interactions
         private async Task HandleInteractionAsync(SocketInteraction arg)
         {
@@ -396,6 +406,22 @@ namespace Discord_Bot
             {
                 logger.Error("App.xaml.cs HandleInteractionAsync", ex.ToString());
             }
+        }
+
+        private Task HandleInteractionExecutionAsync(ICommandInfo info, IInteractionContext context, Discord.Interactions.IResult result)
+        {
+            switch (result.Error)
+            {
+                case null:
+                    break;
+                default:
+                    {
+                        logger.Warning("App.xaml.cs HandleCommandAsync", result.ErrorReason);
+                        break;
+                    }
+            }
+            var item = interactions.Modals;
+            return Task.CompletedTask;
         }
         #endregion
     }

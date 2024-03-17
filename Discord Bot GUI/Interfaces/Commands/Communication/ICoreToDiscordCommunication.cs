@@ -8,7 +8,7 @@ namespace Discord_Bot.Interfaces.Commands.Communication
     {
         Task SendBirthdayMessages();
         Task SendReminders();
-        Task CustomCommands(SocketCommandContext context);
+        Task CustomCommands(ICommandContext context);
         Task FeatureChecksAsync(SocketCommandContext context);
         Task SendInstagramPostEmbed(Uri uri, ulong messageId, ulong channelId, ulong? guildId);
         Task SelfRole(SocketCommandContext context);

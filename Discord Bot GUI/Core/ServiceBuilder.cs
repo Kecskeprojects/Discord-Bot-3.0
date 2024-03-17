@@ -35,7 +35,8 @@ namespace Discord_Bot.Core
             InteractionService interactions = new(client,
                 new InteractionServiceConfig()
                 {
-                    DefaultRunMode = Discord.Interactions.RunMode.Async
+                    DefaultRunMode = Discord.Interactions.RunMode.Async,
+                    UseCompiledLambda = true,
                 });
 
             CommandService commands = new(new CommandServiceConfig()
@@ -109,7 +110,7 @@ namespace Discord_Bot.Core
             collection.AddScoped<IIdolRepository, IdolRepository>();
             collection.AddScoped<IIdolGroupRepository, IdolGroupRepository>();
             collection.AddScoped<IIdolAliasRepository, IdolAliasRepository>();
-            collection.AddTransient<IIdolImageRepository, IdolImageRepository>();
+            collection.AddScoped<IIdolImageRepository, IdolImageRepository>();
 
             //Commands
             collection.AddTransient<IServiceToDiscordCommunication, ServiceDiscordCommunication>();

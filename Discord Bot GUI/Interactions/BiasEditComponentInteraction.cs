@@ -1,10 +1,12 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord_Bot.Communication;
+using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Properties;
 using Discord_Bot.Resources;
 using System;
 using System.Collections.Generic;
@@ -22,7 +24,7 @@ namespace Discord_Bot.Interactions
 
         public BiasEditComponentInteraction(IIdolService idolService, IIdolGroupService idolGroupService, IIdolImageService idolImageService, Logging logger, Config config) : base(logger, config)
         {
-            Actions.Add(BiasEditActionTypeEnum.EditIdol, CreateEditIdolModalAsync);
+            Actions.Add(BiasEditActionTypeEnum.EditIdol, SendEditIdolModalAsync);
             Actions.Add(BiasEditActionTypeEnum.EditIdolExtended, CreateEditIdolExtendedModalAsync);
             Actions.Add(BiasEditActionTypeEnum.EditGroup, CreateEditGroupModalAsync);
             Actions.Add(BiasEditActionTypeEnum.ChangeProfileLink, CreateChangeProfileLinkModalAsync);
@@ -57,75 +59,65 @@ namespace Discord_Bot.Interactions
             }
         }
 
-        private async Task CreateEditIdolModalAsync(string idol, string group)
+        private async Task SendEditIdolModalAsync(string idol, string group)
         {
             IdolExtendedResource resource = await idolService.GetIdolDetailsAsync(idol, group);
 
-            ModalBuilder mb = new ModalBuilder()
-                .WithTitle("Edit Idol")
-                .WithCustomId("EditIdolModal")
-                .AddTextInput("Profile URL", "profileurl", placeholder: resource.ProfileUrl, maxLength: 200, required: true)
-                .AddTextInput("Name", "name", placeholder: resource.Name, maxLength: 100, required: true)
-                .AddTextInput("Group", "group", placeholder: resource.GroupName, maxLength: 100, required: true)
-                .AddTextInput("Date Of Birth", "dateofbirth", placeholder: resource.DateOfBirth.ToString())
-                .AddTextInput("Gender", "gender", placeholder: resource.Gender, maxLength: 10);
+            void Modify(ModalBuilder builder) => builder
+                .UpdateTextInput("profileurl", resource.ProfileUrl)
+                .UpdateTextInput("name", resource.Name)
+                .UpdateTextInput("group", resource.GroupName)
+                .UpdateTextInput("dateofbirth", resource.DateOfBirth.ToString())
+                .UpdateTextInput("gender", resource.Gender);
 
-            await Context.Interaction.RespondWithModalAsync(mb.Build());
+            await Context.Interaction.RespondWithModalAsync<EditIdolModal>($"EditIdolModal_{resource.IdolId}", modifyModal: Modify);
         }
 
         private async Task CreateEditIdolExtendedModalAsync(string idol, string group)
         {
             IdolExtendedResource resource = await idolService.GetIdolDetailsAsync(idol, group);
 
-            ModalBuilder mb = new ModalBuilder()
-                .WithTitle("Edit Idol Extended")
-                .WithCustomId("EditIdolExtendedModal")
-                .AddTextInput("Stage Name", "stagename", placeholder: resource.StageName, maxLength: 100)
-                .AddTextInput("Full Name", "fullname", placeholder: resource.FullName, maxLength: 100)
-                .AddTextInput("Korean Stage Name", "koreanstagename", placeholder: resource.KoreanStageName, maxLength: 100)
-                .AddTextInput("Korean Full name", "koreanfullname", placeholder: resource.KoreanFullName, maxLength: 100)
-                .AddTextInput("Debut Date", "debutdate", placeholder: resource.DebutDate.ToString());
+            void Modify(ModalBuilder builder) => builder
+                .UpdateTextInput("stagename", resource.StageName)
+                .UpdateTextInput("fullname", resource.FullName)
+                .UpdateTextInput("koreanstagename", resource.KoreanStageName)
+                .UpdateTextInput("koreanfullname", resource.KoreanFullName)
+                .UpdateTextInput("debutdate", resource.DebutDate.ToString());
 
-            await Context.Interaction.RespondWithModalAsync(mb.Build());
+            await Context.Interaction.RespondWithModalAsync<EditIdolExtendedModal>($"EditIdolExtendedModal_{resource.IdolId}", modifyModal: Modify);
         }
 
         private async Task CreateEditGroupModalAsync(string idol, string group)
         {
             IdolGroupExtendedResource resource = await idolGroupService.GetIdolGroupDetailsAsync(group);
 
-            ModalBuilder mb = new ModalBuilder()
-                .WithTitle("Edit Group")
-                .WithCustomId("EditGroupModal")
-                .AddTextInput("Name", "name", placeholder: resource.Name, maxLength: 100)
-                .AddTextInput("Full Name", "fullname", placeholder: resource.FullName, maxLength: 100)
-                .AddTextInput("Full Korean Name", "fullkoreanname", placeholder: resource.FullKoreanName, maxLength: 100)
-                .AddTextInput("Debut Date", "debutdate", placeholder: resource.DebutDate.ToString(), maxLength: 100);
+            void Modify(ModalBuilder builder) => builder
+                .UpdateTextInput("name", resource.Name)
+                .UpdateTextInput("fullname", resource.FullName)
+                .UpdateTextInput("fullkoreanname", resource.FullKoreanName)
+                .UpdateTextInput("debutdate", resource.DebutDate.ToString());
 
-            await Context.Interaction.RespondWithModalAsync(mb.Build());
+            await Context.Interaction.RespondWithModalAsync<EditGroupModal>($"EditGroupModal_{resource.GroupId}", modifyModal: Modify);
         }
 
         private async Task CreateChangeProfileLinkModalAsync(string idol, string group)
         {
             IdolExtendedResource resource = await idolService.GetIdolDetailsAsync(idol, group);
 
-            ModalBuilder mb = new ModalBuilder()
-                .WithTitle("Change Idol Profile Link")
-                .WithCustomId("ChangeIdolProfileLinkModal")
-                .AddTextInput("Profile URL", "profileurl", placeholder: resource.ProfileUrl, maxLength: 200, required: true);
+            void Modify(ModalBuilder builder) => builder
+                .UpdateTextInput("profileurl", resource.ProfileUrl);
 
-            await Context.Interaction.RespondWithModalAsync(mb.Build());
+            await Context.Interaction.RespondWithModalAsync<ChangeIdolProfileLinkModal>($"ChangeIdolProfileLinkModal_{resource.IdolId}", modifyModal: Modify);
         }
 
         private async Task CreateChangeGroupModalAsync(string idol, string group)
         {
             IdolExtendedResource resource = await idolService.GetIdolDetailsAsync(idol, group);
 
-            ModalBuilder mb = new ModalBuilder()
-                .WithTitle("Change Idol Group")
-                .WithCustomId("ChangeIdolGroupModal")
-                .AddTextInput("Group", "group", placeholder: resource.GroupName, maxLength: 100, required: true);
+            void Modify(ModalBuilder builder) => builder
+                .UpdateTextInput("group", resource.GroupName);
 
-            await Context.Interaction.RespondWithModalAsync(mb.Build());
+            await Context.Interaction.RespondWithModalAsync<ChangeIdolGroupModal>($"ChangeIdolGroupModal_{resource.IdolId}", modifyModal: Modify);
         }
 
         private async Task RemoveImageAsync(string idol, string group)
