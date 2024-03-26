@@ -236,7 +236,7 @@ namespace Discord_Bot.Commands
 
                 if (!string.IsNullOrEmpty(url))
                 {
-                    Stream stream = Global.GetStream(url);
+                    Stream stream = await Global.GetStream(url);
 
                     MemoryStream gifStream = pictureHandler.CreateBonkImage(stream, frameDelay);
 

@@ -1,9 +1,9 @@
-﻿using AngleSharp;
-using AngleSharp.Dom;
-using Discord_Bot.Communication;
+﻿using Discord_Bot.Communication;
 using Discord_Bot.Core;
+using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.Twitter;
+using Discord_Bot.Tools;
 using PuppeteerSharp;
 using System;
 using System.Collections.Generic;
@@ -15,23 +15,10 @@ namespace Discord_Bot.Services
     public class TwitterScraper(Logging logger) : ITwitterScraper
     {
         private readonly Logging logger = logger;
+        private static readonly string[] smallSizingStrings = ["thumb", "small", "medium"];
+        //private static readonly string[] largeSizingStrings = ["large", "orig"];
 
-        #region Variables
-        //The standard video url is the following:
-        //https://video.twimg.com/[folder_type]/[folder_id]/pu/vid/[width]x[height]/[video_id].mp4?tag=12
-        private List<Uri> Videos { get; set; } = [];
-
-        //Storing all video links before filtering
-        private List<Uri> TempVideos { get; set; } = [];
-
-        //The standard image url is the following:
-        //https://pbs.twimg.com/media/[image_id]?format=[image_format]&name=[width]x[height]
-        private List<Uri> Images { get; set; } = [];
-        private string TextContent { get; set; } = "";
-        private List<string> Exceptions { get; } = [];
-        private bool HasVideo { get; set; } = false;
-        public bool SensitiveContent { get; set; } = false;
-        #endregion
+        private Root Body { get; set; }
 
         #region Main Methods
         public async Task<TwitterScrapingResult> GetDataFromUrls(List<Uri> uris)
@@ -46,11 +33,13 @@ namespace Discord_Bot.Services
                 IPage mainPage = await BrowserService.CreateNewPage();
                 mainPage.Response += TwitterScraperResponse;
 
+                TwitterScrapingResult result = new();
+
                 string messages = "";
                 for (int i = 0; i < uris.Count; i++)
                 {
-                    ClearVariables();
-                    string mess = await ExtractFromUrl(mainPage, uris[i]);
+                    Body = null;
+                    string mess = await ExtractFromUrl(mainPage, uris[i], uris.Count == 1, result);
                     if (uris.Count > 1 && mess != "")
                     {
                         messages += $"\n#{i + 1} ";
@@ -63,13 +52,8 @@ namespace Discord_Bot.Services
 
                 await mainPage.CloseAsync();
 
-                messages += string.Join("\n", Exceptions);
-                return new TwitterScrapingResult(Videos, Images, uris.Count == 1 ? TextContent : "", messages);
-            }
-            catch (NavigationException ex)
-            {
-                logger.Warning("TwitterScraper.cs GetDataFromUrls", ex.ToString());
-                return new TwitterScrapingResult("Open link operation timed out after 15 seconds.");
+                result.ErrorMessage = messages;
+                return result;
             }
             catch (Exception ex)
             {
@@ -79,48 +63,36 @@ namespace Discord_Bot.Services
         }
         #endregion
 
-        #region Helper functions
-        private void ClearVariables()
-        {
-            TempVideos = [];
-            HasVideo = false;
-            SensitiveContent = false;
-        }
-
-        private async Task<string> ExtractFromUrl(IPage page, Uri uri)
+        private async Task<string> ExtractFromUrl(IPage page, Uri uri, bool singleLink, TwitterScrapingResult result)
         {
             try
             {
-                int videosBeforeMainCount = 0;
-                int videoCount = 0;
-                IDocument document = await OpenPage(page, uri);
+                await page.DeleteCookieAsync();
+                await page.GoToAsync(uri.OriginalString);
 
-                if (SensitiveContent)
+                int count = 0;
+                while (Body == null && count < 60)
                 {
-                    return "Post is flagged as potentially sensitive content!";
+                    count++;
+                    await Task.Delay(500);
                 }
 
-                IHtmlCollection<IElement> articles = document.QuerySelectorAll("article");
-
-                //The timestamp link contains the post's relative path, we can find the post's article by that, we also get it's index in the list
-                IElement main = articles.First(x => x.QuerySelectorAll("a[href]").FirstOrDefault(e => e.GetAttribute("href").Contains(uri.AbsolutePath, StringComparison.OrdinalIgnoreCase)) != null);
-                int mainPos = articles.Index(main);
-
-                if (main.Text().Contains("sensitive content") || SensitiveContent)
+                if (Body == null)
                 {
-                    return "Post is flagged as potentially sensitive content!";
+                    return "Timeout while getting content.";
                 }
 
-                List<Uri> currImages = GetImages(main);
-                GetText(main);
-
-                Images.AddRange(currImages);
-
-                if (HasVideo)
+                string reason = Body?.Data?.TweetResult?.Result?.Reason;
+                string quoteReason = Body?.Data?.TweetResult?.Result?.QuotedStatusResult?.Result?.Reason;
+                if (!string.IsNullOrEmpty(reason) || !string.IsNullOrEmpty(quoteReason))
                 {
-                    GetVideos(main, articles, mainPos, ref videosBeforeMainCount, ref videoCount);
-                    Videos.AddRange(TempVideos.Skip(videosBeforeMainCount).Take(videoCount));
+                    if (reason == "NsfwLoggedOut" || quoteReason == "NsfwLoggedOut")
+                    {
+                        return "Post is flagged as potentially sensitive content!";
+                    }
                 }
+
+                GetData(singleLink, result);
             }
             catch (Exception ex)
             {
@@ -130,160 +102,106 @@ namespace Discord_Bot.Services
             return "";
         }
 
-        private void GetText(IElement main)
+        private void GetData(bool singleLink, TwitterScrapingResult result)
         {
-            IElement text = main.QuerySelector("div[data-testid=\"tweetText\"]");
-            if (text != null)
+            List<Uri> links = [];
+            Legacy tweet = Body?.Data?.TweetResult?.Result?.Legacy;
+            Legacy quote = Body?.Data?.TweetResult?.Result?.QuotedStatusResult?.Result?.Legacy;
+
+            if (tweet?.Entities?.Media?.Count > 0)
             {
-                if (text.Children.Any(x => x.TagName == "IMG"))
+                links.AddRange(GetMediaUris(result, tweet.Entities?.Media));
+            }
+
+            if (quote?.Entities?.Media?.Count > 0)
+            {
+                links.AddRange(GetMediaUris(result, quote.Entities?.Media));
+            }
+
+            if (singleLink)
+            {
+                if (tweet?.FullText?.Length > 0)
                 {
-                    foreach (IElement textPart in text.Children)
-                    {
-                        if (textPart.TagName == "IMG")
-                        {
-                            TextContent += textPart.GetAttribute("alt");
-                        }
-                        else
-                        {
-                            TextContent += textPart.TextContent;
-                        }
-                    }
+                    result.TextContent += tweet.FullText;
                 }
-                else
+
+                if (quote?.FullText?.Length > 0)
                 {
-                    TextContent = text.TextContent;
+                    result.TextContent += $"\n\n**Quoting**\n{quote.FullText}";
                 }
+
+                result.TextContent = UrlTools.SanitizeText(result.TextContent);
             }
         }
+        #endregion
 
-        private void GetVideos(IElement main, IHtmlCollection<IElement> articles, int mainPos, ref int videosBeforeMainCount, ref int videoCount)
+        #region Helper Methods
+        private async Task<IPage> CreateNewPage()
         {
-            //We also search for Videos in the post
-            videoCount = main.QuerySelectorAll("div[data-testid]").Where(e => e.GetAttribute("data-testid") == "videoPlayer").Count();
-
-            //Checking any articles before main post
-            for (int i = 0; i < mainPos; i++)
-            {
-                int tempCount = articles[i].QuerySelectorAll("div[data-testid]").Where(e => e.GetAttribute("data-testid") == "videoPlayer").Count();
-                videosBeforeMainCount += tempCount;
-            }
-
-            //As the video links are caught in the TwitterScraper_Response event handler,
-            //the only way to verify if we got them all is to wait until the right amount of links are stored in the list
-            int count = 0;
-            while (TempVideos.Count < videoCount + videosBeforeMainCount && count < 10)
-            {
-                Task.Delay(500).Wait();
-                count++;
-            }
-        }
-
-        private static List<Uri> GetImages(IElement main)
-        {
-            //Getting the Images, if there are any
-            List<Uri> currImages = [];
-            foreach (IElement element in main.QuerySelectorAll("a"))
-            {
-                IElement img = element.QuerySelector("img");
-                if (img != null)
+            IPage mainPage = await BrowserService.Browser.NewPageAsync();
+            Dictionary<string, string> headers = new()
                 {
-                    Uri newUri = new(img.GetAttribute("src"));
-                    if (newUri.Segments[1] == "media/")
-                    {
-                        currImages.Add(new Uri(img.GetAttribute("src")));
-                    }
-                }
-            }
+                    { "user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" },
+                    { "upgrade-insecure-requests", "1" },
+                    { "accept", "text/html,application/xhtml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3" },
+                    { "accept-encoding", "gzip, deflate, br" },
+                    { "accept-language", "en-US,en;q=0.9,en;q=0.8" }
+                };
+            await mainPage.SetExtraHttpHeadersAsync(headers);
 
-            return currImages;
-        }
-
-        private async Task<IDocument> OpenPage(IPage page, Uri uri)
-        {
-            await page.DeleteCookieAsync();
-            await page.GoToAsync(uri.OriginalString);
-            try
-            {
-                await page.WaitForSelectorAsync("div[data-testid=\"tweetPhoto\"]>img,div[data-testid=\"videoPlayer\"],div[data-testid=\"tweetText\"]", new WaitForSelectorOptions() { Timeout = 15000 });
-                try
-                {
-                    await page.WaitForSelectorAsync("div[data-testid=\"videoPlayer\"]", new WaitForSelectorOptions() { Timeout = 1000 });
-                    HasVideo = true;
-                }
-                catch (Exception) { }
-            }
-            catch (Exception e)
-            {
-                logger.Error("TwitterScraper.cs OpenPage", e.ToString(), LogOnly: true);
-            }
-
-            string content = await page.GetContentAsync();
-
-            IBrowsingContext context = BrowsingContext.New(Configuration.Default);
-            IDocument document = await context.OpenAsync(req => req.Content(content));
-            return document;
+            mainPage.Response += TwitterScraperResponse;
+            return mainPage;
         }
 
         private async void TwitterScraperResponse(object sender, ResponseCreatedEventArgs e)
         {
             try
             {
-                //This logic is to be used if a fallback is needed to an older chrome version
-                //The standard video url we want is the following:
-                //https://video.twimg.com/ext_tw_video/[folder_id]/pu/vid/[width]x[height]/[video_id].mp4?tag=12
-                //https://video.twimg.com/amplify_video/[folder_id]/vid/[width]x[height]/[video_id].mp4?tag=14
-                //https://video.twimg.com/tweet_video/[video_id].mp4
-                //if (e.Response.Url.StartsWith("https://video.twimg.com/") && e.Response.Url.Contains(".mp4"))
-                //{
-                //    Uri currUrl = new(e.Response.Url);
-
-                //    //Links get repeatedly sent by twitter, so we only want to save one of each
-                //    if (TempVideos.FirstOrDefault(x => x.Segments[2] == currUrl.Segments[2]) == null)
-                //    {
-                //        TempVideos.Add(currUrl);
-                //    }
-                //}
-                //else
                 if (e.Response.Url.Contains("TweetResultByRestId"))
                 {
-                    Root body = await e.Response.JsonAsync<Root>(); //Todo: investigate the possibility of using this body object to get the tweet data instead of web scraping
-                    string reason = body?.Data?.TweetResult?.Result?.Reason;
-                    string quoteReason = body?.Data?.TweetResult?.Result?.QuotedStatusResult?.Result?.Reason;
-                    if (!string.IsNullOrEmpty(reason) || !string.IsNullOrEmpty(quoteReason))
-                    {
-                        if (reason == "NsfwLoggedOut" || quoteReason == "NsfwLoggedOut")
-                        {
-                            SensitiveContent = true;
-                        }
-                    }
-
-                    if (body?.Data?.TweetResult?.Result?.Legacy?.Entities?.Media?.Count > 0)
-                    {
-                        AddVideos(body?.Data?.TweetResult?.Result?.Legacy?.Entities?.Media);
-                    }
-
-                    if (body?.Data?.TweetResult?.Result?.QuotedStatusResult?.Result?.Legacy?.Entities?.Media?.Count > 0)
-                    {
-                        AddVideos(body?.Data?.TweetResult?.Result?.QuotedStatusResult?.Result?.Legacy?.Entities?.Media);
-                    }
+                    Body = await e.Response.JsonAsync<Root>();
                 }
             }
             catch (Exception ex)
             {
-                Exceptions.Add(ex.Message);
+                logger.Error("TwitterScraper.cs TwitterScraperResponse", ex.ToString());
             }
         }
 
-        private void AddVideos(List<Medium> list)
+        private static List<Uri> GetMediaUris(TwitterScrapingResult result, List<Medium> list)
         {
+            List<Uri> tempMedia = [];
             foreach (Medium item in list)
             {
-                if (item.VideoInfo != null)
+                if (item.Type == "photo")
+                {
+                    Uri url = ModifyImageUrl(item.MediaUrlHttps);
+                    result.Content.Add(new(url, TwitterContentTypeEnum.Image));
+                }
+                else if (item.VideoInfo != null)
                 {
                     Uri url = new(item.VideoInfo.Variants[^1].Url);
-                    TempVideos.Add(url);
+                    result.Content.Add(new(url, TwitterContentTypeEnum.Video));
                 }
             }
+            return tempMedia;
+        }
+
+        private static Uri ModifyImageUrl(string url)
+        {
+            if (url.Split(".").Length > 1)
+            {
+                return new(url.Split("?")[0]);
+            }
+
+            string query = new Uri(url).Query;
+
+            string newQuery = query.Contains("jpg") ? "?format=jpg" : "?format=png";
+            newQuery += smallSizingStrings.Any(query.Contains)
+                    ? "&name=medium"
+                    : "&name=orig";
+
+            return new(url.Split("?")[0] + newQuery);
         }
         #endregion
     }

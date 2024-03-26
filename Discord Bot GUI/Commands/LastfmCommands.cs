@@ -548,7 +548,7 @@ namespace Discord_Bot.Commands
                     if (!string.IsNullOrEmpty(wk.ImageUrl))
                     {
                         //Download image and get back it's filepath
-                        Stream originalImage = Global.GetStream(wk.ImageUrl);
+                        Stream originalImage = await Global.GetStream(wk.ImageUrl);
 
                         //Edit the picture to the list format
                         Discord_Bot.Communication.EditPictureResult modifiedImage = pictureHandler.EditPicture(originalImage, wk.Plays, wk.Searched);

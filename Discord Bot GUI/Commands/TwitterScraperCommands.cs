@@ -58,13 +58,13 @@ namespace Discord_Bot.Commands
                                 logger.Log(result.ErrorMessage);
                             }
 
-                            if (CollectionTools.IsNullOrEmpty(result.Images) && CollectionTools.IsNullOrEmpty(result.Videos))
+                            if (CollectionTools.IsNullOrEmpty(result.Content))
                             {
                                 return;
                             }
                         }
 
-                        List<FileAttachment> attachments = TwitterScraperService.AllContentInRegularMessage(result.Videos, result.Images);
+                        List<FileAttachment> attachments = await TwitterScraperService.AllContentInRegularMessage(result.Content);
                         if (!CollectionTools.IsNullOrEmpty(attachments))
                         {
                             try
@@ -78,7 +78,7 @@ namespace Discord_Bot.Commands
                                     logger.Warning("ServiceDiscordCommunication.cs SendTwitterMessage", "Embed too large, only sending images!", LogOnly: true);
                                     logger.Warning("ServiceDiscordCommunication.cs SendTwitterMessage", ex.ToString(), LogOnly: true);
 
-                                    attachments = TwitterScraperService.AllContentInRegularMessage(result.Videos, result.Images, false);
+                                    attachments = await TwitterScraperService.AllContentInRegularMessage(result.Content, false);
                                     if (!CollectionTools.IsNullOrEmpty(attachments))
                                     {
                                         await Context.Channel.SendFilesAsync(attachments, result.TextContent, messageReference: refer);

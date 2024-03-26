@@ -35,6 +35,9 @@ namespace Discord_Bot.Services.Models.Twitter
         [JsonProperty("ext_media_availability")]
         public ExtMediaAvailability ExtMediaAvailability { get; set; }
 
+        [JsonProperty("features")]
+        public Features Features { get; set; }
+
         [JsonProperty("sizes")]
         public Sizes Sizes { get; set; }
 

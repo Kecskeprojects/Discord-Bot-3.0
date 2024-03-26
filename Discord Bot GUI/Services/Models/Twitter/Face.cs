@@ -1,20 +1,19 @@
 ﻿using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace Discord_Bot.Services.Models.Twitter
 {
-    public class Large
+    public class Face
     {
-        [JsonProperty("faces")]
-        public List<Face> Faces { get; set; }
+        [JsonProperty("x")]
+        public int X { get; set; }
+
+        [JsonProperty("y")]
+        public int Y { get; set; }
 
         [JsonProperty("h")]
         public int H { get; set; }
 
         [JsonProperty("w")]
         public int W { get; set; }
-
-        [JsonProperty("resize")]
-        public string Resize { get; set; }
     }
 }

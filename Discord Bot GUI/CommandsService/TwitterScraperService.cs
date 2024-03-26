@@ -1,34 +1,35 @@
 ﻿using Discord;
+using Discord_Bot.Communication;
 using Discord_Bot.Core;
+using Discord_Bot.Enums;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace Discord_Bot.CommandsService
 {
     public class TwitterScraperService
     {
-        private static readonly string[] smallSizingStrings = ["thumb", "small", "medium"];
-        //private static readonly string[] largeSizingStrings = ["large", "orig"];
-        public static List<FileAttachment> AllContentInRegularMessage(List<Uri> videos, List<Uri> images, bool sendVideos = true)
+        public static async Task<List<FileAttachment>> AllContentInRegularMessage(List<TwitterContent> content, bool sendVideos = true)
         {
             List<FileAttachment> Embeds = [];
             string commonFileName = $"twitter_{DateTime.UtcNow:yyMMdd}_{DateTime.UtcNow:HHmmss}";
 
-            for (int i = 0; i < (images.Count < 10 ? images.Count : 10) && Embeds.Count < 10; i++)
+            for (int i = 0; i < content.Count && Embeds.Count < 10; i++)
             {
-                string query = images[i].Query;
-                query = smallSizingStrings.Any(query.Contains)
-                        ? "?format=jpg&name=medium"
-                        : "?format=jpg&name=orig";
+                if (!sendVideos && content[i].Type == TwitterContentTypeEnum.Video)
+                {
+                    continue;
+                }
 
-                images[i] = new Uri(images[i].OriginalString.Split("?")[0] + query);
-                Embeds.Add(new FileAttachment(Global.GetStream(images[i].OriginalString), $"{commonFileName}_image_{i + 1}.png"));
-            }
+                string fileName = content[i].Type switch
+                {
+                    TwitterContentTypeEnum.Video => $"{commonFileName}_video_{i + 1}.mp4",
+                    TwitterContentTypeEnum.Image => $"{commonFileName}_image_{i + 1}.png",
+                    _ => ""
+                };
 
-            for (int i = 0; sendVideos && i < (videos.Count < 10 ? videos.Count : 10) && Embeds.Count < 10; i++)
-            {
-                Embeds.Add(new FileAttachment(Global.GetStream(videos[i].OriginalString), $"{commonFileName}_video_{i + 1}.mp4"));
+                Embeds.Add(new FileAttachment(await Global.GetStream(content[i].Url.OriginalString), fileName));
             }
 
             return Embeds;
