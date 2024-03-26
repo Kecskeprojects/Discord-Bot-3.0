@@ -1,11 +1,13 @@
 ﻿using Discord_Bot.Communication;
 using Discord_Bot.Core;
+using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.Twitter;
 using Discord_Bot.Tools;
 using PuppeteerSharp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Services
@@ -13,6 +15,8 @@ namespace Discord_Bot.Services
     public class TwitterScraper(Logging logger) : ITwitterScraper
     {
         private readonly Logging logger = logger;
+        private static readonly string[] smallSizingStrings = ["thumb", "small", "medium"];
+        //private static readonly string[] largeSizingStrings = ["large", "orig"];
 
         private Root Body { get; set; }
 
@@ -86,34 +90,7 @@ namespace Discord_Bot.Services
                     }
                 }
 
-                List<Uri> links = [];
-                Legacy tweet = Body?.Data?.TweetResult?.Result?.Legacy;
-                Legacy quote = Body?.Data?.TweetResult?.Result?.QuotedStatusResult?.Result?.Legacy;
-
-                if (tweet?.Entities?.Media?.Count > 0)
-                {
-                    links.AddRange(GetMediaUris(result, tweet.Entities?.Media));
-                }
-
-                if (quote?.Entities?.Media?.Count > 0)
-                {
-                    links.AddRange(GetMediaUris(result, quote.Entities?.Media));
-                }
-
-                if (singleLink)
-                {
-                    if (tweet?.FullText?.Length > 0)
-                    {
-                        result.TextContent += tweet.FullText;
-                    }
-
-                    if (quote?.FullText?.Length > 0)
-                    {
-                        result.TextContent += $"\n\n**Quoting**\n{quote.FullText}";
-                    }
-
-                    result.TextContent = UrlTools.SanitizeText(result.TextContent);
-                }
+                GetData(singleLink, result);
             }
             catch (Exception ex)
             {
@@ -121,6 +98,38 @@ namespace Discord_Bot.Services
             }
 
             return "";
+        }
+
+        private void GetData(bool singleLink, TwitterScrapingResult result)
+        {
+            List<Uri> links = [];
+            Legacy tweet = Body?.Data?.TweetResult?.Result?.Legacy;
+            Legacy quote = Body?.Data?.TweetResult?.Result?.QuotedStatusResult?.Result?.Legacy;
+
+            if (tweet?.Entities?.Media?.Count > 0)
+            {
+                links.AddRange(GetMediaUris(result, tweet.Entities?.Media));
+            }
+
+            if (quote?.Entities?.Media?.Count > 0)
+            {
+                links.AddRange(GetMediaUris(result, quote.Entities?.Media));
+            }
+
+            if (singleLink)
+            {
+                if (tweet?.FullText?.Length > 0)
+                {
+                    result.TextContent += tweet.FullText;
+                }
+
+                if (quote?.FullText?.Length > 0)
+                {
+                    result.TextContent += $"\n\n**Quoting**\n{quote.FullText}";
+                }
+
+                result.TextContent = UrlTools.SanitizeText(result.TextContent);
+            }
         }
         #endregion
 
@@ -164,16 +173,33 @@ namespace Discord_Bot.Services
             {
                 if (item.Type == "photo")
                 {
-                    Uri url = new(item.MediaUrlHttps);
-                    result.Images.Add(url);
+                    Uri url = ModifyImageUrl(item.MediaUrlHttps);
+                    result.Content.Add(new(url, TwitterContentTypeEnum.Image));
                 }
                 else if (item.VideoInfo != null)
                 {
                     Uri url = new(item.VideoInfo.Variants[^1].Url);
-                    result.Videos.Add(url);
+                    result.Content.Add(new(url, TwitterContentTypeEnum.Video));
                 }
             }
             return tempMedia;
+        }
+
+        private static Uri ModifyImageUrl(string url)
+        {
+            if (url.Split(".").Length > 1)
+            {
+                return new(url.Split("?")[0]);
+            }
+
+            string query = new Uri(url).Query;
+
+            string newQuery = query.Contains("jpg") ? "?format=jpg" : "?format=png";
+            newQuery += smallSizingStrings.Any(query.Contains)
+                    ? "&name=medium"
+                    : "&name=orig";
+
+            return new (url.Split("?")[0] + newQuery);
         }
         #endregion
     }

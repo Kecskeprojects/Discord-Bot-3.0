@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.NetworkInformation;
+using System.Threading.Tasks;
 
 namespace Discord_Bot.Core
 {
@@ -33,13 +34,13 @@ namespace Discord_Bot.Core
                         allowLackOfType : value.Contains(channelId));
         }
 
-        public static Stream GetStream(string url)
+        public static async Task<Stream> GetStream(string url)
         {
             Stream imageData = null;
 
             using (HttpClient wc = new() { Timeout = new TimeSpan(0, 3, 0) })
             {
-                imageData = wc.GetStreamAsync(url).GetAwaiter().GetResult();
+                imageData = await wc.GetStreamAsync(url);
             }
 
             return imageData;
