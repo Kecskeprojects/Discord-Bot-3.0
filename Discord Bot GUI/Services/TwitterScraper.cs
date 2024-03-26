@@ -61,7 +61,6 @@ namespace Discord_Bot.Services
                 return new TwitterScrapingResult("Unexpected error occured");
             }
         }
-        #endregion
 
         private async Task<string> ExtractFromUrl(IPage page, Uri uri, bool singleLink, TwitterScrapingResult result)
         {
