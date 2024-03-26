@@ -60,5 +60,33 @@ namespace Discord_Bot.Tools
             return null;
         }
 
+        public static string SanitizeText(string message)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                return null;
+            }
+
+            int startIndex = 0;
+            while (startIndex != -1 && message.Length - 1 > startIndex)
+            {
+                startIndex = message.IndexOf("https://", startIndex);
+
+                if (startIndex == -1)
+                {
+                    break;
+                }
+
+                string beginningCut = message[startIndex..];
+
+                string url = beginningCut.Split(whiteSpaceSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)[0];
+
+                message = message.Replace(url, $"<{url}>");
+                
+                startIndex += url.Length + 2;
+            }
+
+            return message;
+        }
     }
 }
