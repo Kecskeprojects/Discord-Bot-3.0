@@ -199,7 +199,7 @@ namespace Discord_Bot.Services
                     ? "&name=medium"
                     : "&name=orig";
 
-            return new (url.Split("?")[0] + newQuery);
+            return new(url.Split("?")[0] + newQuery);
         }
         #endregion
     }
