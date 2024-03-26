@@ -10,6 +10,7 @@ namespace Discord_Bot.CommandsService
     {
         private static readonly string[] smallSizingStrings = ["thumb", "small", "medium"];
         //private static readonly string[] largeSizingStrings = ["large", "orig"];
+
         public static List<FileAttachment> AllContentInRegularMessage(List<Uri> videos, List<Uri> images, bool sendVideos = true)
         {
             List<FileAttachment> Embeds = [];

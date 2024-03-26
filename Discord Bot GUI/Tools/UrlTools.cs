@@ -82,7 +82,7 @@ namespace Discord_Bot.Tools
                 string url = beginningCut.Split(whiteSpaceSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)[0];
 
                 message = message.Replace(url, $"<{url}>");
-                
+
                 startIndex += url.Length + 2;
             }
 

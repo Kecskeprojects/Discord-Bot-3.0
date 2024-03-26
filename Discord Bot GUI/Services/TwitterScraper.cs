@@ -25,7 +25,7 @@ namespace Discord_Bot.Services
                 {
                     await BrowserService.OpenBroser();
                 }
-                
+
                 IPage mainPage = await CreateNewPage();
 
                 TwitterScrapingResult result = new();
@@ -70,8 +70,8 @@ namespace Discord_Bot.Services
                     count++;
                     await Task.Delay(500);
                 }
-                
-                if(count > 60 && Body == null)
+
+                if (Body == null)
                 {
                     return "Timeout while getting content.";
                 }
@@ -102,12 +102,12 @@ namespace Discord_Bot.Services
 
                 if (singleLink)
                 {
-                    if(tweet?.FullText?.Length > 0)
+                    if (tweet?.FullText?.Length > 0)
                     {
                         result.TextContent += tweet.FullText;
                     }
 
-                    if(quote?.FullText?.Length > 0)
+                    if (quote?.FullText?.Length > 0)
                     {
                         result.TextContent += $"\n\n**Quoting**\n{quote.FullText}";
                     }
