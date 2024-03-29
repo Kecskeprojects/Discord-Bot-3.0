@@ -67,10 +67,4 @@
 			<LastGenOutput>Resource.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 	</ItemGroup>
-	<ItemGroup>
-	  <EditorConfigFiles Remove="C:\Users\Kirsch_Adam_Peter\source\repos\Discord-Bot-3.0\Discord Bot GUI\Properties\.editorconfig" />
-	</ItemGroup>
-	<ItemGroup>
-	  <None Include="C:\Users\Kirsch_Adam_Peter\source\repos\Discord-Bot-3.0\Discord Bot GUI\Database\.editorconfig" />
-	</ItemGroup>
 </Project>
