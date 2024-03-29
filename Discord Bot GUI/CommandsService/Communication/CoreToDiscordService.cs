@@ -60,6 +60,7 @@ namespace Discord_Bot.CommandsService.Communication
                 {
                     text = text[..indexOfTag];
                 }
+                text = UrlTools.SanitizeText(text);
 
                 message += $"{text}\n";
             }
@@ -71,7 +72,6 @@ namespace Discord_Bot.CommandsService.Communication
                 message = message[..1999];
             }
 
-            message = UrlTools.SanitizeText(message);
             return message;
         }
 
