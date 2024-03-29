@@ -119,6 +119,5 @@
     <Build Include="Tables\UserIdolStatistic.sql" />
     <Build Include="Tables\ChannelType.sql" />
     <Build Include="Views\ServerChannelView.sql" />
-    <None Include="Patch\MainDB_Update_1.sql" />
   </ItemGroup>
 </Project>
