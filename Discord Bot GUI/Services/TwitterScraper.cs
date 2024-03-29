@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Discord_Bot.Services
 {
@@ -128,6 +129,12 @@ namespace Discord_Bot.Services
                     result.TextContent += $"\n\n**Quoting**\n{quote.FullText}";
                 }
 
+                if (result.TextContent.Length > 2000)
+                {
+                    result.TextContent = result.TextContent[..1999];
+                }
+
+                result.TextContent = HttpUtility.HtmlDecode(result.TextContent);
                 result.TextContent = UrlTools.SanitizeText(result.TextContent);
             }
         }

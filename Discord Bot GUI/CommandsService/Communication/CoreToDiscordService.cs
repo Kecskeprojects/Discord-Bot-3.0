@@ -4,6 +4,7 @@ using Discord_Bot.Communication;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.Instagram;
+using Discord_Bot.Tools;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -67,8 +68,10 @@ namespace Discord_Bot.CommandsService.Communication
 
             if (message.Length > 2000)
             {
-                message = message[..2000];
+                message = message[..1999];
             }
+
+            message = UrlTools.SanitizeText(message);
             return message;
         }
 
