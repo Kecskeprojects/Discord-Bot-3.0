@@ -44,7 +44,8 @@ namespace Discord_Bot.Core.Config
                     youtube_API_Keys = [],
                     youtube_Filter_Words = [],
                     enable_Instagram_Embed = false,
-                    enable_Twitter_Embed = false
+                    enable_Twitter_Embed = false,
+                    sql_connection_string = ""
                 };
 
                 using StreamWriter sw = File.AppendText(Path.Combine(path, "config.json"));
