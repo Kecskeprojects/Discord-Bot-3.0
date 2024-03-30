@@ -92,7 +92,7 @@ namespace Discord_Bot.Interactions
                 logger.Log($"Change Idol Profile Link Modal Submitted for idol with ID {idolId}", LogOnly: true);
 
                 DbProcessResultEnum result = await idolService.UpdateAsync(idolId, modal);
-                if(result == DbProcessResultEnum.Success)
+                if (result == DbProcessResultEnum.Success)
                 {
                     await RespondAsync("Edited bias successfully!");
                     return;

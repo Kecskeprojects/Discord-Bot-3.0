@@ -15,7 +15,7 @@ namespace Discord_Bot.Database.DBRepositories
         public Task<IdolGroup> FirstOrDefaultByIdAsync(int groupId)
         {
             return context.IdolGroups
-                .FirstOrDefaultAsync(ig => ig.GroupId ==  groupId);
+                .FirstOrDefaultAsync(ig => ig.GroupId == groupId);
         }
 
         public Task<IdolGroup> GetGroupAsync(string idolGroup)
