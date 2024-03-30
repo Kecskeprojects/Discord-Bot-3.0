@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
+using Discord_Bot.Database.DBRepositories;
 using Discord_Bot.Database.Models;
+using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
@@ -34,6 +37,24 @@ namespace Discord_Bot.Database.DBServices
             }
 
             return resource;
+        }
+
+        public async Task<DbProcessResultEnum> UpdateAsync(int groupId, EditGroupModal modal)
+        {
+            try
+            {
+                IdolGroup idolGroup = await idolGroupRepository.FirstOrDefaultByIdAsync(groupId);
+
+                await idolGroupRepository.SaveChangesAsync();
+
+                logger.Log($"Group with ID {groupId} updated successfully!");
+                return DbProcessResultEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("IdolGroupService.cs UpdateAsync", ex.ToString());
+            }
+            return DbProcessResultEnum.Failure;
         }
     }
 }

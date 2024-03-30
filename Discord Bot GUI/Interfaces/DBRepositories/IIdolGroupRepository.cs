@@ -5,6 +5,9 @@ namespace Discord_Bot.Interfaces.DBRepositories
 {
     public interface IIdolGroupRepository
     {
+        Task AddGroupAsync(IdolGroup newGroup);
+        Task<IdolGroup> FirstOrDefaultByIdAsync(int groupId);
         Task<IdolGroup> GetGroupAsync(string idolGroup);
+        Task SaveChangesAsync();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Discord_Bot.Communication;
+using Discord_Bot.Communication.Modal;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using System.Collections.Generic;
@@ -14,5 +15,9 @@ namespace Discord_Bot.Interfaces.DBServices
         Task<List<IdolResource>> GetAllIdolsAsync();
         Task UpdateIdolDetailsAsync(IdolResource idolResource, ExtendedBiasData data, AdditionalIdolData additional);
         Task<IdolExtendedResource> GetIdolDetailsAsync(string idolName, string idolGroup);
+        Task<DbProcessResultEnum> UpdateAsync(int idolId, EditIdolModal modal);
+        Task<DbProcessResultEnum> UpdateAsync(int idolId, EditIdolExtendedModal modal);
+        Task<DbProcessResultEnum> UpdateAsync(int idolId, ChangeIdolProfileLinkModal modal);
+        Task<DbProcessResultEnum> UpdateAsync(int idolId, ChangeIdolGroupModal modal);
     }
 }

@@ -102,9 +102,16 @@ namespace Discord_Bot.Database.DBRepositories
                 .ToListAsync();
         }
 
-        public ValueTask<Idol> FindByIdAsync(int idolId)
+        public Task<Idol> FirstOrDefaultByIdAsync(int idolId)
         {
-            return context.Idols.FindAsync(idolId);
+            return context.Idols
+                .Include(i => i.Group)
+                .FirstOrDefaultAsync(x => x.IdolId == idolId);
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await context.SaveChangesAsync();
         }
     }
 }

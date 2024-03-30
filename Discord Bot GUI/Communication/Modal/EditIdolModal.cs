@@ -6,7 +6,7 @@ namespace Discord_Bot.Communication.Modal
     {
         public string Title => "Edit Idol";
 
-        [RequiredInput(true)]
+        [RequiredInput(false)]
         [InputLabel("Profile URL")]
         [ModalTextInput("profileurl", placeholder: "kpopdb or kprofiles link", maxLength: 200)]
         public string ProfileURL { get; set; }

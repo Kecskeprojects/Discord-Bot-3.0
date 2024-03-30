@@ -35,6 +35,7 @@ namespace Discord_Bot.Interactions
         }
 
         [ComponentInteraction("EditIdolData")]
+        [RequireOwner]
         public async Task EditIdolMenuHandler(string[] selectedAction)
         {
             try

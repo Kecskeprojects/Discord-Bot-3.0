@@ -17,6 +17,7 @@ namespace Discord_Bot.Interfaces.DBRepositories
         Task UpdateIdolAsync(Idol idol);
         Task<List<Idol>> GetIdolsByNameAndGroupAndUserAsync(ulong userId, string idolName, string idolGroup);
         Task<List<Idol>> GetAllIdolsAsync();
-        ValueTask<Idol> FindByIdAsync(int idolId);
+        Task<Idol> FirstOrDefaultByIdAsync(int idolId);
+        Task SaveChangesAsync();
     }
 }
