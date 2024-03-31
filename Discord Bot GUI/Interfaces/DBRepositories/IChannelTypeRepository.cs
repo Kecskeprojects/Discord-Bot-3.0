@@ -1,11 +1,8 @@
 ﻿using Discord_Bot.Database.Models;
-using Discord_Bot.Enums;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Interfaces.DBRepositories
 {
-    public interface IChannelTypeRepository
+    public interface IChannelTypeRepository : IGenericRepository<ChannelType>
     {
-        Task<ChannelType> GetChannelTypeByIdAsync(ChannelTypeEnum channelTypeId);
     }
 }

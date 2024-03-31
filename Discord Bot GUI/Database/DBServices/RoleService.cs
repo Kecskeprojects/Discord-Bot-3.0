@@ -78,7 +78,7 @@ namespace Discord_Bot.Database.DBServices
             List<RoleResource> result = null;
             try
             {
-                List<Role> role = await roleRepository.GetListAsync(r => 
+                List<Role> role = await roleRepository.GetListAsync(r =>
                 r.Server.DiscordId == serverId.ToString(),
                 r => r.Server);
                 result = mapper.Map<List<Role>, List<RoleResource>>(role);

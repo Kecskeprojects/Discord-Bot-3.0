@@ -73,7 +73,7 @@ namespace Discord_Bot.Database.DBServices
             List<ReminderResource> result = null;
             try
             {
-                List<Reminder> server = await reminderRepository.GetListAsync(r => 
+                List<Reminder> server = await reminderRepository.GetListAsync(r =>
                 r.User.DiscordId == userId.ToString(),
                 orderBy: r => r.Date,
                 includes: r => r.User);

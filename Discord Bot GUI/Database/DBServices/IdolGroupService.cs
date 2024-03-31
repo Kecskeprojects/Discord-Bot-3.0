@@ -68,7 +68,7 @@ namespace Discord_Bot.Database.DBServices
             }
 
             IdolGroup newGroup = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.Name == groupName);
-            if(newGroup == null)
+            if (newGroup == null)
             {
                 newGroup = new IdolGroup()
                 {
