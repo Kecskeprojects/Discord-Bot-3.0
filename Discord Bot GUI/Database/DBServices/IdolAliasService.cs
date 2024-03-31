@@ -10,7 +10,12 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices
 {
-    public class IdolAliasService(IIdolAliasRepository idolAliasRepository, IIdolRepository idolRepository, IMapper mapper, Logging logger, Cache cache) : BaseService(mapper, logger, cache), IIdolAliasService
+    public class IdolAliasService(
+        IIdolAliasRepository idolAliasRepository,
+        IIdolRepository idolRepository,
+        IMapper mapper,
+        Logging logger,
+        Cache cache) : BaseService(mapper, logger, cache), IIdolAliasService
     {
         private readonly IIdolAliasRepository idolAliasRepository = idolAliasRepository;
         private readonly IIdolRepository idolRepository = idolRepository;

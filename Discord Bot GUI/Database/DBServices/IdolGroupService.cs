@@ -12,7 +12,11 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices
 {
-    public class IdolGroupService(IIdolGroupRepository idolGroupRepository, IMapper mapper, Logging logger, Cache cache) : BaseService(mapper, logger, cache), IIdolGroupService
+    public class IdolGroupService(
+        IIdolGroupRepository idolGroupRepository,
+        IMapper mapper,
+        Logging logger,
+        Cache cache) : BaseService(mapper, logger, cache), IIdolGroupService
     {
         private readonly IIdolGroupRepository idolGroupRepository = idolGroupRepository;
 

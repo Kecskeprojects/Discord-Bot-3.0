@@ -12,7 +12,12 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices
 {
-    public class RoleService(IMapper mapper, Logging logger, Cache cache, IRoleRepository roleRepository, IServerRepository serverRepository) : BaseService(mapper, logger, cache), IRoleService
+    public class RoleService(
+        IRoleRepository roleRepository,
+        IServerRepository serverRepository,
+        IMapper mapper,
+        Logging logger,
+        Cache cache) : BaseService(mapper, logger, cache), IRoleService
     {
         private readonly IRoleRepository roleRepository = roleRepository;
         private readonly IServerRepository serverRepository = serverRepository;

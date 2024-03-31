@@ -12,7 +12,12 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices
 {
-    public class CustomCommandService(IMapper mapper, Logging logger, Cache cache, ICustomCommandRepository customCommandRepository, IServerRepository serverRepository) : BaseService(mapper, logger, cache), ICustomCommandService
+    public class CustomCommandService(
+        ICustomCommandRepository customCommandRepository,
+        IServerRepository serverRepository,
+        IMapper mapper,
+        Logging logger,
+        Cache cache) : BaseService(mapper, logger, cache), ICustomCommandService
     {
         private readonly ICustomCommandRepository customCommandRepository = customCommandRepository;
         private readonly IServerRepository serverRepository = serverRepository;

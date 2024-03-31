@@ -13,7 +13,12 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices
 {
-    public class ReminderService(IMapper mapper, Logging logger, Cache cache, IReminderRepository reminderRepository, IUserRepository userRepository) : BaseService(mapper, logger, cache), IReminderService
+    public class ReminderService(
+        IReminderRepository reminderRepository,
+        IUserRepository userRepository,
+        IMapper mapper,
+        Logging logger,
+        Cache cache) : BaseService(mapper, logger, cache), IReminderService
     {
         private readonly IReminderRepository reminderRepository = reminderRepository;
         private readonly IUserRepository userRepository = userRepository;

@@ -11,7 +11,12 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices
 {
-    public class KeywordService(IMapper mapper, Logging logger, Cache cache, IKeywordRepository keywordRepository, IServerRepository serverRepository) : BaseService(mapper, logger, cache), IKeywordService
+    public class KeywordService(
+        IKeywordRepository keywordRepository,
+        IServerRepository serverRepository,
+        IMapper mapper,
+        Logging logger,
+        Cache cache) : BaseService(mapper, logger, cache), IKeywordService
     {
         private readonly IKeywordRepository keywordRepository = keywordRepository;
         private readonly IServerRepository serverRepository = serverRepository;
