@@ -30,7 +30,7 @@ namespace Discord_Bot.Database.DBServices
                     Date = date,
                     Message = remindMessage
                 };
-                await reminderRepository.AddReminderAsync(reminder);
+                await reminderRepository.AddAsync(reminder);
 
                 logger.Log($"Reminder added for the following user: {userId}\nwith the following date: {date:yyyy.MM.dd HH:mm:ss}");
                 return DbProcessResultEnum.Success;
@@ -47,7 +47,7 @@ namespace Discord_Bot.Database.DBServices
             List<ReminderResource> result = null;
             try
             {
-                List<Reminder> reminders = await reminderRepository.GetCurrentRemindersAsync(dateTime);
+                List<Reminder> reminders = await reminderRepository.GetListAsync(r => r.Date <= dateTime, r => r.User);
                 if (reminders == null)
                 {
                     return null;
@@ -68,7 +68,10 @@ namespace Discord_Bot.Database.DBServices
             List<ReminderResource> result = null;
             try
             {
-                List<Reminder> server = await reminderRepository.GetUserReminderListAsync(userId);
+                List<Reminder> server = await reminderRepository.GetListAsync(r => 
+                r.User.DiscordId == userId.ToString(),
+                orderBy: r => r.Date,
+                includes: r => r.User);
                 if (server == null)
                 {
                     return null;
@@ -88,11 +91,11 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                List<Reminder> reminders = await reminderRepository.GetRemindersByIds(reminderIds);
+                List<Reminder> reminders = await reminderRepository.GetListAsync(r => reminderIds.Contains(r.ReminderId));
 
                 if (!CollectionTools.IsNullOrEmpty(reminders))
                 {
-                    await reminderRepository.RemoveCurrentRemindersAsync(reminders);
+                    await reminderRepository.RemoveAsync(reminders);
 
                     logger.Log($"Reminders removed with the following IDs: {string.Join(",", reminderIds)}");
                 }
@@ -113,11 +116,11 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                Reminder reminder = await reminderRepository.GetUserReminderById(userId, reminderOrderId);
+                Reminder reminder = await reminderRepository.GetByIndexAsync(userId.ToString(), reminderOrderId);
 
                 if (reminder != null)
                 {
-                    await reminderRepository.RemoveReminderAsync(reminder);
+                    await reminderRepository.RemoveAsync(reminder);
 
                     logger.Log($"Reminders removed by the following user: {userId}\nwith the following ID: {reminderOrderId}");
                     return DbProcessResultEnum.Success;

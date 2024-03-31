@@ -309,7 +309,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("UserService.cs GetUsersWithIdolsAsync", ex.ToString());
+                logger.Error("IdolService.cs GetUsersByIdolsAsync", ex.ToString());
             }
             return result;
         }
