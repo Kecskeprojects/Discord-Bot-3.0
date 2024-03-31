@@ -24,7 +24,11 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                Idol idolForImage = await idolRepository.GetIdolByNameAndGroupAsync(idol, group);
+                Idol idolForImage = await idolRepository.FirstOrDefaultAsync(
+                    i => i.Name == idol &&
+                    i.Group.Name == group,
+                    i => i.Group,
+                    i => i.IdolImages);
                 if (idolForImage != null)
                 {
                     await idolImageRepository.RemoveAsync(idolForImage.IdolImages);

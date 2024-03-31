@@ -34,7 +34,9 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                if (await idolRepository.IdolExistsAsync(idolName, idolGroup))
+                if (await idolRepository.ExistsAsync(
+                    i => i.Name == idolName && i.Group.Name == idolGroup,
+                    i => i.Group))
                 {
                     logger.Log($"Idol [{idolName}]-[{idolGroup}] is already in database!");
                     return DbProcessResultEnum.AlreadyExists;
@@ -54,7 +56,7 @@ namespace Discord_Bot.Database.DBServices
                     Group = group,
                     Name = idolName,
                 };
-                await idolRepository.AddIdolAsync(idol);
+                await idolRepository.AddAsync(idol);
 
                 logger.Log($"Idol [{idolName}]-[{idolGroup}] added successfully!");
                 return DbProcessResultEnum.Success;
@@ -71,7 +73,10 @@ namespace Discord_Bot.Database.DBServices
             List<IdolResource> result = null;
             try
             {
-                List<Idol> idols = await idolRepository.GetIdolsByGroupAsync(groupName);
+                List<Idol> idols = await idolRepository.GetListAsync(
+                    i => string.IsNullOrEmpty(groupName) ||
+                    i.Group.Name == groupName,
+                    i => i.Group);
 
                 result = mapper.Map<List<Idol>, List<IdolResource>>(idols);
             }
@@ -86,10 +91,13 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                Idol idol = await idolRepository.GetIdolByNameAndGroupAsync(idolName, idolGroup);
+                Idol idol = await idolRepository.FirstOrDefaultAsync(
+                    i => i.Name == idolName &&
+                    i.Group.Name == idolGroup,
+                    i => i.Group);
                 if (idol != null)
                 {
-                    await idolRepository.RemoveIdolAsync(idol);
+                    await idolRepository.RemoveAsync(idol);
 
                     logger.Log($"Idol [{idolName}]-[{idolGroup}] removed successfully!");
                     return DbProcessResultEnum.Success;
@@ -112,7 +120,7 @@ namespace Discord_Bot.Database.DBServices
             List<IdolResource> result = null;
             try
             {
-                List<Idol> idols = await idolRepository.GetAllIdolsAsync();
+                List<Idol> idols = await idolRepository.GetAllAsync(i => i.Group);
 
                 result = mapper.Map<List<Idol>, List<IdolResource>>(idols);
             }
@@ -127,7 +135,7 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                Idol idol = await idolRepository.FirstOrDefaultByIdAsync(idolResource.IdolId);
+                Idol idol = await idolRepository.FirstOrDefaultAsync(i => i.IdolId == idolResource.IdolId, i => i.Group, i => i.IdolImages);
 
                 if (idol.IdolImages.Count > 3)
                 {
@@ -150,7 +158,7 @@ namespace Discord_Bot.Database.DBServices
                     }
                 }
 
-                await idolRepository.UpdateIdolAsync(idol);
+                await idolRepository.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -163,7 +171,10 @@ namespace Discord_Bot.Database.DBServices
             IdolExtendedResource resource = null;
             try
             {
-                Idol idol = await idolRepository.GetIdolByNameAndGroupAsync(idolName, idolGroup);
+                Idol idol = await idolRepository.FirstOrDefaultAsync(
+                    i => i.Name == idolName &&
+                    i.Group.Name == idolGroup,
+                    i => i.Group);
 
                 if (idol == null)
                 {
@@ -184,7 +195,7 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                Idol idol = await idolRepository.FirstOrDefaultByIdAsync(idolId);
+                Idol idol = await idolRepository.FirstOrDefaultAsync(i => i.IdolId == idolId, i => i.Group);
                 idol.ProfileUrl = modal.ProfileURL;
                 idol.DateOfBirth = DateOnly.TryParse(modal.DateOfBirth, out DateOnly dateOfBirth) ? dateOfBirth : idol.DateOfBirth;
                 idol.Name = modal.Name.ToLower();
@@ -211,7 +222,7 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                Idol idol = await idolRepository.FirstOrDefaultByIdAsync(idolId);
+                Idol idol = await idolRepository.FirstOrDefaultAsync(i => i.IdolId == idolId);
                 idol.StageName = modal.StageName;
                 idol.KoreanStageName = modal.KoreanStageName;
                 idol.FullName = modal.FullName;
@@ -233,7 +244,7 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                Idol idol = await idolRepository.FirstOrDefaultByIdAsync(idolId);
+                Idol idol = await idolRepository.FirstOrDefaultAsync(i => i.IdolId == idolId);
                 idol.ProfileUrl = modal.ProfileURL;
                 await idolRepository.SaveChangesAsync();
 
@@ -251,7 +262,7 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                Idol idol = await idolRepository.FirstOrDefaultByIdAsync(idolId);
+                Idol idol = await idolRepository.FirstOrDefaultAsync(i => i.IdolId == idolId);
                 idol.Group = await idolGroupService.UpdateOrCreateGroupAsync(idol.Group, modal.Group.ToLower());
                 await idolRepository.SaveChangesAsync();
 
@@ -276,7 +287,8 @@ namespace Discord_Bot.Database.DBServices
                     string[] parts = item.Split("-");
                     string idolOrGroupName = parts[0];
                     string groupName = parts.Length == 2 ? parts[1] : "";
-                    idols = idols.Union(await idolRepository.GetIdolsByNameAndGroupAsync(idolOrGroupName, groupName)).ToList();
+                    List<Idol> newIdols = await idolRepository.GetListByNamesAsync(idolOrGroupName, groupName);
+                    idols = idols.Union(newIdols).ToList();
                 }
 
                 if (CollectionTools.IsNullOrEmpty(idols))

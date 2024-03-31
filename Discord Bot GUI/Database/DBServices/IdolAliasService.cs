@@ -35,7 +35,11 @@ namespace Discord_Bot.Database.DBServices
                     return DbProcessResultEnum.AlreadyExists;
                 }
 
-                Idol idol = await idolRepository.GetIdolWithAliasesAsync(idolName, idolGroup);
+                Idol idol = await idolRepository.FirstOrDefaultAsync(
+                    i => idolGroup == i.Group.Name &&
+                    i.Name == idolName,
+                    i => i.IdolAliases,
+                    i => i.Group);
 
                 if (idol == null)
                 {
@@ -49,7 +53,7 @@ namespace Discord_Bot.Database.DBServices
                 };
                 idol.IdolAliases.Add(alias);
 
-                await idolRepository.UpdateIdolAsync(idol);
+                await idolRepository.SaveChangesAsync();
 
                 logger.Log($"Idol [{idolAlias}-{idolName}]-[{idolGroup}] added successfully!");
                 return DbProcessResultEnum.Success;

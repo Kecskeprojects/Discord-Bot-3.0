@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Discord_Bot.Resources
 {
@@ -16,7 +15,5 @@ namespace Discord_Bot.Resources
         public string CurrentImageUrl { get; set; }
 
         public DateOnly? GroupDebutDate { get; set; }
-
-        public List<IdolAliasResource> IdolAliases { get; set; } = [];
     }
 }

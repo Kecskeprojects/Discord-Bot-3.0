@@ -28,7 +28,12 @@ namespace Discord_Bot.Database.DBServices
             List<IdolResource> result = null;
             try
             {
-                List<Idol> idols = await idolRepository.GetUserIdolsListAsync(userId, groupName);
+                List<Idol> idols = await idolRepository.GetListAsync(
+                    i => (string.IsNullOrEmpty(groupName) ||
+                    i.Group.Name == groupName) &&
+                    i.Users.FirstOrDefault(u => u.DiscordId == userId.ToString()) != null,
+                    i => i.Users,
+                    i => i.Group);
 
                 result = mapper.Map<List<Idol>, List<IdolResource>>(idols);
             }
@@ -45,7 +50,7 @@ namespace Discord_Bot.Database.DBServices
             {
                 bool noGroup = string.IsNullOrEmpty(idolGroup);
 
-                List<Idol> idols = await idolRepository.GetIdolsByNameAndGroupAsync(idolName, idolGroup);
+                List<Idol> idols = await idolRepository.GetListByNamesAsync(idolName, idolGroup);
 
                 if (idols.Count == 0)
                 {
@@ -62,7 +67,7 @@ namespace Discord_Bot.Database.DBServices
 
                 User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString(), u => u.Idols);
                 user ??= new User() { DiscordId = userId.ToString(), Idols = [] };
-                List<Idol> userIdols = await idolRepository.GetIdolsByNameAndGroupAndUserAsync(userId, idolName, idolGroup);
+                List<Idol> userIdols = await idolRepository.GetListByNamesAsync(idolName, idolGroup, userId.ToString());
                 if (userIdols.Count > 0)
                 {
                     logger.Log($"{userId} user's with idol [{idolName}]-[{(noGroup ? "No group specified" : idolGroup)}] is already connected!");
