@@ -24,6 +24,13 @@ namespace Discord_Bot.Database.DBRepositories
         }
         #endregion
 
+        #region Exists
+        public Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return context.Set<TEntity>().Where(predicate).AnyAsync();
+        }
+        #endregion
+
         #region FindById
         public ValueTask<TEntity> FindByIdAsync(int id)
         {

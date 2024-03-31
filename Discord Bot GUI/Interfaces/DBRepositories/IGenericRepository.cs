@@ -21,6 +21,7 @@ namespace Discord_Bot.Interfaces.DBRepositories
         Task<List<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> orderBy, bool ascending = true);
         Task<List<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes);
         Task<List<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> orderBy, bool ascending = true, params Expression<Func<TEntity, object>>[] includes);
+        Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate);
         Task<int> RemoveAsync(TEntity item, bool saveChanges = true);
         Task<int> RemoveAsync(IEnumerable<TEntity> items, bool saveChanges = true);
         Task<int> SaveChangesAsync();

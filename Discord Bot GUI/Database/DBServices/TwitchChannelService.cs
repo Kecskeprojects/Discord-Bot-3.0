@@ -29,7 +29,7 @@ namespace Discord_Bot.Database.DBServices
                     return DbProcessResultEnum.NotFound;
                 }
 
-                if (await twitchChannelRepository.TwitchChannelExistsAsync(serverId, twitchUserId))
+                if (await twitchChannelRepository.ExistsAsync(tc => tc.Server.DiscordId == serverId.ToString() && tc.TwitchId == twitchUserId))
                 {
                     return DbProcessResultEnum.AlreadyExists;
                 }
@@ -43,7 +43,7 @@ namespace Discord_Bot.Database.DBServices
                     Server = server
                 };
 
-                await twitchChannelRepository.AddTwitchChannelAsync(channel);
+                await twitchChannelRepository.AddAsync(channel);
 
                 cache.RemoveCachedEntityManually(serverId);
 
@@ -61,7 +61,7 @@ namespace Discord_Bot.Database.DBServices
             List<TwitchChannelResource> result = null;
             try
             {
-                List<TwitchChannel> channels = await twitchChannelRepository.GetChannelsAsync();
+                List<TwitchChannel> channels = await twitchChannelRepository.GetAllAsync(x => x.Server, x => x.Server.NotificationRole);
                 if (channels == null)
                 {
                     return null;
@@ -81,13 +81,13 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                TwitchChannel channel = await twitchChannelRepository.GetChannelsNameAsync(serverId, name);
+                TwitchChannel channel = await twitchChannelRepository.FirstOrDefaultAsync(tc => tc.Server.DiscordId == serverId.ToString() && tc.TwitchName == name);
                 if (channel == null)
                 {
                     return DbProcessResultEnum.NotFound;
                 }
 
-                await twitchChannelRepository.RemoveTwitchChannelAsync(channel);
+                await twitchChannelRepository.RemoveAsync(channel);
 
                 cache.RemoveCachedEntityManually(serverId);
 
@@ -104,13 +104,13 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                List<TwitchChannel> channels = await twitchChannelRepository.GetChannelsByServerIdAsync(serverId);
+                List<TwitchChannel> channels = await twitchChannelRepository.GetListAsync(tc => tc.Server.DiscordId == serverId.ToString());
                 if (CollectionTools.IsNullOrEmpty(channels))
                 {
                     return DbProcessResultEnum.NotFound;
                 }
 
-                await twitchChannelRepository.RemoveTwitchChannelsAsync(channels);
+                await twitchChannelRepository.RemoveAsync(channels);
 
                 cache.RemoveCachedEntityManually(serverId);
 
