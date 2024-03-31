@@ -79,6 +79,7 @@ namespace Discord_Bot.Core
 
             //Database Services
             collection.AddTransient<IServerService, ServerService>();
+            collection.AddTransient<IServerChannelViewService, ServerChannelViewService>();
             collection.AddTransient<IGreetingService, GreetingService>();
             collection.AddTransient<ITwitchChannelService, TwitchChannelService>();
             collection.AddTransient<ICustomCommandService, CustomCommandService>();

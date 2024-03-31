@@ -7,16 +7,21 @@ using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices
 {
-    public class ServerService(IServerRepository serverRepository, IServerChannelViewRepository channelViewRepository, IMapper mapper, Logging logger, Cache cache) : BaseService(mapper, logger, cache), IServerService
+    public class ServerService(
+        IServerChannelViewService serverChannelViewService,
+        IServerRepository serverRepository,
+        IRoleRepository roleRepository,
+        IMapper mapper,
+        Logging logger,
+        Cache cache) : BaseService(mapper, logger, cache), IServerService
     {
+        private readonly IServerChannelViewService serverChannelViewService = serverChannelViewService;
         private readonly IServerRepository serverRepository = serverRepository;
-        private readonly IServerChannelViewRepository channelViewRepository = channelViewRepository;
+        private readonly IRoleRepository roleRepository = roleRepository;
 
         public async Task<DbProcessResultEnum> AddServerAsync(ulong serverId)
         {
@@ -26,7 +31,7 @@ namespace Discord_Bot.Database.DBServices
                 {
                     DiscordId = serverId.ToString()
                 };
-                await serverRepository.AddServerAsync(server);
+                await serverRepository.AddAsync(server);
 
                 logger.Log($"Server added with the following ID: {serverId}");
                 return DbProcessResultEnum.Success;
@@ -42,11 +47,11 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                Server server = await serverRepository.GetByDiscordIdAsync(serverId);
+                Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
 
                 server.RoleMessageDiscordId = messageId.ToString();
 
-                await serverRepository.UpdateServerAsync(server);
+                await serverRepository.SaveChangesAsync();
 
                 cache.RemoveCachedEntityManually(serverId);
 
@@ -57,6 +62,71 @@ namespace Discord_Bot.Database.DBServices
                 logger.Error("ServerService.cs ChangeRoleMessageIdAsync", ex.ToString());
             }
 
+            return DbProcessResultEnum.Failure;
+        }
+
+        public async Task<DbProcessResultEnum> AddNotificationRoleAsync(ulong serverId, ulong roleId, string roleName)
+        {
+            try
+            {
+                Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
+                if (server == null)
+                {
+                    return DbProcessResultEnum.NotFound;
+                }
+
+                Role role = await roleRepository.GetRoleAsync(serverId, roleName);
+                role ??= new()
+                {
+                    RoleId = 0,
+                    DiscordId = roleId.ToString(),
+                    RoleName = roleName,
+                    Server = server,
+                    Servers = []
+                };
+
+                if (role.RoleId == server.NotificationRoleId)
+                {
+                    return DbProcessResultEnum.AlreadyExists;
+                }
+
+                server.NotificationRole = role;
+
+                await serverRepository.SaveChangesAsync();
+
+                cache.RemoveCachedEntityManually(serverId);
+
+                return DbProcessResultEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("TwitchChannelService.cs AddNotificationRoleAsync", ex.ToString());
+            }
+            return DbProcessResultEnum.Failure;
+        }
+
+        public async Task<DbProcessResultEnum> RemoveNotificationRoleAsync(ulong serverId)
+        {
+            try
+            {
+                Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
+                if (server == null || server.NotificationRoleId == null)
+                {
+                    return DbProcessResultEnum.NotFound;
+                }
+
+                server.NotificationRole = null;
+
+                await serverRepository.SaveChangesAsync();
+
+                cache.RemoveCachedEntityManually(serverId);
+
+                return DbProcessResultEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("TwitchChannelService.cs RemoveNotificationRoleAsync", ex.ToString());
+            }
             return DbProcessResultEnum.Failure;
         }
 
@@ -71,14 +141,17 @@ namespace Discord_Bot.Database.DBServices
                     return cachedServer;
                 }
 
-                Server server = await serverRepository.GetByDiscordIdAsync(serverId);
+                Server server = await serverRepository.FirstOrDefaultAsync(s =>
+                s.DiscordId == serverId.ToString(),
+                s => s.TwitchChannels,
+                s => s.NotificationRole);
                 if (server == null)
                 {
                     return null;
                 }
 
                 result = mapper.Map<Server, ServerResource>(server);
-                await FillWithChannels(result);
+                result.SettingsChannels = await serverChannelViewService.GetServerChannelsAsync(result.ServerId);
 
                 cache.TryAddValue(result.DiscordId, result);
             }
@@ -88,15 +161,6 @@ namespace Discord_Bot.Database.DBServices
             }
 
             return result;
-        }
-
-        private async Task FillWithChannels(ServerResource resource)
-        {
-            List<ServerChannelView> channels = await channelViewRepository.GetServerChannels(resource.ServerId);
-
-            List<IGrouping<int?, ServerChannelView>> groups = channels.GroupBy(ch => ch.ChannelTypeId).ToList();
-            resource.SettingsChannels = mapper.Map<List<IGrouping<int?, ServerChannelView>>, Dictionary<ChannelTypeEnum, List<ulong>>>(groups);
-            return;
         }
     }
 }

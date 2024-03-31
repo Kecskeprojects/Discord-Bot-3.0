@@ -25,7 +25,7 @@ namespace Discord_Bot.Database.DBServices
                     return DbProcessResultEnum.AlreadyExists;
                 }
 
-                Server server = await serverRepository.GetByDiscordIdAsync(serverId);
+                Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
 
                 Keyword keyword = new()
                 {

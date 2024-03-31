@@ -1,12 +1,8 @@
 ﻿using Discord_Bot.Database.Models;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Interfaces.DBRepositories
 {
-    public interface IServerRepository
+    public interface IServerRepository : IGenericRepository<Server>
     {
-        Task AddServerAsync(Server server);
-        Task<Server> GetByDiscordIdAsync(ulong serverId);
-        Task UpdateServerAsync(Server server);
     }
 }

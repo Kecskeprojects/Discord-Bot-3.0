@@ -228,7 +228,7 @@ namespace Discord_Bot.Commands
                     return;
                 }
                 //Adds the notification role for every checked channel, as of now it will overwrite the previous one, there cannot be multiple, removes server from cache
-                DbProcessResultEnum result = await twitchChannelService.AddNotificationRoleAsync(Context.Guild.Id, role.Id, role.Name);
+                DbProcessResultEnum result = await serverService.AddNotificationRoleAsync(Context.Guild.Id, role.Id, role.Name);
 
                 if (result == DbProcessResultEnum.Success)
                 {
@@ -308,7 +308,7 @@ namespace Discord_Bot.Commands
             try
             {
                 //Removes the currently set notification role, removes server from cache
-                DbProcessResultEnum result = await twitchChannelService.RemoveNotificationRoleAsync(Context.Guild.Id);
+                DbProcessResultEnum result = await serverService.RemoveNotificationRoleAsync(Context.Guild.Id);
 
                 if (result == DbProcessResultEnum.Success)
                 {

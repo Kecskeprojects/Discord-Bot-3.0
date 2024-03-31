@@ -31,7 +31,7 @@ namespace Discord_Bot.Database.DBServices
                     return DbProcessResultEnum.NotFound;
                 }
 
-                Server server = await serverRepository.GetByDiscordIdAsync(serverId);
+                Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
                 if (server == null)
                 {
                     return DbProcessResultEnum.NotFound;

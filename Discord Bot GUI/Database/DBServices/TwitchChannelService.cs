@@ -13,58 +13,17 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices
 {
-    public class TwitchChannelService(IMapper mapper, Logging logger, Cache cache, ITwitchChannelRepository twitchChannelRepository, IServerRepository serverRepository, IRoleRepository roleRepository) : BaseService(mapper, logger, cache), ITwitchChannelService
+    public class TwitchChannelService(IMapper mapper, Logging logger, Cache cache, ITwitchChannelRepository twitchChannelRepository, IServerRepository serverRepository) : BaseService(mapper, logger, cache), ITwitchChannelService
     {
         private readonly ITwitchChannelRepository twitchChannelRepository = twitchChannelRepository;
         private readonly IServerRepository serverRepository = serverRepository;
-        private readonly IRoleRepository roleRepository = roleRepository;
-
-        public async Task<DbProcessResultEnum> AddNotificationRoleAsync(ulong serverId, ulong roleId, string roleName)
-        {
-            try
-            {
-                Server server = await serverRepository.GetByDiscordIdAsync(serverId);
-                if (server == null)
-                {
-                    return DbProcessResultEnum.NotFound;
-                }
-
-                Role role = await roleRepository.GetRoleAsync(serverId, roleName);
-                role ??= new()
-                {
-                    RoleId = 0,
-                    DiscordId = roleId.ToString(),
-                    RoleName = roleName,
-                    Server = server,
-                    Servers = []
-                };
-
-                if (role.RoleId == server.NotificationRoleId)
-                {
-                    return DbProcessResultEnum.AlreadyExists;
-                }
-
-                server.NotificationRole = role;
-
-                await serverRepository.UpdateServerAsync(server);
-
-                cache.RemoveCachedEntityManually(serverId);
-
-                return DbProcessResultEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("TwitchChannelService.cs AddNotificationRoleAsync", ex.ToString());
-            }
-            return DbProcessResultEnum.Failure;
-        }
 
         public async Task<DbProcessResultEnum> AddTwitchChannelAsync(ulong serverId, string twitchUserId, string twitchUserName)
         {
             try
             {
                 string url = $"https://www.twitch.tv/{twitchUserName}";
-                Server server = await serverRepository.GetByDiscordIdAsync(serverId);
+                Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
                 if (server == null)
                 {
                     return DbProcessResultEnum.NotFound;
@@ -116,31 +75,6 @@ namespace Discord_Bot.Database.DBServices
             }
 
             return result;
-        }
-
-        public async Task<DbProcessResultEnum> RemoveNotificationRoleAsync(ulong serverId)
-        {
-            try
-            {
-                Server server = await serverRepository.GetByDiscordIdAsync(serverId);
-                if (server == null || server.NotificationRoleId == null)
-                {
-                    return DbProcessResultEnum.NotFound;
-                }
-
-                server.NotificationRole = null;
-
-                await serverRepository.UpdateServerAsync(server);
-
-                cache.RemoveCachedEntityManually(serverId);
-
-                return DbProcessResultEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("TwitchChannelService.cs RemoveNotificationRoleAsync", ex.ToString());
-            }
-            return DbProcessResultEnum.Failure;
         }
 
         public async Task<DbProcessResultEnum> RemoveTwitchChannelAsync(ulong serverId, string name)
