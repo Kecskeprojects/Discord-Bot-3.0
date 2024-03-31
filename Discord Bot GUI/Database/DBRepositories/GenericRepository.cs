@@ -36,7 +36,7 @@ namespace Discord_Bot.Database.DBRepositories
 
             foreach (Expression<Func<TEntity, object>> include in includes)
             {
-                dbSet.Include(include);
+                dbSet = dbSet.Include(include);
             }
 
             return dbSet.AnyAsync();
@@ -62,7 +62,7 @@ namespace Discord_Bot.Database.DBRepositories
 
             foreach (Expression<Func<TEntity, object>> include in includes)
             {
-                dbSet.Include(include);
+                dbSet = dbSet.Include(include);
             }
 
             return dbSet.FirstOrDefaultAsync(predicate);
@@ -81,7 +81,7 @@ namespace Discord_Bot.Database.DBRepositories
 
             foreach (Expression<Func<TEntity, object>> include in includes)
             {
-                dbSet.Include(include);
+                dbSet = dbSet.Include(include);
             }
 
             return dbSet.ToListAsync();
@@ -91,7 +91,7 @@ namespace Discord_Bot.Database.DBRepositories
         {
             IQueryable<TEntity> dbSet = context.Set<TEntity>();
 
-            dbSet.OrderByDynamic(orderBy, ascending);
+            dbSet = dbSet.OrderByDynamic(orderBy, ascending);
 
             return dbSet.ToListAsync();
         }
@@ -100,11 +100,11 @@ namespace Discord_Bot.Database.DBRepositories
         {
             IQueryable<TEntity> dbSet = context.Set<TEntity>();
 
-            dbSet.OrderByDynamic(orderBy, ascending);
+            dbSet = dbSet.OrderByDynamic(orderBy, ascending);
 
             foreach (Expression<Func<TEntity, object>> include in includes)
             {
-                dbSet.Include(include);
+                dbSet = dbSet.Include(include);
             }
 
             return dbSet.ToListAsync();
@@ -123,7 +123,7 @@ namespace Discord_Bot.Database.DBRepositories
 
             foreach (Expression<Func<TEntity, object>> include in includes)
             {
-                dbSet.Include(include);
+                dbSet = dbSet.Include(include);
             }
 
             return dbSet.ToListAsync();
@@ -133,7 +133,7 @@ namespace Discord_Bot.Database.DBRepositories
         {
             IQueryable<TEntity> dbSet = context.Set<TEntity>().Where(predicate);
 
-            dbSet.OrderByDynamic(orderBy, ascending);
+            dbSet = dbSet.OrderByDynamic(orderBy, ascending);
 
             return dbSet.ToListAsync();
         }
@@ -142,11 +142,11 @@ namespace Discord_Bot.Database.DBRepositories
         {
             IQueryable<TEntity> dbSet = context.Set<TEntity>().Where(predicate);
 
-            dbSet.OrderByDynamic(orderBy, ascending);
+            dbSet = dbSet.OrderByDynamic(orderBy, ascending);
 
             foreach (Expression<Func<TEntity, object>> include in includes)
             {
-                dbSet.Include(include);
+                dbSet = dbSet.Include(include);
             }
 
             return dbSet.ToListAsync();
