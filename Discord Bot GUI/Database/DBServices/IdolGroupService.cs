@@ -42,7 +42,7 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                IdolGroup idolGroup = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.GroupId == groupId);
+                IdolGroup idolGroup = await idolGroupRepository.FindByIdAsync(groupId);
 
                 await idolGroupRepository.SaveChangesAsync();
 

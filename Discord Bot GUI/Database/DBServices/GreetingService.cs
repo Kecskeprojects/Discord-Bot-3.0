@@ -21,7 +21,7 @@ namespace Discord_Bot.Database.DBServices
             List<GreetingResource> result = null;
             try
             {
-                List<Greeting> greetings = await greetingRepository.GetAllGreetingAsync();
+                List<Greeting> greetings = await greetingRepository.GetAllAsync();
                 result = mapper.Map<List<Greeting>, List<GreetingResource>>(greetings);
             }
             catch (Exception ex)
@@ -40,7 +40,7 @@ namespace Discord_Bot.Database.DBServices
                     GreetingId = 0,
                     Url = url
                 };
-                await greetingRepository.AddGreetingAsync(greeting);
+                await greetingRepository.AddAsync(greeting);
 
                 logger.Log("Greeting added successfully!");
                 return DbProcessResultEnum.Success;
@@ -56,10 +56,10 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                Greeting greeting = await greetingRepository.GetGreetingByIdAsync(id);
+                Greeting greeting = await greetingRepository.FindByIdAsync(id);
                 if (greeting != null)
                 {
-                    await greetingRepository.RemoveGreetingAsync(greeting);
+                    await greetingRepository.RemoveAsync(greeting);
 
                     logger.Log($"Greeting with ID: {id} removed successfully!");
                     return DbProcessResultEnum.Success;
