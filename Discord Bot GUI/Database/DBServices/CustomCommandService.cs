@@ -21,7 +21,10 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                if (await customCommandRepository.CustomCommandExistsAsync(serverId, commandName))
+                if (await customCommandRepository.ExistsAsync(
+                    cc => cc.Server.DiscordId == serverId.ToString() &&
+                    cc.Command.Trim().ToLower().Equals(commandName.Trim().ToLower()),
+                    cc => cc.Server))
                 {
                     return DbProcessResultEnum.AlreadyExists;
                 }
@@ -36,7 +39,7 @@ namespace Discord_Bot.Database.DBServices
                     Url = link
 
                 };
-                await customCommandRepository.AddCustomCommandAsync(command);
+                await customCommandRepository.AddAsync(command);
 
                 logger.Log("Custom command added successfully!");
                 return DbProcessResultEnum.Success;
@@ -53,7 +56,10 @@ namespace Discord_Bot.Database.DBServices
             CustomCommandResource result = null;
             try
             {
-                CustomCommand command = await customCommandRepository.GetCustomCommandAsync(serverId, commandName);
+                CustomCommand command = await customCommandRepository.FirstOrDefaultAsync(
+                    cc => cc.Server.DiscordId == serverId.ToString() &&
+                    cc.Command.Trim().ToLower().Equals(commandName.Trim().ToLower()),
+                    cc => cc.Server);
                 result = mapper.Map<CustomCommand, CustomCommandResource>(command);
             }
             catch (Exception ex)
@@ -68,7 +74,10 @@ namespace Discord_Bot.Database.DBServices
             List<CustomCommandResource> result = null;
             try
             {
-                List<CustomCommand> commands = await customCommandRepository.GetCustomCommandListAsync(serverId);
+                List<CustomCommand> commands = await customCommandRepository.GetListAsync(
+                    cc => cc.Server.DiscordId == serverId.ToString(),
+                    orderBy: cc => cc.Command,
+                    includes: cc => cc.Server);
                 result = mapper.Map<List<CustomCommand>, List<CustomCommandResource>>(commands);
             }
             catch (Exception ex)
@@ -82,10 +91,13 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                CustomCommand customCommand = await customCommandRepository.GetCustomCommandAsync(serverId, commandName);
+                CustomCommand customCommand = await customCommandRepository.FirstOrDefaultAsync(
+                    cc => cc.Server.DiscordId == serverId.ToString() &&
+                    cc.Command.Trim().ToLower().Equals(commandName.Trim().ToLower()),
+                    cc => cc.Server);
                 if (customCommand != null)
                 {
-                    await customCommandRepository.RemoveCustomCommandAsync(customCommand);
+                    await customCommandRepository.RemoveAsync(customCommand);
 
                     logger.Log($"Custom command {commandName} removed successfully!");
                     return DbProcessResultEnum.Success;
