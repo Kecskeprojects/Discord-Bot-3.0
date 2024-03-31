@@ -60,7 +60,7 @@ namespace Discord_Bot.Database.DBServices
 
                 Idol idol = idols[0];
 
-                User user = await userRepository.GetUserWithIdolsByDiscordIdAsync(userId);
+                User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString(), u => u.Idols);
                 user ??= new User() { DiscordId = userId.ToString(), Idols = [] };
                 List<Idol> userIdols = await idolRepository.GetIdolsByNameAndGroupAndUserAsync(userId, idolName, idolGroup);
                 if (userIdols.Count > 0)
@@ -71,7 +71,7 @@ namespace Discord_Bot.Database.DBServices
 
                 user.Idols.Add(idol);
 
-                await userRepository.UpdateUserAsync(user);
+                await userRepository.UpdateAsync(user);
 
                 logger.Log($"{userId} user's idol [{idolName}]-[{(noGroup ? "No group specified" : idolGroup)}] added successfully!");
                 return DbProcessResultEnum.Success;
@@ -87,11 +87,11 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                User user = await userRepository.GetUserWithIdolsByDiscordIdAsync(userId);
+                User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString(), u => u.Idols);
                 user ??= new User() { DiscordId = userId.ToString() };
                 user.Idols = [];
 
-                await userRepository.UpdateUserAsync(user);
+                await userRepository.UpdateAsync(user);
 
                 logger.Log("User idol added successfully!");
                 return DbProcessResultEnum.Success;
@@ -109,7 +109,7 @@ namespace Discord_Bot.Database.DBServices
             {
                 bool noGroup = string.IsNullOrEmpty(idolGroup);
 
-                User user = await userRepository.GetUserWithIdolsByDiscordIdAsync(userId);
+                User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString(), u => u.Idols);
                 user ??= new User() { DiscordId = userId.ToString() };
                 List<Idol> idols = user.Idols.Where(i => i.Name == idolName && (string.IsNullOrEmpty(idolGroup) || idolGroup == i.Group.Name)).ToList();
                 if (idols.Count == 0)
@@ -125,7 +125,7 @@ namespace Discord_Bot.Database.DBServices
                 Idol idol = idols[0];
                 user.Idols.Remove(idol);
 
-                await userRepository.UpdateUserAsync(user);
+                await userRepository.UpdateAsync(user);
 
                 logger.Log($"{userId} user's idol [{idolName}]-[{(noGroup ? "No group specified" : idolGroup)}] removed successfully!");
                 return DbProcessResultEnum.Success;

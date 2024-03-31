@@ -40,7 +40,7 @@ namespace Discord_Bot.Database.DBServices
                     }
                 }
                 Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
-                User user = await userRepository.GetUserByDiscordIdAsync(userId);
+                User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
 
                 birthday = new()
                 {

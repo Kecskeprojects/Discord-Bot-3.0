@@ -8,6 +8,7 @@ using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
+using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -279,6 +280,38 @@ namespace Discord_Bot.Database.DBServices
 
             await idolGroupRepository.AddGroupAsync(newGroup);
             return newGroup;
+        }
+
+        public async Task<ListWithDbResult<UserResource>> GetUsersByIdolsAsync(string[] nameList)
+        {
+            ListWithDbResult<UserResource> result = new(null, DbProcessResultEnum.Failure);
+            try
+            {
+                List<Idol> idols = [];
+                foreach (string item in nameList)
+                {
+                    string[] parts = item.Split("-");
+                    string idolOrGroupName = parts[0];
+                    string groupName = parts.Length == 2 ? parts[1] : "";
+                    idols = idols.Union(await idolRepository.GetIdolsByNameAndGroupAsync(idolOrGroupName, groupName)).ToList();
+                }
+
+                if (CollectionTools.IsNullOrEmpty(idols))
+                {
+                    result.ProcessResultEnum = DbProcessResultEnum.NotFound;
+                    return result;
+                }
+
+                List<User> users = idols.SelectMany(i => i.Users).DistinctBy(u => u.UserId).ToList();
+
+                result.List = mapper.Map<List<User>, List<UserResource>>(users);
+                result.ProcessResultEnum = DbProcessResultEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("UserService.cs GetUsersWithIdolsAsync", ex.ToString());
+            }
+            return result;
         }
     }
 }

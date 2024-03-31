@@ -19,5 +19,6 @@ namespace Discord_Bot.Interfaces.DBServices
         Task<DbProcessResultEnum> UpdateAsync(int idolId, EditIdolExtendedModal modal);
         Task<DbProcessResultEnum> UpdateAsync(int idolId, ChangeIdolProfileLinkModal modal);
         Task<DbProcessResultEnum> UpdateAsync(int idolId, ChangeIdolGroupModal modal);
+        Task<ListWithDbResult<UserResource>> GetUsersByIdolsAsync(string[] nameList);
     }
 }

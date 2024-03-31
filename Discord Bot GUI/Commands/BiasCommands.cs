@@ -19,14 +19,12 @@ namespace Discord_Bot.Commands
 {
     public class BiasCommands(
         IUserIdolService userIdolService,
-        IUserService userService,
         IIdolService idolService,
         IServerService serverService,
         Logging logger,
         Config config) : BaseCommand(logger, config, serverService), IBiasCommands
     {
         private readonly IUserIdolService userIdolService = userIdolService;
-        private readonly IUserService userService = userService;
         private readonly IIdolService idolService = idolService;
 
         #region Bias management commands
@@ -301,7 +299,7 @@ namespace Discord_Bot.Commands
                 string[] nameList = biasNames.ToLower().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
                 //Get the users that have the bias with the following names, if the bias exists
-                ListWithDbResult<UserResource> result = await userService.GetUsersWithIdolsAsync(nameList);
+                ListWithDbResult<UserResource> result = await idolService.GetUsersByIdolsAsync(nameList);
 
                 if (result.ProcessResultEnum == DbProcessResultEnum.NotFound)
                 {
