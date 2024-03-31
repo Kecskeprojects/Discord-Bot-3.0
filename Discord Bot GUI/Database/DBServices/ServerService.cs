@@ -95,7 +95,7 @@ namespace Discord_Bot.Database.DBServices
 
                 server.NotificationRole = role;
 
-                await serverRepository.SaveChangesAsync();
+                await serverRepository.UpdateAsync(server);
 
                 cache.RemoveCachedEntityManually(serverId);
 

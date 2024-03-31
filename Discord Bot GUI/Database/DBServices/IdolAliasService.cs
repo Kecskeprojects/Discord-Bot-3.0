@@ -53,7 +53,7 @@ namespace Discord_Bot.Database.DBServices
                 };
                 idol.IdolAliases.Add(alias);
 
-                await idolRepository.SaveChangesAsync();
+                await idolRepository.UpdateAsync(idol);
 
                 logger.Log($"Idol [{idolAlias}-{idolName}]-[{idolGroup}] added successfully!");
                 return DbProcessResultEnum.Success;

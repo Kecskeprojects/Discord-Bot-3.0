@@ -158,7 +158,7 @@ namespace Discord_Bot.Database.DBServices
                     }
                 }
 
-                await idolRepository.SaveChangesAsync();
+                await idolRepository.UpdateAsync(idol);
             }
             catch (Exception ex)
             {
@@ -196,16 +196,16 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 Idol idol = await idolRepository.FirstOrDefaultAsync(i => i.IdolId == idolId, i => i.Group);
-                idol.ProfileUrl = modal.ProfileURL;
+                idol.ProfileUrl = modal.ProfileURL.Trim();
                 idol.DateOfBirth = DateOnly.TryParse(modal.DateOfBirth, out DateOnly dateOfBirth) ? dateOfBirth : idol.DateOfBirth;
-                idol.Name = modal.Name.ToLower();
+                idol.Name = modal.Name.ToLower().Trim();
                 idol.Gender =
                     modal.Gender.Equals(GenderType.Female, StringComparison.OrdinalIgnoreCase) ?
                         "F" :
                         (modal.Gender.Equals(GenderType.Male, StringComparison.OrdinalIgnoreCase) ?
                             "M" :
                             idol.Gender);
-                idol.Group = await idolGroupService.UpdateOrCreateGroupAsync(idol.Group, modal.Group.ToLower());
+                idol.Group = await idolGroupService.UpdateOrCreateGroupAsync(idol.Group, modal.Group.ToLower().Trim());
                 await idolRepository.SaveChangesAsync();
 
                 logger.Log($"Idol with ID {idolId} updated successfully!");
@@ -223,10 +223,10 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 Idol idol = await idolRepository.FirstOrDefaultAsync(i => i.IdolId == idolId);
-                idol.StageName = modal.StageName;
-                idol.KoreanStageName = modal.KoreanStageName;
-                idol.FullName = modal.FullName;
-                idol.KoreanFullName = modal.KoreanFullName;
+                idol.StageName = modal.StageName.Trim();
+                idol.KoreanStageName = modal.KoreanStageName.Trim();
+                idol.FullName = modal.FullName.Trim();
+                idol.KoreanFullName = modal.KoreanFullName.Trim();
                 idol.DebutDate = DateOnly.TryParse(modal.DebutDate, out DateOnly debutDate) ? debutDate : idol.DebutDate;
                 await idolRepository.SaveChangesAsync();
 
@@ -245,7 +245,7 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 Idol idol = await idolRepository.FirstOrDefaultAsync(i => i.IdolId == idolId);
-                idol.ProfileUrl = modal.ProfileURL;
+                idol.ProfileUrl = modal.ProfileURL.Trim();
                 await idolRepository.SaveChangesAsync();
 
                 logger.Log($"Idol with ID {idolId} updated successfully!");
@@ -263,7 +263,7 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 Idol idol = await idolRepository.FirstOrDefaultAsync(i => i.IdolId == idolId);
-                idol.Group = await idolGroupService.UpdateOrCreateGroupAsync(idol.Group, modal.Group.ToLower());
+                idol.Group = await idolGroupService.UpdateOrCreateGroupAsync(idol.Group, modal.Group.ToLower().Trim());
                 await idolRepository.SaveChangesAsync();
 
                 logger.Log($"Idol with ID {idolId} updated successfully!");

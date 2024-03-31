@@ -47,6 +47,10 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 IdolGroup idolGroup = await idolGroupRepository.FindByIdAsync(groupId);
+                idolGroup.Name = modal.Name.ToLower().Trim();
+                idolGroup.FullName = modal.FullName.Trim();
+                idolGroup.FullKoreanName = modal.FullKoreanName.Trim();
+                idolGroup.DebutDate = DateOnly.TryParse(modal.DebutDate, out DateOnly debutDate) ? debutDate : idolGroup.DebutDate;
 
                 await idolGroupRepository.SaveChangesAsync();
 

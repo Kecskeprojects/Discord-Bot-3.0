@@ -14,10 +14,6 @@ namespace Discord_Bot.Interactions
         private readonly IIdolService idolService = idolService;
         private readonly IIdolGroupService idolGroupService = idolGroupService;
 
-        //Todo:
-        //The modal items can be handed over to the DB services to edit the entities, together with the identifying IDs
-        //If EditIdolModalSubmit recieves an entirely new group's name not found in the database, an entirely new group will be created
-        //If the group of the idol is reassigned, the idol's extended data should be removed
         [ModalInteraction("EditIdolModal_*")]
         [RequireOwner]
         public async Task EditIdolModalSubmit(int idolId, EditIdolModal modal)

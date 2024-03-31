@@ -1,7 +1,6 @@
 ﻿using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Tools;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,14 +12,18 @@ namespace Discord_Bot.Database.DBRepositories
     public class GenericRepository<TEntity>(MainDbContext context) : BaseRepository(context), IGenericRepository<TEntity> where TEntity : class
     {
         #region Add
-        public ValueTask<EntityEntry<TEntity>> AddAsync(TEntity item)
+        public Task<int> AddAsync(TEntity item, bool saveChanges = true)
         {
-            return context.Set<TEntity>().AddAsync(item);
+            context.Set<TEntity>().Add(item);
+
+            return saveChanges ? context.SaveChangesAsync() : new Task<int>(() => 0);
         }
 
-        public Task AddAsync(IEnumerable<TEntity> items)
+        public Task<int> AddAsync(IEnumerable<TEntity> items, bool saveChanges = true)
         {
-            return context.Set<TEntity>().AddRangeAsync(items);
+            context.Set<TEntity>().AddRange(items);
+
+            return saveChanges ? context.SaveChangesAsync() : new Task<int>(() => 0);
         }
         #endregion
 

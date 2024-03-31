@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -8,8 +7,8 @@ namespace Discord_Bot.Interfaces.DBRepositories
 {
     public interface IGenericRepository<TEntity> where TEntity : class
     {
-        ValueTask<EntityEntry<TEntity>> AddAsync(TEntity item);
-        Task AddAsync(IEnumerable<TEntity> items);
+        Task<int> AddAsync(TEntity item, bool saveChanges = true);
+        Task<int> AddAsync(IEnumerable<TEntity> items, bool saveChanges = true);
         ValueTask<TEntity> FindByIdAsync(int id);
         Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
         Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes);
