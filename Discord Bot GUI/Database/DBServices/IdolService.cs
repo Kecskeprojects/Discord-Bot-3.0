@@ -19,6 +19,7 @@ namespace Discord_Bot.Database.DBServices
     public class IdolService(
         IIdolRepository idolRepository,
         IIdolGroupRepository idolGroupRepository,
+        IIdolGroupService idolGroupService,
         IIdolImageRepository idolImageRepository,
         IMapper mapper,
         Logging logger,
@@ -26,6 +27,7 @@ namespace Discord_Bot.Database.DBServices
     {
         private readonly IIdolRepository idolRepository = idolRepository;
         private readonly IIdolGroupRepository idolGroupRepository = idolGroupRepository;
+        private readonly IIdolGroupService idolGroupService = idolGroupService;
         private readonly IIdolImageRepository idolImageRepository = idolImageRepository;
 
         public async Task<DbProcessResultEnum> AddIdolAsync(string idolName, string idolGroup)
@@ -38,7 +40,7 @@ namespace Discord_Bot.Database.DBServices
                     return DbProcessResultEnum.AlreadyExists;
                 }
 
-                IdolGroup group = await idolGroupRepository.GetGroupAsync(idolGroup);
+                IdolGroup group = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.Name == idolGroup);
 
                 group ??= new()
                 {
@@ -192,7 +194,7 @@ namespace Discord_Bot.Database.DBServices
                         (modal.Gender.Equals(GenderType.Male, StringComparison.OrdinalIgnoreCase) ?
                             "M" :
                             idol.Gender);
-                idol.Group = await UpdateGroupAsync(idol.Group, modal.Group);
+                idol.Group = await idolGroupService.UpdateOrCreateGroupAsync(idol.Group, modal.Group.ToLower());
                 await idolRepository.SaveChangesAsync();
 
                 logger.Log($"Idol with ID {idolId} updated successfully!");
@@ -250,7 +252,7 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 Idol idol = await idolRepository.FirstOrDefaultByIdAsync(idolId);
-                idol.Group = await UpdateGroupAsync(idol.Group, modal.Group);
+                idol.Group = await idolGroupService.UpdateOrCreateGroupAsync(idol.Group, modal.Group.ToLower());
                 await idolRepository.SaveChangesAsync();
 
                 logger.Log($"Idol with ID {idolId} updated successfully!");
@@ -261,25 +263,6 @@ namespace Discord_Bot.Database.DBServices
                 logger.Error("IdolService.cs UpdateAsync", ex.ToString());
             }
             return DbProcessResultEnum.Failure;
-        }
-
-        private async Task<IdolGroup> UpdateGroupAsync(IdolGroup group, string groupName)
-        {
-            if (string.IsNullOrWhiteSpace(groupName))
-            {
-                return group;
-            }
-
-            IdolGroup newGroup = await idolGroupRepository.GetGroupAsync(groupName);
-            newGroup ??= new IdolGroup()
-            {
-                Name = groupName,
-                CreatedOn = DateTime.UtcNow,
-                ModifiedOn = DateTime.UtcNow
-            };
-
-            await idolGroupRepository.AddGroupAsync(newGroup);
-            return newGroup;
         }
 
         public async Task<ListWithDbResult<UserResource>> GetUsersByIdolsAsync(string[] nameList)

@@ -1,13 +1,8 @@
 ﻿using Discord_Bot.Database.Models;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Interfaces.DBRepositories
 {
-    public interface IIdolGroupRepository
+    public interface IIdolGroupRepository : IGenericRepository<IdolGroup>
     {
-        Task AddGroupAsync(IdolGroup newGroup);
-        Task<IdolGroup> FirstOrDefaultByIdAsync(int groupId);
-        Task<IdolGroup> GetGroupAsync(string idolGroup);
-        Task SaveChangesAsync();
     }
 }

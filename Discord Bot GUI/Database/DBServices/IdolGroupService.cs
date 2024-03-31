@@ -16,12 +16,12 @@ namespace Discord_Bot.Database.DBServices
     {
         private readonly IIdolGroupRepository idolGroupRepository = idolGroupRepository;
 
-        public async Task<IdolGroupExtendedResource> GetIdolGroupDetailsAsync(string group)
+        public async Task<IdolGroupExtendedResource> GetIdolGroupDetailsAsync(string groupName)
         {
             IdolGroupExtendedResource resource = null;
             try
             {
-                IdolGroup idol = await idolGroupRepository.GetGroupAsync(group);
+                IdolGroup idol = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.Name == groupName);
 
                 if (idol == null)
                 {
@@ -42,7 +42,7 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                IdolGroup idolGroup = await idolGroupRepository.FirstOrDefaultByIdAsync(groupId);
+                IdolGroup idolGroup = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.GroupId == groupId);
 
                 await idolGroupRepository.SaveChangesAsync();
 
@@ -54,6 +54,28 @@ namespace Discord_Bot.Database.DBServices
                 logger.Error("IdolGroupService.cs UpdateAsync", ex.ToString());
             }
             return DbProcessResultEnum.Failure;
+        }
+
+        public async Task<IdolGroup> UpdateOrCreateGroupAsync(IdolGroup group, string groupName)
+        {
+            if (string.IsNullOrWhiteSpace(groupName))
+            {
+                return group;
+            }
+
+            IdolGroup newGroup = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.Name == groupName);
+            if(newGroup == null)
+            {
+                newGroup = new IdolGroup()
+                {
+                    Name = groupName,
+                    CreatedOn = DateTime.UtcNow,
+                    ModifiedOn = DateTime.UtcNow
+                };
+
+                await idolGroupRepository.AddAsync(newGroup);
+            }
+            return newGroup;
         }
     }
 }
