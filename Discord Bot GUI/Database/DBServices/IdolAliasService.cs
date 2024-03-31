@@ -19,7 +19,12 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                if (await idolAliasRepository.IdolAliasExistsAsync(idolAlias, idolName, idolGroup))
+                if (await idolAliasRepository.ExistsAsync(
+                    ia => ia.Alias == idolAlias &&
+                    ia.Idol.Name == idolName &&
+                    ia.Idol.Group.Name == idolGroup,
+                    ia => ia.Idol,
+                    ia => ia.Idol.Group))
                 {
                     logger.Log($"Alias [{idolAlias}-{idolName}]-[{idolGroup}] is already in database!");
                     return DbProcessResultEnum.AlreadyExists;
@@ -55,10 +60,15 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                IdolAlias idolAliasItem = await idolAliasRepository.GetIdolAliasAsync(idolAlias, idolName, idolGroup);
+                IdolAlias idolAliasItem = await idolAliasRepository.FirstOrDefaultAsync(
+                    ia => ia.Alias == idolAlias &&
+                    ia.Idol.Name == idolName &&
+                    ia.Idol.Group.Name == idolGroup,
+                    ia => ia.Idol,
+                    ia => ia.Idol.Group);
                 if (idolAlias != null)
                 {
-                    await idolAliasRepository.RemoveIdolAliasAsync(idolAliasItem);
+                    await idolAliasRepository.RemoveAsync(idolAliasItem);
 
                     logger.Log($"Idol [{idolAlias}-{idolName}]-[{idolGroup}] removed successfully!");
                     return DbProcessResultEnum.Success;
