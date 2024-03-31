@@ -12,7 +12,13 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices
 {
-    public class BirthdayService(IServerRepository serverRepository, IUserRepository userRepository, IBirthdayRepository birthdayRepository, IMapper mapper, Logging logger, Cache cache) : BaseService(mapper, logger, cache), IBirthdayService
+    public class BirthdayService(
+        IServerRepository serverRepository,
+        IUserRepository userRepository,
+        IBirthdayRepository birthdayRepository,
+        IMapper mapper,
+        Logging logger,
+        Cache cache) : BaseService(mapper, logger, cache), IBirthdayService
     {
         private readonly IServerRepository serverRepository = serverRepository;
         private readonly IUserRepository userRepository = userRepository;
@@ -22,7 +28,10 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                Birthday birthday = await birthdayRepository.GetBirthdayAsync(serverId, userId);
+                Birthday birthday = await birthdayRepository.FirstOrDefaultAsync(
+                    b => b.Server.DiscordId == serverId.ToString() &&
+                    b.User.DiscordId == userId.ToString(),
+                    b => b.Server);
                 DateOnly datePart = DateOnly.FromDateTime(date);
 
                 if (birthday != null)
@@ -30,7 +39,7 @@ namespace Discord_Bot.Database.DBServices
                     if (birthday.Date != datePart)
                     {
                         birthday.Date = datePart;
-                        await birthdayRepository.UpdateBirthdayAsync(birthday);
+                        await birthdayRepository.SaveChangesAsync();
                         logger.Log("Birthday updated successfully!");
                         return DbProcessResultEnum.UpdatedExisting;
                     }
@@ -49,7 +58,7 @@ namespace Discord_Bot.Database.DBServices
                     User = user ?? new User() { DiscordId = userId.ToString() },
                     Server = server ?? new Server() { DiscordId = serverId.ToString() },
                 };
-                await birthdayRepository.AddBirthdayAsync(birthday);
+                await birthdayRepository.AddAsync(birthday);
 
                 logger.Log("Birthday added successfully!");
                 return DbProcessResultEnum.Success;
@@ -63,13 +72,16 @@ namespace Discord_Bot.Database.DBServices
 
         public async Task<List<BirthdayResource>> GetBirthdaysByDateAsync()
         {
-            List<Birthday> birthday = await birthdayRepository.GetBirthdaysByDateAsync();
+            List<Birthday> birthday = await birthdayRepository.GetListAsync(
+                b => b.Date.Month == DateTime.UtcNow.Month &&
+                b.Date.Day == DateTime.UtcNow.Day,
+                b => b.Server);
             return mapper.Map<List<Birthday>, List<BirthdayResource>>(birthday);
         }
 
         public async Task<List<BirthdayResource>> GetServerBirthdayListAsync(ulong serverId)
         {
-            List<Birthday> birthday = await birthdayRepository.GetBirthdaysByServerAsync(serverId);
+            List<Birthday> birthday = await birthdayRepository.GetListForServerAsync(serverId.ToString());
             return mapper.Map<List<Birthday>, List<BirthdayResource>>(birthday);
         }
 
@@ -77,10 +89,13 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                Birthday birthday = await birthdayRepository.GetBirthdayAsync(serverId, userId);
+                Birthday birthday = await birthdayRepository.FirstOrDefaultAsync(
+                    b => b.Server.DiscordId == serverId.ToString() &&
+                    b.User.DiscordId == userId.ToString(),
+                    b => b.Server);
                 if (birthday != null)
                 {
-                    await birthdayRepository.RemoveBirthdayAsync(birthday);
+                    await birthdayRepository.RemoveAsync(birthday);
 
                     logger.Log("Birthday removed successfully!");
                     return DbProcessResultEnum.Success;

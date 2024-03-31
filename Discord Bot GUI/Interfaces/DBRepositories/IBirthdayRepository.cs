@@ -4,13 +4,8 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Interfaces.DBRepositories
 {
-    public interface IBirthdayRepository
+    public interface IBirthdayRepository : IGenericRepository<Birthday>
     {
-        Task AddBirthdayAsync(Birthday birthday);
-        Task<Birthday> GetBirthdayAsync(ulong serverId, ulong userId);
-        Task<List<Birthday>> GetBirthdaysByDateAsync();
-        Task<List<Birthday>> GetBirthdaysByServerAsync(ulong serverId);
-        Task RemoveBirthdayAsync(Birthday birthday);
-        Task UpdateBirthdayAsync(Birthday birthday);
+        Task<List<Birthday>> GetListForServerAsync(string serverId);
     }
 }
