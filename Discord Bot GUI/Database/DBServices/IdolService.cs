@@ -131,7 +131,7 @@ namespace Discord_Bot.Database.DBServices
 
                 if (idol.IdolImages.Count > 3)
                 {
-                    await idolImageRepository.RemoveRangeAsync(idol.IdolImages.OrderBy(x => x.CreatedOn).Skip(3).ToList());
+                    await idolImageRepository.RemoveAsync(idol.IdolImages.OrderBy(x => x.CreatedOn).Skip(3).ToList());
                 }
 
                 if (string.IsNullOrEmpty(idol.ProfileUrl) && data != null)

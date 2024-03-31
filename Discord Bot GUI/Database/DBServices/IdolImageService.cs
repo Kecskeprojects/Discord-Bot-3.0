@@ -22,7 +22,7 @@ namespace Discord_Bot.Database.DBServices
                 Idol idolForImage = await idolRepository.GetIdolByNameAndGroupAsync(idol, group);
                 if (idolForImage != null)
                 {
-                    await idolImageRepository.RemoveRangeAsync(idolForImage.IdolImages);
+                    await idolImageRepository.RemoveAsync(idolForImage.IdolImages);
 
                     logger.Log("Idol Images removed successfully!");
                     return DbProcessResultEnum.Success;
