@@ -75,7 +75,9 @@ namespace Discord_Bot.Database.DBServices
                     return DbProcessResultEnum.NotFound;
                 }
 
-                Role role = await roleRepository.GetRoleAsync(serverId, roleName);
+                Role role = await roleRepository.FirstOrDefaultAsync(
+                    r => r.Server.DiscordId == serverId.ToString() &&
+                         r.RoleName.Trim().ToLower().Equals(roleName.Trim().ToLower()));
                 role ??= new()
                 {
                     RoleId = 0,
