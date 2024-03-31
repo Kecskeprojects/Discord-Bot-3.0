@@ -29,7 +29,9 @@ namespace Discord_Bot.Database.DBServices
                     return DbProcessResultEnum.NotFound;
                 }
 
-                if (await twitchChannelRepository.ExistsAsync(tc => tc.Server.DiscordId == serverId.ToString() && tc.TwitchId == twitchUserId))
+                if (await twitchChannelRepository.ExistsAsync(
+                    tc => tc.Server.DiscordId == serverId.ToString() && tc.TwitchId == twitchUserId,
+                    tc => tc.Server))
                 {
                     return DbProcessResultEnum.AlreadyExists;
                 }
@@ -81,7 +83,9 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                TwitchChannel channel = await twitchChannelRepository.FirstOrDefaultAsync(tc => tc.Server.DiscordId == serverId.ToString() && tc.TwitchName == name);
+                TwitchChannel channel = await twitchChannelRepository.FirstOrDefaultAsync(
+                    tc => tc.Server.DiscordId == serverId.ToString() && tc.TwitchName == name,
+                    tc => tc.Server);
                 if (channel == null)
                 {
                     return DbProcessResultEnum.NotFound;
@@ -104,7 +108,9 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                List<TwitchChannel> channels = await twitchChannelRepository.GetListAsync(tc => tc.Server.DiscordId == serverId.ToString());
+                List<TwitchChannel> channels = await twitchChannelRepository.GetListAsync(
+                    tc => tc.Server.DiscordId == serverId.ToString(),
+                    tc => tc.Server);
                 if (CollectionTools.IsNullOrEmpty(channels))
                 {
                     return DbProcessResultEnum.NotFound;

@@ -20,7 +20,10 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                if (await keywordRepository.KeywordExistsAsync(serverId, trigger))
+                if (await keywordRepository.ExistsAsync(
+                    kw => kw.Server.DiscordId == serverId.ToString() &&
+                    kw.Trigger.Trim().ToLower().Equals(trigger.Trim().ToLower()),
+                    kw => kw.Server))
                 {
                     return DbProcessResultEnum.AlreadyExists;
                 }
@@ -34,7 +37,7 @@ namespace Discord_Bot.Database.DBServices
                     Trigger = trigger,
                     Response = response
                 };
-                await keywordRepository.AddCustomCommandAsync(keyword);
+                await keywordRepository.AddAsync(keyword);
 
                 logger.Log("Keyword added successfully!");
                 return DbProcessResultEnum.Success;
@@ -51,7 +54,10 @@ namespace Discord_Bot.Database.DBServices
             KeywordResource result = null;
             try
             {
-                Keyword keyword = await keywordRepository.GetKeywordAsync(serverId, trigger);
+                Keyword keyword = await keywordRepository.FirstOrDefaultAsync(
+                    kw => kw.Server.DiscordId == serverId.ToString() &&
+                    kw.Trigger.Trim().ToLower().Equals(trigger.Trim().ToLower()),
+                    kw => kw.Server);
                 result = mapper.Map<Keyword, KeywordResource>(keyword);
             }
             catch (Exception ex)
@@ -65,10 +71,13 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                Keyword keyword = await keywordRepository.GetKeywordAsync(serverId, trigger);
+                Keyword keyword = await keywordRepository.FirstOrDefaultAsync(
+                    kw => kw.Server.DiscordId == serverId.ToString() &&
+                    kw.Trigger.Trim().ToLower().Equals(trigger.Trim().ToLower()),
+                    kw => kw.Server);
                 if (keyword != null)
                 {
-                    await keywordRepository.RemoveKeywordAsync(keyword);
+                    await keywordRepository.RemoveAsync(keyword);
 
                     logger.Log($"Keyword '{trigger}' removed successfully!");
                     return DbProcessResultEnum.Success;

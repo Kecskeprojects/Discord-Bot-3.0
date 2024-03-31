@@ -29,6 +29,18 @@ namespace Discord_Bot.Database.DBRepositories
         {
             return context.Set<TEntity>().Where(predicate).AnyAsync();
         }
+
+        public Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
+        {
+            IQueryable<TEntity> dbSet = context.Set<TEntity>().Where(predicate);
+
+            foreach (Expression<Func<TEntity, object>> include in includes)
+            {
+                dbSet.Include(include);
+            }
+
+            return dbSet.AnyAsync();
+        }
         #endregion
 
         #region FindById

@@ -21,7 +21,9 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                if (await roleRepository.ExistsAsync(r => r.Server.DiscordId == serverId.ToString() && r.DiscordId == roleId.ToString()))
+                if (await roleRepository.ExistsAsync(
+                    r => r.Server.DiscordId == serverId.ToString() && r.DiscordId == roleId.ToString(),
+                    r => r.Server))
                 {
                     return DbProcessResultEnum.AlreadyExists;
                 }
