@@ -53,7 +53,7 @@ namespace Discord_Bot.Core
                 .ForMember(dest => dest.DiscordId, opt => opt.MapFrom(u => ulong.Parse(u.DiscordId)))
                 .ForMember(dest => dest.LastFmUsername, opt => opt.MapFrom(u => u.LastFmusername));
             CreateMap<ExtendedBiasData, Idol>()
-                .ForMember(dest => dest.Gender, opt => opt.MapFrom(e => e.Gender.Value))
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom(e => e.Gender))
                 .ForMember(dest => dest.ModifiedOn, opt => opt.MapFrom(x => DateTime.UtcNow));
             CreateMap<ExtendedBiasData, IdolGroup>()
                 .ForMember(dest => dest.Name, opt => opt.Ignore());
@@ -64,6 +64,7 @@ namespace Discord_Bot.Core
                 .ForMember(dest => dest.ModifiedOn, opt => opt.MapFrom(x => DateTime.UtcNow));
             CreateMap<Idol, IdolExtendedResource>();
             CreateMap<IdolGroup, IdolGroupExtendedResource>();
+            CreateMap<Idol, IdolGameResource>();
         }
     }
 }

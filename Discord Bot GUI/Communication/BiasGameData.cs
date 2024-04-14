@@ -26,8 +26,10 @@ namespace Discord_Bot.Communication
 
         public void SetDebut(string[] chosenYears)
         {
-            DebutYearStart = int.TryParse(chosenYears[0], out int start) ? start : 0;
-            DebutYearEnd = int.TryParse(chosenYears[1], out int end) ? end : 0;
+            int date1 = int.TryParse(chosenYears[0], out int start) ? start : 0;
+            int date2 = int.TryParse(chosenYears[1], out int end) ? end : 0;
+            DebutYearStart = date1 > date2 ? date2 : date1;
+            DebutYearEnd = date1 > date2 ? date1 : date2;
         }
     }
 }

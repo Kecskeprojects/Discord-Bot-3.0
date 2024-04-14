@@ -61,7 +61,6 @@
     <Folder Include="Post-deployment" />
     <Folder Include="Post-deployment\PostDeployment" />
     <Folder Include="Post-deployment\PostDeployment\Inserts" />
-    <Folder Include="Patch" />
     <Folder Include="Views" />
   </ItemGroup>
   <ItemGroup>

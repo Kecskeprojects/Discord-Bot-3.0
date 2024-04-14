@@ -120,7 +120,7 @@ namespace Discord_Bot.Database.DBServices
             List<IdolResource> result = null;
             try
             {
-                List<Idol> idols = await idolRepository.GetAllAsync(i => i.Group);
+                List<Idol> idols = await idolRepository.GetAllAsync(includes: i => i.Group);
 
                 result = mapper.Map<List<Idol>, List<IdolResource>>(idols);
             }
@@ -305,6 +305,22 @@ namespace Discord_Bot.Database.DBServices
             catch (Exception ex)
             {
                 logger.Error("IdolService.cs GetUsersByIdolsAsync", ex.ToString());
+            }
+            return result;
+        }
+
+        public async Task<List<IdolGameResource>> GetListForGameAsync(GenderType gender, int debutAfter, int debutBefore)
+        {
+            List<IdolGameResource> result = null;
+            try
+            {
+                List<Idol> idols = await idolRepository.GetListForGameAsync(gender, debutAfter, debutBefore);
+
+                result = mapper.Map<List<Idol>, List<IdolGameResource>>(idols);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("IdolService.cs GetListForGameAsync", ex.ToString());
             }
             return result;
         }

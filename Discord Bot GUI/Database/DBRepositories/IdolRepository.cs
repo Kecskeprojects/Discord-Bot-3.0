@@ -1,6 +1,8 @@
 ﻿using Discord_Bot.Database.Models;
+using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBRepositories;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,6 +30,20 @@ namespace Discord_Bot.Database.DBRepositories
                 i.Name == idolOrGroupName ||
                 i.IdolAliases.FirstOrDefault(ia => ia.Alias == idolOrGroupName) != null ||
                 i.Group.Name == idolOrGroupName)
+                .ToListAsync();
+        }
+
+        public Task<List<Idol>> GetListForGameAsync(GenderType gender, int debutAfter, int debutBefore)
+        {
+            return context.Idols
+                .Include(x => x.Group)
+                .Include(x => x.IdolImages)
+                .Where(x => gender != GenderType.None && x.DebutDate.HasValue &&
+                            x.Gender == gender &&
+                            x.DebutDate.Value.Year >= debutAfter &&
+                            x.DebutDate.Value.Year <= debutBefore)
+                .OrderBy(x => Guid.NewGuid())
+                .Take(16)
                 .ToListAsync();
         }
     }

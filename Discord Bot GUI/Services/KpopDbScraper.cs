@@ -131,6 +131,12 @@ namespace Discord_Bot.Services
 
             try
             {
+                await page.ClickAsync("#ez-accept-all");
+            }
+            catch (Exception) { }
+
+            try
+            {
                 await page.ClickAsync(".fc-cta-consent");
             }
             catch (Exception) { }
