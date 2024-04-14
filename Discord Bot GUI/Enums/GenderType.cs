@@ -18,5 +18,6 @@
 
         public static GenderType Male => new("M");
         public static GenderType Female => new("F");
+        public static GenderType None => new("N/A");
     }
 }

@@ -58,6 +58,7 @@ namespace Discord_Bot.Interactions
             catch (Exception ex)
             {
                 logger.Error("BiasListComponentInteraction.cs IdolMenuHandler", ex.ToString());
+                await RespondAsync("Something went wrong while getting idols.");
             }
         }
     }

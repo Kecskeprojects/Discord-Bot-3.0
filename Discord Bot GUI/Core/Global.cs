@@ -4,6 +4,7 @@ using Discord_Bot.Communication;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
@@ -15,7 +16,8 @@ namespace Discord_Bot.Core
     public static class Global
     {
         #region Global Variables
-        public static Dictionary<ulong, ServerAudioResource> ServerAudioResources { get; set; } = [];
+        public static ConcurrentDictionary<ulong, ServerAudioResource> ServerAudioResources { get; private set; } = [];
+        public static ConcurrentDictionary<ulong, BiasGameData> BiasGames { get; private set; } = [];
         #endregion
 
         #region Global Functions

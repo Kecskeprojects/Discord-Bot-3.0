@@ -50,13 +50,13 @@ namespace Discord_Bot.Interactions
                     await value.Invoke(data.BiasName, data.BiasGroupName);
                     return;
                 }
-
-                await RespondAsync("Something went wrong during the process.");
             }
             catch (Exception ex)
             {
                 logger.Error("BiasEditComponentInteraction.cs EditIdolMenuHandler", ex.ToString());
             }
+
+            await RespondAsync("Something went wrong during the process.");
         }
 
         private async Task SendEditIdolModalAsync(string idol, string group)

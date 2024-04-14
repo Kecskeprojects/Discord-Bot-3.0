@@ -160,7 +160,7 @@ namespace Discord_Bot.Services
             if (!Global.ServerAudioResources.TryGetValue(serverId, out ServerAudioResource audioResource))
             {
                 audioResource = new(serverId);
-                Global.ServerAudioResources.Add(serverId, audioResource);
+                Global.ServerAudioResources.TryAdd(serverId, audioResource);
             }
 
             audioResource.MusicRequests.Add(new MusicRequest(temp[0], temp[1], temp[2], temp[3], username));

@@ -50,7 +50,7 @@ namespace Discord_Bot.Database.DBServices
             List<UserResource> result = null;
             try
             {
-                List<User> users = await userRepository.GetAllAsync();
+                List<User> users = await userRepository.GetListAsync(x => !string.IsNullOrEmpty(x.LastFmusername));
                 result = mapper.Map<List<User>, List<UserResource>>(users);
             }
             catch (Exception ex)
