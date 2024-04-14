@@ -73,6 +73,16 @@ namespace Discord_Bot.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap polaroid_base {
+            get {
+                object obj = ResourceManager.GetObject("polaroid_base", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap winter0 {
             get {
                 object obj = ResourceManager.GetObject("winter0", resourceCulture);
