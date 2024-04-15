@@ -9,6 +9,7 @@ using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.Wotd;
 using System;
@@ -20,10 +21,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class ChatCommands(IWordOfTheDayService wordOfTheDayService, IPictureHandler pictureHandler, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), IChatCommands
+    public class ChatCommands(IWordOfTheDayService wordOfTheDayService, BonkGifProcessor bonkGifProcessor, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), IChatCommands
     {
         private readonly IWordOfTheDayService wordOfTheDayService = wordOfTheDayService;
-        private readonly IPictureHandler pictureHandler = pictureHandler;
+        private readonly BonkGifProcessor bonkGifProcessor = bonkGifProcessor;
 
         [Command("help")]
         [Summary("List out commands everybody has access to")]
@@ -238,7 +239,7 @@ namespace Discord_Bot.Commands
                 {
                     Stream stream = await Global.GetStream(url);
 
-                    MemoryStream gifStream = pictureHandler.CreateBonkImage(stream, frameDelay);
+                    MemoryStream gifStream = bonkGifProcessor.CreateBonkImage(stream, frameDelay);
 
                     await Context.Channel.SendFileAsync(gifStream, $"bonk_{userName}.gif");
                 }

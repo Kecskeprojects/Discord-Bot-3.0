@@ -7,6 +7,7 @@ using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.LastFm;
 using LastFmApi;
@@ -19,11 +20,11 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, IPictureHandler pictureHandler, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), ILastfmCommands
+    public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoKnowsImageProcessor whoKnowsImageProcessor, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), ILastfmCommands
     {
         private readonly IUserService userService = userService;
         private readonly ILastFmAPI lastFmAPI = lastFmAPI;
-        private readonly IPictureHandler pictureHandler = pictureHandler;
+        private readonly WhoKnowsImageProcessor whoKnowsImageProcessor = whoKnowsImageProcessor;
 
         #region Connect last.fm commands
         [Command("lf conn")]
@@ -551,7 +552,7 @@ namespace Discord_Bot.Commands
                         Stream originalImage = await Global.GetStream(wk.ImageUrl);
 
                         //Edit the picture to the list format
-                        Discord_Bot.Communication.EditPictureResult modifiedImage = pictureHandler.EditPicture(originalImage, wk.Plays, wk.Searched);
+                        Discord_Bot.Communication.EditPictureResult modifiedImage = whoKnowsImageProcessor.EditPicture(originalImage, wk.Plays, wk.Searched);
 
                         if (modifiedImage != null)
                         {

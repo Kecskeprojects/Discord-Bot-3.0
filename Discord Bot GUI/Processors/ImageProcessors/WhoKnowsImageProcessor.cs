@@ -1,12 +1,9 @@
 ﻿using Discord_Bot.Communication;
 using Discord_Bot.Core;
-using Discord_Bot.Interfaces.Services;
-using Discord_Bot.Properties;
 using Discord_Bot.Tools;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System;
@@ -14,14 +11,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Discord_Bot.Services
+namespace Discord_Bot.Processors.ImageProcessors
 {
-
-    public class PictureHandler(Logging logger) : IPictureHandler
+    public class WhoKnowsImageProcessor(Logging logger)
     {
         private readonly Logging logger = logger;
 
-        #region Main function
         //Our image size will be 800*500 in the end
         public EditPictureResult EditPicture(Stream originalImg, Dictionary<string, int> plays, string HeadText)
         {
@@ -87,73 +82,46 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("LastfmPictureDrawer.cs EditPicture", ex.ToString());
+                logger.Error("WhoKnowsImageProcessor.cs EditPicture", ex.ToString());
             }
 
             return null;
         }
 
-        public MemoryStream CreateBonkImage(Stream stream, int delay)
+        #region Helper Methods
+        private static void ResizeImages(Image mainImage, Image AlbumImage)
         {
-            // Image dimensions of the gif.
-            const int width = 1000;
-            const int height = 1000;
+            //Resize the album picture that is not blurred, 1 pixel less on each side so it can have a proper border
+            AlbumImage.Mutate(x => x.Resize(348, 348));
 
-            using Image profile = Image.Load<Rgba32>(stream);
-            profile.Mutate(x => x.Resize(400, 400).ApplyRoundedCorners(200));
-
-            MemoryStream winter0Stream = new();
-            Resource.winter0.Save(winter0Stream, System.Drawing.Imaging.ImageFormat.Png);
-            using Image winter0 = Image.Load<Rgba32>(winter0Stream.ToArray());
-            winter0.Mutate(x => x.Resize(width, height));
-
-            MemoryStream winter1Stream = new();
-            Resource.winter1.Save(winter1Stream, System.Drawing.Imaging.ImageFormat.Png);
-            using Image winter1 = Image.Load<Rgba32>(winter1Stream.ToArray());
-            winter1.Mutate(x => x.Resize(width, height));
-
-            // For demonstration: use images with different colors.
-            Image[] images = [null, null];
-            Image[] winterFrame = [winter0, winter1];
-            for (int i = 0; i < 2; i++)
-            {
-                Image background = new Image<Rgba32>(width, height, new Rgba32(1, 1, 1, 0.5f));
-                background.Mutate(x => x.DrawImage(profile, backgroundLocation: new Point(10, 500), 1));
-                background.Mutate(x => x.DrawImage(winterFrame[i], backgroundLocation: new Point(0, 0), 1));
-
-                images[i] = background;
-            }
-
-            // Create empty image.
-            using Image<Rgba32> gif = new(width, height, new Rgba32(0, 0, 0, 0));
-
-            GifMetadata gifMetaData = gif.Metadata.GetGifMetadata();
-            gifMetaData.RepeatCount = 0;
-
-            // Set the delay until the next image is displayed.
-            GifFrameMetadata metadata = gif.Frames.RootFrame.Metadata.GetGifMetadata();
-            for (int i = 0; i < images.Length; i++)
-            {
-                // Set the delay until the next image is displayed.
-                metadata = images[i].Frames.RootFrame.Metadata.GetGifMetadata();
-                metadata.FrameDelay = delay;
-                metadata.DisposalMethod = GifDisposalMethod.RestoreToBackground;
-
-                // Add the color image to the gif.
-                gif.Frames.AddFrame(images[i].Frames.RootFrame);
-            }
-            gif.Frames.RemoveFrame(0);
-            images.ToList().ForEach(x => x.Dispose());
-
-            // Save the final result.
-            MemoryStream gifStream = new();
-            gif.SaveAsGif(gifStream);
-
-            return gifStream;
+            //Resize the blurred image, cut it to size, cutting off 150pixels from the top and the bottom
+            //Then lastly do a heavy blur on it
+            mainImage.Mutate(x =>
+                x.Resize(800, 800)
+                .Crop(new Rectangle(0, 150, 800, 500))
+                .GaussianBlur(15)
+            );
         }
-        #endregion
 
-        #region Helper methods
+        private static void WriteHeader(string HeadText, Image mainImage, Font font, Color TextColor)
+        {
+            //We write the artist and the song in separate lines in case it turns out too long
+            string[] HeadTextparts = HeadText.Replace(" by ", "\nby ").Split("\n");
+            for (int i = 0; i < HeadTextparts.Length; i++)
+            {
+                //Measure the length of the text so we can put it in the middle
+                FontRectangle textsize = TextMeasurer.MeasureBounds(HeadTextparts[i], new TextOptions(font));
+
+                int X = (mainImage.Width - (int)textsize.Width) / 2;
+                int Y = ((125 - ((int)textsize.Height * HeadTextparts.Length)) / 2) + ((int)textsize.Height * i);
+
+                //Put Top text on image
+                mainImage.Mutate(x =>
+                    x.DrawText(HeadTextparts[i], font, TextColor, new Point(X, Y))
+                );
+            }
+        }
+
         private static void WriteUserNames(Dictionary<string, int> plays, Image mainImage, Color ContrastColor, DrawingOptions options, Font font, Color TextColor, int length)
         {
             for (int i = 0; i < length; i++)
@@ -206,39 +174,6 @@ namespace Discord_Bot.Services
             }
 
             return user;
-        }
-
-        private static void WriteHeader(string HeadText, Image mainImage, Font font, Color TextColor)
-        {
-            //We write the artist and the song in separate lines in case it turns out too long
-            string[] HeadTextparts = HeadText.Replace(" by ", "\nby ").Split("\n");
-            for (int i = 0; i < HeadTextparts.Length; i++)
-            {
-                //Measure the length of the text so we can put it in the middle
-                FontRectangle textsize = TextMeasurer.MeasureBounds(HeadTextparts[i], new TextOptions(font));
-
-                int X = (mainImage.Width - (int)textsize.Width) / 2;
-                int Y = ((125 - ((int)textsize.Height * HeadTextparts.Length)) / 2) + ((int)textsize.Height * i);
-
-                //Put Top text on image
-                mainImage.Mutate(x =>
-                    x.DrawText(HeadTextparts[i], font, TextColor, new Point(X, Y))
-                );
-            }
-        }
-
-        private static void ResizeImages(Image mainImage, Image AlbumImage)
-        {
-            //Resize the album picture that is not blurred, 1 pixel less on each side so it can have a proper border
-            AlbumImage.Mutate(x => x.Resize(348, 348));
-
-            //Resize the blurred image, cut it to size, cutting off 150pixels from the top and the bottom
-            //Then lastly do a heavy blur on it
-            mainImage.Mutate(x =>
-                x.Resize(800, 800)
-                .Crop(new Rectangle(0, 150, 800, 500))
-                .GaussianBlur(15)
-            );
         }
         #endregion
     }

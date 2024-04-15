@@ -12,6 +12,7 @@ using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -62,11 +63,14 @@ namespace Discord_Bot.Core
             collection.AddTransient<ICoreLogic, CoreLogic>();
             collection.AddTransient(typeof(MainWindow));
 
+            //Processors
+            collection.AddTransient<WhoKnowsImageProcessor>();
+            collection.AddTransient<BonkGifProcessor>();
+
             //Services
             collection.AddTransient<ITwitchAPI, TwitchAPI>();
             collection.AddTransient<ISpotifyAPI, Services.SpotifyAPI>();
             collection.AddTransient<IYoutubeAPI, YoutubeAPI>();
-            collection.AddTransient<IPictureHandler, PictureHandler>();
             collection.AddTransient<IInstaLoader, InstaLoader>();
             collection.AddTransient<IWordOfTheDayService, WordOfTheDayService>();
             collection.AddTransient<IAudioService, AudioService>();
