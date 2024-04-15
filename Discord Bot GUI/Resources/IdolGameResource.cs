@@ -7,5 +7,6 @@
         public string KoreanStageName { get; set; }
         public string GroupFullName { get; set; }
         public string GroupFullKoreanName { get; set; }
+        public string LatestImageUrl { get; set; }
     }
 }

@@ -64,7 +64,8 @@ namespace Discord_Bot.Core
                 .ForMember(dest => dest.ModifiedOn, opt => opt.MapFrom(x => DateTime.UtcNow));
             CreateMap<Idol, IdolExtendedResource>();
             CreateMap<IdolGroup, IdolGroupExtendedResource>();
-            CreateMap<Idol, IdolGameResource>();
+            CreateMap<Idol, IdolGameResource>()
+                .ForMember(dest => dest.LatestImageUrl, opt => opt.MapFrom(i => i.IdolImages.OrderByDescending(x => x.CreatedOn).First().ImageUrl));
         }
     }
 }

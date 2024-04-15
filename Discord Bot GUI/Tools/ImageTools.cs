@@ -1,4 +1,5 @@
-﻿using SixLabors.ImageSharp;
+﻿using SixLabors.Fonts;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System;
@@ -8,10 +9,10 @@ namespace Discord_Bot.Tools
     public class ImageTools
     {
 
-        public static void CorrectImageRatio(Image mainImage, Image AlbumImage)
+        public static void CorrectImageRatio(Image mainImage, double ratio = 0.2)
         {
             //If the Cover image is too wide or high, we crop it depending on which of the two it is
-            if (mainImage.Height / mainImage.Width > 1.2 || mainImage.Height / mainImage.Width < 0.8)
+            if (mainImage.Height / mainImage.Width > (1 + ratio) || mainImage.Height / mainImage.Width < (1 - ratio))
             {
                 int difference;
                 if (mainImage.Width > mainImage.Height)
@@ -19,14 +20,12 @@ namespace Discord_Bot.Tools
                     difference = mainImage.Width - mainImage.Height;
 
                     mainImage.Mutate(x => x.Crop(new Rectangle(difference / 2, 0, mainImage.Width - difference, mainImage.Height)));
-                    AlbumImage.Mutate(x => x.Crop(new Rectangle(difference / 2, 0, AlbumImage.Width - difference, AlbumImage.Height)));
                 }
                 else
                 {
                     difference = mainImage.Height - mainImage.Width;
 
                     mainImage.Mutate(x => x.Crop(new Rectangle(0, difference / 2, mainImage.Width, mainImage.Height - difference)));
-                    AlbumImage.Mutate(x => x.Crop(new Rectangle(0, difference / 2, AlbumImage.Width, AlbumImage.Height - difference)));
                 }
 
             }
@@ -84,6 +83,29 @@ namespace Discord_Bot.Tools
             double l = (0.2126 * color.R) + (0.7152 * color.G) + (0.0722 * color.B);
 
             return l < 127.5 ? Color.White : Color.Black;
+        }
+
+        public static string ShortenText(Font font, string text, FontRectangle textsize, int maxWidth)
+        {
+            //If it is longer than 210 it will collide with the plays
+            if (textsize.Width > maxWidth)
+            {
+                //We check character by character when it is shorter than that limit
+                for (int ch = text.Length; ch > 0; ch--)
+                {
+                    //We check the currently shortened string's length
+                    float tempwidth = TextMeasurer.MeasureBounds(string.Format("{0, 12}", text[..ch]), new TextOptions(font)).Width;
+
+                    //When it is short enough, we shorten the original text to this version and move on
+                    if (tempwidth < 210)
+                    {
+                        text = text[..ch];
+                        break;
+                    }
+                }
+            }
+
+            return text;
         }
     }
 }

@@ -24,9 +24,10 @@ namespace Discord_Bot.Processors.ImageProcessors
             {
                 //Get two instances of the same picture
                 using Image mainImage = Image.Load(originalImg);
-                using Image AlbumImage = mainImage.CloneAs<Rgba32>();
 
-                ImageTools.CorrectImageRatio(mainImage, AlbumImage);
+                ImageTools.CorrectImageRatio(mainImage);
+
+                using Image AlbumImage = mainImage.CloneAs<Rgba32>();
 
                 //Get the dominant and contrast colors for the album image
                 Tuple<Color, Color> Colors = ImageTools.GetContrastAndDominantColors(mainImage.CloneAs<Rgba32>());
@@ -76,7 +77,7 @@ namespace Discord_Bot.Processors.ImageProcessors
                 string fileName = $"{new Random().Next(0, int.MaxValue)}.png";
 
                 MemoryStream result = new();
-                mainImage.Save(result, new SixLabors.ImageSharp.Formats.Png.PngEncoder()); // Automatic encoder selected based on extension.
+                mainImage.Save(result, new SixLabors.ImageSharp.Formats.Png.PngEncoder());
 
                 return new EditPictureResult(fileName, result);
             }
@@ -137,7 +138,7 @@ namespace Discord_Bot.Processors.ImageProcessors
 
                 //Check the length of the user string
                 FontRectangle textsize = TextMeasurer.MeasureBounds(string.Format("{0, 12}", user), new TextOptions(font));
-                user = ShortenUsername(font, user, textsize);
+                user = ImageTools.ShortenText(font, user, textsize, 210);
 
                 //Place tranking and name of user
                 mainImage.Mutate(x => x.DrawText(user, font, TextColor, new Point(427, 137 + (i * 28))));
@@ -151,29 +152,6 @@ namespace Discord_Bot.Processors.ImageProcessors
                     x.DrawText(points, font, TextColor, new Point(722 - (int)textsize.Width, 137 + (i * 28)))
                 );
             }
-        }
-
-        private static string ShortenUsername(Font font, string user, FontRectangle textsize)
-        {
-            //If it is longer than 210 it will collide with the plays
-            if (textsize.Width > 210)
-            {
-                //We check character by character when it is shorter than that limit
-                for (int ch = user.Length; ch > 0; ch--)
-                {
-                    //We check the currently shortened string's length
-                    float tempwidth = TextMeasurer.MeasureBounds(string.Format("{0, 12}", user[..ch]), new TextOptions(font)).Width;
-
-                    //When it is short enough, we shorten the original text to this version and move on
-                    if (tempwidth < 210)
-                    {
-                        user = user[..ch];
-                        break;
-                    }
-                }
-            }
-
-            return user;
         }
         #endregion
     }

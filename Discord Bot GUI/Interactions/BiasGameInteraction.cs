@@ -1,0 +1,220 @@
+﻿using Discord;
+using Discord.Interactions;
+using Discord.WebSocket;
+using Discord_Bot.Communication;
+using Discord_Bot.Core;
+using Discord_Bot.Core.Config;
+using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Processors.ImageProcessors;
+using Discord_Bot.Resources;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+
+namespace Discord_Bot.Interactions
+{
+    public class BiasGameInteraction(IIdolService idolService, BiasGameImageProcessor biasGameImageProcessor, Logging logger, Config config) : BaseInteraction(logger, config)
+    {
+        private readonly IIdolService idolService = idolService;
+        private readonly BiasGameImageProcessor biasGameImageProcessor = biasGameImageProcessor;
+
+        //Todo: select/input for when they were born
+        //Todo: Select for the number of pairs (8, 10, 12, 16, 20, 24, if possible))
+        //If at any point during the furter rounds a non-even number shows up, one contestant skips to the next round
+        [ComponentInteraction("BiasGame_Setup_Gender_*_*")]
+        public async Task GenderChosen(GenderChoiceEnum choiceId, ulong userId)
+        {
+            try
+            {
+                if (Context.User.Id != userId || !Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData data))
+                {
+                    return;
+                }
+
+                data.SetGender(choiceId);
+
+                logger.Log($"BiasGame Setup Gender Chosen: {choiceId}", LogOnly: true);
+
+                List<int> options = [];
+                for (int i = 1996; i <= DateTime.UtcNow.Year; i += 4)
+                {
+                    options.Add(i);
+                }
+
+                if (DateTime.UtcNow.Year % 4 > 0)
+                {
+                    options.Add(DateTime.UtcNow.Year);
+                }
+
+                SelectMenuBuilder selectMenu = new();
+                selectMenu.WithCustomId($"BiasGame_Setup_Debut_{data.UserId}");
+                selectMenu.WithPlaceholder("Select TWO years as a start and end date!");
+                selectMenu.WithMinValues(2);
+                selectMenu.WithMaxValues(2);
+
+                options.ForEach(y => selectMenu.AddOption(y.ToString(), y.ToString()));
+
+                ComponentBuilder components = new();
+                components.WithSelectMenu(selectMenu);
+
+                SocketMessageComponent component = Context.Interaction as SocketMessageComponent;
+                await component.UpdateAsync(x => x.Components = components.Build());
+            }
+            catch (Exception ex)
+            {
+                logger.Error("BiasGameInteraction.cs GenderChoosen", ex.ToString());
+                Global.BiasGames.TryRemove(Context.User.Id, out _);
+                await RespondAsync("Failure during setup!");
+            }
+        }
+
+        [ComponentInteraction("BiasGame_Setup_Debut_*")]
+        public async Task DebutChosen(ulong userId, string[] chosenYears)
+        {
+            try
+            {
+                if (Context.User.Id != userId || !Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData data))
+                {
+                    return;
+                }
+
+                data.SetDebut(chosenYears);
+
+                logger.Log($"BiasGame Setup Debut Chosen: {string.Join(", ", chosenYears)}", LogOnly: true);
+
+                SocketMessageComponent component = Context.Interaction as SocketMessageComponent;
+
+                ComponentBuilder waitButton = new ComponentBuilder()
+                    .WithButton("Your game is being set up...", "BiasGame_Setup_Debut_Disabled", disabled: true, style: ButtonStyle.Secondary);
+                await component.UpdateAsync(x => x.Components = waitButton.Build());
+
+                List<IdolGameResource> idols = await idolService.GetListForGameAsync(data.Gender, data.DebutYearStart, data.DebutYearEnd);
+
+                foreach (IdolGameResource idol in idols)
+                {
+                    Stream stream = await biasGameImageProcessor.CreatePolaroid(idol);
+                    string fileName = $"{Guid.NewGuid()}_{idol.IdolId}.png";
+
+                    data.AddImage(idol.IdolId, stream, fileName);
+                }
+
+                data.CreatePairs();
+
+                int[] idolIds = data.Pairs[data.CurrentPair];
+                List<FileAttachment> files = [
+                    data.IdolWithImage[idolIds[0]],
+                    data.IdolWithImage[idolIds[1]]
+                ];
+
+                Embed[] embeds = CreateEmbeds(data, files);
+
+                ComponentBuilder components = CreateButtons(idolIds);
+
+                await DeleteOriginalResponseAsync();
+
+                //Followup will respond with the first embed
+                await FollowupWithFilesAsync(files, embeds: embeds, components: components.Build());
+            }
+            catch (Exception ex)
+            {
+                logger.Error("BiasGameInteraction.cs DebutChosen", ex.ToString());
+                Global.BiasGames.TryRemove(Context.User.Id, out _);
+                await RespondAsync("Failure during setup!");
+            }
+        }
+
+        [ComponentInteraction("BiasGame_Next_*_*")]
+        public async Task BiasGameNext(int idolId, ulong userId)
+        {
+            try
+            {
+                if (Context.User.Id != userId || !Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData data))
+                {
+                    return;
+                }
+
+                logger.Log($"BiasGame Next Step: IdolId: {idolId}", LogOnly: true);
+
+                data.RemoveItem(idolId);
+
+                if(data.IdolWithImage.Count == 1)
+                {
+                    //Finish game logic here
+                }
+
+                if(data.CurrentPair > data.Pairs.Count - 1)
+                {
+                    data.CreatePairs();
+                }
+
+                int[] idolIds = data.Pairs[data.CurrentPair];
+                List<FileAttachment> files = [
+                    data.IdolWithImage[idolIds[0]],
+                    data.IdolWithImage[idolIds[1]]
+                ];
+
+                Embed[] embeds = CreateEmbeds(data, files);
+
+                ComponentBuilder components = CreateButtons(idolIds);
+
+                SocketMessageComponent component = Context.Interaction as SocketMessageComponent;
+                await component.UpdateAsync(x => {
+                    x.Attachments = files;
+                    x.Embeds = embeds;
+                    x.Components = components.Build();
+                });
+            }
+            catch (Exception ex)
+            {
+                logger.Error("BiasGameInteraction.cs DebutChosen", ex.ToString());
+                Global.BiasGames.TryRemove(Context.User.Id, out _);
+                await RespondAsync("Failure during setup!");
+            }
+        }
+
+        private ComponentBuilder CreateButtons(int[] idolIds)
+        {
+            //The idol IDs are reversed, the selected button sends the idol to delete from the list
+            ActionRowBuilder buttonRow = new();
+            buttonRow.WithButton(label: "\U00002B9C", customId: $"BiasGame_Next_{idolIds[1]}_{Context.User.Id}", style: ButtonStyle.Primary); //Left Arrow 
+            buttonRow.WithButton(label: "Who do you pick?", customId: $"BiasGame_Next_Disabled", disabled: true, style: ButtonStyle.Secondary);
+            buttonRow.WithButton(label: "\U00002B9E", customId: $"BiasGame_Next_{idolIds[0]}_{Context.User.Id}", style: ButtonStyle.Primary); //Right Arrow
+
+            ComponentBuilder components = new();
+            components.AddRow(buttonRow);
+
+            return components;
+        }
+
+        private Embed[] CreateEmbeds(BiasGameData data, List<FileAttachment> files)
+        {
+            string url = "https://www.dbkpop.com"; //This could be anything as long as it is the same
+            List<Embed> embeds = [];
+
+            EmbedBuilder main = new();
+
+            main.WithDescription($"**BIAS GAME MATCH {data.CurrentPair + 1} OUT OF {data.Pairs.Count}**");
+
+            EmbedFooterBuilder footer = new();
+            footer.WithIconUrl(Context.User.GetDisplayAvatarUrl(ImageFormat.Jpeg, 512));
+            footer.WithText($"{Global.GetNickName(Context.Channel, Context.User)} | {data.Gender} | {data.DebutYearStart}-{data.DebutYearEnd}");
+            main.WithFooter(footer);
+
+            for (int i = 0; i < 2; i++)
+            {
+                if (i == 0)
+                {
+                    embeds.Add(main.WithUrl(url).WithImageUrl($"attachment://{files[i].FileName}").Build());
+                }
+                else
+                {
+                    embeds.Add(new EmbedBuilder().WithUrl(url).WithImageUrl($"attachment://{files[i].FileName}").Build());
+                }
+            }
+
+            return [.. embeds];
+        }
+    }
+}

@@ -66,6 +66,7 @@ namespace Discord_Bot.Core
             //Processors
             collection.AddTransient<WhoKnowsImageProcessor>();
             collection.AddTransient<BonkGifProcessor>();
+            collection.AddTransient<BiasGameImageProcessor>();
 
             //Services
             collection.AddTransient<ITwitchAPI, TwitchAPI>();

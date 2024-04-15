@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord.Rest;
+using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
 using Discord_Bot.Interfaces.DBServices;
@@ -14,52 +14,73 @@ namespace Discord_Bot.Commands
         //Todo: Create full game
         //First, ask user for specifics a select for male/female/indifferent, a select/input for debut date and perhaps a select/input for when they were born
         //Perhaps another select for the number of pairs (8, 10, 12, 16(, 20, 24, if possible))
-        //If at any point during the furter rounds a non-even number shows up, one contestant skips to the next round
-        //Second, create all combinations of first round, and create a class that will store the progress of user, this can be saved in memory into a dictionary (userId, gameClass)
         //Some process will be needed to edit together the pictures of the "contestants", this will only be done the very first time, there is a function that relays to the interaction handler that it's a longer process
-        //Third, Create an InteractionHandler for the button clicks, one button will have 1, the other 2, in it's id to know which they clicked, and of course, create handlers for the interactions before game start
+        //Second, create all combinations of first round, and create a class that will store the progress of user, this can be saved in memory into a dictionary (userId, gameClass)
+        //Third, Create an InteractionHandler for the button clicks, one button will have 1, the other 2, in it's id to know which they clicked
+        //------
+        //Done
+        //------
         //Fourth, Upon finishing a game, the results will be saved into the UserIdolStatistics table so users can check their stats of their previous games, this will be a different command
         //For reference on how the logic will work, check the bangya bot in text1
         [Command("bias game")]
         [RequireOwner]
-        [Summary("Update the extended information of idols manually from www.dbkpop.com")]
+        [Summary("A game of choosing favorites")]
         public async Task BiasGame()
         {
             try
             {
+                if (Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData data))
+                {
+                    if (data.StartedAt > DateTime.UtcNow.AddMinutes(-30))
+                    {
+                        await ReplyAsync("You already have a game going!");
+                        return;
+                    }
+                    Global.BiasGames.TryRemove(Context.User.Id, out _);
+                }
+
+                Global.BiasGames.TryAdd(Context.User.Id, new BiasGameData(Context.User.Id));
+
                 EmbedBuilder mainEmbed = new();
-                mainEmbed.WithTitle("Bias Game 1/2");
+                mainEmbed.WithTitle("Bias Game Setup");
+
                 EmbedFooterBuilder footer = new();
                 footer.WithIconUrl(Context.User.GetDisplayAvatarUrl(ImageFormat.Jpeg, 512));
                 footer.WithText(Global.GetNickName(Context.Channel, Context.User));
                 mainEmbed.WithFooter(footer);
 
-                FileAttachment file = new(await Global.GetStream("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYscfUBUbqwGd_DHVhG-ZjCOD7MUpxp4uhNe7toUg4ug&s"), $"img.jpg");
-                mainEmbed.WithImageUrl($"attachment://img.jpg");
+                mainEmbed.AddField("1. Select a gender", "Male, Female, Both");
+                mainEmbed.AddField("2. Select a debut range", "A start date and an end date");
 
-                RestUserMessage message = await Context.Channel.SendFileAsync(file, embed: mainEmbed.Build());
+                ActionRowBuilder buttonRow = new();
+                buttonRow.WithButton(emote: new Emoji("\U0001F57A"), customId: $"BiasGame_Setup_Gender_1_{Context.User.Id}", style: ButtonStyle.Primary); //Man
+                buttonRow.WithButton(emote: new Emoji("\U0001F483"), customId: $"BiasGame_Setup_Gender_2_{Context.User.Id}", style: ButtonStyle.Primary); //Woman
+                buttonRow.WithButton(emote: new Emoji("\U0001F46B"), customId: $"BiasGame_Setup_Gender_3_{Context.User.Id}", style: ButtonStyle.Primary); //Both
 
-                await Task.Delay(2000);
+                ComponentBuilder components = new();
+                components.AddRow(buttonRow);
 
-                mainEmbed = new();
-                mainEmbed.WithTitle("Bias Game 2/2");
-                footer = new();
-                footer.WithIconUrl(Context.User.GetDisplayAvatarUrl(ImageFormat.Jpeg, 512));
-                footer.WithText(Global.GetNickName(Context.Channel, Context.User));
-                mainEmbed.WithFooter(footer);
-
-                file = new(await Global.GetStream("https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg"), $"img2.jpg");
-                mainEmbed.WithImageUrl($"attachment://img2.jpg");
-
-                await message.ModifyAsync(x =>
-                {
-                    x.Attachments = new[] { file };
-                    x.Embed = mainEmbed.Build();
-                });
+                await ReplyAsync("", components: components.Build(), embed: mainEmbed.Build());
             }
             catch (Exception ex)
             {
                 logger.Error("BiasGameCommands.cs BiasGame", ex.ToString());
+            }
+        }
+
+        [Command("bias game stop")]
+        [RequireOwner]
+        [Summary("Stop current game")]
+        public async Task BiasGameStop()
+        {
+            try
+            {
+                Global.BiasGames.TryRemove(Context.User.Id, out _);
+                await ReplyAsync("Game removed!");
+            }
+            catch (Exception ex)
+            {
+                logger.Error("BiasGameCommands.cs BiasGameStop", ex.ToString());
             }
         }
     }
