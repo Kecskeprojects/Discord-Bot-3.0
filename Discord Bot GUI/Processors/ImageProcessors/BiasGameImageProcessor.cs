@@ -41,6 +41,13 @@ namespace Discord_Bot.Processors.ImageProcessors
 
                 polaroidBase.Mutate(x => x.Resize(280, 338));
 
+                polaroidBase.Mutate(x => x.Resize(new ResizeOptions()
+                {
+                    Mode = ResizeMode.BoxPad,
+                    Position = AnchorPositionMode.Center,
+                    Size = new Size(300, 500)
+                }));
+
                 MemoryStream result = new();
                 polaroidBase.Save(result, new SixLabors.ImageSharp.Formats.Png.PngEncoder());
 

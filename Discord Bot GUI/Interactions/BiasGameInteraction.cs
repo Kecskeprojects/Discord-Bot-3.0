@@ -92,6 +92,15 @@ namespace Discord_Bot.Interactions
 
                 List<IdolGameResource> idols = await idolService.GetListForGameAsync(data.Gender, data.DebutYearStart, data.DebutYearEnd);
 
+                //Todo: Check if there are enough idols
+                if (idols.Count < 16)
+                {
+                    await DeleteOriginalResponseAsync();
+
+                    await FollowupAsync("Not enough idols with your selected parameters!");
+                    Global.BiasGames.TryRemove(Context.User.Id, out _);
+                }
+
                 foreach (IdolGameResource idol in idols)
                 {
                     Stream stream = await biasGameImageProcessor.CreatePolaroid(idol);
@@ -179,9 +188,9 @@ namespace Discord_Bot.Interactions
         {
             //The idol IDs are reversed, the selected button sends the idol to delete from the list
             ActionRowBuilder buttonRow = new();
-            buttonRow.WithButton(label: "\U00002B9C", customId: $"BiasGame_Next_{idolIds[1]}_{Context.User.Id}", style: ButtonStyle.Primary); //Left Arrow 
+            buttonRow.WithButton(label: "\U000025C4", customId: $"BiasGame_Next_{idolIds[1]}_{Context.User.Id}", style: ButtonStyle.Primary); //Left Arrow 
             buttonRow.WithButton(label: "Who do you pick?", customId: $"BiasGame_Next_Disabled", disabled: true, style: ButtonStyle.Secondary);
-            buttonRow.WithButton(label: "\U00002B9E", customId: $"BiasGame_Next_{idolIds[0]}_{Context.User.Id}", style: ButtonStyle.Primary); //Right Arrow
+            buttonRow.WithButton(label: "\U000025BA", customId: $"BiasGame_Next_{idolIds[0]}_{Context.User.Id}", style: ButtonStyle.Primary); //Right Arrow
 
             ComponentBuilder components = new();
             components.AddRow(buttonRow);

@@ -99,6 +99,7 @@ namespace Discord_Bot.Core
             collection.AddTransient<IIdolGroupService, IdolGroupService>();
             collection.AddTransient<IUserIdolService, UserIdolService>();
             collection.AddTransient<IIdolImageService, IdolImageService>();
+            collection.AddTransient<IUserIdolStatisticService, UserIdolStatisticService>();
 
             //Database Repositories
             collection.AddScoped<IServerRepository, ServerRepository>();
@@ -117,6 +118,7 @@ namespace Discord_Bot.Core
             collection.AddScoped<IIdolGroupRepository, IdolGroupRepository>();
             collection.AddScoped<IIdolAliasRepository, IdolAliasRepository>();
             collection.AddScoped<IIdolImageRepository, IdolImageRepository>();
+            collection.AddScoped<IUserIdolStatisticRepository, UserIdolStatisticRepository>();
 
             //Commands
             collection.AddTransient<IServiceToDiscordCommunication, ServiceDiscordCommunication>();
