@@ -1,13 +1,13 @@
-﻿using Discord_Bot.Properties;
+﻿using Discord_Bot.Core;
+using Discord_Bot.Properties;
+using Discord_Bot.Tools;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using System;
 using System.IO;
 using System.Linq;
-using SixLabors.ImageSharp.Processing;
-using Discord_Bot.Tools;
-using Discord_Bot.Core;
-using System;
 
 namespace Discord_Bot.Processors.ImageProcessors
 {

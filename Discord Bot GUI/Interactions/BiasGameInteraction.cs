@@ -139,12 +139,12 @@ namespace Discord_Bot.Interactions
 
                 data.RemoveItem(idolId);
 
-                if(data.IdolWithImage.Count == 1)
+                if (data.IdolWithImage.Count == 1)
                 {
                     //Finish game logic here
                 }
 
-                if(data.CurrentPair > data.Pairs.Count - 1)
+                if (data.CurrentPair > data.Pairs.Count - 1)
                 {
                     data.CreatePairs();
                 }
@@ -160,7 +160,8 @@ namespace Discord_Bot.Interactions
                 ComponentBuilder components = CreateButtons(idolIds);
 
                 SocketMessageComponent component = Context.Interaction as SocketMessageComponent;
-                await component.UpdateAsync(x => {
+                await component.UpdateAsync(x =>
+                {
                     x.Attachments = files;
                     x.Embeds = embeds;
                     x.Components = components.Build();

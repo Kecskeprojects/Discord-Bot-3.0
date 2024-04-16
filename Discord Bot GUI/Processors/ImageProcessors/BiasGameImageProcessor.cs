@@ -10,7 +10,6 @@ using SixLabors.ImageSharp.Processing;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Windows.Gaming.Input;
 
 namespace Discord_Bot.Processors.ImageProcessors
 {

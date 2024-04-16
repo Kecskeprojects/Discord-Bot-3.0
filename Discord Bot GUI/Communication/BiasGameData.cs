@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord_Bot.Enums;
-using Discord_Bot.Services.Models.Twitter;
 using System;
 using System.Collections.Generic;
 using System.IO;
