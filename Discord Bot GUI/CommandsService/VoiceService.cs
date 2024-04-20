@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Enums;
+using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,8 @@ namespace Discord_Bot.CommandsService
 
             builder.WithThumbnailUrl(request.Thumbnail);
 
-            builder.AddField("Song duration:", request.Duration[2..].ToLower(), true);
+            TimeSpan span = XmlConvert.ToTimeSpan(request.Duration);
+            builder.AddField("Song duration:", span.ToTimeString(), true);
 
             builder.AddField("Position in queue:", count - 1, true);
 
@@ -55,8 +57,9 @@ namespace Discord_Bot.CommandsService
 
             builder.WithThumbnailUrl(nowPlaying.Thumbnail);
 
+            TimeSpan span = XmlConvert.ToTimeSpan(nowPlaying.Duration);
             builder.AddField("Requested by:", nowPlaying.User, false);
-            builder.AddField("Song duration:", elapsed_time + " / " + nowPlaying.Duration[2..].ToLower(), false);
+            builder.AddField("Song duration:", elapsed_time + " / " + span.ToTimeString(), false);
 
             builder.WithTimestamp(DateTime.UtcNow);
             builder.WithColor(Color.DarkBlue);
