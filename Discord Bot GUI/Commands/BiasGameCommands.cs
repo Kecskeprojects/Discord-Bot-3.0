@@ -21,7 +21,6 @@ namespace Discord_Bot.Commands
         //Done
         //------
         //Fourth, Upon finishing a game, the results will be saved into the UserIdolStatistics table so users can check their stats of their previous games, this will be a different command
-        //For reference on how the logic will work, check the bangya bot in text1
         [Command("bias game")]
         [RequireOwner]
         [Summary("A game of choosing favorites")]
@@ -53,9 +52,18 @@ namespace Discord_Bot.Commands
                 mainEmbed.AddField("2. Select a debut range", "A start date and an end date");
 
                 ActionRowBuilder buttonRow = new();
-                buttonRow.WithButton(emote: new Emoji("\U0001F57A"), customId: $"BiasGame_Setup_Gender_1_{Context.User.Id}", style: ButtonStyle.Primary); //Man
-                buttonRow.WithButton(emote: new Emoji("\U0001F483"), customId: $"BiasGame_Setup_Gender_2_{Context.User.Id}", style: ButtonStyle.Primary); //Woman
-                buttonRow.WithButton(emote: new Emoji("\U0001F46B"), customId: $"BiasGame_Setup_Gender_3_{Context.User.Id}", style: ButtonStyle.Primary); //Both
+                buttonRow.WithButton(
+                    emote: new Emoji("\U0001F57A"), //Man
+                    customId: $"BiasGame_Setup_Gender_1_{Context.User.Id}",
+                    style: ButtonStyle.Primary);
+                buttonRow.WithButton(
+                    emote: new Emoji("\U0001F483"), //Woman
+                    customId: $"BiasGame_Setup_Gender_2_{Context.User.Id}",
+                    style: ButtonStyle.Primary);
+                buttonRow.WithButton(
+                    emote: new Emoji("\U0001F46B"), //Both
+                    customId: $"BiasGame_Setup_Gender_3_{Context.User.Id}",
+                    style: ButtonStyle.Primary);
 
                 ComponentBuilder components = new();
                 components.AddRow(buttonRow);

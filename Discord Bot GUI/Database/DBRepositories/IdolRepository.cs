@@ -38,8 +38,8 @@ namespace Discord_Bot.Database.DBRepositories
             return context.Idols
                 .Include(x => x.Group)
                 .Include(x => x.IdolImages)
-                .Where(x => gender != GenderType.None && x.DebutDate.HasValue && x.IdolImages.Count != 0 &&
-                            x.Gender == gender &&
+                .Where(x => (gender != GenderType.None || x.Gender == gender) &&
+                            x.DebutDate.HasValue && x.IdolImages.Count != 0 &&
                             x.DebutDate.Value.Year >= debutAfter &&
                             x.DebutDate.Value.Year <= debutBefore)
                 .OrderBy(x => Guid.NewGuid())

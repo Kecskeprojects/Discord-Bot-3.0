@@ -21,9 +21,6 @@ namespace Discord_Bot.Processors.ImageProcessors
         {
             try
             {
-                const int idolImageWidth = 309;
-                const int idolImageHeight = 322;
-
                 MemoryStream polaroidStream = new();
                 Resource.polaroid_base.Save(polaroidStream, System.Drawing.Imaging.ImageFormat.Png);
                 using Image polaroidBase = Image.Load<Rgba32>(polaroidStream.ToArray());
@@ -31,13 +28,13 @@ namespace Discord_Bot.Processors.ImageProcessors
                 using Image idolImage = Image.Load<Rgba32>(await Global.GetStream(idol.LatestImageUrl));
 
                 ImageTools.CorrectImageRatio(idolImage);
-                idolImage.Mutate(x => x.Resize(new Size(idolImageWidth, idolImageHeight)));
+                idolImage.Mutate(x => x.Resize(new Size(309, 322))); //The Size is the empty part of the polaroid_base
 
-                polaroidBase.Mutate(x => x.DrawImage(idolImage, backgroundLocation: new Point(20, 20), 1));
+                polaroidBase.Mutate(x => x.DrawImage(idolImage, backgroundLocation: new Point(20, 20), 1)); //The polaroid borders are 20px wide
 
-                WriteText(polaroidBase, idol.StageName, 30, 25, 357);
+                WriteText(polaroidBase, idol.StageName, fontSize: 30, posX: 25, posY: 357);
 
-                WriteText(polaroidBase, idol.GroupFullName ?? "Soloist", 20, 25, 392);
+                WriteText(polaroidBase, idol.GroupFullName ?? "Soloist", fontSize: 20, posX: 25, posY: 392);
 
                 polaroidBase.Mutate(x => x.Resize(280, 338));
 

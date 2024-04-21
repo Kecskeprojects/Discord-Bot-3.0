@@ -15,14 +15,18 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions
 {
-    public class BiasGameInteraction(IIdolService idolService, BiasGameImageProcessor biasGameImageProcessor, Logging logger, Config config) : BaseInteraction(logger, config)
+    public class BiasGameInteraction(
+        IIdolService idolService,
+        BiasGameImageProcessor biasGameImageProcessor,
+        BiasGameWinnerBracketImageProcessor biasGameWinnerBracketImageProcessor,
+        Logging logger,
+        Config config) : BaseInteraction(logger, config)
     {
         private readonly IIdolService idolService = idolService;
         private readonly BiasGameImageProcessor biasGameImageProcessor = biasGameImageProcessor;
+        private readonly BiasGameWinnerBracketImageProcessor biasGameWinnerBracketImageProcessor = biasGameWinnerBracketImageProcessor;
 
         //Todo: select/input for when they were born
-        //Todo: Select for the number of pairs (8, 10, 12, 16, 20, 24, if possible))
-        //If at any point during the furter rounds a non-even number shows up, one contestant skips to the next round
         [ComponentInteraction("BiasGame_Setup_Gender_*_*")]
         public async Task GenderChosen(GenderChoiceEnum choiceId, ulong userId)
         {
@@ -38,7 +42,7 @@ namespace Discord_Bot.Interactions
                 logger.Log($"BiasGame Setup Gender Chosen: {choiceId}", LogOnly: true);
 
                 List<int> options = [];
-                for (int i = 1996; i <= DateTime.UtcNow.Year; i += 4)
+                for (int i = 2000; i <= DateTime.UtcNow.Year; i += 4)
                 {
                     options.Add(i);
                 }
@@ -92,7 +96,6 @@ namespace Discord_Bot.Interactions
 
                 List<IdolGameResource> idols = await idolService.GetListForGameAsync(data.Gender, data.DebutYearStart, data.DebutYearEnd);
 
-                //Todo: Check if there are enough idols
                 if (idols.Count < 16)
                 {
                     await DeleteOriginalResponseAsync();
@@ -146,11 +149,26 @@ namespace Discord_Bot.Interactions
 
                 logger.Log($"BiasGame Next Step: IdolId: {idolId}", LogOnly: true);
 
+                data.WinnerBracket = biasGameWinnerBracketImageProcessor.UpdateWinnerBracket(data);
                 data.RemoveItem(idolId);
 
+                SocketMessageComponent component = Context.Interaction as SocketMessageComponent;
                 if (data.IdolWithImage.Count == 1)
                 {
-                    //Finish game logic here
+                    data.FinalizeData();
+                    data.WinnerBracket = biasGameWinnerBracketImageProcessor.AddFinal(data);
+                    List<FileAttachment> file = [new FileAttachment(data.WinnerBracket, "winner-bracket.png")];
+                    Embed[] embed = CreateFinalEmbed(data);
+
+                    await component.UpdateAsync(x =>
+                    {
+                        x.Attachments = file;
+                        x.Embeds = embed;
+                        x.Components = null;
+                    });
+
+                    //Todo: Save the rankings in the db
+                    return;
                 }
 
                 if (data.CurrentPair > data.Pairs.Count - 1)
@@ -168,7 +186,6 @@ namespace Discord_Bot.Interactions
 
                 ComponentBuilder components = CreateButtons(idolIds);
 
-                SocketMessageComponent component = Context.Interaction as SocketMessageComponent;
                 await component.UpdateAsync(x =>
                 {
                     x.Attachments = files;
@@ -223,6 +240,23 @@ namespace Discord_Bot.Interactions
                     embeds.Add(new EmbedBuilder().WithUrl(url).WithImageUrl($"attachment://{files[i].FileName}").Build());
                 }
             }
+
+            return [.. embeds];
+        }
+
+        private Embed[] CreateFinalEmbed(BiasGameData data)
+        {
+            List<Embed> embeds = [];
+
+            EmbedBuilder main = new();
+
+            main.WithDescription("**BIAS GAME MATCH RESULT**");
+
+            EmbedFooterBuilder footer = new();
+            footer.WithIconUrl(Context.User.GetDisplayAvatarUrl(ImageFormat.Jpeg, 512));
+            footer.WithText($"{Global.GetNickName(Context.Channel, Context.User)} | {data.Gender} | {data.DebutYearStart}-{data.DebutYearEnd}");
+            main.WithFooter(footer);
+            embeds.Add(main.WithImageUrl("attachment://winner-bracket.png").Build());
 
             return [.. embeds];
         }

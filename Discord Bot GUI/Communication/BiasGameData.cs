@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord_Bot.Enums;
+using Discord_Bot.Properties;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,9 +8,15 @@ using System.Linq;
 
 namespace Discord_Bot.Communication
 {
-    public class BiasGameData(ulong userId)
+    public class BiasGameData
     {
-        public ulong UserId { get; private set; } = userId;
+        public BiasGameData(ulong userId)
+        {
+            UserId = userId;
+            Resource.winner_bracket.Save(WinnerBracket, System.Drawing.Imaging.ImageFormat.Png);
+        }
+
+        public ulong UserId { get; private set; }
         public DateTime StartedAt { get; private set; } = DateTime.UtcNow;
         public GenderType Gender { get; private set; }
         public int DebutYearStart { get; private set; }
@@ -18,8 +25,10 @@ namespace Discord_Bot.Communication
         public Dictionary<int, FileAttachment> IdolWithImage { get; private set; } = [];
         public List<int[]> Pairs { get; private set; }
         public int CurrentPair { get; private set; }
+        public int CurrentRound { get; private set; } = 0;
 
         public Stack<int> Ranking { get; private set; } = [];
+        public MemoryStream WinnerBracket { get; set; } = new MemoryStream();
 
         public void SetGender(GenderChoiceEnum gender)
         {
@@ -45,18 +54,26 @@ namespace Discord_Bot.Communication
 
         public void CreatePairs()
         {
-            int[] keys = [.. IdolWithImage.Keys.OrderBy(x => Guid.NewGuid())];
             CurrentPair = 0;
-            Pairs = keys.Chunk(2).ToList();
+            CurrentRound++;
+            Pairs = IdolWithImage.Keys.Chunk(2).ToList();
         }
 
-        internal void RemoveItem(int idolId)
+        public void RemoveItem(int idolId)
         {
             Ranking.Push(idolId);
 
             IdolWithImage.Remove(idolId, out _);
 
             CurrentPair++;
+        }
+
+        public void FinalizeData()
+        {
+            Ranking.Push(IdolWithImage.Keys.First());
+            CurrentPair = 0;
+            CurrentRound++;
+            Pairs.Clear();
         }
     }
 }

@@ -100,11 +100,11 @@ namespace Discord_Bot.Enums
 
         public static StaticRoundData[] BiasGameStaticRoundData { get; } =
             [
-                new StaticRoundData(baseLeftX: 5, baseRightX: 945, baseDiagonal: 50, baseY: 11, spacing: 54),
-                new StaticRoundData(baseLeftX: 100, baseRightX: 834, baseDiagonal: 66, baseY: 55, spacing: 141),
-                new StaticRoundData(baseLeftX: 196, baseRightX: 722, baseDiagonal: 82, baseY: 151, spacing: 332),
-                new StaticRoundData(baseLeftX: 292, baseRightX: 610, baseDiagonal: 98, baseY: 350, spacing: 0),
-                new StaticRoundData(baseLeftX: 435, baseRightX: 0, baseDiagonal: 130, baseY: 334, spacing: 0),
+                new StaticRoundData(baseLeftX: 5, baseRightX: 945, baseDiagonal: 50, baseY: 11, spacing: 54, totalPositions: 16),
+                new StaticRoundData(baseLeftX: 100, baseRightX: 834, baseDiagonal: 66, baseY: 55, spacing: 141, totalPositions: 8),
+                new StaticRoundData(baseLeftX: 196, baseRightX: 722, baseDiagonal: 82, baseY: 151, spacing: 332, totalPositions: 4),
+                new StaticRoundData(baseLeftX: 292, baseRightX: 610, baseDiagonal: 98, baseY: 350, spacing: 0, totalPositions: 2),
+                new StaticRoundData(baseLeftX: 435, baseRightX: 0, baseDiagonal: 130, baseY: 334, spacing: 0, totalPositions: 1),
             ];
     }
 }
