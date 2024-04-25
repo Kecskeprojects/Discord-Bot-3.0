@@ -9,6 +9,7 @@ namespace Discord_Bot.Interfaces.DBServices
     {
         Task<DbProcessResultEnum> AddLastfmUsernameAsync(ulong userId, string name);
         Task<List<UserResource>> GetAllLastFmUsersAsync();
+        Task<UserBiasGameStatResource> GetTopIdolsAsync(ulong userId, GenderType none);
         Task<UserResource> GetUserAsync(ulong userId);
         Task<DbProcessResultEnum> RemoveLastfmUsernameAsync(ulong userId);
     }

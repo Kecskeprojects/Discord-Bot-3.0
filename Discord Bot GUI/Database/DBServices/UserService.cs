@@ -14,6 +14,7 @@ namespace Discord_Bot.Database.DBServices
 {
     public class UserService(
         IUserRepository userRepository,
+        IUserIdolStatisticRepository userIdolStatisticRepository,
         IMapper mapper,
         Logging logger,
         Cache cache) : BaseService(mapper, logger, cache), IUserService
@@ -56,6 +57,23 @@ namespace Discord_Bot.Database.DBServices
             catch (Exception ex)
             {
                 logger.Error("UserService.cs GetAllLastFmUsersAsync", ex.ToString());
+            }
+            return result;
+        }
+
+        public async Task<UserBiasGameStatResource> GetTopIdolsAsync(ulong userId, GenderType gender)
+        {
+            UserBiasGameStatResource result = null;
+            try
+            {
+                User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
+                result = mapper.Map<User, UserBiasGameStatResource>(user);
+
+                result.Stats = await userIdolStatisticRepository.GetTop10ForUserAsync(user.UserId, gender);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("UserService.cs GetUserAsync", ex.ToString());
             }
             return result;
         }

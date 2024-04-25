@@ -19,12 +19,14 @@ namespace Discord_Bot.Interactions
         IIdolService idolService,
         BiasGameImageProcessor biasGameImageProcessor,
         BiasGameWinnerBracketImageProcessor biasGameWinnerBracketImageProcessor,
+        IUserIdolStatisticService userIdolStatisticService,
         Logging logger,
         Config config) : BaseInteraction(logger, config)
     {
         private readonly IIdolService idolService = idolService;
         private readonly BiasGameImageProcessor biasGameImageProcessor = biasGameImageProcessor;
         private readonly BiasGameWinnerBracketImageProcessor biasGameWinnerBracketImageProcessor = biasGameWinnerBracketImageProcessor;
+        private readonly IUserIdolStatisticService userIdolStatisticService = userIdolStatisticService;
 
         //Todo: select/input for when they were born
         [ComponentInteraction("BiasGame_Setup_Gender_*_*")]
@@ -167,7 +169,8 @@ namespace Discord_Bot.Interactions
                         x.Components = null;
                     });
 
-                    //Todo: Save the rankings in the db
+                    await userIdolStatisticService.UpdateUserStatisticsAsync(data.UserId, data.Ranking);
+                    Global.BiasGames.TryRemove(data.UserId, out _);
                     return;
                 }
 

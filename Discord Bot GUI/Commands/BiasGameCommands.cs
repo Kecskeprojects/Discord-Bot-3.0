@@ -3,25 +3,21 @@ using Discord.Commands;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Config;
+using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Processors.EmbedProcessors;
+using Discord_Bot.Resources;
 using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class BiasGameCommands(Logging logger, Config config, IServerService serverService) : BaseCommand(logger, config, serverService)
+    public class BiasGameCommands(Logging logger, Config config, IServerService serverService, IUserService userService) : BaseCommand(logger, config, serverService)
     {
-        //Todo: Create full game
-        //First, ask user for specifics a select for male/female/indifferent, a select/input for debut date and perhaps a select/input for when they were born
-        //Perhaps another select for the number of pairs (8, 10, 12, 16(, 20, 24, if possible))
-        //Some process will be needed to edit together the pictures of the "contestants", this will only be done the very first time, there is a function that relays to the interaction handler that it's a longer process
-        //Second, create all combinations of first round, and create a class that will store the progress of user, this can be saved in memory into a dictionary (userId, gameClass)
-        //Third, Create an InteractionHandler for the button clicks, one button will have 1, the other 2, in it's id to know which they clicked
-        //------
-        //Done
-        //------
-        //Fourth, Upon finishing a game, the results will be saved into the UserIdolStatistics table so users can check their stats of their previous games, this will be a different command
+        private readonly IUserService userService = userService;
+
         [Command("bias game")]
+        [Alias(["bg", "biasgame"])]
         [RequireOwner]
         [Summary("A game of choosing favorites")]
         public async Task BiasGame()
@@ -77,6 +73,7 @@ namespace Discord_Bot.Commands
         }
 
         [Command("bias game stop")]
+        [Alias(["bgs", "biasgamestop"])]
         [RequireOwner]
         [Summary("Stop current game")]
         public async Task BiasGameStop()
@@ -89,6 +86,34 @@ namespace Discord_Bot.Commands
             catch (Exception ex)
             {
                 logger.Error("BiasGameCommands.cs BiasGameStop", ex.ToString());
+            }
+        }
+
+        [Command("bias stats")]
+        [Alias(["bs", "biasstats", "biastats"])]
+        [RequireOwner]
+        [Summary("Show your game statistics")]
+        public async Task BiasStats()
+        {
+            try
+            {
+                UserBiasGameStatResource stats = await userService.GetTopIdolsAsync(Context.User.Id, GenderType.None);
+
+                if(stats == null || stats.BiasGameCount == 0 || stats.Stats.Count == 0)
+                {
+                    await ReplyAsync("You have not played any games!");
+                    return;
+                }
+
+                Embed[] embed = BiasGameEmbedProcessor.CreateEmbed(Global.GetNickName(Context.Channel, Context.User), GenderType.None, stats);
+
+                MessageComponent component = BiasGameEmbedProcessor.CreateComponent(Context.User.Id);
+
+                await ReplyAsync(embeds: embed, components: component);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("BiasGameCommands.cs BiasStats", ex.ToString());
             }
         }
     }

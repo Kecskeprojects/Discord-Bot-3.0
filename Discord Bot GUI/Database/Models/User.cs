@@ -13,6 +13,8 @@ public partial class User
 
     public DateTime CreatedOn { get; set; }
 
+    public int BiasGameCount { get; set; }
+
     public virtual ICollection<Birthday> Birthdays { get; set; } = new List<Birthday>();
 
     public virtual ICollection<Reminder> Reminders { get; set; } = new List<Reminder>();

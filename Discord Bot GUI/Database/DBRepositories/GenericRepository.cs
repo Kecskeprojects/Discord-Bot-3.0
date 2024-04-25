@@ -12,18 +12,18 @@ namespace Discord_Bot.Database.DBRepositories
     public class GenericRepository<TEntity>(MainDbContext context) : BaseRepository(context), IGenericRepository<TEntity> where TEntity : class
     {
         #region Add
-        public Task<int> AddAsync(TEntity item, bool saveChanges = true)
+        public async Task<int> AddAsync(TEntity item, bool saveChanges = true)
         {
             context.Set<TEntity>().Add(item);
 
-            return saveChanges ? context.SaveChangesAsync() : new Task<int>(() => 0);
+            return saveChanges ? await context.SaveChangesAsync() : 0;
         }
 
-        public Task<int> AddAsync(IEnumerable<TEntity> items, bool saveChanges = true)
+        public async Task<int> AddAsync(IEnumerable<TEntity> items, bool saveChanges = true)
         {
             context.Set<TEntity>().AddRange(items);
 
-            return saveChanges ? context.SaveChangesAsync() : new Task<int>(() => 0);
+            return saveChanges ? await context.SaveChangesAsync() : 0;
         }
         #endregion
 
@@ -157,18 +157,18 @@ namespace Discord_Bot.Database.DBRepositories
         #endregion
 
         #region Remove
-        public Task<int> RemoveAsync(TEntity item, bool saveChanges = true)
+        public async Task<int> RemoveAsync(TEntity item, bool saveChanges = true)
         {
             context.Set<TEntity>().Remove(item);
 
-            return saveChanges ? context.SaveChangesAsync() : new Task<int>(() => 0);
+            return saveChanges ? await context.SaveChangesAsync() : 0;
         }
 
-        public Task<int> RemoveAsync(IEnumerable<TEntity> items, bool saveChanges = true)
+        public async Task<int> RemoveAsync(IEnumerable<TEntity> items, bool saveChanges = true)
         {
             context.Set<TEntity>().RemoveRange(items);
 
-            return saveChanges ? context.SaveChangesAsync() : new Task<int>(() => 0);
+            return saveChanges ? await context.SaveChangesAsync() : 0;
         }
         #endregion
 
@@ -180,18 +180,18 @@ namespace Discord_Bot.Database.DBRepositories
         #endregion
 
         #region Update
-        public Task<int> UpdateAsync(TEntity item, bool saveChanges = true)
+        public async Task<int> UpdateAsync(TEntity item, bool saveChanges = true)
         {
             context.Set<TEntity>().Update(item);
 
-            return saveChanges ? context.SaveChangesAsync() : new Task<int>(() => 0);
+            return saveChanges ? await context.SaveChangesAsync() : 0;
         }
 
-        public Task<int> UpdateAsync(IEnumerable<TEntity> items, bool saveChanges = true)
+        public async Task<int> UpdateAsync(IEnumerable<TEntity> items, bool saveChanges = true)
         {
             context.Set<TEntity>().UpdateRange(items);
 
-            return saveChanges ? context.SaveChangesAsync() : new Task<int>(() => 0);
+            return saveChanges ? await context.SaveChangesAsync() : 0;
         }
         #endregion
     }

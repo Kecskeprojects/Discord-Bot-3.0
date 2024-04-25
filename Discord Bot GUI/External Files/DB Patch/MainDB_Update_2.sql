@@ -48,6 +48,10 @@ GO
 ALTER TABLE [dbo].[Idol]
     ADD [DebutDate] DATE NULL;
 
+GO
+ALTER TABLE [dbo].[User]
+    ADD [BiasGameCount] INT DEFAULT (0) NOT NULL;
+
 
 GO
 PRINT N'Update complete.';
