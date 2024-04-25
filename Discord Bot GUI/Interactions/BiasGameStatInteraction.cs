@@ -1,5 +1,5 @@
-﻿using Discord_Bot.Core.Config;
-using Discord_Bot.Core;
+﻿using Discord_Bot.Core;
+using Discord_Bot.Core.Config;
 
 namespace Discord_Bot.Interactions
 {

@@ -59,6 +59,6 @@ namespace Discord_Bot.Database.DBServices
             {
                 logger.Error("UserIdolStatisticService.cs UpdateUserStatisticsAsync", ex.ToString());
             }
-}
+        }
     }
 }

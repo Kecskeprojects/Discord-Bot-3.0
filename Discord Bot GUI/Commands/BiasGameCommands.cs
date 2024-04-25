@@ -15,7 +15,7 @@ namespace Discord_Bot.Commands
     public class BiasGameCommands(Logging logger, Config config, IServerService serverService, IUserService userService) : BaseCommand(logger, config, serverService)
     {
         private readonly IUserService userService = userService;
-
+        //Todo: add the bias game commands and edit command to the commands txts if they are not there yet
         [Command("bias game")]
         [Alias(["bg", "biasgame"])]
         [RequireOwner]
@@ -99,7 +99,7 @@ namespace Discord_Bot.Commands
             {
                 UserBiasGameStatResource stats = await userService.GetTopIdolsAsync(Context.User.Id, GenderType.None);
 
-                if(stats == null || stats.BiasGameCount == 0 || stats.Stats.Count == 0)
+                if (stats == null || stats.BiasGameCount == 0 || stats.Stats.Count == 0)
                 {
                     await ReplyAsync("You have not played any games!");
                     return;

@@ -22,12 +22,12 @@ namespace Discord_Bot.Database.DBRepositories
                 {
                     IdolGroupFullName = stat.Idol.Group.FullName,
                     IdolStageName = stat.Idol.StageName,
-                    Weight = 
-                        stat.Placed1 * 2 +
-                        stat.Placed2 * 0.5 +
-                        stat.Placed3 * 0.25 +
-                        stat.Placed4 * 0.125 +
-                        stat.Placed5 * 0.001,
+                    Weight =
+                        (stat.Placed1 * 2) +
+                        (stat.Placed2 * 0.5) +
+                        (stat.Placed3 * 0.25) +
+                        (stat.Placed4 * 0.125) +
+                        (stat.Placed5 * 0.001),
                 })
                 .OrderByDescending(statres => statres.Weight)
                 .Take(10)
