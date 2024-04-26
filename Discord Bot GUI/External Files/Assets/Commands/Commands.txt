@@ -54,3 +54,8 @@ Bias Commands:
 !bias clear		Clear your bias list (DM)
 !bias list [group]		List all available biases (DM)
 !my biases [group]		List my biases (DM)
+
+Bias Game Commands:
+!bias game		A game of choosing favorites (DM)
+!bias game stop		Stop current game (DM)
+!bias stats		Show your game statistics (DM)

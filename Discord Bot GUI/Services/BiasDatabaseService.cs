@@ -88,7 +88,7 @@ namespace Discord_Bot.Services
                     await BrowserService.OpenBroser();
                 }
 
-                IPage mainPage = await BrowserService.CreateNewPage();
+                IPage mainPage = await BrowserService.CreateNewPage(logger);
 
                 biasDataList = await kpopDbScraper.ExtractFromDatabaseTable(mainPage);
 
@@ -116,7 +116,7 @@ namespace Discord_Bot.Services
                     await BrowserService.OpenBroser();
                 }
 
-                IPage mainPage = await BrowserService.CreateNewPage();
+                IPage mainPage = await BrowserService.CreateNewPage(logger);
 
                 idolData = await kpopDbScraper.GetProfileDataAsync(mainPage, url, getGroupData);
 

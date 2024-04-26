@@ -15,7 +15,7 @@ namespace Discord_Bot.Commands
     public class BiasGameCommands(Logging logger, Config config, IServerService serverService, IUserService userService) : BaseCommand(logger, config, serverService)
     {
         private readonly IUserService userService = userService;
-        //Todo: add the bias game commands and edit command to the commands txts if they are not there yet
+
         [Command("bias game")]
         [Alias(["bg", "biasgame"])]
         [RequireOwner]
@@ -107,7 +107,7 @@ namespace Discord_Bot.Commands
 
                 Embed[] embed = BiasGameEmbedProcessor.CreateEmbed(Global.GetNickName(Context.Channel, Context.User), GenderType.None, stats);
 
-                MessageComponent component = BiasGameEmbedProcessor.CreateComponent(Context.User.Id);
+                MessageComponent component = BiasGameEmbedProcessor.CreateComponent(GenderType.None, Context.User.Id);
 
                 await ReplyAsync(embeds: embed, components: component);
             }

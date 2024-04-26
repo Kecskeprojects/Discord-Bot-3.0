@@ -86,8 +86,8 @@ namespace Discord_Bot.Services
             string groupUrl = "";
             if (groups != null && groups.Length > 0)
             {
-                //The last one should be the most recent group the idol was a member of
-                groupUrl = groups.Last().GetAttribute("href");
+                //The first one should be the most likely accurate group the idol was a member of
+                groupUrl = groups.First().GetAttribute("href");
             }
 
             if (getGroupData && !string.IsNullOrEmpty(groupUrl))
@@ -108,7 +108,7 @@ namespace Discord_Bot.Services
             await page.DeleteCookieAsync();
             try
             {
-                await page.GoToAsync(uri.OriginalString, 15000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded, WaitUntilNavigation.Networkidle2, WaitUntilNavigation.Networkidle0]);
+                await page.GoToAsync(uri.OriginalString, 15000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded]);
             }
             catch (Exception) { }
 

@@ -31,7 +31,7 @@ namespace Discord_Bot.Services
                     await BrowserService.OpenBroser();
                 }
 
-                IPage mainPage = await BrowserService.CreateNewPage();
+                IPage mainPage = await BrowserService.CreateNewPage(logger);
                 mainPage.Response += TwitterScraperResponse;
 
                 TwitterScrapingResult result = new();

@@ -84,6 +84,7 @@ namespace Discord_Bot.Commands
 
         [Command("manual update bias")]
         [RequireOwner]
+        [Alias(["manual update idol", "mass update bias", "mass update idol"])]
         [Summary("Update the extended information of idols manually from www.dbkpop.com")]
         public async Task ManualUpdateBias()
         {

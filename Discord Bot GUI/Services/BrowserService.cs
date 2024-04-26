@@ -1,4 +1,5 @@
-﻿using PuppeteerSharp;
+﻿using Discord_Bot.Core;
+using PuppeteerSharp;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -38,9 +39,13 @@ namespace Discord_Bot.Services
             }
         }
 
-        public static async Task<IPage> CreateNewPage()
+        public static async Task<IPage> CreateNewPage(Logging logger)
         {
+            IPage[] pages = await Browser.PagesAsync();
+
             IPage mainPage = await Browser.NewPageAsync();
+            logger.Log($"New Browser Page opened. (Total pages: {pages.Length + 1})");
+
             Dictionary<string, string> headers = new()
                 {
                     { "user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" },

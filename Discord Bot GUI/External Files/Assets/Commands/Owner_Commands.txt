@@ -10,4 +10,4 @@ Owner Commands:
 !greeting add [url]		Add new greeting url (DM)
 !greeting remove [id]		Remove greeting url (DM)
 !manual update bias		Update bias data (DM)
-
+!edit biasdata [name]-[group]		edit a single idol's properties (DM)

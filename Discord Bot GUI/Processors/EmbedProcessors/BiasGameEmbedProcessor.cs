@@ -26,25 +26,25 @@ namespace Discord_Bot.Processors.EmbedProcessors
                 list += $"#{i + 1} {stats.Stats[i].IdolStageName} - {stats.Stats[i].IdolGroupFullName.Replace("*", "\\*")}\n";
             }
 
-            builder.AddField("Your Favorites", list);
+            builder.AddField($"Your Favorites from *{stats.BiasGameCount} games*", list);
 
             return [builder.Build()];
         }
 
-        public static MessageComponent CreateComponent(ulong userId)
+        public static MessageComponent CreateComponent(string genderType, ulong userId)
         {
             ActionRowBuilder buttonRow = new();
             buttonRow.WithButton(
                 emote: new Emoji("\U0001F57A"), //Man
-                customId: $"BiasStats_Gender_1_{userId}",
+                customId: $"BiasStats_Gender_1_{genderType}_{userId}",
                 style: ButtonStyle.Primary);
             buttonRow.WithButton(
                 emote: new Emoji("\U0001F483"), //Woman
-                customId: $"BiasStats_Gender_2_{userId}",
+                customId: $"BiasStats_Gender_2_{genderType}_{userId}",
                 style: ButtonStyle.Primary);
             buttonRow.WithButton(
                 emote: new Emoji("\U0001F46B"), //Both
-                customId: $"BiasStats_Gender_3_{userId}",
+                customId: $"BiasStats_Gender_3_{genderType}_{userId}",
                 style: ButtonStyle.Primary);
 
             ComponentBuilder components = new();

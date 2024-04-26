@@ -17,7 +17,7 @@ namespace Discord_Bot.Database.DBRepositories
                 .Include(stat => stat.Idol)
                 .Include(i => i.Idol.Group)
                 .Include(i => i.Idol.IdolImages)
-                .Where(stat => stat.UserId == userId && (gender == GenderType.None.ToString() || stat.Idol.Gender == gender))
+                .Where(stat => stat.UserId == userId && (gender == GenderType.None.ToString() || stat.Idol.Gender == gender.ToString()))
                 .Select(stat => new UserIdolStatisticResource()
                 {
                     IdolGroupFullName = stat.Idol.Group.FullName,
