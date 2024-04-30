@@ -1,4 +1,5 @@
 ﻿using Discord_Bot.Core;
+using Discord_Bot.Core.Config;
 using PuppeteerSharp;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,13 +9,13 @@ namespace Discord_Bot.Services
     public class BrowserService
     {
         public static IBrowser Browser { get; set; }
-        public static async Task OpenBroser()
+        public static async Task OpenBroser(Config config)
         {
             BrowserFetcher browserFetcher = new(SupportedBrowser.Chrome);
             await browserFetcher.DownloadAsync(PuppeteerSharp.BrowserData.Chrome.DefaultBuildId); //117.0.5938.62 is the last version where videos were sent as media http responses
             IBrowser browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
-                Headless = true,
+                Headless = config.Headless,
                 Args =
                 [
                     "--no-sandbox",

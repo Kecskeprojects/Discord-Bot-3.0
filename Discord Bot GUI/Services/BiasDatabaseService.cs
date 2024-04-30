@@ -1,5 +1,6 @@
 ﻿using Discord_Bot.Communication;
 using Discord_Bot.Core;
+using Discord_Bot.Core.Config;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Services
 {
-    public class BiasDatabaseService(Logging logger, IIdolService idolService, IKpopDbScraper kpopDbScraper) : IBiasDatabaseService
+    public class BiasDatabaseService(Logging logger, Config config, IIdolService idolService, IKpopDbScraper kpopDbScraper) : IBiasDatabaseService
     {
         private readonly Logging logger = logger;
         private readonly IIdolService idolService = idolService;
@@ -91,7 +92,7 @@ namespace Discord_Bot.Services
             {
                 if (BrowserService.Browser == null || BrowserService.Browser.IsClosed)
                 {
-                    await BrowserService.OpenBroser();
+                    await BrowserService.OpenBroser(config);
                 }
 
                 IPage mainPage = await BrowserService.CreateNewPage(logger);
@@ -119,7 +120,7 @@ namespace Discord_Bot.Services
             {
                 if (BrowserService.Browser == null || BrowserService.Browser.IsClosed)
                 {
-                    await BrowserService.OpenBroser();
+                    await BrowserService.OpenBroser(config);
                 }
 
                 IPage mainPage = await BrowserService.CreateNewPage(logger);

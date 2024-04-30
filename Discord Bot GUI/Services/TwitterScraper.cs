@@ -1,5 +1,6 @@
 ﻿using Discord_Bot.Communication;
 using Discord_Bot.Core;
+using Discord_Bot.Core.Config;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.Twitter;
@@ -13,7 +14,7 @@ using System.Web;
 
 namespace Discord_Bot.Services
 {
-    public class TwitterScraper(Logging logger) : ITwitterScraper
+    public class TwitterScraper(Logging logger, Config config) : ITwitterScraper
     {
         private readonly Logging logger = logger;
         private static readonly string[] smallSizingStrings = ["thumb", "small", "medium"];
@@ -28,7 +29,7 @@ namespace Discord_Bot.Services
             {
                 if (BrowserService.Browser == null || BrowserService.Browser.IsClosed)
                 {
-                    await BrowserService.OpenBroser();
+                    await BrowserService.OpenBroser(config);
                 }
 
                 IPage mainPage = await BrowserService.CreateNewPage(logger);

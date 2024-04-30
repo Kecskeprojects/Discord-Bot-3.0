@@ -23,6 +23,7 @@ namespace Discord_Bot.Core.Config
             public bool enable_Instagram_Embed;
             public bool enable_Twitter_Embed;
             public string sql_connection_string;
+            public bool headless;
         }
 
         public Config()
@@ -45,7 +46,8 @@ namespace Discord_Bot.Core.Config
                     youtube_Filter_Words = [],
                     enable_Instagram_Embed = false,
                     enable_Twitter_Embed = false,
-                    sql_connection_string = ""
+                    sql_connection_string = "",
+                    headless = true
                 };
 
                 using StreamWriter sw = File.AppendText(Path.Combine(path, "config.json"));
@@ -88,6 +90,8 @@ namespace Discord_Bot.Core.Config
         public bool Enable_Twitter_Embed => Configuration.GetSection("enable_twitter_embed").Get<bool>();
 
         public string SqlConnectionString => Configuration.GetSection("sql_connection_string").Get<string>();
+
+        public bool Headless => Configuration.GetSection("headless").Get<bool>();
         #endregion
 
     }

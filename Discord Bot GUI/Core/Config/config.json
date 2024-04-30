@@ -12,5 +12,6 @@
 	"youtube_filter_words": [],
 	"enable_instagram_embed": false,
 	"enable_twitter_embed": false,
-	"sql_connection_string": ""
+	"sql_connection_string": "",
+	"Headless": true
 }

@@ -42,9 +42,11 @@ namespace Discord_Bot.Database.DBServices
 
                     if (userIdolStatistic == null)
                     {
-                        userIdolStatistic = new() { IdolId = idolId };
-
-                        userIdolStatistic.User = user;
+                        userIdolStatistic = new()
+                        {
+                            IdolId = idolId,
+                            User = user
+                        };
 
                         await userIdolStatisticRepository.AddAsync(userIdolStatistic, saveChanges: false);
                     }
