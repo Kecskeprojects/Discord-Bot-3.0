@@ -3,6 +3,7 @@ using AngleSharp.Dom;
 using Discord_Bot.Communication;
 using Discord_Bot.Interfaces.Services;
 using PuppeteerSharp;
+using PuppeteerSharp.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,7 @@ namespace Discord_Bot.Services
         public async Task<AdditionalIdolData> GetProfileDataAsync(IPage page, string url, bool getGroupData)
         {
             Uri uri = new(url);
-            IDocument document = await GetPageByUrl(page, uri);
+            IDocument document = await GetPageByUrl(page, uri, url.StartsWith("https://kprofiles.com/"));
 
             //A profile link could lead to dbkpop or kprofiles
             AdditionalIdolData data = new();
@@ -57,7 +58,7 @@ namespace Discord_Bot.Services
             await page.DeleteCookieAsync();
             try
             {
-                await page.GoToAsync(BaseUrl.OriginalString, 15000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded, WaitUntilNavigation.Networkidle2, WaitUntilNavigation.Networkidle0]);
+                await page.GoToAsync(BaseUrl.OriginalString, 15000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded]);
             }
             catch (Exception) { }
 
@@ -92,7 +93,7 @@ namespace Discord_Bot.Services
 
             if (getGroupData && !string.IsNullOrEmpty(groupUrl))
             {
-                document = await GetPageByUrl(page, new Uri(groupUrl));
+                document = await GetPageByUrl(page, new Uri(groupUrl), false);
                 IHtmlCollection<IElement> details = document.QuerySelectorAll(".wpb-content-wrapper .vc_sw-align-left");
                 if (details.Length >= 3)
                 {
@@ -103,7 +104,7 @@ namespace Discord_Bot.Services
             }
         }
 
-        private static async Task<IDocument> GetPageByUrl(IPage page, Uri uri)
+        private static async Task<IDocument> GetPageByUrl(IPage page, Uri uri, bool isKprofiles)
         {
             await page.DeleteCookieAsync();
             try
@@ -112,7 +113,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception) { }
 
-            await RemovePopUps(page);
+            await RemovePopUps(page, isKprofiles);
 
             string content = await page.GetContentAsync();
 
@@ -121,37 +122,55 @@ namespace Discord_Bot.Services
             return document;
         }
 
-        private static async Task RemovePopUps(IPage page)
+        private static async Task RemovePopUps(IPage page, bool isKprofiles = false)
         {
-            try
+            if (isKprofiles)
             {
-                await page.ClickAsync("#ez-accept-all");
+                try
+                {
+                    await page.ClickAsync(".last-focusable-el");
+                }
+                catch (Exception) { }
             }
-            catch (Exception) { }
+            else
+            {
+                try
+                {
+                    await page.ClickAsync("#ez-accept-all");
+                }
+                catch (Exception) { }
 
-            try
-            {
-                await page.ClickAsync("#onesignal-slidedown-cancel-button");
-            }
-            catch (Exception) { }
+                try
+                {
+                    await page.WaitForSelectorAsync("ins.ezfound");
+                    await page.ClickAsync("ins.ezfound", new ClickOptions() { Button = MouseButton.Right, OffSet = new Offset(10, 10) });
+                }
+                catch (Exception) { }
 
-            try
-            {
-                await page.ClickAsync(".ezmob-footer-close");
-            }
-            catch (Exception) { }
+                try
+                {
+                    await page.ClickAsync("#onesignal-slidedown-cancel-button");
+                }
+                catch (Exception) { }
 
-            try
-            {
-                await page.ClickAsync(".fc-cta-consent");
-            }
-            catch (Exception) { }
+                try
+                {
+                    await page.ClickAsync(".ezmob-footer-close");
+                }
+                catch (Exception) { }
 
-            try
-            {
-                await page.ClickAsync("#cn-accept-cookie");
+                try
+                {
+                    await page.ClickAsync(".fc-cta-consent");
+                }
+                catch (Exception) { }
+
+                try
+                {
+                    await page.ClickAsync("#cn-accept-cookie");
+                }
+                catch (Exception) { }
             }
-            catch (Exception) { }
         }
         #endregion
     }

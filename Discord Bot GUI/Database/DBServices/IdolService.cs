@@ -173,7 +173,7 @@ namespace Discord_Bot.Database.DBServices
             {
                 List<Idol> idols = await idolRepository.GetListAsync(i => i.Group.DebutDate != null && i.DebutDate == null && i.ProfileUrl != null, includes: i => i.Group);
 
-                if(idols.Count > 0)
+                if (idols.Count > 0)
                 {
                     foreach (Idol item in idols)
                     {
