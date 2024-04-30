@@ -125,13 +125,19 @@ namespace Discord_Bot.Services
         {
             try
             {
+                await page.ClickAsync("#ez-accept-all");
+            }
+            catch (Exception) { }
+
+            try
+            {
                 await page.ClickAsync("#onesignal-slidedown-cancel-button");
             }
             catch (Exception) { }
 
             try
             {
-                await page.ClickAsync("#ez-accept-all");
+                await page.ClickAsync(".ezmob-footer-close");
             }
             catch (Exception) { }
 
