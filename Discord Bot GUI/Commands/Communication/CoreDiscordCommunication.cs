@@ -149,7 +149,7 @@ namespace Discord_Bot.Commands.Communication
                     string mess = context.Message.Content.ToLower();
                     if (mess.StartsWith("i think"))
                     {
-                        await context.Channel.SendMessageAsync("I agree wholeheartedly!");
+                        await context.Channel.SendMessageAsync("I agree wholeheartedly!"); //Todo: Add a possibility to mock the user in a return message using randomized upper-lower characters, saying what they said
                     }
                     else if ((mess.StartsWith("i am") && mess != "i am") || (mess.StartsWith("i'm") && mess != "i'm"))
                     {
