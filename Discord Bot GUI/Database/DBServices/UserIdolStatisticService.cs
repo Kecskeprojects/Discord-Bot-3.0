@@ -25,6 +25,15 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 int i = 1;
+
+                User user = await userRepository.FirstOrDefaultAsync(x => x.DiscordId == userId.ToString());
+
+                if (user == null)
+                {
+                    user = new() { DiscordId = userId.ToString() };
+                    await userRepository.AddAsync(user);
+                }
+
                 while (ranking != null && ranking.Count > 0)
                 {
                     int idolId = ranking.Pop();
@@ -35,25 +44,19 @@ namespace Discord_Bot.Database.DBServices
                     {
                         userIdolStatistic = new() { IdolId = idolId };
 
-                        User user = await userRepository.FirstOrDefaultAsync(x => x.DiscordId == userId.ToString());
-
-                        if (user == null)
-                        {
-                            user = new() { DiscordId = userId.ToString() };
-                            await userRepository.AddAsync(user);
-                        }
-
                         userIdolStatistic.User = user;
 
                         await userIdolStatisticRepository.AddAsync(userIdolStatistic, saveChanges: false);
                     }
 
-                    userIdolStatistic.User.BiasGameCount++;
                     UserIdolStatisticTools.AddRanking(userIdolStatistic, i);
                     await userIdolStatisticRepository.SaveChangesAsync();
 
                     i++;
                 }
+
+                user.BiasGameCount++;
+                await userRepository.SaveChangesAsync();
             }
             catch (Exception ex)
             {

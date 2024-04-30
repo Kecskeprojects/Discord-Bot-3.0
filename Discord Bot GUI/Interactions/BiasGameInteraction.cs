@@ -104,6 +104,7 @@ namespace Discord_Bot.Interactions
 
                     await FollowupAsync("Not enough idols with your selected parameters!");
                     Global.BiasGames.TryRemove(Context.User.Id, out _);
+                    return;
                 }
 
                 foreach (IdolGameResource idol in idols)

@@ -8,15 +8,15 @@ namespace Discord_Bot.Communication
     {
         public ExtendedBiasData(IElement row)
         {
-            ProfileUrl = row.QuerySelector(".column-profile>a").GetAttribute("href").Trim();
-            StageName = row.QuerySelector(".column-stage_name").InnerHtml.Trim();
-            FullName = row.QuerySelector(".column-full_name").InnerHtml.Trim();
-            KoreanFullName = row.QuerySelector(".column-korean_name").InnerHtml.Trim();
-            KoreanStageName = row.QuerySelector(".column-korean_stage_name").InnerHtml.Trim();
-            string dateString = row.QuerySelector(".column-dob").InnerHtml.Trim();
+            ProfileUrl = Uri.UnescapeDataString(row.QuerySelector(".column-profile>a").GetAttribute("href").Trim());
+            StageName = Uri.UnescapeDataString(row.QuerySelector(".column-stage_name").InnerHtml.Trim());
+            FullName = Uri.UnescapeDataString(row.QuerySelector(".column-full_name").InnerHtml.Trim());
+            KoreanFullName = Uri.UnescapeDataString(row.QuerySelector(".column-korean_name").InnerHtml.Trim());
+            KoreanStageName = Uri.UnescapeDataString(row.QuerySelector(".column-korean_stage_name").InnerHtml.Trim());
+            string dateString = Uri.UnescapeDataString(row.QuerySelector(".column-dob").InnerHtml.Trim());
             DateOfBirth = DateOnly.TryParseExact(dateString, "yyyy-MM-dd", out DateOnly date) ? date : null;
-            GroupName = row.QuerySelector(".column-grp").InnerHtml.Trim();
-            string gender = row.QuerySelector(".column-gender").InnerHtml.Trim();
+            GroupName = Uri.UnescapeDataString(row.QuerySelector(".column-grp").InnerHtml.Trim());
+            string gender = Uri.UnescapeDataString(row.QuerySelector(".column-gender").InnerHtml.Trim());
             Gender = gender == GenderType.Male ? GenderType.Male : gender == GenderType.Female ? GenderType.Female : null;
         }
 

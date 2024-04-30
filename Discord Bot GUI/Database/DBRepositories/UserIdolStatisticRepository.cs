@@ -20,7 +20,7 @@ namespace Discord_Bot.Database.DBRepositories
                 .Where(stat => stat.UserId == userId && (gender == GenderType.None.ToString() || stat.Idol.Gender == gender.ToString()))
                 .Select(stat => new UserIdolStatisticResource()
                 {
-                    IdolGroupFullName = stat.Idol.Group.FullName,
+                    IdolGroupFullName = stat.Idol.Group.FullName ?? "Soloist",
                     IdolStageName = stat.Idol.StageName,
                     Weight =
                         (stat.Placed1 * 2) +
@@ -28,6 +28,7 @@ namespace Discord_Bot.Database.DBRepositories
                         (stat.Placed3 * 0.25) +
                         (stat.Placed4 * 0.125) +
                         (stat.Placed5 * 0.001),
+                    LatestImageUrl = stat.Idol.IdolImages.OrderByDescending(x => x.CreatedOn).First().ImageUrl
                 })
                 .OrderByDescending(statres => statres.Weight)
                 .Take(10)

@@ -21,5 +21,6 @@ namespace Discord_Bot.Interfaces.DBServices
         Task<DbProcessResultEnum> UpdateAsync(int idolId, ChangeIdolGroupModal modal);
         Task<ListWithDbResult<UserResource>> GetUsersByIdolsAsync(string[] nameList);
         Task<List<IdolGameResource>> GetListForGameAsync(GenderType gender, int debutAfter, int debutBefore);
+        Task<int> CorrectUpdateErrorsAsync();
     }
 }

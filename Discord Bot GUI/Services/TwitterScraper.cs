@@ -71,7 +71,7 @@ namespace Discord_Bot.Services
                 await page.GoToAsync(uri.OriginalString);
 
                 int count = 0;
-                while (Body == null && count < 60)
+                while (Body == null && count < 120)
                 {
                     count++;
                     await Task.Delay(500);

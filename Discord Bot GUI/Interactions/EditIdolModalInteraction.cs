@@ -25,7 +25,7 @@ namespace Discord_Bot.Interactions
                 DbProcessResultEnum result = await idolService.UpdateAsync(idolId, modal);
                 if (result == DbProcessResultEnum.Success)
                 {
-                    await RespondAsync("Edited bias successfully!");
+                    await RespondAsync("Edited bias successfully!", ephemeral: true);
                     return;
                 }
             }
@@ -46,7 +46,7 @@ namespace Discord_Bot.Interactions
                 DbProcessResultEnum result = await idolService.UpdateAsync(idolId, modal);
                 if (result == DbProcessResultEnum.Success)
                 {
-                    await RespondAsync("Edited bias successfully!");
+                    await RespondAsync("Edited bias successfully!", ephemeral: true);
                     return;
                 }
             }
@@ -68,7 +68,7 @@ namespace Discord_Bot.Interactions
                 DbProcessResultEnum result = await idolGroupService.UpdateAsync(groupId, modal);
                 if (result == DbProcessResultEnum.Success)
                 {
-                    await RespondAsync("Edited group successfully!");
+                    await RespondAsync("Edited group successfully!", ephemeral: true);
                     return;
                 }
             }
@@ -90,7 +90,7 @@ namespace Discord_Bot.Interactions
                 DbProcessResultEnum result = await idolService.UpdateAsync(idolId, modal);
                 if (result == DbProcessResultEnum.Success)
                 {
-                    await RespondAsync("Edited bias successfully!");
+                    await RespondAsync("Edited bias successfully!", ephemeral: true);
                     return;
                 }
             }
@@ -112,7 +112,7 @@ namespace Discord_Bot.Interactions
                 DbProcessResultEnum result = await idolService.UpdateAsync(idolId, modal);
                 if (result == DbProcessResultEnum.Success)
                 {
-                    await RespondAsync("Edited bias successfully!");
+                    await RespondAsync("Edited bias successfully!", ephemeral: true);
                     return;
                 }
             }

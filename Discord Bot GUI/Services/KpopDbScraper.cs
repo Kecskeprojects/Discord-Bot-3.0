@@ -96,9 +96,9 @@ namespace Discord_Bot.Services
                 IHtmlCollection<IElement> details = document.QuerySelectorAll(".wpb-content-wrapper .vc_sw-align-left");
                 if (details.Length >= 3)
                 {
-                    data.GroupFullName = details[0].InnerHtml;
-                    data.GroupFullKoreanName = details[1].InnerHtml;
-                    data.DebutDate = DateOnly.TryParse(details[2].InnerHtml, out DateOnly date) ? date : null;
+                    data.GroupFullName = Uri.UnescapeDataString(details[0].InnerHtml);
+                    data.GroupFullKoreanName = Uri.UnescapeDataString(details[1].InnerHtml);
+                    data.DebutDate = DateOnly.TryParse(Uri.UnescapeDataString(details[2].InnerHtml), out DateOnly date) ? date : null;
                 }
             }
         }

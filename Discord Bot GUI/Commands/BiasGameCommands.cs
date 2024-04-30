@@ -90,7 +90,7 @@ namespace Discord_Bot.Commands
         }
 
         [Command("bias stats")]
-        [Alias(["bs", "biasstats", "biastats"])]
+        [Alias(["bs", "biasstats", "biastats", "bias stat", "biasstat", "biastat"])]
         [RequireOwner]
         [Summary("Show your game statistics")]
         public async Task BiasStats()

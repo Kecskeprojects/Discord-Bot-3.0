@@ -166,6 +166,32 @@ namespace Discord_Bot.Database.DBServices
             }
         }
 
+        public async Task<int> CorrectUpdateErrorsAsync()
+        {
+            int count = 0;
+            try
+            {
+                List<Idol> idols = await idolRepository.GetListAsync(i => i.Group.DebutDate != null && i.DebutDate == null && i.ProfileUrl != null, includes: i => i.Group);
+
+                if(idols.Count > 0)
+                {
+                    foreach (Idol item in idols)
+                    {
+                        item.DebutDate = item.Group.DebutDate;
+                    }
+
+                    await idolRepository.SaveChangesAsync();
+                    count = idols.Count;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("IdolService.cs CorrectUpdateErrorsAsync", ex.ToString());
+            }
+
+            return count;
+        }
+
         public async Task<IdolExtendedResource> GetIdolDetailsAsync(string idolName, string idolGroup)
         {
             IdolExtendedResource resource = null;

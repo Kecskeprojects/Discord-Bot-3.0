@@ -68,6 +68,12 @@ namespace Discord_Bot.Services
                 }
 
                 logger.Log($"Updated {count} idol's details.");
+
+                int correctionCount = await idolService.CorrectUpdateErrorsAsync();
+                logger.Log($"Corrected {correctionCount} idols with errors created during update.");
+
+                await BrowserService.CloseBrowser();
+
                 logger.Log("Update Bias Data Logic ended!");
             }
             catch (Exception ex)

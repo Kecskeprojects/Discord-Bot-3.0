@@ -100,7 +100,7 @@ namespace Discord_Bot.Commands
 
         [Command("edit biasdata")]
         [RequireOwner]
-        [Alias(["editbiasdata", "edit bias data"])]
+        [Alias(["editbiasdata", "edit bias data", "edit bias", "editbias", "editidol", "edit idol", "editidoldata", "edit idol data", "edit idoldata"])]
         [Summary("Edit bias related data")]
         public async Task EditBiasData([Remainder] string biasData)
         {
@@ -142,7 +142,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasOwnerCommands.cs EditIdolData", ex.ToString());
+                logger.Error("BiasOwnerCommands.cs EditBiasData", ex.ToString());
             }
         }
     }
