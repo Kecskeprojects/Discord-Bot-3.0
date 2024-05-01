@@ -87,6 +87,7 @@ namespace Discord_Bot.Commands
             }
         }
 
+        //Todo: Show with some icon if the idol is currently added to their biases
         [Command("bias stats")]
         [Alias(["bs", "biasstats", "biastats", "bias stat", "biasstat", "biastat"])]
         [Summary("Show your game statistics")]

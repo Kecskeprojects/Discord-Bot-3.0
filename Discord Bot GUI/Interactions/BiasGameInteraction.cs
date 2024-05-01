@@ -143,6 +143,7 @@ namespace Discord_Bot.Interactions
             }
         }
 
+        //Todo: Test if defer can be added
         [ComponentInteraction("BiasGame_Next_*_*")]
         public async Task BiasGameNext(int idolId, ulong userId)
         {

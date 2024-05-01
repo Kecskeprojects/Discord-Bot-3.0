@@ -16,6 +16,7 @@ namespace Discord_Bot.Interactions
     {
         private readonly IUserService userService = userService;
 
+        //Todo: Test if defer can be added
         [ComponentInteraction("BiasStats_Gender_*_*_*")]
         public async Task GenderChosen(GenderChoiceEnum choiceId, string currentChoiceId, ulong userId)
         {

@@ -76,7 +76,7 @@ namespace Discord_Bot.Database.DBServices
                 List<Idol> idols = await idolRepository.GetListAsync(
                     i => string.IsNullOrEmpty(groupName) ||
                     i.Group.Name == groupName,
-                    i => i.Group);
+                    includes: i => i.Group);
 
                 result = mapper.Map<List<Idol>, List<IdolResource>>(idols);
             }
