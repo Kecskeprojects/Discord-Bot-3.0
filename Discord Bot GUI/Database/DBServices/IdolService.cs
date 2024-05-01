@@ -120,7 +120,7 @@ namespace Discord_Bot.Database.DBServices
             List<IdolResource> result = null;
             try
             {
-                List<Idol> idols = await idolRepository.GetAllAsync(includes: i => i.Group);
+                List<Idol> idols = await idolRepository.GetAllAsync(includes: [i => i.Group, i => i.IdolImages]);
 
                 result = mapper.Map<List<Idol>, List<IdolResource>>(idols);
             }

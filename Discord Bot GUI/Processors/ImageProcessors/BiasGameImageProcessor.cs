@@ -35,7 +35,7 @@ namespace Discord_Bot.Processors.ImageProcessors
                 {
                     ImageTools.CorrectImageRatio(idolImage);
                 }
-                
+
                 idolImage.Mutate(x => x.Resize(new Size(309, 322))); //The Size is the empty part of the polaroid_base
 
                 polaroidBase.Mutate(x => x.DrawImage(idolImage, backgroundLocation: new Point(20, 20), 1)); //The polaroid borders are 20px wide

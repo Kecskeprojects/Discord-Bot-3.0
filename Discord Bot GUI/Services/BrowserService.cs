@@ -45,7 +45,7 @@ namespace Discord_Bot.Services
             IPage[] pages = await Browser.PagesAsync();
 
             IPage mainPage = await Browser.NewPageAsync();
-            logger.Log($"New Browser Page opened. (Total pages: {pages.Length + 1})");
+            logger.Log($"New Browser Page opened. (Total pages: {pages.Length + 1})", LogOnly: true);
 
             Dictionary<string, string> headers = new()
                 {

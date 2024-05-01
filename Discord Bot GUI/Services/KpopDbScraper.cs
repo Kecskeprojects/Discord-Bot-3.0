@@ -46,7 +46,7 @@ namespace Discord_Bot.Services
             }
             else
             {
-                data.ImageUrl = document.QuerySelector(".entry-content img").GetAttribute("src");
+                data.ImageUrl = document.QuerySelector(".entry-content img")?.GetAttribute("src");
             }
 
             return data;

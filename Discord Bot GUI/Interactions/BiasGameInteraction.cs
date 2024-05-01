@@ -49,7 +49,7 @@ namespace Discord_Bot.Interactions
                     options.Add(i);
                 }
 
-                if (DateTime.UtcNow.Year - 2010 % 4 > 0)
+                if ((DateTime.UtcNow.Year - 2010) % 4 > 0)
                 {
                     options.Add(DateTime.UtcNow.Year);
                 }
