@@ -80,7 +80,7 @@ namespace Discord_Bot.Processors.ImageProcessors
             Image<Rgba32> idolImage = Image.Load<Rgba32>(file.ToArray());
 
             //The polaroids were resized, so 20 became 16 (the added numbers are the "paddings", the inner image became 247 instead of 309 in width
-            idolImage.Mutate(x => x.Crop(new Rectangle(new Point(10 + 16, 81 + 16), new Size(247, 247))));
+            idolImage.Mutate(x => x.Crop(new Rectangle(new Point(16, 16), new Size(247, 247))));
             idolImage.Mutate(x => x.Resize(roundData.BaseDiagonal, roundData.BaseDiagonal));
 
             idolImage.Mutate(x => x.ApplyRoundedCorners(roundData.BaseDiagonal / 2));

@@ -18,7 +18,6 @@ namespace Discord_Bot.Commands
 
         [Command("bias game")]
         [Alias(["bg", "biasgame"])]
-        [RequireOwner]
         [Summary("A game of choosing favorites")]
         public async Task BiasGame()
         {
@@ -74,7 +73,6 @@ namespace Discord_Bot.Commands
 
         [Command("bias game stop")]
         [Alias(["bgs", "biasgamestop"])]
-        [RequireOwner]
         [Summary("Stop current game")]
         public async Task BiasGameStop()
         {
@@ -91,7 +89,6 @@ namespace Discord_Bot.Commands
 
         [Command("bias stats")]
         [Alias(["bs", "biasstats", "biastats", "bias stat", "biasstat", "biastat"])]
-        [RequireOwner]
         [Summary("Show your game statistics")]
         public async Task BiasStats()
         {

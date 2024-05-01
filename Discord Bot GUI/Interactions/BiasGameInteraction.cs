@@ -123,7 +123,10 @@ namespace Discord_Bot.Interactions
                     data.IdolWithImage[idolIds[1]]
                 ];
 
-                Embed[] embeds = CreateEmbeds(data, files);
+                Stream combined = biasGameImageProcessor.CombineImages((MemoryStream)files[0].Stream, (MemoryStream)files[1].Stream);
+                files = [new FileAttachment(combined, "combined.png")];
+
+                Embed[] embeds = CreateEmbeds(data);
 
                 ComponentBuilder components = CreateButtons(idolIds);
 
@@ -186,7 +189,10 @@ namespace Discord_Bot.Interactions
                     data.IdolWithImage[idolIds[1]]
                 ];
 
-                Embed[] embeds = CreateEmbeds(data, files);
+                Stream combined = biasGameImageProcessor.CombineImages((MemoryStream)files[0].Stream, (MemoryStream)files[1].Stream);
+                files = [new FileAttachment(combined, "combined.png")];
+
+                Embed[] embeds = CreateEmbeds(data);
 
                 ComponentBuilder components = CreateButtons(idolIds);
 
@@ -219,9 +225,8 @@ namespace Discord_Bot.Interactions
             return components;
         }
 
-        private Embed[] CreateEmbeds(BiasGameData data, List<FileAttachment> files)
+        private Embed[] CreateEmbeds(BiasGameData data)
         {
-            string url = "https://www.dbkpop.com"; //This could be anything as long as it is the same
             List<Embed> embeds = [];
 
             EmbedBuilder main = new();
@@ -233,17 +238,9 @@ namespace Discord_Bot.Interactions
             footer.WithText($"{Global.GetNickName(Context.Channel, Context.User)} | {data.Gender} | {data.DebutYearStart}-{data.DebutYearEnd}");
             main.WithFooter(footer);
 
-            for (int i = 0; i < 2; i++)
-            {
-                if (i == 0)
-                {
-                    embeds.Add(main.WithUrl(url).WithImageUrl($"attachment://{files[i].FileName}").Build());
-                }
-                else
-                {
-                    embeds.Add(new EmbedBuilder().WithUrl(url).WithImageUrl($"attachment://{files[i].FileName}").Build());
-                }
-            }
+            main.WithImageUrl($"attachment://combined.png");
+
+            embeds.Add(main.Build());
 
             return [.. embeds];
         }

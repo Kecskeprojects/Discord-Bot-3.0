@@ -16,7 +16,35 @@ namespace Discord_Bot.Processors.ImageProcessors
     public class BiasGameImageProcessor(Logging logger)
     {
         private readonly Logging logger = logger;
-        //Todo: kpopdb images are wide with the face in the middle, kprofile images are vertical with the face in the top to middle part, this should be accounted for
+
+        public Stream CombineImages(MemoryStream left, MemoryStream right)
+        {
+            try
+            {
+                using Image leftImage = Image.Load<Rgba32>(left.ToArray());
+                using Image rightImage = Image.Load<Rgba32>(right.ToArray());
+
+                leftImage.Mutate(x => x.Resize(new ResizeOptions()
+                {
+                    Mode = ResizeMode.BoxPad,
+                    Position = AnchorPositionMode.Left,
+                    Size = new Size(280 + 50 + 280, 338) //2 image width plus 50px separator
+                }));
+                leftImage.Mutate(x => x.DrawImage(rightImage, backgroundLocation: new Point(330, 0), 1));
+
+                MemoryStream result = new();
+                leftImage.Save(result, new SixLabors.ImageSharp.Formats.Png.PngEncoder());
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("BiasGameImageProcessor.cs CreatePolaroid", ex.ToString());
+            }
+
+            return null;
+        }
+
         public async Task<Stream> CreatePolaroid(IdolGameResource idol)
         {
             try
@@ -45,13 +73,6 @@ namespace Discord_Bot.Processors.ImageProcessors
                 WriteText(polaroidBase, idol.GroupFullName ?? "Soloist", fontSize: 20, posX: 25, posY: 392);
 
                 polaroidBase.Mutate(x => x.Resize(280, 338));
-
-                polaroidBase.Mutate(x => x.Resize(new ResizeOptions()
-                {
-                    Mode = ResizeMode.BoxPad,
-                    Position = AnchorPositionMode.Center,
-                    Size = new Size(300, 500)
-                }));
 
                 MemoryStream result = new();
                 polaroidBase.Save(result, new SixLabors.ImageSharp.Formats.Png.PngEncoder());
