@@ -16,7 +16,7 @@ namespace Discord_Bot.Processors.ImageProcessors
     public class BiasGameImageProcessor(Logging logger)
     {
         private readonly Logging logger = logger;
-
+        //Todo: kpopdb images are wide with the face in the middle, kprofile images are vertical with the face in the top to middle part, this should be accounted for
         public async Task<Stream> CreatePolaroid(IdolGameResource idol)
         {
             try
