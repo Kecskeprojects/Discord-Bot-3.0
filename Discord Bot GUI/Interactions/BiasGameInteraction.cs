@@ -43,13 +43,13 @@ namespace Discord_Bot.Interactions
 
                 logger.Log($"BiasGame Setup Gender Chosen: {choiceId}", LogOnly: true);
 
-                List<int> options = [];
-                for (int i = 2000; i <= DateTime.UtcNow.Year; i += 4)
+                List<int> options = [1995, 2000, 2005];
+                for (int i = 2010; i <= DateTime.UtcNow.Year; i += 4)
                 {
                     options.Add(i);
                 }
 
-                if (DateTime.UtcNow.Year % 4 > 0)
+                if (DateTime.UtcNow.Year - 2010 % 4 > 0)
                 {
                     options.Add(DateTime.UtcNow.Year);
                 }

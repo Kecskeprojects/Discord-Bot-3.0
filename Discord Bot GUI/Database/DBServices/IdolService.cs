@@ -149,7 +149,6 @@ namespace Discord_Bot.Database.DBServices
 
                 if (additional != null)
                 {
-                    idol.DebutDate = additional.DebutDate;
                     idol.IdolImages.Add(new IdolImage() { ImageUrl = additional.ImageUrl });
 
                     if (idol.Group.Name != "soloist" && idol.Group.DebutDate == null)

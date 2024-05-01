@@ -27,7 +27,15 @@ namespace Discord_Bot.Processors.ImageProcessors
 
                 using Image idolImage = Image.Load<Rgba32>(await Global.GetStream(idol.LatestImageUrl));
 
-                ImageTools.CorrectImageRatio(idolImage);
+                if (!idol.LatestImageUrl.StartsWith("https://dbkpop.com"))
+                {
+                    ImageTools.CorrectImageRatio(idolImage, acceptableMargin: 0.05, cutoffTopRatio: 0.1, extraHeight: 0.05);
+                }
+                else
+                {
+                    ImageTools.CorrectImageRatio(idolImage);
+                }
+                
                 idolImage.Mutate(x => x.Resize(new Size(309, 322))); //The Size is the empty part of the polaroid_base
 
                 polaroidBase.Mutate(x => x.DrawImage(idolImage, backgroundLocation: new Point(20, 20), 1)); //The polaroid borders are 20px wide

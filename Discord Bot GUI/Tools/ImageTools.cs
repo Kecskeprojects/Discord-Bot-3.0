@@ -8,28 +8,28 @@ namespace Discord_Bot.Tools
 {
     public class ImageTools
     {
-
-        public static void CorrectImageRatio(Image mainImage, double ratio = 0.2)
+        public static void CorrectImageRatio(Image mainImage, double acceptableMargin = 0.2, double cutoffTopRatio = 0.5, double cutoffLeftRatio = 0.5, double extraHeight = 0.0, double extraWidth = 0.0)
         {
             //If the Cover image is too wide or high, we crop it depending on which of the two it is
-            if (mainImage.Height / mainImage.Width > (1 + ratio) || mainImage.Height / mainImage.Width < (1 - ratio))
+            if (mainImage.Height / (double)mainImage.Width > (1 + acceptableMargin) || mainImage.Height / (double)mainImage.Width < (1 - acceptableMargin))
             {
-                int difference;
+                int difference = Math.Abs(mainImage.Height - mainImage.Width);
                 if (mainImage.Width > mainImage.Height)
                 {
-                    difference = mainImage.Width - mainImage.Height;
-
-                    mainImage.Mutate(x => x.Crop(new Rectangle(difference / 2, 0, mainImage.Width - difference, mainImage.Height)));
+                    int X = (int)(difference * cutoffLeftRatio);
+                    int plusWidth = (int)((mainImage.Width - difference) * extraWidth);
+                    mainImage.Mutate(x => x.Crop(new Rectangle(X, 0, mainImage.Width - difference + plusWidth, mainImage.Height)));
                 }
                 else
                 {
-                    difference = mainImage.Height - mainImage.Width;
-
-                    mainImage.Mutate(x => x.Crop(new Rectangle(0, difference / 2, mainImage.Width, mainImage.Height - difference)));
+                    int Y = (int)(difference * cutoffTopRatio);
+                    int plusHeight = (int)((mainImage.Height - difference) * extraHeight);
+                    mainImage.Mutate(x => x.Crop(new Rectangle(0, Y, mainImage.Width, mainImage.Height - difference + plusHeight)));
                 }
 
             }
         }
+
         public static Tuple<Color, Color> GetContrastAndDominantColors(Image<Rgba32> image)
         {
             //Use nearest neighbor sampling to simplify image and resize it to a 100 pixel wide image with near equal aspect ratio
