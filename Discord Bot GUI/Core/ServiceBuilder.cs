@@ -36,13 +36,13 @@ namespace Discord_Bot.Core
             InteractionService interactions = new(client,
                 new InteractionServiceConfig()
                 {
-                    DefaultRunMode = Discord.Interactions.RunMode.Async,
+                    DefaultRunMode = Discord.Interactions.RunMode.Sync,
                     UseCompiledLambda = true,
                 });
 
             CommandService commands = new(new CommandServiceConfig()
             {
-                DefaultRunMode = Discord.Commands.RunMode.Async
+                DefaultRunMode = Discord.Commands.RunMode.Sync
             });
             Config.Config config = new();
 

@@ -16,6 +16,7 @@ namespace Discord_Bot.Services
     public class BiasDatabaseService(Logging logger, Config config, IIdolService idolService, IKpopDbScraper kpopDbScraper) : IBiasDatabaseService
     {
         private readonly Logging logger = logger;
+        private readonly Config config = config;
         private readonly IIdolService idolService = idolService;
         private readonly IKpopDbScraper kpopDbScraper = kpopDbScraper;
 

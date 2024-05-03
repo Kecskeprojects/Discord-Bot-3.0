@@ -10,6 +10,7 @@ using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
 using Discord_Bot.Services;
+using Discord_Bot.Services.Models.Twitter;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Reflection;
@@ -330,7 +331,7 @@ namespace Discord_Bot
 
                 if (context.Message.HasCharPrefix('!', ref argPos) || context.Message.HasCharPrefix('.', ref argPos))
                 {
-                    Discord.Commands.IResult result = await commands.ExecuteAsync(context, argPos, services);
+                    _ = ExecuteCommandAsync(context, argPos);
                 }
                 else if (context.Channel.GetChannelType() != ChannelType.DM && Global.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id, false))
                 {
@@ -362,6 +363,14 @@ namespace Discord_Bot
             catch (Exception ex)
             {
                 logger.Error("App.xaml.cs HandleCommandAsync", ex.ToString());
+            }
+        }
+
+        private async Task ExecuteCommandAsync(SocketCommandContext context, int argPos)
+        {
+            using (IServiceScope commandScope = services.CreateScope())
+            {
+                await commands.ExecuteAsync(context, argPos, commandScope.ServiceProvider);
             }
         }
 
@@ -400,11 +409,19 @@ namespace Discord_Bot
             try
             {
                 SocketInteractionContext context = new(client, arg);
-                await interactions.ExecuteCommandAsync(context, services);
+                _ = ExecuteInteractionAsync(context);
             }
             catch (Exception ex)
             {
                 logger.Error("App.xaml.cs HandleInteractionAsync", ex.ToString());
+            }
+        }
+
+        private async Task ExecuteInteractionAsync(SocketInteractionContext context)
+        {
+            using (IServiceScope interactionScope = services.CreateScope())
+            {
+                await interactions.ExecuteCommandAsync(context, interactionScope.ServiceProvider);
             }
         }
 
