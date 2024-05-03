@@ -35,6 +35,7 @@ namespace Discord_Bot.Processors.ImageProcessors
             return null;
         }
 
+        //Todo: add a crown to the base image and write the winner's name under the middle image
         public MemoryStream AddFinal(BiasGameData data)
         {
             try

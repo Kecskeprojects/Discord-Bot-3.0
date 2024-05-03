@@ -7,6 +7,7 @@ using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.Twitch;
 using Discord_Bot.Tools;
 using Newtonsoft.Json;
+using SpotifyAPI.Web;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -102,15 +103,18 @@ namespace Discord_Bot.Services
                 List<TwitchChannelResource> channels = await twitchChannelService.GetChannelsAsync();
                 if (channels == null)
                 {
+                    logger.Query("No channels found in db. Stopping logic from notifying...", LogOnly: true);
                     return;
                 }
 
                 foreach (TwitchChannelResource channel in channels)
                 {
+                    logger.Query($"Checking against channel: TwitchId is {channel.TwitchId}, Name is {channel.TwitchLink}", LogOnly: true);
                     if (channelStatuses.TryGetValue(channel.TwitchId, out bool channelStatus) &&
                         !channelStatus &&
                         channel.TwitchId == e.Stream.UserId)
                     {
+                        logger.Query("Found match.", LogOnly: true);
                         await serviceDiscordCommunication.SendTwitchEmbed(channel, e.Stream.ThumbnailUrl, e.Stream.Title);
                         channelStatuses[channel.TwitchId] = true;
                     }

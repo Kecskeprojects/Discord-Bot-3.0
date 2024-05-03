@@ -25,16 +25,16 @@ namespace Discord_Bot.Interactions
                     return;
                 }
 
-                List<IdolResource> idoles;
+                List<IdolResource> idols;
                 if (selectedIdolGroups[0].Contains("><"))
                 {
                     string name = selectedIdolGroups[0].Split("><")[0];
                     ulong userId = ulong.Parse(selectedIdolGroups[0].Split("><")[1]);
-                    idoles = await userIdolService.GetUserIdolsListAsync(userId, name);
+                    idols = await userIdolService.GetUserIdolsListAsync(userId, name);
                 }
                 else
                 {
-                    idoles = await idolService.GetIdolsByGroupAsync(selectedIdolGroups[0]);
+                    idols = await idolService.GetIdolsByGroupAsync(selectedIdolGroups[0]);
                 }
 
                 string message = "";
@@ -43,9 +43,9 @@ namespace Discord_Bot.Interactions
                 message += $"{selectedIdolGroups[0].Split("><")[0].ToUpper()}:\n";
 
                 //Add individual members
-                foreach (IdolResource member in idoles)
+                foreach (IdolResource member in idols)
                 {
-                    if (member != idoles[0])
+                    if (member != idols[0])
                     {
                         message += ", ";
                     }
