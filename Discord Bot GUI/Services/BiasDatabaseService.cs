@@ -45,7 +45,7 @@ namespace Discord_Bot.Services
 
                     AdditionalIdolData additional = await GetAdditionalBiasDataAsync(profileUrl, getGroupData: localIdols[i].GroupDebutDate == null);
 
-                    if(additional.ImageUrl == null)
+                    if (additional.ImageUrl == null)
                     {
                         logger.Warning("CoreLogic.cs UpdateExtendedBiasData", $"Image not found. DATA: {data?.StageName} of {data?.GroupName} | DB: {localIdols[i].Name} of {localIdols[i].GroupName}");
                         continue;

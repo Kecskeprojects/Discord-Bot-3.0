@@ -10,7 +10,6 @@ using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
 using Discord_Bot.Services;
-using Discord_Bot.Services.Models.Twitter;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Reflection;
@@ -404,7 +403,7 @@ namespace Discord_Bot
         }
 
         //Handling Interactions
-        private async Task HandleInteractionAsync(SocketInteraction arg)
+        private Task HandleInteractionAsync(SocketInteraction arg)
         {
             try
             {
@@ -415,6 +414,7 @@ namespace Discord_Bot
             {
                 logger.Error("App.xaml.cs HandleInteractionAsync", ex.ToString());
             }
+            return Task.CompletedTask;
         }
 
         private async Task ExecuteInteractionAsync(SocketInteractionContext context)

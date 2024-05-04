@@ -7,7 +7,6 @@ using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.Twitch;
 using Discord_Bot.Tools;
 using Newtonsoft.Json;
-using SpotifyAPI.Web;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
