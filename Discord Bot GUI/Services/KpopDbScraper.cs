@@ -58,7 +58,7 @@ namespace Discord_Bot.Services
             await page.DeleteCookieAsync();
             try
             {
-                await page.GoToAsync(BaseUrl.OriginalString, 15000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded]);
+                await page.GoToAsync(BaseUrl.OriginalString, 60000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded]);
             }
             catch (Exception) { }
 
@@ -109,7 +109,7 @@ namespace Discord_Bot.Services
             await page.DeleteCookieAsync();
             try
             {
-                await page.GoToAsync(uri.OriginalString, 15000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded]);
+                await page.GoToAsync(uri.OriginalString, 60000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded]);
             }
             catch (Exception) { }
 
