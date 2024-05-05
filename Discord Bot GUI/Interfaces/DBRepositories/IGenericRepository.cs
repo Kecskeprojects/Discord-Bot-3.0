@@ -13,13 +13,13 @@ namespace Discord_Bot.Interfaces.DBRepositories
         Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
         Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes);
         Task<List<TEntity>> GetAllAsync();
-        Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, object>> orderBy, bool ascending = true);
         Task<List<TEntity>> GetAllAsync(params Expression<Func<TEntity, object>>[] includes);
-        Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, object>> orderBy, bool ascending = true, params Expression<Func<TEntity, object>>[] includes);
+        Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, object>> orderBy, bool ascending);
+        Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, object>> orderBy, bool ascending, params Expression<Func<TEntity, object>>[] includes);
         Task<List<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate);
-        Task<List<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> orderBy, bool ascending = true);
         Task<List<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes);
-        Task<List<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> orderBy, bool ascending = true, params Expression<Func<TEntity, object>>[] includes);
+        Task<List<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> orderBy, bool ascending);
+        Task<List<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> orderBy, bool ascending, params Expression<Func<TEntity, object>>[] includes);
         Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate);
         Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes);
         Task<int> RemoveAsync(TEntity item, bool saveChanges = true);

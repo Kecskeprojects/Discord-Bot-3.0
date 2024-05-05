@@ -76,8 +76,9 @@ namespace Discord_Bot.Database.DBServices
                 List<Idol> idols = await idolRepository.GetListAsync(
                     i => string.IsNullOrEmpty(groupName) ||
                     i.Group.Name == groupName,
-                    includes: i => i.Group,
-                    orderBy: i => i.Name);
+                    ascending: true,
+                    orderBy: i => i.Name,
+                    includes: i => i.Group);
 
                 result = mapper.Map<List<Idol>, List<IdolResource>>(idols);
             }
@@ -121,7 +122,7 @@ namespace Discord_Bot.Database.DBServices
             List<IdolResource> result = null;
             try
             {
-                List<Idol> idols = await idolRepository.GetAllAsync(includes: [i => i.Group, i => i.IdolImages]);
+                List<Idol> idols = await idolRepository.GetAllAsync(i => i.Group, i => i.IdolImages);
 
                 result = mapper.Map<List<Idol>, List<IdolResource>>(idols);
             }
@@ -171,7 +172,12 @@ namespace Discord_Bot.Database.DBServices
             int count = 0;
             try
             {
-                List<Idol> idols = await idolRepository.GetListAsync(i => i.Group.DebutDate != null && i.DebutDate == null && i.ProfileUrl != null, includes: i => i.Group);
+                List<Idol> idols = 
+                    await idolRepository.GetListAsync(i => 
+                        i.Group.DebutDate != null &&
+                        i.DebutDate == null &&
+                        i.ProfileUrl != null,
+                        i => i.Group);
 
                 if (idols.Count > 0)
                 {

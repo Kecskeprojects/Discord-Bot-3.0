@@ -82,6 +82,7 @@ namespace Discord_Bot.Database.DBServices
                 List<CustomCommand> commands = await customCommandRepository.GetListAsync(
                     cc => cc.Server.DiscordId == serverId.ToString(),
                     orderBy: cc => cc.Command,
+                    ascending: true,
                     includes: cc => cc.Server);
                 result = mapper.Map<List<CustomCommand>, List<CustomCommandResource>>(commands);
             }
