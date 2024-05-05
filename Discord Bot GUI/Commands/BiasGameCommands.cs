@@ -78,8 +78,10 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                Global.BiasGames.TryRemove(Context.User.Id, out _);
-                await ReplyAsync("Game removed!");
+                if (Global.BiasGames.TryRemove(Context.User.Id, out _))
+                {
+                    await ReplyAsync("Game removed!");
+                }
             }
             catch (Exception ex)
             {

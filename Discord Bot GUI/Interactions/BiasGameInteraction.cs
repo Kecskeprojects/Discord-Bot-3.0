@@ -11,6 +11,7 @@ using Discord_Bot.Resources;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions
@@ -43,6 +44,8 @@ namespace Discord_Bot.Interactions
 
                 logger.Log($"BiasGame Setup Gender Chosen: {choiceId}", LogOnly: true);
 
+                await DeferAsync();
+
                 List<int> options = [1990, 2000];
                 for (int i = 2010; i <= DateTime.UtcNow.Year; i += 4)
                 {
@@ -65,8 +68,7 @@ namespace Discord_Bot.Interactions
                 ComponentBuilder components = new();
                 components.WithSelectMenu(selectMenu);
 
-                SocketMessageComponent component = Context.Interaction as SocketMessageComponent;
-                await component.UpdateAsync(x => x.Components = components.Build());
+                await ModifyOriginalResponseAsync(x => x.Components = components.Build());
             }
             catch (Exception ex)
             {
@@ -143,7 +145,6 @@ namespace Discord_Bot.Interactions
             }
         }
 
-        //Todo: Test if defer can be added
         [ComponentInteraction("BiasGame_Next_*_*")]
         public async Task BiasGameNext(int idolId, ulong userId)
         {
@@ -156,18 +157,21 @@ namespace Discord_Bot.Interactions
 
                 logger.Log($"BiasGame Next Step: IdolId: {idolId}", LogOnly: true);
 
+                await DeferAsync();
+
                 data.WinnerBracket = biasGameWinnerBracketImageProcessor.UpdateWinnerBracket(data);
                 data.RemoveItem(idolId);
 
-                SocketMessageComponent component = Context.Interaction as SocketMessageComponent;
                 if (data.IdolWithImage.Count == 1)
                 {
                     data.FinalizeData();
-                    data.WinnerBracket = biasGameWinnerBracketImageProcessor.AddFinal(data);
+
+                    IdolGameResource idolResource = await idolService.GetIdolByIdAsync(data.IdolWithImage.Keys.First());
+                    data.WinnerBracket = biasGameWinnerBracketImageProcessor.AddFinal(data, idolResource);
                     List<FileAttachment> file = [new FileAttachment(data.WinnerBracket, "winner-bracket.png")];
                     Embed[] embed = CreateFinalEmbed(data);
 
-                    await component.UpdateAsync(x =>
+                    await ModifyOriginalResponseAsync(x =>
                     {
                         x.Attachments = file;
                         x.Embeds = embed;
@@ -197,7 +201,7 @@ namespace Discord_Bot.Interactions
 
                 ComponentBuilder components = CreateButtons(idolIds);
 
-                await component.UpdateAsync(x =>
+                await ModifyOriginalResponseAsync(x =>
                 {
                     x.Attachments = files;
                     x.Embeds = embeds;

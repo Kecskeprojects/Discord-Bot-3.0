@@ -350,5 +350,22 @@ namespace Discord_Bot.Database.DBServices
             }
             return result;
         }
+
+        public async Task<IdolGameResource> GetIdolByIdAsync(int idolId)
+        {
+            IdolGameResource result = null;
+            try
+            {
+                Idol idol = await idolRepository.FirstOrDefaultAsync(x => x.IdolId == idolId, x => x.Group, x => x.IdolImages);
+
+                result = mapper.Map<Idol, IdolGameResource>(idol);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("IdolService.cs GetIdolByIdAsync", ex.ToString());
+            }
+
+            return result;
+        }
     }
 }

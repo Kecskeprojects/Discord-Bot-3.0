@@ -16,7 +16,6 @@ namespace Discord_Bot.Interactions
     {
         private readonly IUserService userService = userService;
 
-        //Todo: Test if defer can be added
         [ComponentInteraction("BiasStats_Gender_*_*_*")]
         public async Task GenderChosen(GenderChoiceEnum choiceId, string currentChoiceId, ulong userId)
         {
@@ -40,6 +39,8 @@ namespace Discord_Bot.Interactions
 
                 logger.Log($"Bias Stat Gender Chosen: {choiceId}", LogOnly: true);
 
+                await DeferAsync();
+
                 UserBiasGameStatResource stats = await userService.GetTopIdolsAsync(Context.User.Id, gender);
 
                 if (stats == null || stats.BiasGameCount == 0 || stats.Stats.Count == 0)
@@ -53,7 +54,7 @@ namespace Discord_Bot.Interactions
                 MessageComponent component = BiasGameEmbedProcessor.CreateComponent(gender, Context.User.Id);
 
                 SocketMessageComponent message = Context.Interaction as SocketMessageComponent;
-                await message.UpdateAsync(x =>
+                await ModifyOriginalResponseAsync(x =>
                 {
                     x.Embeds = embed;
                     x.Components = component;

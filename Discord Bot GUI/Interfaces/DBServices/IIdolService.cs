@@ -22,5 +22,6 @@ namespace Discord_Bot.Interfaces.DBServices
         Task<ListWithDbResult<UserResource>> GetUsersByIdolsAsync(string[] nameList);
         Task<List<IdolGameResource>> GetListForGameAsync(GenderType gender, int debutAfter, int debutBefore);
         Task<int> CorrectUpdateErrorsAsync();
+        Task<IdolGameResource> GetIdolByIdAsync(int idolId);
     }
 }

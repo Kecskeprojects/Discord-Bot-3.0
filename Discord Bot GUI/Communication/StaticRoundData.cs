@@ -11,7 +11,7 @@
 
         public int CalculateY(int positionInRound)
         {
-            //If the other side is rendered, and we are not rendering the finalist, restart the multiplier
+            //If the second half, meaning the right side, is being rendered, and we are not rendering the finalist, restart the multiplier, as we restart from the top
             int multiplier = (TotalPositions != 1 && positionInRound + 1 > (TotalPositions / 2))
                 ? (positionInRound - (TotalPositions / 2))
                 : positionInRound;
@@ -20,7 +20,7 @@
 
         public int CalculateX(int positionInRound)
         {
-            //If the other side is rendered, and we are not rendering the finalist, use the larger X value
+            //If the second half, meaning the right side, is being rendered, and we are not rendering the finalist, use the larger X value, which is the right one
             return (TotalPositions != 1 && positionInRound + 1 > (TotalPositions / 2))
                 ? BaseRightX
                 : BaseLeftX;

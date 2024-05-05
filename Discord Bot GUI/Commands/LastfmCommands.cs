@@ -537,6 +537,7 @@ namespace Discord_Bot.Commands
                 if (!string.IsNullOrEmpty(wk.Message))
                 {
                     await ReplyAsync(wk.Message);
+                    return;
                 }
 
                 if (wk.Plays.Count > 0)
@@ -549,6 +550,7 @@ namespace Discord_Bot.Commands
                     if (!string.IsNullOrEmpty(wk.ImageUrl))
                     {
                         //Download image and get back it's filepath
+                        logger.Query($"Getting album cover image:\n{wk.ImageUrl}");
                         Stream originalImage = await Global.GetStream(wk.ImageUrl);
 
                         //Edit the picture to the list format
