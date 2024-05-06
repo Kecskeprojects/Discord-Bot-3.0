@@ -128,13 +128,46 @@ namespace Discord_Bot.Core
                 Logs.Add(log);
             }
         }
+        public void Error(string location, Exception ex, bool ConsoleOnly = false, bool LogOnly = false)
+        {
+            Log log = BaseLog(LogType.Error);
 
+            log.Content += $"Location: {location}\n{ex}";
+            log.Content = PutTabsOnNewLines(log.Content);
+
+            if (!LogOnly)
+            {
+                LogToWindow(log, Brushes.Red);
+            }
+
+            if (!ConsoleOnly)
+            {
+                Logs.Add(log);
+            }
+        }
 
         public void Warning(string location, string message, bool ConsoleOnly = false, bool LogOnly = false)
         {
             Log log = BaseLog(LogType.Warning);
 
             log.Content += $"Location: {location}, Content: {message}";
+            log.Content = PutTabsOnNewLines(log.Content);
+
+            if (!LogOnly)
+            {
+                LogToWindow(log, Brushes.Yellow);
+            }
+
+            if (!ConsoleOnly)
+            {
+                Logs.Add(log);
+            }
+        }
+        public void Warning(string location, Exception ex, bool ConsoleOnly = false, bool LogOnly = false)
+        {
+            Log log = BaseLog(LogType.Warning);
+
+            log.Content += $"Location: {location}, Content: {ex}";
             log.Content = PutTabsOnNewLines(log.Content);
 
             if (!LogOnly)

@@ -3,7 +3,6 @@ using Discord_Bot.Interfaces.Commands.Communication;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
-using Discord_Bot.Services;
 using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
@@ -19,7 +18,7 @@ namespace Discord_Bot.Core
         private readonly IServerService serverService = serverService;
         private readonly ICoreToDiscordCommunication coreDiscordCommunication = coreDiscordCommunication;
 
-        public async Task<ServerResource> GetServerAsync(ulong serverId, string serverName)
+        public async Task<ServerResource> GetOrAddServerAsync(ulong serverId, string serverName)
         {
             ServerResource server = await serverService.GetByDiscordIdAsync(serverId);
             if (server == null)
@@ -37,32 +36,6 @@ namespace Discord_Bot.Core
 
             return server;
         }
-
-        #region OnClose logic
-        //Things to do when app is closing
-        //3 second time limit to event by default
-        public async void Closing()
-        {
-            try
-            {
-                logger.Log("Application closing...");
-                await BrowserService.CloseBrowser();
-                LogToFile();
-            }
-            catch (Exception) { }
-        }
-
-        public async void Closing(object sender, EventArgs e)
-        {
-            try
-            {
-                logger.Log("Application closing...");
-                await BrowserService.CloseBrowser();
-                LogToFile();
-            }
-            catch (Exception) { }
-        }
-        #endregion
 
         #region CoreDiscordCommunication Calls
         public async Task ReminderCheck()

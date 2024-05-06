@@ -61,7 +61,8 @@ namespace Discord_Bot.Core
             collection.AddAutoMapper(x => x.AddProfile<MapperConfig>());
 
             collection.AddTransient<ICoreLogic, CoreLogic>();
-            collection.AddTransient(typeof(MainWindow));
+            collection.AddSingleton<BotMain>();
+            collection.AddTransient<MainWindow>();
 
             //Processors
             collection.AddTransient<WhoKnowsImageProcessor>();
