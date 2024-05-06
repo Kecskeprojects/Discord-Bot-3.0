@@ -68,7 +68,9 @@ namespace Discord_Bot
 
             twitchThread = new Thread(async () =>
             {
-                await services.GetService<ITwitchAPI>().Start();
+                using IServiceScope scope = services.CreateScope();
+                ITwitchAPI twitchAPI = scope.ServiceProvider.GetService<ITwitchAPI>();
+                await twitchAPI.Start();
             });
             twitchThread.Start();
 
@@ -164,9 +166,10 @@ namespace Discord_Bot
                     //Only on a monday
                     if (DateTime.UtcNow.DayOfWeek == DayOfWeek.Monday)
                     {
-                        IBiasDatabaseService biasDatabaseService = scope.ServiceProvider.GetService<IBiasDatabaseService>();
                         biasUpdateThread = new Thread(async () =>
                         {
+                            using IServiceScope scope = services.CreateScope();
+                            IBiasDatabaseService biasDatabaseService = scope.ServiceProvider.GetService<IBiasDatabaseService>();
                             await biasDatabaseService.RunUpdateBiasDataAsync();
                         });
                         biasUpdateThread.Start();
