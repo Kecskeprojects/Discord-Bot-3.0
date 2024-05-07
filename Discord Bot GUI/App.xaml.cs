@@ -1,8 +1,8 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Discord_Bot.Core;
-using Discord_Bot.Core.Config;
-using Discord_Bot.Interfaces.Commands.Communication;
+using Discord_Bot.Core.Configuration;
+using Discord_Bot.Features;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services;
@@ -71,11 +71,7 @@ namespace Discord_Bot
             {
                 using (IServiceScope scope = services.CreateScope())
                 {
-                    ICoreLogic coreLogic = scope.ServiceProvider.GetService<ICoreLogic>();
-                    ICoreToDiscordCommunication discordCommunication = scope.ServiceProvider.GetService<ICoreToDiscordCommunication>();
                     DiscordSocketClient client = scope.ServiceProvider.GetService<DiscordSocketClient>();
-                    Config config = scope.ServiceProvider.GetService<Config>();
-
                     if (client.LoginState == LoginState.LoggedOut)
                     {
                         logger.Log("Attempting to re-connect bot after disconnect.");
@@ -91,8 +87,10 @@ namespace Discord_Bot
                     //Do at GMT+0 6 am every day
                     if (DateTime.UtcNow.Hour == 6 && DateTime.UtcNow.Minute == 0)
                     {
-                        await discordCommunication.SendBirthdayMessages();
+                        BirthdayFeature birthdayFeature = scope.ServiceProvider.GetService<BirthdayFeature>();
+                        await birthdayFeature.Run();
 
+                        Config config = scope.ServiceProvider.GetService<Config>();
                         YoutubeAPI.KeyReset(config.Youtube_API_Keys);
                         logger.Log("Youtube keys reset!");
 
@@ -110,9 +108,11 @@ namespace Discord_Bot
                         }
                     }
 
-                    coreLogic.LogToFile();
+                    ReminderFeature reminderFeature = scope.ServiceProvider.GetService<ReminderFeature>();
+                    await reminderFeature.Run();
 
-                    await discordCommunication.SendReminders();
+                    ICoreLogic coreLogic = scope.ServiceProvider.GetService<ICoreLogic>();
+                    coreLogic.LogToFile();
                 }
             }
             catch (Exception ex)

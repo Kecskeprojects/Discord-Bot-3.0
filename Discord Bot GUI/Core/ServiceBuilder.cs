@@ -4,9 +4,11 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Discord_Bot.Commands.Communication;
 using Discord_Bot.Core.Caching;
+using Discord_Bot.Core.Configuration;
 using Discord_Bot.Database;
 using Discord_Bot.Database.DBRepositories;
 using Discord_Bot.Database.DBServices;
+using Discord_Bot.Features;
 using Discord_Bot.Interfaces.Commands.Communication;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
@@ -44,7 +46,6 @@ namespace Discord_Bot.Core
             {
                 DefaultRunMode = Discord.Commands.RunMode.Sync
             });
-            Config.Config config = new();
 
             IServiceCollection collection = new ServiceCollection();
 
@@ -52,10 +53,11 @@ namespace Discord_Bot.Core
             collection.AddSingleton(client);
             collection.AddSingleton(interactions);
             collection.AddSingleton(commands);
-            collection.AddSingleton(config);
+            collection.AddTransient<Config>(); //This is transient meaning configuration can be edited on the fly
             collection.AddSingleton(new Logging());
             collection.AddSingleton(new Cache());
 
+            Config config = new();
             collection.AddDbContext<MainDbContext>(options => options.UseSqlServer(config.SqlConnectionString));
 
             collection.AddAutoMapper(x => x.AddProfile<MapperConfig>());
@@ -69,6 +71,14 @@ namespace Discord_Bot.Core
             collection.AddTransient<BonkGifProcessor>();
             collection.AddTransient<BiasGameImageProcessor>();
             collection.AddTransient<BiasGameWinnerBracketImageProcessor>();
+
+            //Features
+            collection.AddTransient<InstagramEmbedFeature>();
+            collection.AddTransient<SelfRoleFeature>();
+            collection.AddTransient<EasterEggFeature>();
+            collection.AddTransient<CustomCommandFeature>();
+            collection.AddTransient<BirthdayFeature>();
+            collection.AddTransient<ReminderFeature>();
 
             //Services
             collection.AddTransient<ITwitchAPI, TwitchAPI>();
@@ -124,7 +134,6 @@ namespace Discord_Bot.Core
 
             //Commands
             collection.AddTransient<IServiceToDiscordCommunication, ServiceDiscordCommunication>();
-            collection.AddTransient<ICoreToDiscordCommunication, CoreDiscordCommunication>();
 
             return collection.BuildServiceProvider();
         }

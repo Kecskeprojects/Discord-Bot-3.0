@@ -72,16 +72,32 @@ namespace Discord_Bot.Database.DBServices
 
         public async Task<List<BirthdayResource>> GetBirthdaysByDateAsync()
         {
-            List<Birthday> birthday = await birthdayRepository.GetListAsync(
-                b => b.Date.Month == DateTime.UtcNow.Month &&
-                b.Date.Day == DateTime.UtcNow.Day,
-                b => b.Server);
+            List<Birthday> birthday = [];
+            try
+            {
+                birthday = await birthdayRepository.GetListAsync(
+                    b => b.Date.Month == DateTime.UtcNow.Month &&
+                    b.Date.Day == DateTime.UtcNow.Day,
+                    b => b.Server);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("BirthdayService.cs GetBirthdaysByDateAsync", ex.ToString());
+            }
             return mapper.Map<List<Birthday>, List<BirthdayResource>>(birthday);
         }
 
         public async Task<List<BirthdayResource>> GetServerBirthdayListAsync(ulong serverId)
         {
-            List<Birthday> birthday = await birthdayRepository.GetListForServerAsync(serverId.ToString());
+            List<Birthday> birthday = [];
+            try
+            {
+                birthday = await birthdayRepository.GetListForServerAsync(serverId.ToString());
+            }
+            catch (Exception ex)
+            {
+                logger.Error("BirthdayService.cs GetServerBirthdayListAsync", ex.ToString());
+            }
             return mapper.Map<List<Birthday>, List<BirthdayResource>>(birthday);
         }
 

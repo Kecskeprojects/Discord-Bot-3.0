@@ -3,9 +3,9 @@ using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Discord_Bot.Core;
-using Discord_Bot.Core.Config;
+using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.Commands.Communication;
+using Discord_Bot.Features;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Resources;
 using Microsoft.Extensions.DependencyInjection;
@@ -186,13 +186,11 @@ namespace Discord_Bot
 
                 using (IServiceScope scope = services.CreateScope())
                 {
-                    ICoreLogic coreLogic = scope.ServiceProvider.GetService<ICoreLogic>();
-                    ICoreToDiscordCommunication discordCommunication = scope.ServiceProvider.GetService<ICoreToDiscordCommunication>();
-
                     //If message is not private message, and the server is not in our database, add it
                     ServerResource server = null;
                     if (context.Channel.GetChannelType() != ChannelType.DM)
                     {
+                        ICoreLogic coreLogic = scope.ServiceProvider.GetService<ICoreLogic>();
                         server = await coreLogic.GetOrAddServerAsync(context.Guild.Id, context.Guild.Name);
                         if (server == null)
                         {
@@ -209,34 +207,38 @@ namespace Discord_Bot
                                 await commands.ExecuteAsync(context, argPos, commandScope.ServiceProvider);
                             }
                         });
+                        return;
                     }
                     else if (context.Channel.GetChannelType() != ChannelType.DM && Global.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id, false))
                     {
                         if (context.Message.HasCharPrefix('+', ref argPos) || context.Message.HasCharPrefix('-', ref argPos))
                         {
                             //self roles
-                            await discordCommunication.SelfRole(context);
+                            SelfRoleFeature selfRoleFeature = scope.ServiceProvider.GetService<SelfRoleFeature>();
+                            await selfRoleFeature.Run(context);
                         }
 
                         await context.Message.DeleteAsync();
-                    }
-                    else
-                    {
-                        //Response to mention
-                        if (context.Message.Content.Contains(client.CurrentUser.Mention) || context.Message.Content.Contains(client.CurrentUser.Mention.Remove(2, 1)))
-                        {
-                            await discordCommunication.GreetAsync(context);
-                        }
-
-                        await discordCommunication.FeatureChecksAsync(context);
-
-                        //Make embed independently from main thread
-                        if (config.Enable_Instagram_Embed)
-                        {
-                            coreLogic.InstagramEmbed(context.Message.Content, context.Message.Id, context.Channel.Id, context.Guild?.Id);
-                        }
+                        return;
                     }
                 }
+
+                _ = Task.Run(async () =>
+                {
+                    using (IServiceScope scope = services.CreateScope())
+                    {
+                        EasterEggFeature easterEggFeature = scope.ServiceProvider.GetService<EasterEggFeature>();
+                        await easterEggFeature.Run(context);
+
+
+                        //Make embed for instagram links
+                        if (config.Enable_Instagram_Embed)
+                        {
+                            InstagramEmbedFeature instagramEmbedFeature = scope.ServiceProvider.GetService<InstagramEmbedFeature>();
+                            await instagramEmbedFeature.Run(context);
+                        }
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -263,8 +265,8 @@ namespace Discord_Bot
                             {
                                 using (IServiceScope scope = services.CreateScope())
                                 {
-                                    ICoreToDiscordCommunication discordCommunication = scope.ServiceProvider.GetService<ICoreToDiscordCommunication>();
-                                    await discordCommunication.CustomCommands(context);
+                                    CustomCommandFeature customCommandFeature = scope.ServiceProvider.GetService<CustomCommandFeature>();
+                                    await customCommandFeature.Run(context as SocketCommandContext);
                                 }
                             }
                             break;

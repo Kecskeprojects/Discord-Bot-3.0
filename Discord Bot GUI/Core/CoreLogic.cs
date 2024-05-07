@@ -1,5 +1,4 @@
 ﻿using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.Commands.Communication;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
@@ -12,11 +11,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Core
 {
-    public class CoreLogic(Logging logger, IServerService serverService, ICoreToDiscordCommunication coreDiscordCommunication) : ICoreLogic
+    public class CoreLogic(Logging logger, IServerService serverService) : ICoreLogic
     {
         private readonly Logging logger = logger;
         private readonly IServerService serverService = serverService;
-        private readonly ICoreToDiscordCommunication coreDiscordCommunication = coreDiscordCommunication;
 
         public async Task<ServerResource> GetOrAddServerAsync(ulong serverId, string serverName)
         {
@@ -37,59 +35,6 @@ namespace Discord_Bot.Core
             return server;
         }
 
-        #region CoreDiscordCommunication Calls
-        public async Task ReminderCheck()
-        {
-            await coreDiscordCommunication.SendReminders();
-        }
-
-        public async Task BirthdayCheck()
-        {
-            await coreDiscordCommunication.SendBirthdayMessages();
-        }
-
-        //Check if message is an instagram link and has an embed or not
-        public void InstagramEmbed(string message, ulong messageId, ulong channelId, ulong? guildId)
-        {
-            try
-            {
-                List<Uri> urls = UrlTools.LinkSearch(message, false, "https://instagram.com/");
-
-                //Check if message is an instagram link
-                if (!CollectionTools.IsNullOrEmpty(urls))
-                {
-                    //Run link embedding in separate thread
-                    _ = Task.Run(async () =>
-                    {
-                        try
-                        {
-                            for (int i = 0; i < urls.Count; i++)
-                            {
-                                logger.Log($"Embed message from following link: {urls[i]}");
-                                if (urls[i].Segments.Length != 2 &&
-                                    urls[i].Segments[1][..^1] != "stories" &&
-                                    urls[i].Segments[1][..^1] != "live" &&
-                                    urls[i].Segments[2][..^1] != "live")
-                                {
-                                    await coreDiscordCommunication.SendInstagramPostEmbed(urls[i], messageId, channelId, guildId);
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.Error("CoreLogic.cs InstagramEmbed AsyncTask", ex.ToString());
-                        }
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("CoreLogic.cs InstagramEmbed", ex.ToString());
-            }
-        }
-        #endregion
-
-        #region Helper Methods
         //For logging messages, errors, and messages to log files
         public void LogToFile()
         {
@@ -115,7 +60,7 @@ namespace Discord_Bot.Core
             }
             catch (Exception ex)
             {
-                logger.Error("CoreLogic.cs LogtoFile", ex.ToString());
+                logger.Error("CoreLogic.cs LogtoFile", ex);
             }
         }
 
@@ -152,9 +97,8 @@ namespace Discord_Bot.Core
             }
             catch (Exception ex)
             {
-                logger.Error("CoreLogic.css CheckFolder", ex.ToString());
+                logger.Error("CoreLogic.css CheckFolder", ex);
             }
         }
-        #endregion
     }
 }
