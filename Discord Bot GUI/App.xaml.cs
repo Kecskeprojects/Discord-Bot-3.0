@@ -85,7 +85,7 @@ namespace Discord_Bot
                     }
 
                     //Do at GMT+0 6 am every day
-                    if (DateTime.UtcNow.Hour == 6 && DateTime.UtcNow.Minute == 0)
+                    if (DateTime.UtcNow.Hour == 7 && DateTime.UtcNow.Minute == 0)
                     {
                         BirthdayFeature birthdayFeature = scope.ServiceProvider.GetService<BirthdayFeature>();
                         await birthdayFeature.Run();
