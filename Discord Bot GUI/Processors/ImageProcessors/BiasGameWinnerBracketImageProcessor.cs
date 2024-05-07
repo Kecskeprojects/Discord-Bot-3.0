@@ -32,7 +32,7 @@ namespace Discord_Bot.Processors.ImageProcessors
             }
             catch (Exception ex)
             {
-                logger.Error("BiasGameWinnerBracketImageProcessor.cs UpdateWinnerBracket", ex.ToString());
+                logger.Error("BiasGameWinnerBracketImageProcessor.cs UpdateWinnerBracket", ex);
             }
 
             return null;
@@ -49,7 +49,7 @@ namespace Discord_Bot.Processors.ImageProcessors
             }
             catch (Exception ex)
             {
-                logger.Error("BiasGameWinnerBracketImageProcessor.cs AddFinal", ex.ToString());
+                logger.Error("BiasGameWinnerBracketImageProcessor.cs AddFinal", ex);
             }
 
             return null;

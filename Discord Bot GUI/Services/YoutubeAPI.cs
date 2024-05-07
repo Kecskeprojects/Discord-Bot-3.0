@@ -2,7 +2,7 @@
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.Commands.Communication;
+using Discord_Bot.Features;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Tools;
 using Google.Apis.Services;
@@ -18,14 +18,14 @@ using System.Web;
 namespace Discord_Bot.Services
 {
 
-    public class YoutubeAPI(Logging logger, Config config, IServiceToDiscordCommunication serviceDiscordCommunication) : IYoutubeAPI
+    public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Logging logger, Config config) : IYoutubeAPI
     {
         #region Variables
         private static readonly Dictionary<string, int> keys = [];
         private static int youtubeIndex = 0;
+        private readonly YoutubeAddPlaylistFeature youtubeAddPlaylistFeature = youtubeAddPlaylistFeature;
         private readonly Logging logger = logger;
         private readonly Config config = config;
-        private readonly IServiceToDiscordCommunication serviceDiscordCommunication = serviceDiscordCommunication;
         #endregion
 
         #region Base Methods
@@ -62,14 +62,14 @@ namespace Discord_Bot.Services
                     youtubeIndex = r.Next(0, keys.Count);
                     currentKey = config.Youtube_API_Keys[youtubeIndex];
 
-                    logger.Warning("YoutubeAPI.cs Searching", ex.ToString(), LogOnly: true);
+                    logger.Warning("YoutubeAPI.cs Searching", ex, LogOnly: true);
                     logger.Log($"Key switched out to key in {youtubeIndex} position, value: {currentKey}!");
 
                     result = await Run(query, username, serverId, channelId);
                 }
                 else
                 {
-                    logger.Error("YoutubeAPI.cs Searching", ex.ToString());
+                    logger.Error("YoutubeAPI.cs Searching", ex);
                 }
             }
             return result;
@@ -143,7 +143,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("YoutubeAPI.cs VideoSearch", ex.ToString());
+                logger.Error("YoutubeAPI.cs VideoSearch", ex);
             }
 
             keys[currentKey] += 1;
@@ -187,7 +187,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("YoutubeAPI.cs KeywordSearch", ex.ToString());
+                logger.Error("YoutubeAPI.cs KeywordSearch", ex);
             }
 
             keys[currentKey] += 100;
@@ -230,7 +230,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("YoutubeAPI.cs PlaylistSearch", ex.ToString());
+                logger.Error("YoutubeAPI.cs PlaylistSearch", ex);
             }
 
             keys[currentKey] += 1;
@@ -272,7 +272,7 @@ namespace Discord_Bot.Services
         {
             try
             {
-                bool result = await serviceDiscordCommunication.YoutubeAddPlaylistMessage(channelId);
+                bool result = await youtubeAddPlaylistFeature.Run(channelId);
 
                 //Todo: Check if the given song is part of the first 25 songs that will be imported, and do not import it twice
                 if (result)
@@ -282,7 +282,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("YoutubeAPI.cs AddPlaylistAsync", ex.ToString());
+                logger.Error("YoutubeAPI.cs AddPlaylistAsync", ex);
             }
         }
 

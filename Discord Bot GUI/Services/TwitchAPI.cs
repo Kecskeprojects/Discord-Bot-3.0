@@ -1,6 +1,6 @@
 ﻿using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
-using Discord_Bot.Interfaces.Commands.Communication;
+using Discord_Bot.Features;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
@@ -19,7 +19,7 @@ using TwitchLib.Api.Services.Events.LiveStreamMonitor;
 
 namespace Discord_Bot.Services
 {
-    public class TwitchAPI(Logging logger, Config config, ITwitchChannelService twitchChannelService, IServiceToDiscordCommunication serviceDiscordCommunication) : ITwitchAPI
+    public class TwitchAPI(ITwitchChannelService twitchChannelService, TwitchNotificationFeature twitchNotificationFeature, Logging logger, Config config) : ITwitchAPI
     {
         #region Variables
         //Saved variables
@@ -28,11 +28,10 @@ namespace Discord_Bot.Services
         private static readonly Dictionary<string, bool> channelStatuses = [];
         private static string Token;
         private static int TokenTick = 0;
-
+        private readonly ITwitchChannelService twitchChannelService = twitchChannelService;
+        private readonly TwitchNotificationFeature twitchNotificationFeature = twitchNotificationFeature;
         private readonly Logging logger = logger;
         private readonly Config config = config;
-        private readonly ITwitchChannelService twitchChannelService = twitchChannelService;
-        private readonly IServiceToDiscordCommunication serviceDiscordCommunication = serviceDiscordCommunication;
         #endregion
 
         #region Base Methods
@@ -49,7 +48,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("TwitchAPI.cs Twitch", ex.ToString());
+                logger.Error("TwitchAPI.cs Twitch", ex);
             }
         }
 
@@ -69,7 +68,7 @@ namespace Discord_Bot.Services
 
             Monitor = new LiveStreamMonitorService(API);
 
-            List<string> lst = await GetChannels();
+            List<string> lst = await GetChannelsAsync();
 
             if (CollectionTools.IsNullOrEmpty(lst))
             {
@@ -111,14 +110,14 @@ namespace Discord_Bot.Services
                         !channelStatus &&
                         channel.TwitchId == e.Stream.UserId)
                     {
-                        await serviceDiscordCommunication.SendTwitchEmbed(channel, e.Stream.ThumbnailUrl, e.Stream.Title);
+                        await twitchNotificationFeature.Run(channel, e.Stream.ThumbnailUrl, e.Stream.Title);
                         channelStatuses[channel.TwitchId] = true;
                     }
                 }
             }
             catch (Exception ex)
             {
-                logger.Error("TwitchAPI.cs MonitorOnStreamOnline", ex.ToString());
+                logger.Error("TwitchAPI.cs MonitorOnStreamOnline", ex);
             }
         }
 
@@ -147,7 +146,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("TwitchAPI.cs MonitorOnStreamOffline", ex.ToString());
+                logger.Error("TwitchAPI.cs MonitorOnStreamOffline", ex);
             }
         }
 
@@ -170,7 +169,7 @@ namespace Discord_Bot.Services
 
                 if (TokenTick % 5 == 0)
                 {
-                    List<string> lst = await GetChannels();
+                    List<string> lst = await GetChannelsAsync();
 
                     if (!CollectionTools.IsNullOrEmpty(lst) && Monitor.ChannelsToMonitor.Except(lst).Any())
                     {
@@ -180,7 +179,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("TwitchAPI.cs MonitorOnServiceTick", ex.ToString());
+                logger.Error("TwitchAPI.cs MonitorOnServiceTick", ex);
             }
         }
 
@@ -193,7 +192,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("TwitchAPI.cs MonitorOnChannelsSet", ex.ToString());
+                logger.Error("TwitchAPI.cs MonitorOnChannelsSet", ex);
             }
         }
 
@@ -205,7 +204,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("TwitchAPI.cs MonitorOnServiceStarted", ex.ToString());
+                logger.Error("TwitchAPI.cs MonitorOnServiceStarted", ex);
             }
         }
         #endregion
@@ -268,7 +267,7 @@ namespace Discord_Bot.Services
             return twitchUser.Response[0];
         }
 
-        private async Task<List<string>> GetChannels()
+        private async Task<List<string>> GetChannelsAsync()
         {
             List<TwitchChannelResource> channels = await twitchChannelService.GetChannelsAsync();
             List<string> lst = [];

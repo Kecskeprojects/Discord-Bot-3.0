@@ -2,14 +2,12 @@
 using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Discord_Bot.Commands.Communication;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Database;
 using Discord_Bot.Database.DBRepositories;
 using Discord_Bot.Database.DBServices;
 using Discord_Bot.Features;
-using Discord_Bot.Interfaces.Commands.Communication;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
@@ -79,6 +77,8 @@ namespace Discord_Bot.Core
             collection.AddTransient<CustomCommandFeature>();
             collection.AddTransient<BirthdayFeature>();
             collection.AddTransient<ReminderFeature>();
+            collection.AddTransient<TwitchNotificationFeature>();
+            collection.AddTransient<YoutubeAddPlaylistFeature>();
 
             //Services
             collection.AddTransient<ITwitchAPI, TwitchAPI>();
@@ -131,9 +131,6 @@ namespace Discord_Bot.Core
             collection.AddScoped<IIdolAliasRepository, IdolAliasRepository>();
             collection.AddScoped<IIdolImageRepository, IdolImageRepository>();
             collection.AddScoped<IUserIdolStatisticRepository, UserIdolStatisticRepository>();
-
-            //Commands
-            collection.AddTransient<IServiceToDiscordCommunication, ServiceDiscordCommunication>();
 
             return collection.BuildServiceProvider();
         }

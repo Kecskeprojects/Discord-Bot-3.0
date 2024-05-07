@@ -83,7 +83,7 @@ namespace Discord_Bot.Processors.ImageProcessors
             }
             catch (Exception ex)
             {
-                logger.Error("WhoKnowsImageProcessor.cs EditPicture", ex.ToString());
+                logger.Error("WhoKnowsImageProcessor.cs EditPicture", ex);
             }
 
             return null;

@@ -38,7 +38,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("InstaLoader.cs DownloadFromInstagram", ex.ToString());
+                logger.Error("InstaLoader.cs DownloadFromInstagram", ex);
             }
 
             return errorDuringDownload;

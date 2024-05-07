@@ -39,7 +39,7 @@ namespace Discord_Bot.Processors.ImageProcessors
             }
             catch (Exception ex)
             {
-                logger.Error("BiasGameImageProcessor.cs CreatePolaroid", ex.ToString());
+                logger.Error("BiasGameImageProcessor.cs CreatePolaroid", ex);
             }
 
             return null;
@@ -81,7 +81,7 @@ namespace Discord_Bot.Processors.ImageProcessors
             }
             catch (Exception ex)
             {
-                logger.Error("BiasGameImageProcessor.cs CreatePolaroid", ex.ToString());
+                logger.Error("BiasGameImageProcessor.cs CreatePolaroid", ex);
             }
 
             return null;

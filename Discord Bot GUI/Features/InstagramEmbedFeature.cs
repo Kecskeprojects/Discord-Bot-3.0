@@ -44,7 +44,7 @@ namespace Discord_Bot.Features
             }
         }
 
-        public async Task SendInstagramPostEmbedAsync(Uri uri)
+        private async Task SendInstagramPostEmbedAsync(Uri uri)
         {
             InstagramMessageResult result = new();
             List<FileAttachment> attachments = [];

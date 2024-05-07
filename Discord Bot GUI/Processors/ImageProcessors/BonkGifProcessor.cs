@@ -77,7 +77,7 @@ namespace Discord_Bot.Processors.ImageProcessors
             }
             catch (Exception ex)
             {
-                logger.Error("BonkGifProcessor.cs CreateBonkImage", ex.ToString());
+                logger.Error("BonkGifProcessor.cs CreateBonkImage", ex);
             }
 
             return null;
