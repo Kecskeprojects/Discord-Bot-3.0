@@ -1,4 +1,4 @@
-﻿namespace Discord_Bot.Communication
+﻿namespace Discord_Bot.Communication.BiasScrape
 {
     public class BiasEditData
     {

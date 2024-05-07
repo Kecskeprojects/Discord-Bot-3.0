@@ -1,4 +1,4 @@
-﻿using Discord_Bot.Communication;
+﻿using Discord_Bot.Communication.Bias;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Enums

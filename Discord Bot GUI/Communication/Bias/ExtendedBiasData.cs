@@ -2,7 +2,7 @@
 using Discord_Bot.Enums;
 using System;
 
-namespace Discord_Bot.Communication
+namespace Discord_Bot.Communication.Bias
 {
     public class ExtendedBiasData
     {

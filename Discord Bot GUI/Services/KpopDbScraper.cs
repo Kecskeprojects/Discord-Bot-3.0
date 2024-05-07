@@ -1,6 +1,7 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
-using Discord_Bot.Communication;
+using Discord_Bot.Communication.Bias;
+using Discord_Bot.Communication.BiasScrape;
 using Discord_Bot.Interfaces.Services;
 using PuppeteerSharp;
 using PuppeteerSharp.Input;

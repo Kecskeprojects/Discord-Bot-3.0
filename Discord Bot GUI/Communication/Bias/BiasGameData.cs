@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Discord_Bot.Communication
+namespace Discord_Bot.Communication.Bias
 {
     public class BiasGameData
     {
