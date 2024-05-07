@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Discord_Bot.Communication.BiasScrape;
+using Discord_Bot.Communication.Bias;
 using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;

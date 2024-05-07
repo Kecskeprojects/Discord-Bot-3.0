@@ -73,7 +73,7 @@ namespace Discord_Bot.Features
                 }
                 catch (Exception ex)
                 {
-                    if(ex is not HttpException && ex is not ArgumentException)
+                    if (ex is not HttpException && ex is not ArgumentException)
                     {
                         throw;
                     }

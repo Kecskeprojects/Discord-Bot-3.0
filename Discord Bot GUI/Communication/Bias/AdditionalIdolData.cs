@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Discord_Bot.Communication.BiasScrape
+namespace Discord_Bot.Communication.Bias
 {
     public class AdditionalIdolData
     {

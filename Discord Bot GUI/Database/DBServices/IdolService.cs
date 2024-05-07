@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Discord_Bot.Communication;
 using Discord_Bot.Communication.Bias;
-using Discord_Bot.Communication.BiasScrape;
 using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
@@ -174,8 +173,8 @@ namespace Discord_Bot.Database.DBServices
             int count = 0;
             try
             {
-                List<Idol> idols = 
-                    await idolRepository.GetListAsync(i => 
+                List<Idol> idols =
+                    await idolRepository.GetListAsync(i =>
                         i.Group.DebutDate != null &&
                         i.DebutDate == null &&
                         i.ProfileUrl != null,

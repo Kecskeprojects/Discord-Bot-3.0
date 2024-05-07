@@ -1,5 +1,4 @@
 ﻿using Discord_Bot.Communication.Bias;
-using Discord_Bot.Communication.BiasScrape;
 using PuppeteerSharp;
 using System.Collections.Generic;
 using System.Threading.Tasks;

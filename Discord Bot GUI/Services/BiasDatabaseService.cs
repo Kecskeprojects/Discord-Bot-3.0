@@ -1,5 +1,4 @@
 ﻿using Discord_Bot.Communication.Bias;
-using Discord_Bot.Communication.BiasScrape;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Interfaces.DBServices;

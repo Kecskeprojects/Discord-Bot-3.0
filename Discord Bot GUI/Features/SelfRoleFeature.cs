@@ -1,11 +1,11 @@
-﻿using Discord.Rest;
+﻿using Discord;
+using Discord.Rest;
 using Discord.WebSocket;
-using Discord;
 using Discord_Bot.Core;
+using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using System;
 using System.Threading.Tasks;
-using Discord_Bot.Interfaces.DBServices;
 
 namespace Discord_Bot.Features
 {
@@ -28,13 +28,13 @@ namespace Discord_Bot.Features
                     {
                         case '+':
                             {
-                                await(Context.User as SocketGuildUser).AddRoleAsync(discordRole);
+                                await (Context.User as SocketGuildUser).AddRoleAsync(discordRole);
                                 reply = await Context.Channel.SendMessageAsync($"You now have the `{discordRole.Name}` role!");
                                 break;
                             }
                         case '-':
                             {
-                                await(Context.User as SocketGuildUser).RemoveRoleAsync(discordRole);
+                                await (Context.User as SocketGuildUser).RemoveRoleAsync(discordRole);
                                 reply = await Context.Channel.SendMessageAsync($"`{discordRole.Name}` role has been removed!");
                                 break;
                             }

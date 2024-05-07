@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Discord_Bot.Communication.Bias;
-using Discord_Bot.Communication.BiasScrape;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
