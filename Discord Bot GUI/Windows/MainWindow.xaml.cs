@@ -9,12 +9,9 @@ using System.Windows.Threading;
 
 namespace Discord_Bot
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
-        private static Timer MainTimer;
+        private static Timer diagnosticsTimer;
         private bool AutoScroll = true;
 
         private readonly Logging logger;
@@ -23,9 +20,9 @@ namespace Discord_Bot
         {
             InitializeComponent();
             this.logger = logger;
-            MainTimer = new(1000) { AutoReset = true }; //1 second
-            MainTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-            MainTimer.Start();
+            diagnosticsTimer = new(1000) { AutoReset = true }; //1 second
+            diagnosticsTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
+            diagnosticsTimer.Start();
         }
 
         private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)

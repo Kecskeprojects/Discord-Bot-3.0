@@ -130,9 +130,7 @@ namespace Discord_Bot
             }
             return Task.CompletedTask;
         }
-        #endregion
 
-        #region Command and Interaction Event Handlers
         public async Task RegisterCommandsAsync()
         {
             client.MessageReceived += HandleCommandAsync;
@@ -146,7 +144,9 @@ namespace Discord_Bot
             interactions.InteractionExecuted += HandleInteractionExecutionAsync;
             await interactions.AddModulesAsync(Assembly.GetEntryAssembly(), services);
         }
+        #endregion
 
+        #region Command and Interaction Event Handlers
         private async Task HandleCommandAsync(SocketMessage arg)
         {
             try
@@ -202,7 +202,13 @@ namespace Discord_Bot
 
                     if (context.Message.HasCharPrefix('!', ref argPos) || context.Message.HasCharPrefix('.', ref argPos))
                     {
-                        _ = ExecuteCommandAsync(context, argPos);
+                        _ = Task.Run(async () =>
+                        {
+                            using (IServiceScope commandScope = services.CreateScope())
+                            {
+                                await commands.ExecuteAsync(context, argPos, commandScope.ServiceProvider);
+                            }
+                        });
                     }
                     else if (context.Channel.GetChannelType() != ChannelType.DM && Global.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id, false))
                     {
@@ -238,14 +244,6 @@ namespace Discord_Bot
             }
         }
 
-        private async Task ExecuteCommandAsync(SocketCommandContext context, int argPos)
-        {
-            using (IServiceScope commandScope = services.CreateScope())
-            {
-                await commands.ExecuteAsync(context, argPos, commandScope.ServiceProvider);
-            }
-        }
-
         private async Task HandleCommandExecutionAsync(Optional<CommandInfo> info, ICommandContext context, Discord.Commands.IResult result)
         {
             try
@@ -263,9 +261,11 @@ namespace Discord_Bot
                         {
                             if (context.Channel.GetChannelType() != ChannelType.DM)
                             {
-                                using IServiceScope scope = services.CreateScope();
-                                ICoreToDiscordCommunication discordCommunication = scope.ServiceProvider.GetService<ICoreToDiscordCommunication>();
-                                await discordCommunication.CustomCommands(context);
+                                using (IServiceScope scope = services.CreateScope())
+                                {
+                                    ICoreToDiscordCommunication discordCommunication = scope.ServiceProvider.GetService<ICoreToDiscordCommunication>();
+                                    await discordCommunication.CustomCommands(context);
+                                }
                             }
                             break;
                         }
@@ -287,21 +287,19 @@ namespace Discord_Bot
             try
             {
                 SocketInteractionContext context = new(client, arg);
-                _ = ExecuteInteractionAsync(context);
+                _ = Task.Run(async () =>
+                {
+                    using (IServiceScope interactionScope = services.CreateScope())
+                    {
+                        await interactions.ExecuteCommandAsync(context, interactionScope.ServiceProvider);
+                    }
+                });
             }
             catch (Exception ex)
             {
                 logger.Error("BotMain.cs HandleInteractionAsync", ex);
             }
             return Task.CompletedTask;
-        }
-
-        private async Task ExecuteInteractionAsync(SocketInteractionContext context)
-        {
-            using (IServiceScope interactionScope = services.CreateScope())
-            {
-                await interactions.ExecuteCommandAsync(context, interactionScope.ServiceProvider);
-            }
         }
 
         private Task HandleInteractionExecutionAsync(ICommandInfo info, IInteractionContext context, Discord.Interactions.IResult result)

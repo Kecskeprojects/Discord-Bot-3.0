@@ -21,7 +21,6 @@ namespace Discord_Bot
         private IServiceProvider services;
         private Logging logger;
         private Thread twitchThread;
-        private Thread biasUpdateThread;
         private System.Timers.Timer mainTimer;
         private BotMain Bot;
         #endregion
@@ -52,7 +51,15 @@ namespace Discord_Bot
                 YoutubeAPI.KeyReset(config.Youtube_API_Keys);
             }
 
-            StartTwitchThread();
+            twitchThread = new Thread(async () =>
+            {
+                using (IServiceScope scope = services.CreateScope())
+                {
+                    ITwitchAPI twitchAPI = scope.ServiceProvider.GetService<ITwitchAPI>();
+                    await twitchAPI.Start();
+                }
+            });
+            twitchThread.Start();
 
             Bot = services.GetRequiredService<BotMain>();
             await Bot.RunBotAsync();
@@ -92,7 +99,14 @@ namespace Discord_Bot
                         //Only on a monday
                         if (DateTime.UtcNow.DayOfWeek == DayOfWeek.Monday)
                         {
-                            StartBiasUpdate();
+                            _ = Task.Run(async () =>
+                            {
+                                using (IServiceScope scope = services.CreateScope())
+                                {
+                                    IBiasDatabaseService biasDatabaseService = scope.ServiceProvider.GetService<IBiasDatabaseService>();
+                                    await biasDatabaseService.RunUpdateBiasDataAsync();
+                                }
+                            });
                         }
                     }
 
@@ -105,32 +119,6 @@ namespace Discord_Bot
             {
                 logger.Error("App.xaml.cs OnTimedEvent", ex);
             }
-        }
-
-        private void StartTwitchThread()
-        {
-            twitchThread = new Thread(async () =>
-            {
-                using (IServiceScope scope = services.CreateScope())
-                {
-                    ITwitchAPI twitchAPI = scope.ServiceProvider.GetService<ITwitchAPI>();
-                    await twitchAPI.Start();
-                }
-            });
-            twitchThread.Start();
-        }
-
-        private void StartBiasUpdate()
-        {
-            _ = Task.Run(async () =>
-            {
-                using (IServiceScope scope = services.CreateScope())
-                {
-                    IBiasDatabaseService biasDatabaseService = scope.ServiceProvider.GetService<IBiasDatabaseService>();
-                    await biasDatabaseService.RunUpdateBiasDataAsync();
-                }
-            });
-            biasUpdateThread.Start();
         }
 
         #region OnClose logic
