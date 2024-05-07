@@ -43,7 +43,7 @@ namespace Discord_Bot
             }
             catch (Exception ex)
             {
-                logger.Error("MainWindow.xaml.cs ScrollViewer_ScrollChanged", ex.ToString());
+                logger.Error("MainWindow.xaml.cs ScrollViewer_ScrollChanged", ex);
             }
         }
 
@@ -64,7 +64,7 @@ namespace Discord_Bot
             }
             catch (Exception ex)
             {
-                logger.Error("MainWindow.xaml.cs ToolBar_Loaded", ex.ToString());
+                logger.Error("MainWindow.xaml.cs ToolBar_Loaded", ex);
             }
         }
 
@@ -76,7 +76,7 @@ namespace Discord_Bot
             }
             catch (Exception ex)
             {
-                logger.Error("MainWindow.xaml.cs ClearLog", ex.ToString());
+                logger.Error("MainWindow.xaml.cs ClearLog", ex);
             }
         }
 
@@ -101,7 +101,7 @@ namespace Discord_Bot
             }
             catch (Exception ex)
             {
-                logger.Error("MainWindow.xaml.cs OnTimedEvent", ex.ToString());
+                logger.Error("MainWindow.xaml.cs OnTimedEvent", ex);
             }
         }
     }

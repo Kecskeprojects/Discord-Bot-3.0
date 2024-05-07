@@ -1,6 +1,6 @@
 ﻿using Discord.Commands;
 using Discord_Bot.Core;
-using Discord_Bot.Core.Config;
+using Discord_Bot.Core.Configuration;
 using Discord_Bot.Interfaces.DBServices;
 
 namespace Discord_Bot.Commands

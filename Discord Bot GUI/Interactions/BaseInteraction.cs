@@ -1,6 +1,6 @@
 ﻿using Discord.Interactions;
 using Discord_Bot.Core;
-using Discord_Bot.Core.Config;
+using Discord_Bot.Core.Configuration;
 
 namespace Discord_Bot.Interactions
 {

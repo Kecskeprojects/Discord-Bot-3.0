@@ -1,6 +1,6 @@
 ﻿using Discord.Interactions;
 using Discord_Bot.Core;
-using Discord_Bot.Core.Config;
+using Discord_Bot.Core.Configuration;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using System;

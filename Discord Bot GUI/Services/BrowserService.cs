@@ -1,5 +1,5 @@
 ﻿using Discord_Bot.Core;
-using Discord_Bot.Core.Config;
+using Discord_Bot.Core.Configuration;
 using PuppeteerSharp;
 using System.Collections.Generic;
 using System.Threading.Tasks;

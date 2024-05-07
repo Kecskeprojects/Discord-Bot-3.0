@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using System.IO;
 
-namespace Discord_Bot.Core.Config
+namespace Discord_Bot.Core.Configuration
 {
     public class Config
     {
