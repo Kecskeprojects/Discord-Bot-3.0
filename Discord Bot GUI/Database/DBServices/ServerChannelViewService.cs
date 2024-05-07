@@ -25,7 +25,7 @@ namespace Discord_Bot.Database.DBServices
             Dictionary<ChannelTypeEnum, List<ulong>> result = [];
             try
             {
-                List<ServerChannelView> channels = await serverChannelViewRepository.GetListAsync(scv => scv.ServerDiscordId == serverId.ToString());
+                List<ServerChannelView> channels = await serverChannelViewRepository.GetListAsync(scv => scv.ServerId == serverId);
 
                 List<IGrouping<int?, ServerChannelView>> groups = channels.GroupBy(ch => ch.ChannelTypeId).ToList();
                 result = mapper.Map<List<IGrouping<int?, ServerChannelView>>, Dictionary<ChannelTypeEnum, List<ulong>>>(groups);
