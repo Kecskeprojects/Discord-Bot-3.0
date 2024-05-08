@@ -67,7 +67,7 @@ namespace Discord_Bot.Services
                 else
                 {
                     result.Message = "Unexpected exception during request!";
-                    logger.Error("LastFmAPI.cs GetNowPlayingAsync", restResult.Exception.ToString());
+                    logger.Error("LastFmAPI.cs GetNowPlayingAsync", restResult.Exception);
                 }
                 return result;
             }
@@ -124,7 +124,7 @@ namespace Discord_Bot.Services
                 else
                 {
                     result.Message = "Unexpected exception during request!";
-                    logger.Error("LastFmAPI.cs GetTopAlbumsAsync", restResult.Exception.ToString());
+                    logger.Error("LastFmAPI.cs GetTopAlbumsAsync", restResult.Exception);
                 }
                 return result;
             }
@@ -181,7 +181,7 @@ namespace Discord_Bot.Services
                 else
                 {
                     result.Message = "Unexpected exception during request!";
-                    logger.Error("LastFmAPI.cs GetTopArtistsAsync", restResult.Exception.ToString());
+                    logger.Error("LastFmAPI.cs GetTopArtistsAsync", restResult.Exception);
                 }
                 return result;
             }
@@ -238,7 +238,7 @@ namespace Discord_Bot.Services
                 else
                 {
                     result.Message = "Unexpected exception during request!";
-                    logger.Error("LastFmAPI.cs GetTopTracksAsync", restResult.Exception.ToString());
+                    logger.Error("LastFmAPI.cs GetTopTracksAsync", restResult.Exception);
                 }
                 return result;
             }
@@ -295,7 +295,7 @@ namespace Discord_Bot.Services
                 else
                 {
                     result.Message = "Unexpected exception during request!";
-                    logger.Error("LastFmAPI.cs GetRecentsAsync", restResult.Exception.ToString());
+                    logger.Error("LastFmAPI.cs GetRecentsAsync", restResult.Exception);
                 }
                 return result;
             }

@@ -128,6 +128,7 @@ namespace Discord_Bot.Core
                 Logs.Add(log);
             }
         }
+
         public void Error(string location, Exception ex, bool ConsoleOnly = false, bool LogOnly = false)
         {
             Log log = BaseLog(LogType.Error);
@@ -163,6 +164,7 @@ namespace Discord_Bot.Core
                 Logs.Add(log);
             }
         }
+
         public void Warning(string location, Exception ex, bool ConsoleOnly = false, bool LogOnly = false)
         {
             Log log = BaseLog(LogType.Warning);
