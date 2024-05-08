@@ -4,12 +4,10 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
-namespace Discord_Bot.Tools
+namespace Discord_Bot.Tools.Extensions
 {
     public static class ImageProcessingContextExtension
     {
-
-
         // This method can be seen as an inline implementation of an `IImageProcessor`:
         // (The combination of `IImageOperations.Apply()` + this could be replaced with an `IImageProcessor`)
         public static IImageProcessingContext ApplyRoundedCorners(this IImageProcessingContext context, float cornerRadius)

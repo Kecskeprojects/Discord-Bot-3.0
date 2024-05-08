@@ -3,6 +3,7 @@ using Discord_Bot.Core;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
+using Discord_Bot.Tools.Extensions;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;

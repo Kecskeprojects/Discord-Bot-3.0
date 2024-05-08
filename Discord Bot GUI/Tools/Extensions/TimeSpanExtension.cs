@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Discord_Bot.Tools
+namespace Discord_Bot.Tools.Extensions
 {
-    public static class TimeSpanTools
+    public static class TimeSpanExtension
     {
         public static string ToTimeString(this TimeSpan timespan)
         {

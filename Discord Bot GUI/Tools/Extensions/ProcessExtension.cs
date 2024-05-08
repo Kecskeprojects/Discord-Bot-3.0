@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Management;
 
-namespace Discord_Bot.Tools
+namespace Discord_Bot.Tools.Extensions
 {
     public static class ProcessExtension
     {

@@ -1,6 +1,6 @@
 ﻿namespace Discord_Bot.Tools
 {
-    public class StringTools
+    public static class StringTools
     {
         public static string AddNumberPositionIdentifier(string position)
         {

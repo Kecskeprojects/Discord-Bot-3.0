@@ -2,7 +2,7 @@
 
 namespace Discord_Bot.Tools
 {
-    public class DateTimeTools
+    public static class DateTimeTools
     {
         public static string CurrentTime(bool utc = false)
         {

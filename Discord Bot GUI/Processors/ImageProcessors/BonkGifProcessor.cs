@@ -1,6 +1,6 @@
 ﻿using Discord_Bot.Core;
 using Discord_Bot.Properties;
-using Discord_Bot.Tools;
+using Discord_Bot.Tools.Extensions;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.PixelFormats;

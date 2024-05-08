@@ -2,7 +2,7 @@
 
 namespace Discord_Bot.Tools
 {
-    public class CollectionTools
+    public static class CollectionTools
     {
         public static bool IsNullOrEmpty<T>(T collection) where T : ICollection
         {

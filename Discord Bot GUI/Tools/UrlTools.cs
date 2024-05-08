@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Discord_Bot.Tools
 {
-    public class UrlTools
+    public static class UrlTools
     {
         private static readonly char[] whiteSpaceSeparator = [' ', '\n'];
 

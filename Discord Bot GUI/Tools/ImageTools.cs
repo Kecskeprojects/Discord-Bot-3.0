@@ -6,7 +6,7 @@ using System;
 
 namespace Discord_Bot.Tools
 {
-    public class ImageTools
+    public static class ImageTools
     {
         public static void CorrectImageRatio(Image mainImage, double acceptableMargin = 0.2, double cutoffTopRatio = 0.5, double cutoffLeftRatio = 0.5, double extraHeight = 0.0, double extraWidth = 0.0)
         {

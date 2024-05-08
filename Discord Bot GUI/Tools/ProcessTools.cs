@@ -1,4 +1,5 @@
 ﻿using Discord_Bot.Communication;
+using Discord_Bot.Tools.Extensions;
 using Microsoft.VisualBasic.Devices;
 using System;
 using System.Diagnostics;

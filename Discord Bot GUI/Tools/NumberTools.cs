@@ -1,6 +1,6 @@
 ﻿namespace Discord_Bot.Tools
 {
-    public class NumberTools
+    public static class NumberTools
     {
         public static bool IsNullOrZero(int? value)
         {

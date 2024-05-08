@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Discord_Bot.Tools
+namespace Discord_Bot.Tools.Extensions
 {
     public static class EntityFrameworkExtension
     {
