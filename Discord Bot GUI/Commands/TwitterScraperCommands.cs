@@ -76,7 +76,7 @@ namespace Discord_Bot.Commands
                                 if (ex.Message.Contains("40005"))
                                 {
                                     logger.Warning("ServiceDiscordCommunication.cs SendTwitterMessage", "Embed too large, only sending images!", LogOnly: true);
-                                    logger.Warning("ServiceDiscordCommunication.cs SendTwitterMessage", ex.ToString(), LogOnly: true);
+                                    logger.Warning("ServiceDiscordCommunication.cs SendTwitterMessage", ex, LogOnly: true);
 
                                     attachments = await TwitterScraperService.AllContentInRegularMessage(result.Content, false);
                                     if (!CollectionTools.IsNullOrEmpty(attachments))
@@ -104,7 +104,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("TwitterScraperCommands.cs ScrapeFromUrl", ex.ToString());
+                logger.Error("TwitterScraperCommands.cs ScrapeFromUrl", ex);
             }
         }
     }

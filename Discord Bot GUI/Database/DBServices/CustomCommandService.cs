@@ -51,7 +51,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("CustomCommandService.cs AddCustomCommandAsync", ex.ToString());
+                logger.Error("CustomCommandService.cs AddCustomCommandAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
@@ -69,7 +69,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("CustomCommandService.cs GetCustomCommandAsync", ex.ToString());
+                logger.Error("CustomCommandService.cs GetCustomCommandAsync", ex);
             }
             return result;
         }
@@ -88,7 +88,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("CustomCommandService.cs GetServerCustomCommandListAsync", ex.ToString());
+                logger.Error("CustomCommandService.cs GetServerCustomCommandListAsync", ex);
             }
             return result;
         }
@@ -116,7 +116,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("CustomCommandService.cs RemoveCustomCommandAsync", ex.ToString());
+                logger.Error("CustomCommandService.cs RemoveCustomCommandAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }

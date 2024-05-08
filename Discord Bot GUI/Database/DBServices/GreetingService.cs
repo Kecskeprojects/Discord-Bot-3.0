@@ -30,7 +30,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("GreetingService.cs GetAllGreetingAsync", ex.ToString());
+                logger.Error("GreetingService.cs GetAllGreetingAsync", ex);
             }
             return result;
         }
@@ -51,7 +51,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("GreetingService.cs AddGreetingAsync", ex.ToString());
+                logger.Error("GreetingService.cs AddGreetingAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
@@ -76,7 +76,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("GreetingService.cs RemoveGreetingAsync", ex.ToString());
+                logger.Error("GreetingService.cs RemoveGreetingAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }

@@ -41,7 +41,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("UserService.cs AddLastfmUsernameAsync", ex.ToString());
+                logger.Error("UserService.cs AddLastfmUsernameAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
@@ -56,7 +56,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("UserService.cs GetAllLastFmUsersAsync", ex.ToString());
+                logger.Error("UserService.cs GetAllLastFmUsersAsync", ex);
             }
             return result;
         }
@@ -73,7 +73,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("UserService.cs GetUserAsync", ex.ToString());
+                logger.Error("UserService.cs GetUserAsync", ex);
             }
             return result;
         }
@@ -88,7 +88,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("UserService.cs GetUserAsync", ex.ToString());
+                logger.Error("UserService.cs GetUserAsync", ex);
             }
             return result;
         }
@@ -111,7 +111,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("UserService.cs RemoveLastfmUsernameAsync", ex.ToString());
+                logger.Error("UserService.cs RemoveLastfmUsernameAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }

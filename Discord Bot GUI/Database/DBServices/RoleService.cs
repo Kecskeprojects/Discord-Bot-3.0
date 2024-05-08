@@ -50,7 +50,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("RoleService.cs AddSelfRoleAsync", ex.ToString());
+                logger.Error("RoleService.cs AddSelfRoleAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
@@ -68,7 +68,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("RoleService.cs GetRoleAsync", ex.ToString());
+                logger.Error("RoleService.cs GetRoleAsync", ex);
             }
             return result;
         }
@@ -85,7 +85,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("RoleService.cs GetServerRolesAsync", ex.ToString());
+                logger.Error("RoleService.cs GetServerRolesAsync", ex);
             }
             return result;
         }
@@ -112,7 +112,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("RoleService.cs RemoveSelfRoleAsync", ex.ToString());
+                logger.Error("RoleService.cs RemoveSelfRoleAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }

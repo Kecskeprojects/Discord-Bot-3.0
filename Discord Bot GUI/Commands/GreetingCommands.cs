@@ -42,7 +42,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("GreetingCommands.cs GreetingList", ex.ToString());
+                logger.Error("GreetingCommands.cs GreetingList", ex);
             }
         }
 
@@ -65,7 +65,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("GreetingCommands.cs GreetingAdd", ex.ToString());
+                logger.Error("GreetingCommands.cs GreetingAdd", ex);
             }
         }
 
@@ -92,7 +92,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("GreetingCommands.cs GreetingRemove", ex.ToString());
+                logger.Error("GreetingCommands.cs GreetingRemove", ex);
             }
         }
     }

@@ -42,7 +42,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("ReminderService.cs GetCurrentReminderAsync", ex.ToString());
+                logger.Error("ReminderService.cs GetCurrentReminderAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
@@ -62,7 +62,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("ReminderService.cs GetCurrentReminderAsync", ex.ToString());
+                logger.Error("ReminderService.cs GetCurrentReminderAsync", ex);
             }
 
             return result;
@@ -88,7 +88,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("ReminderService.cs GetCurrentReminderAsync", ex.ToString());
+                logger.Error("ReminderService.cs GetCurrentReminderAsync", ex);
             }
 
             return result;
@@ -114,7 +114,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("ReminderService.cs RemoveCurrentReminderAsync", ex.ToString());
+                logger.Error("ReminderService.cs RemoveCurrentReminderAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
@@ -140,7 +140,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("ReminderService.cs RemoveCurrentReminderAsync", ex.ToString());
+                logger.Error("ReminderService.cs RemoveCurrentReminderAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }

@@ -32,7 +32,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("ServerChannelViewService.cs GetServerChannelsAsync", ex.ToString());
+                logger.Error("ServerChannelViewService.cs GetServerChannelsAsync", ex);
             }
             return result;
         }

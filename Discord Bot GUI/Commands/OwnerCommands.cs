@@ -38,7 +38,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("OwnerCommands.cs Help", ex.ToString());
+                logger.Error("OwnerCommands.cs Help", ex);
             }
         }
 

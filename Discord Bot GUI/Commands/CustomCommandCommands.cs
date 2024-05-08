@@ -38,7 +38,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("CustomCommandCommands.cs CustomList", ex.ToString());
+                logger.Error("CustomCommandCommands.cs CustomList", ex);
             }
         }
 
@@ -74,7 +74,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("CustomCommandCommands.cs CustomCommandAdd", ex.ToString());
+                logger.Error("CustomCommandCommands.cs CustomCommandAdd", ex);
             }
         }
 
@@ -102,7 +102,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("CustomCommandCommands.cs CustomCommandRemove", ex.ToString());
+                logger.Error("CustomCommandCommands.cs CustomCommandRemove", ex);
             }
         }
     }

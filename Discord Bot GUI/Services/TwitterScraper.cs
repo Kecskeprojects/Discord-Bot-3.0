@@ -59,8 +59,23 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("TwitterScraper.cs GetDataFromUrls", ex.ToString());
+                logger.Error("TwitterScraper.cs GetDataFromUrls", ex);
                 return new TwitterScrapingResult("Unexpected error occured");
+            }
+        }
+
+        private async void TwitterScraperResponse(object sender, ResponseCreatedEventArgs e)
+        {
+            try
+            {
+                if (e.Response.Url.Contains("TweetResultByRestId"))
+                {
+                    Body = await e.Response.JsonAsync<Root>();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("TwitterScraper.cs TwitterScraperResponse", ex);
             }
         }
 
@@ -97,7 +112,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("TwitterScraper.cs ExtractFromUrl", ex.ToString());
+                logger.Error("TwitterScraper.cs ExtractFromUrl", ex);
             }
 
             return "";
@@ -143,20 +158,6 @@ namespace Discord_Bot.Services
         #endregion
 
         #region Helper Methods
-        private async void TwitterScraperResponse(object sender, ResponseCreatedEventArgs e)
-        {
-            try
-            {
-                if (e.Response.Url.Contains("TweetResultByRestId"))
-                {
-                    Body = await e.Response.JsonAsync<Root>();
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("TwitterScraper.cs TwitterScraperResponse", ex.ToString());
-            }
-        }
 
         private static List<Uri> GetMediaUris(TwitterScrapingResult result, List<Medium> list)
         {

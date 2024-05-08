@@ -86,7 +86,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("ChannelService.cs AddSettingChannelAsync", ex.ToString());
+                logger.Error("ChannelService.cs AddSettingChannelAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
@@ -126,7 +126,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("ChannelService.cs RemoveSettingChannelAsync", ex.ToString());
+                logger.Error("ChannelService.cs RemoveSettingChannelAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
@@ -163,7 +163,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("ChannelService.cs RemoveSettingChannelsAsync", ex.ToString());
+                logger.Error("ChannelService.cs RemoveSettingChannelsAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }

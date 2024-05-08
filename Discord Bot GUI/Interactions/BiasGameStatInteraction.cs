@@ -63,7 +63,7 @@ namespace Discord_Bot.Interactions
             }
             catch (Exception ex)
             {
-                logger.Error("BiasGameInteraction.cs GenderChoosen", ex.ToString());
+                logger.Error("BiasGameInteraction.cs GenderChoosen", ex);
                 Global.BiasGames.TryRemove(Context.User.Id, out _);
                 await FollowupAsync("Failure during setup!");
             }

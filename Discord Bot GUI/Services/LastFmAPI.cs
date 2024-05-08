@@ -74,7 +74,7 @@ namespace Discord_Bot.Services
             catch (HttpRequestException ex)
             {
                 result.Message = "Last.fm is temporarily unavailable!";
-                logger.Error("LastFmAPI.cs GetNowPlayingAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs GetNowPlayingAsync", ex);
                 return result;
             }
             catch (Exception ex)
@@ -83,7 +83,7 @@ namespace Discord_Bot.Services
                 {
                     result.Message = "A partial result was empty!";
                 }
-                logger.Error("LastFmAPI.cs  GetNowPlayingAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs  GetNowPlayingAsync", ex);
             }
             return null;
         }
@@ -131,7 +131,7 @@ namespace Discord_Bot.Services
             catch (HttpRequestException ex)
             {
                 result.Message = "Last.fm is temporarily unavailable!";
-                logger.Error("LastFmAPI.cs GetTopAlbumsAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs GetTopAlbumsAsync", ex);
                 return result;
             }
             catch (Exception ex)
@@ -140,7 +140,7 @@ namespace Discord_Bot.Services
                 {
                     result.Message = "A partial result was empty!";
                 }
-                logger.Error("LastFmAPI.cs GetTopAlbumsAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs GetTopAlbumsAsync", ex);
             }
             return null;
         }
@@ -188,7 +188,7 @@ namespace Discord_Bot.Services
             catch (HttpRequestException ex)
             {
                 result.Message = "Last.fm is temporarily unavailable!";
-                logger.Error("LastFmAPI.cs GetTopArtistsAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs GetTopArtistsAsync", ex);
                 return result;
             }
             catch (Exception ex)
@@ -197,7 +197,7 @@ namespace Discord_Bot.Services
                 {
                     result.Message = "A partial result was empty!";
                 }
-                logger.Error("LastFmAPI.cs GetTopArtistsAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs GetTopArtistsAsync", ex);
             }
             return null;
         }
@@ -245,7 +245,7 @@ namespace Discord_Bot.Services
             catch (HttpRequestException ex)
             {
                 result.Message = "Last.fm is temporarily unavailable!";
-                logger.Error("LastFmAPI.cs GetTopTracksAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs GetTopTracksAsync", ex);
                 return result;
             }
             catch (Exception ex)
@@ -254,7 +254,7 @@ namespace Discord_Bot.Services
                 {
                     result.Message = "A partial result was empty!";
                 }
-                logger.Error("LastFmAPI.cs GetTopTracksAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs GetTopTracksAsync", ex);
             }
             return null;
         }
@@ -302,12 +302,12 @@ namespace Discord_Bot.Services
             catch (HttpRequestException ex)
             {
                 result.Message = "Last.fm is temporarily unavailable!";
-                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs GetRecentsAsync", ex);
                 return result;
             }
             catch (Exception ex)
             {
-                logger.Error("LastFmAPI.cs GetRecentsAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs GetRecentsAsync", ex);
             }
             return null;
         }
@@ -360,7 +360,7 @@ namespace Discord_Bot.Services
             catch (HttpRequestException ex)
             {
                 result.Message = "Last.fm is temporarily unavailable!";
-                logger.Error("LastFmAPI.cs GetArtistDataAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs GetArtistDataAsync", ex);
                 return result;
             }
             catch (Exception ex)
@@ -369,7 +369,7 @@ namespace Discord_Bot.Services
                 {
                     result.Message = "A partial result was empty!";
                 }
-                logger.Error("LastFmAPI.cs GetArtistDataAsync", ex.ToString());
+                logger.Error("LastFmAPI.cs GetArtistDataAsync", ex);
             }
 
             return null;
@@ -426,7 +426,7 @@ namespace Discord_Bot.Services
             catch (HttpRequestException ex)
             {
                 wk.Message = "Last.fm is temporarily unavailable!";
-                logger.Error("LastFmAPI.cs WhoKnowsByCurrentlyPlaying", ex.ToString());
+                logger.Error("LastFmAPI.cs WhoKnowsByCurrentlyPlaying", ex);
             }
             catch (Exception ex)
             {
@@ -434,7 +434,7 @@ namespace Discord_Bot.Services
                 {
                     wk.Message = "A partial result was empty!";
                 }
-                logger.Error("LastFmAPI.cs WhoKnowsByCurrentlyPlaying", ex.ToString());
+                logger.Error("LastFmAPI.cs WhoKnowsByCurrentlyPlaying", ex);
             }
         }
 
@@ -479,7 +479,7 @@ namespace Discord_Bot.Services
             catch (HttpRequestException ex)
             {
                 wk.Message = "Last.fm is temporarily unavailable!";
-                logger.Error("LastFmAPI.cs WhoKnowsByTrack", ex.ToString());
+                logger.Error("LastFmAPI.cs WhoKnowsByTrack", ex);
             }
             catch (Exception ex)
             {
@@ -487,7 +487,7 @@ namespace Discord_Bot.Services
                 {
                     wk.Message = "A partial result was empty!";
                 }
-                logger.Error("LastFmAPI.cs WhoKnowsByTrack", ex.ToString());
+                logger.Error("LastFmAPI.cs WhoKnowsByTrack", ex);
             }
         }
 
@@ -529,7 +529,7 @@ namespace Discord_Bot.Services
             catch (HttpRequestException ex)
             {
                 wk.Message = "Last.fm is temporarily unavailable!";
-                logger.Error("LastFmAPI.cs WhoKnowsByArtist", ex.ToString());
+                logger.Error("LastFmAPI.cs WhoKnowsByArtist", ex);
             }
             catch (Exception ex)
             {
@@ -537,7 +537,7 @@ namespace Discord_Bot.Services
                 {
                     wk.Message = "A partial result was empty!";
                 }
-                logger.Error("LastFmAPI.cs WhoKnowsByArtist", ex.ToString());
+                logger.Error("LastFmAPI.cs WhoKnowsByArtist", ex);
             }
         }
 

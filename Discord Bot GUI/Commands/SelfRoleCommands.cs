@@ -55,7 +55,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("AdminCommands.cs SelfRoleAdd", ex.ToString());
+                logger.Error("AdminCommands.cs SelfRoleAdd", ex);
             }
         }
 
@@ -93,7 +93,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("AdminCommands.cs SelfRoleRemove", ex.ToString());
+                logger.Error("AdminCommands.cs SelfRoleRemove", ex);
             }
         }
 
@@ -139,7 +139,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("AdminCommands.cs SendSelfRoleMessage", ex.ToString());
+                logger.Error("AdminCommands.cs SendSelfRoleMessage", ex);
             }
         }
     }

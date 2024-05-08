@@ -41,7 +41,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("UserIdolService.cs GetUserIdolsListAsync", ex.ToString());
+                logger.Error("UserIdolService.cs GetUserIdolsListAsync", ex);
             }
             return result;
         }
@@ -85,7 +85,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("UserIdolService.cs AddUserIdolAsync", ex.ToString());
+                logger.Error("UserIdolService.cs AddUserIdolAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
@@ -105,7 +105,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("UserIdolService.cs ClearUserIdolAsync", ex.ToString());
+                logger.Error("UserIdolService.cs ClearUserIdolAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
@@ -139,7 +139,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("UserIdolService.cs RemoveUserIdolAsync", ex.ToString());
+                logger.Error("UserIdolService.cs RemoveUserIdolAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }

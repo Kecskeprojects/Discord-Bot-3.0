@@ -67,7 +67,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasGameCommands.cs BiasGame", ex.ToString());
+                logger.Error("BiasGameCommands.cs BiasGame", ex);
             }
         }
 
@@ -85,7 +85,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasGameCommands.cs BiasGameStop", ex.ToString());
+                logger.Error("BiasGameCommands.cs BiasGameStop", ex);
             }
         }
 
@@ -113,7 +113,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasGameCommands.cs BiasStats", ex.ToString());
+                logger.Error("BiasGameCommands.cs BiasStats", ex);
             }
         }
     }

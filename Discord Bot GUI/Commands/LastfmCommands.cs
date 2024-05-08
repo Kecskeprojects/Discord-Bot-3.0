@@ -59,7 +59,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("LastfmCommands.cs LfConnect", ex.ToString());
+                logger.Error("LastfmCommands.cs LfConnect", ex);
             }
         }
 
@@ -95,7 +95,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("LastfmCommands.cs LfDisconnect", ex.ToString());
+                logger.Error("LastfmCommands.cs LfDisconnect", ex);
             }
         }
         #endregion
@@ -160,11 +160,11 @@ namespace Discord_Bot.Commands
             catch (HttpRequestException ex)
             {
                 await ReplyAsync("Last.fm is temporarily unavailable!");
-                logger.Error("LastfmCommands.cs LfTopTrack", ex.ToString());
+                logger.Error("LastfmCommands.cs LfTopTrack", ex);
             }
             catch (Exception ex)
             {
-                logger.Error("LastfmCommands.cs LfTopTrack", ex.ToString());
+                logger.Error("LastfmCommands.cs LfTopTrack", ex);
             }
         }
 
@@ -228,7 +228,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("LastfmCommands.cs LfTopAlbum", ex.ToString());
+                logger.Error("LastfmCommands.cs LfTopAlbum", ex);
             }
         }
 
@@ -290,7 +290,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("LastfmCommands.cs LfTopArtist", ex.ToString());
+                logger.Error("LastfmCommands.cs LfTopArtist", ex);
             }
         }
         #endregion
@@ -350,11 +350,11 @@ namespace Discord_Bot.Commands
             catch (HttpRequestException ex)
             {
                 await ReplyAsync("Last.fm is temporarily unavailable!");
-                logger.Error("LastfmCommands.cs LfTopTrack", ex.ToString());
+                logger.Error("LastfmCommands.cs LfTopTrack", ex);
             }
             catch (Exception ex)
             {
-                logger.Error("LastfmCommands.cs LfNowPlaying", ex.ToString());
+                logger.Error("LastfmCommands.cs LfNowPlaying", ex);
             }
         }
 
@@ -410,7 +410,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("LastfmCommands.cs LfRecent", ex.ToString());
+                logger.Error("LastfmCommands.cs LfRecent", ex);
             }
         }
         #endregion
@@ -478,11 +478,11 @@ namespace Discord_Bot.Commands
             catch (HttpRequestException ex)
             {
                 await ReplyAsync("Last.fm is temporarily unavailable!");
-                logger.Error("LastfmCommands.cs LfTopTrack", ex.ToString());
+                logger.Error("LastfmCommands.cs LfTopTrack", ex);
             }
             catch (Exception ex)
             {
-                logger.Error("LastfmCommands.cs LfArtist", ex.ToString());
+                logger.Error("LastfmCommands.cs LfArtist", ex);
             }
         }
 
@@ -604,7 +604,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("LastfmCommands.cs LfWhoKnows", ex.ToString());
+                logger.Error("LastfmCommands.cs LfWhoKnows", ex);
             }
         }
         #endregion

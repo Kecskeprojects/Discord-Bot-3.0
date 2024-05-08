@@ -108,7 +108,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("ReminderCommands.cs RemindAt", ex.ToString());
+                logger.Error("ReminderCommands.cs RemindAt", ex);
             }
         }
 
@@ -173,7 +173,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("ChatCommands.cs RemindIn", ex.ToString());
+                logger.Error("ChatCommands.cs RemindIn", ex);
             }
         }
 
@@ -212,7 +212,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("ChatCommands.cs RemindList", ex.ToString());
+                logger.Error("ChatCommands.cs RemindList", ex);
             }
         }
 
@@ -248,7 +248,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("ChatCommands.cs RemindRemove", ex.ToString());
+                logger.Error("ChatCommands.cs RemindRemove", ex);
             }
         }
     }

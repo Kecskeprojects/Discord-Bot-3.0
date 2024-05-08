@@ -57,7 +57,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("VoiceCommands.cs Play", ex.ToString());
+                logger.Error("VoiceCommands.cs Play", ex);
             }
         }
         #endregion
@@ -82,7 +82,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("VoiceCommands.cs Join", ex.ToString());
+                logger.Error("VoiceCommands.cs Join", ex);
             }
         }
 
@@ -111,7 +111,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("VoiceCommands.cs Leave", ex.ToString());
+                logger.Error("VoiceCommands.cs Leave", ex);
             }
         }
         #endregion
@@ -144,7 +144,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("VoiceCommands.cs Queue", ex.ToString());
+                logger.Error("VoiceCommands.cs Queue", ex);
             }
         }
 
@@ -167,7 +167,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("VoiceCommands.cs NowPlaying", ex.ToString());
+                logger.Error("VoiceCommands.cs NowPlaying", ex);
             }
         }
 
@@ -194,7 +194,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("VoiceCommands.cs Clear", ex.ToString());
+                logger.Error("VoiceCommands.cs Clear", ex);
             }
         }
 
@@ -219,7 +219,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("VoiceCommands.cs Skip", ex.ToString());
+                logger.Error("VoiceCommands.cs Skip", ex);
             }
         }
 
@@ -244,7 +244,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("VoiceCommands.cs Remove", ex.ToString());
+                logger.Error("VoiceCommands.cs Remove", ex);
             }
         }
 
@@ -268,7 +268,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("VoiceCommands.cs Shuffle", ex.ToString());
+                logger.Error("VoiceCommands.cs Shuffle", ex);
             }
         }
         #endregion

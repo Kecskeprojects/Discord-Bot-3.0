@@ -93,7 +93,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BirthdayCommands.cs BirthdayAddForUser", ex.ToString());
+                logger.Error("BirthdayCommands.cs BirthdayAddForUser", ex);
             }
         }
 
@@ -136,7 +136,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BirthdayCommands.cs BirthdayRemove", ex.ToString());
+                logger.Error("BirthdayCommands.cs BirthdayRemove", ex);
             }
         }
 
@@ -187,7 +187,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BirthdayCommands.cs BirthdayAdd", ex.ToString());
+                logger.Error("BirthdayCommands.cs BirthdayAdd", ex);
             }
         }
 
@@ -214,7 +214,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BirthdayCommands.cs BirthdayRemove", ex.ToString());
+                logger.Error("BirthdayCommands.cs BirthdayRemove", ex);
             }
         }
 
@@ -247,7 +247,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BirthdayCommands.cs BirthdayList", ex.ToString());
+                logger.Error("BirthdayCommands.cs BirthdayList", ex);
             }
         }
     }

@@ -62,7 +62,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("UserIdolStatisticService.cs UpdateUserStatisticsAsync", ex.ToString());
+                logger.Error("UserIdolStatisticService.cs UpdateUserStatisticsAsync", ex);
             }
         }
     }

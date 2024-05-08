@@ -53,7 +53,7 @@ namespace Discord_Bot.Interactions
             }
             catch (Exception ex)
             {
-                logger.Error("BiasEditComponentInteraction.cs EditIdolMenuHandler", ex.ToString());
+                logger.Error("BiasEditComponentInteraction.cs EditIdolMenuHandler", ex);
             }
 
             await RespondAsync("Something went wrong during the process.");

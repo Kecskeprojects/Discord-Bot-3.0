@@ -48,7 +48,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasAliasCommands.cs AddBiasAlias", ex.ToString());
+                logger.Error("BiasAliasCommands.cs AddBiasAlias", ex);
             }
 
         }
@@ -85,7 +85,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasAliasCommands.cs RemoveBiasAlias", ex.ToString());
+                logger.Error("BiasAliasCommands.cs RemoveBiasAlias", ex);
             }
 
         }

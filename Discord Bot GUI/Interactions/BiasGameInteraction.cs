@@ -73,7 +73,7 @@ namespace Discord_Bot.Interactions
             }
             catch (Exception ex)
             {
-                logger.Error("BiasGameInteraction.cs GenderChoosen", ex.ToString());
+                logger.Error("BiasGameInteraction.cs GenderChoosen", ex);
                 Global.BiasGames.TryRemove(Context.User.Id, out _);
                 await FollowupAsync("Failure during setup!");
             }
@@ -141,7 +141,7 @@ namespace Discord_Bot.Interactions
             }
             catch (Exception ex)
             {
-                logger.Error("BiasGameInteraction.cs DebutChosen", ex.ToString());
+                logger.Error("BiasGameInteraction.cs DebutChosen", ex);
                 Global.BiasGames.TryRemove(Context.User.Id, out _);
                 await RespondAsync("Failure during setup!");
             }
@@ -213,7 +213,7 @@ namespace Discord_Bot.Interactions
             }
             catch (Exception ex)
             {
-                logger.Error("BiasGameInteraction.cs DebutChosen", ex.ToString());
+                logger.Error("BiasGameInteraction.cs DebutChosen", ex);
                 Global.BiasGames.TryRemove(Context.User.Id, out _);
                 await FollowupAsync("Failure during setup!");
             }

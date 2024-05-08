@@ -36,7 +36,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("SpotifyAPI.cs SpotifySearch", ex.ToString());
+                logger.Error("SpotifyAPI.cs SpotifySearch", ex);
             }
             return SearchResultEnum.SpotifyNotFound;
         }
@@ -188,7 +188,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("SpotifyAPI.cs SearchItemAsync", ex.ToString());
+                logger.Error("SpotifyAPI.cs SearchItemAsync", ex);
             }
             return null;
         }

@@ -40,7 +40,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("AdminCommands.cs KeywordAdd", ex.ToString());
+                logger.Error("AdminCommands.cs KeywordAdd", ex);
             }
         }
 
@@ -68,7 +68,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("AdminCommands.cs KeywordRemove", ex.ToString());
+                logger.Error("AdminCommands.cs KeywordRemove", ex);
             }
         }
     }

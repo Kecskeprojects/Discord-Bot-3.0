@@ -32,7 +32,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("MusicBrainzAPI.cs GetArtistSpotifyUrl", ex.ToString());
+                logger.Error("MusicBrainzAPI.cs GetArtistSpotifyUrl", ex);
             }
 
             return null;

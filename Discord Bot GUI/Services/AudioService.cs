@@ -57,7 +57,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("AudioFunctions.cs RequestHandler", ex.ToString());
+                logger.Error("AudioFunctions.cs RequestHandler", ex);
             }
         }
 
@@ -104,7 +104,7 @@ namespace Discord_Bot.Services
                     }
                     catch (Exception ex)
                     {
-                        logger.Error("AudioFunctions.cs PlayHandler", ex.ToString());
+                        logger.Error("AudioFunctions.cs PlayHandler", ex);
                     }
 
                     //Deleting the finished song if the list was not cleared for some other reason
@@ -163,7 +163,7 @@ namespace Discord_Bot.Services
                     await clientUser.VoiceChannel.DisconnectAsync();
                 }
 
-                logger.Error("AudioFunctions.cs PlayHandler", ex.ToString());
+                logger.Error("AudioFunctions.cs PlayHandler", ex);
             }
         }
 
@@ -197,7 +197,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("AudioFunctions.cs ConnectBot", ex.ToString());
+                logger.Error("AudioFunctions.cs ConnectBot", ex);
             }
             return false;
         }
@@ -231,14 +231,14 @@ namespace Discord_Bot.Services
             catch (OperationCanceledException ex)
             {
                 logger.Log("Exception thrown when audio stream is cancelled!");
-                logger.Warning("AudioService.cs Stream", ex.ToString(), LogOnly: true);
+                logger.Warning("AudioService.cs Stream", ex, LogOnly: true);
 
                 Global.ServerAudioResources[sId].AudioVariables.FFmpeg.Kill();
                 Global.ServerAudioResources[sId].AudioVariables.AbruptDisconnect = true;
             }
             catch (Exception ex)
             {
-                logger.Error("AudioService.cs Stream", ex.ToString());
+                logger.Error("AudioService.cs Stream", ex);
             }
 
             if (!Global.ServerAudioResources[sId].AudioVariables.FFmpeg.HasExited)
@@ -267,7 +267,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("AudioFunctions.cs ReConnectBot", ex.ToString());
+                logger.Error("AudioFunctions.cs ReConnectBot", ex);
             }
             return false;
         }

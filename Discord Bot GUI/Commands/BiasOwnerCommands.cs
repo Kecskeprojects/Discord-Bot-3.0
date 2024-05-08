@@ -47,7 +47,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasOwnerCommands.cs AddBiasList", ex.ToString());
+                logger.Error("BiasOwnerCommands.cs AddBiasList", ex);
             }
         }
 
@@ -78,7 +78,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasOwnerCommands.cs RemoveBiasList", ex.ToString());
+                logger.Error("BiasOwnerCommands.cs RemoveBiasList", ex);
             }
         }
 
@@ -94,7 +94,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasOwnerCommands.cs ManualUpdateBias", ex.ToString());
+                logger.Error("BiasOwnerCommands.cs ManualUpdateBias", ex);
             }
         }
 
@@ -142,7 +142,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasOwnerCommands.cs EditBiasData", ex.ToString());
+                logger.Error("BiasOwnerCommands.cs EditBiasData", ex);
             }
         }
     }

@@ -39,7 +39,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("WordOfTheDay.cs GetDataAsync", ex.ToString());
+                logger.Error("WordOfTheDay.cs GetDataAsync", ex);
             }
 
             return result;

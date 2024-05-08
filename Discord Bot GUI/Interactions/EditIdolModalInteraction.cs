@@ -31,7 +31,7 @@ namespace Discord_Bot.Interactions
             }
             catch (Exception ex)
             {
-                logger.Error("EditIdolModalInteraction.cs EditIdolModalSubmit", ex.ToString());
+                logger.Error("EditIdolModalInteraction.cs EditIdolModalSubmit", ex);
             }
             await RespondAsync("Bias could not be edited!");
         }
@@ -52,7 +52,7 @@ namespace Discord_Bot.Interactions
             }
             catch (Exception ex)
             {
-                logger.Error("EditIdolModalInteraction.cs EditIdolExtendedModalSubmit", ex.ToString());
+                logger.Error("EditIdolModalInteraction.cs EditIdolExtendedModalSubmit", ex);
             }
             await RespondAsync("Bias could not be edited!");
         }
@@ -74,7 +74,7 @@ namespace Discord_Bot.Interactions
             }
             catch (Exception ex)
             {
-                logger.Error("EditIdolModalInteraction.cs EditGroupModalSubmit", ex.ToString());
+                logger.Error("EditIdolModalInteraction.cs EditGroupModalSubmit", ex);
             }
             await RespondAsync("Group could not be edited!");
         }
@@ -96,7 +96,7 @@ namespace Discord_Bot.Interactions
             }
             catch (Exception ex)
             {
-                logger.Error("EditIdolModalInteraction.cs ChangeIdolProfileLinkModalSubmit", ex.ToString());
+                logger.Error("EditIdolModalInteraction.cs ChangeIdolProfileLinkModalSubmit", ex);
             }
             await RespondAsync("Bias could not be edited!");
         }
@@ -118,7 +118,7 @@ namespace Discord_Bot.Interactions
             }
             catch (Exception ex)
             {
-                logger.Error("EditIdolModalInteraction.cs ChangeIdolGroupModalSubmit", ex.ToString());
+                logger.Error("EditIdolModalInteraction.cs ChangeIdolGroupModalSubmit", ex);
             }
             await RespondAsync("Bias could not be edited!");
         }

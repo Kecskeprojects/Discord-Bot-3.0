@@ -36,7 +36,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("IdolGroupService.cs GetIdolGroupDetailsAsync", ex.ToString());
+                logger.Error("IdolGroupService.cs GetIdolGroupDetailsAsync", ex);
             }
 
             return resource;
@@ -59,7 +59,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("IdolGroupService.cs UpdateAsync", ex.ToString());
+                logger.Error("IdolGroupService.cs UpdateAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }

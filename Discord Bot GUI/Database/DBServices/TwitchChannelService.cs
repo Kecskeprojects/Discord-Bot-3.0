@@ -53,7 +53,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("TwitchChannelService.cs AddTwitchChannelAsync", ex.ToString());
+                logger.Error("TwitchChannelService.cs AddTwitchChannelAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
@@ -73,7 +73,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("TwitchChannelService.cs GetChannelsAsync", ex.ToString());
+                logger.Error("TwitchChannelService.cs GetChannelsAsync", ex);
             }
 
             return result;
@@ -99,7 +99,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("TwitchChannelService.cs RemoveTwitchChannelAsync", ex.ToString());
+                logger.Error("TwitchChannelService.cs RemoveTwitchChannelAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
@@ -124,7 +124,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("TwitchChannelService.cs RemoveTwitchChannelsAsync", ex.ToString());
+                logger.Error("TwitchChannelService.cs RemoveTwitchChannelsAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }

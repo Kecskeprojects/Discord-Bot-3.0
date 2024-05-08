@@ -87,7 +87,7 @@ namespace Discord_Bot.Services
             }
             catch (Exception ex)
             {
-                logger.Error("CoreLogic.cs UpdateExtendedBiasData", ex.ToString());
+                logger.Error("CoreLogic.cs UpdateExtendedBiasData", ex);
             }
         }
         #endregion
@@ -111,11 +111,11 @@ namespace Discord_Bot.Services
             }
             catch (NavigationException ex)
             {
-                logger.Warning("BiasDatabaseService.cs GetBiasDataAsync", ex.ToString());
+                logger.Warning("BiasDatabaseService.cs GetBiasDataAsync", ex);
             }
             catch (Exception ex)
             {
-                logger.Error("BiasDatabaseService.cs GetBiasDataAsync", ex.ToString());
+                logger.Error("BiasDatabaseService.cs GetBiasDataAsync", ex);
             }
 
             return biasDataList;
@@ -139,11 +139,11 @@ namespace Discord_Bot.Services
             }
             catch (NavigationException ex)
             {
-                logger.Warning("BiasDatabaseService.cs GetAdditionalBiasDataAsync", ex.ToString());
+                logger.Warning("BiasDatabaseService.cs GetAdditionalBiasDataAsync", ex);
             }
             catch (Exception ex)
             {
-                logger.Error("BiasDatabaseService.cs GetAdditionalBiasDataAsync", ex.ToString());
+                logger.Error("BiasDatabaseService.cs GetAdditionalBiasDataAsync", ex);
             }
             return idolData;
         }

@@ -86,7 +86,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasCommands.cs AddBias", ex.ToString());
+                logger.Error("BiasCommands.cs AddBias", ex);
             }
         }
 
@@ -139,7 +139,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasCommands.cs RemoveBias", ex.ToString());
+                logger.Error("BiasCommands.cs RemoveBias", ex);
             }
         }
 
@@ -170,7 +170,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasCommands.cs ClearBias", ex.ToString());
+                logger.Error("BiasCommands.cs ClearBias", ex);
             }
         }
 
@@ -239,7 +239,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasCommands.cs MyBiases", ex.ToString());
+                logger.Error("BiasCommands.cs MyBiases", ex);
             }
         }
         #endregion
@@ -283,7 +283,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasCommands.cs BiasList", ex.ToString());
+                logger.Error("BiasCommands.cs BiasList", ex);
             }
         }
         #endregion
@@ -354,7 +354,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasCommands.cs PingBias", ex.ToString());
+                logger.Error("BiasCommands.cs PingBias", ex);
             }
         }
         #endregion

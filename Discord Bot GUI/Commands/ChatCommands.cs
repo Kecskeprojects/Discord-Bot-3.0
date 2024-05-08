@@ -56,7 +56,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("ChatCommands.cs Help", ex.ToString());
+                logger.Error("ChatCommands.cs Help", ex);
             }
         }
 
@@ -85,7 +85,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("ChatCommands.cs Eightball", ex.ToString());
+                logger.Error("ChatCommands.cs Eightball", ex);
             }
         }
 
@@ -131,7 +131,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("ChatCommands.cs CoinFlip", ex.ToString());
+                logger.Error("ChatCommands.cs CoinFlip", ex);
             }
         }
 
@@ -170,7 +170,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("ChatCommands.cs WotDFunction", ex.ToString());
+                logger.Error("ChatCommands.cs WotDFunction", ex);
             }
         }
 
@@ -247,7 +247,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("ChatCommands.cs Bonk", ex.ToString());
+                logger.Error("ChatCommands.cs Bonk", ex);
             }
         }
     }

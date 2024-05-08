@@ -60,7 +60,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("IdolService.cs AddIdolAsync", ex.ToString());
+                logger.Error("IdolService.cs AddIdolAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
@@ -90,7 +90,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("IdolService.cs RemoveIdolAsync", ex.ToString());
+                logger.Error("IdolService.cs RemoveIdolAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }

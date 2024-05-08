@@ -38,7 +38,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("ServerService.cs AddServerAsync", ex.ToString());
+                logger.Error("ServerService.cs AddServerAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
@@ -59,7 +59,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("ServerService.cs ChangeRoleMessageIdAsync", ex.ToString());
+                logger.Error("ServerService.cs ChangeRoleMessageIdAsync", ex);
             }
 
             return DbProcessResultEnum.Failure;
@@ -103,7 +103,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("TwitchChannelService.cs AddNotificationRoleAsync", ex.ToString());
+                logger.Error("TwitchChannelService.cs AddNotificationRoleAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
@@ -128,7 +128,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("TwitchChannelService.cs RemoveNotificationRoleAsync", ex.ToString());
+                logger.Error("TwitchChannelService.cs RemoveNotificationRoleAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
@@ -160,7 +160,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("ServerService.cs GetByDiscordIdAsync", ex.ToString());
+                logger.Error("ServerService.cs GetByDiscordIdAsync", ex);
             }
 
             return result;

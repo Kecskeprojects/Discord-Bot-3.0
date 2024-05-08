@@ -44,7 +44,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("IdolImageService.cs RemoveIdolImagesAsync", ex.ToString());
+                logger.Error("IdolImageService.cs RemoveIdolImagesAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }

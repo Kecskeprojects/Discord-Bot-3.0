@@ -49,7 +49,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("KeywordService.cs AddKeywordAsync", ex.ToString());
+                logger.Error("KeywordService.cs AddKeywordAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
@@ -67,7 +67,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("KeywordService.cs GetKeywordAsync", ex.ToString());
+                logger.Error("KeywordService.cs GetKeywordAsync", ex);
             }
             return result;
         }
@@ -95,7 +95,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("KeywordService.cs RemoveKeywordAsync", ex.ToString());
+                logger.Error("KeywordService.cs RemoveKeywordAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }

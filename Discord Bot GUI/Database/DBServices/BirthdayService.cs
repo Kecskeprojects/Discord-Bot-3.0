@@ -65,7 +65,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("BirthdayService.cs AddBirthdayAsync", ex.ToString());
+                logger.Error("BirthdayService.cs AddBirthdayAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
@@ -82,7 +82,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("BirthdayService.cs GetBirthdaysByDateAsync", ex.ToString());
+                logger.Error("BirthdayService.cs GetBirthdaysByDateAsync", ex);
             }
             return mapper.Map<List<Birthday>, List<BirthdayResource>>(birthday);
         }
@@ -96,7 +96,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("BirthdayService.cs GetServerBirthdayListAsync", ex.ToString());
+                logger.Error("BirthdayService.cs GetServerBirthdayListAsync", ex);
             }
             return mapper.Map<List<Birthday>, List<BirthdayResource>>(birthday);
         }
@@ -124,7 +124,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("BirthdayService.cs RemoveBirthdayAsync", ex.ToString());
+                logger.Error("BirthdayService.cs RemoveBirthdayAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
