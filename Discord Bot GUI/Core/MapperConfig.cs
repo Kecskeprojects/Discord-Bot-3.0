@@ -13,7 +13,7 @@ namespace Discord_Bot.Core
     {
         public MapperConfig()
         {
-            //Provide all the Mapping Configuration
+            //Model to Resource
             CreateMap<Server, ServerResource>()
                 .ForMember(dest => dest.DiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.DiscordId)))
                 .ForMember(dest => dest.RoleMessageDiscordId, opt => opt.MapFrom(scv => scv.RoleMessageDiscordId))
@@ -52,6 +52,15 @@ namespace Discord_Bot.Core
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(u => u.UserId))
                 .ForMember(dest => dest.DiscordId, opt => opt.MapFrom(u => ulong.Parse(u.DiscordId)))
                 .ForMember(dest => dest.LastFmUsername, opt => opt.MapFrom(u => u.LastFmusername));
+            CreateMap<Idol, IdolExtendedResource>();
+            CreateMap<IdolGroup, IdolGroupExtendedResource>();
+            CreateMap<Idol, IdolGameResource>()
+                .ForMember(dest => dest.GroupFullName, opt => opt.MapFrom(i => i.Group.FullName ?? "Soloist"))
+                .ForMember(dest => dest.LatestImageUrl, opt => opt.MapFrom(i => i.IdolImages.OrderByDescending(x => x.CreatedOn).First().ImageUrl));
+            CreateMap<User, UserBiasGameStatResource>()
+                .ForMember(dest => dest.Stats, opt => opt.Ignore());
+
+            //Communication to Model
             CreateMap<ExtendedBiasData, Idol>()
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(e => e.Gender))
                 .ForMember(dest => dest.ModifiedOn, opt => opt.MapFrom(x => DateTime.UtcNow));
@@ -62,13 +71,6 @@ namespace Discord_Bot.Core
                 .ForMember(dest => dest.FullKoreanName, opt => opt.MapFrom(e => e.GroupFullKoreanName))
                 .ForMember(dest => dest.DebutDate, opt => opt.MapFrom(e => e.DebutDate))
                 .ForMember(dest => dest.ModifiedOn, opt => opt.MapFrom(x => DateTime.UtcNow));
-            CreateMap<Idol, IdolExtendedResource>();
-            CreateMap<IdolGroup, IdolGroupExtendedResource>();
-            CreateMap<Idol, IdolGameResource>()
-                .ForMember(dest => dest.GroupFullName, opt => opt.MapFrom(i => i.Group.FullName ?? "Soloist"))
-                .ForMember(dest => dest.LatestImageUrl, opt => opt.MapFrom(i => i.IdolImages.OrderByDescending(x => x.CreatedOn).First().ImageUrl));
-            CreateMap<User, UserBiasGameStatResource>()
-                .ForMember(dest => dest.Stats, opt => opt.Ignore());
         }
     }
 }
