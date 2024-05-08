@@ -70,7 +70,7 @@ namespace Discord_Bot.Processors.ImageProcessors
 
                 WriteText(polaroidBase, idol.StageName, fontSize: 30, posX: 25, posY: 357);
 
-                WriteText(polaroidBase, idol.GroupFullName ?? "Soloist", fontSize: 20, posX: 25, posY: 392);
+                WriteText(polaroidBase, idol.GroupFullName, fontSize: 20, posX: 25, posY: 392);
 
                 polaroidBase.Mutate(x => x.Resize(280, 338));
 

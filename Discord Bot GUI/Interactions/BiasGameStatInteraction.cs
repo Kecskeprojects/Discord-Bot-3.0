@@ -23,8 +23,11 @@ namespace Discord_Bot.Interactions
             {
                 if (userId != Context.User.Id)
                 {
+                    await RespondAsync("You are not the owner of this interaction-", ephemeral: true);
                     return;
                 }
+
+                await DeferAsync();
 
                 GenderType gender = choiceId == GenderChoiceEnum.Female ?
                     GenderType.Female :
@@ -39,13 +42,11 @@ namespace Discord_Bot.Interactions
 
                 logger.Log($"Bias Stat Gender Chosen: {choiceId}", LogOnly: true);
 
-                await DeferAsync();
-
                 UserBiasGameStatResource stats = await userService.GetTopIdolsAsync(Context.User.Id, gender);
 
                 if (stats == null || stats.BiasGameCount == 0 || stats.Stats.Count == 0)
                 {
-                    await RespondAsync("Not enough choices made for this gender!", ephemeral: true);
+                    await FollowupAsync("Not enough choices made for this gender!", ephemeral: true);
                     return;
                 }
 
@@ -64,7 +65,7 @@ namespace Discord_Bot.Interactions
             {
                 logger.Error("BiasGameInteraction.cs GenderChoosen", ex.ToString());
                 Global.BiasGames.TryRemove(Context.User.Id, out _);
-                await RespondAsync("Failure during setup!");
+                await FollowupAsync("Failure during setup!");
             }
         }
     }

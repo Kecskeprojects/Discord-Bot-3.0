@@ -366,6 +366,7 @@ namespace Discord_Bot.Database.DBServices
                 Idol idol = await idolRepository.FirstOrDefaultAsync(x => x.IdolId == idolId, x => x.Group, x => x.IdolImages);
 
                 result = mapper.Map<Idol, IdolGameResource>(idol);
+                result.GroupFullName ??= "Soloist";
             }
             catch (Exception ex)
             {

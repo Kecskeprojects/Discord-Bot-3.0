@@ -37,14 +37,15 @@ namespace Discord_Bot.Interactions
             {
                 if (Context.User.Id != userId || !Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData data))
                 {
+                    await RespondAsync("You are not the owner of this interaction-", ephemeral: true);
                     return;
                 }
+
+                await DeferAsync();
 
                 data.SetGender(choiceId);
 
                 logger.Log($"BiasGame Setup Gender Chosen: {choiceId}", LogOnly: true);
-
-                await DeferAsync();
 
                 List<int> options = [1990, 2000];
                 for (int i = 2010; i <= DateTime.UtcNow.Year; i += 4)
@@ -74,7 +75,7 @@ namespace Discord_Bot.Interactions
             {
                 logger.Error("BiasGameInteraction.cs GenderChoosen", ex.ToString());
                 Global.BiasGames.TryRemove(Context.User.Id, out _);
-                await RespondAsync("Failure during setup!");
+                await FollowupAsync("Failure during setup!");
             }
         }
 
@@ -85,6 +86,7 @@ namespace Discord_Bot.Interactions
             {
                 if (Context.User.Id != userId || !Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData data))
                 {
+                    await RespondAsync("You are not the owner of this interaction-", ephemeral: true);
                     return;
                 }
 
@@ -152,12 +154,13 @@ namespace Discord_Bot.Interactions
             {
                 if (Context.User.Id != userId || !Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData data))
                 {
+                    await RespondAsync("You are not the owner of this interaction-", ephemeral: true);
                     return;
                 }
 
-                logger.Log($"BiasGame Next Step: IdolId: {idolId}", LogOnly: true);
-
                 await DeferAsync();
+
+                logger.Log($"BiasGame Next Step: IdolId: {idolId}", LogOnly: true);
 
                 data.WinnerBracket = biasGameWinnerBracketImageProcessor.UpdateWinnerBracket(data);
                 data.RemoveItem(idolId);
@@ -212,7 +215,7 @@ namespace Discord_Bot.Interactions
             {
                 logger.Error("BiasGameInteraction.cs DebutChosen", ex.ToString());
                 Global.BiasGames.TryRemove(Context.User.Id, out _);
-                await RespondAsync("Failure during setup!");
+                await FollowupAsync("Failure during setup!");
             }
         }
 
