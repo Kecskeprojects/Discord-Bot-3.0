@@ -65,6 +65,7 @@ namespace Discord_Bot.Core
             CreateMap<Idol, IdolExtendedResource>();
             CreateMap<IdolGroup, IdolGroupExtendedResource>();
             CreateMap<Idol, IdolGameResource>()
+                .ForMember(dest => dest.GroupFullName, opt => opt.MapFrom(i => i.Group.FullName ?? "Soloist"))
                 .ForMember(dest => dest.LatestImageUrl, opt => opt.MapFrom(i => i.IdolImages.OrderByDescending(x => x.CreatedOn).First().ImageUrl));
             CreateMap<User, UserBiasGameStatResource>()
                 .ForMember(dest => dest.Stats, opt => opt.Ignore());
