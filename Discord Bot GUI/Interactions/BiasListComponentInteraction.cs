@@ -25,33 +25,9 @@ namespace Discord_Bot.Interactions
                     return;
                 }
 
-                List<IdolResource> idols;
-                if (selectedIdolGroups[0].Contains("><"))
-                {
-                    string name = selectedIdolGroups[0].Split("><")[0];
-                    ulong userId = ulong.Parse(selectedIdolGroups[0].Split("><")[1]);
-                    idols = await userIdolService.GetUserIdolsListAsync(userId, name);
-                }
-                else
-                {
-                    idols = await idolService.GetIdolsByGroupAsync(selectedIdolGroups[0]);
-                }
+                List<IdolResource> idols = await GetIdols(selectedIdolGroups);
 
-                string message = "";
-
-                //Add Group name
-                message += $"{selectedIdolGroups[0].Split("><")[0].ToUpper()}:\n";
-
-                //Add individual members
-                foreach (IdolResource member in idols)
-                {
-                    if (member != idols[0])
-                    {
-                        message += ", ";
-                    }
-
-                    message += $"`{member.Name.ToUpper()}`";
-                }
+                string message = CreateMessage(selectedIdolGroups, idols);
 
                 await RespondAsync(message);
             }
@@ -60,6 +36,41 @@ namespace Discord_Bot.Interactions
                 logger.Error("BiasListComponentInteraction.cs IdolMenuHandler", ex);
                 await RespondAsync("Something went wrong while getting idols.");
             }
+        }
+
+        private async Task<List<IdolResource>> GetIdols(string[] selectedIdolGroups)
+        {
+            if (selectedIdolGroups[0].Contains("><"))
+            {
+                string name = selectedIdolGroups[0].Split("><")[0];
+                ulong userId = ulong.Parse(selectedIdolGroups[0].Split("><")[1]);
+                return await userIdolService.GetUserIdolsListAsync(userId, name);
+            }
+            else
+            {
+                return await idolService.GetIdolsByGroupAsync(selectedIdolGroups[0]);
+            }
+        }
+
+        private static string CreateMessage(string[] selectedIdolGroups, List<IdolResource> idols)
+        {
+            string message = "";
+
+            //Add Group name
+            message += $"{selectedIdolGroups[0].Split("><")[0].ToUpper()}:\n";
+
+            //Add individual members
+            foreach (IdolResource member in idols)
+            {
+                if (member != idols[0])
+                {
+                    message += ", ";
+                }
+
+                message += $"`{member.Name.ToUpper()}`";
+            }
+
+            return message;
         }
     }
 }

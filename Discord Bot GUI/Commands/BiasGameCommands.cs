@@ -34,17 +34,7 @@ namespace Discord_Bot.Commands
                 }
 
                 Global.BiasGames.TryAdd(Context.User.Id, new BiasGameData(Context.User.Id));
-
-                EmbedBuilder mainEmbed = new();
-                mainEmbed.WithTitle("Bias Game Setup");
-
-                EmbedFooterBuilder footer = new();
-                footer.WithIconUrl(Context.User.GetDisplayAvatarUrl(ImageFormat.Jpeg, 512));
-                footer.WithText(Global.GetNickName(Context.Channel, Context.User));
-                mainEmbed.WithFooter(footer);
-
-                mainEmbed.AddField("1. Select a gender", "Male, Female, Both");
-                mainEmbed.AddField("2. Select a debut range", "A start date and an end date");
+                EmbedBuilder mainEmbed = SetupEmbed();
 
                 ActionRowBuilder buttonRow = new();
                 buttonRow.WithButton(
@@ -69,6 +59,21 @@ namespace Discord_Bot.Commands
             {
                 logger.Error("BiasGameCommands.cs BiasGame", ex);
             }
+        }
+
+        private EmbedBuilder SetupEmbed()
+        {
+            EmbedBuilder mainEmbed = new();
+            mainEmbed.WithTitle("Bias Game Setup");
+
+            EmbedFooterBuilder footer = new();
+            footer.WithIconUrl(Context.User.GetDisplayAvatarUrl(ImageFormat.Jpeg, 512));
+            footer.WithText(Global.GetNickName(Context.Channel, Context.User));
+            mainEmbed.WithFooter(footer);
+
+            mainEmbed.AddField("1. Select a gender", "Male, Female, Both");
+            mainEmbed.AddField("2. Select a debut range", "A start date and an end date");
+            return mainEmbed;
         }
 
         [Command("bias game stop")]
@@ -113,9 +118,9 @@ namespace Discord_Bot.Commands
                     return;
                 }
 
-                Embed[] embed = BiasGameEmbedProcessor.CreateEmbed(Global.GetNickName(Context.Channel, Context.User), GenderType.None, stats);
+                Embed[] embed = BiasGameStatEmbedProcessor.CreateEmbed(Global.GetNickName(Context.Channel, Context.User), GenderType.None, stats);
 
-                MessageComponent component = BiasGameEmbedProcessor.CreateComponent(GenderType.None, Context.User.Id);
+                MessageComponent component = BiasGameStatEmbedProcessor.CreateComponent(GenderType.None, Context.User.Id);
 
                 await ReplyAsync(embeds: embed, components: component);
             }

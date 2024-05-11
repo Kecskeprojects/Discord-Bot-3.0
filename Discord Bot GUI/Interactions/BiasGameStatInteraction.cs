@@ -50,9 +50,9 @@ namespace Discord_Bot.Interactions
                     return;
                 }
 
-                Embed[] embed = BiasGameEmbedProcessor.CreateEmbed(Global.GetNickName(Context.Channel, Context.User), gender, stats);
+                Embed[] embed = BiasGameStatEmbedProcessor.CreateEmbed(Global.GetNickName(Context.Channel, Context.User), gender, stats);
 
-                MessageComponent component = BiasGameEmbedProcessor.CreateComponent(gender, Context.User.Id);
+                MessageComponent component = BiasGameStatEmbedProcessor.CreateComponent(gender, Context.User.Id);
 
                 SocketMessageComponent message = Context.Interaction as SocketMessageComponent;
                 await ModifyOriginalResponseAsync(x =>
