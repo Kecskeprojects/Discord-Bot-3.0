@@ -135,6 +135,35 @@ namespace Discord_Bot.Commands
             }
         }
 
+        [Command("decide")]
+        [Summary("Random from multiple options")]
+        public async Task Decide([Remainder] string optionString)
+        {
+            try
+            {
+                if (Context.Channel.GetChannelType() != ChannelType.DM)
+                {
+                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
+                    {
+                        return;
+                    }
+                }
+
+                Random r = new();
+
+                string[] options = optionString.Split(",", options: StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+                string chosen = options[r.Next(0, options.Length)];
+
+                await ReplyAsync(chosen);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("ChatCommands.cs Decide", ex);
+            }
+        }
+
         [Command("wotd")]
         [Alias(["word of the day"])]
         [Summary("Learn a word a day command")]

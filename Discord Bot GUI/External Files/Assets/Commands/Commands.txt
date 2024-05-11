@@ -4,6 +4,7 @@ Text Commands:
 !8ball [question]		8ball game (DM)
 !custom list		List of custom commands
 !coin flip [head] or [tails]		Flip a coin (DM)
+!decide [opt1],[opt2]...		Decide from options (DM)
 !wotd [language]		Word of the day in a language (DM)
 !birthday add [date]		Add your birthday for server
 !birthday remove		Remove your birthday from server
