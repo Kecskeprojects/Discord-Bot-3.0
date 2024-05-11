@@ -37,7 +37,6 @@ namespace Discord_Bot.Enums
                 "Are you sure about that?"
             ];
 
-        //Array for 8ball answers
         public static string[] Answers8ball { get; } =
             [
                 "It is certain",

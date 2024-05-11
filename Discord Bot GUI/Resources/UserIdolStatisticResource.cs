@@ -9,5 +9,7 @@
         public string LatestImageUrl { get; set; }
 
         public double Weight { get; set; }
+
+        public bool IsUserBias { get; set; }
     }
 }

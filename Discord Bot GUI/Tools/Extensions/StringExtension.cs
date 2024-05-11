@@ -26,7 +26,7 @@ namespace Discord_Bot.Tools
             newString = "";
             for (int i = 0; i < str.Length; i++)
             {
-                if(i > 1 && char.IsUpper(str[i]) && char.IsUpper(str[i - 1]) && char.IsUpper(newString[i - 1]))
+                if (i > 1 && char.IsUpper(str[i]) && char.IsUpper(str[i - 1]) && char.IsUpper(newString[i - 1]))
                 {
                     newString += char.ToLower(str[i]);
                     continue;

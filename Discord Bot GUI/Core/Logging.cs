@@ -50,7 +50,6 @@ namespace Discord_Bot.Core
             }
         }
 
-
         public void Query(string message, bool ConsoleOnly = false, bool LogOnly = false)
         {
             Log log = BaseLog(LogType.Query);
@@ -68,7 +67,6 @@ namespace Discord_Bot.Core
                 Logs.Add(log);
             }
         }
-
 
         public void Client(string message, bool ConsoleOnly = false, bool LogOnly = false)
         {

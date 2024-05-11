@@ -17,6 +17,7 @@ namespace Discord_Bot.Database.DBRepositories
                 .Include(stat => stat.Idol)
                 .Include(i => i.Idol.Group)
                 .Include(i => i.Idol.IdolImages)
+                .Include(i => i.Idol.Users)
                 .Where(stat => stat.UserId == userId && (gender == GenderType.None.ToString() || stat.Idol.Gender == gender.ToString()))
                 .Select(stat => new UserIdolStatisticResource()
                 {
@@ -28,7 +29,8 @@ namespace Discord_Bot.Database.DBRepositories
                         (stat.Placed3 * 0.25) +
                         (stat.Placed4 * 0.125) +
                         (stat.Placed5 * 0.001),
-                    LatestImageUrl = stat.Idol.IdolImages.OrderByDescending(x => x.CreatedOn).First().ImageUrl
+                    LatestImageUrl = stat.Idol.IdolImages.OrderByDescending(x => x.CreatedOn).First().ImageUrl,
+                    IsUserBias = stat.Idol.Users.Any(x => x.UserId == userId)
                 })
                 .OrderByDescending(statres => statres.Weight)
                 .Take(10)

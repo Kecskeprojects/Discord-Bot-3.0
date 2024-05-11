@@ -20,10 +20,6 @@ namespace Discord_Bot.Interactions
             try
             {
                 logger.Log($"Idol menu item selected with following parameters: {count}, {string.Join(",", selectedIdolGroups)}", LogOnly: true);
-                if (count > 1)
-                {
-                    return;
-                }
 
                 List<IdolResource> idols = await GetIdols(selectedIdolGroups);
 
