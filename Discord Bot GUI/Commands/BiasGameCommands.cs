@@ -79,7 +79,7 @@ namespace Discord_Bot.Commands
             try
             {
                 Random r = new();
-                if (r.Next(1, 101) == 1)
+                if (r.Next(0, 100) == 0)
                 {
                     await ReplyAsync(StaticLists.BiasGameStopMessages[r.Next(0, StaticLists.BiasGameStopMessages.Length)]);
                     return;

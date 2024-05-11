@@ -106,7 +106,7 @@ namespace Discord_Bot.Commands
                 }
 
                 Random r = new();
-                int chance = r.Next(1, 101);
+                int chance = r.Next(0, 100);
 
                 string[] choices = ["Heads", "Tails"];
 

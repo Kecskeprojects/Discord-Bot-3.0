@@ -49,16 +49,25 @@ namespace Discord_Bot.Features
                 {
                     await Context.Channel.SendMessageAsync(StaticLists.EasterEggMessages[r.Next(0, StaticLists.EasterEggMessages.Length)]);
                 }
-                else if (r.Next(1, 21) < 1)
+                else if (r.Next(0, 20) == 0)
                 {
+                    MessageReference refer = new(Context.Message.Id, Context.Channel.Id, Context.Guild.Id, false);
                     string mess = Context.Message.Content.ToLower();
                     if (mess.StartsWith("i think"))
                     {
-                        await Context.Channel.SendMessageAsync("I agree wholeheartedly!"); //Todo: Add a possibility to mock the user in a return message using randomized upper-lower characters, saying what they said
+                        if (r.Next(0, 2) == 0)
+                        {
+                            await Context.Channel.SendMessageAsync("I agree wholeheartedly!", messageReference: refer);
+                        }
+                        else
+                        {
+                            await Context.Channel.SendMessageAsync(Context.Message.Content.ToMockText(), messageReference: refer);
+                        }
                     }
                     else if ((mess.StartsWith("i am") && mess != "i am") || (mess.StartsWith("i'm") && mess != "i'm"))
                     {
-                        await Context.Channel.SendMessageAsync(string.Concat("Hey ", Context.Message.Content.AsSpan(mess.StartsWith("i am") ? 5 : 4), ", I'm Kim Synthji!"));
+                        string message = string.Concat("Hey ", Context.Message.Content.AsSpan(mess.StartsWith("i am") ? 5 : 4), ", I'm Kim Synthji!");
+                        await Context.Channel.SendMessageAsync(message, messageReference: refer);
                     }
                 }
             }
