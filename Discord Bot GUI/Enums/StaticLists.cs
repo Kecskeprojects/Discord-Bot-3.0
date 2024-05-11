@@ -29,6 +29,14 @@ namespace Discord_Bot.Enums
                 "Do you want me to tell you a joke?"
             ];
 
+        public static string[] BiasGameStopMessages { get; } =
+            [
+                "You can't escape that easily",
+                "No, you have to choose",
+                "You know what you have to do",
+                "Are you sure about that?"
+            ];
+
         //Array for 8ball answers
         public static string[] Answers8ball { get; } =
             [

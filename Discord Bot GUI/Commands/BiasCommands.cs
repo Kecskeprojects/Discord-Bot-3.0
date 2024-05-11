@@ -21,12 +21,14 @@ namespace Discord_Bot.Commands
     public class BiasCommands(
         IUserIdolService userIdolService,
         IIdolService idolService,
+        IIdolGroupService idolGroupService,
         IServerService serverService,
         Logging logger,
         Config config) : BaseCommand(logger, config, serverService), IBiasCommands
     {
         private readonly IUserIdolService userIdolService = userIdolService;
         private readonly IIdolService idolService = idolService;
+        private readonly IIdolGroupService idolGroupService = idolGroupService;
 
         #region Bias management commands
         [Command("bias add")]
@@ -35,7 +37,7 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                if (Context.Channel.GetChannelType() != ChannelType.DM)
                 {
                     ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
                     if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
@@ -48,6 +50,7 @@ namespace Discord_Bot.Commands
                 string biasName = "";
                 string biasGroup = "";
 
+                bool isGroupName = false;
                 if (biasData.Contains('-'))
                 {
                     biasName = biasData.ToLower().Split('-')[0].Trim();
@@ -55,13 +58,23 @@ namespace Discord_Bot.Commands
                 }
                 else
                 {
-                    biasName = biasData.ToLower().Trim();
+                    isGroupName = await idolGroupService.GroupExistsAsnyc(biasData.ToLower().Trim());
+                    if (isGroupName)
+                    {
+                        biasGroup = biasData.ToLower().Trim();
+                    }
+                    else
+                    {
+                        biasName = biasData.ToLower().Trim();
+                    }
                 }
 
-                DbProcessResultEnum result = await userIdolService.AddUserIdolAsync(Context.User.Id, biasName, biasGroup);
+                DbProcessResultEnum result = isGroupName
+                    ? await userIdolService.AddUserIdolGroupAsync(Context.User.Id, biasGroup)
+                    : await userIdolService.AddUserIdolAsync(Context.User.Id, biasName, biasGroup);
                 if (result == DbProcessResultEnum.Success)
                 {
-                    await ReplyAsync("Bias added to your list of biases!");
+                    await ReplyAsync("Bias(es) added to your list of biases!");
                 }
                 else if (result == DbProcessResultEnum.MultipleResults)
                 {
@@ -69,7 +82,7 @@ namespace Discord_Bot.Commands
                 }
                 else if (result == DbProcessResultEnum.AlreadyExists)
                 {
-                    await ReplyAsync("You already have this bias on your list!");
+                    await ReplyAsync("You already have this bias/these biases on your list!");
                 }
                 else if (result == DbProcessResultEnum.MultipleExists)
                 {
@@ -81,7 +94,7 @@ namespace Discord_Bot.Commands
                 }
                 else
                 {
-                    await ReplyAsync("Bias could not be added!");
+                    await ReplyAsync("Bias(es) could not be added!");
                 }
             }
             catch (Exception ex)
@@ -96,7 +109,7 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                if (Context.Channel.GetChannelType() != ChannelType.DM)
                 {
                     ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
                     if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
@@ -109,6 +122,7 @@ namespace Discord_Bot.Commands
                 string biasName = "";
                 string biasGroup = "";
 
+                bool isGroupName = false;
                 if (biasData.Contains('-'))
                 {
                     biasName = biasData.ToLower().Split('-')[0].Trim();
@@ -116,13 +130,23 @@ namespace Discord_Bot.Commands
                 }
                 else
                 {
-                    biasName = biasData.ToLower().Trim();
+                    isGroupName = await idolGroupService.GroupExistsAsnyc(biasData.ToLower().Trim());
+                    if (isGroupName)
+                    {
+                        biasGroup = biasData.ToLower().Trim();
+                    }
+                    else
+                    {
+                        biasName = biasData.ToLower().Trim();
+                    }
                 }
 
-                DbProcessResultEnum result = await userIdolService.RemoveUserIdolAsync(Context.User.Id, biasName, biasGroup);
+                DbProcessResultEnum result = isGroupName
+                    ? await userIdolService.RemoveUserIdolGroupAsync(Context.User.Id, biasGroup)
+                    : await userIdolService.RemoveUserIdolAsync(Context.User.Id, biasName, biasGroup);
                 if (result == DbProcessResultEnum.Success)
                 {
-                    await ReplyAsync("Bias removed from your list of biases!");
+                    await ReplyAsync("Bias(es) removed from your list of biases!");
                 }
                 else if (result == DbProcessResultEnum.MultipleResults)
                 {
@@ -130,11 +154,11 @@ namespace Discord_Bot.Commands
                 }
                 else if (result == DbProcessResultEnum.PartialNotFound)
                 {
-                    await ReplyAsync("You do not have this bias on your list!");
+                    await ReplyAsync("You do not have this bias/these biases on your list!");
                 }
                 else
                 {
-                    await ReplyAsync("Bias could not be removed!");
+                    await ReplyAsync("Bias(es) could not be removed!");
                 }
             }
             catch (Exception ex)
@@ -149,7 +173,7 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                if (Context.Channel.GetChannelType() != ChannelType.DM)
                 {
                     ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
                     if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
@@ -181,7 +205,7 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                if (Context.Channel.GetChannelType() != ChannelType.DM)
                 {
                     ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
                     if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))

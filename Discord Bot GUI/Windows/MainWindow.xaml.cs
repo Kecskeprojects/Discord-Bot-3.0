@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 
-namespace Discord_Bot
+namespace Discord_Bot.Windows
 {
     public partial class MainWindow : Window
     {

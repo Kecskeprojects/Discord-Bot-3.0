@@ -59,7 +59,7 @@ namespace Discord_Bot.Processors.EmbedProcessors
                 {
                     metadata = JsonConvert.DeserializeObject<InstaLoaderBase>(File.ReadAllText(files[i])).Node;
                 }
-                else if (attachments.Count <= 10 && (!ignoreVideos || files[i].EndsWith(".jpg") || files[i].EndsWith(".png")))
+                else if (attachments.Count < 10 && (!ignoreVideos || files[i].EndsWith(".jpg") || files[i].EndsWith(".png")))
                 {
                     attachments.Add(new FileAttachment(files[i]));
                 }

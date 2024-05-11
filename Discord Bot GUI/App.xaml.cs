@@ -6,6 +6,7 @@ using Discord_Bot.Features;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services;
+using Discord_Bot.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading;

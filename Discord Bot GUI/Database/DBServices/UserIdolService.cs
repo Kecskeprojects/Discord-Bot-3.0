@@ -90,6 +90,49 @@ namespace Discord_Bot.Database.DBServices
             return DbProcessResultEnum.Failure;
         }
 
+        public async Task<DbProcessResultEnum> AddUserIdolGroupAsync(ulong userId, string biasGroup)
+        {
+            try
+            {
+                List<Idol> idols = await idolRepository.GetListAsync(i => i.Group.Name == biasGroup, i => i.Group);
+
+                User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString(), u => u.Idols);
+                user ??= new User() { DiscordId = userId.ToString(), Idols = [] };
+
+                List<Idol> userIdols = await idolRepository
+                    .GetListAsync(i =>
+                        i.Users.FirstOrDefault(u => u.DiscordId == userId.ToString()) != null &&
+                        i.Group.Name == biasGroup,
+                        i => i.Group,
+                        i => i.Users);
+                if (userIdols.Count >= idols.Count)
+                {
+                    logger.Log($"{userId} user's with idols from group [{biasGroup}] is already connected!");
+                    return DbProcessResultEnum.AlreadyExists;
+                }
+
+                if (userIdols.Count > 0)
+                {
+                    idols = idols.Except(userIdols).ToList();
+                }
+
+                foreach (Idol idol in idols)
+                {
+                    user.Idols.Add(idol);
+                }
+
+                await userRepository.UpdateAsync(user);
+
+                logger.Log($"{userId} user's idols from group [{biasGroup}] added successfully!");
+                return DbProcessResultEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("UserIdolService.cs AddUserIdolGroupAsync", ex);
+            }
+            return DbProcessResultEnum.Failure;
+        }
+
         public async Task<DbProcessResultEnum> ClearUserIdolAsync(ulong userId)
         {
             try
@@ -140,6 +183,42 @@ namespace Discord_Bot.Database.DBServices
             catch (Exception ex)
             {
                 logger.Error("UserIdolService.cs RemoveUserIdolAsync", ex);
+            }
+            return DbProcessResultEnum.Failure;
+        }
+
+        public async Task<DbProcessResultEnum> RemoveUserIdolGroupAsync(ulong userId, string biasGroup)
+        {
+            try
+            {
+                User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString(), u => u.Idols);
+                user ??= new User() { DiscordId = userId.ToString() };
+
+                List<Idol> userIdols = await idolRepository
+                    .GetListAsync(i =>
+                        i.Users.FirstOrDefault(u => u.DiscordId == userId.ToString()) != null &&
+                        i.Group.Name == biasGroup,
+                        i => i.Group,
+                        i => i.Users);
+                if (userIdols.Count == 0)
+                {
+                    logger.Log($"{userId} user's with idols from group [{biasGroup}] are not connected currently!");
+                    return DbProcessResultEnum.PartialNotFound;
+                }
+
+                foreach (Idol idol in userIdols)
+                {
+                    user.Idols.Remove(idol);
+                }
+
+                await userRepository.UpdateAsync(user);
+
+                logger.Log($"{userId} user's idols from group [{biasGroup}] removed successfully!");
+                return DbProcessResultEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("UserIdolService.cs RemoveUserIdolGroupAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }

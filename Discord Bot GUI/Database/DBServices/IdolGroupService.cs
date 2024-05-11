@@ -42,6 +42,21 @@ namespace Discord_Bot.Database.DBServices
             return resource;
         }
 
+        public async Task<bool> GroupExistsAsnyc(string groupName)
+        {
+            bool result = false;
+            try
+            {
+                result = await idolGroupRepository.ExistsAsync(x => x.Name == groupName);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("IdolGroupService.cs GroupExistsAsnyc", ex);
+            }
+
+            return result;
+        }
+
         public async Task<DbProcessResultEnum> UpdateAsync(int groupId, EditGroupModal modal)
         {
             try

@@ -78,9 +78,15 @@ namespace Discord_Bot.Commands
         {
             try
             {
+                Random r = new();
+                if (r.Next(1, 101) == 1)
+                {
+                    await ReplyAsync(StaticLists.BiasGameStopMessages[r.Next(0, StaticLists.BiasGameStopMessages.Length)]);
+                }
+
                 if (Global.BiasGames.TryRemove(Context.User.Id, out _))
                 {
-                    await ReplyAsync("Game removed!");
+                    await ReplyAsync("Game stopped!");
                 }
             }
             catch (Exception ex)

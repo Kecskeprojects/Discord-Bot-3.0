@@ -544,7 +544,7 @@ namespace Discord_Bot.Services
         #region Helper API calls
         private async Task<LastFmApi.Models.ArtistInfo.Artist> GetArtistPlaysAsync(string lastFmUsername, string artistName)
         {
-            GenericResponseItem<LastFmApi.Models.ArtistInfo.Artist> restResult = await InfoBasedRequests.ArtistPlays(config.Lastfm_API_Key, lastFmUsername, artistName);
+            GenericResponseItem<LastFmApi.Models.ArtistInfo.Artist> restResult = await InfoBasedRequests.ArtistPlays(config.Lastfm_API_Key, lastFmUsername, artistName);//Todo: If results in a fail, use simple data
             logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
 
             return restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success
@@ -554,7 +554,7 @@ namespace Discord_Bot.Services
 
         private async Task<LastFmApi.Models.TrackInfo.Track> GetTrackPlaysAsync(string lastFmUsername, string artistName, string trackName)
         {
-            GenericResponseItem<LastFmApi.Models.TrackInfo.Track> restResult = await InfoBasedRequests.TrackPlays(config.Lastfm_API_Key, lastFmUsername, artistName, trackName);
+            GenericResponseItem<LastFmApi.Models.TrackInfo.Track> restResult = await InfoBasedRequests.TrackPlays(config.Lastfm_API_Key, lastFmUsername, artistName, trackName);//Todo: If results in a fail, use simple data
             logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
 
             return restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success

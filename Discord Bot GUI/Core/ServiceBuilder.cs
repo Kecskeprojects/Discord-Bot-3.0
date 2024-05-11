@@ -14,6 +14,7 @@ using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Services;
+using Discord_Bot.Windows;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
