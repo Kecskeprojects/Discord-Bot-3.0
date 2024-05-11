@@ -30,6 +30,8 @@ namespace Discord_Bot.Communication.Bias
         public Stack<int> Ranking { get; private set; } = [];
         public MemoryStream WinnerBracket { get; set; } = new MemoryStream();
 
+        public ulong MessageId { get; set; }//This is only stored so if the game is stopped, the embed can be deleted
+
         public void SetGender(GenderChoiceEnum gender)
         {
             Gender = gender == GenderChoiceEnum.Female ?

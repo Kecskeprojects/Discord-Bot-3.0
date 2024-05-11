@@ -137,7 +137,8 @@ namespace Discord_Bot.Interactions
                 await DeleteOriginalResponseAsync();
 
                 //Followup will respond with the first embed
-                await FollowupWithFilesAsync(files, embeds: embeds, components: components.Build());
+                IUserMessage message = await FollowupWithFilesAsync(files, embeds: embeds, components: components.Build());
+                data.MessageId = message.Id;
             }
             catch (Exception ex)
             {

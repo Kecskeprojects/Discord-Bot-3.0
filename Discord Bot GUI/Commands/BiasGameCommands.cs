@@ -82,11 +82,13 @@ namespace Discord_Bot.Commands
                 if (r.Next(1, 101) == 1)
                 {
                     await ReplyAsync(StaticLists.BiasGameStopMessages[r.Next(0, StaticLists.BiasGameStopMessages.Length)]);
+                    return;
                 }
 
-                if (Global.BiasGames.TryRemove(Context.User.Id, out _))
+                if (Global.BiasGames.TryRemove(Context.User.Id, out BiasGameData data))
                 {
                     await ReplyAsync("Game stopped!");
+                    await Context.Channel.DeleteMessageAsync(data.MessageId);
                 }
             }
             catch (Exception ex)
