@@ -25,19 +25,19 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 if (await idolAliasRepository.ExistsAsync(
-                    ia => ia.Alias == idolAlias &&
-                    ia.Idol.Name == idolName &&
-                    ia.Idol.Group.Name == idolGroup,
+                    ia => ia.Alias == idolAlias
+                    && ia.Idol.Name == idolName
+                    && ia.Idol.Group.Name == idolGroup,
                     ia => ia.Idol,
                     ia => ia.Idol.Group))
                 {
-                    logger.Log($"Alias [{idolAlias}-{idolName}]-[{idolGroup}] is already in database!");
+                    logger.Log($"Idol Alias [{idolAlias}-{idolName}]-[{idolGroup}] is already in database!");
                     return DbProcessResultEnum.AlreadyExists;
                 }
 
                 Idol idol = await idolRepository.FirstOrDefaultAsync(
-                    i => idolGroup == i.Group.Name &&
-                    i.Name == idolName,
+                    i => idolGroup == i.Group.Name
+                    && i.Name == idolName,
                     i => i.IdolAliases,
                     i => i.Group);
 
@@ -55,12 +55,12 @@ namespace Discord_Bot.Database.DBServices
 
                 await idolRepository.UpdateAsync(idol);
 
-                logger.Log($"Idol [{idolAlias}-{idolName}]-[{idolGroup}] added successfully!");
+                logger.Log($"Idol Alias [{idolAlias}-{idolName}]-[{idolGroup}] added successfully!");
                 return DbProcessResultEnum.Success;
             }
             catch (Exception ex)
             {
-                logger.Error("IdolService.cs AddIdolAsync", ex);
+                logger.Error("IdolAliasService.cs AddIdolAliasAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }
@@ -70,27 +70,27 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 IdolAlias idolAliasItem = await idolAliasRepository.FirstOrDefaultAsync(
-                    ia => ia.Alias == idolAlias &&
-                    ia.Idol.Name == idolName &&
-                    ia.Idol.Group.Name == idolGroup,
+                    ia => ia.Alias == idolAlias
+                    && ia.Idol.Name == idolName
+                    && ia.Idol.Group.Name == idolGroup,
                     ia => ia.Idol,
                     ia => ia.Idol.Group);
                 if (idolAlias != null)
                 {
                     await idolAliasRepository.RemoveAsync(idolAliasItem);
 
-                    logger.Log($"Idol [{idolAlias}-{idolName}]-[{idolGroup}] removed successfully!");
+                    logger.Log($"Idol Alias [{idolAlias}-{idolName}]-[{idolGroup}] removed successfully!");
                     return DbProcessResultEnum.Success;
                 }
                 else
                 {
-                    logger.Log($"Idol [{idolAlias}-{idolName}]-[{idolGroup}] could not be found!");
+                    logger.Log($"Idol Alias [{idolAlias}-{idolName}]-[{idolGroup}] could not be found!");
                     return DbProcessResultEnum.NotFound;
                 }
             }
             catch (Exception ex)
             {
-                logger.Error("IdolService.cs RemoveIdolAsync", ex);
+                logger.Error("IdolAliasService.cs RemoveIdolAliasAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }

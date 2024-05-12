@@ -6,9 +6,13 @@ using Discord_Bot.Interfaces.DBServices;
 using System;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Commands
+namespace Discord_Bot.Commands.Owner
 {
-    public class BiasAliasCommands(IIdolAliasService idolAliasService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
+    public class BiasAliasCommands(
+        IIdolAliasService idolAliasService,
+        IServerService serverService,
+        Logging logger,
+        Config config) : BaseCommand(logger, config, serverService)
     {
         private readonly IIdolAliasService idolAliasService = idolAliasService;
         [Command("bias alias add")]
