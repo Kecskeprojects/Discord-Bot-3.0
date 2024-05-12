@@ -42,9 +42,9 @@ namespace Discord_Bot.Interactions
                 data.SetGender(choiceId);
 
                 logger.Log($"BiasGame Setup Gender Chosen: {choiceId}", LogOnly: true);
-                ComponentBuilder components = BiasGameDebutEmbedProcessor.CreateEmbed(data);
+                MessageComponent component = BiasGameDebutEmbedProcessor.CreateEmbed(data);
 
-                await ModifyOriginalResponseAsync(x => x.Components = components.Build());
+                await ModifyOriginalResponseAsync(x => x.Components = component);
             }
             catch (Exception ex)
             {
@@ -90,12 +90,12 @@ namespace Discord_Bot.Interactions
                     Context.User.GetDisplayAvatarUrl(ImageFormat.Jpeg, 512),
                     Global.GetNickName(Context.Channel, Context.User));
 
-                ComponentBuilder components = BiasGameEmbedProcessor.CreateButtons(idolIds, Context.User.Id);
+                MessageComponent components = BiasGameEmbedProcessor.CreateComponent(idolIds, Context.User.Id);
 
                 await DeleteOriginalResponseAsync();
 
                 //Followup will respond with the first embed
-                IUserMessage message = await FollowupWithFilesAsync(files, embeds: embeds, components: components.Build());
+                IUserMessage message = await FollowupWithFilesAsync(files, embeds: embeds, components: components);
                 data.MessageId = message.Id;
             }
             catch (Exception ex)

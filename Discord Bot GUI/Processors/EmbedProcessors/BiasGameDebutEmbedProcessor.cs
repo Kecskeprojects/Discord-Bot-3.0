@@ -7,7 +7,7 @@ namespace Discord_Bot.Processors.EmbedProcessors
 {
     public class BiasGameDebutEmbedProcessor
     {
-        public static ComponentBuilder CreateEmbed(BiasGameData data)
+        public static MessageComponent CreateEmbed(BiasGameData data)
         {
             List<int> options = [1990, 2000, 2010, 2014, 2018];
             for (int i = 2020; i <= DateTime.UtcNow.Year; i += 2)
@@ -30,7 +30,7 @@ namespace Discord_Bot.Processors.EmbedProcessors
 
             ComponentBuilder components = new();
             components.WithSelectMenu(selectMenu);
-            return components;
+            return components.Build();
         }
     }
 }

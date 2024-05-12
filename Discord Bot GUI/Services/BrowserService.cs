@@ -40,8 +40,13 @@ namespace Discord_Bot.Services
             }
         }
 
-        public static async Task<IPage> CreateNewPage(Logging logger)
+        public static async Task<IPage> CreateNewPage(Logging logger, Config config)
         {
+            if (Browser == null || Browser.IsClosed)
+            {
+                await OpenBroser(config);
+            }
+
             IPage[] pages = await Browser.PagesAsync();
 
             IPage mainPage = await Browser.NewPageAsync();

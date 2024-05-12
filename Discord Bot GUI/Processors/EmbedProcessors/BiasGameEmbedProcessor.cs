@@ -6,7 +6,7 @@ namespace Discord_Bot.Processors.EmbedProcessors
 {
     public class BiasGameEmbedProcessor
     {
-        public static ComponentBuilder CreateButtons(int[] idolIds, ulong userId)
+        public static MessageComponent CreateComponent(int[] idolIds, ulong userId)
         {
             //The idol IDs are reversed, the selected button sends the idol to delete from the list
             ActionRowBuilder buttonRow = new();
@@ -17,7 +17,7 @@ namespace Discord_Bot.Processors.EmbedProcessors
             ComponentBuilder components = new();
             components.AddRow(buttonRow);
 
-            return components;
+            return components.Build();
         }
 
         public static Embed[] CreateEmbed(BiasGameData data, string avatarUrl, string userName)

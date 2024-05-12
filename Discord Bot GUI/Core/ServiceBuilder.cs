@@ -12,6 +12,7 @@ using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Processors;
 using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Services;
 using Discord_Bot.Windows;
@@ -70,6 +71,7 @@ namespace Discord_Bot.Core
             collection.AddTransient<BonkGifProcessor>();
             collection.AddTransient<BiasGameImageProcessor>();
             collection.AddTransient<BiasGameWinnerBracketImageProcessor>();
+            collection.AddTransient<BiasScrapingProcessor>();
 
             //Features
             collection.AddTransient<InstagramEmbedFeature>();

@@ -71,13 +71,13 @@ namespace Discord_Bot.Interactions
                     Context.User.GetDisplayAvatarUrl(ImageFormat.Jpeg, 512),
                     Global.GetNickName(Context.Channel, Context.User));
 
-                ComponentBuilder components = BiasGameEmbedProcessor.CreateButtons(idolIds, Context.User.Id);
+                MessageComponent components = BiasGameEmbedProcessor.CreateComponent(idolIds, Context.User.Id);
 
                 await ModifyOriginalResponseAsync(x =>
                 {
                     x.Attachments = files;
                     x.Embeds = embeds;
-                    x.Components = components.Build();
+                    x.Components = components;
                 });
             }
             catch (Exception ex)

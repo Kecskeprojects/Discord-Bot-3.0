@@ -1,6 +1,8 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
 using Discord_Bot.Communication.Bias;
+using Discord_Bot.Core;
+using Discord_Bot.Core.Configuration;
 using Discord_Bot.Interfaces.Services;
 using PuppeteerSharp;
 using PuppeteerSharp.Input;
@@ -11,49 +13,45 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Services
 {
-    public class KpopDbScraper : IKpopDbScraper
+    public class KpopDbScraper(Config config, Logging logger) : IKpopDbScraper
     {
         private static Uri BaseUrl { get; } = new("https://dbkpop.com/db/all-k-pop-idols/");
+        private readonly Config config = config;
+        private readonly Logging logger = logger;
 
-        public async Task<List<ExtendedBiasData>> ExtractFromDatabaseTable(IPage page)
+        public async Task<List<ExtendedBiasData>> ExtractFromDatabaseTableAsync()
         {
-            IDocument document = await GetPageAndSetSettings(page);
-
-            IElement table = document.QuerySelector("#table_1>tbody");
-
-            IHtmlCollection<IElement> rows = table.GetElementsByTagName("tr");
-
             List<ExtendedBiasData> biasDataList = [];
-            foreach (IElement row in rows)
+            try
             {
-                biasDataList.Add(new ExtendedBiasData(row));
+                IPage mainPage = await BrowserService.CreateNewPage(logger, config);
+
+                IDocument document = await GetPageAndSetSettingsAsync(mainPage);
+
+                IElement table = document.QuerySelector("#table_1>tbody");
+
+                IHtmlCollection<IElement> rows = table.GetElementsByTagName("tr");
+
+                foreach (IElement row in rows)
+                {
+                    biasDataList.Add(new ExtendedBiasData(row));
+                }
+
+                await mainPage.CloseAsync();
+            }
+            catch (NavigationException ex)
+            {
+                logger.Warning("KpopDbScraper.cs ExtractFromDatabaseTableAsync", ex);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("KpopDbScraper.cs ExtractFromDatabaseTableAsync", ex);
             }
 
             return biasDataList;
         }
 
-        public async Task<AdditionalIdolData> GetProfileDataAsync(IPage page, string url, bool getGroupData)
-        {
-            Uri uri = new(url);
-            IDocument document = await GetPageByUrl(page, uri, url.StartsWith("https://kprofiles.com/"));
-
-            //A profile link could lead to dbkpop or kprofiles
-            AdditionalIdolData data = new();
-            if (!url.StartsWith("https://kprofiles.com/"))
-            {
-                data.ImageUrl = document.QuerySelector(".attachment-post-thumbnail")?.GetAttribute("src");
-                await ScrapeGroupData(data, page, document, getGroupData);
-            }
-            else
-            {
-                data.ImageUrl = document.QuerySelector(".entry-content img")?.GetAttribute("src");
-            }
-
-            return data;
-        }
-
-        #region Helper Methods
-        private static async Task<IDocument> GetPageAndSetSettings(IPage page)
+        private static async Task<IDocument> GetPageAndSetSettingsAsync(IPage page)
         {
             await page.DeleteCookieAsync();
             try
@@ -81,6 +79,40 @@ namespace Discord_Bot.Services
             return document;
         }
 
+        public async Task<AdditionalIdolData> GetProfileDataAsync(string url, bool getGroupData)
+        {
+            AdditionalIdolData idolData = null;
+            try
+            {
+                IPage mainPage = await BrowserService.CreateNewPage(logger, config);
+
+                Uri uri = new(url);
+                IDocument document = await GetPageByUrl(mainPage, uri, url.StartsWith("https://kprofiles.com/"));
+
+                //A profile link could lead to dbkpop or kprofiles
+                AdditionalIdolData data = new();
+                if (!url.StartsWith("https://kprofiles.com/"))
+                {
+                    data.ImageUrl = document.QuerySelector(".attachment-post-thumbnail")?.GetAttribute("src");
+                    await ScrapeGroupData(data, mainPage, document, getGroupData);
+                }
+                else
+                {
+                    data.ImageUrl = document.QuerySelector(".entry-content img")?.GetAttribute("src");
+                }
+
+                await mainPage.CloseAsync();
+            }
+            catch (NavigationException ex)
+            {
+                logger.Warning("BiasDatabaseService.cs GetAdditionalBiasDataAsync", ex);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("BiasDatabaseService.cs GetAdditionalBiasDataAsync", ex);
+            }
+            return idolData;
+        }
         private static async Task ScrapeGroupData(AdditionalIdolData data, IPage page, IDocument document, bool getGroupData)
         {
             IHtmlCollection<IElement> groups = document.QuerySelectorAll("li>a[href*=\"https://dbkpop.com/group\"]");
@@ -104,6 +136,7 @@ namespace Discord_Bot.Services
             }
         }
 
+        #region Helper Methods
         private static async Task<IDocument> GetPageByUrl(IPage page, Uri uri, bool isKprofiles)
         {
             await page.DeleteCookieAsync();

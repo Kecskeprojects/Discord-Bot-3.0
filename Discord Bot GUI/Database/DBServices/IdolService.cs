@@ -36,7 +36,8 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 if (await idolRepository.ExistsAsync(
-                    i => i.Name == idolName && i.Group.Name == idolGroup,
+                    i => i.Name == idolName
+                    && i.Group.Name == idolGroup,
                     i => i.Group))
                 {
                     logger.Log($"Idol [{idolName}]-[{idolGroup}] is already in database!");
@@ -95,8 +96,8 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 Idol idol = await idolRepository.FirstOrDefaultAsync(
-                    i => i.Name == idolName &&
-                    i.Group.Name == idolGroup,
+                    i => i.Name == idolName
+                    && i.Group.Name == idolGroup,
                     i => i.Group);
                 if (idol != null)
                 {

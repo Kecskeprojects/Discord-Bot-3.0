@@ -4,16 +4,22 @@ using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
-using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Processors;
+using Discord_Bot.Processors.EmbedProcessors;
 using System;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Commands
+namespace Discord_Bot.Commands.Owner
 {
-    public class BiasOwnerCommands(IBiasDatabaseService biasDatabaseService, IIdolService idolService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
+    public class OwnerBiasCommands(
+        IIdolService idolService,
+        IServerService serverService,
+        BiasScrapingProcessor biasScrapingProcessor,
+        Logging logger,
+        Config config) : BaseCommand(logger, config, serverService)
     {
-        private readonly IBiasDatabaseService biasDatabaseService = biasDatabaseService;
         private readonly IIdolService idolService = idolService;
+        private readonly BiasScrapingProcessor biasScrapingProcessor = biasScrapingProcessor;
 
         [Command("biaslist add")]
         [RequireOwner]
@@ -46,7 +52,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasOwnerCommands.cs AddBiasList", ex);
+                logger.Error("OwnerBiasCommands.cs AddBiasList", ex);
             }
         }
 
@@ -77,29 +83,29 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasOwnerCommands.cs RemoveBiasList", ex);
+                logger.Error("OwnerBiasCommands.cs RemoveBiasList", ex);
             }
         }
 
         [Command("manual update bias")]
-        [RequireOwner]
         [Alias(["manual update idol", "mass update bias", "mass update idol"])]
+        [RequireOwner]
         [Summary("Update the extended information of idols manually from www.dbkpop.com")]
         public async Task ManualUpdateBias()
         {
             try
             {
-                await biasDatabaseService.RunUpdateBiasDataAsync();
+                await biasScrapingProcessor.RunUpdateBiasDataAsync();
             }
             catch (Exception ex)
             {
-                logger.Error("BiasOwnerCommands.cs ManualUpdateBias", ex);
+                logger.Error("OwnerBiasCommands.cs ManualUpdateBias", ex);
             }
         }
 
         [Command("edit biasdata")]
-        [RequireOwner]
         [Alias(["editbiasdata", "edit bias data", "edit bias", "editbias", "editidol", "edit idol", "editidoldata", "edit idol data", "edit idoldata"])]
+        [RequireOwner]
         [Summary("Edit bias related data")]
         public async Task EditBiasData([Remainder] string biasData)
         {
@@ -124,24 +130,13 @@ namespace Discord_Bot.Commands
                     return;
                 }
 
-                SelectMenuBuilder menuBuilder = new SelectMenuBuilder()
-                    .WithPlaceholder("Select edit type")
-                    .WithCustomId("EditIdolData")
-                    .AddOption("Edit Group", $"{BiasEditActionTypeEnum.EditGroup};{biasName};{biasGroup}", "Edit group currently related to idol")
-                    .AddOption("Edit Idol", $"{BiasEditActionTypeEnum.EditIdol};{biasName};{biasGroup}", "Edit idol in question")
-                    .AddOption("Edit Idol Extended", $"{BiasEditActionTypeEnum.EditIdolExtended};{biasName};{biasGroup}", "Edit idol's extra details")
-                    .AddOption("Change Group", $"{BiasEditActionTypeEnum.ChangeGroup};{biasName};{biasGroup}", "Change the group the idol belongs to")
-                    .AddOption("Change Profile Link", $"{BiasEditActionTypeEnum.ChangeProfileLink};{biasName};{biasGroup}", "Edit idol's profile page link")
-                    .AddOption("Remove Images", $"{BiasEditActionTypeEnum.RemoveImage};{biasName};{biasGroup}", "Remove all images stored for idol");
+                MessageComponent component = EditBiasDataEmbedProcessor.CreateComponent(biasName, biasGroup);
 
-                ComponentBuilder builder = new();
-                builder.WithSelectMenu(menuBuilder);
-
-                await ReplyAsync("What action would you like to perform", components: builder.Build());
+                await ReplyAsync("What action would you like to perform", components: component);
             }
             catch (Exception ex)
             {
-                logger.Error("BiasOwnerCommands.cs EditBiasData", ex);
+                logger.Error("OwnerBiasCommands.cs EditBiasData", ex);
             }
         }
     }
