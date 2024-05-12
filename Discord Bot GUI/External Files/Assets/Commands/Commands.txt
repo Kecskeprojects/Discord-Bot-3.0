@@ -39,7 +39,7 @@ Last.fm commands:
 !lf conn [username]		Connect last.fm username to you (DM)
 !lf del		Disconnect last.fm username from you (DM)
 !lf np		Song you are currently playing (DM)
-!lf rc [length(1-30)]		Your most recent song (DM)
+!lf rc [length(1-30)]		Your most recent songs (DM)
 !lf tar [length(1-30)] [*period]		Your top artists (DM)
 !lf tal [length(1-30)] [*period]		Your top albums (DM)
 !lf tt [length(1-30)] [*period]		Your top tracks (DM)

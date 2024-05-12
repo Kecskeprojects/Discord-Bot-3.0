@@ -1,9 +1,9 @@
-﻿using Discord.WebSocket;
-using Discord;
+﻿using Discord;
+using Discord.WebSocket;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Discord_Bot.Processors.EmbedProcessors

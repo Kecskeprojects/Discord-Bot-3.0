@@ -15,9 +15,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Commands
+namespace Discord_Bot.Commands.User
 {
-    public class BiasCommands(
+    public class UserBiasCommands(
         IUserIdolService userIdolService,
         IIdolService idolService,
         IIdolGroupService idolGroupService,
@@ -29,7 +29,6 @@ namespace Discord_Bot.Commands
         private readonly IIdolService idolService = idolService;
         private readonly IIdolGroupService idolGroupService = idolGroupService;
 
-        #region Bias management commands
         [Command("bias add")]
         [Summary("Command for adding a new bias into a user's list")]
         public async Task AddBias([Remainder] string biasData)
@@ -38,7 +37,7 @@ namespace Discord_Bot.Commands
             {
                 if (Context.Channel.GetChannelType() != ChannelType.DM)
                 {
-                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    ServerResource server = await GetCurrentServerAsync();
                     if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
                     {
                         return;
@@ -98,7 +97,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasCommands.cs AddBias", ex);
+                logger.Error("UserBiasCommands.cs AddBias", ex);
             }
         }
 
@@ -110,7 +109,7 @@ namespace Discord_Bot.Commands
             {
                 if (Context.Channel.GetChannelType() != ChannelType.DM)
                 {
-                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    ServerResource server = await GetCurrentServerAsync();
                     if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
                     {
                         return;
@@ -162,7 +161,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasCommands.cs RemoveBias", ex);
+                logger.Error("UserBiasCommands.cs RemoveBias", ex);
             }
         }
 
@@ -174,7 +173,7 @@ namespace Discord_Bot.Commands
             {
                 if (Context.Channel.GetChannelType() != ChannelType.DM)
                 {
-                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    ServerResource server = await GetCurrentServerAsync();
                     if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
                     {
                         return;
@@ -193,7 +192,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasCommands.cs ClearBias", ex);
+                logger.Error("UserBiasCommands.cs ClearBias", ex);
             }
         }
 
@@ -206,7 +205,7 @@ namespace Discord_Bot.Commands
             {
                 if (Context.Channel.GetChannelType() != ChannelType.DM)
                 {
-                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    ServerResource server = await GetCurrentServerAsync();
                     if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
                     {
                         return;
@@ -262,21 +261,19 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasCommands.cs MyBiases", ex);
+                logger.Error("UserBiasCommands.cs MyBiases", ex);
             }
         }
-        #endregion
 
-        #region List biases command
         [Command("bias list")]
         [Summary("Command for checking our biases as a whole")]
         public async Task BiasList([Remainder] string groupName = "")
         {
             try
             {
-                if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+                if (Context.Channel.GetChannelType() != ChannelType.DM)
                 {
-                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                    ServerResource server = await GetCurrentServerAsync();
                     if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
                     {
                         return;
@@ -306,12 +303,10 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasCommands.cs BiasList", ex);
+                logger.Error("UserBiasCommands.cs BiasList", ex);
             }
         }
-        #endregion
 
-        #region Ping command
         [Command("ping")]
         [RequireContext(ContextType.Guild)]
         [Summary("Command for pinging biases")]
@@ -377,9 +372,8 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("BiasCommands.cs PingBias", ex);
+                logger.Error("UserBiasCommands.cs PingBias", ex);
             }
         }
-        #endregion
     }
 }

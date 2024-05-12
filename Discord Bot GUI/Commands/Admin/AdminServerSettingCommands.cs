@@ -15,10 +15,10 @@ using System.Threading.Tasks;
 namespace Discord_Bot.Commands.Admin
 {
     public class AdminServerSettingCommands(
-        IServerService serverService,
         IChannelService channelService,
         ITwitchChannelService twitchChannelService,
         ITwitchCLI twitchCLI,
+        IServerService serverService,
         Logging logger,
         Config config) : BaseCommand(logger, config, serverService)
     {
