@@ -4,13 +4,9 @@ using Discord_Bot.Features;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
-using Discord_Bot.Services.Models.Twitch;
 using Discord_Bot.Tools;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TwitchLib.Api.Services;
@@ -19,7 +15,12 @@ using TwitchLib.Api.Services.Events.LiveStreamMonitor;
 
 namespace Discord_Bot.Services
 {
-    public class TwitchAPI(ITwitchChannelService twitchChannelService, TwitchNotificationFeature twitchNotificationFeature, Logging logger, Config config) : ITwitchAPI
+    public class TwitchAPI(
+        ITwitchCLI twitchCLI,
+        ITwitchChannelService twitchChannelService,
+        TwitchNotificationFeature twitchNotificationFeature,
+        Logging logger,
+        Config config) : ITwitchAPI
     {
         #region Variables
         //Saved variables
@@ -28,6 +29,7 @@ namespace Discord_Bot.Services
         private static readonly Dictionary<string, bool> channelStatuses = [];
         private static string Token;
         private static int TokenTick = 0;
+        private readonly ITwitchCLI twitchCLI = twitchCLI;
         private readonly ITwitchChannelService twitchChannelService = twitchChannelService;
         private readonly TwitchNotificationFeature twitchNotificationFeature = twitchNotificationFeature;
         private readonly Logging logger = logger;
@@ -42,7 +44,7 @@ namespace Discord_Bot.Services
             {
                 logger.Log("Twitch monitoring starting!");
 
-                Token = GenerateToken();
+                Token = twitchCLI.GenerateToken();
 
                 await Check();
             }
@@ -158,7 +160,7 @@ namespace Discord_Bot.Services
                 TokenTick++;
                 if (TokenTick > 1440)
                 {
-                    Token = GenerateToken();
+                    Token = twitchCLI.GenerateToken();
                     TokenTick = 0;
                 }
 
@@ -210,62 +212,6 @@ namespace Discord_Bot.Services
         #endregion
 
         #region Helper Methods
-        //Responsible for generating the access tokens to Twitch's api requests
-        private string GenerateToken()
-        {
-            Process process = new()
-            {
-                StartInfo = new ProcessStartInfo()
-                {
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    FileName = "cmd.exe",
-                    Arguments = "/C twitch.exe token",
-                    RedirectStandardError = true,
-                    RedirectStandardOutput = true,
-                    WorkingDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Dependencies")
-                }
-            };
-            process.Start();
-            string response = process.StandardError.ReadToEnd();
-            process.WaitForExit();
-
-            response = response.Substring(response.IndexOf("Token: ") + 7, 30);
-            logger.Query($"Twitch API token: {response}");
-            return response;
-        }
-
-        //Get user data by username
-        public UserData GetChannel(string username)
-        {
-            Process process = new()
-            {
-                StartInfo = new ProcessStartInfo()
-                {
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    FileName = "cmd.exe",
-                    Arguments = $"/C twitch.exe api get users?login={username.ToLower()}",
-                    RedirectStandardError = true,
-                    RedirectStandardOutput = true,
-                    WorkingDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Dependencies")
-                }
-            };
-            process.Start();
-            string response = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
-
-            User twitchUser = JsonConvert.DeserializeObject<User>(response);
-
-            if (twitchUser == null || CollectionTools.IsNullOrEmpty(twitchUser.Response))
-            {
-                return null;
-            }
-
-            logger.Query($"Twitch user found: {twitchUser.Response[0].DisplayName}");
-
-            return twitchUser.Response[0];
-        }
 
         private async Task<List<string>> GetChannelsAsync()
         {

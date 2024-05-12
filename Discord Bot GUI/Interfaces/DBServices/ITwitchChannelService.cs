@@ -9,7 +9,6 @@ namespace Discord_Bot.Interfaces.DBServices
     {
         Task<DbProcessResultEnum> AddTwitchChannelAsync(ulong serverId, string twitchUserId, string twitchUserName);
         Task<List<TwitchChannelResource>> GetChannelsAsync();
-        Task<DbProcessResultEnum> RemoveTwitchChannelAsync(ulong serverId, string name);
-        Task<DbProcessResultEnum> RemoveTwitchChannelsAsync(ulong serverId);
+        Task<DbProcessResultEnum> RemoveTwitchChannelAsync(ulong serverId, string name = "");
     }
 }

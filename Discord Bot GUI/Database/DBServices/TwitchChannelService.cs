@@ -30,7 +30,8 @@ namespace Discord_Bot.Database.DBServices
                 }
 
                 if (await twitchChannelRepository.ExistsAsync(
-                    tc => tc.Server.DiscordId == serverId.ToString() && tc.TwitchId == twitchUserId,
+                    tc => tc.Server.DiscordId == serverId.ToString()
+                    && tc.TwitchId == twitchUserId,
                     tc => tc.Server))
                 {
                     return DbProcessResultEnum.AlreadyExists;
@@ -79,37 +80,13 @@ namespace Discord_Bot.Database.DBServices
             return result;
         }
 
-        public async Task<DbProcessResultEnum> RemoveTwitchChannelAsync(ulong serverId, string name)
-        {
-            try
-            {
-                TwitchChannel channel = await twitchChannelRepository.FirstOrDefaultAsync(
-                    tc => tc.Server.DiscordId == serverId.ToString() && tc.TwitchName == name,
-                    tc => tc.Server);
-                if (channel == null)
-                {
-                    return DbProcessResultEnum.NotFound;
-                }
-
-                await twitchChannelRepository.RemoveAsync(channel);
-
-                cache.RemoveCachedEntityManually(serverId);
-
-                return DbProcessResultEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("TwitchChannelService.cs RemoveTwitchChannelAsync", ex);
-            }
-            return DbProcessResultEnum.Failure;
-        }
-
-        public async Task<DbProcessResultEnum> RemoveTwitchChannelsAsync(ulong serverId)
+        public async Task<DbProcessResultEnum> RemoveTwitchChannelAsync(ulong serverId, string name = "")
         {
             try
             {
                 List<TwitchChannel> channels = await twitchChannelRepository.GetListAsync(
-                    tc => tc.Server.DiscordId == serverId.ToString(),
+                    tc => tc.Server.DiscordId == serverId.ToString()
+                    && (string.IsNullOrEmpty(name) || tc.TwitchName == name),
                     tc => tc.Server);
                 if (CollectionTools.IsNullOrEmpty(channels))
                 {
@@ -124,7 +101,7 @@ namespace Discord_Bot.Database.DBServices
             }
             catch (Exception ex)
             {
-                logger.Error("TwitchChannelService.cs RemoveTwitchChannelsAsync", ex);
+                logger.Error("TwitchChannelService.cs RemoveTwitchChannelAsync", ex);
             }
             return DbProcessResultEnum.Failure;
         }

@@ -83,6 +83,7 @@ namespace Discord_Bot.Core
 
             //Services
             collection.AddTransient<ITwitchAPI, TwitchAPI>();
+            collection.AddTransient<ITwitchCLI, TwitchCLI>();
             collection.AddTransient<ISpotifyAPI, Services.SpotifyAPI>();
             collection.AddTransient<IYoutubeAPI, YoutubeAPI>();
             collection.AddTransient<IInstaLoader, InstaLoader>();

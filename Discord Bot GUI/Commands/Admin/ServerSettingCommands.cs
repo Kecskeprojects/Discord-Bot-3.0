@@ -1,91 +1,51 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord_Bot.CommandsService;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Processors.EmbedProcessors;
 using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.Twitch;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Commands
+namespace Discord_Bot.Commands.Admin
 {
-    public class AdminCommands(
+    public class ServerSettingCommands(
         IServerService serverService,
         IChannelService channelService,
         ITwitchChannelService twitchChannelService,
-        ITwitchAPI twitchAPI,
+        ITwitchCLI twitchCLI,
         Logging logger,
-        Config config) : BaseCommand(logger, config, serverService), IAdminCommands
+        Config config) : BaseCommand(logger, config, serverService)
     {
         private readonly IChannelService channelService = channelService;
         private readonly ITwitchChannelService twitchChannelService = twitchChannelService;
-        private readonly ITwitchAPI twitchAPI = twitchAPI;
+        private readonly ITwitchCLI twitchCLI = twitchCLI;
 
-        [Command("help admin")]
-        [Alias(["help a"])]
+        [Command("server settings")]
+        [Alias(["serversettings", "serversetting", "server setting"])]
         [RequireUserPermission(ChannelPermission.ManageChannels)]
         [RequireContext(ContextType.Guild)]
-        [Summary("Embed complete list of commands in a text file")]
-        public async Task Help()
+        [Summary("Lists server settings")]
+        public async Task ServerSettings()
         {
             try
             {
-                Dictionary<string, string> commands = [];
+                ServerResource server = await GetCurrentServerAsync();
+                Embed[] embed = ServerSettingEmbedProcessor.CreateEmbed(server, Context.Guild.TextChannels, config.Img);
 
-                if (!File.Exists("Assets\\Commands\\Admin_Commands.txt"))
-                {
-                    await ReplyAsync("List of commands can't be found!");
-                    return;
-                }
-
-                AdminService.ReadCommandsFile(commands);
-                EmbedBuilder builder = AdminService.BuildHelpEmbed(commands, config.Img);
-
-                await ReplyAsync("", false, builder.Build());
+                await ReplyAsync(embeds: embed);
             }
             catch (Exception ex)
             {
-                logger.Error("AdminCommands.cs Help", ex);
+                logger.Error("AdminCommands.cs ServerSettings", ex);
             }
         }
 
-        [Command("feature")]
-        [Alias(["features"])]
-        [RequireUserPermission(ChannelPermission.ManageChannels)]
-        [RequireContext(ContextType.Guild)]
-        [Summary("Embed complete list of features")]
-        public async Task Features()
-        {
-            try
-            {
-                Dictionary<string, string> commands = [];
-
-                if (!File.Exists("Assets\\Commands\\Features.txt"))
-                {
-                    await ReplyAsync("List of commands can't be found!");
-                    return;
-                }
-
-                AdminService.ReadFeaturesFile(commands);
-                EmbedBuilder builder = AdminService.BuildFeaturesEmbed(commands, config.Img);
-
-                await ReplyAsync("", false, builder.Build());
-            }
-            catch (Exception ex)
-            {
-                logger.Error("AdminCommands.cs Features", ex);
-            }
-        }
-
-        #region Server Setting
         [Command("channel add")]
         [RequireUserPermission(ChannelPermission.ManageChannels)]
         [RequireContext(ContextType.Guild)]
@@ -249,6 +209,36 @@ namespace Discord_Bot.Commands
             }
         }
 
+        [Command("twitch role remove")]
+        [RequireUserPermission(ChannelPermission.ManageChannels)]
+        [RequireContext(ContextType.Guild)]
+        [Summary("Server setting twitch role removal")]
+        public async Task TwitchRoleRemove()
+        {
+            try
+            {
+                //Removes the currently set notification role, removes server from cache
+                DbProcessResultEnum result = await serverService.RemoveNotificationRoleAsync(Context.Guild.Id);
+
+                if (result == DbProcessResultEnum.Success)
+                {
+                    await ReplyAsync("Notification role removed!");
+                }
+                else if (result == DbProcessResultEnum.NotFound)
+                {
+                    await ReplyAsync("Notification role currently not set in database!");
+                }
+                else
+                {
+                    await ReplyAsync("Notification role could not be removed!");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("AdminCommands.cs TwitchRoleRemove", ex);
+            }
+        }
+
         [Command("twitch add")]
         [RequireUserPermission(ChannelPermission.ManageChannels)]
         [RequireContext(ContextType.Guild)]
@@ -267,7 +257,7 @@ namespace Discord_Bot.Commands
                     }
                     name = uri.Segments[1].Replace("/", "");
                 }
-                UserData response = twitchAPI.GetChannel(name);
+                UserData response = twitchCLI.GetChannel(name);
 
                 if (response == null)
                 {
@@ -299,36 +289,6 @@ namespace Discord_Bot.Commands
             }
         }
 
-        [Command("twitch role remove")]
-        [RequireUserPermission(ChannelPermission.ManageChannels)]
-        [RequireContext(ContextType.Guild)]
-        [Summary("Server setting twitch role removal")]
-        public async Task TwitchRoleRemove()
-        {
-            try
-            {
-                //Removes the currently set notification role, removes server from cache
-                DbProcessResultEnum result = await serverService.RemoveNotificationRoleAsync(Context.Guild.Id);
-
-                if (result == DbProcessResultEnum.Success)
-                {
-                    await ReplyAsync("Notification role removed!");
-                }
-                else if (result == DbProcessResultEnum.NotFound)
-                {
-                    await ReplyAsync("Notification role currently not set in database!");
-                }
-                else
-                {
-                    await ReplyAsync("Notification role could not be removed!");
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("AdminCommands.cs TwitchRoleRemove", ex);
-            }
-        }
-
         [Command("twitch remove")]
         [RequireUserPermission(ChannelPermission.ManageChannels)]
         [RequireContext(ContextType.Guild)]
@@ -356,7 +316,7 @@ namespace Discord_Bot.Commands
                 else
                 {
                     //Removes every twitch channel tied to the server, removes server from cache
-                    result = await twitchChannelService.RemoveTwitchChannelsAsync(Context.Guild.Id);
+                    result = await twitchChannelService.RemoveTwitchChannelAsync(Context.Guild.Id);
                 }
 
                 if (result == DbProcessResultEnum.Success)
@@ -377,26 +337,5 @@ namespace Discord_Bot.Commands
                 logger.Error("AdminCommands.cs TwitchRemove", ex);
             }
         }
-
-        [Command("server settings")]
-        [Alias(["serversettings", "serversetting", "server setting"])]
-        [RequireUserPermission(ChannelPermission.ManageChannels)]
-        [RequireContext(ContextType.Guild)]
-        [Summary("Lists server settings")]
-        public async Task ServerSettings()
-        {
-            try
-            {
-                ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                EmbedBuilder embed = AdminService.CreateServerSettingEmbed(server, config, Context.Guild.TextChannels);
-
-                await ReplyAsync("", false, embed.Build());
-            }
-            catch (Exception ex)
-            {
-                logger.Error("AdminCommands.cs ServerSettings", ex);
-            }
-        }
-        #endregion
     }
 }
