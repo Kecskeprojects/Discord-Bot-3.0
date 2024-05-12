@@ -11,7 +11,7 @@ using Discord_Bot.Processors.EmbedProcessors;
 
 namespace Discord_Bot.Commands.Admin
 {
-    public class HelpCommands(
+    public class AdminHelpCommands(
         IServerService serverService,
         Logging logger,
         Config config) : BaseCommand(logger, config, serverService)
@@ -39,7 +39,7 @@ namespace Discord_Bot.Commands.Admin
             }
             catch (Exception ex)
             {
-                logger.Error("HelpAdminCommands.cs Help", ex);
+                logger.Error("AdminHelpCommands.cs Help", ex);
             }
         }
 
@@ -66,7 +66,7 @@ namespace Discord_Bot.Commands.Admin
             }
             catch (Exception ex)
             {
-                logger.Error("HelpAdminCommands.cs Features", ex);
+                logger.Error("AdminHelpCommands.cs Features", ex);
             }
         }
     }

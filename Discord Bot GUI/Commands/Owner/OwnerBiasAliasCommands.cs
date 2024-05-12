@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Owner
 {
-    public class BiasAliasCommands(
+    public class OwnerBiasAliasCommands(
         IIdolAliasService idolAliasService,
         IServerService serverService,
         Logging logger,
         Config config) : BaseCommand(logger, config, serverService)
     {
         private readonly IIdolAliasService idolAliasService = idolAliasService;
+
         [Command("bias alias add")]
         [RequireOwner]
         [Summary("Admin command for adding a new bias alias into our lists")]
@@ -51,7 +52,7 @@ namespace Discord_Bot.Commands.Owner
             }
             catch (Exception ex)
             {
-                logger.Error("BiasAliasCommands.cs AddBiasAlias", ex);
+                logger.Error("OwnerBiasAliasCommands.cs AddBiasAlias", ex);
             }
 
         }
@@ -88,7 +89,7 @@ namespace Discord_Bot.Commands.Owner
             }
             catch (Exception ex)
             {
-                logger.Error("BiasAliasCommands.cs RemoveBiasAlias", ex);
+                logger.Error("OwnerBiasAliasCommands.cs RemoveBiasAlias", ex);
             }
 
         }

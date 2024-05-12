@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin
 {
-    public class ServerSettingCommands(
+    public class AdminServerSettingCommands(
         IServerService serverService,
         IChannelService channelService,
         ITwitchChannelService twitchChannelService,
@@ -42,7 +42,7 @@ namespace Discord_Bot.Commands.Admin
             }
             catch (Exception ex)
             {
-                logger.Error("AdminCommands.cs ServerSettings", ex);
+                logger.Error("AdminServerSettingCommands.cs ServerSettings", ex);
             }
         }
 
@@ -108,7 +108,7 @@ namespace Discord_Bot.Commands.Admin
             }
             catch (Exception ex)
             {
-                logger.Error("AdminCommands.cs ChannelAdd", ex);
+                logger.Error("AdminServerSettingCommands.cs ChannelAdd", ex);
             }
         }
 
@@ -169,7 +169,7 @@ namespace Discord_Bot.Commands.Admin
             }
             catch (Exception ex)
             {
-                logger.Error("AdminCommands.cs ChannelRemove", ex);
+                logger.Error("AdminServerSettingCommands.cs ChannelRemove", ex);
             }
         }
 
@@ -205,7 +205,7 @@ namespace Discord_Bot.Commands.Admin
             }
             catch (Exception ex)
             {
-                logger.Error("AdminCommands.cs TwitchRoleAdd", ex);
+                logger.Error("AdminServerSettingCommands.cs TwitchRoleAdd", ex);
             }
         }
 
@@ -235,7 +235,7 @@ namespace Discord_Bot.Commands.Admin
             }
             catch (Exception ex)
             {
-                logger.Error("AdminCommands.cs TwitchRoleRemove", ex);
+                logger.Error("AdminServerSettingCommands.cs TwitchRoleRemove", ex);
             }
         }
 
@@ -285,7 +285,7 @@ namespace Discord_Bot.Commands.Admin
             }
             catch (Exception ex)
             {
-                logger.Error("AdminCommands.cs TwitchAdd", ex);
+                logger.Error("AdminServerSettingCommands.cs TwitchAdd", ex);
             }
         }
 
@@ -334,7 +334,7 @@ namespace Discord_Bot.Commands.Admin
             }
             catch (Exception ex)
             {
-                logger.Error("AdminCommands.cs TwitchRemove", ex);
+                logger.Error("AdminServerSettingCommands.cs TwitchRemove", ex);
             }
         }
     }
