@@ -27,12 +27,7 @@ namespace Discord_Bot.Services
         {
             try
             {
-                if (BrowserService.Browser == null || BrowserService.Browser.IsClosed)
-                {
-                    await BrowserService.OpenBroser(config);
-                }
-
-                IPage mainPage = await BrowserService.CreateNewPage(logger);
+                IPage mainPage = await BrowserService.CreateNewPage(logger, config);
                 mainPage.Response += TwitterScraperResponse;
 
                 TwitterScrapingResult result = new();

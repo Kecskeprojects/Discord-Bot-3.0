@@ -5,6 +5,7 @@ using Discord_Bot.Core.Configuration;
 using Discord_Bot.Features;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Processors;
 using Discord_Bot.Services;
 using Discord_Bot.Windows;
 using Microsoft.Extensions.DependencyInjection;
@@ -102,8 +103,8 @@ namespace Discord_Bot
                             {
                                 using (IServiceScope scope = services.CreateScope())
                                 {
-                                    IBiasDatabaseService biasDatabaseService = scope.ServiceProvider.GetService<IBiasDatabaseService>();
-                                    await biasDatabaseService.RunUpdateBiasDataAsync();
+                                    BiasScrapingProcessor biasScrapingProcessor = scope.ServiceProvider.GetService<BiasScrapingProcessor>();
+                                    await biasScrapingProcessor.RunUpdateBiasDataAsync();
                                 }
                             });
                         }
