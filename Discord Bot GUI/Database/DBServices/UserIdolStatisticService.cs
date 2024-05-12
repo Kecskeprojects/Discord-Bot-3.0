@@ -38,7 +38,10 @@ namespace Discord_Bot.Database.DBServices
                 {
                     int idolId = ranking.Pop();
                     UserIdolStatistic userIdolStatistic = await userIdolStatisticRepository
-                        .FirstOrDefaultAsync(x => x.User.DiscordId == userId.ToString() && idolId == x.IdolId, x => x.User);
+                        .FirstOrDefaultAsync(i =>
+                            i.User.DiscordId == userId.ToString()
+                            && idolId == i.IdolId,
+                            i => i.User);
 
                     if (userIdolStatistic == null)
                     {

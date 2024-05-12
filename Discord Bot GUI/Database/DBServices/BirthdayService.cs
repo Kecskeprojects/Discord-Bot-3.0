@@ -29,8 +29,8 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 Birthday birthday = await birthdayRepository.FirstOrDefaultAsync(
-                    b => b.Server.DiscordId == serverId.ToString() &&
-                    b.User.DiscordId == userId.ToString(),
+                    b => b.Server.DiscordId == serverId.ToString()
+                    && b.User.DiscordId == userId.ToString(),
                     b => b.Server);
                 DateOnly datePart = DateOnly.FromDateTime(date);
 
@@ -76,8 +76,8 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 birthday = await birthdayRepository.GetListAsync(
-                    b => b.Date.Month == DateTime.UtcNow.Month &&
-                    b.Date.Day == DateTime.UtcNow.Day,
+                    b => b.Date.Month == DateTime.UtcNow.Month
+                    && b.Date.Day == DateTime.UtcNow.Day,
                     b => b.Server);
             }
             catch (Exception ex)
@@ -106,8 +106,8 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 Birthday birthday = await birthdayRepository.FirstOrDefaultAsync(
-                    b => b.Server.DiscordId == serverId.ToString() &&
-                    b.User.DiscordId == userId.ToString(),
+                    b => b.Server.DiscordId == serverId.ToString()
+                    && b.User.DiscordId == userId.ToString(),
                     b => b.Server);
                 if (birthday != null)
                 {

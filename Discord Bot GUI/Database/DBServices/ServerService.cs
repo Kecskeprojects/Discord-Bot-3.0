@@ -75,9 +75,9 @@ namespace Discord_Bot.Database.DBServices
                     return DbProcessResultEnum.NotFound;
                 }
 
-                Role role = await roleRepository.FirstOrDefaultAsync(
-                    r => r.Server.DiscordId == serverId.ToString() &&
-                         r.RoleName.Trim().ToLower().Equals(roleName.Trim().ToLower()),
+                Role role = await roleRepository.FirstOrDefaultAsync( r =>
+                    r.Server.DiscordId == serverId.ToString()
+                    && r.RoleName.Trim().ToLower().Equals(roleName.Trim().ToLower()),
                     r => r.Server);
                 role ??= new()
                 {
@@ -145,9 +145,9 @@ namespace Discord_Bot.Database.DBServices
                 }
 
                 Server server = await serverRepository.FirstOrDefaultAsync(s =>
-                s.DiscordId == serverId.ToString(),
-                s => s.TwitchChannels,
-                s => s.NotificationRole);
+                    s.DiscordId == serverId.ToString(),
+                    s => s.TwitchChannels,
+                    s => s.NotificationRole);
                 if (server == null)
                 {
                     return null;

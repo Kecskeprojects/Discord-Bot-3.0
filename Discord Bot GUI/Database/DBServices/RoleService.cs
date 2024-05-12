@@ -27,7 +27,8 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 if (await roleRepository.ExistsAsync(
-                    r => r.Server.DiscordId == serverId.ToString() && r.DiscordId == roleId.ToString(),
+                    r => r.Server.DiscordId == serverId.ToString()
+                    && r.DiscordId == roleId.ToString(),
                     r => r.Server))
                 {
                     return DbProcessResultEnum.AlreadyExists;
@@ -60,9 +61,9 @@ namespace Discord_Bot.Database.DBServices
             RoleResource result = null;
             try
             {
-                Role role = await roleRepository.FirstOrDefaultAsync(
-                    r => r.Server.DiscordId == serverId.ToString() &&
-                         r.RoleName.Trim().ToLower().Equals(roleName.Trim().ToLower()),
+                Role role = await roleRepository.FirstOrDefaultAsync(r =>
+                    r.Server.DiscordId == serverId.ToString()
+                    && r.RoleName.Trim().ToLower().Equals(roleName.Trim().ToLower()),
                     r => r.Server);
                 result = mapper.Map<Role, RoleResource>(role);
             }
@@ -94,9 +95,9 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                Role role = await roleRepository.FirstOrDefaultAsync(
-                    r => r.Server.DiscordId == serverId.ToString() &&
-                         r.RoleName.Trim().ToLower().Equals(roleName.Trim().ToLower()));
+                Role role = await roleRepository.FirstOrDefaultAsync(r =>
+                    r.Server.DiscordId == serverId.ToString()
+                    && r.RoleName.Trim().ToLower().Equals(roleName.Trim().ToLower()));
                 if (role != null)
                 {
                     await roleRepository.RemoveAsync(role);

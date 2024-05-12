@@ -30,8 +30,8 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 Channel channel = await channelRepository.FirstOrDefaultAsync(
-                    c => c.Server.DiscordId == serverId.ToString() &&
-                    c.DiscordId == channelId.ToString(),
+                    c => c.Server.DiscordId == serverId.ToString()
+                    && c.DiscordId == channelId.ToString(),
                     c => c.Server);
 
                 ChannelType channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int)channelTypeId);
@@ -49,9 +49,9 @@ namespace Discord_Bot.Database.DBServices
                 if (ChannelTypeNameCollections.RestrictedChannelTypes.Contains(channelTypeId))
                 {
                     List<Channel> channels = await channelRepository.GetListAsync(
-                        c => c.Server.DiscordId == serverId.ToString() &&
-                        c.DiscordId != channelId.ToString() &&
-                        c.ChannelTypes.FirstOrDefault(ct => ct.ChannelTypeId == (int)channelTypeId) != null,
+                        c => c.Server.DiscordId == serverId.ToString()
+                        && c.DiscordId != channelId.ToString()
+                        && c.ChannelTypes.FirstOrDefault(ct => ct.ChannelTypeId == (int)channelTypeId) != null,
                         c => c.ChannelTypes,
                         c => c.Server);
                     channels.ForEach((channel) => { channel.ChannelTypes.Remove(channelType); });
@@ -96,8 +96,8 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 Channel channel = await channelRepository.FirstOrDefaultAsync(
-                    c => c.Server.DiscordId == serverId.ToString() &&
-                    c.DiscordId == channelId.ToString(),
+                    c => c.Server.DiscordId == serverId.ToString()
+                    && c.DiscordId == channelId.ToString(),
                     c => c.Server);
                 ChannelType channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int)channelTypeId);
                 if (channelType == null)
@@ -136,8 +136,8 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 List<Channel> channels = await channelRepository.GetListAsync(
-                        c => c.Server.DiscordId == serverId.ToString() &&
-                        c.ChannelTypes.FirstOrDefault(ct => ct.ChannelTypeId == (int)channelTypeId) != null,
+                        c => c.Server.DiscordId == serverId.ToString()
+                        && c.ChannelTypes.FirstOrDefault(ct => ct.ChannelTypeId == (int)channelTypeId) != null,
                         c => c.ChannelTypes,
                         c => c.Server);
                 ChannelType channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int)channelTypeId);

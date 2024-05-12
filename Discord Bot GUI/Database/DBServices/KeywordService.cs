@@ -26,8 +26,8 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 if (await keywordRepository.ExistsAsync(
-                    kw => kw.Server.DiscordId == serverId.ToString() &&
-                    kw.Trigger.Trim().ToLower().Equals(trigger.Trim().ToLower()),
+                    kw => kw.Server.DiscordId == serverId.ToString()
+                    && kw.Trigger.Trim().ToLower().Equals(trigger.Trim().ToLower()),
                     kw => kw.Server))
                 {
                     return DbProcessResultEnum.AlreadyExists;
@@ -60,8 +60,8 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 Keyword keyword = await keywordRepository.FirstOrDefaultAsync(
-                    kw => kw.Server.DiscordId == serverId.ToString() &&
-                    kw.Trigger.Trim().ToLower().Equals(trigger.Trim().ToLower()),
+                    kw => kw.Server.DiscordId == serverId.ToString()
+                    && kw.Trigger.Trim().ToLower().Equals(trigger.Trim().ToLower()),
                     kw => kw.Server);
                 result = mapper.Map<Keyword, KeywordResource>(keyword);
             }
@@ -77,8 +77,8 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 Keyword keyword = await keywordRepository.FirstOrDefaultAsync(
-                    kw => kw.Server.DiscordId == serverId.ToString() &&
-                    kw.Trigger.Trim().ToLower().Equals(trigger.Trim().ToLower()),
+                    kw => kw.Server.DiscordId == serverId.ToString()
+                    && kw.Trigger.Trim().ToLower().Equals(trigger.Trim().ToLower()),
                     kw => kw.Server);
                 if (keyword != null)
                 {

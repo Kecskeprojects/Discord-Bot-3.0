@@ -27,8 +27,8 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 if (await customCommandRepository.ExistsAsync(
-                    cc => cc.Server.DiscordId == serverId.ToString() &&
-                    cc.Command.Trim().ToLower().Equals(commandName.Trim().ToLower()),
+                    cc => cc.Server.DiscordId == serverId.ToString()
+                    && cc.Command.Trim().ToLower().Equals(commandName.Trim().ToLower()),
                     cc => cc.Server))
                 {
                     return DbProcessResultEnum.AlreadyExists;
@@ -62,8 +62,8 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 CustomCommand command = await customCommandRepository.FirstOrDefaultAsync(
-                    cc => cc.Server.DiscordId == serverId.ToString() &&
-                    cc.Command.Trim().ToLower().Equals(commandName.Trim().ToLower()),
+                    cc => cc.Server.DiscordId == serverId.ToString()
+                    && cc.Command.Trim().ToLower().Equals(commandName.Trim().ToLower()),
                     cc => cc.Server);
                 result = mapper.Map<CustomCommand, CustomCommandResource>(command);
             }
@@ -98,8 +98,8 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 CustomCommand customCommand = await customCommandRepository.FirstOrDefaultAsync(
-                    cc => cc.Server.DiscordId == serverId.ToString() &&
-                    cc.Command.Trim().ToLower().Equals(commandName.Trim().ToLower()),
+                    cc => cc.Server.DiscordId == serverId.ToString()
+                    && cc.Command.Trim().ToLower().Equals(commandName.Trim().ToLower()),
                     cc => cc.Server);
                 if (customCommand != null)
                 {

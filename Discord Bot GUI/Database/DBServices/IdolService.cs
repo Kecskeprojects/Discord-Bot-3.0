@@ -76,8 +76,8 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 List<Idol> idols = await idolRepository.GetListAsync(
-                    i => string.IsNullOrEmpty(groupName) ||
-                    i.Group.Name == groupName,
+                    i => string.IsNullOrEmpty(groupName)
+                    || i.Group.Name == groupName,
                     ascending: true,
                     orderBy: i => i.Name,
                     includes: i => i.Group);
@@ -139,7 +139,11 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                Idol idol = await idolRepository.FirstOrDefaultAsync(i => i.IdolId == idolResource.IdolId, i => i.Group, i => i.IdolImages);
+                Idol idol = await idolRepository
+                    .FirstOrDefaultAsync(i =>
+                        i.IdolId == idolResource.IdolId,
+                        i => i.Group,
+                        i => i.IdolImages);
 
                 if (idol.IdolImages.Count > 3)
                 {
@@ -176,9 +180,9 @@ namespace Discord_Bot.Database.DBServices
             {
                 List<Idol> idols =
                     await idolRepository.GetListAsync(i =>
-                        i.Group.DebutDate != null &&
-                        i.DebutDate == null &&
-                        i.ProfileUrl != null,
+                        i.Group.DebutDate != null
+                        && i.DebutDate == null
+                        && i.ProfileUrl != null,
                         i => i.Group);
 
                 if (idols.Count > 0)
@@ -206,8 +210,8 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 Idol idol = await idolRepository.FirstOrDefaultAsync(
-                    i => i.Name == idolName &&
-                    i.Group.Name == idolGroup,
+                    i => i.Name == idolName
+                    && i.Group.Name == idolGroup,
                     i => i.Group);
 
                 if (idol == null)
@@ -229,7 +233,11 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                Idol idol = await idolRepository.FirstOrDefaultAsync(i => i.IdolId == idolId, i => i.Group);
+                Idol idol = await idolRepository
+                    .FirstOrDefaultAsync(i =>
+                    i.IdolId == idolId,
+                    i => i.Group);
+
                 idol.ProfileUrl = modal.ProfileURL.Trim();
                 idol.DateOfBirth = DateOnly.TryParse(modal.DateOfBirth, out DateOnly dateOfBirth) ? dateOfBirth : idol.DateOfBirth;
                 idol.Name = modal.Name.ToLower().Trim();
@@ -256,7 +264,9 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                Idol idol = await idolRepository.FirstOrDefaultAsync(i => i.IdolId == idolId);
+                Idol idol = await idolRepository
+                    .FirstOrDefaultAsync(i => i.IdolId == idolId);
+
                 idol.StageName = modal.StageName.Trim();
                 idol.KoreanStageName = modal.KoreanStageName.Trim();
                 idol.FullName = modal.FullName.Trim();
@@ -278,7 +288,9 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                Idol idol = await idolRepository.FirstOrDefaultAsync(i => i.IdolId == idolId);
+                Idol idol = await idolRepository
+                    .FirstOrDefaultAsync(i => i.IdolId == idolId);
+
                 idol.ProfileUrl = modal.ProfileURL.Trim();
                 await idolRepository.SaveChangesAsync();
 
@@ -296,7 +308,9 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
-                Idol idol = await idolRepository.FirstOrDefaultAsync(i => i.IdolId == idolId);
+                Idol idol = await idolRepository
+                    .FirstOrDefaultAsync(i => i.IdolId == idolId);
+
                 idol.Group = await idolGroupService.UpdateOrCreateGroupAsync(idol.Group, modal.Group.ToLower().Trim());
                 await idolRepository.SaveChangesAsync();
 
@@ -364,7 +378,11 @@ namespace Discord_Bot.Database.DBServices
             IdolGameResource result = null;
             try
             {
-                Idol idol = await idolRepository.FirstOrDefaultAsync(x => x.IdolId == idolId, x => x.Group, x => x.IdolImages);
+                Idol idol = await idolRepository
+                    .FirstOrDefaultAsync(i =>
+                        i.IdolId == idolId,
+                        i => i.Group,
+                        i => i.IdolImages);
 
                 result = mapper.Map<Idol, IdolGameResource>(idol);
             }

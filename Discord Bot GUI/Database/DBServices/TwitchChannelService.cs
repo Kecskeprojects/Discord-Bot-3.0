@@ -64,7 +64,7 @@ namespace Discord_Bot.Database.DBServices
             List<TwitchChannelResource> result = null;
             try
             {
-                List<TwitchChannel> channels = await twitchChannelRepository.GetAllAsync(x => x.Server, x => x.Server.NotificationRole);
+                List<TwitchChannel> channels = await twitchChannelRepository.GetAllAsync(i => i.Server, i => i.Server.NotificationRole);
                 if (channels == null)
                 {
                     return null;

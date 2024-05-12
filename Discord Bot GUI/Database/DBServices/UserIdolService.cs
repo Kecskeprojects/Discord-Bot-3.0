@@ -29,9 +29,9 @@ namespace Discord_Bot.Database.DBServices
             try
             {
                 List<Idol> idols = await idolRepository.GetListAsync(
-                    i => (string.IsNullOrEmpty(groupName) ||
-                    i.Group.Name == groupName) &&
-                    i.Users.FirstOrDefault(u => u.DiscordId == userId.ToString()) != null,
+                    i => (string.IsNullOrEmpty(groupName)
+                    || i.Group.Name == groupName)
+                    && i.Users.FirstOrDefault(u => u.DiscordId == userId.ToString()) != null,
                     orderBy: i => i.Name,
                     ascending: true,
                     i => i.Users,
@@ -101,8 +101,8 @@ namespace Discord_Bot.Database.DBServices
 
                 List<Idol> userIdols = await idolRepository
                     .GetListAsync(i =>
-                        i.Users.FirstOrDefault(u => u.DiscordId == userId.ToString()) != null &&
-                        i.Group.Name == biasGroup,
+                        i.Users.FirstOrDefault(u => u.DiscordId == userId.ToString()) != null
+                        && i.Group.Name == biasGroup,
                         i => i.Group,
                         i => i.Users);
                 if (userIdols.Count >= idols.Count)
@@ -196,8 +196,8 @@ namespace Discord_Bot.Database.DBServices
 
                 List<Idol> userIdols = await idolRepository
                     .GetListAsync(i =>
-                        i.Users.FirstOrDefault(u => u.DiscordId == userId.ToString()) != null &&
-                        i.Group.Name == biasGroup,
+                        i.Users.FirstOrDefault(u => u.DiscordId == userId.ToString()) != null
+                        && i.Group.Name == biasGroup,
                         i => i.Group,
                         i => i.Users);
                 if (userIdols.Count == 0)
