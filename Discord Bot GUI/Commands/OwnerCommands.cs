@@ -3,7 +3,6 @@ using Discord.Commands;
 using Discord_Bot.CommandsService;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
-using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -14,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class OwnerCommands(IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), IOwnerCommands
+    public class OwnerCommands(IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
     {
         [Command("help owner")]
         [RequireOwner]

@@ -4,7 +4,6 @@ using Discord_Bot.CommandsService;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.ImageProcessors;
@@ -20,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoKnowsImageProcessor whoKnowsImageProcessor, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), ILastfmCommands
+    public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoKnowsImageProcessor whoKnowsImageProcessor, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
     {
         private readonly IUserService userService = userService;
         private readonly ILastFmAPI lastFmAPI = lastFmAPI;

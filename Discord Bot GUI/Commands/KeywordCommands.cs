@@ -3,14 +3,13 @@ using Discord.Commands;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
 using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class KeywordCommands(IKeywordService keywordService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), IKeywordCommands
+    public class KeywordCommands(IKeywordService keywordService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
     {
         private readonly IKeywordService keywordService = keywordService;
 

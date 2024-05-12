@@ -2,14 +2,13 @@
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
 using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class BiasAliasCommands(IIdolAliasService idolAliasService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), IBiasAliasCommands
+    public class BiasAliasCommands(IIdolAliasService idolAliasService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
     {
         private readonly IIdolAliasService idolAliasService = idolAliasService;
         [Command("bias alias add")]

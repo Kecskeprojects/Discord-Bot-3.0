@@ -3,7 +3,6 @@ using Discord.Commands;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using System;
@@ -11,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class BiasOwnerCommands(IBiasDatabaseService biasDatabaseService, IIdolService idolService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), IBiasOwnerCommands
+    public class BiasOwnerCommands(IBiasDatabaseService biasDatabaseService, IIdolService idolService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
     {
         private readonly IBiasDatabaseService biasDatabaseService = biasDatabaseService;
         private readonly IIdolService idolService = idolService;

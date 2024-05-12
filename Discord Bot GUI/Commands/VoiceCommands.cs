@@ -4,7 +4,6 @@ using Discord.WebSocket;
 using Discord_Bot.CommandsService;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
-using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
@@ -17,7 +16,7 @@ namespace Discord_Bot.Commands
         IServerService serverService,
         IAudioService audioService,
         Logging logger,
-        Config config) : BaseCommand(logger, config, serverService), IVoiceCommands
+        Config config) : BaseCommand(logger, config, serverService)
     {
         private readonly IAudioService audioService = audioService;
 

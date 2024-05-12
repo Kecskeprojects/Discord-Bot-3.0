@@ -6,7 +6,6 @@ using Discord_Bot.CommandsService;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.Commands;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.ImageProcessors;
@@ -21,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
 {
-    public class ChatCommands(IWordOfTheDayService wordOfTheDayService, BonkGifProcessor bonkGifProcessor, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService), IChatCommands
+    public class ChatCommands(IWordOfTheDayService wordOfTheDayService, BonkGifProcessor bonkGifProcessor, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
     {
         private readonly IWordOfTheDayService wordOfTheDayService = wordOfTheDayService;
         private readonly BonkGifProcessor bonkGifProcessor = bonkGifProcessor;
