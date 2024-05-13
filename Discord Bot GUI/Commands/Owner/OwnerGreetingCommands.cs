@@ -15,7 +15,7 @@ namespace Discord_Bot.Commands.Owner
     public class OwnerGreetingCommands(
         IGreetingService greetingService,
         IServerService serverService,
-        Logging logger
+        Logging logger,
         Config config) : BaseCommand(logger, config, serverService)
     {
         private readonly IGreetingService greetingService = greetingService;
