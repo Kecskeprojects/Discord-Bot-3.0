@@ -1,9 +1,9 @@
 ﻿using Discord;
 using Discord_Bot.Enums;
 
-namespace Discord_Bot.Processors.EmbedProcessors
+namespace Discord_Bot.Processors.MessageProcessor
 {
-    public class EditBiasDataEmbedProcessor
+    public static class EditBiasDataMessageProcessor
     {
         public static MessageComponent CreateComponent(string biasName, string biasGroup)
         {

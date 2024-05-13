@@ -5,7 +5,7 @@ using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Processors;
-using Discord_Bot.Processors.EmbedProcessors;
+using Discord_Bot.Processors.MessageProcessor;
 using System;
 using System.Threading.Tasks;
 
@@ -130,7 +130,7 @@ namespace Discord_Bot.Commands.Owner
                     return;
                 }
 
-                MessageComponent component = EditBiasDataEmbedProcessor.CreateComponent(biasName, biasGroup);
+                MessageComponent component = EditBiasDataMessageProcessor.CreateComponent(biasName, biasGroup);
 
                 await ReplyAsync("What action would you like to perform", components: component);
             }

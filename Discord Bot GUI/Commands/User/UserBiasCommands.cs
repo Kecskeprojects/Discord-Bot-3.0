@@ -1,13 +1,13 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Discord_Bot.CommandsService;
 using Discord_Bot.Communication;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Processors.MessageProcessor;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
 using System;
@@ -230,19 +230,19 @@ namespace Discord_Bot.Commands.User
                     return;
                 }
 
-                BiasMessageResult result = BiasService.BuildBiasMessage(list, groupName, $"{Global.GetNickName(Context.Channel, Context.User)}'s biases by group", Context.User.Id, true);
-                if (result.Builder == null)
+                BiasMessageResult result = BiasListMessageProcessor.BuildBiasMessage(list, groupName, $"{Global.GetNickName(Context.Channel, Context.User)}'s biases by group", Context.User.Id, true);
+                if (result.Component == null)
                 {
                     await ReplyAsync(result.Message);
                 }
                 else
                 {
-                    await ReplyAsync(result.Message, components: result.Builder.Build());
+                    await ReplyAsync(result.Message, components: result.Component);
                 }
 
                 //Generate a random number, 10% chance for an additional message to appear
                 Random r = new();
-                if (r.Next(0, 100) < 10)
+                if (r.Next(0, 10) == 0)
                 {
                     //Pick a random bias
                     string bias = list[r.Next(0, list.Count)].Name;
@@ -291,14 +291,14 @@ namespace Discord_Bot.Commands.User
                     return;
                 }
 
-                BiasMessageResult result = BiasService.BuildBiasMessage(idols, groupName, "Which group do you want to see?", Context.User.Id, false);
-                if (result.Builder == null)
+                BiasMessageResult result = BiasListMessageProcessor.BuildBiasMessage(idols, groupName, "Which group do you want to see?", Context.User.Id, false);
+                if (result.Component == null)
                 {
                     await ReplyAsync(result.Message);
                 }
                 else
                 {
-                    await ReplyAsync(result.Message, components: result.Builder.Build());
+                    await ReplyAsync(result.Message, components: result.Component);
                 }
             }
             catch (Exception ex)

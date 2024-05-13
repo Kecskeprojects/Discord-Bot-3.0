@@ -4,9 +4,9 @@ using Discord_Bot.Resources;
 using System;
 using System.Collections.Generic;
 
-namespace Discord_Bot.CommandsService
+namespace Discord_Bot.Processors.MessageProcessor
 {
-    public class BiasService
+    public static class BiasListMessageProcessor
     {
         public static BiasMessageResult BuildBiasMessage(List<IdolResource> list, string groupName, string headMessage, ulong userId, bool isUser)
         {
@@ -84,7 +84,7 @@ namespace Discord_Bot.CommandsService
                     selectCount++;
                 }
 
-                return new BiasMessageResult() { Message = headMessage, Builder = builder };
+                return new BiasMessageResult() { Message = headMessage, Component = builder.Build() };
             }
         }
     }

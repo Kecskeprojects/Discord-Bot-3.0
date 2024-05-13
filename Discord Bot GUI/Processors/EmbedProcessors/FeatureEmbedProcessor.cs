@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Discord_Bot.Processors.EmbedProcessors
 {
-    public class FeatureEmbedProcessor
+    public static class FeatureEmbedProcessor
     {
         public static Embed[] CreateEmbed(string imageUrl)
         {

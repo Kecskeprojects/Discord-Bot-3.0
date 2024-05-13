@@ -3,7 +3,7 @@ using Discord.Net;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces.Services;
-using Discord_Bot.Processors.EmbedProcessors;
+using Discord_Bot.Processors.MessageProcessor;
 using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
@@ -102,7 +102,7 @@ namespace Discord_Bot.Features
 
         private static async Task<InstagramMessageResult> SendInstagramMessageAsync(List<FileAttachment> attachments, string[] files, string url, MessageReference refer, IMessageChannel channel, bool ignoreVideos)
         {
-            string message = InstagramEmbedProcessor.GetEmbedContent(attachments, files, url, ignoreVideos);
+            string message = InstagramMessageProcessor.GetEmbedContent(attachments, files, url, ignoreVideos);
 
             InstagramMessageResult result = new();
             if (attachments.Count > 0)

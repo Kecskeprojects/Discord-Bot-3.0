@@ -42,7 +42,7 @@ namespace Discord_Bot.Interactions
                 data.SetGender(choiceId);
 
                 logger.Log($"BiasGame Setup Gender Chosen: {choiceId}", LogOnly: true);
-                MessageComponent component = BiasGameDebutEmbedProcessor.CreateEmbed(data);
+                MessageComponent component = BiasGameDebutEmbedProcessor.CreateComponent(data);
 
                 await ModifyOriginalResponseAsync(x => x.Components = component);
             }

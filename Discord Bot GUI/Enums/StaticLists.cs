@@ -113,5 +113,7 @@ namespace Discord_Bot.Enums
                 new StaticRoundData(baseLeftX: 292, baseRightX: 610, baseDiagonal: 98, baseY: 350, spacing: 0, totalPositions: 2),
                 new StaticRoundData(baseLeftX: 435, baseRightX: 0, baseDiagonal: 130, baseY: 334, spacing: 0, totalPositions: 1),
             ];
+        
+        public static string[] DateSeparator { get; } = [",", "/", "\\", "-", ".", " "];
     }
 }

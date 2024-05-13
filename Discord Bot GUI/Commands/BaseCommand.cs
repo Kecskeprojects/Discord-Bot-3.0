@@ -31,5 +31,11 @@ namespace Discord_Bot.Commands
                 ? (Context.User as SocketGuildUser).Nickname ?? Context.User.Username
                 : Context.User.Username;
         }
+        protected string GetUserNickname(IUser user)
+        {
+            return Context.Channel.GetChannelType() != ChannelType.DM
+                ? (user as SocketGuildUser).Nickname ?? Context.User.Username
+                : Context.User.Username;
+        }
     }
 }

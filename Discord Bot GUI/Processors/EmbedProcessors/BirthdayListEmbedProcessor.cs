@@ -2,11 +2,11 @@
 using Discord_Bot.Resources;
 using System.Collections.Generic;
 
-namespace Discord_Bot.CommandsService
+namespace Discord_Bot.Processors.EmbedProcessors
 {
-    public class BirthdayService
+    public static class BirthdayListEmbedProcessor
     {
-        public static EmbedBuilder BuildBirthdayListEmbed(List<BirthdayResource> list, List<string> users)
+        public static Embed[] CreateEmbed(List<BirthdayResource> list, List<string> users)
         {
             EmbedBuilder builder = new();
             builder.WithTitle("Server birthdays:");
@@ -29,7 +29,7 @@ namespace Discord_Bot.CommandsService
                 builder.AddField("\u200b", field);
             }
             builder.WithColor(Color.LightOrange);
-            return builder;
+            return [builder.Build()];
         }
     }
 }

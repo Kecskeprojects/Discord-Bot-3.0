@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 namespace Discord_Bot.Processors.EmbedProcessors
 {
-    public class BiasGameDebutEmbedProcessor
+    public static class BiasGameDebutEmbedProcessor
     {
-        public static MessageComponent CreateEmbed(BiasGameData data)
+        public static MessageComponent CreateComponent(BiasGameData data)
         {
             List<int> options = [1990, 2000, 2010, 2014, 2018];
             for (int i = 2020; i <= DateTime.UtcNow.Year; i += 2)

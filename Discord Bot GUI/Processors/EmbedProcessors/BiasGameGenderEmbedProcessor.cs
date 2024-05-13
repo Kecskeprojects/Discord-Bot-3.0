@@ -2,7 +2,7 @@
 
 namespace Discord_Bot.Processors.EmbedProcessors
 {
-    public class BiasGameGenderEmbedProcessor
+    public static class BiasGameGenderEmbedProcessor
     {
         public static Embed[] CreateEmbed(string userName, string avatarUrl)
         {
