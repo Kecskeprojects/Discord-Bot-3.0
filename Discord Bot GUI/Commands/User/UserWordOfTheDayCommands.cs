@@ -1,15 +1,15 @@
-﻿using Discord.Commands;
-using Discord;
+﻿using Discord;
+using Discord.Commands;
 using Discord_Bot.Core;
+using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Processors.EmbedProcessors;
 using Discord_Bot.Services.Models.Wotd;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Discord_Bot.Core.Configuration;
-using Discord_Bot.Interfaces.DBServices;
-using Discord_Bot.Interfaces.Services;
-using Discord_Bot.Processors.EmbedProcessors;
 
 namespace Discord_Bot.Commands.User
 {

@@ -32,7 +32,7 @@ namespace Discord_Bot.Commands
             return Context.User.GetDisplayAvatarUrl(format, size);
         }
 
-        protected string GetUserAvatar(IUser user, ImageFormat format = ImageFormat.Png, ushort size = 512)
+        protected static string GetUserAvatar(IUser user, ImageFormat format = ImageFormat.Png, ushort size = 512)
         {
             return user.GetDisplayAvatarUrl(format, size);
         }
@@ -53,7 +53,7 @@ namespace Discord_Bot.Commands
 
         protected async Task<bool> IsCommandAllowedAsync(ChannelTypeEnum type, bool allowLackOfType = true)
         {
-            if(IsDM())
+            if (IsDM())
             {
                 return false;
             }

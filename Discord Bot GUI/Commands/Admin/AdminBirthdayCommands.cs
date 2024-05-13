@@ -1,14 +1,14 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord.Rest;
-using Discord;
+using Discord_Bot.Core;
+using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.DBServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord_Bot.Interfaces.DBServices;
-using Discord_Bot.Core.Configuration;
-using Discord_Bot.Core;
 
 namespace Discord_Bot.Commands.Admin
 {
