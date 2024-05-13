@@ -50,7 +50,7 @@ namespace Discord_Bot.Interactions
                     return;
                 }
 
-                Embed[] embed = BiasGameStatEmbedProcessor.CreateEmbed(Global.GetNickName(Context.Channel, Context.User), gender, stats);
+                Embed[] embed = BiasGameStatEmbedProcessor.CreateEmbed(GetCurrentUserNickname(), gender, stats);
 
                 MessageComponent component = BiasGameStatEmbedProcessor.CreateComponent(gender, Context.User.Id);
 

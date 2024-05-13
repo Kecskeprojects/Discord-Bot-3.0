@@ -27,6 +27,11 @@ namespace Discord_Bot.Commands.User
         {
             try
             {
+                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
+                {
+                    return;
+                }
+
                 if (Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData data))
                 {
                     if (data.StartedAt > DateTime.UtcNow.AddMinutes(-30))
@@ -56,6 +61,11 @@ namespace Discord_Bot.Commands.User
         {
             try
             {
+                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
+                {
+                    return;
+                }
+
                 Random r = new();
                 if (r.Next(0, 100) == 0)
                 {
@@ -82,6 +92,11 @@ namespace Discord_Bot.Commands.User
         {
             try
             {
+                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
+                {
+                    return;
+                }
+
                 UserBiasGameStatResource stats = await userService.GetTopIdolsAsync(Context.User.Id, GenderType.None);
 
                 if (stats == null || stats.BiasGameCount == 0 || stats.Stats.Count == 0)
@@ -90,7 +105,7 @@ namespace Discord_Bot.Commands.User
                     return;
                 }
 
-                Embed[] embed = BiasGameStatEmbedProcessor.CreateEmbed(Global.GetNickName(Context.Channel, Context.User), GenderType.None, stats);
+                Embed[] embed = BiasGameStatEmbedProcessor.CreateEmbed(GetCurrentUserNickname(), GenderType.None, stats);
 
                 MessageComponent component = BiasGameStatEmbedProcessor.CreateComponent(GenderType.None, Context.User.Id);
 

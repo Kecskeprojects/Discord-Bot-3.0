@@ -9,19 +9,15 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
-using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Core
 {
     public static class Global
     {
-        #region Global Variables
         public static ConcurrentDictionary<ulong, ServerAudioResource> ServerAudioResources { get; private set; } = [];
         public static ConcurrentDictionary<ulong, BiasGameData> BiasGames { get; private set; } = [];
-        #endregion
-
-        #region Global Functions
+        
         //Check if user has a nickname
         public static string GetNickName(ISocketMessageChannel channel, SocketUser user)
         {
@@ -48,20 +44,5 @@ namespace Discord_Bot.Core
 
             return imageData;
         }
-
-        //Testing connection by pinging google, it is quite a problem if that's down too
-        public static bool Connection()
-        {
-            try
-            {
-                if (new Ping().Send("google.com", 1000, new byte[32], new PingOptions()).Status == IPStatus.Success)
-                {
-                    return true;
-                }
-            }
-            catch (Exception) { }
-            return false;
-        }
-        #endregion
     }
 }

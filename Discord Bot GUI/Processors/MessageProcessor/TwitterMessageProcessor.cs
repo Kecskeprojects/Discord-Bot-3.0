@@ -1,16 +1,16 @@
 ﻿using Discord;
 using Discord_Bot.Communication;
-using Discord_Bot.Core;
 using Discord_Bot.Enums;
+using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.CommandsService
+namespace Discord_Bot.Processors.MessageProcessor
 {
-    public class TwitterScraperService
+    public static class TwitterMessageProcessor
     {
-        public static async Task<List<FileAttachment>> AllContentInRegularMessage(List<TwitterContent> content, bool sendVideos = true)
+        public static async Task<List<FileAttachment>> GetAttachments(List<TwitterContent> content, bool sendVideos = true)
         {
             List<FileAttachment> Embeds = [];
             string commonFileName = $"twitter_{DateTime.UtcNow:yyMMdd}_{DateTime.UtcNow:HHmmss}";
@@ -29,7 +29,7 @@ namespace Discord_Bot.CommandsService
                     _ => ""
                 };
 
-                Embeds.Add(new FileAttachment(await Global.GetStream(content[i].Url.OriginalString), fileName));
+                Embeds.Add(new FileAttachment(await HttpClientTools.GetStream(content[i].Url.OriginalString), fileName));
             }
 
             return Embeds;

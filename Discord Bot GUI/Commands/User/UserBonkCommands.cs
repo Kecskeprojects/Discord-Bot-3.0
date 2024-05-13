@@ -7,6 +7,7 @@ using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Resources;
+using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -52,8 +53,7 @@ namespace Discord_Bot.Commands.User
                     userName = string.Join(" ", paramParts);
                 }
 
-                ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
+                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
                 {
                     return;
                 }
@@ -62,7 +62,7 @@ namespace Discord_Bot.Commands.User
                 if (string.IsNullOrEmpty(userName))
                 {
                     url = GetCurrentUserAvatar();
-                    userName = Global.GetNickName(Context.Channel, Context.User);
+                    userName = Context.User.Username;
                 }
                 else
                 {
@@ -87,7 +87,7 @@ namespace Discord_Bot.Commands.User
                 if (!string.IsNullOrEmpty(url))
                 {
                     logger.Query($"Getting profile image:\n{url}");
-                    Stream stream = await Global.GetStream(url);
+                    Stream stream = await HttpClientTools.GetStream(url);
 
                     MemoryStream gifStream = bonkGifProcessor.CreateBonkImage(stream, frameDelay);
 

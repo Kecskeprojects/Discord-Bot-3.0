@@ -87,8 +87,8 @@ namespace Discord_Bot.Interactions
 
                 Embed[] embeds = BiasGameEmbedProcessor.CreateEmbed(
                     data,
-                    Context.User.GetDisplayAvatarUrl(ImageFormat.Jpeg, 512),
-                    Global.GetNickName(Context.Channel, Context.User));
+                    GetCurrentUserAvatar(),
+                    GetCurrentUserNickname());
 
                 MessageComponent components = BiasGameEmbedProcessor.CreateComponent(idolIds, Context.User.Id);
 

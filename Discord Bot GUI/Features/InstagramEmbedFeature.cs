@@ -111,7 +111,6 @@ namespace Discord_Bot.Features
                 await channel.SendFilesAsync(attachments, message, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
                 result.ShouldMessageBeSuppressed = true;
             }
-
             //Ignore videos is a second try at sending so that is when we can know if the post is too large to send
             else if (ignoreVideos == true)
             {

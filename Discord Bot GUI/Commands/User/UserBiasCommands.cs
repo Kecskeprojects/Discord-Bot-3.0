@@ -213,7 +213,7 @@ namespace Discord_Bot.Commands.User
                     return;
                 }
 
-                BiasMessageResult result = BiasListMessageProcessor.BuildBiasMessage(list, groupName, $"{Global.GetNickName(Context.Channel, Context.User)}'s biases by group", Context.User.Id, true);
+                BiasMessageResult result = BiasListMessageProcessor.BuildBiasMessage(list, groupName, $"{GetCurrentUserNickname()}'s biases by group", Context.User.Id, true);
                 if (result.Component == null)
                 {
                     await ReplyAsync(result.Message);

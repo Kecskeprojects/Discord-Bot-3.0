@@ -8,6 +8,7 @@ using Discord_Bot.Enums;
 using Discord_Bot.Features;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Resources;
+using Discord_Bot.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Reflection;
@@ -34,7 +35,7 @@ namespace Discord_Bot
 
         public async Task RunBotAsync()
         {
-            if (!Global.Connection())
+            if (!CoreLogic.TestConnection())
             {
                 return;
             }
@@ -209,7 +210,7 @@ namespace Discord_Bot
                         });
                         return;
                     }
-                    else if (context.Channel.GetChannelType() != ChannelType.DM && Global.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id, false))
+                    else if (context.Channel.GetChannelType() != ChannelType.DM && DiscordTools.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id, false))
                     {
                         if (context.Message.HasCharPrefix('+', ref argPos) || context.Message.HasCharPrefix('-', ref argPos))
                         {

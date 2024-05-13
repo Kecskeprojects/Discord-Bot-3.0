@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Core
@@ -99,6 +100,19 @@ namespace Discord_Bot.Core
             {
                 logger.Error("CoreLogic.css CheckFolder", ex);
             }
+        }
+
+        public static bool TestConnection()
+        {
+            try
+            {
+                if (new Ping().Send("google.com", 1000, new byte[32], new PingOptions()).Status == IPStatus.Success)
+                {
+                    return true;
+                }
+            }
+            catch (Exception) { }
+            return false;
         }
     }
 }

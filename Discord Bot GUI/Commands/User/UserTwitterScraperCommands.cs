@@ -1,21 +1,25 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.Net;
-using Discord_Bot.CommandsService;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Processors.MessageProcessor;
 using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Commands
+namespace Discord_Bot.Commands.User
 {
-    public class TwitterScraperCommands(ITwitterScraper twitterScraper, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
+    public class UserTwitterScraperCommands(
+        ITwitterScraper twitterScraper,
+        IServerService serverService,
+        Logging logger,
+        Config config) : BaseCommand(logger, config, serverService)
     {
         private static readonly string[] baseURLs = ["https://twitter.com/", "https://x.com/"];
         private readonly ITwitterScraper twitterScraper = twitterScraper;
@@ -63,7 +67,7 @@ namespace Discord_Bot.Commands
                             }
                         }
 
-                        List<FileAttachment> attachments = await TwitterScraperService.AllContentInRegularMessage(result.Content);
+                        List<FileAttachment> attachments = await TwitterMessageProcessor.GetAttachments(result.Content);
                         if (!CollectionTools.IsNullOrEmpty(attachments))
                         {
                             try
@@ -74,10 +78,9 @@ namespace Discord_Bot.Commands
                             {
                                 if (ex.Message.Contains("40005"))
                                 {
-                                    logger.Warning("ServiceDiscordCommunication.cs SendTwitterMessage", "Embed too large, only sending images!", LogOnly: true);
-                                    logger.Warning("ServiceDiscordCommunication.cs SendTwitterMessage", ex, LogOnly: true);
+                                    logger.Warning("InstagramEmbedFeature.cs SendInstagramPostEmbedAsync", "Embed too large, only sending images!");
 
-                                    attachments = await TwitterScraperService.AllContentInRegularMessage(result.Content, false);
+                                    attachments = await TwitterMessageProcessor.GetAttachments(result.Content, false);
                                     if (!CollectionTools.IsNullOrEmpty(attachments))
                                     {
                                         await Context.Channel.SendFilesAsync(attachments, result.TextContent, messageReference: refer);
@@ -103,7 +106,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("TwitterScraperCommands.cs ScrapeFromUrl", ex);
+                logger.Error("UserTwitterScraperCommands.cs ScrapeFromUrl", ex);
             }
         }
     }
