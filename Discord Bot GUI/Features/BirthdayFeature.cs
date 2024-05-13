@@ -27,18 +27,7 @@ namespace Discord_Bot.Features
                     logger.Log($"Sending birthday message to {result.Count} people.");
                     foreach (BirthdayResource birthday in result)
                     {
-                        ServerResource server = await serverService.GetByDiscordIdAsync(birthday.ServerDiscordId);
-
-                        if (server.SettingsChannels.TryGetValue(ChannelTypeEnum.BirthdayText, out List<ulong> channels))
-                        {
-                            ISocketMessageChannel channel = client.GetChannel(channels[0]) as ISocketMessageChannel;
-                            SocketGuild guild = client.GetGuild(birthday.ServerDiscordId);
-                            await guild.DownloadUsersAsync();
-
-                            string message = CreateBirthdayMessage(birthday, guild);
-
-                            await channel.SendMessageAsync(message);
-                        }
+                        await SendBirthdayMessageAsync(birthday);
                     }
                 }
             }
@@ -47,6 +36,23 @@ namespace Discord_Bot.Features
                 logger.Error("BirthdayFeature.cs ExecuteCoreLogicAsync", ex);
             }
         }
+
+        private async Task SendBirthdayMessageAsync(BirthdayResource birthday)
+        {
+            ServerResource server = await serverService.GetByDiscordIdAsync(birthday.ServerDiscordId);
+
+            if (server.SettingsChannels.TryGetValue(ChannelTypeEnum.BirthdayText, out List<ulong> channels))
+            {
+                ISocketMessageChannel channel = client.GetChannel(channels[0]) as ISocketMessageChannel;
+                SocketGuild guild = client.GetGuild(birthday.ServerDiscordId);
+                await guild.DownloadUsersAsync();
+
+                string message = CreateBirthdayMessage(birthday, guild);
+
+                await channel.SendMessageAsync(message);
+            }
+        }
+
         private static string CreateBirthdayMessage(BirthdayResource birthday, SocketGuild guild)
         {
             SocketGuildUser user = guild.GetUser(birthday.UserDiscordId);

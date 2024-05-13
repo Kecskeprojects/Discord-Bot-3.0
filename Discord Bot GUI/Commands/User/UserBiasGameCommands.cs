@@ -41,7 +41,7 @@ namespace Discord_Bot.Commands.User
                 Embed[] embed = BiasGameGenderEmbedProcessor.CreateEmbed(GetCurrentUserNickname(), GetCurrentUserAvatar());
                 MessageComponent components = BiasGameGenderEmbedProcessor.CreateComponent(Context.User.Id);
 
-                await ReplyAsync("", components: components, embeds: embed);
+                await ReplyAsync(components: components, embeds: embed);
             }
             catch (Exception ex)
             {

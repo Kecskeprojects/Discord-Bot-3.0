@@ -35,13 +35,9 @@ namespace Discord_Bot.Commands.User
         {
             try
             {
-                if (Context.Channel.GetChannelType() != ChannelType.DM)
+                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
                 {
-                    ServerResource server = await GetCurrentServerAsync();
-                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
-                    {
-                        return;
-                    }
+                    return;
                 }
 
                 //Make the name lowercase and clear and accidental spaces
@@ -107,13 +103,9 @@ namespace Discord_Bot.Commands.User
         {
             try
             {
-                if (Context.Channel.GetChannelType() != ChannelType.DM)
+                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
                 {
-                    ServerResource server = await GetCurrentServerAsync();
-                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
-                    {
-                        return;
-                    }
+                    return;
                 }
 
                 //Make the name lowercase and clear and accidental spaces
@@ -171,13 +163,9 @@ namespace Discord_Bot.Commands.User
         {
             try
             {
-                if (Context.Channel.GetChannelType() != ChannelType.DM)
+                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
                 {
-                    ServerResource server = await GetCurrentServerAsync();
-                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
-                    {
-                        return;
-                    }
+                    return;
                 }
 
                 DbProcessResultEnum result = await userIdolService.ClearUserIdolAsync(Context.User.Id);
@@ -203,13 +191,9 @@ namespace Discord_Bot.Commands.User
         {
             try
             {
-                if (Context.Channel.GetChannelType() != ChannelType.DM)
+                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
                 {
-                    ServerResource server = await GetCurrentServerAsync();
-                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
-                    {
-                        return;
-                    }
+                    return;
                 }
 
                 //Get your list of biases
@@ -267,13 +251,9 @@ namespace Discord_Bot.Commands.User
         {
             try
             {
-                if (Context.Channel.GetChannelType() != ChannelType.DM)
+                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
                 {
-                    ServerResource server = await GetCurrentServerAsync();
-                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
-                    {
-                        return;
-                    }
+                    return;
                 }
 
                 //Get the global list of biases

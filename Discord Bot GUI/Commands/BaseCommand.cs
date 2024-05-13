@@ -3,8 +3,10 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
+using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands
@@ -14,6 +16,11 @@ namespace Discord_Bot.Commands
         protected readonly Logging logger = logger;
         protected readonly Config config = config;
         protected readonly IServerService serverService = serverService;
+
+        protected bool IsDM()
+        {
+            return Context.Channel.GetChannelType() == ChannelType.DM;
+        }
 
         protected async Task<ServerResource> GetCurrentServerAsync()
         {
@@ -25,17 +32,36 @@ namespace Discord_Bot.Commands
             return Context.User.GetDisplayAvatarUrl(format, size);
         }
 
+        protected string GetUserAvatar(IUser user, ImageFormat format = ImageFormat.Png, ushort size = 512)
+        {
+            return user.GetDisplayAvatarUrl(format, size);
+        }
+
         protected string GetCurrentUserNickname()
         {
-            return Context.Channel.GetChannelType() != ChannelType.DM
+            return !IsDM()
                 ? (Context.User as SocketGuildUser).Nickname ?? Context.User.Username
                 : Context.User.Username;
         }
+
         protected string GetUserNickname(IUser user)
         {
-            return Context.Channel.GetChannelType() != ChannelType.DM
+            return !IsDM()
                 ? (user as SocketGuildUser).Nickname ?? Context.User.Username
                 : Context.User.Username;
+        }
+
+        protected async Task<bool> IsCommandAllowedAsync(ChannelTypeEnum type, bool allowLackOfType = true)
+        {
+            if(IsDM())
+            {
+                return false;
+            }
+
+            ServerResource server = await GetCurrentServerAsync();
+            return server == null || (!server.SettingsChannels.TryGetValue(type, out List<ulong> value)
+                ? allowLackOfType
+                : value.Contains(Context.Channel.Id));
         }
     }
 }
