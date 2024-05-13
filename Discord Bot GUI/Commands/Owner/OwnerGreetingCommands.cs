@@ -10,9 +10,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Commands
+namespace Discord_Bot.Commands.Owner
 {
-    public class GreetingCommands(IGreetingService greetingService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
+    public class OwnerGreetingCommands(
+        IGreetingService greetingService,
+        IServerService serverService,
+        Logging logger
+        Config config) : BaseCommand(logger, config, serverService)
     {
         private readonly IGreetingService greetingService = greetingService;
 
@@ -41,7 +45,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("GreetingCommands.cs GreetingList", ex);
+                logger.Error("OwnerGreetingCommands.cs GreetingList", ex);
             }
         }
 
@@ -64,7 +68,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("GreetingCommands.cs GreetingAdd", ex);
+                logger.Error("OwnerGreetingCommands.cs GreetingAdd", ex);
             }
         }
 
@@ -91,7 +95,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("GreetingCommands.cs GreetingRemove", ex);
+                logger.Error("OwnerGreetingCommands.cs GreetingRemove", ex);
             }
         }
     }
