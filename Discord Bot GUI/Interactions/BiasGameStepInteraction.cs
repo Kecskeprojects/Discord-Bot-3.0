@@ -68,8 +68,8 @@ namespace Discord_Bot.Interactions
 
                 Embed[] embeds = BiasGameEmbedProcessor.CreateEmbed(
                     data,
-                    Context.User.GetDisplayAvatarUrl(ImageFormat.Jpeg, 512),
-                    Global.GetNickName(Context.Channel, Context.User));
+                    GetCurrentUserAvatar(),
+                    GetCurrentUserNickname());
 
                 MessageComponent components = BiasGameEmbedProcessor.CreateComponent(idolIds, Context.User.Id);
 
@@ -97,8 +97,8 @@ namespace Discord_Bot.Interactions
             List<FileAttachment> file = [new FileAttachment(data.WinnerBracket, "winner-bracket.png")];
             Embed[] embed = BiasGameEmbedProcessor.CreateFinalEmbed(
                 data,
-                Context.User.GetDisplayAvatarUrl(ImageFormat.Jpeg, 512),
-            Global.GetNickName(Context.Channel, Context.User));
+                GetCurrentUserAvatar(),
+                GetCurrentUserNickname());
 
             await ModifyOriginalResponseAsync(x =>
             {

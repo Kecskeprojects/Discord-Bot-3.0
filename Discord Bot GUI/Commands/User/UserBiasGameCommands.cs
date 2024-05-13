@@ -10,9 +10,13 @@ using Discord_Bot.Resources;
 using System;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Commands
+namespace Discord_Bot.Commands.User
 {
-    public class BiasGameCommands(Logging logger, Config config, IServerService serverService, IUserService userService) : BaseCommand(logger, config, serverService)
+    public class UserBiasGameCommands(
+        IUserService userService,
+        IServerService serverService,
+        Logging logger,
+        Config config) : BaseCommand(logger, config, serverService)
     {
         private readonly IUserService userService = userService;
 
@@ -34,46 +38,15 @@ namespace Discord_Bot.Commands
                 }
 
                 Global.BiasGames.TryAdd(Context.User.Id, new BiasGameData(Context.User.Id));
-                EmbedBuilder mainEmbed = SetupEmbed();
+                Embed[] embed = BiasGameGenderEmbedProcessor.CreateEmbed(GetCurrentUserNickname(), GetCurrentUserAvatar());
+                MessageComponent components = BiasGameGenderEmbedProcessor.CreateComponent(Context.User.Id);
 
-                ActionRowBuilder buttonRow = new();
-                buttonRow.WithButton(
-                    emote: new Emoji("\U0001F57A"), //Man
-                    customId: $"BiasGame_Setup_Gender_1_{Context.User.Id}",
-                    style: ButtonStyle.Primary);
-                buttonRow.WithButton(
-                    emote: new Emoji("\U0001F483"), //Woman
-                    customId: $"BiasGame_Setup_Gender_2_{Context.User.Id}",
-                    style: ButtonStyle.Primary);
-                buttonRow.WithButton(
-                    emote: new Emoji("\U0001F46B"), //Both
-                    customId: $"BiasGame_Setup_Gender_3_{Context.User.Id}",
-                    style: ButtonStyle.Primary);
-
-                ComponentBuilder components = new();
-                components.AddRow(buttonRow);
-
-                await ReplyAsync("", components: components.Build(), embed: mainEmbed.Build());
+                await ReplyAsync("", components: components, embeds: embed);
             }
             catch (Exception ex)
             {
                 logger.Error("BiasGameCommands.cs BiasGame", ex);
             }
-        }
-
-        private EmbedBuilder SetupEmbed()
-        {
-            EmbedBuilder mainEmbed = new();
-            mainEmbed.WithTitle("Bias Game Setup");
-
-            EmbedFooterBuilder footer = new();
-            footer.WithIconUrl(Context.User.GetDisplayAvatarUrl(ImageFormat.Jpeg, 512));
-            footer.WithText(Global.GetNickName(Context.Channel, Context.User));
-            mainEmbed.WithFooter(footer);
-
-            mainEmbed.AddField("1. Select a gender", "Male, Female, Both");
-            mainEmbed.AddField("2. Select a debut range", "A start date and an end date");
-            return mainEmbed;
         }
 
         [Command("bias game stop")]

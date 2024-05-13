@@ -298,7 +298,7 @@ namespace Discord_Bot.Commands
         [Command("lf np")]
         [Alias(["lf nowplaying", "lf now playing"])]
         [Summary("Get the currently playing/last played track of the user")]
-        public async Task LfNowPlaying()
+        public async Task LfNowPlaying() //Todo: Add previous track to embed
         {
             try
             {

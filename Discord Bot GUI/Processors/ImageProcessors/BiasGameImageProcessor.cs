@@ -57,11 +57,11 @@ namespace Discord_Bot.Processors.ImageProcessors
 
                 if (!idol.LatestImageUrl.StartsWith("https://dbkpop.com"))
                 {
-                    ImageTools.CorrectImageRatio(idolImage, acceptableMargin: 0.05, cutoffTopRatio: 0.1, extraHeight: 0.05);
+                    ImageTools.CorrectImageRatio(idolImage, acceptableMargin: 0, cutoffTopRatio: 0.1, extraHeight: 0.05);
                 }
                 else
                 {
-                    ImageTools.CorrectImageRatio(idolImage);
+                    ImageTools.CorrectImageRatio(idolImage, acceptableMargin: 0);
                 }
 
                 idolImage.Mutate(x => x.Resize(new Size(309, 322))); //The Size is the empty part of the polaroid_base
