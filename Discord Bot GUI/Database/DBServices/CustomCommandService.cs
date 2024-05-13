@@ -26,9 +26,10 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
+                commandName = commandName.Trim().ToLower();
                 if (await customCommandRepository.ExistsAsync(
                     cc => cc.Server.DiscordId == serverId.ToString()
-                    && cc.Command.Trim().ToLower().Equals(commandName.Trim().ToLower()),
+                    && cc.Command.Trim().ToLower().Equals(commandName),
                     cc => cc.Server))
                 {
                     return DbProcessResultEnum.AlreadyExists;
@@ -61,9 +62,10 @@ namespace Discord_Bot.Database.DBServices
             CustomCommandResource result = null;
             try
             {
+                commandName = commandName.Trim().ToLower();
                 CustomCommand command = await customCommandRepository.FirstOrDefaultAsync(
                     cc => cc.Server.DiscordId == serverId.ToString()
-                    && cc.Command.Trim().ToLower().Equals(commandName.Trim().ToLower()),
+                    && cc.Command.Trim().ToLower().Equals(commandName),
                     cc => cc.Server);
                 result = mapper.Map<CustomCommand, CustomCommandResource>(command);
             }
@@ -81,9 +83,9 @@ namespace Discord_Bot.Database.DBServices
             {
                 List<CustomCommand> commands = await customCommandRepository.GetListAsync(
                     cc => cc.Server.DiscordId == serverId.ToString(),
+                    includes: cc => cc.Server,
                     orderBy: cc => cc.Command,
-                    ascending: true,
-                    includes: cc => cc.Server);
+                    ascending: true);
                 result = mapper.Map<List<CustomCommand>, List<CustomCommandResource>>(commands);
             }
             catch (Exception ex)
@@ -97,9 +99,10 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
+                commandName = commandName.Trim().ToLower();
                 CustomCommand customCommand = await customCommandRepository.FirstOrDefaultAsync(
                     cc => cc.Server.DiscordId == serverId.ToString()
-                    && cc.Command.Trim().ToLower().Equals(commandName.Trim().ToLower()),
+                    && cc.Command.Trim().ToLower().Equals(commandName),
                     cc => cc.Server);
                 if (customCommand != null)
                 {

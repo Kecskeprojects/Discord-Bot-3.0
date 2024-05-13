@@ -75,9 +75,10 @@ namespace Discord_Bot.Database.DBServices
                     return DbProcessResultEnum.NotFound;
                 }
 
+                roleName = roleName.Trim().ToLower();
                 Role role = await roleRepository.FirstOrDefaultAsync( r =>
                     r.Server.DiscordId == serverId.ToString()
-                    && r.RoleName.Trim().ToLower().Equals(roleName.Trim().ToLower()),
+                    && r.RoleName.Trim().ToLower().Equals(roleName),
                     r => r.Server);
                 role ??= new()
                 {

@@ -61,9 +61,10 @@ namespace Discord_Bot.Database.DBServices
             RoleResource result = null;
             try
             {
+                roleName = roleName.Trim().ToLower();
                 Role role = await roleRepository.FirstOrDefaultAsync(r =>
                     r.Server.DiscordId == serverId.ToString()
-                    && r.RoleName.Trim().ToLower().Equals(roleName.Trim().ToLower()),
+                    && r.RoleName.Trim().ToLower().Equals(roleName),
                     r => r.Server);
                 result = mapper.Map<Role, RoleResource>(role);
             }
@@ -95,9 +96,10 @@ namespace Discord_Bot.Database.DBServices
         {
             try
             {
+                roleName = roleName.Trim().ToLower();
                 Role role = await roleRepository.FirstOrDefaultAsync(r =>
                     r.Server.DiscordId == serverId.ToString()
-                    && r.RoleName.Trim().ToLower().Equals(roleName.Trim().ToLower()));
+                    && r.RoleName.Trim().ToLower().Equals(roleName));
                 if (role != null)
                 {
                     await roleRepository.RemoveAsync(role);

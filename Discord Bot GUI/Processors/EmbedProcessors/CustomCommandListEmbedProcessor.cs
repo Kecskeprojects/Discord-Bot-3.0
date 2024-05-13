@@ -2,12 +2,11 @@
 using Discord_Bot.Resources;
 using System.Collections.Generic;
 
-namespace Discord_Bot.CommandsService
+namespace Discord_Bot.Processors.EmbedProcessors
 {
-    public class ChatService
+    public static class CustomCommandListEmbedProcessor
     {
-        #region CustomList
-        public static EmbedBuilder BuildCustomListEmbed(List<CustomCommandResource> list)
+        public static Embed[] CreateEmbed(List<CustomCommandResource> list)
         {
             EmbedBuilder builder = new();
             builder.WithTitle("Custom commands:");
@@ -26,8 +25,7 @@ namespace Discord_Bot.CommandsService
             }
             builder.WithDescription(commands);
             builder.WithColor(Color.Teal);
-            return builder;
+            return [builder.Build()];
         }
-        #endregion
     }
 }

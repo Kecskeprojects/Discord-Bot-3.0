@@ -1,46 +1,21 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord_Bot.CommandsService;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
-using Discord_Bot.Resources;
-using Discord_Bot.Tools;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Commands
+namespace Discord_Bot.Commands.Admin
 {
-    public class CustomCommandCommands(ICustomCommandService customCommandService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
+    public class AdminCustomCommandCommands(
+        ICustomCommandService customCommandService,
+        IServerService serverService,
+        Logging logger,
+        Config config) : BaseCommand(logger, config, serverService)
     {
         private readonly ICustomCommandService customCommandService = customCommandService;
-
-        [Command("custom list")]
-        [RequireContext(ContextType.Guild)]
-        [Alias(["customlist", "customcommands"])]
-        [Summary("Command to list out all the currently available commands")]
-        public async Task CustomList()
-        {
-            try
-            {
-                List<CustomCommandResource> list = await customCommandService.GetServerCustomCommandListAsync(Context.Guild.Id);
-                if (CollectionTools.IsNullOrEmpty(list))
-                {
-                    await ReplyAsync("There are no custom commands on this server!");
-                    return;
-                }
-
-                EmbedBuilder builder = ChatService.BuildCustomListEmbed(list);
-
-                await ReplyAsync("", false, builder.Build());
-            }
-            catch (Exception ex)
-            {
-                logger.Error("CustomCommandCommands.cs CustomList", ex);
-            }
-        }
 
         [Command("command add")]
         [RequireUserPermission(ChannelPermission.ManageMessages)]
@@ -74,7 +49,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("CustomCommandCommands.cs CustomCommandAdd", ex);
+                logger.Error("AdminCustomCommandCommands.cs CustomCommandAdd", ex);
             }
         }
 
@@ -102,7 +77,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("CustomCommandCommands.cs CustomCommandRemove", ex);
+                logger.Error("AdminCustomCommandCommands.cs CustomCommandRemove", ex);
             }
         }
     }
