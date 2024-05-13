@@ -249,14 +249,10 @@ namespace Discord_Bot.Commands.User
                     //Also make the first letter upper case
                     bias = bias.ToUpper();
 
-                    //Choose 1 out of 4 responses
-                    switch (r.Next(0, 4))
-                    {
-                        case 0: { await ReplyAsync($"Between you and me, I quite like {bias} too."); break; }
-                        case 1: { await ReplyAsync($"{bias}? Good choice!"); break; }
-                        case 2: { await ReplyAsync($"Hmm, this list is quite short, someone with a life over here..."); break; }
-                        case 3: { await ReplyAsync($"Oh, {bias} is honestly just great."); break; }
-                    }
+                    string baseMessage = StaticLists.BiasExtraMessage[r.Next(0, StaticLists.BiasExtraMessage.Length)];
+                    string message = string.Format(baseMessage, bias);
+
+                    await ReplyAsync(message);
                 }
             }
             catch (Exception ex)

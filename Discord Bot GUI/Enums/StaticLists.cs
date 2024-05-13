@@ -90,7 +90,6 @@ namespace Discord_Bot.Enums
             {"japanese", "ja-widget.xml"}
         };
 
-        //Array for birthday messages
         public static string[] BirthdayMessage { get; } =
             [
                 "Hey look, {0} has their birthday today! Send some nice wishes!",
@@ -115,5 +114,13 @@ namespace Discord_Bot.Enums
             ];
         
         public static string[] DateSeparator { get; } = [",", "/", "\\", "-", ".", " "];
+
+        public static string[] BiasExtraMessage { get; } =
+            [
+                "Between you and me, I quite like {0} too.",
+                "{0}? Good choice!",
+                "Hmm, this list is quite short, someone with a life over here...",
+                "Oh, {0} is honestly just great."
+            ];
     }
 }
