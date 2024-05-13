@@ -1,11 +1,11 @@
-﻿using Discord.Commands;
-using Discord;
+﻿using Discord;
+using Discord.Commands;
+using Discord_Bot.Core;
+using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces.DBServices;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord_Bot.Core.Configuration;
-using Discord_Bot.Core;
-using Discord_Bot.Interfaces.DBServices;
 
 namespace Discord_Bot.Commands.Owner
 {

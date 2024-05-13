@@ -17,7 +17,7 @@ namespace Discord_Bot.Core
     {
         public static ConcurrentDictionary<ulong, ServerAudioResource> ServerAudioResources { get; private set; } = [];
         public static ConcurrentDictionary<ulong, BiasGameData> BiasGames { get; private set; } = [];
-        
+
         //Check if user has a nickname
         public static string GetNickName(ISocketMessageChannel channel, SocketUser user)
         {
