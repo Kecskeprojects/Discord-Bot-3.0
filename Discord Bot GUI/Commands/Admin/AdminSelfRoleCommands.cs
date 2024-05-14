@@ -7,6 +7,7 @@ using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Processors.MessageProcessor;
 using Discord_Bot.Resources;
 using System;
 using System.Collections.Generic;
@@ -14,9 +15,13 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Commands
+namespace Discord_Bot.Commands.Admin
 {
-    public class SelfRoleCommands(IRoleService roleService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
+    public class AdminSelfRoleCommands(
+        IRoleService roleService,
+        IServerService serverService,
+        Logging logger,
+        Config config) : BaseCommand(logger, config, serverService)
     {
         private readonly IRoleService roleService = roleService;
 
@@ -54,7 +59,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("AdminCommands.cs SelfRoleAdd", ex);
+                logger.Error("AdminSelfRoleCommands.cs SelfRoleAdd", ex);
             }
         }
 
@@ -92,7 +97,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("AdminCommands.cs SelfRoleRemove", ex);
+                logger.Error("AdminSelfRoleCommands.cs SelfRoleRemove", ex);
             }
         }
 
@@ -104,7 +109,7 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+                ServerResource server = await GetCurrentServerAsync();
 
                 if (!server.SettingsChannels.TryGetValue(ChannelTypeEnum.RoleText, out List<ulong> roleChannels))
                 {
@@ -123,7 +128,7 @@ namespace Discord_Bot.Commands
 
                 List<RoleResource> roles = await roleService.GetServerRolesAsync(Context.Guild.Id);
 
-                string message = RoleService.CreateRoleMessage(roles);
+                string message = RoleMessageProcessor.CreateMessage(roles);
                 RestUserMessage newMessage = await channel.SendMessageAsync(message);
 
                 DbProcessResultEnum result = await serverService.ChangeRoleMessageIdAsync(Context.Guild.Id, newMessage.Id);
@@ -138,7 +143,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("AdminCommands.cs SendSelfRoleMessage", ex);
+                logger.Error("AdminSelfRoleCommands.cs SendSelfRoleMessage", ex);
             }
         }
     }

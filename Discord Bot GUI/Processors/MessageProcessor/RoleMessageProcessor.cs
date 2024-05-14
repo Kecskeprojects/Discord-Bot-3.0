@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace Discord_Bot.CommandsService
+namespace Discord_Bot.Processors.MessageProcessor
 {
-    public class RoleService
+    public class RoleMessageProcessor
     {
-        public static string CreateRoleMessage(List<RoleResource> roles)
+        public static string CreateMessage(List<RoleResource> roles)
         {
             TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
             string[] roleStrings = [.. roles.Select(r => $"- `{textInfo.ToTitleCase(r.RoleName)}`").Order()];

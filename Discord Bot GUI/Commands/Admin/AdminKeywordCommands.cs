@@ -9,7 +9,11 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin
 {
-    public class AdminKeywordCommands(IKeywordService keywordService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
+    public class AdminKeywordCommands(
+        IKeywordService keywordService,
+        IServerService serverService,
+        Logging logger,
+        Config config) : BaseCommand(logger, config, serverService)
     {
         private readonly IKeywordService keywordService = keywordService;
 
