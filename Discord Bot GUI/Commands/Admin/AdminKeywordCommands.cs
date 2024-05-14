@@ -7,9 +7,9 @@ using Discord_Bot.Interfaces.DBServices;
 using System;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Commands
+namespace Discord_Bot.Commands.Admin
 {
-    public class KeywordCommands(IKeywordService keywordService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
+    public class AdminKeywordCommands(IKeywordService keywordService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
     {
         private readonly IKeywordService keywordService = keywordService;
 
@@ -39,7 +39,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("AdminCommands.cs KeywordAdd", ex);
+                logger.Error("AdminKeywordCommands.cs KeywordAdd", ex);
             }
         }
 
@@ -67,7 +67,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("AdminCommands.cs KeywordRemove", ex);
+                logger.Error("AdminKeywordCommands.cs KeywordRemove", ex);
             }
         }
     }

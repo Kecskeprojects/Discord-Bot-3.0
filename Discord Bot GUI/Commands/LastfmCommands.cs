@@ -25,6 +25,7 @@ namespace Discord_Bot.Commands
         private readonly ILastFmAPI lastFmAPI = lastFmAPI;
         private readonly WhoKnowsImageProcessor whoKnowsImageProcessor = whoKnowsImageProcessor;
 
+        //Todo: Where percentages are shown, change the current rounded ints to double
         #region Connect last.fm commands
         [Command("lf conn")]
         [Alias(["lf c", "lf connect"])]
