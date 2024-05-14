@@ -1,19 +1,23 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord_Bot.CommandsService;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
+using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Commands
+namespace Discord_Bot.Commands.User
 {
-    public class ReminderCommands(IReminderService reminderService, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
+    public class UserReminderCommands(
+        IReminderService reminderService,
+        IServerService serverService,
+        Logging logger,
+        Config config) : BaseCommand(logger, config, serverService)
     {
         private readonly IReminderService reminderService = reminderService;
 
@@ -24,13 +28,9 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                if (Context.Channel.GetChannelType() != ChannelType.DM)
+                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
                 {
-                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
-                    {
-                        return;
-                    }
+                    return;
                 }
 
                 if (message.Split(">").Length < 2)
@@ -107,7 +107,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("ReminderCommands.cs RemindAt", ex);
+                logger.Error("UserReminderCommands.cs RemindAt", ex);
             }
         }
 
@@ -118,13 +118,9 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                if (Context.Channel.GetChannelType() != ChannelType.DM)
+                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
                 {
-                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
-                    {
-                        return;
-                    }
+                    return;
                 }
 
                 if (message.Split(">").Length < 2)
@@ -135,7 +131,7 @@ namespace Discord_Bot.Commands
                 //Take the message apart and clear trailing whitespaces
                 string amountstring = message.Split(">")[0].Trim();
                 string remindMessage = message.Split(">")[1].Trim();
-                List<string> amounts = ReminderService.GetAmountsList(amountstring);
+                List<string> amounts = StringTools.GetTimeMeasurements(amountstring);
 
                 //Length check, the message row of the database only accepts lengths of up to 150
                 if (remindMessage.Length > 150)
@@ -148,7 +144,7 @@ namespace Discord_Bot.Commands
                 if (amounts.Count % 2 == 0)
                 {
                     //Check what lengths of time we need to deal with and add it to the current date
-                    if (!ReminderService.TryAddValuesToDate(amounts, out DateTime date))
+                    if (!DateTimeTools.TryAddValuesToDate(amounts, out DateTime date))
                     {
                         return;
                     }
@@ -172,7 +168,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("ChatCommands.cs RemindIn", ex);
+                logger.Error("UserReminderCommands.cs RemindIn", ex);
             }
         }
 
@@ -183,13 +179,9 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                if (Context.Channel.GetChannelType() != ChannelType.DM)
+                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
                 {
-                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
-                    {
-                        return;
-                    }
+                    return;
                 }
 
                 List<ReminderResource> list = await reminderService.GetUserReminderListAsync(Context.User.Id);
@@ -211,7 +203,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("ChatCommands.cs RemindList", ex);
+                logger.Error("UserReminderCommands.cs RemindList", ex);
             }
         }
 
@@ -222,13 +214,9 @@ namespace Discord_Bot.Commands
         {
             try
             {
-                if (Context.Channel.GetChannelType() != ChannelType.DM)
+                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
                 {
-                    ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                    if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
-                    {
-                        return;
-                    }
+                    return;
                 }
 
                 DbProcessResultEnum result = await reminderService.RemoveUserReminderAsync(Context.User.Id, reminderOrderId);
@@ -247,7 +235,7 @@ namespace Discord_Bot.Commands
             }
             catch (Exception ex)
             {
-                logger.Error("ChatCommands.cs RemindRemove", ex);
+                logger.Error("UserReminderCommands.cs RemindRemove", ex);
             }
         }
     }

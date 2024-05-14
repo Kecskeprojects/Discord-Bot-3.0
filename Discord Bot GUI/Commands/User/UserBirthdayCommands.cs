@@ -29,6 +29,11 @@ namespace Discord_Bot.Commands.User
         {
             try
             {
+                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
+                {
+                    return;
+                }
+
                 if (!string.IsNullOrEmpty(month) && string.IsNullOrEmpty(day))
                 {
                     return;
@@ -80,6 +85,11 @@ namespace Discord_Bot.Commands.User
         {
             try
             {
+                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
+                {
+                    return;
+                }
+
                 DbProcessResultEnum result = await birthdayService.RemoveBirthdayAsync(Context.Guild.Id, Context.User.Id);
                 if (result == DbProcessResultEnum.Success)
                 {
@@ -107,6 +117,11 @@ namespace Discord_Bot.Commands.User
         {
             try
             {
+                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
+                {
+                    return;
+                }
+
                 List<BirthdayResource> list = await birthdayService.GetServerBirthdayListAsync(Context.Guild.Id);
                 if (CollectionTools.IsNullOrEmpty(list))
                 {
