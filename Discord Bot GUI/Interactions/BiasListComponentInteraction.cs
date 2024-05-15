@@ -2,6 +2,7 @@
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Processors.MessageProcessor;
 using Discord_Bot.Resources;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace Discord_Bot.Interactions
 
                 List<IdolResource> idols = await GetIdols(selectedIdolGroups);
 
-                string message = CreateMessage(selectedIdolGroups, idols);
+                string message = BiasListGroupMemberMessageProcessor.CreateMessage(selectedIdolGroups, idols);
 
                 await RespondAsync(message);
             }
@@ -46,27 +47,6 @@ namespace Discord_Bot.Interactions
             {
                 return await idolService.GetIdolsByGroupAsync(selectedIdolGroups[0]);
             }
-        }
-
-        private static string CreateMessage(string[] selectedIdolGroups, List<IdolResource> idols)
-        {
-            string message = "";
-
-            //Add Group name
-            message += $"{selectedIdolGroups[0].Split("><")[0].ToUpper()}:\n";
-
-            //Add individual members
-            foreach (IdolResource member in idols)
-            {
-                if (member != idols[0])
-                {
-                    message += ", ";
-                }
-
-                message += $"`{member.Name.ToUpper()}`";
-            }
-
-            return message;
         }
     }
 }

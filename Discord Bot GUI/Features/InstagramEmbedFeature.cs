@@ -69,7 +69,7 @@ namespace Discord_Bot.Features
 
                 try
                 {
-                    result = await SendInstagramMessageAsync(attachments, files, uri.OriginalString, refer, Context.Channel, false);
+                    result = await SendInstagramMessageAsync(attachments, files, uri.OriginalString, refer, false);
                 }
                 catch (Exception ex)
                 {
@@ -79,7 +79,7 @@ namespace Discord_Bot.Features
                     }
 
                     logger.Warning("InstagramEmbedFeature.cs SendInstagramPostEmbedAsync", "Embed too large, only sending images!");
-                    result = await SendInstagramMessageAsync(attachments, files, uri.OriginalString, refer, Context.Channel, ignoreVideos: true);
+                    result = await SendInstagramMessageAsync(attachments, files, uri.OriginalString, refer, ignoreVideos: true);
                 }
             }
             catch (Exception ex)
@@ -100,7 +100,7 @@ namespace Discord_Bot.Features
             }
         }
 
-        private static async Task<InstagramMessageResult> SendInstagramMessageAsync(List<FileAttachment> attachments, string[] files, string url, MessageReference refer, IMessageChannel channel, bool ignoreVideos)
+        private async Task<InstagramMessageResult> SendInstagramMessageAsync(List<FileAttachment> attachments, string[] files, string url, MessageReference refer, bool ignoreVideos)
         {
             string message = InstagramMessageProcessor.GetEmbedContent(attachments, files, url, ignoreVideos);
 
@@ -108,13 +108,13 @@ namespace Discord_Bot.Features
             if (attachments.Count > 0)
             {
                 result.HasFileDownloadHappened = true;
-                await channel.SendFilesAsync(attachments, message, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
+                await Context.Channel.SendFilesAsync(attachments, message, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
                 result.ShouldMessageBeSuppressed = true;
             }
             //Ignore videos is a second try at sending so that is when we can know if the post is too large to send
             else if (ignoreVideos == true)
             {
-                await channel.SendMessageAsync("Post content too large to send!");
+                await Context.Channel.SendMessageAsync("Post content too large to send!");
             }
 
             return result;

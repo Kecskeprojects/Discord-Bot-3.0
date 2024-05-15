@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Discord_Bot.Processors.EmbedProcessors
+namespace Discord_Bot.Processors.EmbedProcessors.Help
 {
-    public static class HelpAdminEmbedProcessor
+    public class HelpOwnerEmbedProcessor
     {
         public static Embed[] CreateEmbed(string imageUrl)
         {
             EmbedBuilder builder = new();
-            builder.WithTitle("Admin Commands");
+            Dictionary<string, string> commands = ReadCommandsFile();
+            builder.WithTitle("Owner Commands");
 
             int i = 1;
-            Dictionary<string, string> commands = ReadCommandsFile();
             foreach (KeyValuePair<string, string> item in commands)
             {
                 builder.AddField(item.Key, item.Value, false);
@@ -26,7 +26,7 @@ namespace Discord_Bot.Processors.EmbedProcessors
         private static Dictionary<string, string> ReadCommandsFile()
         {
             Dictionary<string, string> commands = [];
-            using (StreamReader reader = new("Assets\\Commands\\Admin_Commands.txt"))
+            using (StreamReader reader = new("Assets\\Commands\\Owner_Commands.txt"))
             {
                 while (!reader.EndOfStream)
                 {

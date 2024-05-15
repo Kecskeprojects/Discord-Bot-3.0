@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Processors.EmbedProcessors;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
 using System;
@@ -29,12 +30,12 @@ namespace Discord_Bot.Features
                     foreach (ulong channelId in notificationChannels)
                     {
                         IMessageChannel channel = client.GetChannel(channelId) as IMessageChannel;
-                        EmbedBuilder builder = BuildTwitchEmbed(twitchChannel, thumbnailUrl, title);
+                        Embed[] embed = TwitchNotificationEmbedProcessor.CreateEmbed(twitchChannel, thumbnailUrl, title);
 
                         //If there is no notification role set on the server, we just send a message without the role ping
                         string notifRole = !NumberTools.IsNullOrZero(twitchChannel.NotificationRoleDiscordId) ? $"<@&{twitchChannel.NotificationRoleDiscordId}>" : "";
 
-                        await channel.SendMessageAsync(notifRole, false, builder.Build());
+                        await channel.SendMessageAsync(notifRole, embeds: embed);
                     }
                 }
             }
@@ -42,20 +43,6 @@ namespace Discord_Bot.Features
             {
                 logger.Error("TwitchNotificationFeature.cs Run", ex);
             }
-        }
-
-        private static EmbedBuilder BuildTwitchEmbed(TwitchChannelResource twitchChannel, string thumbnailUrl, string title)
-        {
-            string thumbnail = thumbnailUrl.Replace("{width}", "1024").Replace("{height}", "576");
-
-            EmbedBuilder builder = new();
-            builder.WithTitle("Stream is now online!");
-            builder.AddField(title != "" ? title : "No Title", twitchChannel.TwitchLink, false);
-            builder.WithImageUrl(thumbnail);
-            builder.WithCurrentTimestamp();
-
-            builder.WithColor(Color.Purple);
-            return builder;
         }
     }
 }

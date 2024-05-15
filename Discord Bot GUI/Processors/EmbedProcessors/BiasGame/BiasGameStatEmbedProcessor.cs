@@ -3,7 +3,7 @@ using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using System.Linq;
 
-namespace Discord_Bot.Processors.EmbedProcessors
+namespace Discord_Bot.Processors.EmbedProcessors.BiasGame
 {
     public static class BiasGameStatEmbedProcessor
     {

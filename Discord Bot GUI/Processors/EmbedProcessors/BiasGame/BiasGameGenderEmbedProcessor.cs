@@ -1,6 +1,6 @@
 ﻿using Discord;
 
-namespace Discord_Bot.Processors.EmbedProcessors
+namespace Discord_Bot.Processors.EmbedProcessors.BiasGame
 {
     public static class BiasGameGenderEmbedProcessor
     {

@@ -4,15 +4,15 @@ using System.IO;
 
 namespace Discord_Bot.Processors.EmbedProcessors
 {
-    public class HelpOwnerEmbedProcessor
+    public static class FeaturesEmbedProcessor
     {
         public static Embed[] CreateEmbed(string imageUrl)
         {
             EmbedBuilder builder = new();
-            Dictionary<string, string> commands = ReadCommandsFile();
-            builder.WithTitle("Owner Commands");
+            builder.WithTitle("Passive processes");
 
             int i = 1;
+            Dictionary<string, string> commands = ReadFeaturesFile();
             foreach (KeyValuePair<string, string> item in commands)
             {
                 builder.AddField(item.Key, item.Value, false);
@@ -23,19 +23,24 @@ namespace Discord_Bot.Processors.EmbedProcessors
             return [builder.Build()];
         }
 
-        private static Dictionary<string, string> ReadCommandsFile()
+        public static Dictionary<string, string> ReadFeaturesFile()
         {
             Dictionary<string, string> commands = [];
-            using (StreamReader reader = new("Assets\\Commands\\Owner_Commands.txt"))
+            using (StreamReader reader = new("Assets\\Commands\\Features.txt"))
             {
+                string curr = "";
                 while (!reader.EndOfStream)
                 {
                     string line = reader.ReadLine();
 
-                    if (line.StartsWith('!') || line.StartsWith('.'))
+                    if (line.StartsWith('-'))
                     {
-                        string[] parts = line.Split("\t\t");
-                        commands.Add(parts[0], parts[1]);
+                        commands[curr] += $"{line}\n";
+                    }
+                    else if (line != "")
+                    {
+                        commands.Add(line, "");
+                        curr = line;
                     }
                 }
             };

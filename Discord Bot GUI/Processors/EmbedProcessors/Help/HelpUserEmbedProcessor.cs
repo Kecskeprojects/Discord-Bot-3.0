@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Discord_Bot.Processors.EmbedProcessors
+namespace Discord_Bot.Processors.EmbedProcessors.Help
 {
     public static class HelpUserEmbedProcessor
     {

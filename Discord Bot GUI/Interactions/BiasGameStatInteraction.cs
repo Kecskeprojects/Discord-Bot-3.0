@@ -5,7 +5,7 @@ using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
-using Discord_Bot.Processors.EmbedProcessors;
+using Discord_Bot.Processors.EmbedProcessors.BiasGame;
 using Discord_Bot.Resources;
 using System;
 using System.Threading.Tasks;

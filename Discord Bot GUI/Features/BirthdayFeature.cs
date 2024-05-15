@@ -2,6 +2,7 @@
 using Discord_Bot.Core;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Processors.MessageProcessor;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
 using System;
@@ -47,21 +48,10 @@ namespace Discord_Bot.Features
                 SocketGuild guild = client.GetGuild(birthday.ServerDiscordId);
                 await guild.DownloadUsersAsync();
 
-                string message = CreateBirthdayMessage(birthday, guild);
+                string message = BirthdayMessageProcessor.CreateMessage(birthday, guild);
 
                 await channel.SendMessageAsync(message);
             }
-        }
-
-        private static string CreateBirthdayMessage(BirthdayResource birthday, SocketGuild guild)
-        {
-            SocketGuildUser user = guild.GetUser(birthday.UserDiscordId);
-
-            Random r = new();
-            string baseMessage = StaticLists.BirthdayMessage[r.Next(0, StaticLists.BirthdayMessage.Length)];
-
-            string message = string.Format(baseMessage, user.Mention, (DateTime.UtcNow.Year - birthday.Date.Year).ToString());
-            return message;
         }
     }
 }

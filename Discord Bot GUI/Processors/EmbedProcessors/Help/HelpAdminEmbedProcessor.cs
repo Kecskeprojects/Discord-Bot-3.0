@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Discord_Bot.Processors.EmbedProcessors
+namespace Discord_Bot.Processors.EmbedProcessors.Help
 {
-    public static class FeatureEmbedProcessor
+    public static class HelpAdminEmbedProcessor
     {
         public static Embed[] CreateEmbed(string imageUrl)
         {
             EmbedBuilder builder = new();
-            builder.WithTitle("Passive processes");
+            builder.WithTitle("Admin Commands");
 
             int i = 1;
-            Dictionary<string, string> commands = ReadFeaturesFile();
+            Dictionary<string, string> commands = ReadCommandsFile();
             foreach (KeyValuePair<string, string> item in commands)
             {
                 builder.AddField(item.Key, item.Value, false);
@@ -23,24 +23,19 @@ namespace Discord_Bot.Processors.EmbedProcessors
             return [builder.Build()];
         }
 
-        public static Dictionary<string, string> ReadFeaturesFile()
+        private static Dictionary<string, string> ReadCommandsFile()
         {
             Dictionary<string, string> commands = [];
-            using (StreamReader reader = new("Assets\\Commands\\Features.txt"))
+            using (StreamReader reader = new("Assets\\Commands\\Admin_Commands.txt"))
             {
-                string curr = "";
                 while (!reader.EndOfStream)
                 {
                     string line = reader.ReadLine();
 
-                    if (line.StartsWith('-'))
+                    if (line.StartsWith('!') || line.StartsWith('.'))
                     {
-                        commands[curr] += $"{line}\n";
-                    }
-                    else if (line != "")
-                    {
-                        commands.Add(line, "");
-                        curr = line;
+                        string[] parts = line.Split("\t\t");
+                        commands.Add(parts[0], parts[1]);
                     }
                 }
             };

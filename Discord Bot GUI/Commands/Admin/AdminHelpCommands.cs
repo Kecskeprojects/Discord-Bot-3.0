@@ -4,6 +4,7 @@ using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Processors.EmbedProcessors;
+using Discord_Bot.Processors.EmbedProcessors.Help;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -60,7 +61,7 @@ namespace Discord_Bot.Commands.Admin
                     return;
                 }
 
-                Embed[] embed = FeatureEmbedProcessor.CreateEmbed(config.Img);
+                Embed[] embed = FeaturesEmbedProcessor.CreateEmbed(config.Img);
 
                 await ReplyAsync(embeds: embed);
             }

@@ -2,7 +2,7 @@
 using Discord_Bot.Communication.Bias;
 using System.Collections.Generic;
 
-namespace Discord_Bot.Processors.EmbedProcessors
+namespace Discord_Bot.Processors.EmbedProcessors.BiasGame
 {
     public static class BiasGameEmbedProcessor
     {

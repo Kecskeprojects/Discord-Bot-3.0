@@ -3,7 +3,7 @@ using Discord.Commands;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Interfaces.DBServices;
-using Discord_Bot.Processors.EmbedProcessors;
+using Discord_Bot.Processors.EmbedProcessors.Help;
 using System;
 using System.Collections.Generic;
 using System.IO;
