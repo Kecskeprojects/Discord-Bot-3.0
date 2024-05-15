@@ -22,6 +22,7 @@ namespace Discord_Bot
         #region Variables
         private IServiceProvider services;
         private Logging logger;
+        private BrowserService browserService;
         private Thread twitchThread;
         private System.Timers.Timer mainTimer;
         private BotMain Bot;
@@ -37,6 +38,7 @@ namespace Discord_Bot
 
             services = ServiceBuilder.BuildService();
             logger = services.GetService<Logging>();
+            browserService = services.GetService<BrowserService>();
 
             using (IServiceScope scope = services.CreateScope())
             {
@@ -142,7 +144,7 @@ namespace Discord_Bot
         {
             try
             {
-                await BrowserService.CloseBrowser();
+                await browserService.CloseBrowser();
                 logger.Log("Application closing...");
 
                 using (IServiceScope scope = services.CreateScope())
@@ -158,7 +160,7 @@ namespace Discord_Bot
         {
             try
             {
-                await BrowserService.CloseBrowser();
+                await browserService.CloseBrowser();
                 logger.Log("Application closing...");
 
                 using (IServiceScope scope = services.CreateScope())

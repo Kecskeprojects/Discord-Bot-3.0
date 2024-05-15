@@ -15,6 +15,7 @@ namespace Discord_Bot.Processors
     public class BiasScrapingProcessor(
         IIdolService idolService,
         IKpopDbScraper kpopDbScraper,
+        BrowserService browserService,
         Logging logger)
     {
         private readonly IIdolService idolService = idolService;
@@ -45,7 +46,7 @@ namespace Discord_Bot.Processors
                 logger.Log($"Corrected {correctionCount} idols with errors created during update.");
 
                 //Sometimes spam pages are opened so we clean the browser
-                await BrowserService.CloseBrowser();
+                await browserService.CloseBrowser();
 
                 logger.Log("Update Bias Data Logic ended!");
             }

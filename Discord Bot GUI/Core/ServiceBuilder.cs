@@ -84,6 +84,7 @@ namespace Discord_Bot.Core
             collection.AddTransient<YoutubeAddPlaylistFeature>();
 
             //Services
+            collection.AddSingleton<BrowserService>();
             collection.AddTransient<ITwitchAPI, TwitchAPI>();
             collection.AddTransient<ITwitchCLI, TwitchCLI>();
             collection.AddTransient<ISpotifyAPI, Services.SpotifyAPI>();

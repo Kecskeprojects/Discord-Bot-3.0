@@ -2,7 +2,6 @@
 using AngleSharp.Dom;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
-using Discord_Bot.Core.Configuration;
 using Discord_Bot.Interfaces.Services;
 using PuppeteerSharp;
 using PuppeteerSharp.Input;
@@ -13,18 +12,18 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Services
 {
-    public class KpopDbScraper(Config config, Logging logger) : IKpopDbScraper
+    public class KpopDbScraper(Logging logger, BrowserService browserService) : IKpopDbScraper
     {
         private static Uri BaseUrl { get; } = new("https://dbkpop.com/db/all-k-pop-idols/");
-        private readonly Config config = config;
         private readonly Logging logger = logger;
+        private readonly BrowserService browserService = browserService;
 
         public async Task<List<ExtendedBiasData>> ExtractFromDatabaseTableAsync()
         {
             List<ExtendedBiasData> biasDataList = [];
             try
             {
-                IPage mainPage = await BrowserService.CreateNewPage(logger, config);
+                IPage mainPage = await browserService.NewPage();
 
                 IDocument document = await GetPageAndSetSettingsAsync(mainPage);
 
@@ -84,7 +83,7 @@ namespace Discord_Bot.Services
             AdditionalIdolData idolData = null;
             try
             {
-                IPage mainPage = await BrowserService.CreateNewPage(logger, config);
+                IPage mainPage = await browserService.NewPage();
 
                 Uri uri = new(url);
                 IDocument document = await GetPageByUrl(mainPage, uri, url.StartsWith("https://kprofiles.com/"));

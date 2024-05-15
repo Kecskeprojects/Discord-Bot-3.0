@@ -11,7 +11,7 @@ namespace Discord_Bot.Windows
 {
     public partial class MainWindow : Window
     {
-        private static Timer diagnosticsTimer;
+        private readonly Timer diagnosticsTimer;
         private bool AutoScroll = true;
 
         private readonly Logging logger;
