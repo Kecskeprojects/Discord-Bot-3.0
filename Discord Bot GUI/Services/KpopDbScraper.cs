@@ -14,9 +14,10 @@ namespace Discord_Bot.Services
 {
     public class KpopDbScraper(Logging logger, BrowserService browserService) : IKpopDbScraper
     {
-        private static Uri BaseUrl { get; } = new("https://dbkpop.com/db/all-k-pop-idols/");
         private readonly Logging logger = logger;
         private readonly BrowserService browserService = browserService;
+
+        private static Uri BaseUrl { get; } = new("https://dbkpop.com/db/all-k-pop-idols/");
 
         public async Task<List<ExtendedBiasData>> ExtractFromDatabaseTableAsync()
         {

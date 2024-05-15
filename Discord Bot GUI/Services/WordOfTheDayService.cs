@@ -15,7 +15,7 @@ namespace Discord_Bot.Services
     {
         private readonly Logging logger = logger;
 
-        private static string BaseUrl { get; } = "http://wotd.transparent.com/rss/";
+        private static Uri BaseUrl { get; } = new("http://wotd.transparent.com/rss/");
 
         public async Task<WotdBase> GetDataAsync(string language)
         {

@@ -17,10 +17,10 @@ namespace Discord_Bot.Services
     {
         private readonly Logging logger = logger;
         private readonly BrowserService browserService = browserService;
-        private static readonly string[] smallSizingStrings = ["thumb", "small", "medium"];
-        //private static readonly string[] largeSizingStrings = ["large", "orig"];
 
         private Root Body { get; set; }
+        private static readonly string[] smallSizingStrings = ["thumb", "small", "medium"];
+        //private static readonly string[] largeSizingStrings = ["large", "orig"];
 
         #region Main Methods
         public async Task<TwitterScrapingResult> GetDataFromUrls(List<Uri> uris)

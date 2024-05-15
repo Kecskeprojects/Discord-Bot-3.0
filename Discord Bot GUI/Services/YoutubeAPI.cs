@@ -21,11 +21,12 @@ namespace Discord_Bot.Services
     public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Logging logger, Config config) : IYoutubeAPI
     {
         #region Variables
-        private static readonly Dictionary<string, int> keys = [];
-        private static int youtubeIndex = 0;
         private readonly YoutubeAddPlaylistFeature youtubeAddPlaylistFeature = youtubeAddPlaylistFeature;
         private readonly Logging logger = logger;
         private readonly Config config = config;
+
+        private static readonly Dictionary<string, int> keys = [];
+        private static int youtubeIndex = 0;
         #endregion
 
         #region Base Methods

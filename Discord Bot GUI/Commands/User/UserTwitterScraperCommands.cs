@@ -21,8 +21,9 @@ namespace Discord_Bot.Commands.User
         Logging logger,
         Config config) : BaseCommand(logger, config, serverService)
     {
-        private static readonly string[] baseURLs = ["https://twitter.com/", "https://x.com/"];
         private readonly ITwitterScraper twitterScraper = twitterScraper;
+
+        private static readonly string[] baseURLs = ["https://twitter.com/", "https://x.com/"];
 
         [Command("twt")]
         [Summary("For embedding twitter messages, replacing the built in discord embeds")]

@@ -11,9 +11,10 @@ namespace Discord_Bot.Services
 {
     public class MusicBrainzAPI(Logging logger) : IMusicBrainzAPI
     {
-        private static string BaseUrl { get; } = "https://musicbrainz.org/ws/2/";
-        private static readonly RestClient _client = new(BaseUrl);
         private readonly Logging logger = logger;
+
+        private static Uri BaseUrl { get; } = new("https://musicbrainz.org/ws/2/");
+        private static readonly RestClient _client = new(BaseUrl);
 
         //https://musicbrainz.org/ws/2/artist/[artistMBID]?inc=url-rels&fmt=json
         public async Task<string> GetArtistSpotifyUrlAsync(string mbid)

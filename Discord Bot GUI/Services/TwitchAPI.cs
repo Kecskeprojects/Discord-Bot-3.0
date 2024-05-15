@@ -23,17 +23,17 @@ namespace Discord_Bot.Services
         Config config) : ITwitchAPI
     {
         #region Variables
-        //Saved variables
-        private LiveStreamMonitorService Monitor;
-        private TwitchLib.Api.TwitchAPI API;
-        private static readonly Dictionary<string, bool> channelStatuses = [];
-        private static string Token;
-        private static int TokenTick = 0;
         private readonly ITwitchCLI twitchCLI = twitchCLI;
         private readonly ITwitchChannelService twitchChannelService = twitchChannelService;
         private readonly TwitchNotificationFeature twitchNotificationFeature = twitchNotificationFeature;
         private readonly Logging logger = logger;
         private readonly Config config = config;
+
+        private LiveStreamMonitorService Monitor;
+        private TwitchLib.Api.TwitchAPI API;
+        private readonly Dictionary<string, bool> channelStatuses = [];
+        private string Token;
+        private int TokenTick = 0;
         #endregion
 
         #region Base Methods
