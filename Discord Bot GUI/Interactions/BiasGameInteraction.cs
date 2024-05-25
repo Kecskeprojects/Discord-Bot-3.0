@@ -25,7 +25,6 @@ namespace Discord_Bot.Interactions
         private readonly IIdolService idolService = idolService;
         private readonly BiasGameImageProcessor biasGameImageProcessor = biasGameImageProcessor;
 
-        //Todo: select/input for when they were born
         [ComponentInteraction("BiasGame_Setup_Gender_*_*")]
         public async Task GenderChosen(GenderChoiceEnum choiceId, ulong userId)
         {
