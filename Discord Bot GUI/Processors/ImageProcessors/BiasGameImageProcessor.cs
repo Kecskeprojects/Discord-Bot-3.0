@@ -53,7 +53,7 @@ namespace Discord_Bot.Processors.ImageProcessors
                 Resource.polaroid_base.Save(polaroidStream, System.Drawing.Imaging.ImageFormat.Png);
                 using Image polaroidBase = Image.Load<Rgba32>(polaroidStream.ToArray());
 
-                using Image idolImage = Image.Load<Rgba32>(await HttpClientTools.GetStream(idol.LatestImageUrl));
+                using Image idolImage = Image.Load<Rgba32>(await WebTools.GetStream(idol.LatestImageUrl));
 
                 if (!idol.LatestImageUrl.StartsWith("https://dbkpop.com"))
                 {

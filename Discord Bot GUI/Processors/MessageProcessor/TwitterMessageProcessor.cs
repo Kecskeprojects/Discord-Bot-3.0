@@ -29,7 +29,7 @@ namespace Discord_Bot.Processors.MessageProcessor
                     _ => ""
                 };
 
-                Embeds.Add(new FileAttachment(await HttpClientTools.GetStream(content[i].Url.OriginalString), fileName));
+                Embeds.Add(new FileAttachment(await WebTools.GetStream(content[i].Url.OriginalString), fileName));
             }
 
             return Embeds;

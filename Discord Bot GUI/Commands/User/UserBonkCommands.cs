@@ -86,7 +86,7 @@ namespace Discord_Bot.Commands.User
                 if (!string.IsNullOrEmpty(url))
                 {
                     logger.Query($"Getting profile image:\n{url}");
-                    Stream stream = await HttpClientTools.GetStream(url);
+                    Stream stream = await WebTools.GetStream(url);
 
                     MemoryStream gifStream = bonkGifProcessor.CreateBonkImage(stream, frameDelay);
 

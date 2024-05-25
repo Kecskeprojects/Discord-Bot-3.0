@@ -35,7 +35,7 @@ namespace Discord_Bot
 
         public async Task RunBotAsync()
         {
-            if (!CoreLogic.TestConnection())
+            if (!WebTools.TestConnection())
             {
                 return;
             }
