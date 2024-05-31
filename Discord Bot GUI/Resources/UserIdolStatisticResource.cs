@@ -1,15 +1,14 @@
-﻿namespace Discord_Bot.Resources
+﻿namespace Discord_Bot.Resources;
+
+public class UserIdolStatisticResource
 {
-    public class UserIdolStatisticResource
-    {
-        public string IdolStageName { get; set; }
+    public string IdolStageName { get; set; }
 
-        public string IdolGroupFullName { get; set; }
+    public string IdolGroupFullName { get; set; }
 
-        public string LatestImageUrl { get; set; }
+    public string LatestImageUrl { get; set; }
 
-        public double Weight { get; set; }
+    public double Weight { get; set; }
 
-        public bool IsUserBias { get; set; }
-    }
+    public bool IsUserBias { get; set; }
 }

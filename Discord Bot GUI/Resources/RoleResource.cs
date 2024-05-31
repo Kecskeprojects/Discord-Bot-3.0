@@ -1,9 +1,8 @@
-﻿namespace Discord_Bot.Resources
-{
-    public class RoleResource
-    {
-        public ulong DiscordId { get; set; }
+﻿namespace Discord_Bot.Resources;
 
-        public string RoleName { get; set; }
-    }
+public class RoleResource
+{
+    public ulong DiscordId { get; set; }
+
+    public string RoleName { get; set; }
 }

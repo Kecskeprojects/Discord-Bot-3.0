@@ -1,9 +1,8 @@
-﻿namespace Discord_Bot.Resources
-{
-    public class IdolAliasResource
-    {
-        public int IdolAliasId { get; set; }
+﻿namespace Discord_Bot.Resources;
 
-        public string Alias { get; set; }
-    }
+public class IdolAliasResource
+{
+    public int IdolAliasId { get; set; }
+
+    public string Alias { get; set; }
 }

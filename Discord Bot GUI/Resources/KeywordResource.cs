@@ -1,9 +1,8 @@
-﻿namespace Discord_Bot.Resources
-{
-    public class KeywordResource
-    {
-        public string Trigger { get; set; }
+﻿namespace Discord_Bot.Resources;
 
-        public string Response { get; set; }
-    }
+public class KeywordResource
+{
+    public string Trigger { get; set; }
+
+    public string Response { get; set; }
 }

@@ -1,14 +1,13 @@
-﻿namespace Discord_Bot.Communication
-{
-    public class InstagramMessageResult
-    {
-        public InstagramMessageResult()
-        {
-            ShouldMessageBeSuppressed = false;
-            HasFileDownloadHappened = false;
-        }
+﻿namespace Discord_Bot.Communication;
 
-        public bool ShouldMessageBeSuppressed { get; set; }
-        public bool HasFileDownloadHappened { get; set; }
+public class InstagramMessageResult
+{
+    public InstagramMessageResult()
+    {
+        ShouldMessageBeSuppressed = false;
+        HasFileDownloadHappened = false;
     }
+
+    public bool ShouldMessageBeSuppressed { get; set; }
+    public bool HasFileDownloadHappened { get; set; }
 }

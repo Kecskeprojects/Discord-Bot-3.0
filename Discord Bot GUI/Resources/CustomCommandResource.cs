@@ -1,9 +1,8 @@
-﻿namespace Discord_Bot.Resources
-{
-    public class CustomCommandResource
-    {
-        public string Command { get; set; }
+﻿namespace Discord_Bot.Resources;
 
-        public string Url { get; set; }
-    }
+public class CustomCommandResource
+{
+    public string Command { get; set; }
+
+    public string Url { get; set; }
 }

@@ -1,10 +1,9 @@
-﻿namespace Discord_Bot.Enums
+﻿namespace Discord_Bot.Enums;
+
+public enum GenderChoiceEnum
 {
-    public enum GenderChoiceEnum
-    {
-        Unknown = 0,
-        Male = 1,
-        Female = 2,
-        Both = 3
-    }
+    Unknown = 0,
+    Male = 1,
+    Female = 2,
+    Both = 3
 }

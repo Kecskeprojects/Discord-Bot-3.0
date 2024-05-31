@@ -1,10 +1,9 @@
-﻿namespace Discord_Bot.Enums
+﻿namespace Discord_Bot.Enums;
+
+public enum TwitterContentTypeEnum
 {
-    public enum TwitterContentTypeEnum
-    {
-        None = 0,
-        Image = 1,
-        Video = 2,
-        Other = 3
-    }
+    None = 0,
+    Image = 1,
+    Video = 2,
+    Other = 3
 }

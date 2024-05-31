@@ -1,13 +1,12 @@
-﻿namespace Discord_Bot.Enums
+﻿namespace Discord_Bot.Enums;
+
+public enum ChannelTypeEnum
 {
-    public enum ChannelTypeEnum
-    {
-        None = 0,
-        RoleText = 1,
-        TwitchNotificationText = 2,
-        MusicText = 3,
-        MusicVoice = 4,
-        CommandText = 5,
-        BirthdayText = 6,
-    }
+    None = 0,
+    RoleText = 1,
+    TwitchNotificationText = 2,
+    MusicText = 3,
+    MusicVoice = 4,
+    CommandText = 5,
+    BirthdayText = 6,
 }

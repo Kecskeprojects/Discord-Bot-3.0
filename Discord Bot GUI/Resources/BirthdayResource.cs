@@ -1,15 +1,14 @@
 ﻿using System;
 
-namespace Discord_Bot.Resources
+namespace Discord_Bot.Resources;
+
+public class BirthdayResource
 {
-    public class BirthdayResource
-    {
-        public int BirthdayId { get; set; }
+    public int BirthdayId { get; set; }
 
-        public ulong ServerDiscordId { get; set; }
+    public ulong ServerDiscordId { get; set; }
 
-        public ulong UserDiscordId { get; set; }
+    public ulong UserDiscordId { get; set; }
 
-        public DateOnly Date { get; set; }
-    }
+    public DateOnly Date { get; set; }
 }

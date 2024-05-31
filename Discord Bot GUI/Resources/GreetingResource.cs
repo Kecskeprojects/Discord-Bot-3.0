@@ -1,9 +1,8 @@
-﻿namespace Discord_Bot.Resources
-{
-    public class GreetingResource
-    {
-        public int GreetingId { get; set; }
+﻿namespace Discord_Bot.Resources;
 
-        public string Url { get; set; }
-    }
+public class GreetingResource
+{
+    public int GreetingId { get; set; }
+
+    public string Url { get; set; }
 }
