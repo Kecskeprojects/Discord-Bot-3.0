@@ -11,19 +11,19 @@ namespace Discord_Bot.Tools
         public static void CorrectImageRatio(Image mainImage, double acceptableMargin = 0.2, double cutoffTopRatio = 0.5, double cutoffLeftRatio = 0.5, double extraHeight = 0.0, double extraWidth = 0.0)
         {
             //If the Cover image is too wide or high, we crop it depending on which of the two it is
-            if (mainImage.Height / (double)mainImage.Width > (1 + acceptableMargin) || mainImage.Height / (double)mainImage.Width < (1 - acceptableMargin))
+            if (mainImage.Height / (double) mainImage.Width > (1 + acceptableMargin) || mainImage.Height / (double) mainImage.Width < (1 - acceptableMargin))
             {
                 int difference = Math.Abs(mainImage.Height - mainImage.Width);
                 if (mainImage.Width > mainImage.Height)
                 {
-                    int X = (int)(difference * cutoffLeftRatio);
-                    int plusWidth = (int)((mainImage.Width - difference) * extraWidth);
+                    int X = (int) (difference * cutoffLeftRatio);
+                    int plusWidth = (int) ((mainImage.Width - difference) * extraWidth);
                     mainImage.Mutate(x => x.Crop(new Rectangle(X, 0, mainImage.Width - difference + plusWidth, mainImage.Height)));
                 }
                 else
                 {
-                    int Y = (int)(difference * cutoffTopRatio);
-                    int plusHeight = (int)((mainImage.Height - difference) * extraHeight);
+                    int Y = (int) (difference * cutoffTopRatio);
+                    int plusHeight = (int) ((mainImage.Height - difference) * extraHeight);
                     mainImage.Mutate(x => x.Crop(new Rectangle(0, Y, mainImage.Width, mainImage.Height - difference + plusHeight)));
                 }
 
@@ -67,11 +67,13 @@ namespace Discord_Bot.Tools
             b /= totalPixels;
 
             //We get the dominant color
-            Rgba32 DominantColor = new((byte)r, (byte)g, (byte)b, 255);
+            Rgba32 DominantColor = new((byte) r, (byte) g, (byte) b, 255);
 
             //By subtracting the values from 255 we get the exact opposite of the color, making it the most visible color
-            r = 255 - r; g = 255 - g; b = 255 - b;
-            Rgba32 ContrastColor = new((byte)r, (byte)g, (byte)b, 255);
+            r = 255 - r;
+            g = 255 - g;
+            b = 255 - b;
+            Rgba32 ContrastColor = new((byte) r, (byte) g, (byte) b, 255);
 
             //Return the two colors in a tuple
             return new Tuple<Color, Color>(DominantColor, ContrastColor);

@@ -30,7 +30,7 @@ namespace Discord_Bot.Services
 
                     XmlSerializer serializer = new(typeof(WotdBase));
                     using StringReader reader = new(response.Content);
-                    result = (WotdBase)serializer.Deserialize(reader);
+                    result = (WotdBase) serializer.Deserialize(reader);
                 }
             }
             catch (HttpRequestException)

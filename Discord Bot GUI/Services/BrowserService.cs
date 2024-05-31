@@ -42,7 +42,7 @@ namespace Discord_Bot.Services
             }
         }
 
-        public  async Task<IPage> NewPage()
+        public async Task<IPage> NewPage()
         {
             if (Browser == null || Browser.IsClosed)
             {

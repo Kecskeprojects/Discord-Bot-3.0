@@ -27,17 +27,17 @@ namespace Discord_Bot.Features
                     switch (Context.Message.Content[0])
                     {
                         case '+':
-                            {
-                                await (Context.User as SocketGuildUser).AddRoleAsync(discordRole);
-                                reply = await Context.Channel.SendMessageAsync($"You now have the `{discordRole.Name}` role!");
-                                break;
-                            }
+                        {
+                            await (Context.User as SocketGuildUser).AddRoleAsync(discordRole);
+                            reply = await Context.Channel.SendMessageAsync($"You now have the `{discordRole.Name}` role!");
+                            break;
+                        }
                         case '-':
-                            {
-                                await (Context.User as SocketGuildUser).RemoveRoleAsync(discordRole);
-                                reply = await Context.Channel.SendMessageAsync($"`{discordRole.Name}` role has been removed!");
-                                break;
-                            }
+                        {
+                            await (Context.User as SocketGuildUser).RemoveRoleAsync(discordRole);
+                            reply = await Context.Channel.SendMessageAsync($"`{discordRole.Name}` role has been removed!");
+                            break;
+                        }
                     }
                 }
 

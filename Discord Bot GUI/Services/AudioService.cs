@@ -99,7 +99,7 @@ namespace Discord_Bot.Services
                         else
                         {
                             logger.Log("Intentional waiting when a video is too short to play");
-                            await Task.Delay((int)length + 2000);
+                            await Task.Delay((int) length + 2000);
                         }
                     }
                     catch (Exception ex)

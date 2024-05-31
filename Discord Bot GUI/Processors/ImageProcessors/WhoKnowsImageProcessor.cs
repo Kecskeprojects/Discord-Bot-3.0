@@ -113,8 +113,8 @@ namespace Discord_Bot.Processors.ImageProcessors
                 //Measure the length of the text so we can put it in the middle
                 FontRectangle textsize = TextMeasurer.MeasureBounds(HeadTextparts[i], new TextOptions(font));
 
-                int X = (mainImage.Width - (int)textsize.Width) / 2;
-                int Y = ((125 - ((int)textsize.Height * HeadTextparts.Length)) / 2) + ((int)textsize.Height * i);
+                int X = (mainImage.Width - (int) textsize.Width) / 2;
+                int Y = ((125 - ((int) textsize.Height * HeadTextparts.Length)) / 2) + ((int) textsize.Height * i);
 
                 //Put Top text on image
                 mainImage.Mutate(x =>
@@ -149,7 +149,7 @@ namespace Discord_Bot.Processors.ImageProcessors
 
                 //Amount of plays the user has
                 mainImage.Mutate(x =>
-                    x.DrawText(points, font, TextColor, new Point(722 - (int)textsize.Width, 137 + (i * 28)))
+                    x.DrawText(points, font, TextColor, new Point(722 - (int) textsize.Width, 137 + (i * 28)))
                 );
             }
         }

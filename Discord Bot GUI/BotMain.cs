@@ -75,29 +75,29 @@ namespace Discord_Bot
                 {
                     case "Server requested a reconnect":
                     case "Unable to connect to the remote server":
-                        {
-                            logger.Client($"{arg.Exception.Message}!");
-                            break;
-                        }
+                    {
+                        logger.Client($"{arg.Exception.Message}!");
+                        break;
+                    }
                     case "WebSocket connection was closed":
                     case "WebSocket session expired":
                     case "A task was canceled.":
+                    {
+                        string message = arg.Exception.Message;
+                        if (message.EndsWith('.'))
                         {
-                            string message = arg.Exception.Message;
-                            if (message.EndsWith('.'))
-                            {
-                                message = message[..^1];
-                            }
+                            message = message[..^1];
+                        }
 
-                            logger.Client($"{message}!", ConsoleOnly: true);
-                            logger.Warning("BotMain.cs ClientLog", arg.Exception, LogOnly: true);
-                            break;
-                        }
+                        logger.Client($"{message}!", ConsoleOnly: true);
+                        logger.Warning("BotMain.cs ClientLog", arg.Exception, LogOnly: true);
+                        break;
+                    }
                     default:
-                        {
-                            logger.Error("BotMain.cs ClientLog", arg.Exception);
-                            break;
-                        }
+                    {
+                        logger.Error("BotMain.cs ClientLog", arg.Exception);
+                        break;
+                    }
                 }
             }
             catch (Exception ex)
@@ -256,27 +256,27 @@ namespace Discord_Bot
                     case null:
                         break;
                     case CommandError.UnmetPrecondition:
-                        {
-                            await context.Channel.SendMessageAsync(result.ErrorReason);
-                            break;
-                        }
+                    {
+                        await context.Channel.SendMessageAsync(result.ErrorReason);
+                        break;
+                    }
                     case CommandError.UnknownCommand:
+                    {
+                        if (context.Channel.GetChannelType() != ChannelType.DM)
                         {
-                            if (context.Channel.GetChannelType() != ChannelType.DM)
+                            using (IServiceScope scope = services.CreateScope())
                             {
-                                using (IServiceScope scope = services.CreateScope())
-                                {
-                                    CustomCommandFeature customCommandFeature = scope.ServiceProvider.GetService<CustomCommandFeature>();
-                                    await customCommandFeature.Run(context as SocketCommandContext);
-                                }
+                                CustomCommandFeature customCommandFeature = scope.ServiceProvider.GetService<CustomCommandFeature>();
+                                await customCommandFeature.Run(context as SocketCommandContext);
                             }
-                            break;
                         }
+                        break;
+                    }
                     default:
-                        {
-                            logger.Warning("BotMain.cs HandleCommandExecutionAsync", result.ErrorReason);
-                            break;
-                        }
+                    {
+                        logger.Warning("BotMain.cs HandleCommandExecutionAsync", result.ErrorReason);
+                        break;
+                    }
                 }
             }
             catch (Exception ex)
@@ -314,10 +314,10 @@ namespace Discord_Bot
                     case null:
                         break;
                     default:
-                        {
-                            logger.Warning("BotMain.cs HandleInteractionExecutionAsync", result.ErrorReason);
-                            break;
-                        }
+                    {
+                        logger.Warning("BotMain.cs HandleInteractionExecutionAsync", result.ErrorReason);
+                        break;
+                    }
                 }
             }
             catch (Exception ex)

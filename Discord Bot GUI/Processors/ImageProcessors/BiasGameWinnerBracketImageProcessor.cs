@@ -115,7 +115,7 @@ namespace Discord_Bot.Processors.ImageProcessors
             textsize = TextMeasurer.MeasureBounds(shortenedText, new TextOptions(font));
 
             bracket.Mutate(x =>
-                x.DrawText(text, font, color, new Point(posCenterX - ((int)textsize.Width / 2), posY))
+                x.DrawText(text, font, color, new Point(posCenterX - ((int) textsize.Width / 2), posY))
             );
         }
     }

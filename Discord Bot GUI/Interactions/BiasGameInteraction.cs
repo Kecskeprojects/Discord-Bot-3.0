@@ -80,8 +80,8 @@ namespace Discord_Bot.Interactions
                 int[] idolIds = data.Pairs[data.CurrentPair];
 
                 Stream combined = biasGameImageProcessor.CombineImages(
-                    (MemoryStream)data.IdolWithImage[idolIds[0]].Stream,
-                    (MemoryStream)data.IdolWithImage[idolIds[1]].Stream);
+                    (MemoryStream) data.IdolWithImage[idolIds[0]].Stream,
+                    (MemoryStream) data.IdolWithImage[idolIds[1]].Stream);
                 List<FileAttachment> files = [new FileAttachment(combined, "combined.png")];
 
                 Embed[] embeds = BiasGameEmbedProcessor.CreateEmbed(

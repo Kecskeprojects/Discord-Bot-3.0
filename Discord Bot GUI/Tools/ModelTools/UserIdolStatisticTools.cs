@@ -9,30 +9,30 @@ namespace Discord_Bot.Tools.ModelTools
             switch (pos)
             {
                 case 1:
-                    {
-                        stat.Placed1++;
-                        break;
-                    }
+                {
+                    stat.Placed1++;
+                    break;
+                }
                 case 2:
-                    {
-                        stat.Placed2++;
-                        break;
-                    }
+                {
+                    stat.Placed2++;
+                    break;
+                }
                 case 3:
-                    {
-                        stat.Placed3++;
-                        break;
-                    }
+                {
+                    stat.Placed3++;
+                    break;
+                }
                 case >= 4 and <= 7:
-                    {
-                        stat.Placed4++;
-                        break;
-                    }
+                {
+                    stat.Placed4++;
+                    break;
+                }
                 case >= 8 and <= 16:
-                    {
-                        stat.Placed5++;
-                        break;
-                    }
+                {
+                    stat.Placed5++;
+                    break;
+                }
                 default:
                     break;
             }

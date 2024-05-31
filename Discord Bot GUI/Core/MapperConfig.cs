@@ -21,7 +21,7 @@ namespace Discord_Bot.Core
                 .ForMember(dest => dest.NotificationRoleName, opt => opt.MapFrom(scv => scv.NotificationRole.RoleName));
             CreateMap<IGrouping<int?, ServerChannelView>, KeyValuePair<ChannelTypeEnum, List<ulong>>>()
             .ConstructUsing(scv => new KeyValuePair<ChannelTypeEnum, List<ulong>>(
-                scv.Key != null ? (ChannelTypeEnum)scv.Key : ChannelTypeEnum.None,
+                scv.Key != null ? (ChannelTypeEnum) scv.Key : ChannelTypeEnum.None,
                 scv.Select(x => ulong.Parse(x.ChannelDiscordId)).ToList()));
             CreateMap<TwitchChannel, TwitchChannelResource>();
             CreateMap<Greeting, GreetingResource>();

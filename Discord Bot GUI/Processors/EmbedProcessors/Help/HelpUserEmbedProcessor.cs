@@ -31,7 +31,8 @@ namespace Discord_Bot.Processors.EmbedProcessors.Help
                 {
                     string line = reader.ReadLine();
 
-                    if (line == "") { continue; }
+                    if (line == "")
+                    { continue; }
 
                     if (line.StartsWith('!') || line.StartsWith('.'))
                     {

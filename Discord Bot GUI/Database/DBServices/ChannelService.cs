@@ -34,7 +34,7 @@ namespace Discord_Bot.Database.DBServices
                     && c.DiscordId == channelId.ToString(),
                     c => c.Server);
 
-                ChannelType channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int)channelTypeId);
+                ChannelType channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int) channelTypeId);
                 if (channelType == null)
                 {
                     return DbProcessResultEnum.NotFound;
@@ -51,7 +51,7 @@ namespace Discord_Bot.Database.DBServices
                     List<Channel> channels = await channelRepository.GetListAsync(
                         c => c.Server.DiscordId == serverId.ToString()
                         && c.DiscordId != channelId.ToString()
-                        && c.ChannelTypes.FirstOrDefault(ct => ct.ChannelTypeId == (int)channelTypeId) != null,
+                        && c.ChannelTypes.FirstOrDefault(ct => ct.ChannelTypeId == (int) channelTypeId) != null,
                         c => c.ChannelTypes,
                         c => c.Server);
                     channels.ForEach((channel) => { channel.ChannelTypes.Remove(channelType); });
@@ -99,7 +99,7 @@ namespace Discord_Bot.Database.DBServices
                     c => c.Server.DiscordId == serverId.ToString()
                     && c.DiscordId == channelId.ToString(),
                     c => c.Server);
-                ChannelType channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int)channelTypeId);
+                ChannelType channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int) channelTypeId);
                 if (channelType == null)
                 {
                     return DbProcessResultEnum.NotFound;
@@ -137,10 +137,10 @@ namespace Discord_Bot.Database.DBServices
             {
                 List<Channel> channels = await channelRepository.GetListAsync(
                         c => c.Server.DiscordId == serverId.ToString()
-                        && c.ChannelTypes.FirstOrDefault(ct => ct.ChannelTypeId == (int)channelTypeId) != null,
+                        && c.ChannelTypes.FirstOrDefault(ct => ct.ChannelTypeId == (int) channelTypeId) != null,
                         c => c.ChannelTypes,
                         c => c.Server);
-                ChannelType channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int)channelTypeId);
+                ChannelType channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int) channelTypeId);
                 if (channelType == null)
                 {
                     return DbProcessResultEnum.NotFound;

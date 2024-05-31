@@ -12,28 +12,28 @@
                 //If both parameters are given, we check if they are in the right order
                 //If only one of them is given, we figure out the other and give default value to the other
                 case 2:
-                    {
-                        outarray = int.TryParse(parameters[0], out _) && LastfmTimePeriod(parameters[1], out parameters[1])
-                            ? ([parameters[0], parameters[1]])
-                            : int.TryParse(parameters[1], out _) && LastfmTimePeriod(parameters[0], out parameters[0])
-                                ? ([parameters[1], parameters[0]])
-                                : throw new Exception("Wrong input format!");
-                        break;
-                    }
+                {
+                    outarray = int.TryParse(parameters[0], out _) && LastfmTimePeriod(parameters[1], out parameters[1])
+                        ? ([parameters[0], parameters[1]])
+                        : int.TryParse(parameters[1], out _) && LastfmTimePeriod(parameters[0], out parameters[0])
+                            ? ([parameters[1], parameters[0]])
+                            : throw new Exception("Wrong input format!");
+                    break;
+                }
                 case 1:
-                    {
-                        outarray = int.TryParse(parameters[0], out _)
-                            ? [parameters[0], "overall"]
-                            : LastfmTimePeriod(parameters[0], out parameters[0])
-                                ? ["10", parameters[0]]
-                                : throw new Exception("Wrong input format!");
-                        break;
-                    }
+                {
+                    outarray = int.TryParse(parameters[0], out _)
+                        ? [parameters[0], "overall"]
+                        : LastfmTimePeriod(parameters[0], out parameters[0])
+                            ? ["10", parameters[0]]
+                            : throw new Exception("Wrong input format!");
+                    break;
+                }
                 case 0:
-                    {
-                        outarray = ["10", "overall"];
-                        break;
-                    }
+                {
+                    outarray = ["10", "overall"];
+                    break;
+                }
                 default:
                     throw new Exception("Too many or too few parameters!");
             }

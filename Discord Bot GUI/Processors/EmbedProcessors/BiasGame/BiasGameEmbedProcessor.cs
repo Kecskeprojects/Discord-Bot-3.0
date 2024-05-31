@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord_Bot.Communication.Bias;
-using System.Collections.Generic;
 
 namespace Discord_Bot.Processors.EmbedProcessors.BiasGame
 {

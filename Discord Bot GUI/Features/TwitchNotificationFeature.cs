@@ -35,7 +35,7 @@ namespace Discord_Bot.Features
                         //If there is no notification role set on the server, we just send a message without the role ping
                         string notifRole = !NumberTools.IsNullOrZero(twitchChannel.NotificationRoleDiscordId) ? $"<@&{twitchChannel.NotificationRoleDiscordId}>" : "";
 
-                        if(channel == null)
+                        if (channel == null)
                         {
                             logger.Error("TwitchNotificationFeature.cs Run", $"Channel (ID: {channelId}) was not found to send twitch notification. (Server ID: {server.ServerId}).");
                         }
