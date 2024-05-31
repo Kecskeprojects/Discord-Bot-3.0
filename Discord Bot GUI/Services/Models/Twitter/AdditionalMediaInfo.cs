@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
 
-namespace Discord_Bot.Services.Models.Twitter
+namespace Discord_Bot.Services.Models.Twitter;
+
+public class AdditionalMediaInfo
 {
-    public class AdditionalMediaInfo
-    {
-        [JsonProperty("monetizable")]
-        public bool Monetizable { get; set; }
-    }
+    [JsonProperty("monetizable")]
+    public bool Monetizable { get; set; }
 }

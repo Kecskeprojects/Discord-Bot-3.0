@@ -1,16 +1,15 @@
 ﻿using Newtonsoft.Json;
 
-namespace Discord_Bot.Services.Models.Twitter
+namespace Discord_Bot.Services.Models.Twitter;
+
+public class Thumb
 {
-    public class Thumb
-    {
-        [JsonProperty("h")]
-        public int H { get; set; }
+    [JsonProperty("h")]
+    public int H { get; set; }
 
-        [JsonProperty("w")]
-        public int W { get; set; }
+    [JsonProperty("w")]
+    public int W { get; set; }
 
-        [JsonProperty("resize")]
-        public string Resize { get; set; }
-    }
+    [JsonProperty("resize")]
+    public string Resize { get; set; }
 }

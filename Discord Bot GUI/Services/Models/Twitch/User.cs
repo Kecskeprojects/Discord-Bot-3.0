@@ -1,11 +1,10 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Discord_Bot.Services.Models.Twitch
+namespace Discord_Bot.Services.Models.Twitch;
+
+public class User
 {
-    public class User
-    {
-        [JsonProperty("data")]
-        public List<UserData> Response { get; set; }
-    }
+    [JsonProperty("data")]
+    public List<UserData> Response { get; set; }
 }

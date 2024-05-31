@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
 
-namespace Discord_Bot.Services.Models.Twitter
+namespace Discord_Bot.Services.Models.Twitter;
+
+public class Core
 {
-    public class Core
-    {
-        [JsonProperty("user_results")]
-        public UserResults UserResults { get; set; }
-    }
+    [JsonProperty("user_results")]
+    public UserResults UserResults { get; set; }
 }
