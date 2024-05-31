@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Interfaces.DBServices
+namespace Discord_Bot.Interfaces.DBServices;
+
+public interface IServerChannelViewService
 {
-    public interface IServerChannelViewService
-    {
-        Task<Dictionary<ChannelTypeEnum, List<ulong>>> GetServerChannelsAsync(int serverId);
-    }
+    Task<Dictionary<ChannelTypeEnum, List<ulong>>> GetServerChannelsAsync(int serverId);
 }

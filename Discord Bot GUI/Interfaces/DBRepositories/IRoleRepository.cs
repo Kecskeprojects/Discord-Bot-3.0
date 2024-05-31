@@ -1,8 +1,7 @@
 ﻿using Discord_Bot.Database.Models;
 
-namespace Discord_Bot.Interfaces.DBRepositories
+namespace Discord_Bot.Interfaces.DBRepositories;
+
+public interface IRoleRepository : IGenericRepository<Role>
 {
-    public interface IRoleRepository : IGenericRepository<Role>
-    {
-    }
 }

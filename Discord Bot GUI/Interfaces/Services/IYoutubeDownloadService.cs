@@ -1,9 +1,8 @@
 ﻿using System.Diagnostics;
 
-namespace Discord_Bot.Interfaces.Services
+namespace Discord_Bot.Interfaces.Services;
+
+public interface IYoutubeDownloadService
 {
-    public interface IYoutubeDownloadService
-    {
-        Process CreateYoutubeStream(string url);
-    }
+    Process CreateYoutubeStream(string url);
 }
