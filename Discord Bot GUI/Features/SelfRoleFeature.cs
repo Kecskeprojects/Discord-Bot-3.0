@@ -7,51 +7,50 @@ using Discord_Bot.Resources;
 using System;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Features
+namespace Discord_Bot.Features;
+
+public class SelfRoleFeature(IRoleService roleService, Logging logger) : BaseFeature(logger)
 {
-    public class SelfRoleFeature(IRoleService roleService, Logging logger) : BaseFeature(logger)
+    private readonly IRoleService roleService = roleService;
+
+    protected override async Task ExecuteCoreLogicAsync()
     {
-        private readonly IRoleService roleService = roleService;
-
-        protected override async Task ExecuteCoreLogicAsync()
+        try
         {
-            try
+            RoleResource role = await roleService.GetRoleAsync(Context.Guild.Id, Context.Message.Content[1..].ToLower());
+
+            RestUserMessage reply = null;
+            if (role != null)
             {
-                RoleResource role = await roleService.GetRoleAsync(Context.Guild.Id, Context.Message.Content[1..].ToLower());
+                IRole discordRole = Context.Guild.GetRole(role.DiscordId);
 
-                RestUserMessage reply = null;
-                if (role != null)
+                switch (Context.Message.Content[0])
                 {
-                    IRole discordRole = Context.Guild.GetRole(role.DiscordId);
-
-                    switch (Context.Message.Content[0])
+                    case '+':
                     {
-                        case '+':
-                        {
-                            await (Context.User as SocketGuildUser).AddRoleAsync(discordRole);
-                            reply = await Context.Channel.SendMessageAsync($"You now have the `{discordRole.Name}` role!");
-                            break;
-                        }
-                        case '-':
-                        {
-                            await (Context.User as SocketGuildUser).RemoveRoleAsync(discordRole);
-                            reply = await Context.Channel.SendMessageAsync($"`{discordRole.Name}` role has been removed!");
-                            break;
-                        }
+                        await (Context.User as SocketGuildUser).AddRoleAsync(discordRole);
+                        reply = await Context.Channel.SendMessageAsync($"You now have the `{discordRole.Name}` role!");
+                        break;
+                    }
+                    case '-':
+                    {
+                        await (Context.User as SocketGuildUser).RemoveRoleAsync(discordRole);
+                        reply = await Context.Channel.SendMessageAsync($"`{discordRole.Name}` role has been removed!");
+                        break;
                     }
                 }
-
-                if (reply != null)
-                {
-                    await Task.Delay(1500);
-
-                    await reply.DeleteAsync();
-                }
             }
-            catch (Exception ex)
+
+            if (reply != null)
             {
-                logger.Error("SelfRoleFeature.cs ExecuteCoreLogicAsync", ex);
+                await Task.Delay(1500);
+
+                await reply.DeleteAsync();
             }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("SelfRoleFeature.cs ExecuteCoreLogicAsync", ex);
         }
     }
 }

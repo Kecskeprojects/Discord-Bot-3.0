@@ -20,124 +20,123 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace Discord_Bot.Core
+namespace Discord_Bot.Core;
+
+public static class ServiceBuilder
 {
-    public static class ServiceBuilder
+    public static IServiceProvider BuildService()
     {
-        public static IServiceProvider BuildService()
+        DiscordSocketClient client = new(new DiscordSocketConfig()
         {
-            DiscordSocketClient client = new(new DiscordSocketConfig()
+            GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMembers | GatewayIntents.GuildBans | GatewayIntents.GuildEmojis
+                            | GatewayIntents.GuildIntegrations | GatewayIntents.GuildWebhooks /*| GatewayIntents.GuildInvites*/ | GatewayIntents.GuildVoiceStates
+                            /*| GatewayIntents.GuildPresences*/ | GatewayIntents.GuildMessages | GatewayIntents.GuildMessageReactions | GatewayIntents.GuildMessageTyping
+                            | GatewayIntents.DirectMessages | GatewayIntents.DirectMessageReactions | GatewayIntents.DirectMessageTyping | GatewayIntents.MessageContent
+                            /*| GatewayIntents.GuildScheduledEvents/* /*| GatewayIntents.AutoModerationConfiguration*/ /*| GatewayIntents.AutoModerationActionExecution*/
+                            | GatewayIntents.GuildMessagePolls | GatewayIntents.DirectMessagePolls,
+            LogLevel = LogSeverity.Info
+        });
+        InteractionService interactions = new(client,
+            new InteractionServiceConfig()
             {
-                GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMembers | GatewayIntents.GuildBans | GatewayIntents.GuildEmojis
-                                | GatewayIntents.GuildIntegrations | GatewayIntents.GuildWebhooks /*| GatewayIntents.GuildInvites*/ | GatewayIntents.GuildVoiceStates
-                                /*| GatewayIntents.GuildPresences*/ | GatewayIntents.GuildMessages | GatewayIntents.GuildMessageReactions | GatewayIntents.GuildMessageTyping
-                                | GatewayIntents.DirectMessages | GatewayIntents.DirectMessageReactions | GatewayIntents.DirectMessageTyping | GatewayIntents.MessageContent
-                                /*| GatewayIntents.GuildScheduledEvents/* /*| GatewayIntents.AutoModerationConfiguration*/ /*| GatewayIntents.AutoModerationActionExecution*/
-                                | GatewayIntents.GuildMessagePolls | GatewayIntents.DirectMessagePolls,
-                LogLevel = LogSeverity.Info
-            });
-            InteractionService interactions = new(client,
-                new InteractionServiceConfig()
-                {
-                    DefaultRunMode = Discord.Interactions.RunMode.Sync,
-                    UseCompiledLambda = true,
-                });
-
-            CommandService commands = new(new CommandServiceConfig()
-            {
-                DefaultRunMode = Discord.Commands.RunMode.Sync
+                DefaultRunMode = Discord.Interactions.RunMode.Sync,
+                UseCompiledLambda = true,
             });
 
-            IServiceCollection collection = new ServiceCollection();
+        CommandService commands = new(new CommandServiceConfig()
+        {
+            DefaultRunMode = Discord.Commands.RunMode.Sync
+        });
 
-            //Core
-            collection.AddSingleton(client);
-            collection.AddSingleton(interactions);
-            collection.AddSingleton(commands);
-            collection.AddTransient<Config>(); //This is transient meaning configuration can be edited on the fly
-            collection.AddSingleton(new Logging());
-            collection.AddSingleton(new Cache());
+        IServiceCollection collection = new ServiceCollection();
 
-            Config config = new();
-            collection.AddDbContext<MainDbContext>(options => options.UseSqlServer(config.SqlConnectionString));
+        //Core
+        collection.AddSingleton(client);
+        collection.AddSingleton(interactions);
+        collection.AddSingleton(commands);
+        collection.AddTransient<Config>(); //This is transient meaning configuration can be edited on the fly
+        collection.AddSingleton(new Logging());
+        collection.AddSingleton(new Cache());
 
-            collection.AddAutoMapper(x => x.AddProfile<MapperConfig>());
+        Config config = new();
+        collection.AddDbContext<MainDbContext>(options => options.UseSqlServer(config.SqlConnectionString));
 
-            collection.AddTransient<ICoreLogic, CoreLogic>();
-            collection.AddSingleton<BotMain>();
-            collection.AddTransient<MainWindow>();
+        collection.AddAutoMapper(x => x.AddProfile<MapperConfig>());
 
-            //Processors
-            collection.AddTransient<WhoKnowsImageProcessor>();
-            collection.AddTransient<BonkGifProcessor>();
-            collection.AddTransient<BiasGameImageProcessor>();
-            collection.AddTransient<BiasGameWinnerBracketImageProcessor>();
-            collection.AddTransient<BiasScrapingProcessor>();
+        collection.AddTransient<ICoreLogic, CoreLogic>();
+        collection.AddSingleton<BotMain>();
+        collection.AddTransient<MainWindow>();
 
-            //Features
-            collection.AddTransient<InstagramEmbedFeature>();
-            collection.AddTransient<SelfRoleFeature>();
-            collection.AddTransient<EasterEggFeature>();
-            collection.AddTransient<CustomCommandFeature>();
-            collection.AddTransient<BirthdayFeature>();
-            collection.AddTransient<ReminderFeature>();
-            collection.AddTransient<TwitchNotificationFeature>();
-            collection.AddTransient<YoutubeAddPlaylistFeature>();
+        //Processors
+        collection.AddTransient<WhoKnowsImageProcessor>();
+        collection.AddTransient<BonkGifProcessor>();
+        collection.AddTransient<BiasGameImageProcessor>();
+        collection.AddTransient<BiasGameWinnerBracketImageProcessor>();
+        collection.AddTransient<BiasScrapingProcessor>();
 
-            //Services
-            collection.AddSingleton<BrowserService>();
-            collection.AddTransient<ITwitchAPI, TwitchAPI>();
-            collection.AddTransient<ITwitchCLI, TwitchCLI>();
-            collection.AddTransient<ISpotifyAPI, Services.SpotifyAPI>();
-            collection.AddTransient<IYoutubeAPI, YoutubeAPI>();
-            collection.AddTransient<IInstaLoader, InstaLoader>();
-            collection.AddTransient<IWordOfTheDayService, WordOfTheDayService>();
-            collection.AddTransient<IAudioService, AudioService>();
-            collection.AddTransient<IYoutubeDownloadService, YoutubeDownloadService>();
-            collection.AddTransient<ILastFmAPI, LastFmAPI>();
-            collection.AddTransient<IMusicBrainzAPI, MusicBrainzAPI>();
-            collection.AddTransient<ITwitterScraper, TwitterScraper>();
-            collection.AddTransient<IKpopDbScraper, KpopDbScraper>();
+        //Features
+        collection.AddTransient<InstagramEmbedFeature>();
+        collection.AddTransient<SelfRoleFeature>();
+        collection.AddTransient<EasterEggFeature>();
+        collection.AddTransient<CustomCommandFeature>();
+        collection.AddTransient<BirthdayFeature>();
+        collection.AddTransient<ReminderFeature>();
+        collection.AddTransient<TwitchNotificationFeature>();
+        collection.AddTransient<YoutubeAddPlaylistFeature>();
 
-            //Database Services
-            collection.AddTransient<IServerService, ServerService>();
-            collection.AddTransient<IServerChannelViewService, ServerChannelViewService>();
-            collection.AddTransient<IGreetingService, GreetingService>();
-            collection.AddTransient<ITwitchChannelService, TwitchChannelService>();
-            collection.AddTransient<ICustomCommandService, CustomCommandService>();
-            collection.AddTransient<IRoleService, RoleService>();
-            collection.AddTransient<IKeywordService, KeywordService>();
-            collection.AddTransient<IReminderService, ReminderService>();
-            collection.AddTransient<IChannelService, ChannelService>();
-            collection.AddTransient<IBirthdayService, BirthdayService>();
-            collection.AddTransient<IIdolService, IdolService>();
-            collection.AddTransient<IUserService, UserService>();
-            collection.AddTransient<IIdolAliasService, IdolAliasService>();
-            collection.AddTransient<IIdolGroupService, IdolGroupService>();
-            collection.AddTransient<IUserIdolService, UserIdolService>();
-            collection.AddTransient<IIdolImageService, IdolImageService>();
-            collection.AddTransient<IUserIdolStatisticService, UserIdolStatisticService>();
+        //Services
+        collection.AddSingleton<BrowserService>();
+        collection.AddTransient<ITwitchAPI, TwitchAPI>();
+        collection.AddTransient<ITwitchCLI, TwitchCLI>();
+        collection.AddTransient<ISpotifyAPI, Services.SpotifyAPI>();
+        collection.AddTransient<IYoutubeAPI, YoutubeAPI>();
+        collection.AddTransient<IInstaLoader, InstaLoader>();
+        collection.AddTransient<IWordOfTheDayService, WordOfTheDayService>();
+        collection.AddTransient<IAudioService, AudioService>();
+        collection.AddTransient<IYoutubeDownloadService, YoutubeDownloadService>();
+        collection.AddTransient<ILastFmAPI, LastFmAPI>();
+        collection.AddTransient<IMusicBrainzAPI, MusicBrainzAPI>();
+        collection.AddTransient<ITwitterScraper, TwitterScraper>();
+        collection.AddTransient<IKpopDbScraper, KpopDbScraper>();
 
-            //Database Repositories
-            collection.AddScoped<IServerRepository, ServerRepository>();
-            collection.AddScoped<IServerChannelViewRepository, ServerChannelViewRepository>();
-            collection.AddScoped<IGreetingRepository, GreetingRepository>();
-            collection.AddScoped<ITwitchChannelRepository, TwitchChannelRepository>();
-            collection.AddScoped<ICustomCommandRepository, CustomCommandRepository>();
-            collection.AddScoped<IRoleRepository, RoleRepository>();
-            collection.AddScoped<IKeywordRepository, KeywordRepository>();
-            collection.AddScoped<IReminderRepository, ReminderRepository>();
-            collection.AddScoped<IUserRepository, UserRepository>();
-            collection.AddScoped<IChannelRepository, ChannelRepository>();
-            collection.AddScoped<IChannelTypeRepository, ChannelTypeRepository>();
-            collection.AddScoped<IBirthdayRepository, BirthdayRepository>();
-            collection.AddScoped<IIdolRepository, IdolRepository>();
-            collection.AddScoped<IIdolGroupRepository, IdolGroupRepository>();
-            collection.AddScoped<IIdolAliasRepository, IdolAliasRepository>();
-            collection.AddScoped<IIdolImageRepository, IdolImageRepository>();
-            collection.AddScoped<IUserIdolStatisticRepository, UserIdolStatisticRepository>();
+        //Database Services
+        collection.AddTransient<IServerService, ServerService>();
+        collection.AddTransient<IServerChannelViewService, ServerChannelViewService>();
+        collection.AddTransient<IGreetingService, GreetingService>();
+        collection.AddTransient<ITwitchChannelService, TwitchChannelService>();
+        collection.AddTransient<ICustomCommandService, CustomCommandService>();
+        collection.AddTransient<IRoleService, RoleService>();
+        collection.AddTransient<IKeywordService, KeywordService>();
+        collection.AddTransient<IReminderService, ReminderService>();
+        collection.AddTransient<IChannelService, ChannelService>();
+        collection.AddTransient<IBirthdayService, BirthdayService>();
+        collection.AddTransient<IIdolService, IdolService>();
+        collection.AddTransient<IUserService, UserService>();
+        collection.AddTransient<IIdolAliasService, IdolAliasService>();
+        collection.AddTransient<IIdolGroupService, IdolGroupService>();
+        collection.AddTransient<IUserIdolService, UserIdolService>();
+        collection.AddTransient<IIdolImageService, IdolImageService>();
+        collection.AddTransient<IUserIdolStatisticService, UserIdolStatisticService>();
 
-            return collection.BuildServiceProvider();
-        }
+        //Database Repositories
+        collection.AddScoped<IServerRepository, ServerRepository>();
+        collection.AddScoped<IServerChannelViewRepository, ServerChannelViewRepository>();
+        collection.AddScoped<IGreetingRepository, GreetingRepository>();
+        collection.AddScoped<ITwitchChannelRepository, TwitchChannelRepository>();
+        collection.AddScoped<ICustomCommandRepository, CustomCommandRepository>();
+        collection.AddScoped<IRoleRepository, RoleRepository>();
+        collection.AddScoped<IKeywordRepository, KeywordRepository>();
+        collection.AddScoped<IReminderRepository, ReminderRepository>();
+        collection.AddScoped<IUserRepository, UserRepository>();
+        collection.AddScoped<IChannelRepository, ChannelRepository>();
+        collection.AddScoped<IChannelTypeRepository, ChannelTypeRepository>();
+        collection.AddScoped<IBirthdayRepository, BirthdayRepository>();
+        collection.AddScoped<IIdolRepository, IdolRepository>();
+        collection.AddScoped<IIdolGroupRepository, IdolGroupRepository>();
+        collection.AddScoped<IIdolAliasRepository, IdolAliasRepository>();
+        collection.AddScoped<IIdolImageRepository, IdolImageRepository>();
+        collection.AddScoped<IUserIdolStatisticRepository, UserIdolStatisticRepository>();
+
+        return collection.BuildServiceProvider();
     }
 }

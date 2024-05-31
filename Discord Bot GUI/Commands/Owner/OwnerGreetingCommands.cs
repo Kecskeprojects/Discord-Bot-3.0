@@ -11,84 +11,83 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Commands.Owner
+namespace Discord_Bot.Commands.Owner;
+
+public class OwnerGreetingCommands(
+    IGreetingService greetingService,
+    IServerService serverService,
+    Logging logger,
+    Config config) : BaseCommand(logger, config, serverService)
 {
-    public class OwnerGreetingCommands(
-        IGreetingService greetingService,
-        IServerService serverService,
-        Logging logger,
-        Config config) : BaseCommand(logger, config, serverService)
+    private readonly IGreetingService greetingService = greetingService;
+
+    [Command("greeting list")]
+    [RequireOwner]
+    [Summary("Command for owner to list global greeting gifs")]
+    public async Task GreetingList()
     {
-        private readonly IGreetingService greetingService = greetingService;
-
-        [Command("greeting list")]
-        [RequireOwner]
-        [Summary("Command for owner to list global greeting gifs")]
-        public async Task GreetingList()
+        try
         {
-            try
+            List<GreetingResource> greetings = await greetingService.GetAllGreetingAsync();
+            if (!CollectionTools.IsNullOrEmpty(greetings))
             {
-                List<GreetingResource> greetings = await greetingService.GetAllGreetingAsync();
-                if (!CollectionTools.IsNullOrEmpty(greetings))
-                {
-                    Embed[] embed = GreetingListEmbedProcessor.CreateEmbed(greetings);
-                    await ReplyAsync(embeds: embed);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("OwnerGreetingCommands.cs GreetingList", ex);
+                Embed[] embed = GreetingListEmbedProcessor.CreateEmbed(greetings);
+                await ReplyAsync(embeds: embed);
             }
         }
-
-        [Command("greeting add")]
-        [RequireOwner]
-        [Summary("Command for owner to add global greeting gifs")]
-        public async Task GreetingAdd(string url)
+        catch (Exception ex)
         {
-            try
+            logger.Error("OwnerGreetingCommands.cs GreetingList", ex);
+        }
+    }
+
+    [Command("greeting add")]
+    [RequireOwner]
+    [Summary("Command for owner to add global greeting gifs")]
+    public async Task GreetingAdd(string url)
+    {
+        try
+        {
+            DbProcessResultEnum result = await greetingService.AddGreetingAsync(url);
+            if (result == DbProcessResultEnum.Success)
             {
-                DbProcessResultEnum result = await greetingService.AddGreetingAsync(url);
-                if (result == DbProcessResultEnum.Success)
-                {
-                    await ReplyAsync("Greeting added!");
-                }
-                else
-                {
-                    await ReplyAsync("Greeting could not be added!");
-                }
+                await ReplyAsync("Greeting added!");
             }
-            catch (Exception ex)
+            else
             {
-                logger.Error("OwnerGreetingCommands.cs GreetingAdd", ex);
+                await ReplyAsync("Greeting could not be added!");
             }
         }
-
-        [Command("greeting remove")]
-        [RequireOwner]
-        [Summary("Command for owner to remove global greeting gifs")]
-        public async Task GreetingRemove(int id)
+        catch (Exception ex)
         {
-            try
+            logger.Error("OwnerGreetingCommands.cs GreetingAdd", ex);
+        }
+    }
+
+    [Command("greeting remove")]
+    [RequireOwner]
+    [Summary("Command for owner to remove global greeting gifs")]
+    public async Task GreetingRemove(int id)
+    {
+        try
+        {
+            DbProcessResultEnum result = await greetingService.RemoveGreetingAsync(id);
+            if (result == DbProcessResultEnum.Success)
             {
-                DbProcessResultEnum result = await greetingService.RemoveGreetingAsync(id);
-                if (result == DbProcessResultEnum.Success)
-                {
-                    await ReplyAsync($"Greeting with the ID {id} has been removed!");
-                }
-                else if (result == DbProcessResultEnum.NotFound)
-                {
-                    await ReplyAsync("Greeting doesn't exist with that ID or it is not yours!");
-                }
-                else
-                {
-                    await ReplyAsync("Greeting could not be removed!");
-                }
+                await ReplyAsync($"Greeting with the ID {id} has been removed!");
             }
-            catch (Exception ex)
+            else if (result == DbProcessResultEnum.NotFound)
             {
-                logger.Error("OwnerGreetingCommands.cs GreetingRemove", ex);
+                await ReplyAsync("Greeting doesn't exist with that ID or it is not yours!");
             }
+            else
+            {
+                await ReplyAsync("Greeting could not be removed!");
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("OwnerGreetingCommands.cs GreetingRemove", ex);
         }
     }
 }

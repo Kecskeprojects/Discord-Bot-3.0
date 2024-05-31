@@ -9,189 +9,188 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Services
+namespace Discord_Bot.Services;
+
+class SpotifyAPI(Logging logger, Config config, IYoutubeAPI youtubeAPI, IMusicBrainzAPI musicBrainzAPI) : ISpotifyAPI
 {
-    class SpotifyAPI(Logging logger, Config config, IYoutubeAPI youtubeAPI, IMusicBrainzAPI musicBrainzAPI) : ISpotifyAPI
+    private readonly Logging logger = logger;
+    private readonly Config config = config;
+    private readonly IYoutubeAPI youtubeAPI = youtubeAPI;
+    private readonly IMusicBrainzAPI musicBrainzAPI = musicBrainzAPI;
+
+    #region Main functions
+    //Main function starting the query and catching errors
+    public async Task<SearchResultEnum> SpotifySearch(string query, ulong serverId, ulong channelId, string username)
     {
-        private readonly Logging logger = logger;
-        private readonly Config config = config;
-        private readonly IYoutubeAPI youtubeAPI = youtubeAPI;
-        private readonly IMusicBrainzAPI musicBrainzAPI = musicBrainzAPI;
+        logger.Query("============================================================================");
+        logger.Query("Spotify Data API: Search");
 
-        #region Main functions
-        //Main function starting the query and catching errors
-        public async Task<SearchResultEnum> SpotifySearch(string query, ulong serverId, ulong channelId, string username)
+        try
         {
+            SearchResultEnum result = await Run(query, serverId, channelId, username);
+
+            logger.Query("Spotify query complete!");
             logger.Query("============================================================================");
-            logger.Query("Spotify Data API: Search");
 
-            try
-            {
-                SearchResultEnum result = await Run(query, serverId, channelId, username);
-
-                logger.Query("Spotify query complete!");
-                logger.Query("============================================================================");
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("SpotifyAPI.cs SpotifySearch", ex);
-            }
-            return SearchResultEnum.SpotifyNotFound;
+            return result;
         }
-
-
-        //The function running the query
-        private async Task<SearchResultEnum> Run(string query, ulong serverId, ulong channelId, string username)
+        catch (Exception ex)
         {
-            SpotifyClientConfig configuration = SpotifyClientConfig.CreateDefault().WithAuthenticator(new ClientCredentialsAuthenticator(config.Spotify_Client_Id, config.Spotify_Client_Secret));
-            SpotifyClient spotify = new(configuration);
+            logger.Error("SpotifyAPI.cs SpotifySearch", ex);
+        }
+        return SearchResultEnum.SpotifyNotFound;
+    }
 
-            //Spotify link format: https://open.spotify.com/[TYPE]/[ID]?query, the id is 22 characters long
-            if (Uri.IsWellFormedUriString(query, UriKind.Absolute))
+
+    //The function running the query
+    private async Task<SearchResultEnum> Run(string query, ulong serverId, ulong channelId, string username)
+    {
+        SpotifyClientConfig configuration = SpotifyClientConfig.CreateDefault().WithAuthenticator(new ClientCredentialsAuthenticator(config.Spotify_Client_Id, config.Spotify_Client_Secret));
+        SpotifyClient spotify = new(configuration);
+
+        //Spotify link format: https://open.spotify.com/[TYPE]/[ID]?query, the id is 22 characters long
+        if (Uri.IsWellFormedUriString(query, UriKind.Absolute))
+        {
+            Uri uri = new(query);
+
+            string type = "";
+            string id = "";
+            if (uri.Segments.Length >= 4)
             {
-                Uri uri = new(query);
+                type = uri.Segments[2].EndsWith('/') ? uri.Segments[2][..^1] : uri.Segments[2];
+                id = uri.Segments[3];
+            }
+            else if (uri.Segments.Length >= 3)
+            {
+                type = uri.Segments[1].EndsWith('/') ? uri.Segments[1][..^1] : uri.Segments[1];
+                id = uri.Segments[2];
+            }
 
-                string type = "";
-                string id = "";
-                if (uri.Segments.Length >= 4)
+            if (type == "track")
+            {
+                FullTrack track = await spotify.Tracks.Get(id);
+
+                if (track != null)
                 {
-                    type = uri.Segments[2].EndsWith('/') ? uri.Segments[2][..^1] : uri.Segments[2];
-                    id = uri.Segments[3];
-                }
-                else if (uri.Segments.Length >= 3)
-                {
-                    type = uri.Segments[1].EndsWith('/') ? uri.Segments[1][..^1] : uri.Segments[1];
-                    id = uri.Segments[2];
-                }
+                    string temp = $"{track.Name.Trim()} {track.Artists[0].Name.Trim()}";
 
-                if (type == "track")
-                {
-                    FullTrack track = await spotify.Tracks.Get(id);
+                    logger.Query($"Result: {temp}");
 
-                    if (track != null)
-                    {
-                        string temp = $"{track.Name.Trim()} {track.Artists[0].Name.Trim()}";
-
-                        logger.Query($"Result: {temp}");
-
-                        return await youtubeAPI.Searching(temp, username, serverId, channelId) == SearchResultEnum.YoutubeFoundVideo
-                            ? SearchResultEnum.SpotifyVideoFound
-                            : SearchResultEnum.SpotifyFoundYoutubeNotFound;
-                    }
-                }
-                else if (type == "playlist" || type == "album")
-                {
-                    string[] list = null;
-
-                    if (type == "playlist")
-                    {
-                        Paging<PlaylistTrack<IPlayableItem>> playlist = await spotify.Playlists.GetItems(id, new PlaylistGetItemsRequest { Limit = 25 });
-
-                        list = playlist.Items.Select(n => $"{(n.Track as FullTrack).Name.Trim()} {(n.Track as FullTrack).Artists[0].Name.Trim()}").ToArray();
-                    }
-                    else
-                    {
-                        Paging<SimpleTrack> album = await spotify.Albums.GetTracks(id);
-                        list = album.Items.Select(n => $"{n.Name.Trim()} {n.Artists[0].Name.Trim()}").ToArray();
-                    }
-
-                    if (!CollectionTools.IsNullOrEmpty(list))
-                    {
-                        foreach (string track in list)
-                        {
-                            logger.Query($"List item: {track}");
-                            await youtubeAPI.Searching(track, username, serverId, channelId);
-                        }
-
-                        return SearchResultEnum.SpotifyPlaylistFound;
-                    }
+                    return await youtubeAPI.Searching(temp, username, serverId, channelId) == SearchResultEnum.YoutubeFoundVideo
+                        ? SearchResultEnum.SpotifyVideoFound
+                        : SearchResultEnum.SpotifyFoundYoutubeNotFound;
                 }
             }
-            return SearchResultEnum.SpotifyNotFound;
-        }
-        #endregion
-
-        #region Image search
-        //Lastfm complimentary function
-        public async Task<SpotifyImageSearchResult> SearchItemAsync(string artistMbid, string artistName, string songName = "")
-        {
-            try
+            else if (type == "playlist" || type == "album")
             {
-                if (string.IsNullOrEmpty(artistMbid))
+                string[] list = null;
+
+                if (type == "playlist")
                 {
-                    return null;
-                }
-                string url = await musicBrainzAPI.GetArtistSpotifyUrlAsync(artistMbid);
-                if (string.IsNullOrEmpty(url))
-                {
-                    return null;
-                }
+                    Paging<PlaylistTrack<IPlayableItem>> playlist = await spotify.Playlists.GetItems(id, new PlaylistGetItemsRequest { Limit = 25 });
 
-                string artistId = new Uri(url).Segments[^1];
-
-                SpotifyClientConfig configuration = SpotifyClientConfig.CreateDefault().WithAuthenticator(new ClientCredentialsAuthenticator(config.Spotify_Client_Id, config.Spotify_Client_Secret));
-                SpotifyClient spotify = new(configuration);
-
-                string spotifyArtist = "";
-
-                logger.Query("============================================================================");
-                logger.Query("Spotify image search:");
-
-                SpotifyImageSearchResult result = new();
-                if (songName == "")
-                {
-                    FullArtist artist = await spotify.Artists.Get(artistId);
-
-                    if (artist == null)
-                    {
-                        logger.Query("Artist not found!");
-                        logger.Query("============================================================================");
-                        return null;
-                    }
-
-                    spotifyArtist = artist.Name;
-                    result.ImageUrl = artist.Images[0].Url;
-                    result.EntityUrl = artist.ExternalUrls["spotify"];
+                    list = playlist.Items.Select(n => $"{(n.Track as FullTrack).Name.Trim()} {(n.Track as FullTrack).Artists[0].Name.Trim()}").ToArray();
                 }
                 else
                 {
-                    SearchRequest request = new(SearchRequest.Types.Track, $"{songName} {artistName}");
-                    SearchResponse searchResult = await spotify.Search.Item(request);
-
-                    if (searchResult.Tracks.Items.Count == 0)
-                    {
-                        logger.Query("No results for track!");
-                        logger.Query("============================================================================");
-                        return null;
-                    }
-
-                    FullTrack track = searchResult.Tracks.Items.FirstOrDefault(x => x.Artists.Any(y => y.Id == artistId));
-
-                    if (track == null)
-                    {
-                        logger.Query("Track not found!");
-                        logger.Query("============================================================================");
-                        return null;
-                    }
-
-                    spotifyArtist = track.Artists[0].Name;
-                    result.ImageUrl = track.Album.Images[0].Url;
-                    result.EntityUrl = track.ExternalUrls["spotify"];
+                    Paging<SimpleTrack> album = await spotify.Albums.GetTracks(id);
+                    list = album.Items.Select(n => $"{n.Name.Trim()} {n.Artists[0].Name.Trim()}").ToArray();
                 }
 
-                logger.Query($"Artist found by Last.fm: {artistName}\nArtist found by Spotify: {spotifyArtist}\nWith image link: {result.ImageUrl}");
-                logger.Query("============================================================================");
+                if (!CollectionTools.IsNullOrEmpty(list))
+                {
+                    foreach (string track in list)
+                    {
+                        logger.Query($"List item: {track}");
+                        await youtubeAPI.Searching(track, username, serverId, channelId);
+                    }
 
-                return result;
+                    return SearchResultEnum.SpotifyPlaylistFound;
+                }
             }
-            catch (Exception ex)
-            {
-                logger.Error("SpotifyAPI.cs SearchItemAsync", ex);
-            }
-            return null;
         }
-        #endregion
+        return SearchResultEnum.SpotifyNotFound;
     }
+    #endregion
+
+    #region Image search
+    //Lastfm complimentary function
+    public async Task<SpotifyImageSearchResult> SearchItemAsync(string artistMbid, string artistName, string songName = "")
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(artistMbid))
+            {
+                return null;
+            }
+            string url = await musicBrainzAPI.GetArtistSpotifyUrlAsync(artistMbid);
+            if (string.IsNullOrEmpty(url))
+            {
+                return null;
+            }
+
+            string artistId = new Uri(url).Segments[^1];
+
+            SpotifyClientConfig configuration = SpotifyClientConfig.CreateDefault().WithAuthenticator(new ClientCredentialsAuthenticator(config.Spotify_Client_Id, config.Spotify_Client_Secret));
+            SpotifyClient spotify = new(configuration);
+
+            string spotifyArtist = "";
+
+            logger.Query("============================================================================");
+            logger.Query("Spotify image search:");
+
+            SpotifyImageSearchResult result = new();
+            if (songName == "")
+            {
+                FullArtist artist = await spotify.Artists.Get(artistId);
+
+                if (artist == null)
+                {
+                    logger.Query("Artist not found!");
+                    logger.Query("============================================================================");
+                    return null;
+                }
+
+                spotifyArtist = artist.Name;
+                result.ImageUrl = artist.Images[0].Url;
+                result.EntityUrl = artist.ExternalUrls["spotify"];
+            }
+            else
+            {
+                SearchRequest request = new(SearchRequest.Types.Track, $"{songName} {artistName}");
+                SearchResponse searchResult = await spotify.Search.Item(request);
+
+                if (searchResult.Tracks.Items.Count == 0)
+                {
+                    logger.Query("No results for track!");
+                    logger.Query("============================================================================");
+                    return null;
+                }
+
+                FullTrack track = searchResult.Tracks.Items.FirstOrDefault(x => x.Artists.Any(y => y.Id == artistId));
+
+                if (track == null)
+                {
+                    logger.Query("Track not found!");
+                    logger.Query("============================================================================");
+                    return null;
+                }
+
+                spotifyArtist = track.Artists[0].Name;
+                result.ImageUrl = track.Album.Images[0].Url;
+                result.EntityUrl = track.ExternalUrls["spotify"];
+            }
+
+            logger.Query($"Artist found by Last.fm: {artistName}\nArtist found by Spotify: {spotifyArtist}\nWith image link: {result.ImageUrl}");
+            logger.Query("============================================================================");
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("SpotifyAPI.cs SearchItemAsync", ex);
+        }
+        return null;
+    }
+    #endregion
 }

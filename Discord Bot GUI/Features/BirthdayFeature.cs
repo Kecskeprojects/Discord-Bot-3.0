@@ -9,49 +9,48 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Features
-{
-    public class BirthdayFeature(IBirthdayService birthdayService, IServerService serverService, DiscordSocketClient client, Logging logger) : BaseFeature(logger)
-    {
-        private readonly IBirthdayService birthdayService = birthdayService;
-        private readonly IServerService serverService = serverService;
-        private readonly DiscordSocketClient client = client;
+namespace Discord_Bot.Features;
 
-        protected override async Task ExecuteCoreLogicAsync()
+public class BirthdayFeature(IBirthdayService birthdayService, IServerService serverService, DiscordSocketClient client, Logging logger) : BaseFeature(logger)
+{
+    private readonly IBirthdayService birthdayService = birthdayService;
+    private readonly IServerService serverService = serverService;
+    private readonly DiscordSocketClient client = client;
+
+    protected override async Task ExecuteCoreLogicAsync()
+    {
+        try
         {
-            try
+            //Get the list of birthdays that are on this date
+            List<BirthdayResource> result = await birthdayService.GetBirthdaysByDateAsync();
+            if (!CollectionTools.IsNullOrEmpty(result))
             {
-                //Get the list of birthdays that are on this date
-                List<BirthdayResource> result = await birthdayService.GetBirthdaysByDateAsync();
-                if (!CollectionTools.IsNullOrEmpty(result))
+                logger.Log($"Sending birthday message to {result.Count} people.");
+                foreach (BirthdayResource birthday in result)
                 {
-                    logger.Log($"Sending birthday message to {result.Count} people.");
-                    foreach (BirthdayResource birthday in result)
-                    {
-                        await SendBirthdayMessageAsync(birthday);
-                    }
+                    await SendBirthdayMessageAsync(birthday);
                 }
             }
-            catch (Exception ex)
-            {
-                logger.Error("BirthdayFeature.cs ExecuteCoreLogicAsync", ex);
-            }
         }
-
-        private async Task SendBirthdayMessageAsync(BirthdayResource birthday)
+        catch (Exception ex)
         {
-            ServerResource server = await serverService.GetByDiscordIdAsync(birthday.ServerDiscordId);
+            logger.Error("BirthdayFeature.cs ExecuteCoreLogicAsync", ex);
+        }
+    }
 
-            if (server.SettingsChannels.TryGetValue(ChannelTypeEnum.BirthdayText, out List<ulong> channels))
-            {
-                ISocketMessageChannel channel = client.GetChannel(channels[0]) as ISocketMessageChannel;
-                SocketGuild guild = client.GetGuild(birthday.ServerDiscordId);
-                await guild.DownloadUsersAsync();
+    private async Task SendBirthdayMessageAsync(BirthdayResource birthday)
+    {
+        ServerResource server = await serverService.GetByDiscordIdAsync(birthday.ServerDiscordId);
 
-                string message = BirthdayMessageProcessor.CreateMessage(birthday, guild);
+        if (server.SettingsChannels.TryGetValue(ChannelTypeEnum.BirthdayText, out List<ulong> channels))
+        {
+            ISocketMessageChannel channel = client.GetChannel(channels[0]) as ISocketMessageChannel;
+            SocketGuild guild = client.GetGuild(birthday.ServerDiscordId);
+            await guild.DownloadUsersAsync();
 
-                await channel.SendMessageAsync(message);
-            }
+            string message = BirthdayMessageProcessor.CreateMessage(birthday, guild);
+
+            await channel.SendMessageAsync(message);
         }
     }
 }

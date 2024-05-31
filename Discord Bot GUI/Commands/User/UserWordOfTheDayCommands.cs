@@ -11,49 +11,48 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Commands.User
+namespace Discord_Bot.Commands.User;
+
+public class UserWordOfTheDayCommands(
+    IWordOfTheDayService wordOfTheDayService,
+    IServerService serverService,
+    Logging logger,
+    Config config) : BaseCommand(logger, config, serverService)
 {
-    public class UserWordOfTheDayCommands(
-        IWordOfTheDayService wordOfTheDayService,
-        IServerService serverService,
-        Logging logger,
-        Config config) : BaseCommand(logger, config, serverService)
+    private readonly IWordOfTheDayService wordOfTheDayService = wordOfTheDayService;
+
+    [Command("wotd")]
+    [Alias(["word of the day"])]
+    [Summary("Learn a word a day command")]
+    public async Task WotdFunction(string language = "korean")
     {
-        private readonly IWordOfTheDayService wordOfTheDayService = wordOfTheDayService;
-
-        [Command("wotd")]
-        [Alias(["word of the day"])]
-        [Summary("Learn a word a day command")]
-        public async Task WotdFunction(string language = "korean")
+        try
         {
-            try
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
             {
-                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
-                {
-                    return;
-                }
-
-                WotdBase result = await wordOfTheDayService.GetDataAsync(language);
-
-                if (result != null)
-                {
-                    Embed[] embed = WordOfTheDayEmbedProcessor.CreateEmbed(result);
-
-                    await ReplyAsync(embeds: embed);
-                }
-                else
-                {
-                    await ReplyAsync("Language is not supported, here is the list of languages:\n" + string.Join(", ", StaticLists.WotdLanguages.Keys));
-                }
+                return;
             }
-            catch (HttpRequestException)
+
+            WotdBase result = await wordOfTheDayService.GetDataAsync(language);
+
+            if (result != null)
             {
-                await ReplyAsync("Site is currently unavailable, try again in a little bit");
+                Embed[] embed = WordOfTheDayEmbedProcessor.CreateEmbed(result);
+
+                await ReplyAsync(embeds: embed);
             }
-            catch (Exception ex)
+            else
             {
-                logger.Error("UserWordOfTheDayCommands.cs WotdFunction", ex);
+                await ReplyAsync("Language is not supported, here is the list of languages:\n" + string.Join(", ", StaticLists.WotdLanguages.Keys));
             }
+        }
+        catch (HttpRequestException)
+        {
+            await ReplyAsync("Site is currently unavailable, try again in a little bit");
+        }
+        catch (Exception ex)
+        {
+            logger.Error("UserWordOfTheDayCommands.cs WotdFunction", ex);
         }
     }
 }

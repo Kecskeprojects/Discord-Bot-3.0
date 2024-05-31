@@ -9,97 +9,96 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Core
+namespace Discord_Bot.Core;
+
+//Todo: This class might not be needed at all, revisit it
+public class CoreLogic(Logging logger, IServerService serverService) : ICoreLogic
 {
-    //Todo: This class might not be needed at all, revisit it
-    public class CoreLogic(Logging logger, IServerService serverService) : ICoreLogic
+    private readonly Logging logger = logger;
+    private readonly IServerService serverService = serverService;
+
+    public async Task<ServerResource> GetOrAddServerAsync(ulong serverId, string serverName)
     {
-        private readonly Logging logger = logger;
-        private readonly IServerService serverService = serverService;
-
-        public async Task<ServerResource> GetOrAddServerAsync(ulong serverId, string serverName)
+        ServerResource server = await serverService.GetByDiscordIdAsync(serverId);
+        if (server == null)
         {
-            ServerResource server = await serverService.GetByDiscordIdAsync(serverId);
-            if (server == null)
+            DbProcessResultEnum result = await serverService.AddServerAsync(serverId);
+            if (result == DbProcessResultEnum.Success)
             {
-                DbProcessResultEnum result = await serverService.AddServerAsync(serverId);
-                if (result == DbProcessResultEnum.Success)
-                {
-                    server = await serverService.GetByDiscordIdAsync(serverId);
-                }
-                else
-                {
-                    logger.Log($"{serverName} could not be added to list!");
-                }
+                server = await serverService.GetByDiscordIdAsync(serverId);
             }
-
-            return server;
+            else
+            {
+                logger.Log($"{serverName} could not be added to list!");
+            }
         }
 
-        //For logging messages, errors, and messages to log files
-        public void LogToFile()
-        {
-            try
-            {
-                StreamWriter logFileWriter = null;
-                if (logger.Logs.Count != 0 && logFileWriter == null)
-                {
-                    string file_location = $"Logs\\logs[{DateTimeTools.CurrentDate()}].txt";
+        return server;
+    }
 
-                    using (logFileWriter = File.AppendText(file_location))
+    //For logging messages, errors, and messages to log files
+    public void LogToFile()
+    {
+        try
+        {
+            StreamWriter logFileWriter = null;
+            if (logger.Logs.Count != 0 && logFileWriter == null)
+            {
+                string file_location = $"Logs\\logs[{DateTimeTools.CurrentDate()}].txt";
+
+                using (logFileWriter = File.AppendText(file_location))
+                {
+                    string[] contents = logger.Logs.Select(n => n.Content).ToArray();
+                    foreach (string log in contents)
                     {
-                        string[] contents = logger.Logs.Select(n => n.Content).ToArray();
-                        foreach (string log in contents)
-                        {
-                            logFileWriter.WriteLine(log);
-                        }
+                        logFileWriter.WriteLine(log);
                     }
-
-                    logFileWriter = null;
-                    logger.Logs.Clear();
                 }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("CoreLogic.cs LogtoFile", ex);
+
+                logFileWriter = null;
+                logger.Logs.Clear();
             }
         }
-
-        //Check if folders for long term storage exist
-        public void CheckFolders()
+        catch (Exception ex)
         {
-            try
+            logger.Error("CoreLogic.cs LogtoFile", ex);
+        }
+    }
+
+    //Check if folders for long term storage exist
+    public void CheckFolders()
+    {
+        try
+        {
+            List<string> logs = [];
+
+            string currentDir = Directory.GetCurrentDirectory();
+            if (!Directory.Exists(Path.Combine(currentDir, "Logs")))
             {
-                List<string> logs = [];
-
-                string currentDir = Directory.GetCurrentDirectory();
-                if (!Directory.Exists(Path.Combine(currentDir, "Logs")))
-                {
-                    Directory.CreateDirectory(Path.Combine(currentDir, "Logs"));
-                    logs.Add("Logs folder created!");
-                }
-
-                if (!Directory.Exists(Path.Combine(currentDir, "Assets")))
-                {
-                    Directory.CreateDirectory(Path.Combine(currentDir, "Assets"));
-                    logs.Add("Assets folder created!");
-                }
-
-                if (!Directory.Exists(Path.Combine(currentDir, "Assets\\Commands")))
-                {
-                    Directory.CreateDirectory(Path.Combine(currentDir, "Assets\\Commands"));
-                    logs.Add("Commands folder created!");
-                }
-
-                if (logs.Count != 0)
-                {
-                    logger.Log(string.Join('\n', logs));
-                }
+                Directory.CreateDirectory(Path.Combine(currentDir, "Logs"));
+                logs.Add("Logs folder created!");
             }
-            catch (Exception ex)
+
+            if (!Directory.Exists(Path.Combine(currentDir, "Assets")))
             {
-                logger.Error("CoreLogic.css CheckFolder", ex);
+                Directory.CreateDirectory(Path.Combine(currentDir, "Assets"));
+                logs.Add("Assets folder created!");
             }
+
+            if (!Directory.Exists(Path.Combine(currentDir, "Assets\\Commands")))
+            {
+                Directory.CreateDirectory(Path.Combine(currentDir, "Assets\\Commands"));
+                logs.Add("Commands folder created!");
+            }
+
+            if (logs.Count != 0)
+            {
+                logger.Log(string.Join('\n', logs));
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("CoreLogic.css CheckFolder", ex);
         }
     }
 }

@@ -13,102 +13,101 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Commands.User
+namespace Discord_Bot.Commands.User;
+
+public class UserTwitterScraperCommands(
+    ITwitterScraper twitterScraper,
+    IServerService serverService,
+    Logging logger,
+    Config config) : BaseCommand(logger, config, serverService)
 {
-    public class UserTwitterScraperCommands(
-        ITwitterScraper twitterScraper,
-        IServerService serverService,
-        Logging logger,
-        Config config) : BaseCommand(logger, config, serverService)
+    private readonly ITwitterScraper twitterScraper = twitterScraper;
+
+    private static readonly string[] baseURLs = ["https://twitter.com/", "https://x.com/"];
+
+    [Command("twt")]
+    [Summary("For embedding twitter messages, replacing the built in discord embeds")]
+    public async Task ScrapeFromUrl([Remainder] string message)
     {
-        private readonly ITwitterScraper twitterScraper = twitterScraper;
-
-        private static readonly string[] baseURLs = ["https://twitter.com/", "https://x.com/"];
-
-        [Command("twt")]
-        [Summary("For embedding twitter messages, replacing the built in discord embeds")]
-        public async Task ScrapeFromUrl([Remainder] string message)
+        if (!config.Enable_Twitter_Embed)
         {
-            if (!config.Enable_Twitter_Embed)
-            {
-                return;
-            }
+            return;
+        }
 
-            try
-            {
-                List<Uri> urls = UrlTools.LinkSearch(message, true, baseURLs);
+        try
+        {
+            List<Uri> urls = UrlTools.LinkSearch(message, true, baseURLs);
 
-                //Check if message is an instagram link
-                if (urls != null)
+            //Check if message is an instagram link
+            if (urls != null)
+            {
+                urls = urls.Where(x => x.Segments.Length >= 3 && x.Segments[2] == "status/").ToList();
+                if (!CollectionTools.IsNullOrEmpty(urls))
                 {
-                    urls = urls.Where(x => x.Segments.Length >= 3 && x.Segments[2] == "status/").ToList();
-                    if (!CollectionTools.IsNullOrEmpty(urls))
+                    logger.Log($"Embed message from following links: \n{string.Join("\n", urls)}");
+
+                    TwitterScrapingResult result = await twitterScraper.GetDataFromUrls(urls);
+
+                    MessageReference refer = new(Context.Message.Id, Context.Channel.Id, Context.Guild.Id, false);
+
+                    if (!string.IsNullOrEmpty(result.ErrorMessage))
                     {
-                        logger.Log($"Embed message from following links: \n{string.Join("\n", urls)}");
-
-                        TwitterScrapingResult result = await twitterScraper.GetDataFromUrls(urls);
-
-                        MessageReference refer = new(Context.Message.Id, Context.Channel.Id, Context.Guild.Id, false);
-
-                        if (!string.IsNullOrEmpty(result.ErrorMessage))
+                        if (result.ErrorMessage.Length < 150)
                         {
-                            if (result.ErrorMessage.Length < 150)
-                            {
-                                await ReplyAsync(result.ErrorMessage);
-                            }
-                            else
-                            {
-                                await ReplyAsync("Error message too long to display!");
-                                logger.Log(result.ErrorMessage);
-                            }
+                            await ReplyAsync(result.ErrorMessage);
+                        }
+                        else
+                        {
+                            await ReplyAsync("Error message too long to display!");
+                            logger.Log(result.ErrorMessage);
+                        }
 
-                            if (CollectionTools.IsNullOrEmpty(result.Content))
+                        if (CollectionTools.IsNullOrEmpty(result.Content))
+                        {
+                            return;
+                        }
+                    }
+
+                    List<FileAttachment> attachments = await TwitterMessageProcessor.GetAttachments(result.Content);
+                    if (!CollectionTools.IsNullOrEmpty(attachments))
+                    {
+                        try
+                        {
+                            await Context.Channel.SendFilesAsync(attachments, result.TextContent, messageReference: refer);
+                        }
+                        catch (HttpException ex)
+                        {
+                            if (ex.Message.Contains("40005"))
                             {
+                                logger.Warning("InstagramEmbedFeature.cs SendInstagramPostEmbedAsync", "Embed too large, only sending images!");
+
+                                attachments = await TwitterMessageProcessor.GetAttachments(result.Content, false);
+                                if (!CollectionTools.IsNullOrEmpty(attachments))
+                                {
+                                    await Context.Channel.SendFilesAsync(attachments, result.TextContent, messageReference: refer);
+                                    await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
+                                }
+                                else
+                                {
+                                    await ReplyAsync("Post content too large to send!");
+                                }
+
                                 return;
                             }
                         }
 
-                        List<FileAttachment> attachments = await TwitterMessageProcessor.GetAttachments(result.Content);
-                        if (!CollectionTools.IsNullOrEmpty(attachments))
-                        {
-                            try
-                            {
-                                await Context.Channel.SendFilesAsync(attachments, result.TextContent, messageReference: refer);
-                            }
-                            catch (HttpException ex)
-                            {
-                                if (ex.Message.Contains("40005"))
-                                {
-                                    logger.Warning("InstagramEmbedFeature.cs SendInstagramPostEmbedAsync", "Embed too large, only sending images!");
-
-                                    attachments = await TwitterMessageProcessor.GetAttachments(result.Content, false);
-                                    if (!CollectionTools.IsNullOrEmpty(attachments))
-                                    {
-                                        await Context.Channel.SendFilesAsync(attachments, result.TextContent, messageReference: refer);
-                                        await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
-                                    }
-                                    else
-                                    {
-                                        await ReplyAsync("Post content too large to send!");
-                                    }
-
-                                    return;
-                                }
-                            }
-
-                            await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
-                            return;
-                        }
-
-                        await ReplyAsync("No image/videos in tweet.");
+                        await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
                         return;
                     }
+
+                    await ReplyAsync("No image/videos in tweet.");
+                    return;
                 }
             }
-            catch (Exception ex)
-            {
-                logger.Error("UserTwitterScraperCommands.cs ScrapeFromUrl", ex);
-            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("UserTwitterScraperCommands.cs ScrapeFromUrl", ex);
         }
     }
 }

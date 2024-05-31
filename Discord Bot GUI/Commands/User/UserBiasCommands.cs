@@ -14,347 +14,346 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Commands.User
+namespace Discord_Bot.Commands.User;
+
+public class UserBiasCommands(
+    IUserIdolService userIdolService,
+    IIdolService idolService,
+    IIdolGroupService idolGroupService,
+    IServerService serverService,
+    Logging logger,
+    Config config) : BaseCommand(logger, config, serverService)
 {
-    public class UserBiasCommands(
-        IUserIdolService userIdolService,
-        IIdolService idolService,
-        IIdolGroupService idolGroupService,
-        IServerService serverService,
-        Logging logger,
-        Config config) : BaseCommand(logger, config, serverService)
+    private readonly IUserIdolService userIdolService = userIdolService;
+    private readonly IIdolService idolService = idolService;
+    private readonly IIdolGroupService idolGroupService = idolGroupService;
+
+    [Command("bias add")]
+    [Summary("Command for adding a new bias into a user's list")]
+    public async Task AddBias([Remainder] string biasData)
     {
-        private readonly IUserIdolService userIdolService = userIdolService;
-        private readonly IIdolService idolService = idolService;
-        private readonly IIdolGroupService idolGroupService = idolGroupService;
-
-        [Command("bias add")]
-        [Summary("Command for adding a new bias into a user's list")]
-        public async Task AddBias([Remainder] string biasData)
+        try
         {
-            try
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
             {
-                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
-                {
-                    return;
-                }
+                return;
+            }
 
-                //Make the name lowercase and clear and accidental spaces
-                string biasName = "";
-                string biasGroup = "";
+            //Make the name lowercase and clear and accidental spaces
+            string biasName = "";
+            string biasGroup = "";
 
-                bool isGroupName = false;
-                if (biasData.Contains('-'))
+            bool isGroupName = false;
+            if (biasData.Contains('-'))
+            {
+                biasName = biasData.ToLower().Split('-')[0].Trim();
+                biasGroup = biasData.ToLower().Split('-')[1].Trim();
+            }
+            else
+            {
+                isGroupName = await idolGroupService.GroupExistsAsnyc(biasData.ToLower().Trim());
+                if (isGroupName)
                 {
-                    biasName = biasData.ToLower().Split('-')[0].Trim();
-                    biasGroup = biasData.ToLower().Split('-')[1].Trim();
+                    biasGroup = biasData.ToLower().Trim();
                 }
                 else
                 {
-                    isGroupName = await idolGroupService.GroupExistsAsnyc(biasData.ToLower().Trim());
-                    if (isGroupName)
-                    {
-                        biasGroup = biasData.ToLower().Trim();
-                    }
-                    else
-                    {
-                        biasName = biasData.ToLower().Trim();
-                    }
-                }
-
-                DbProcessResultEnum result = isGroupName
-                    ? await userIdolService.AddUserIdolGroupAsync(Context.User.Id, biasGroup)
-                    : await userIdolService.AddUserIdolAsync(Context.User.Id, biasName, biasGroup);
-                if (result == DbProcessResultEnum.Success)
-                {
-                    await ReplyAsync("Bias(es) added to your list of biases!");
-                }
-                else if (result == DbProcessResultEnum.MultipleResults)
-                {
-                    await ReplyAsync("There are multiple biases with that name!\nWrite down the group name too in the following format: [name]-[group]");
-                }
-                else if (result == DbProcessResultEnum.AlreadyExists)
-                {
-                    await ReplyAsync("You already have this bias/these biases on your list!");
-                }
-                else if (result == DbProcessResultEnum.MultipleExists)
-                {
-                    await ReplyAsync("A bias with that name was found in your list, but you did not specify a group! (format: [name]-[group])");
-                }
-                else if (result == DbProcessResultEnum.NotFound)
-                {
-                    await ReplyAsync("Bias not in database!");
-                }
-                else
-                {
-                    await ReplyAsync("Bias(es) could not be added!");
+                    biasName = biasData.ToLower().Trim();
                 }
             }
-            catch (Exception ex)
+
+            DbProcessResultEnum result = isGroupName
+                ? await userIdolService.AddUserIdolGroupAsync(Context.User.Id, biasGroup)
+                : await userIdolService.AddUserIdolAsync(Context.User.Id, biasName, biasGroup);
+            if (result == DbProcessResultEnum.Success)
             {
-                logger.Error("UserBiasCommands.cs AddBias", ex);
+                await ReplyAsync("Bias(es) added to your list of biases!");
+            }
+            else if (result == DbProcessResultEnum.MultipleResults)
+            {
+                await ReplyAsync("There are multiple biases with that name!\nWrite down the group name too in the following format: [name]-[group]");
+            }
+            else if (result == DbProcessResultEnum.AlreadyExists)
+            {
+                await ReplyAsync("You already have this bias/these biases on your list!");
+            }
+            else if (result == DbProcessResultEnum.MultipleExists)
+            {
+                await ReplyAsync("A bias with that name was found in your list, but you did not specify a group! (format: [name]-[group])");
+            }
+            else if (result == DbProcessResultEnum.NotFound)
+            {
+                await ReplyAsync("Bias not in database!");
+            }
+            else
+            {
+                await ReplyAsync("Bias(es) could not be added!");
             }
         }
-
-        [Command("bias remove")]
-        [Summary("Command for removing a bias from a user's list")]
-        public async Task RemoveBias([Remainder] string biasData)
+        catch (Exception ex)
         {
-            try
+            logger.Error("UserBiasCommands.cs AddBias", ex);
+        }
+    }
+
+    [Command("bias remove")]
+    [Summary("Command for removing a bias from a user's list")]
+    public async Task RemoveBias([Remainder] string biasData)
+    {
+        try
+        {
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
             {
-                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
-                {
-                    return;
-                }
+                return;
+            }
 
-                //Make the name lowercase and clear and accidental spaces
-                string biasName = "";
-                string biasGroup = "";
+            //Make the name lowercase and clear and accidental spaces
+            string biasName = "";
+            string biasGroup = "";
 
-                bool isGroupName = false;
-                if (biasData.Contains('-'))
+            bool isGroupName = false;
+            if (biasData.Contains('-'))
+            {
+                biasName = biasData.ToLower().Split('-')[0].Trim();
+                biasGroup = biasData.ToLower().Split('-')[1].Trim();
+            }
+            else
+            {
+                isGroupName = await idolGroupService.GroupExistsAsnyc(biasData.ToLower().Trim());
+                if (isGroupName)
                 {
-                    biasName = biasData.ToLower().Split('-')[0].Trim();
-                    biasGroup = biasData.ToLower().Split('-')[1].Trim();
+                    biasGroup = biasData.ToLower().Trim();
                 }
                 else
                 {
-                    isGroupName = await idolGroupService.GroupExistsAsnyc(biasData.ToLower().Trim());
-                    if (isGroupName)
-                    {
-                        biasGroup = biasData.ToLower().Trim();
-                    }
-                    else
-                    {
-                        biasName = biasData.ToLower().Trim();
-                    }
-                }
-
-                DbProcessResultEnum result = isGroupName
-                    ? await userIdolService.RemoveUserIdolGroupAsync(Context.User.Id, biasGroup)
-                    : await userIdolService.RemoveUserIdolAsync(Context.User.Id, biasName, biasGroup);
-                if (result == DbProcessResultEnum.Success)
-                {
-                    await ReplyAsync("Bias(es) removed from your list of biases!");
-                }
-                else if (result == DbProcessResultEnum.MultipleResults)
-                {
-                    await ReplyAsync("You have multiple biases with that name!\nWrite down the group name too in the following format: [name]-[group]");
-                }
-                else if (result == DbProcessResultEnum.PartialNotFound)
-                {
-                    await ReplyAsync("You do not have this bias/these biases on your list!");
-                }
-                else
-                {
-                    await ReplyAsync("Bias(es) could not be removed!");
+                    biasName = biasData.ToLower().Trim();
                 }
             }
-            catch (Exception ex)
+
+            DbProcessResultEnum result = isGroupName
+                ? await userIdolService.RemoveUserIdolGroupAsync(Context.User.Id, biasGroup)
+                : await userIdolService.RemoveUserIdolAsync(Context.User.Id, biasName, biasGroup);
+            if (result == DbProcessResultEnum.Success)
             {
-                logger.Error("UserBiasCommands.cs RemoveBias", ex);
+                await ReplyAsync("Bias(es) removed from your list of biases!");
+            }
+            else if (result == DbProcessResultEnum.MultipleResults)
+            {
+                await ReplyAsync("You have multiple biases with that name!\nWrite down the group name too in the following format: [name]-[group]");
+            }
+            else if (result == DbProcessResultEnum.PartialNotFound)
+            {
+                await ReplyAsync("You do not have this bias/these biases on your list!");
+            }
+            else
+            {
+                await ReplyAsync("Bias(es) could not be removed!");
             }
         }
-
-        [Command("bias clear")]
-        [Summary("Command for clearing the user's bias list")]
-        public async Task ClearBias()
+        catch (Exception ex)
         {
-            try
-            {
-                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
-                {
-                    return;
-                }
+            logger.Error("UserBiasCommands.cs RemoveBias", ex);
+        }
+    }
 
-                DbProcessResultEnum result = await userIdolService.ClearUserIdolAsync(Context.User.Id);
-                if (result == DbProcessResultEnum.Success)
-                {
-                    await ReplyAsync("Your biases have been cleared!");
-                }
-                else
-                {
-                    await ReplyAsync("You did not have any biases to clear!");
-                }
-            }
-            catch (Exception ex)
+    [Command("bias clear")]
+    [Summary("Command for clearing the user's bias list")]
+    public async Task ClearBias()
+    {
+        try
+        {
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
             {
-                logger.Error("UserBiasCommands.cs ClearBias", ex);
+                return;
+            }
+
+            DbProcessResultEnum result = await userIdolService.ClearUserIdolAsync(Context.User.Id);
+            if (result == DbProcessResultEnum.Success)
+            {
+                await ReplyAsync("Your biases have been cleared!");
+            }
+            else
+            {
+                await ReplyAsync("You did not have any biases to clear!");
             }
         }
-
-        [Command("my biases")]
-        [Alias(["mybiases", "biases", "my bias"])]
-        [Summary("Command to check a user's current list of biases")]
-        public async Task MyBiases([Remainder] string groupName = "")
+        catch (Exception ex)
         {
-            try
+            logger.Error("UserBiasCommands.cs ClearBias", ex);
+        }
+    }
+
+    [Command("my biases")]
+    [Alias(["mybiases", "biases", "my bias"])]
+    [Summary("Command to check a user's current list of biases")]
+    public async Task MyBiases([Remainder] string groupName = "")
+    {
+        try
+        {
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
             {
-                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
+                return;
+            }
+
+            //Get your list of biases
+            List<IdolResource> list = await userIdolService.GetUserIdolsListAsync(Context.User.Id, groupName.ToLower().Trim());
+
+            //Check if you have any
+            if (CollectionTools.IsNullOrEmpty(list))
+            {
+                if (groupName != "")
                 {
-                    return;
-                }
-
-                //Get your list of biases
-                List<IdolResource> list = await userIdolService.GetUserIdolsListAsync(Context.User.Id, groupName.ToLower().Trim());
-
-                //Check if you have any
-                if (CollectionTools.IsNullOrEmpty(list))
-                {
-                    if (groupName != "")
-                    {
-                        await ReplyAsync("No biases from that group are in your list!");
-                    }
-                    else
-                    {
-                        await ReplyAsync("You do not have any biases set yet!");
-                    }
-
-                    return;
-                }
-
-                BiasMessageResult result = BiasListMessageProcessor.BuildBiasMessage(list, groupName, $"{GetCurrentUserNickname()}'s biases by group", Context.User.Id, true);
-                if (result.Component == null)
-                {
-                    await ReplyAsync(result.Message);
+                    await ReplyAsync("No biases from that group are in your list!");
                 }
                 else
                 {
-                    await ReplyAsync(result.Message, components: result.Component);
+                    await ReplyAsync("You do not have any biases set yet!");
                 }
 
-                //Generate a random number, 10% chance for an additional message to appear
-                Random r = new();
-                if (r.Next(0, 10) == 0)
-                {
-                    //Pick a random bias
-                    string bias = list[r.Next(0, list.Count)].Name;
-                    //Also make the first letter upper case
-                    bias = bias.ToUpper();
-
-                    string baseMessage = StaticLists.BiasExtraMessage[r.Next(0, StaticLists.BiasExtraMessage.Length)];
-                    string message = string.Format(baseMessage, bias);
-
-                    await ReplyAsync(message);
-                }
+                return;
             }
-            catch (Exception ex)
+
+            BiasMessageResult result = BiasListMessageProcessor.BuildBiasMessage(list, groupName, $"{GetCurrentUserNickname()}'s biases by group", Context.User.Id, true);
+            if (result.Component == null)
             {
-                logger.Error("UserBiasCommands.cs MyBiases", ex);
+                await ReplyAsync(result.Message);
+            }
+            else
+            {
+                await ReplyAsync(result.Message, components: result.Component);
+            }
+
+            //Generate a random number, 10% chance for an additional message to appear
+            Random r = new();
+            if (r.Next(0, 10) == 0)
+            {
+                //Pick a random bias
+                string bias = list[r.Next(0, list.Count)].Name;
+                //Also make the first letter upper case
+                bias = bias.ToUpper();
+
+                string baseMessage = StaticLists.BiasExtraMessage[r.Next(0, StaticLists.BiasExtraMessage.Length)];
+                string message = string.Format(baseMessage, bias);
+
+                await ReplyAsync(message);
             }
         }
-
-        [Command("bias list")]
-        [Summary("Command for checking our biases as a whole")]
-        public async Task BiasList([Remainder] string groupName = "")
+        catch (Exception ex)
         {
-            try
+            logger.Error("UserBiasCommands.cs MyBiases", ex);
+        }
+    }
+
+    [Command("bias list")]
+    [Summary("Command for checking our biases as a whole")]
+    public async Task BiasList([Remainder] string groupName = "")
+    {
+        try
+        {
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
             {
-                if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
-                {
-                    return;
-                }
+                return;
+            }
 
-                //Get the global list of biases
-                List<IdolResource> idols = await idolService.GetIdolsByGroupAsync(groupName.ToLower().Trim());
+            //Get the global list of biases
+            List<IdolResource> idols = await idolService.GetIdolsByGroupAsync(groupName.ToLower().Trim());
 
-                //Check if we have any items on the list
-                if (idols.Count == 0)
+            //Check if we have any items on the list
+            if (idols.Count == 0)
+            {
+                if (groupName != "")
                 {
-                    if (groupName != "")
-                    {
-                        await ReplyAsync("No biases from that group are in the database!");
-                    }
-                    else
-                    {
-                        await ReplyAsync("No biases have been added to database yet!");
-                    }
-                    return;
-                }
-
-                BiasMessageResult result = BiasListMessageProcessor.BuildBiasMessage(idols, groupName, "Which group do you want to see?", Context.User.Id, false);
-                if (result.Component == null)
-                {
-                    await ReplyAsync(result.Message);
+                    await ReplyAsync("No biases from that group are in the database!");
                 }
                 else
                 {
-                    await ReplyAsync(result.Message, components: result.Component);
+                    await ReplyAsync("No biases have been added to database yet!");
                 }
+                return;
             }
-            catch (Exception ex)
+
+            BiasMessageResult result = BiasListMessageProcessor.BuildBiasMessage(idols, groupName, "Which group do you want to see?", Context.User.Id, false);
+            if (result.Component == null)
             {
-                logger.Error("UserBiasCommands.cs BiasList", ex);
+                await ReplyAsync(result.Message);
+            }
+            else
+            {
+                await ReplyAsync(result.Message, components: result.Component);
             }
         }
-
-        [Command("ping")]
-        [RequireContext(ContextType.Guild)]
-        [Summary("Command for pinging biases")]
-        public async Task PingBias([Remainder] string biasNames)
+        catch (Exception ex)
         {
-            try
+            logger.Error("UserBiasCommands.cs BiasList", ex);
+        }
+    }
+
+    [Command("ping")]
+    [RequireContext(ContextType.Guild)]
+    [Summary("Command for pinging biases")]
+    public async Task PingBias([Remainder] string biasNames)
+    {
+        try
+        {
+            //Make the name lowercase and split up names
+            string[] nameList = biasNames.ToLower().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            //Get the users that have the bias with the following names, if the bias exists
+            ListWithDbResult<UserResource> result = await idolService.GetUsersByIdolsAsync(nameList);
+
+            if (result.ProcessResultEnum == DbProcessResultEnum.NotFound)
             {
-                //Make the name lowercase and split up names
-                string[] nameList = biasNames.ToLower().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                await ReplyAsync("No bias found with that name/those names!");
+                return;
+            }
+            else if (result.ProcessResultEnum == DbProcessResultEnum.Failure || result.List == null)
+            {
+                await ReplyAsync("Exception during search for users!");
+                return;
+            }
+            else
+            {
+                await Context.Guild.DownloadUsersAsync();
 
-                //Get the users that have the bias with the following names, if the bias exists
-                ListWithDbResult<UserResource> result = await idolService.GetUsersByIdolsAsync(nameList);
+                List<SocketGuildUser> guildUsers = [];
+                bool isUsersBias = false;
+                foreach (UserResource dbUser in result.List)
+                {
+                    //Find user on server
+                    SocketGuildUser user = Context.Guild.GetUser(dbUser.DiscordId);
 
-                if (result.ProcessResultEnum == DbProcessResultEnum.NotFound)
-                {
-                    await ReplyAsync("No bias found with that name/those names!");
-                    return;
-                }
-                else if (result.ProcessResultEnum == DbProcessResultEnum.Failure || result.List == null)
-                {
-                    await ReplyAsync("Exception during search for users!");
-                    return;
-                }
-                else
-                {
-                    await Context.Guild.DownloadUsersAsync();
-
-                    List<SocketGuildUser> guildUsers = [];
-                    bool isUsersBias = false;
-                    foreach (UserResource dbUser in result.List)
+                    //If user is not found or the user is the one sending the command, do not add their mention to the list
+                    if (user != null)
                     {
-                        //Find user on server
-                        SocketGuildUser user = Context.Guild.GetUser(dbUser.DiscordId);
-
-                        //If user is not found or the user is the one sending the command, do not add their mention to the list
-                        if (user != null)
+                        if (user.Id != Context.User.Id)
                         {
-                            if (user.Id != Context.User.Id)
-                            {
-                                guildUsers.Add(user);
-                                continue;
-                            }
-                            isUsersBias = true;
+                            guildUsers.Add(user);
+                            continue;
                         }
+                        isUsersBias = true;
                     }
-
-                    //If only one person has the bias and it's the command sender, send unique message
-                    if (guildUsers.Count == 0)
-                    {
-                        await ReplyAsync(isUsersBias ?
-                                        "Only you have that bias for now! Time to convert people." :
-                                        "Not even you have this bias, that's just shameful really...");
-                        return;
-                    }
-
-                    //Make a list of mentions out of them
-                    string message = string.Join(" ", guildUsers.Select(u => u.Mention));
-
-                    //delete command and send mentions
-                    await Context.Message.DeleteAsync();
-                    await ReplyAsync(message);
                 }
+
+                //If only one person has the bias and it's the command sender, send unique message
+                if (guildUsers.Count == 0)
+                {
+                    await ReplyAsync(isUsersBias ?
+                                    "Only you have that bias for now! Time to convert people." :
+                                    "Not even you have this bias, that's just shameful really...");
+                    return;
+                }
+
+                //Make a list of mentions out of them
+                string message = string.Join(" ", guildUsers.Select(u => u.Mention));
+
+                //delete command and send mentions
+                await Context.Message.DeleteAsync();
+                await ReplyAsync(message);
             }
-            catch (Exception ex)
-            {
-                logger.Error("UserBiasCommands.cs PingBias", ex);
-            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("UserBiasCommands.cs PingBias", ex);
         }
     }
 }

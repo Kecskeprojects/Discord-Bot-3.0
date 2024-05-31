@@ -9,58 +9,57 @@ using Discord_Bot.Resources;
 using Discord_Bot.Tools;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Commands
+namespace Discord_Bot.Commands;
+
+//Todo: after reorganizing, check if anything in especially the longer commands can be moved into tools, processors, etc...
+public class BaseCommand(Logging logger, Config config, IServerService serverService) : ModuleBase<SocketCommandContext>
 {
-    //Todo: after reorganizing, check if anything in especially the longer commands can be moved into tools, processors, etc...
-    public class BaseCommand(Logging logger, Config config, IServerService serverService) : ModuleBase<SocketCommandContext>
+    protected readonly Logging logger = logger;
+    protected readonly Config config = config;
+    protected readonly IServerService serverService = serverService;
+
+    protected bool IsDM()
     {
-        protected readonly Logging logger = logger;
-        protected readonly Config config = config;
-        protected readonly IServerService serverService = serverService;
+        return Context.Channel.GetChannelType() == ChannelType.DM;
+    }
 
-        protected bool IsDM()
+    protected async Task<ServerResource> GetCurrentServerAsync()
+    {
+        return await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+    }
+
+    protected string GetCurrentUserAvatar(ImageFormat format = ImageFormat.Png, ushort size = 512)
+    {
+        return Context.User.GetDisplayAvatarUrl(format, size);
+    }
+
+    protected static string GetUserAvatar(IUser user, ImageFormat format = ImageFormat.Png, ushort size = 512)
+    {
+        return user.GetDisplayAvatarUrl(format, size);
+    }
+
+    protected string GetCurrentUserNickname()
+    {
+        return !IsDM()
+            ? (Context.User as SocketGuildUser).Nickname ?? Context.User.Username
+            : Context.User.Username;
+    }
+
+    protected string GetUserNickname(IUser user)
+    {
+        return !IsDM()
+            ? (user as SocketGuildUser).Nickname ?? Context.User.Username
+            : Context.User.Username;
+    }
+
+    protected async Task<bool> IsCommandAllowedAsync(ChannelTypeEnum type, bool allowLackOfType = true)
+    {
+        if (IsDM())
         {
-            return Context.Channel.GetChannelType() == ChannelType.DM;
+            return false;
         }
 
-        protected async Task<ServerResource> GetCurrentServerAsync()
-        {
-            return await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-        }
-
-        protected string GetCurrentUserAvatar(ImageFormat format = ImageFormat.Png, ushort size = 512)
-        {
-            return Context.User.GetDisplayAvatarUrl(format, size);
-        }
-
-        protected static string GetUserAvatar(IUser user, ImageFormat format = ImageFormat.Png, ushort size = 512)
-        {
-            return user.GetDisplayAvatarUrl(format, size);
-        }
-
-        protected string GetCurrentUserNickname()
-        {
-            return !IsDM()
-                ? (Context.User as SocketGuildUser).Nickname ?? Context.User.Username
-                : Context.User.Username;
-        }
-
-        protected string GetUserNickname(IUser user)
-        {
-            return !IsDM()
-                ? (user as SocketGuildUser).Nickname ?? Context.User.Username
-                : Context.User.Username;
-        }
-
-        protected async Task<bool> IsCommandAllowedAsync(ChannelTypeEnum type, bool allowLackOfType = true)
-        {
-            if (IsDM())
-            {
-                return false;
-            }
-
-            ServerResource server = await GetCurrentServerAsync();
-            return DiscordTools.IsTypeOfChannel(server, type, Context.Channel.Id, allowLackOfType);
-        }
+        ServerResource server = await GetCurrentServerAsync();
+        return DiscordTools.IsTypeOfChannel(server, type, Context.Channel.Id, allowLackOfType);
     }
 }

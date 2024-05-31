@@ -10,49 +10,48 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Features
+namespace Discord_Bot.Features;
+
+public class ReminderFeature(IReminderService reminderService, DiscordSocketClient client, Logging logger) : BaseFeature(logger)
 {
-    public class ReminderFeature(IReminderService reminderService, DiscordSocketClient client, Logging logger) : BaseFeature(logger)
+    private readonly IReminderService reminderService = reminderService;
+    private readonly DiscordSocketClient client = client;
+
+    protected override async Task ExecuteCoreLogicAsync()
     {
-        private readonly IReminderService reminderService = reminderService;
-        private readonly DiscordSocketClient client = client;
-
-        protected override async Task ExecuteCoreLogicAsync()
+        try
         {
-            try
+            //Get the list of reminders that are before or exactly set to this minute
+            DateTime dateTime = DateTime.Parse(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm"));
+            List<ReminderResource> result = await reminderService.GetCurrentRemindersAsync(dateTime);
+            if (!CollectionTools.IsNullOrEmpty(result))
             {
-                //Get the list of reminders that are before or exactly set to this minute
-                DateTime dateTime = DateTime.Parse(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm"));
-                List<ReminderResource> result = await reminderService.GetCurrentRemindersAsync(dateTime);
-                if (!CollectionTools.IsNullOrEmpty(result))
+                foreach (ReminderResource reminder in result)
                 {
-                    foreach (ReminderResource reminder in result)
+                    //Modify message
+                    reminder.Message = reminder.Message.Insert(0, $"You told me to remind you at `{reminder.Date}` with the following message:\n\n");
+
+                    //Try getting user
+                    IUser user = await client.GetUserAsync(reminder.UserDiscordId);
+
+                    //If user exists send a direct message to the user
+                    if (user != null)
                     {
-                        //Modify message
-                        reminder.Message = reminder.Message.Insert(0, $"You told me to remind you at `{reminder.Date}` with the following message:\n\n");
-
-                        //Try getting user
-                        IUser user = await client.GetUserAsync(reminder.UserDiscordId);
-
-                        //If user exists send a direct message to the user
-                        if (user != null)
-                        {
-                            await user.SendMessageAsync(reminder.Message);
-                        }
-                    }
-
-                    List<int> reminderIds = result.Select(r => r.ReminderId).ToList();
-                    DbProcessResultEnum reminderResult = await reminderService.RemoveCurrentRemindersAsync(reminderIds);
-                    if (reminderResult == DbProcessResultEnum.Failure)
-                    {
-                        logger.Error("ReminderFeature.cs ExecuteCoreLogicAsync", "Failure during reminder check!");
+                        await user.SendMessageAsync(reminder.Message);
                     }
                 }
+
+                List<int> reminderIds = result.Select(r => r.ReminderId).ToList();
+                DbProcessResultEnum reminderResult = await reminderService.RemoveCurrentRemindersAsync(reminderIds);
+                if (reminderResult == DbProcessResultEnum.Failure)
+                {
+                    logger.Error("ReminderFeature.cs ExecuteCoreLogicAsync", "Failure during reminder check!");
+                }
             }
-            catch (Exception ex)
-            {
-                logger.Error("ReminderFeature.cs Log ExecuteCoreLogicAsync", ex);
-            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("ReminderFeature.cs Log ExecuteCoreLogicAsync", ex);
         }
     }
 }
