@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Discord_Bot.Enums
 {
+    //Todo:
+    //Some of the lists and enums may be converted to a better solution, three that caught my eye:
+    //https://stackoverflow.com/a/479453, https://stackoverflow.com/a/45380679 and https://stackoverflow.com/a/28309084
     public class StaticLists
     {
         public static string[] EasterEggMessages { get; } =

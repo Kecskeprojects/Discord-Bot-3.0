@@ -17,6 +17,7 @@ using System.Windows;
 
 namespace Discord_Bot
 {
+    //Todo: Investigate if the various Services can be cleaned up, split up, and also if a base class can be or is needed for them, perhaps multiple base classes
     public partial class App : Application
     {
         #region Variables

@@ -9,8 +9,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBRepositories
 {
-    public class GenericRepository<TEntity>(MainDbContext context) : BaseRepository(context), IGenericRepository<TEntity> where TEntity : class
+    public class GenericRepository<TEntity>(MainDbContext context) : IGenericRepository<TEntity> where TEntity : class
     {
+        protected readonly MainDbContext context = context;
+
         #region Add
         public async Task<int> AddAsync(TEntity item, bool saveChanges = true)
         {

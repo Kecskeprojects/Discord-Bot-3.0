@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Core
 {
+    //Todo: This class might not be needed at all, revisit it
     public class CoreLogic(Logging logger, IServerService serverService) : ICoreLogic
     {
         private readonly Logging logger = logger;

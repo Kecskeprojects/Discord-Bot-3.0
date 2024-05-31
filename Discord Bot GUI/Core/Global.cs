@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Core
 {
+    //Todo: remove all functions from here when it becomes possible, these list may be placed somewhere else, or put into some form of singleton service
     public static class Global
     {
         public static ConcurrentDictionary<ulong, ServerAudioResource> ServerAudioResources { get; private set; } = [];

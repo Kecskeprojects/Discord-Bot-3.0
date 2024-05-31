@@ -6,6 +6,7 @@ using Discord_Bot.Core.Configuration;
 
 namespace Discord_Bot.Interactions
 {
+    //Todo: after reorganizing, check if anything in especially the longer commands can be moved into tools, processors, etc...
     public class BaseInteraction(Logging logger, Config config) : InteractionModuleBase<SocketInteractionContext>
     {
         protected readonly Logging logger = logger;
