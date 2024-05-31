@@ -22,8 +22,6 @@ namespace Discord_Bot.Processors.EmbedProcessors.BiasGame
 
         public static Embed[] CreateEmbed(BiasGameData data, string avatarUrl, string userName)
         {
-            List<Embed> embeds = [];
-
             EmbedBuilder main = new();
 
             main.WithDescription($"**BIAS GAME MATCH {data.CurrentPair + 1} OUT OF {data.Pairs.Count}**");
@@ -35,15 +33,11 @@ namespace Discord_Bot.Processors.EmbedProcessors.BiasGame
 
             main.WithImageUrl($"attachment://combined.png");
 
-            embeds.Add(main.Build());
-
-            return [.. embeds];
+            return [main.Build()];
         }
 
         public static Embed[] CreateFinalEmbed(BiasGameData data, string avatarUrl, string userName)
         {
-            List<Embed> embeds = [];
-
             EmbedBuilder main = new();
 
             main.WithDescription("**BIAS GAME MATCH RESULT**");
@@ -52,9 +46,9 @@ namespace Discord_Bot.Processors.EmbedProcessors.BiasGame
             footer.WithIconUrl(avatarUrl);
             footer.WithText($"{userName} | {data.Gender} | {data.DebutYearStart}-{data.DebutYearEnd}");
             main.WithFooter(footer);
-            embeds.Add(main.WithImageUrl("attachment://winner-bracket.png").Build());
+            main.WithImageUrl("attachment://winner-bracket.png");
 
-            return [.. embeds];
+            return [main.Build()];
         }
     }
 }

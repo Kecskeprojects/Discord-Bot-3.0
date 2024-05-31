@@ -4,6 +4,7 @@ using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Processors.EmbedProcessors;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
 using System;
@@ -30,17 +31,8 @@ namespace Discord_Bot.Commands.Owner
                 List<GreetingResource> greetings = await greetingService.GetAllGreetingAsync();
                 if (!CollectionTools.IsNullOrEmpty(greetings))
                 {
-                    EmbedBuilder builder = new();
-                    builder.WithTitle("Greetings:");
-
-                    int i = 1;
-                    foreach (GreetingResource greeting in greetings)
-                    {
-                        builder.AddField($"ID:{greeting.GreetingId}", greeting.Url);
-                        i++;
-                    }
-
-                    await ReplyAsync("", false, builder.Build());
+                    Embed[] embed = GreetingListEmbedProcessor.CreateEmbed(greetings);
+                    await ReplyAsync(embeds: embed);
                 }
             }
             catch (Exception ex)

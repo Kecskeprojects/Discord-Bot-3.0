@@ -261,8 +261,14 @@ namespace Discord_Bot.Commands.User
                 //Check if we have any items on the list
                 if (idols.Count == 0)
                 {
-                    if (groupName != "") { await ReplyAsync("No biases from that group are in the database!"); }
-                    else { await ReplyAsync("No biases have been added to database yet!"); }
+                    if (groupName != "")
+                    {
+                        await ReplyAsync("No biases from that group are in the database!");
+                    }
+                    else
+                    {
+                        await ReplyAsync("No biases have been added to database yet!");
+                    }
                     return;
                 }
 
