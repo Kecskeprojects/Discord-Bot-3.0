@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
 
-namespace LastFmApi.Models.TrackInfo
+namespace LastFmApi.Models.TrackInfo;
+
+public class Toptags
 {
-    public class Toptags
-    {
-        [JsonProperty("tag")]
-        public List<Tag> Tag { get; set; }
-    }
+    [JsonProperty("tag")]
+    public List<Tag> Tag { get; set; }
 }

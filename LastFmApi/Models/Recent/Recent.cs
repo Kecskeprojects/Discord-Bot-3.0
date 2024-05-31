@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
 
-namespace LastFmApi.Models.Recent
+namespace LastFmApi.Models.Recent;
+
+public class Recent
 {
-    public class Recent
-    {
-        [JsonProperty("recenttracks")]
-        public Recenttracks RecentTracks { get; set; }
-    }
+    [JsonProperty("recenttracks")]
+    public Recenttracks RecentTracks { get; set; }
 }

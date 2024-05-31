@@ -1,10 +1,9 @@
-﻿namespace LastFmApi.Enum
+﻿namespace LastFmApi.Enum;
+
+public enum LastFmRequestResultEnum
 {
-    public enum LastFmRequestResultEnum
-    {
-        Success = 0,
-        Failure = 1,
-        RequiredParameterEmpty = 2,
-        EmptyResponse = 3,
-    }
+    Success = 0,
+    Failure = 1,
+    RequiredParameterEmpty = 2,
+    EmptyResponse = 3,
 }

@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
 
-namespace LastFmApi.Models.TrackInfo
+namespace LastFmApi.Models.TrackInfo;
+
+public class Attr
 {
-    public class Attr
-    {
-        [JsonProperty("position")]
-        public string Position { get; set; }
-    }
+    [JsonProperty("position")]
+    public string Position { get; set; }
 }

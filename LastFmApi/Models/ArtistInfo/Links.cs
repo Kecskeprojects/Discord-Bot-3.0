@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
 
-namespace LastFmApi.Models.ArtistInfo
+namespace LastFmApi.Models.ArtistInfo;
+
+public class Links
 {
-    public class Links
-    {
-        [JsonProperty("link")]
-        public Link Link { get; set; }
-    }
+    [JsonProperty("link")]
+    public Link Link { get; set; }
 }
