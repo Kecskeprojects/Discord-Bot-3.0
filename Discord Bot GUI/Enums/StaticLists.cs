@@ -106,7 +106,6 @@ public class StaticLists
             "You are turning {1} {0}, you have the Big Bang on VHS don't you?"
         ];
 
-
     public static StaticRoundData[] BiasGameStaticRoundData { get; } =
         [
             new StaticRoundData(baseLeftX: 5, baseRightX: 945, baseDiagonal: 50, baseY: 11, spacing: 54, totalPositions: 16),

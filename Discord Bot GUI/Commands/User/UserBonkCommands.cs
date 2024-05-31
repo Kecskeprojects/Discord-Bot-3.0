@@ -38,7 +38,7 @@ public class UserBonkCommands(
             {
                 if (int.TryParse(paramParts[^1], out frameDelay))
                 {
-                    if (frameDelay < 1 || frameDelay > 1000)
+                    if (frameDelay is < 1 or > 1000)
                     {
                         await ReplyAsync("Invalid frame delay length. (1-1000)");
                         return;

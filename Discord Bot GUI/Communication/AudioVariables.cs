@@ -22,7 +22,6 @@ public class AudioVariables
 
     public Stopwatch Stopwatch { get; set; }
 
-
     public AudioVariables()
     {
         AbruptDisconnect = false;

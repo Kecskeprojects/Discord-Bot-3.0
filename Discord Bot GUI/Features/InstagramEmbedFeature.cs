@@ -73,7 +73,7 @@ public class InstagramEmbedFeature(IInstaLoader instaLoader, Logging logger) : B
             }
             catch (Exception ex)
             {
-                if (ex is not HttpException && ex is not ArgumentException)
+                if (ex is not HttpException and not ArgumentException)
                 {
                     throw;
                 }

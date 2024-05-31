@@ -137,6 +137,4 @@ public class AdminBirthdayCommands(
             logger.Error("AdminBirthdayCommands.cs BirthdayRemove", ex);
         }
     }
-
-
 }

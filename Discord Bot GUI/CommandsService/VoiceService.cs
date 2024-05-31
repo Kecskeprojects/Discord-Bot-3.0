@@ -33,7 +33,6 @@ public class VoiceService
 
         builder.AddField("Position in queue:", count - 1, true);
 
-
         builder.WithTimestamp(DateTime.UtcNow);
         builder.WithColor(Color.Red);
 

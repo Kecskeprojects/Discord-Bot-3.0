@@ -168,8 +168,6 @@ public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoK
         }
     }
 
-
-
     [Command("lf tal")]
     [Alias(["lf top albums", "lf top album", "lf topalbums", "lf topalbum"])]
     [Summary("Get the top listened albums of the user")]

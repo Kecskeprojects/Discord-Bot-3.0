@@ -17,7 +17,6 @@ using System.Web;
 
 namespace Discord_Bot.Services;
 
-
 public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Logging logger, Config config) : IYoutubeAPI
 {
     #region Variables

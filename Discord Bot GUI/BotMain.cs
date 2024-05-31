@@ -159,7 +159,7 @@ public class BotMain(
 
             //In case the message was a system message (eg. the message seen when someone a pin is made), a webhook's or a bot's message
             //The function stops as it could cause an infinite loop
-            if (arg.Source == MessageSource.System || arg.Source == MessageSource.Webhook || arg.Source == MessageSource.Bot)
+            if (arg.Source is MessageSource.System or MessageSource.Webhook or MessageSource.Bot)
             {
                 if (arg.Channel.GetChannelType() != ChannelType.DM)
                 {
@@ -230,7 +230,6 @@ public class BotMain(
                 {
                     EasterEggFeature easterEggFeature = scope.ServiceProvider.GetService<EasterEggFeature>();
                     await easterEggFeature.Run(context);
-
 
                     //Make embed for instagram links
                     if (config.Enable_Instagram_Embed)

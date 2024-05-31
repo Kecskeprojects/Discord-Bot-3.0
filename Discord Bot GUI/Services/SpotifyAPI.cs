@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
 
-class SpotifyAPI(Logging logger, Config config, IYoutubeAPI youtubeAPI, IMusicBrainzAPI musicBrainzAPI) : ISpotifyAPI
+public class SpotifyAPI(Logging logger, Config config, IYoutubeAPI youtubeAPI, IMusicBrainzAPI musicBrainzAPI) : ISpotifyAPI
 {
     private readonly Logging logger = logger;
     private readonly Config config = config;
@@ -40,7 +40,6 @@ class SpotifyAPI(Logging logger, Config config, IYoutubeAPI youtubeAPI, IMusicBr
         }
         return SearchResultEnum.SpotifyNotFound;
     }
-
 
     //The function running the query
     private async Task<SearchResultEnum> Run(string query, ulong serverId, ulong channelId, string username)
@@ -81,7 +80,7 @@ class SpotifyAPI(Logging logger, Config config, IYoutubeAPI youtubeAPI, IMusicBr
                         : SearchResultEnum.SpotifyFoundYoutubeNotFound;
                 }
             }
-            else if (type == "playlist" || type == "album")
+            else if (type is "playlist" or "album")
             {
                 string[] list = null;
 

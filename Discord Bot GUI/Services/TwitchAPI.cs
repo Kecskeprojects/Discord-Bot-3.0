@@ -224,7 +224,6 @@ public class TwitchAPI(
                 channelStatuses.TryAdd(channel.TwitchId, false);
                 lst.Add(channel.TwitchId);
             }
-
         }
         return lst;
     }

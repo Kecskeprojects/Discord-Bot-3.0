@@ -54,7 +54,6 @@ public class OwnerBiasAliasCommands(
         {
             logger.Error("OwnerBiasAliasCommands.cs AddBiasAlias", ex);
         }
-
     }
 
     [Command("bias alias remove")]
@@ -91,6 +90,5 @@ public class OwnerBiasAliasCommands(
         {
             logger.Error("OwnerBiasAliasCommands.cs RemoveBiasAlias", ex);
         }
-
     }
 }

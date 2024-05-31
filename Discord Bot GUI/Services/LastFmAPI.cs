@@ -438,7 +438,6 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, Logging logger, Config config) : 
         }
     }
 
-
     public async Task WhoKnowsByTrack(WhoKnows wk, string input)
     {
         try

@@ -9,7 +9,7 @@ public sealed class SizedDictionary<TKey, TValue>(int size) : Dictionary<TKey, T
     private readonly int maxSize = size;
     private Queue<TKey> keys = new();
 
-    new public bool TryAdd(TKey key, TValue value)
+    public new bool TryAdd(TKey key, TValue value)
     {
         if (key == null)
         {
@@ -32,7 +32,7 @@ public sealed class SizedDictionary<TKey, TValue>(int size) : Dictionary<TKey, T
         }
     }
 
-    new public void Add(TKey key, TValue value)
+    public new void Add(TKey key, TValue value)
     {
         if (key == null)
         {
@@ -47,7 +47,7 @@ public sealed class SizedDictionary<TKey, TValue>(int size) : Dictionary<TKey, T
         }
     }
 
-    new public bool Remove(TKey key)
+    public new bool Remove(TKey key)
     {
         if (key == null)
         {
@@ -71,7 +71,7 @@ public sealed class SizedDictionary<TKey, TValue>(int size) : Dictionary<TKey, T
         keys = newQueue;
         return base.Remove(key);
     }
-    new public void Clear()
+    public new void Clear()
     {
         keys.Clear();
         base.Clear();

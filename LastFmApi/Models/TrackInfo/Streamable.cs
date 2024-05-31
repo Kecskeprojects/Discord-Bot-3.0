@@ -2,7 +2,6 @@
 
 namespace LastFmApi.Models.TrackInfo;
 
-
 public class Streamable
 {
     [JsonProperty("#text")]

@@ -26,7 +26,6 @@ public static class ImageTools
                 int plusHeight = (int) ((mainImage.Height - difference) * extraHeight);
                 mainImage.Mutate(x => x.Crop(new Rectangle(0, Y, mainImage.Width, mainImage.Height - difference + plusHeight)));
             }
-
         }
     }
 

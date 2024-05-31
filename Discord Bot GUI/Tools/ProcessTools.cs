@@ -10,7 +10,7 @@ namespace Discord_Bot.Tools;
 
 public static class ProcessTools
 {
-    static readonly ThreadState[] ActiveStates =
+    private static readonly ThreadState[] ActiveStates =
     [
         /*ThreadState.Initialized,*/
         ThreadState.Ready,

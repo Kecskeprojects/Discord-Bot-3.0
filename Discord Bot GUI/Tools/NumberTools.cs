@@ -4,11 +4,11 @@ public static class NumberTools
 {
     public static bool IsNullOrZero(int? value)
     {
-        return value == null || value == 0;
+        return value is null or 0;
     }
 
     public static bool IsNullOrZero(ulong? value)
     {
-        return value == null || value == 0;
+        return value is null or 0;
     }
 }

@@ -25,7 +25,6 @@ public class Track
     [JsonProperty("duration")]
     public string Duration { get; set; }
 
-
     [JsonProperty("@attr")]
     public Attr Attr { get; set; }
 
