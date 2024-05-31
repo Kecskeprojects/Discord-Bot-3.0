@@ -12,7 +12,10 @@ namespace Discord_Bot.Tools
         {
             Stream imageData = null;
 
-            using (HttpClient wc = new() { Timeout = new TimeSpan(0, 3, 0) })
+            using (HttpClient wc = new()
+            {
+                Timeout = new TimeSpan(0, 3, 0)
+            })
             {
                 imageData = await wc.GetStreamAsync(url);
             }

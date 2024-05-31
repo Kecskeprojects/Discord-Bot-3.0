@@ -20,7 +20,10 @@ namespace Discord_Bot.Windows
         {
             InitializeComponent();
             this.logger = logger;
-            diagnosticsTimer = new(1000) { AutoReset = true }; //1 second
+            diagnosticsTimer = new(1000) //1 second
+            {
+                AutoReset = true
+            };
             diagnosticsTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             diagnosticsTimer.Start();
         }

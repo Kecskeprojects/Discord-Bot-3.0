@@ -13,7 +13,10 @@ namespace LastFmApi
     {
         public static async Task<GenericResponseItem<Toptracks>> TopTracks(string apiKey, string username, int? limit, int? page, string period)
         {
-            GenericResponseItem<Toptracks> response = new() { ResultCode = LastFmRequestResultEnum.Failure };
+            GenericResponseItem<Toptracks> response = new()
+            {
+                ResultCode = LastFmRequestResultEnum.Failure
+            };
             try
             {
                 if (string.IsNullOrEmpty(apiKey) ||
@@ -42,7 +45,10 @@ namespace LastFmApi
 
         public static async Task<GenericResponseItem<Topalbums>> TopAlbums(string apiKey, string username, int? limit, int? page, string period)
         {
-            GenericResponseItem<Topalbums> response = new() { ResultCode = LastFmRequestResultEnum.Failure };
+            GenericResponseItem<Topalbums> response = new()
+            {
+                ResultCode = LastFmRequestResultEnum.Failure
+            };
             try
             {
                 if (string.IsNullOrEmpty(apiKey) ||
@@ -73,7 +79,10 @@ namespace LastFmApi
 
         public static async Task<GenericResponseItem<Topartists>> TopArtists(string apiKey, string username, int? limit, int? page, string period)
         {
-            GenericResponseItem<Topartists> response = new() { ResultCode = LastFmRequestResultEnum.Failure };
+            GenericResponseItem<Topartists> response = new()
+            {
+                ResultCode = LastFmRequestResultEnum.Failure
+            };
             try
             {
                 if (string.IsNullOrEmpty(apiKey) ||
@@ -104,7 +113,10 @@ namespace LastFmApi
 
         public static async Task<GenericResponseItem<Recenttracks>> Recents(string apiKey, string username, int? limit)
         {
-            GenericResponseItem<Recenttracks> response = new() { ResultCode = LastFmRequestResultEnum.Failure };
+            GenericResponseItem<Recenttracks> response = new()
+            {
+                ResultCode = LastFmRequestResultEnum.Failure
+            };
             try
             {
                 if (string.IsNullOrEmpty(apiKey) ||
@@ -114,7 +126,10 @@ namespace LastFmApi
                     return response;
                 }
 
-                UserBasedRequestItem request = new("user.getrecenttracks", username, apiKey) { Limit = limit };
+                UserBasedRequestItem request = new("user.getrecenttracks", username, apiKey)
+                {
+                    Limit = limit
+                };
                 response.RequestDetails = new LastFmRequestDetails(request);
 
                 //Getting data from api
@@ -135,7 +150,10 @@ namespace LastFmApi
 
         public static async Task<GenericResponseItem<Models.Recent.Track>> NowPlaying(string apiKey, string username)
         {
-            GenericResponseItem<Models.Recent.Track> response = new() { ResultCode = LastFmRequestResultEnum.Failure };
+            GenericResponseItem<Models.Recent.Track> response = new()
+            {
+                ResultCode = LastFmRequestResultEnum.Failure
+            };
             try
             {
                 if (string.IsNullOrEmpty(apiKey) ||
@@ -145,7 +163,10 @@ namespace LastFmApi
                     return response;
                 }
 
-                UserBasedRequestItem request = new("user.getrecenttracks", username, apiKey) { Limit = 1 };
+                UserBasedRequestItem request = new("user.getrecenttracks", username, apiKey)
+                {
+                    Limit = 1
+                };
                 response.RequestDetails = new LastFmRequestDetails(request);
 
                 //Getting data from api

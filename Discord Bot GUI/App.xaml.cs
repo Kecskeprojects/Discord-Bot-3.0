@@ -31,7 +31,10 @@ namespace Discord_Bot
 
         protected override async void OnStartup(StartupEventArgs e)
         {
-            mainTimer = new(60000) { AutoReset = true }; //1 minute
+            mainTimer = new(60000)//1 minute
+            {
+                AutoReset = true
+            };
             mainTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             mainTimer.Start();
 

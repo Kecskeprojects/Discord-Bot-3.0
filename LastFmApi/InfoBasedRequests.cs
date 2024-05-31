@@ -12,7 +12,10 @@ namespace LastFmApi
         #region Api getInfo calls
         public static async Task<GenericResponseItem<Models.ArtistInfo.Artist>> ArtistPlays(string apiKey, string username, string artistName)
         {
-            GenericResponseItem<Models.ArtistInfo.Artist> response = new() { ResultCode = LastFmRequestResultEnum.Failure };
+            GenericResponseItem<Models.ArtistInfo.Artist> response = new()
+            {
+                ResultCode = LastFmRequestResultEnum.Failure
+            };
             try
             {
                 if (string.IsNullOrEmpty(apiKey) ||
@@ -43,7 +46,10 @@ namespace LastFmApi
 
         public static async Task<GenericResponseItem<Track>> TrackPlays(string apiKey, string username, string artistName, string trackName)
         {
-            GenericResponseItem<Track> response = new() { ResultCode = LastFmRequestResultEnum.Failure };
+            GenericResponseItem<Track> response = new()
+            {
+                ResultCode = LastFmRequestResultEnum.Failure
+            };
             try
             {
                 if (string.IsNullOrEmpty(apiKey) ||
@@ -55,7 +61,10 @@ namespace LastFmApi
                     return response;
                 }
 
-                InfoBasedRequestItem request = new("track.getInfo", username, apiKey, artistName) { Track = trackName };
+                InfoBasedRequestItem request = new("track.getInfo", username, apiKey, artistName)
+                {
+                    Track = trackName
+                };
                 response.RequestDetails = new LastFmRequestDetails(request);
 
                 RestResponse restResultJSON = await InfoBasedRequestHandler(request);

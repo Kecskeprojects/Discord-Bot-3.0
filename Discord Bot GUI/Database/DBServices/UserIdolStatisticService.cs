@@ -30,7 +30,10 @@ namespace Discord_Bot.Database.DBServices
 
                 if (user == null)
                 {
-                    user = new() { DiscordId = userId.ToString() };
+                    user = new()
+                    {
+                        DiscordId = userId.ToString()
+                    };
                     await userRepository.AddAsync(user);
                 }
 
