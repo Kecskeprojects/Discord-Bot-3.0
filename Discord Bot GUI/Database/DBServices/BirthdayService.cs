@@ -78,7 +78,8 @@ public class BirthdayService(
             birthday = await birthdayRepository.GetListAsync(
                 b => b.Date.Month == DateTime.UtcNow.Month
                 && b.Date.Day == DateTime.UtcNow.Day,
-                b => b.Server);
+                b => b.Server,
+                b => b.User);
         }
         catch (Exception ex)
         {

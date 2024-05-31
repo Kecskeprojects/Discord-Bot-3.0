@@ -44,16 +44,16 @@ public class BiasScrapingProcessor(
 
             int correctionCount = await idolService.CorrectUpdateErrorsAsync();
             logger.Log($"Corrected {correctionCount} idols with errors created during update.");
-
-            //Sometimes spam pages are opened so we clean the browser
-            await browserService.CloseBrowser();
-
-            logger.Log("Update Bias Data Logic ended!");
         }
         catch (Exception ex)
         {
             logger.Error("BiasScrapingProcessor.cs RunUpdateBiasDataAsync", ex);
         }
+
+        //Sometimes spam pages are opened so we clean the browser
+        await browserService.CloseBrowser();
+
+        logger.Log("Update Bias Data Logic ended!");
     }
 
     private async Task UpdateBiasAsync(List<IdolResource> localIdols, List<ExtendedBiasData> completeList, int i)
@@ -68,7 +68,7 @@ public class BiasScrapingProcessor(
 
         AdditionalIdolData additional = await kpopDbScraper.GetProfileDataAsync(profileUrl, getGroupData: localIdols[i].GroupDebutDate == null);
 
-        if (additional.ImageUrl == null)
+        if (additional?.ImageUrl == null)
         {
             logger.Warning("CoreLogic.cs UpdateExtendedBiasData", $"Image not found. DATA: {data?.StageName} of {data?.GroupName} | DB: {localIdols[i].Name} of {localIdols[i].GroupName}");
             return;

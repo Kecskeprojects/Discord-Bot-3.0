@@ -48,8 +48,8 @@ public class BaseCommand(Logging logger, Config config, IServerService serverSer
     protected string GetUserNickname(IUser user)
     {
         return !IsDM()
-            ? (user as SocketGuildUser).Nickname ?? Context.User.Username
-            : Context.User.Username;
+            ? (user as SocketGuildUser).Nickname ?? user.Username
+            : user.Username;
     }
 
     protected async Task<bool> IsCommandAllowedAsync(ChannelTypeEnum type, bool allowLackOfType = true)
