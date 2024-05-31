@@ -1,12 +1,11 @@
 ﻿using System.Collections;
 
-namespace Discord_Bot.Tools
+namespace Discord_Bot.Tools;
+
+public static class CollectionTools
 {
-    public static class CollectionTools
+    public static bool IsNullOrEmpty<T>(T collection) where T : ICollection
     {
-        public static bool IsNullOrEmpty<T>(T collection) where T : ICollection
-        {
-            return collection == null || collection.Count == 0;
-        }
+        return collection == null || collection.Count == 0;
     }
 }

@@ -4,36 +4,35 @@ using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Tools
+namespace Discord_Bot.Tools;
+
+public static class WebTools
 {
-    public static class WebTools
+    public static async Task<Stream> GetStream(string url)
     {
-        public static async Task<Stream> GetStream(string url)
+        Stream imageData = null;
+
+        using (HttpClient wc = new()
         {
-            Stream imageData = null;
-
-            using (HttpClient wc = new()
-            {
-                Timeout = new TimeSpan(0, 3, 0)
-            })
-            {
-                imageData = await wc.GetStreamAsync(url);
-            }
-
-            return imageData;
+            Timeout = new TimeSpan(0, 3, 0)
+        })
+        {
+            imageData = await wc.GetStreamAsync(url);
         }
 
-        public static bool TestConnection()
+        return imageData;
+    }
+
+    public static bool TestConnection()
+    {
+        try
         {
-            try
+            if (new Ping().Send("google.com", 1000, new byte[32], new PingOptions()).Status == IPStatus.Success)
             {
-                if (new Ping().Send("google.com", 1000, new byte[32], new PingOptions()).Status == IPStatus.Success)
-                {
-                    return true;
-                }
+                return true;
             }
-            catch (Exception) { }
-            return false;
         }
+        catch (Exception) { }
+        return false;
     }
 }

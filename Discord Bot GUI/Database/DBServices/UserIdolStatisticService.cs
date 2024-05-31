@@ -9,67 +9,66 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Database.DBServices
+namespace Discord_Bot.Database.DBServices;
+
+public class UserIdolStatisticService(
+    IUserIdolStatisticRepository userIdolStatisticRepository,
+    IUserRepository userRepository,
+    IMapper mapper,
+    Logging logger,
+    Cache cache) : BaseService(mapper, logger, cache), IUserIdolStatisticService
 {
-    public class UserIdolStatisticService(
-        IUserIdolStatisticRepository userIdolStatisticRepository,
-        IUserRepository userRepository,
-        IMapper mapper,
-        Logging logger,
-        Cache cache) : BaseService(mapper, logger, cache), IUserIdolStatisticService
+    private readonly IUserIdolStatisticRepository userIdolStatisticRepository = userIdolStatisticRepository;
+
+    public async Task UpdateUserStatisticsAsync(ulong userId, Stack<int> ranking)
     {
-        private readonly IUserIdolStatisticRepository userIdolStatisticRepository = userIdolStatisticRepository;
-
-        public async Task UpdateUserStatisticsAsync(ulong userId, Stack<int> ranking)
+        try
         {
-            try
+            int i = 1;
+
+            User user = await userRepository.FirstOrDefaultAsync(x => x.DiscordId == userId.ToString());
+
+            if (user == null)
             {
-                int i = 1;
-
-                User user = await userRepository.FirstOrDefaultAsync(x => x.DiscordId == userId.ToString());
-
-                if (user == null)
+                user = new()
                 {
-                    user = new()
+                    DiscordId = userId.ToString()
+                };
+                await userRepository.AddAsync(user);
+            }
+
+            while (ranking != null && ranking.Count > 0)
+            {
+                int idolId = ranking.Pop();
+                UserIdolStatistic userIdolStatistic = await userIdolStatisticRepository
+                    .FirstOrDefaultAsync(i =>
+                        i.User.DiscordId == userId.ToString()
+                        && idolId == i.IdolId,
+                        i => i.User);
+
+                if (userIdolStatistic == null)
+                {
+                    userIdolStatistic = new()
                     {
-                        DiscordId = userId.ToString()
+                        IdolId = idolId,
+                        User = user
                     };
-                    await userRepository.AddAsync(user);
+
+                    await userIdolStatisticRepository.AddAsync(userIdolStatistic, saveChanges: false);
                 }
 
-                while (ranking != null && ranking.Count > 0)
-                {
-                    int idolId = ranking.Pop();
-                    UserIdolStatistic userIdolStatistic = await userIdolStatisticRepository
-                        .FirstOrDefaultAsync(i =>
-                            i.User.DiscordId == userId.ToString()
-                            && idolId == i.IdolId,
-                            i => i.User);
+                UserIdolStatisticTools.AddRanking(userIdolStatistic, i);
+                await userIdolStatisticRepository.SaveChangesAsync();
 
-                    if (userIdolStatistic == null)
-                    {
-                        userIdolStatistic = new()
-                        {
-                            IdolId = idolId,
-                            User = user
-                        };
-
-                        await userIdolStatisticRepository.AddAsync(userIdolStatistic, saveChanges: false);
-                    }
-
-                    UserIdolStatisticTools.AddRanking(userIdolStatistic, i);
-                    await userIdolStatisticRepository.SaveChangesAsync();
-
-                    i++;
-                }
-
-                user.BiasGameCount++;
-                await userRepository.SaveChangesAsync();
+                i++;
             }
-            catch (Exception ex)
-            {
-                logger.Error("UserIdolStatisticService.cs UpdateUserStatisticsAsync", ex);
-            }
+
+            user.BiasGameCount++;
+            await userRepository.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.Error("UserIdolStatisticService.cs UpdateUserStatisticsAsync", ex);
         }
     }
 }

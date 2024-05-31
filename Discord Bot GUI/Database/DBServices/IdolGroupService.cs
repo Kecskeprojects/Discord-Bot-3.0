@@ -10,95 +10,94 @@ using Discord_Bot.Resources;
 using System;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Database.DBServices
+namespace Discord_Bot.Database.DBServices;
+
+public class IdolGroupService(
+    IIdolGroupRepository idolGroupRepository,
+    IMapper mapper,
+    Logging logger,
+    Cache cache) : BaseService(mapper, logger, cache), IIdolGroupService
 {
-    public class IdolGroupService(
-        IIdolGroupRepository idolGroupRepository,
-        IMapper mapper,
-        Logging logger,
-        Cache cache) : BaseService(mapper, logger, cache), IIdolGroupService
+    private readonly IIdolGroupRepository idolGroupRepository = idolGroupRepository;
+
+    public async Task<IdolGroupExtendedResource> GetIdolGroupDetailsAsync(string groupName)
     {
-        private readonly IIdolGroupRepository idolGroupRepository = idolGroupRepository;
-
-        public async Task<IdolGroupExtendedResource> GetIdolGroupDetailsAsync(string groupName)
+        IdolGroupExtendedResource resource = null;
+        try
         {
-            IdolGroupExtendedResource resource = null;
-            try
-            {
-                IdolGroup idol = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.Name == groupName);
+            IdolGroup idol = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.Name == groupName);
 
-                if (idol == null)
-                {
-                    return resource;
-                }
-
-                resource = mapper.Map<IdolGroup, IdolGroupExtendedResource>(idol);
-            }
-            catch (Exception ex)
+            if (idol == null)
             {
-                logger.Error("IdolGroupService.cs GetIdolGroupDetailsAsync", ex);
+                return resource;
             }
 
-            return resource;
+            resource = mapper.Map<IdolGroup, IdolGroupExtendedResource>(idol);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("IdolGroupService.cs GetIdolGroupDetailsAsync", ex);
         }
 
-        public async Task<bool> GroupExistsAsnyc(string groupName)
-        {
-            bool result = false;
-            try
-            {
-                result = await idolGroupRepository.ExistsAsync(x => x.Name == groupName);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("IdolGroupService.cs GroupExistsAsnyc", ex);
-            }
+        return resource;
+    }
 
-            return result;
+    public async Task<bool> GroupExistsAsnyc(string groupName)
+    {
+        bool result = false;
+        try
+        {
+            result = await idolGroupRepository.ExistsAsync(x => x.Name == groupName);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("IdolGroupService.cs GroupExistsAsnyc", ex);
         }
 
-        public async Task<DbProcessResultEnum> UpdateAsync(int groupId, EditGroupModal modal)
+        return result;
+    }
+
+    public async Task<DbProcessResultEnum> UpdateAsync(int groupId, EditGroupModal modal)
+    {
+        try
         {
-            try
-            {
-                IdolGroup idolGroup = await idolGroupRepository.FindByIdAsync(groupId);
-                idolGroup.Name = modal.Name.ToLower().Trim();
-                idolGroup.FullName = modal.FullName.Trim();
-                idolGroup.FullKoreanName = modal.FullKoreanName.Trim();
-                idolGroup.DebutDate = DateOnly.TryParse(modal.DebutDate, out DateOnly debutDate) ? debutDate : idolGroup.DebutDate;
+            IdolGroup idolGroup = await idolGroupRepository.FindByIdAsync(groupId);
+            idolGroup.Name = modal.Name.ToLower().Trim();
+            idolGroup.FullName = modal.FullName.Trim();
+            idolGroup.FullKoreanName = modal.FullKoreanName.Trim();
+            idolGroup.DebutDate = DateOnly.TryParse(modal.DebutDate, out DateOnly debutDate) ? debutDate : idolGroup.DebutDate;
 
-                await idolGroupRepository.SaveChangesAsync();
+            await idolGroupRepository.SaveChangesAsync();
 
-                logger.Log($"Group with ID {groupId} updated successfully!");
-                return DbProcessResultEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("IdolGroupService.cs UpdateAsync", ex);
-            }
-            return DbProcessResultEnum.Failure;
+            logger.Log($"Group with ID {groupId} updated successfully!");
+            return DbProcessResultEnum.Success;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("IdolGroupService.cs UpdateAsync", ex);
+        }
+        return DbProcessResultEnum.Failure;
+    }
+
+    public async Task<IdolGroup> UpdateOrCreateGroupAsync(IdolGroup group, string groupName)
+    {
+        if (string.IsNullOrWhiteSpace(groupName))
+        {
+            return group;
         }
 
-        public async Task<IdolGroup> UpdateOrCreateGroupAsync(IdolGroup group, string groupName)
+        IdolGroup newGroup = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.Name == groupName);
+        if (newGroup == null)
         {
-            if (string.IsNullOrWhiteSpace(groupName))
+            newGroup = new IdolGroup()
             {
-                return group;
-            }
+                Name = groupName,
+                CreatedOn = DateTime.UtcNow,
+                ModifiedOn = DateTime.UtcNow
+            };
 
-            IdolGroup newGroup = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.Name == groupName);
-            if (newGroup == null)
-            {
-                newGroup = new IdolGroup()
-                {
-                    Name = groupName,
-                    CreatedOn = DateTime.UtcNow,
-                    ModifiedOn = DateTime.UtcNow
-                };
-
-                await idolGroupRepository.AddAsync(newGroup);
-            }
-            return newGroup;
+            await idolGroupRepository.AddAsync(newGroup);
         }
+        return newGroup;
     }
 }

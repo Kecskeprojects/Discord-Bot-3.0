@@ -2,34 +2,33 @@
 using Discord_Bot.Resources;
 using System.Collections.Generic;
 
-namespace Discord_Bot.Processors.EmbedProcessors
+namespace Discord_Bot.Processors.EmbedProcessors;
+
+public static class BirthdayListEmbedProcessor
 {
-    public static class BirthdayListEmbedProcessor
+    public static Embed[] CreateEmbed(List<BirthdayResource> list, List<string> users)
     {
-        public static Embed[] CreateEmbed(List<BirthdayResource> list, List<string> users)
+        EmbedBuilder builder = new();
+        builder.WithTitle("Server birthdays:");
+
+        List<string> embedFields = [""];
+        int index = 0;
+        for (int i = 0; i < list.Count && embedFields.Count < 5; i++)
         {
-            EmbedBuilder builder = new();
-            builder.WithTitle("Server birthdays:");
+            embedFields[index] += $"- **{list[i].Date:yyyy.MM.dd}**: {users[i]}\n";
 
-            List<string> embedFields = [""];
-            int index = 0;
-            for (int i = 0; i < list.Count && embedFields.Count < 5; i++)
+            if (i > 0 && i % 15 == 0)
             {
-                embedFields[index] += $"- **{list[i].Date:yyyy.MM.dd}**: {users[i]}\n";
-
-                if (i > 0 && i % 15 == 0)
-                {
-                    index++;
-                    embedFields.Add("");
-                }
+                index++;
+                embedFields.Add("");
             }
-
-            foreach (string field in embedFields)
-            {
-                builder.AddField("\u200b", field);
-            }
-            builder.WithColor(Color.LightOrange);
-            return [builder.Build()];
         }
+
+        foreach (string field in embedFields)
+        {
+            builder.AddField("\u200b", field);
+        }
+        builder.WithColor(Color.LightOrange);
+        return [builder.Build()];
     }
 }

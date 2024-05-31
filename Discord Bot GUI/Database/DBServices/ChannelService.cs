@@ -11,161 +11,160 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Database.DBServices
+namespace Discord_Bot.Database.DBServices;
+
+public class ChannelService(
+    IChannelRepository channelRepository,
+    IServerRepository serverRepository,
+    IChannelTypeRepository channelTypeRepository,
+    IMapper mapper,
+    Logging logger,
+    Cache cache) : BaseService(mapper, logger, cache), IChannelService
 {
-    public class ChannelService(
-        IChannelRepository channelRepository,
-        IServerRepository serverRepository,
-        IChannelTypeRepository channelTypeRepository,
-        IMapper mapper,
-        Logging logger,
-        Cache cache) : BaseService(mapper, logger, cache), IChannelService
+    private readonly IChannelRepository channelRepository = channelRepository;
+    private readonly IServerRepository serverRepository = serverRepository;
+    private readonly IChannelTypeRepository channelTypeRepository = channelTypeRepository;
+
+    public async Task<DbProcessResultEnum> AddSettingChannelAsync(ulong serverId, ChannelTypeEnum channelTypeId, ulong channelId)
     {
-        private readonly IChannelRepository channelRepository = channelRepository;
-        private readonly IServerRepository serverRepository = serverRepository;
-        private readonly IChannelTypeRepository channelTypeRepository = channelTypeRepository;
-
-        public async Task<DbProcessResultEnum> AddSettingChannelAsync(ulong serverId, ChannelTypeEnum channelTypeId, ulong channelId)
+        try
         {
-            try
+            Channel channel = await channelRepository.FirstOrDefaultAsync(
+                c => c.Server.DiscordId == serverId.ToString()
+                && c.DiscordId == channelId.ToString(),
+                c => c.Server);
+
+            ChannelType channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int) channelTypeId);
+            if (channelType == null)
             {
-                Channel channel = await channelRepository.FirstOrDefaultAsync(
+                return DbProcessResultEnum.NotFound;
+            }
+
+            Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
+            if (server == null)
+            {
+                return DbProcessResultEnum.NotFound;
+            }
+
+            if (ChannelTypeNameCollections.RestrictedChannelTypes.Contains(channelTypeId))
+            {
+                List<Channel> channels = await channelRepository.GetListAsync(
                     c => c.Server.DiscordId == serverId.ToString()
-                    && c.DiscordId == channelId.ToString(),
+                    && c.DiscordId != channelId.ToString()
+                    && c.ChannelTypes.FirstOrDefault(ct => ct.ChannelTypeId == (int) channelTypeId) != null,
+                    c => c.ChannelTypes,
                     c => c.Server);
-
-                ChannelType channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int) channelTypeId);
-                if (channelType == null)
-                {
-                    return DbProcessResultEnum.NotFound;
-                }
-
-                Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
-                if (server == null)
-                {
-                    return DbProcessResultEnum.NotFound;
-                }
-
-                if (ChannelTypeNameCollections.RestrictedChannelTypes.Contains(channelTypeId))
-                {
-                    List<Channel> channels = await channelRepository.GetListAsync(
-                        c => c.Server.DiscordId == serverId.ToString()
-                        && c.DiscordId != channelId.ToString()
-                        && c.ChannelTypes.FirstOrDefault(ct => ct.ChannelTypeId == (int) channelTypeId) != null,
-                        c => c.ChannelTypes,
-                        c => c.Server);
-                    channels.ForEach((channel) => { channel.ChannelTypes.Remove(channelType); });
-                }
-
-                if (channel == null)
-                {
-                    channel = new()
-                    {
-                        ChannelId = 0,
-                        Server = server,
-                        ChannelTypes = [channelType],
-                        DiscordId = channelId.ToString()
-                    };
-                    await channelRepository.AddAsync(channel);
-                }
-                else
-                {
-                    if (channel.ChannelTypes.Contains(channelType))
-                    {
-                        return DbProcessResultEnum.AlreadyExists;
-                    }
-
-                    channel.ChannelTypes.Add(channelType);
-                    await channelRepository.SaveChangesAsync();
-                }
-
-                cache.RemoveCachedEntityManually(serverId);
-
-                logger.Log("Settings Channel added successfully!");
-                return DbProcessResultEnum.Success;
+                channels.ForEach((channel) => { channel.ChannelTypes.Remove(channelType); });
             }
-            catch (Exception ex)
+
+            if (channel == null)
             {
-                logger.Error("ChannelService.cs AddSettingChannelAsync", ex);
+                channel = new()
+                {
+                    ChannelId = 0,
+                    Server = server,
+                    ChannelTypes = [channelType],
+                    DiscordId = channelId.ToString()
+                };
+                await channelRepository.AddAsync(channel);
             }
-            return DbProcessResultEnum.Failure;
+            else
+            {
+                if (channel.ChannelTypes.Contains(channelType))
+                {
+                    return DbProcessResultEnum.AlreadyExists;
+                }
+
+                channel.ChannelTypes.Add(channelType);
+                await channelRepository.SaveChangesAsync();
+            }
+
+            cache.RemoveCachedEntityManually(serverId);
+
+            logger.Log("Settings Channel added successfully!");
+            return DbProcessResultEnum.Success;
         }
-
-        public async Task<DbProcessResultEnum> RemovelSettingChannelAsync(ulong serverId, ChannelTypeEnum channelTypeId, ulong channelId)
+        catch (Exception ex)
         {
-            try
+            logger.Error("ChannelService.cs AddSettingChannelAsync", ex);
+        }
+        return DbProcessResultEnum.Failure;
+    }
+
+    public async Task<DbProcessResultEnum> RemovelSettingChannelAsync(ulong serverId, ChannelTypeEnum channelTypeId, ulong channelId)
+    {
+        try
+        {
+            Channel channel = await channelRepository.FirstOrDefaultAsync(
+                c => c.Server.DiscordId == serverId.ToString()
+                && c.DiscordId == channelId.ToString(),
+                c => c.Server);
+            ChannelType channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int) channelTypeId);
+            if (channelType == null)
             {
-                Channel channel = await channelRepository.FirstOrDefaultAsync(
-                    c => c.Server.DiscordId == serverId.ToString()
-                    && c.DiscordId == channelId.ToString(),
-                    c => c.Server);
-                ChannelType channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int) channelTypeId);
-                if (channelType == null)
-                {
-                    return DbProcessResultEnum.NotFound;
-                }
-                if (channel != null)
-                {
-                    if (!channel.ChannelTypes.Remove(channelType))
-                    {
-                        logger.Log($"No channel of type '{ChannelTypeNameCollections.EnumName[channelTypeId]}' were found!");
-                        return DbProcessResultEnum.NotFound;
-                    }
-
-                    await channelRepository.SaveChangesAsync();
-
-                    cache.RemoveCachedEntityManually(serverId);
-                    logger.Log($"Settings channel of type '{ChannelTypeNameCollections.EnumName[channelTypeId]}' removed successfully!");
-                    return DbProcessResultEnum.Success;
-                }
-                else
+                return DbProcessResultEnum.NotFound;
+            }
+            if (channel != null)
+            {
+                if (!channel.ChannelTypes.Remove(channelType))
                 {
                     logger.Log($"No channel of type '{ChannelTypeNameCollections.EnumName[channelTypeId]}' were found!");
                     return DbProcessResultEnum.NotFound;
                 }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("ChannelService.cs RemoveSettingChannelAsync", ex);
-            }
-            return DbProcessResultEnum.Failure;
-        }
 
-        public async Task<DbProcessResultEnum> RemoveSettingChannelsAsync(ulong serverId, ChannelTypeEnum channelTypeId)
+                await channelRepository.SaveChangesAsync();
+
+                cache.RemoveCachedEntityManually(serverId);
+                logger.Log($"Settings channel of type '{ChannelTypeNameCollections.EnumName[channelTypeId]}' removed successfully!");
+                return DbProcessResultEnum.Success;
+            }
+            else
+            {
+                logger.Log($"No channel of type '{ChannelTypeNameCollections.EnumName[channelTypeId]}' were found!");
+                return DbProcessResultEnum.NotFound;
+            }
+        }
+        catch (Exception ex)
         {
-            try
-            {
-                List<Channel> channels = await channelRepository.GetListAsync(
-                        c => c.Server.DiscordId == serverId.ToString()
-                        && c.ChannelTypes.FirstOrDefault(ct => ct.ChannelTypeId == (int) channelTypeId) != null,
-                        c => c.ChannelTypes,
-                        c => c.Server);
-                ChannelType channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int) channelTypeId);
-                if (channelType == null)
-                {
-                    return DbProcessResultEnum.NotFound;
-                }
-                if (!CollectionTools.IsNullOrEmpty(channels))
-                {
-                    channels.ForEach((channel) => { channel.ChannelTypes.Remove(channelType); });
-
-                    await channelRepository.SaveChangesAsync();
-
-                    cache.RemoveCachedEntityManually(serverId);
-                    logger.Log($"All settings channels of type '{ChannelTypeNameCollections.EnumName[channelTypeId]}' removed successfully!");
-                    return DbProcessResultEnum.Success;
-                }
-                else
-                {
-                    logger.Log($"No channels of type '{ChannelTypeNameCollections.EnumName[channelTypeId]}' were found!");
-                    return DbProcessResultEnum.NotFound;
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("ChannelService.cs RemoveSettingChannelsAsync", ex);
-            }
-            return DbProcessResultEnum.Failure;
+            logger.Error("ChannelService.cs RemoveSettingChannelAsync", ex);
         }
+        return DbProcessResultEnum.Failure;
+    }
+
+    public async Task<DbProcessResultEnum> RemoveSettingChannelsAsync(ulong serverId, ChannelTypeEnum channelTypeId)
+    {
+        try
+        {
+            List<Channel> channels = await channelRepository.GetListAsync(
+                    c => c.Server.DiscordId == serverId.ToString()
+                    && c.ChannelTypes.FirstOrDefault(ct => ct.ChannelTypeId == (int) channelTypeId) != null,
+                    c => c.ChannelTypes,
+                    c => c.Server);
+            ChannelType channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int) channelTypeId);
+            if (channelType == null)
+            {
+                return DbProcessResultEnum.NotFound;
+            }
+            if (!CollectionTools.IsNullOrEmpty(channels))
+            {
+                channels.ForEach((channel) => { channel.ChannelTypes.Remove(channelType); });
+
+                await channelRepository.SaveChangesAsync();
+
+                cache.RemoveCachedEntityManually(serverId);
+                logger.Log($"All settings channels of type '{ChannelTypeNameCollections.EnumName[channelTypeId]}' removed successfully!");
+                return DbProcessResultEnum.Success;
+            }
+            else
+            {
+                logger.Log($"No channels of type '{ChannelTypeNameCollections.EnumName[channelTypeId]}' were found!");
+                return DbProcessResultEnum.NotFound;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("ChannelService.cs RemoveSettingChannelsAsync", ex);
+        }
+        return DbProcessResultEnum.Failure;
     }
 }

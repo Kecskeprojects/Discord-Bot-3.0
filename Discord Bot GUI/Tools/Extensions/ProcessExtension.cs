@@ -4,16 +4,34 @@ using System.Diagnostics;
 using System.Linq;
 using System.Management;
 
-namespace Discord_Bot.Tools.Extensions
+namespace Discord_Bot.Tools.Extensions;
+
+public static class ProcessExtension
 {
-    public static class ProcessExtension
+    public static IList<Process> GetChildProcesses(this Process process)
     {
-        public static IList<Process> GetChildProcesses(this Process process)
-        {
-            return new ManagementObjectSearcher($"Select * From Win32_Process Where ParentProcessID={process.Id}")
-                        .Get()
-                        .Cast<ManagementObject>()
-                        .Select(mo =>
+        return new ManagementObjectSearcher($"Select * From Win32_Process Where ParentProcessID={process.Id}")
+                    .Get()
+                    .Cast<ManagementObject>()
+                    .Select(mo =>
+                    {
+                        try
+                        {
+                            return Process.GetProcessById(Convert.ToInt32(mo["ProcessID"]));
+                        }
+                        catch (Exception) { }
+                        return null;
+                    })
+                    .Where(x => x != null)
+                    .ToList();
+    }
+
+    public static int GetChildProcessCount(this Process process)
+    {
+        return new ManagementObjectSearcher($"Select * From Win32_Process Where ParentProcessID={process.Id}")
+                    .Get()
+                    .Cast<ManagementObject>()
+                    .Select(mo =>
                         {
                             try
                             {
@@ -22,27 +40,8 @@ namespace Discord_Bot.Tools.Extensions
                             catch (Exception) { }
                             return null;
                         })
-                        .Where(x => x != null)
-                        .ToList();
-        }
-
-        public static int GetChildProcessCount(this Process process)
-        {
-            return new ManagementObjectSearcher($"Select * From Win32_Process Where ParentProcessID={process.Id}")
-                        .Get()
-                        .Cast<ManagementObject>()
-                        .Select(mo =>
-                            {
-                                try
-                                {
-                                    return Process.GetProcessById(Convert.ToInt32(mo["ProcessID"]));
-                                }
-                                catch (Exception) { }
-                                return null;
-                            })
-                        .Where(x => x != null)
-                        .ToList()
-                        .Count;
-        }
+                    .Where(x => x != null)
+                    .ToList()
+                    .Count;
     }
 }

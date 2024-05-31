@@ -9,78 +9,77 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace Discord_Bot.Processors.ImageProcessors
+namespace Discord_Bot.Processors.ImageProcessors;
+
+public class BonkGifProcessor(Logging logger)
 {
-    public class BonkGifProcessor(Logging logger)
+    private readonly Logging logger = logger;
+
+    public MemoryStream CreateBonkImage(Stream stream, int delay)
     {
-        private readonly Logging logger = logger;
-
-        public MemoryStream CreateBonkImage(Stream stream, int delay)
+        try
         {
-            try
+            // Image dimensions of the gif.
+            const int width = 1000;
+            const int height = 1000;
+
+            using Image profile = Image.Load<Rgba32>(stream);
+            profile.Mutate(x => x.Resize(400, 400).ApplyRoundedCorners(200));
+
+            MemoryStream winter0Stream = new();
+            Resource.winter0.Save(winter0Stream, System.Drawing.Imaging.ImageFormat.Png);
+            using Image winter0 = Image.Load<Rgba32>(winter0Stream.ToArray());
+            winter0.Mutate(x => x.Resize(width, height));
+
+            MemoryStream winter1Stream = new();
+            Resource.winter1.Save(winter1Stream, System.Drawing.Imaging.ImageFormat.Png);
+            using Image winter1 = Image.Load<Rgba32>(winter1Stream.ToArray());
+            winter1.Mutate(x => x.Resize(width, height));
+
+            // For demonstration: use images with different colors.
+            Image[] images = [null, null];
+            Image[] winterFrame = [winter0, winter1];
+            for (int i = 0; i < 2; i++)
             {
-                // Image dimensions of the gif.
-                const int width = 1000;
-                const int height = 1000;
+                Image background = new Image<Rgba32>(width, height, new Rgba32(1, 1, 1, 0.5f));
+                background.Mutate(x => x.DrawImage(profile, backgroundLocation: new Point(10, 500), 1));
+                background.Mutate(x => x.DrawImage(winterFrame[i], backgroundLocation: new Point(0, 0), 1));
 
-                using Image profile = Image.Load<Rgba32>(stream);
-                profile.Mutate(x => x.Resize(400, 400).ApplyRoundedCorners(200));
+                images[i] = background;
+            }
 
-                MemoryStream winter0Stream = new();
-                Resource.winter0.Save(winter0Stream, System.Drawing.Imaging.ImageFormat.Png);
-                using Image winter0 = Image.Load<Rgba32>(winter0Stream.ToArray());
-                winter0.Mutate(x => x.Resize(width, height));
+            // Create empty image.
+            using Image<Rgba32> gif = new(width, height, new Rgba32(0, 0, 0, 0));
 
-                MemoryStream winter1Stream = new();
-                Resource.winter1.Save(winter1Stream, System.Drawing.Imaging.ImageFormat.Png);
-                using Image winter1 = Image.Load<Rgba32>(winter1Stream.ToArray());
-                winter1.Mutate(x => x.Resize(width, height));
+            GifMetadata gifMetaData = gif.Metadata.GetGifMetadata();
+            gifMetaData.RepeatCount = 0;
 
-                // For demonstration: use images with different colors.
-                Image[] images = [null, null];
-                Image[] winterFrame = [winter0, winter1];
-                for (int i = 0; i < 2; i++)
-                {
-                    Image background = new Image<Rgba32>(width, height, new Rgba32(1, 1, 1, 0.5f));
-                    background.Mutate(x => x.DrawImage(profile, backgroundLocation: new Point(10, 500), 1));
-                    background.Mutate(x => x.DrawImage(winterFrame[i], backgroundLocation: new Point(0, 0), 1));
-
-                    images[i] = background;
-                }
-
-                // Create empty image.
-                using Image<Rgba32> gif = new(width, height, new Rgba32(0, 0, 0, 0));
-
-                GifMetadata gifMetaData = gif.Metadata.GetGifMetadata();
-                gifMetaData.RepeatCount = 0;
-
+            // Set the delay until the next image is displayed.
+            GifFrameMetadata metadata = gif.Frames.RootFrame.Metadata.GetGifMetadata();
+            for (int i = 0; i < images.Length; i++)
+            {
                 // Set the delay until the next image is displayed.
-                GifFrameMetadata metadata = gif.Frames.RootFrame.Metadata.GetGifMetadata();
-                for (int i = 0; i < images.Length; i++)
-                {
-                    // Set the delay until the next image is displayed.
-                    metadata = images[i].Frames.RootFrame.Metadata.GetGifMetadata();
-                    metadata.FrameDelay = delay;
-                    metadata.DisposalMethod = GifDisposalMethod.RestoreToBackground;
+                metadata = images[i].Frames.RootFrame.Metadata.GetGifMetadata();
+                metadata.FrameDelay = delay;
+                metadata.DisposalMethod = GifDisposalMethod.RestoreToBackground;
 
-                    // Add the color image to the gif.
-                    gif.Frames.AddFrame(images[i].Frames.RootFrame);
-                }
-                gif.Frames.RemoveFrame(0);
-                images.ToList().ForEach(x => x.Dispose());
-
-                // Save the final result.
-                MemoryStream gifStream = new();
-                gif.SaveAsGif(gifStream);
-
-                return gifStream;
+                // Add the color image to the gif.
+                gif.Frames.AddFrame(images[i].Frames.RootFrame);
             }
-            catch (Exception ex)
-            {
-                logger.Error("BonkGifProcessor.cs CreateBonkImage", ex);
-            }
+            gif.Frames.RemoveFrame(0);
+            images.ToList().ForEach(x => x.Dispose());
 
-            return null;
+            // Save the final result.
+            MemoryStream gifStream = new();
+            gif.SaveAsGif(gifStream);
+
+            return gifStream;
         }
+        catch (Exception ex)
+        {
+            logger.Error("BonkGifProcessor.cs CreateBonkImage", ex);
+        }
+
+        return null;
     }
 }
