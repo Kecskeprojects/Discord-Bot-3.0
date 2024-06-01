@@ -8,7 +8,6 @@ using Discord_Bot.Database;
 using Discord_Bot.Database.DBRepositories;
 using Discord_Bot.Database.DBServices;
 using Discord_Bot.Features;
-using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
@@ -63,8 +62,9 @@ public static class ServiceBuilder
 
         collection.AddAutoMapper(x => x.AddProfile<MapperConfig>());
 
-        collection.AddTransient<ICoreLogic, CoreLogic>();
         collection.AddSingleton<BotMain>();
+        collection.AddSingleton<InteractionHandler>();
+        collection.AddSingleton<CommandHandler>();
         collection.AddTransient<MainWindow>();
 
         //Processors

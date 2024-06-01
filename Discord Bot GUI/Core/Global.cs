@@ -4,12 +4,8 @@ using Discord_Bot.Communication;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Core;
 
@@ -32,20 +28,5 @@ public static class Global
     {
         return server == null || (!server.SettingsChannels.TryGetValue(type, out List<ulong> value) ?
                     allowLackOfType : value.Contains(channelId));
-    }
-
-    public static async Task<Stream> GetStream(string url)
-    {
-        Stream imageData = null;
-
-        using (HttpClient wc = new()
-        {
-            Timeout = new TimeSpan(0, 3, 0)
-        })
-        {
-            imageData = await wc.GetStreamAsync(url);
-        }
-
-        return imageData;
     }
 }

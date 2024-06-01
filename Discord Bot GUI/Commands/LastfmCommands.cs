@@ -9,6 +9,7 @@ using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.LastFm;
+using Discord_Bot.Tools;
 using LastFmApi;
 using System;
 using System.Collections.Generic;
@@ -549,7 +550,7 @@ public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoK
                 {
                     //Download image and get back it's filepath
                     logger.Query($"Getting album cover image:\n{wk.ImageUrl}");
-                    Stream originalImage = await Global.GetStream(wk.ImageUrl);
+                    Stream originalImage = await WebTools.GetStream(wk.ImageUrl);
 
                     //Edit the picture to the list format
                     Discord_Bot.Communication.EditPictureResult modifiedImage = whoKnowsImageProcessor.EditPicture(originalImage, wk.Plays, wk.Searched);

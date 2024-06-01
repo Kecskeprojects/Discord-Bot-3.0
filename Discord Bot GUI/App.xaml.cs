@@ -3,13 +3,13 @@ using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Features;
-using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors;
 using Discord_Bot.Services;
 using Discord_Bot.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
@@ -17,7 +17,7 @@ using System.Windows;
 
 namespace Discord_Bot;
 
-//Todo: Investigate if the various Services can be cleaned up, split up, and also if a base class can be or is needed for them, perhaps multiple base classes
+//Todo: Investigate if the various API and other Services can be cleaned up, split up, and also if a base class can be or is needed for them, perhaps multiple base classes
 public partial class App : Application
 {
     #region Variables
@@ -26,7 +26,38 @@ public partial class App : Application
     private BrowserService browserService;
     private Thread twitchThread;
     private System.Timers.Timer mainTimer;
-    private BotMain Bot;
+    private BotMain BotService;
+    #endregion
+
+    #region OnClose logic
+    protected override void OnExit(ExitEventArgs e)
+    {
+        Closing();
+        base.OnExit(e);
+    }
+
+    protected override void OnSessionEnding(SessionEndingCancelEventArgs e)
+    {
+        Closing();
+        base.OnSessionEnding(e);
+    }
+
+    private void Closing(object sender, EventArgs e)
+    {
+        Closing();
+    }
+
+    private async void Closing()
+    {
+        //3 second time limit to event before app closes
+        try
+        {
+            await browserService.CloseBrowser();
+            logger.Log("Application closing...");
+            logger.LogToFile();
+        }
+        catch (Exception) { }
+    }
     #endregion
 
     protected override async void OnStartup(StartupEventArgs e)
@@ -47,33 +78,30 @@ public partial class App : Application
         using (IServiceScope scope = services.CreateScope())
         {
             MainWindow mainWindow = scope.ServiceProvider.GetRequiredService<MainWindow>();
-            Config config = scope.ServiceProvider.GetService<Config>();
 
             mainWindow.Show();
 
+            string currentDir = Directory.GetCurrentDirectory();
+            if (!Directory.Exists(Path.Combine(currentDir, "Logs")))
+            {
+                Directory.CreateDirectory(Path.Combine(currentDir, "Logs"));
+                logger.Log("Logs folder created!");
+            }
+
             logger.Log("App started!");
 
-            ICoreLogic coreLogic = scope.ServiceProvider.GetService<ICoreLogic>();
-            coreLogic.CheckFolders();
-
+            Config config = scope.ServiceProvider.GetService<Config>();
             YoutubeAPI.KeyReset(config.Youtube_API_Keys);
         }
 
-        twitchThread = new Thread(async () =>
-        {
-            using (IServiceScope scope = services.CreateScope())
-            {
-                ITwitchAPI twitchAPI = scope.ServiceProvider.GetService<ITwitchAPI>();
-                await twitchAPI.Start();
-            }
-        });
+        twitchThread = new Thread(new ThreadStart(StartTwitchMonitor));
         twitchThread.Start();
 
-        Bot = services.GetRequiredService<BotMain>();
-        await Bot.RunBotAsync();
+        BotService = services.GetRequiredService<BotMain>();
+        await BotService.RunBotAsync();
     }
 
-    public async void OnTimedEvent(object source, ElapsedEventArgs e)
+    private async void OnTimedEvent(object source, ElapsedEventArgs e)
     {
         try
         {
@@ -83,7 +111,7 @@ public partial class App : Application
                 if (client.LoginState == LoginState.LoggedOut)
                 {
                     logger.Log("Attempting to re-connect bot after disconnect.");
-                    await Bot.RunBotAsync();
+                    await BotService.RunBotAsync();
                 }
 
                 //Do at GMT+0 midnight every day
@@ -93,7 +121,7 @@ public partial class App : Application
                 }
 
                 //Do at GMT+0 6 am every day
-                if (DateTime.UtcNow.Hour == 7 && DateTime.UtcNow.Minute == 0)
+                if (DateTime.UtcNow.Hour == 6 && DateTime.UtcNow.Minute == 0)
                 {
                     BirthdayFeature birthdayFeature = scope.ServiceProvider.GetService<BirthdayFeature>();
                     await birthdayFeature.Run();
@@ -105,22 +133,14 @@ public partial class App : Application
                     //Only on a monday
                     if (DateTime.UtcNow.DayOfWeek == DayOfWeek.Monday)
                     {
-                        _ = Task.Run(async () =>
-                        {
-                            using (IServiceScope scope = services.CreateScope())
-                            {
-                                BiasScrapingProcessor biasScrapingProcessor = scope.ServiceProvider.GetService<BiasScrapingProcessor>();
-                                await biasScrapingProcessor.RunUpdateBiasDataAsync();
-                            }
-                        });
+                        _ = StartBiasScraping();
                     }
                 }
 
                 ReminderFeature reminderFeature = scope.ServiceProvider.GetService<ReminderFeature>();
                 await reminderFeature.Run();
 
-                ICoreLogic coreLogic = scope.ServiceProvider.GetService<ICoreLogic>();
-                coreLogic.LogToFile();
+                logger.LogToFile();
             }
         }
         catch (Exception ex)
@@ -129,51 +149,21 @@ public partial class App : Application
         }
     }
 
-    #region OnClose logic
-    protected override void OnExit(ExitEventArgs e)
+    private async Task StartBiasScraping()
     {
-        Closing();
-        base.OnExit(e);
-    }
-
-    protected override void OnSessionEnding(SessionEndingCancelEventArgs e)
-    {
-        Closing();
-        base.OnSessionEnding(e);
-    }
-
-    //Things to do when app is closing
-    //3 second time limit to event by default
-    public async void Closing()
-    {
-        try
+        using (IServiceScope scope = services.CreateScope())
         {
-            await browserService.CloseBrowser();
-            logger.Log("Application closing...");
-
-            using (IServiceScope scope = services.CreateScope())
-            {
-                ICoreLogic coreLogic = scope.ServiceProvider.GetService<ICoreLogic>();
-                coreLogic.LogToFile();
-            }
+            BiasScrapingProcessor biasScrapingProcessor = scope.ServiceProvider.GetService<BiasScrapingProcessor>();
+            await biasScrapingProcessor.RunUpdateBiasDataAsync();
         }
-        catch (Exception) { }
     }
 
-    public async void Closing(object sender, EventArgs e)
+    private async void StartTwitchMonitor()
     {
-        try
+        using (IServiceScope scope = services.CreateScope())
         {
-            await browserService.CloseBrowser();
-            logger.Log("Application closing...");
-
-            using (IServiceScope scope = services.CreateScope())
-            {
-                ICoreLogic coreLogic = scope.ServiceProvider.GetService<ICoreLogic>();
-                coreLogic.LogToFile();
-            }
+            ITwitchAPI twitchAPI = scope.ServiceProvider.GetService<ITwitchAPI>();
+            await twitchAPI.Start();
         }
-        catch (Exception) { }
     }
-    #endregion
 }

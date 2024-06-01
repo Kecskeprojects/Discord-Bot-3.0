@@ -4,6 +4,7 @@ using Discord_Bot.Tools;
 using Discord_Bot.Windows;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
@@ -20,18 +21,46 @@ public class BotLogger
     public static void ClearWindowLog()
     {
         Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
+        {
+            if (Application.Current.MainWindow != null)
             {
-                if (Application.Current.MainWindow != null)
-                {
-                    MainWindow main = Application.Current.MainWindow as MainWindow;
-                    List<Inline> range = main.MainLogText.Inlines.TakeLast(20).ToList();
-                    main.MainLogText.Inlines.Clear();
-                    main.MainLogText.Inlines.AddRange(range);
-                }
-            });
+                MainWindow main = Application.Current.MainWindow as MainWindow;
+                List<Inline> range = main.MainLogText.Inlines.TakeLast(20).ToList();
+                main.MainLogText.Inlines.Clear();
+                main.MainLogText.Inlines.AddRange(range);
+            }
+        });
     }
 
-    #region Bot Logging
+    public void LogToFile()
+    {
+        try
+        {
+            StreamWriter logFileWriter = null;
+            if (Logs.Count != 0 && logFileWriter == null)
+            {
+                string file_location = $"Logs\\logs[{DateTimeTools.CurrentDate()}].txt";
+
+                using (logFileWriter = File.AppendText(file_location))
+                {
+                    string[] contents = Logs.Select(n => n.Content).ToArray();
+                    foreach (string log in contents)
+                    {
+                        logFileWriter.WriteLine(log);
+                    }
+                }
+
+                logFileWriter = null;
+                Logs.Clear();
+            }
+        }
+        catch (Exception ex)
+        {
+            Error("BotLogger.cs LogtoFile", ex);
+        }
+    }
+
+    #region Internal Logging
     public void Log(string message, bool ConsoleOnly = false, bool LogOnly = false)
     {
         Log log = BaseLog(LogType.Log);
@@ -188,17 +217,17 @@ public class BotLogger
     {
         string mess = log.Content.Replace(":\t", ":    \t");
         Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
+        {
+            if (Application.Current.MainWindow != null)
             {
-                if (Application.Current.MainWindow != null)
+                MainWindow main = Application.Current.MainWindow as MainWindow;
+                Run run = new(mess + "\n")
                 {
-                    MainWindow main = Application.Current.MainWindow as MainWindow;
-                    Run run = new(mess + "\n")
-                    {
-                        Foreground = color
-                    };
-                    main.MainLogText.Inlines.Add(run);
-                }
-            });
+                    Foreground = color
+                };
+                main.MainLogText.Inlines.Add(run);
+            }
+        });
     }
 
     private static Log BaseLog(LogType type)
