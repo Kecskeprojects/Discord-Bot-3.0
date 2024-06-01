@@ -16,11 +16,11 @@ public class BiasScrapingProcessor(
     IIdolService idolService,
     IKpopDbScraper kpopDbScraper,
     BrowserService browserService,
-    Logging logger)
+    BotLogger logger)
 {
     private readonly IIdolService idolService = idolService;
     private readonly IKpopDbScraper kpopDbScraper = kpopDbScraper;
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
 
     public async Task RunUpdateBiasDataAsync()
     {

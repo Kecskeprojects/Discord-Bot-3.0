@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 
-public class ReminderFeature(IReminderService reminderService, DiscordSocketClient client, Logging logger) : BaseFeature(logger)
+public class ReminderFeature(IReminderService reminderService, DiscordSocketClient client, BotLogger logger) : BaseFeature(logger)
 {
     private readonly IReminderService reminderService = reminderService;
     private readonly DiscordSocketClient client = client;

@@ -14,7 +14,7 @@ public class IdolAliasService(
     IIdolAliasRepository idolAliasRepository,
     IIdolRepository idolRepository,
     IMapper mapper,
-    Logging logger,
+    BotLogger logger,
     Cache cache) : BaseService(mapper, logger, cache), IIdolAliasService
 {
     private readonly IIdolAliasRepository idolAliasRepository = idolAliasRepository;

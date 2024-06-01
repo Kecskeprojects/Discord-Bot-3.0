@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 
-public class YoutubeAddPlaylistFeature(DiscordSocketClient client, Logging logger)
+public class YoutubeAddPlaylistFeature(DiscordSocketClient client, BotLogger logger)
 {
     private readonly DiscordSocketClient client = client;
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
 
     public async Task<bool> Run(ulong channelId)
     {

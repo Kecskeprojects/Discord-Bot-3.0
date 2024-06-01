@@ -8,9 +8,9 @@ using System.IO;
 
 namespace Discord_Bot.Services;
 
-public class TwitchCLI(Logging logger) : ITwitchCLI
+public class TwitchCLI(BotLogger logger) : ITwitchCLI
 {
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
 
     //Responsible for generating the access tokens to Twitch's api requests
     public string GenerateToken()

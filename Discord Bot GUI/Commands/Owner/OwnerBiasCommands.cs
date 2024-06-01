@@ -15,7 +15,7 @@ public class OwnerBiasCommands(
     IIdolService idolService,
     IServerService serverService,
     BiasScrapingProcessor biasScrapingProcessor,
-    Logging logger,
+    BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IIdolService idolService = idolService;

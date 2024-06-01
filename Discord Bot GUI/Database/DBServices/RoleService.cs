@@ -16,7 +16,7 @@ public class RoleService(
     IRoleRepository roleRepository,
     IServerRepository serverRepository,
     IMapper mapper,
-    Logging logger,
+    BotLogger logger,
     Cache cache) : BaseService(mapper, logger, cache), IRoleService
 {
     private readonly IRoleRepository roleRepository = roleRepository;

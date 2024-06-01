@@ -22,7 +22,7 @@ public partial class App : Application
 {
     #region Variables
     private IServiceProvider services;
-    private Logging logger;
+    private BotLogger logger;
     private BrowserService browserService;
     private Thread twitchThread;
     private System.Timers.Timer mainTimer;
@@ -41,7 +41,7 @@ public partial class App : Application
         AppDomain.CurrentDomain.ProcessExit += new EventHandler(Closing);
 
         services = ServiceBuilder.BuildService();
-        logger = services.GetService<Logging>();
+        logger = services.GetService<BotLogger>();
         browserService = services.GetService<BrowserService>();
 
         using (IServiceScope scope = services.CreateScope())
@@ -89,7 +89,7 @@ public partial class App : Application
                 //Do at GMT+0 midnight every day
                 if (DateTime.UtcNow.Hour == 0 && DateTime.UtcNow.Minute == 0)
                 {
-                    Logging.ClearWindowLog();
+                    BotLogger.ClearWindowLog();
                 }
 
                 //Do at GMT+0 6 am every day

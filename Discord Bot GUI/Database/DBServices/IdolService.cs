@@ -23,7 +23,7 @@ public class IdolService(
     IIdolGroupService idolGroupService,
     IIdolImageRepository idolImageRepository,
     IMapper mapper,
-    Logging logger,
+    BotLogger logger,
     Cache cache) : BaseService(mapper, logger, cache), IIdolService
 {
     private readonly IIdolRepository idolRepository = idolRepository;

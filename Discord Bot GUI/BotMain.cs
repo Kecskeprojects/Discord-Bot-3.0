@@ -21,7 +21,7 @@ public class BotMain(
     DiscordSocketClient client,
     InteractionService interactions,
     CommandService commands,
-    Logging logger,
+    BotLogger logger,
     Config config)
 {
     #region Variables
@@ -29,7 +29,7 @@ public class BotMain(
     private readonly DiscordSocketClient client = client;
     private readonly InteractionService interactions = interactions;
     private readonly CommandService commands = commands;
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
     private readonly Config config = config;
     #endregion
 

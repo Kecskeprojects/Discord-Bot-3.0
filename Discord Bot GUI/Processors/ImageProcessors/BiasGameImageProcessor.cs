@@ -13,9 +13,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Processors.ImageProcessors;
 
-public class BiasGameImageProcessor(Logging logger)
+public class BiasGameImageProcessor(BotLogger logger)
 {
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
 
     public Stream CombineImages(MemoryStream left, MemoryStream right)
     {

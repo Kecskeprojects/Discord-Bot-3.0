@@ -55,7 +55,7 @@ public static class ServiceBuilder
         collection.AddSingleton(interactions);
         collection.AddSingleton(commands);
         collection.AddTransient<Config>(); //This is transient meaning configuration can be edited on the fly
-        collection.AddSingleton(new Logging());
+        collection.AddSingleton(new BotLogger());
         collection.AddSingleton(new Cache());
 
         Config config = new();

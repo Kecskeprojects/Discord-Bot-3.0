@@ -16,7 +16,7 @@ namespace Discord_Bot.Commands.User;
 public class UserCustomCommandCommands(
     ICustomCommandService customCommandService,
     IServerService serverService,
-    Logging logger,
+    BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly ICustomCommandService customCommandService = customCommandService;

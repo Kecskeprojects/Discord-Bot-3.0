@@ -15,7 +15,7 @@ public class KeywordService(
     IKeywordRepository keywordRepository,
     IServerRepository serverRepository,
     IMapper mapper,
-    Logging logger,
+    BotLogger logger,
     Cache cache) : BaseService(mapper, logger, cache), IKeywordService
 {
     private readonly IKeywordRepository keywordRepository = keywordRepository;

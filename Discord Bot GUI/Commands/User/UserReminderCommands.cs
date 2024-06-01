@@ -17,7 +17,7 @@ namespace Discord_Bot.Commands.User;
 public class UserReminderCommands(
     IReminderService reminderService,
     IServerService serverService,
-    Logging logger,
+    BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IReminderService reminderService = reminderService;

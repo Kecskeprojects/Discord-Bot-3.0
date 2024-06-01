@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 namespace Discord_Bot.Core;
 
 //Todo: This class might not be needed at all, revisit it
-public class CoreLogic(Logging logger, IServerService serverService) : ICoreLogic
+public class CoreLogic(BotLogger logger, IServerService serverService) : ICoreLogic
 {
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
     private readonly IServerService serverService = serverService;
 
     public async Task<ServerResource> GetOrAddServerAsync(ulong serverId, string serverName)

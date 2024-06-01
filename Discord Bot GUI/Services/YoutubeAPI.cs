@@ -17,11 +17,11 @@ using System.Web;
 
 namespace Discord_Bot.Services;
 
-public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Logging logger, Config config) : IYoutubeAPI
+public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, BotLogger logger, Config config) : IYoutubeAPI
 {
     #region Variables
     private readonly YoutubeAddPlaylistFeature youtubeAddPlaylistFeature = youtubeAddPlaylistFeature;
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
     private readonly Config config = config;
 
     private static readonly Dictionary<string, int> keys = [];

@@ -14,7 +14,7 @@ namespace Discord_Bot.Commands.Admin;
 
 public class AdminHelpCommands(
     IServerService serverService,
-    Logging logger,
+    BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     [Command("help admin")]

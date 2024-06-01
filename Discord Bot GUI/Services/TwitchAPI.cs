@@ -19,14 +19,14 @@ public class TwitchAPI(
     ITwitchCLI twitchCLI,
     ITwitchChannelService twitchChannelService,
     TwitchNotificationFeature twitchNotificationFeature,
-    Logging logger,
+    BotLogger logger,
     Config config) : ITwitchAPI
 {
     #region Variables
     private readonly ITwitchCLI twitchCLI = twitchCLI;
     private readonly ITwitchChannelService twitchChannelService = twitchChannelService;
     private readonly TwitchNotificationFeature twitchNotificationFeature = twitchNotificationFeature;
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
     private readonly Config config = config;
 
     private LiveStreamMonitorService Monitor;

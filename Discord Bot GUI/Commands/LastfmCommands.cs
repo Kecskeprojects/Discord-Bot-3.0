@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands;
 
-public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoKnowsImageProcessor whoKnowsImageProcessor, IServerService serverService, Logging logger, Config config) : BaseCommand(logger, config, serverService)
+public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoKnowsImageProcessor whoKnowsImageProcessor, IServerService serverService, BotLogger logger, Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IUserService userService = userService;
     private readonly ILastFmAPI lastFmAPI = lastFmAPI;

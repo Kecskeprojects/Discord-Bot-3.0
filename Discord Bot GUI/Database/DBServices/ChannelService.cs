@@ -18,7 +18,7 @@ public class ChannelService(
     IServerRepository serverRepository,
     IChannelTypeRepository channelTypeRepository,
     IMapper mapper,
-    Logging logger,
+    BotLogger logger,
     Cache cache) : BaseService(mapper, logger, cache), IChannelService
 {
     private readonly IChannelRepository channelRepository = channelRepository;

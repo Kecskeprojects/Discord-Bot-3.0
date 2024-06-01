@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
 
-public class MusicBrainzAPI(Logging logger) : IMusicBrainzAPI
+public class MusicBrainzAPI(BotLogger logger) : IMusicBrainzAPI
 {
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
 
     private static Uri BaseUrl { get; } = new("https://musicbrainz.org/ws/2/");
     private static readonly RestClient _client = new(BaseUrl);

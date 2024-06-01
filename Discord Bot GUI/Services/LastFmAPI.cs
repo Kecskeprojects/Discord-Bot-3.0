@@ -19,10 +19,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
 
-public class LastFmAPI(ISpotifyAPI spotifyAPI, Logging logger, Config config) : ILastFmAPI
+public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) : ILastFmAPI
 {
     private readonly ISpotifyAPI spotifyAPI = spotifyAPI;
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
     private readonly Config config = config;
 
     public async Task<NowPlayingResult> GetNowPlayingAsync(string lastFmUsername)

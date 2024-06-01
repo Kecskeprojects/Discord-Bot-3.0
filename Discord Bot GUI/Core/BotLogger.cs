@@ -12,7 +12,7 @@ using System.Windows.Threading;
 
 namespace Discord_Bot.Core;
 
-public class Logging
+public class BotLogger
 {
     //List of logs, before they are cleared
     public readonly List<Log> Logs = [];

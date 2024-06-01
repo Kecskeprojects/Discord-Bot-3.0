@@ -19,7 +19,7 @@ namespace Discord_Bot.Commands.Admin;
 public class AdminSelfRoleCommands(
     IRoleService roleService,
     IServerService serverService,
-    Logging logger,
+    BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IRoleService roleService = roleService;

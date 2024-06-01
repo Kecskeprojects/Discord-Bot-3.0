@@ -10,7 +10,7 @@ namespace Discord_Bot.Commands.User;
 
 public class UserRandomizeCommands(
     IServerService serverService,
-    Logging logger,
+    BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     [Command("8ball")]

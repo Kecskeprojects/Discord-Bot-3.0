@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 
-public class TwitchNotificationFeature(IServerService serverService, DiscordSocketClient client, Logging logger)
+public class TwitchNotificationFeature(IServerService serverService, DiscordSocketClient client, BotLogger logger)
 {
     private readonly IServerService serverService = serverService;
     private readonly DiscordSocketClient client = client;
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
 
     public async Task Run(TwitchChannelResource twitchChannel, string thumbnailUrl, string title)
     {

@@ -19,7 +19,7 @@ public class AdminServerSettingCommands(
     ITwitchChannelService twitchChannelService,
     ITwitchCLI twitchCLI,
     IServerService serverService,
-    Logging logger,
+    BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IChannelService channelService = channelService;

@@ -15,7 +15,7 @@ namespace Discord_Bot.Commands.User;
 public class UserBiasGameCommands(
     IUserService userService,
     IServerService serverService,
-    Logging logger,
+    BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IUserService userService = userService;

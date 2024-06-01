@@ -14,9 +14,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
 
-public class AudioService(Logging logger, Config config, IYoutubeAPI youtubeAPI, ISpotifyAPI spotifyAPI, IYoutubeDownloadService youtubeDownloadService) : IAudioService
+public class AudioService(BotLogger logger, Config config, IYoutubeAPI youtubeAPI, ISpotifyAPI spotifyAPI, IYoutubeDownloadService youtubeDownloadService) : IAudioService
 {
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
     private readonly Config config = config;
     private readonly IYoutubeAPI youtubeAPI = youtubeAPI;
     private readonly ISpotifyAPI spotifyAPI = spotifyAPI;

@@ -15,7 +15,7 @@ namespace Discord_Bot.Database.DBServices;
 public class ServerChannelViewService(
     IServerChannelViewRepository serverChannelViewRepository,
     IMapper mapper,
-    Logging logger,
+    BotLogger logger,
     Cache cache) : BaseService(mapper, logger, cache), IServerChannelViewService
 {
     private readonly IServerChannelViewRepository serverChannelViewRepository = serverChannelViewRepository;

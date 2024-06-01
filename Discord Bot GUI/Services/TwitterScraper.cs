@@ -13,9 +13,9 @@ using System.Web;
 
 namespace Discord_Bot.Services;
 
-public class TwitterScraper(Logging logger, BrowserService browserService) : ITwitterScraper
+public class TwitterScraper(BotLogger logger, BrowserService browserService) : ITwitterScraper
 {
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
     private readonly BrowserService browserService = browserService;
 
     private Root Body { get; set; }

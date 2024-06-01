@@ -15,7 +15,7 @@ namespace Discord_Bot.Commands.Admin;
 public class AdminBirthdayCommands(
     IBirthdayService birthdayService,
     IServerService serverService,
-    Logging logger,
+    BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IBirthdayService birthdayService = birthdayService;

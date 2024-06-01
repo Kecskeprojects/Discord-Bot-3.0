@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
 
-public class KpopDbScraper(Logging logger, BrowserService browserService) : IKpopDbScraper
+public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IKpopDbScraper
 {
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
     private readonly BrowserService browserService = browserService;
 
     private static Uri BaseUrl { get; } = new("https://dbkpop.com/db/all-k-pop-idols/");

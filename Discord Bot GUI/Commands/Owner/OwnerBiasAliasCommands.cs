@@ -11,7 +11,7 @@ namespace Discord_Bot.Commands.Owner;
 public class OwnerBiasAliasCommands(
     IIdolAliasService idolAliasService,
     IServerService serverService,
-    Logging logger,
+    BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IIdolAliasService idolAliasService = idolAliasService;

@@ -14,9 +14,9 @@ public partial class MainWindow : Window
     private readonly Timer diagnosticsTimer;
     private bool AutoScroll = true;
 
-    private readonly Logging logger;
+    private readonly BotLogger logger;
 
-    public MainWindow(Logging logger)
+    public MainWindow(BotLogger logger)
     {
         InitializeComponent();
         this.logger = logger;

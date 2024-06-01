@@ -16,7 +16,7 @@ namespace Discord_Bot.Commands.User;
 public class UserWordOfTheDayCommands(
     IWordOfTheDayService wordOfTheDayService,
     IServerService serverService,
-    Logging logger,
+    BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IWordOfTheDayService wordOfTheDayService = wordOfTheDayService;

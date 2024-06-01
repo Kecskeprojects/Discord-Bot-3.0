@@ -11,7 +11,7 @@ namespace Discord_Bot.Commands.Owner;
 
 public class OwnerSayCommands(
     IServerService serverService,
-    Logging logger,
+    BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     [Command("say")]

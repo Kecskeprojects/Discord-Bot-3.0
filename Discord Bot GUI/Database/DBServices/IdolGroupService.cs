@@ -15,7 +15,7 @@ namespace Discord_Bot.Database.DBServices;
 public class IdolGroupService(
     IIdolGroupRepository idolGroupRepository,
     IMapper mapper,
-    Logging logger,
+    BotLogger logger,
     Cache cache) : BaseService(mapper, logger, cache), IIdolGroupService
 {
     private readonly IIdolGroupRepository idolGroupRepository = idolGroupRepository;

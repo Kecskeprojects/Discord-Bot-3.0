@@ -12,7 +12,7 @@ namespace Discord_Bot.Commands.Admin;
 public class AdminCustomCommandCommands(
     ICustomCommandService customCommandService,
     IServerService serverService,
-    Logging logger,
+    BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly ICustomCommandService customCommandService = customCommandService;

@@ -16,7 +16,7 @@ public class ServerService(
     IServerRepository serverRepository,
     IRoleRepository roleRepository,
     IMapper mapper,
-    Logging logger,
+    BotLogger logger,
     Cache cache) : BaseService(mapper, logger, cache), IServerService
 {
     private readonly IServerChannelViewService serverChannelViewService = serverChannelViewService;

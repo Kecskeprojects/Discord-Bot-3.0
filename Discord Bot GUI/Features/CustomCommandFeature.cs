@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 
-public class CustomCommandFeature(ICustomCommandService customCommandService, Logging logger) : BaseFeature(logger)
+public class CustomCommandFeature(ICustomCommandService customCommandService, BotLogger logger) : BaseFeature(logger)
 {
     private readonly ICustomCommandService customCommandService = customCommandService;
 

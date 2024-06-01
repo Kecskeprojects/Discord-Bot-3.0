@@ -15,7 +15,7 @@ namespace Discord_Bot.Commands;
 public class VoiceCommands(
     IServerService serverService,
     IAudioService audioService,
-    Logging logger,
+    BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IAudioService audioService = audioService;

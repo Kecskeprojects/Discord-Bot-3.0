@@ -5,9 +5,9 @@ using Discord_Bot.Core.Caching;
 namespace Discord_Bot.Database.DBServices;
 
 //Todo: Consider what can be moved into this class as universal functions, cache related logics may be among the possibilities
-public class BaseService(IMapper mapper, Logging logger, Cache cache)
+public class BaseService(IMapper mapper, BotLogger logger, Cache cache)
 {
     protected readonly IMapper mapper = mapper;
-    protected readonly Logging logger = logger;
+    protected readonly BotLogger logger = logger;
     protected readonly Cache cache = cache;
 }

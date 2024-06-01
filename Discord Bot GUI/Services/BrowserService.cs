@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
 
-public class BrowserService(Logging logger, Config config)
+public class BrowserService(BotLogger logger, Config config)
 {
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
     private readonly Config config = config;
     private IBrowser Browser { get; set; }
     public async Task OpenBroser()

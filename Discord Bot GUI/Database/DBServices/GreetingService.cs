@@ -15,7 +15,7 @@ namespace Discord_Bot.Database.DBServices;
 public class GreetingService(
     IGreetingRepository greetingRepository,
     IMapper mapper,
-    Logging logger,
+    BotLogger logger,
     Cache cache) : BaseService(mapper, logger, cache), IGreetingService
 {
     private readonly IGreetingRepository greetingRepository = greetingRepository;

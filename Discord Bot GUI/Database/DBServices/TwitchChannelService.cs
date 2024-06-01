@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
 
-public class TwitchChannelService(IMapper mapper, Logging logger, Cache cache, ITwitchChannelRepository twitchChannelRepository, IServerRepository serverRepository) : BaseService(mapper, logger, cache), ITwitchChannelService
+public class TwitchChannelService(IMapper mapper, BotLogger logger, Cache cache, ITwitchChannelRepository twitchChannelRepository, IServerRepository serverRepository) : BaseService(mapper, logger, cache), ITwitchChannelService
 {
     private readonly ITwitchChannelRepository twitchChannelRepository = twitchChannelRepository;
     private readonly IServerRepository serverRepository = serverRepository;

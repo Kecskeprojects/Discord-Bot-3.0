@@ -21,7 +21,7 @@ public class BiasEditComponentInteraction : BaseInteraction
 
     private Dictionary<string, Func<string, string, Task>> Actions { get; } = [];
 
-    public BiasEditComponentInteraction(IIdolService idolService, IIdolGroupService idolGroupService, IIdolImageService idolImageService, Logging logger, Config config) : base(logger, config)
+    public BiasEditComponentInteraction(IIdolService idolService, IIdolGroupService idolGroupService, IIdolImageService idolImageService, BotLogger logger, Config config) : base(logger, config)
     {
         Actions.Add(BiasEditActionTypeEnum.EditIdol, SendEditIdolModalAsync);
         Actions.Add(BiasEditActionTypeEnum.EditIdolExtended, CreateEditIdolExtendedModalAsync);

@@ -11,9 +11,9 @@ using System.Linq;
 
 namespace Discord_Bot.Processors.ImageProcessors;
 
-public class BonkGifProcessor(Logging logger)
+public class BonkGifProcessor(BotLogger logger)
 {
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
 
     public MemoryStream CreateBonkImage(Stream stream, int delay)
     {

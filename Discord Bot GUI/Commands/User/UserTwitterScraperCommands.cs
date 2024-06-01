@@ -18,7 +18,7 @@ namespace Discord_Bot.Commands.User;
 public class UserTwitterScraperCommands(
     ITwitterScraper twitterScraper,
     IServerService serverService,
-    Logging logger,
+    BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly ITwitterScraper twitterScraper = twitterScraper;

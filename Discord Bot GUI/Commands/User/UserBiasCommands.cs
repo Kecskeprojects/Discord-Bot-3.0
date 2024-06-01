@@ -21,7 +21,7 @@ public class UserBiasCommands(
     IIdolService idolService,
     IIdolGroupService idolGroupService,
     IServerService serverService,
-    Logging logger,
+    BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IUserIdolService userIdolService = userIdolService;

@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
 
-public class SpotifyAPI(Logging logger, Config config, IYoutubeAPI youtubeAPI, IMusicBrainzAPI musicBrainzAPI) : ISpotifyAPI
+public class SpotifyAPI(BotLogger logger, Config config, IYoutubeAPI youtubeAPI, IMusicBrainzAPI musicBrainzAPI) : ISpotifyAPI
 {
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
     private readonly Config config = config;
     private readonly IYoutubeAPI youtubeAPI = youtubeAPI;
     private readonly IMusicBrainzAPI musicBrainzAPI = musicBrainzAPI;

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 
-public class BirthdayFeature(IBirthdayService birthdayService, IServerService serverService, DiscordSocketClient client, Logging logger) : BaseFeature(logger)
+public class BirthdayFeature(IBirthdayService birthdayService, IServerService serverService, DiscordSocketClient client, BotLogger logger) : BaseFeature(logger)
 {
     private readonly IBirthdayService birthdayService = birthdayService;
     private readonly IServerService serverService = serverService;

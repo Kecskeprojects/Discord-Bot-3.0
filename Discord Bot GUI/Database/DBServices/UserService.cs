@@ -16,7 +16,7 @@ public class UserService(
     IUserRepository userRepository,
     IUserIdolStatisticRepository userIdolStatisticRepository,
     IMapper mapper,
-    Logging logger,
+    BotLogger logger,
     Cache cache) : BaseService(mapper, logger, cache), IUserService
 {
     private readonly IUserRepository userRepository = userRepository;

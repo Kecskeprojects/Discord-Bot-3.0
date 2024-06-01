@@ -16,9 +16,9 @@ using System.Linq;
 
 namespace Discord_Bot.Processors.ImageProcessors;
 
-public class BiasGameWinnerBracketImageProcessor(Logging logger)
+public class BiasGameWinnerBracketImageProcessor(BotLogger logger)
 {
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
 
     public MemoryStream UpdateWinnerBracket(BiasGameData biasGameData)
     {

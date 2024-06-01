@@ -5,9 +5,9 @@ using System.IO;
 
 namespace Discord_Bot.Services;
 
-public class YoutubeDownloadService(Logging logger) : IYoutubeDownloadService
+public class YoutubeDownloadService(BotLogger logger) : IYoutubeDownloadService
 {
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
 
     //Use yt-dlp and ffmpeg to stream audio from youtube to discord
     public Process CreateYoutubeStream(string url)

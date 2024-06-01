@@ -20,7 +20,7 @@ public class BiasGameStepInteraction(
     BiasGameImageProcessor biasGameImageProcessor,
     BiasGameWinnerBracketImageProcessor biasGameWinnerBracketImageProcessor,
     IUserIdolStatisticService userIdolStatisticService,
-    Logging logger,
+    BotLogger logger,
     Config config) : BaseInteraction(logger, config)
 {
     private readonly IIdolService idolService = idolService;

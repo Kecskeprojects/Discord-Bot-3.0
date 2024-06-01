@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions;
 
-public class BiasListComponentInteraction(Logging logger, Config config, IUserIdolService userIdolService, IIdolService idolService) : BaseInteraction(logger, config)
+public class BiasListComponentInteraction(BotLogger logger, Config config, IUserIdolService userIdolService, IIdolService idolService) : BaseInteraction(logger, config)
 {
     private readonly IUserIdolService userIdolService = userIdolService;
     private readonly IIdolService idolService = idolService;

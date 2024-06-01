@@ -12,7 +12,7 @@ namespace Discord_Bot.Commands.Admin;
 public class AdminKeywordCommands(
     IKeywordService keywordService,
     IServerService serverService,
-    Logging logger,
+    BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IKeywordService keywordService = keywordService;

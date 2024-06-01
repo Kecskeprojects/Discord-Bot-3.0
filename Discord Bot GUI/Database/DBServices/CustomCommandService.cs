@@ -16,7 +16,7 @@ public class CustomCommandService(
     ICustomCommandRepository customCommandRepository,
     IServerRepository serverRepository,
     IMapper mapper,
-    Logging logger,
+    BotLogger logger,
     Cache cache) : BaseService(mapper, logger, cache), ICustomCommandService
 {
     private readonly ICustomCommandRepository customCommandRepository = customCommandRepository;

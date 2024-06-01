@@ -13,9 +13,9 @@ using System.Linq;
 
 namespace Discord_Bot.Processors.ImageProcessors;
 
-public class WhoKnowsImageProcessor(Logging logger)
+public class WhoKnowsImageProcessor(BotLogger logger)
 {
-    private readonly Logging logger = logger;
+    private readonly BotLogger logger = logger;
 
     //Our image size will be 800*500 in the end
     public EditPictureResult EditPicture(Stream originalImg, Dictionary<string, int> plays, string HeadText)
