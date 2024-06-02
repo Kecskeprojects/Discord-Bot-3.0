@@ -130,7 +130,7 @@ public class UserVoiceCommands(
             int songcount = audioResource.MusicRequests.Count;
 
             //If queue does not have songs on that page, do not show a queue
-            if (index * 10 <= songcount || (index - 1) * 10 < songcount && index * 10 >= songcount)
+            if (index * 10 <= songcount || ((index - 1) * 10 < songcount && index * 10 >= songcount))
             {
                 Embed[] embed = AudioQueueEmbedProcessor.CreateEmbed(audioResource, index);
 
@@ -159,7 +159,7 @@ public class UserVoiceCommands(
 
             Embed[] embed = AudioNowPlayingEmbedProcessor.CreateEmbed(audioResource);
 
-            await Context.Channel.SendMessageAsync(embeds:embed);
+            await Context.Channel.SendMessageAsync(embeds: embed);
         }
         catch (Exception ex)
         {

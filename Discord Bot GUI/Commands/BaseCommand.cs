@@ -3,12 +3,10 @@ using Discord.Commands;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
-using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
-using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands;
