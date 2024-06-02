@@ -7,7 +7,7 @@ public static class StringTools
 {
     public static string AddNumberPositionIdentifier(string position)
     {
-        if(position[^2..^1] is "11" or "12" or "13")
+        if(position.Length >= 2 && position[^2..^1] is "11" or "12" or "13")
         {
             return $"{position}th";
         }
