@@ -7,6 +7,11 @@ public static class StringTools
 {
     public static string AddNumberPositionIdentifier(string position)
     {
+        if(position[^2..^1] is "11" or "12" or "13")
+        {
+            return $"{position}th";
+        }
+
         return position[^1] switch
         {
             '1' => $"{position}st",
