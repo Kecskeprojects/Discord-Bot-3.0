@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 
-public class EasterEggFeature(IKeywordService keywordService, IGreetingService greetingService, DiscordSocketClient client, BotLogger logger) : BaseFeature(logger)
+public class EasterEggFeature(IKeywordService keywordService, IGreetingService greetingService, DiscordSocketClient client, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IKeywordService keywordService = keywordService;
     private readonly IGreetingService greetingService = greetingService;
     private readonly DiscordSocketClient client = client;
 
-    protected override async Task ExecuteCoreLogicAsync()
+    protected override async Task<bool> ExecuteCoreLogicAsync()
     {
         try
         {
@@ -28,18 +28,18 @@ public class EasterEggFeature(IKeywordService keywordService, IGreetingService g
                 if (!CollectionTools.IsNullOrEmpty(list))
                 {
                     await Context.Channel.SendMessageAsync(list[new Random().Next(0, list.Count)].Url);
-                    return;
+                    return false;
                 }
             }
 
             //Response to keyword
-            if (Context.Message.Content.Length <= 100 && Context.Channel.GetChannelType() != ChannelType.DM)
+            if (Context.Message.Content.Length <= 100 && DiscordTools.IsDM(Context))
             {
                 KeywordResource keyword = await keywordService.GetKeywordAsync(Context.Guild.Id, Context.Message.Content);
                 if (keyword != null)
                 {
                     await Context.Channel.SendMessageAsync(keyword.Response);
-                    return;
+                    return false;
                 }
             }
 
@@ -74,6 +74,8 @@ public class EasterEggFeature(IKeywordService keywordService, IGreetingService g
         catch (Exception ex)
         {
             logger.Error("EasterEggFeature.cs ExecuteCoreLogicAsync", ex);
+            return false;
         }
+        return true;
     }
 }

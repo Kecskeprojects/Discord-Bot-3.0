@@ -83,6 +83,8 @@ public static class ServiceBuilder
         collection.AddTransient<ReminderFeature>();
         collection.AddTransient<TwitchNotificationFeature>();
         collection.AddTransient<YoutubeAddPlaylistFeature>();
+        collection.AddTransient<AudioPlayFeature>();
+        collection.AddTransient<AudioRequestFeature>();
 
         //Services
         collection.AddSingleton<BrowserService>();
@@ -92,8 +94,7 @@ public static class ServiceBuilder
         collection.AddTransient<IYoutubeAPI, YoutubeAPI>();
         collection.AddTransient<IInstaLoader, InstaLoader>();
         collection.AddTransient<IWordOfTheDayService, WordOfTheDayService>();
-        collection.AddTransient<IAudioService, AudioService>();
-        collection.AddTransient<IYoutubeDownloadService, YoutubeDownloadService>();
+        collection.AddTransient<IYoutubeDownloadService, YoutubeStreamService>();
         collection.AddTransient<ILastFmAPI, LastFmAPI>();
         collection.AddTransient<IMusicBrainzAPI, MusicBrainzAPI>();
         collection.AddTransient<ITwitterScraper, TwitterScraper>();

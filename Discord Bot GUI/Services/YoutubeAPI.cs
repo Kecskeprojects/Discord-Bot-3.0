@@ -159,8 +159,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
 
         if (!Global.ServerAudioResources.TryGetValue(serverId, out ServerAudioResource audioResource))
         {
-            audioResource = new(serverId);
-            Global.ServerAudioResources.TryAdd(serverId, audioResource);
+            throw new Exception("Server Audio Resource does not exist");
         }
 
         audioResource.MusicRequests.Add(new MusicRequest(temp[0], temp[1], temp[2], temp[3], username));

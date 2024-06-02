@@ -1,8 +1,8 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
+using Discord_Bot.Tools;
 
 namespace Discord_Bot.Interactions;
 
@@ -19,8 +19,6 @@ public class BaseInteraction(BotLogger logger, Config config) : InteractionModul
 
     protected string GetCurrentUserNickname()
     {
-        return Context.Channel.GetChannelType() != ChannelType.DM
-            ? (Context.User as SocketGuildUser).Nickname ?? Context.User.Username
-            : Context.User.Username;
+        return DiscordTools.GetNickName(Context);
     }
 }

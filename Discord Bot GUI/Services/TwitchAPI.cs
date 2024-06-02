@@ -112,7 +112,7 @@ public class TwitchAPI(
                     !channelStatus &&
                     channel.TwitchId == e.Stream.UserId)
                 {
-                    await twitchNotificationFeature.Run(channel, e.Stream.ThumbnailUrl, e.Stream.Title);
+                    await twitchNotificationFeature.Run(new { TwitchChannel = channel, e.Stream.ThumbnailUrl, e.Stream.Title });
                     channelStatuses[channel.TwitchId] = true;
                 }
             }

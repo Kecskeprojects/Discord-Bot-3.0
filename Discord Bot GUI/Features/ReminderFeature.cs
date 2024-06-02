@@ -12,12 +12,12 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 
-public class ReminderFeature(IReminderService reminderService, DiscordSocketClient client, BotLogger logger) : BaseFeature(logger)
+public class ReminderFeature(IReminderService reminderService, DiscordSocketClient client, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IReminderService reminderService = reminderService;
     private readonly DiscordSocketClient client = client;
 
-    protected override async Task ExecuteCoreLogicAsync()
+    protected override async Task<bool> ExecuteCoreLogicAsync()
     {
         try
         {
@@ -46,12 +46,15 @@ public class ReminderFeature(IReminderService reminderService, DiscordSocketClie
                 if (reminderResult == DbProcessResultEnum.Failure)
                 {
                     logger.Error("ReminderFeature.cs ExecuteCoreLogicAsync", "Failure during reminder check!");
+                    return false;
                 }
             }
         }
         catch (Exception ex)
         {
             logger.Error("ReminderFeature.cs Log ExecuteCoreLogicAsync", ex);
+            return false;
         }
+        return true;
     }
 }

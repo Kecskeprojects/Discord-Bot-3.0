@@ -9,10 +9,10 @@ public static class StringTools
     {
         return position[^1] switch
         {
-            '1' => "st",
-            '2' => "nd",
-            '3' => "rd",
-            _ => "th"
+            '1' => $"{position}st",
+            '2' => $"{position}nd",
+            '3' => $"{position}rd",
+            _ => $"{position}th"
         };
     }
 

@@ -1,12 +1,14 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
+using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
+using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
+using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands;
@@ -17,11 +19,6 @@ public class BaseCommand(BotLogger logger, Config config, IServerService serverS
     protected readonly BotLogger logger = logger;
     protected readonly Config config = config;
     protected readonly IServerService serverService = serverService;
-
-    protected bool IsDM()
-    {
-        return Context.Channel.GetChannelType() == ChannelType.DM;
-    }
 
     protected async Task<ServerResource> GetCurrentServerAsync()
     {
@@ -40,26 +37,32 @@ public class BaseCommand(BotLogger logger, Config config, IServerService serverS
 
     protected string GetCurrentUserNickname()
     {
-        return !IsDM()
-            ? (Context.User as SocketGuildUser).Nickname ?? Context.User.Username
-            : Context.User.Username;
+        return DiscordTools.GetNickName(Context);
     }
 
     protected string GetUserNickname(IUser user)
     {
-        return !IsDM()
-            ? (user as SocketGuildUser).Nickname ?? user.Username
-            : user.Username;
+        return DiscordTools.GetNickName(Context, user);
     }
 
     protected async Task<bool> IsCommandAllowedAsync(ChannelTypeEnum type, bool allowLackOfType = true)
     {
-        if (IsDM())
+        if (DiscordTools.IsDM(Context))
         {
             return false;
         }
 
         ServerResource server = await GetCurrentServerAsync();
         return DiscordTools.IsTypeOfChannel(server, type, Context.Channel.Id, allowLackOfType);
+    }
+
+    protected ServerAudioResource GetCurrentAudioResource()
+    {
+        if (!Global.ServerAudioResources.TryGetValue(Context.Guild.Id, out ServerAudioResource audioResource))
+        {
+            audioResource = new(Context.Guild.Id);
+            Global.ServerAudioResources.TryAdd(Context.Guild.Id, audioResource);
+        }
+        return audioResource;
     }
 }

@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 
-public class CustomCommandFeature(ICustomCommandService customCommandService, BotLogger logger) : BaseFeature(logger)
+public class CustomCommandFeature(ICustomCommandService customCommandService, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly ICustomCommandService customCommandService = customCommandService;
 
-    protected override async Task ExecuteCoreLogicAsync()
+    protected override async Task<bool> ExecuteCoreLogicAsync()
     {
         try
         {
@@ -18,11 +18,13 @@ public class CustomCommandFeature(ICustomCommandService customCommandService, Bo
             if (command != null)
             {
                 await Context.Channel.SendMessageAsync(command.Url);
+                return true;
             }
         }
         catch (Exception ex)
         {
             logger.Error("CustomCommandFeature.cs ExecuteCoreLogicAsync", ex);
         }
+        return false;
     }
 }

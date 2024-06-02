@@ -11,13 +11,12 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 
-public class BirthdayFeature(IBirthdayService birthdayService, IServerService serverService, DiscordSocketClient client, BotLogger logger) : BaseFeature(logger)
+public class BirthdayFeature(IBirthdayService birthdayService, DiscordSocketClient client, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IBirthdayService birthdayService = birthdayService;
-    private readonly IServerService serverService = serverService;
     private readonly DiscordSocketClient client = client;
 
-    protected override async Task ExecuteCoreLogicAsync()
+    protected override async Task<bool> ExecuteCoreLogicAsync()
     {
         try
         {
@@ -35,7 +34,9 @@ public class BirthdayFeature(IBirthdayService birthdayService, IServerService se
         catch (Exception ex)
         {
             logger.Error("BirthdayFeature.cs ExecuteCoreLogicAsync", ex);
+            return false;
         }
+        return true;
     }
 
     private async Task SendBirthdayMessageAsync(BirthdayResource birthday)

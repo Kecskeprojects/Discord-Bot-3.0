@@ -12,16 +12,18 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 
-public class TwitchNotificationFeature(IServerService serverService, DiscordSocketClient client, BotLogger logger)
+public class TwitchNotificationFeature(DiscordSocketClient client, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
 {
-    private readonly IServerService serverService = serverService;
     private readonly DiscordSocketClient client = client;
-    private readonly BotLogger logger = logger;
 
-    public async Task Run(TwitchChannelResource twitchChannel, string thumbnailUrl, string title)
+    protected override async Task<bool> ExecuteCoreLogicAsync()
     {
         try
         {
+            TwitchChannelResource twitchChannel = Parameters.TwitchChannel;
+            string thumbnailUrl = Parameters.ThumbnailUrl;
+            string title = Parameters.Title;
+
             ServerResource server = await serverService.GetByDiscordIdAsync(twitchChannel.ServerDiscordId);
 
             //Do not send a message if a channel was not set
@@ -29,15 +31,15 @@ public class TwitchNotificationFeature(IServerService serverService, DiscordSock
             {
                 foreach (ulong channelId in notificationChannels)
                 {
-                    IMessageChannel channel = client.GetChannel(channelId) as IMessageChannel;
                     Embed[] embed = TwitchNotificationEmbedProcessor.CreateEmbed(twitchChannel, thumbnailUrl, title);
 
                     //If there is no notification role set on the server, we just send a message without the role ping
                     string notifRole = !NumberTools.IsNullOrZero(twitchChannel.NotificationRoleDiscordId) ? $"<@&{twitchChannel.NotificationRoleDiscordId}>" : "";
 
-                    if (channel == null)
+                    if (client.GetChannel(channelId) is not IMessageChannel channel)
                     {
                         logger.Error("TwitchNotificationFeature.cs Run", $"Channel (ID: {channelId}) was not found to send twitch notification. (Server ID: {server.ServerId}).");
+                        return false;
                     }
 
                     await channel.SendMessageAsync(notifRole, embeds: embed);
@@ -47,6 +49,8 @@ public class TwitchNotificationFeature(IServerService serverService, DiscordSock
         catch (Exception ex)
         {
             logger.Error("TwitchNotificationFeature.cs Run", ex);
+            return false;
         }
+        return true;
     }
 }

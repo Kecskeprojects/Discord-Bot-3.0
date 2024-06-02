@@ -2,6 +2,7 @@
 using Discord.Net;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
+using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.MessageProcessor;
 using Discord_Bot.Tools;
@@ -12,11 +13,11 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 
-public class InstagramEmbedFeature(IInstaLoader instaLoader, BotLogger logger) : BaseFeature(logger)
+public class InstagramEmbedFeature(IInstaLoader instaLoader, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IInstaLoader instaLoader = instaLoader;
 
-    protected override async Task ExecuteCoreLogicAsync()
+    protected override async Task<bool> ExecuteCoreLogicAsync()
     {
         try
         {
@@ -41,7 +42,9 @@ public class InstagramEmbedFeature(IInstaLoader instaLoader, BotLogger logger) :
         catch (Exception ex)
         {
             logger.Error("InstagramEmbedFeature.cs ExecuteCoreLogicAsync", ex);
+            return false;
         }
+        return true;
     }
 
     private async Task SendInstagramPostEmbedAsync(Uri uri)

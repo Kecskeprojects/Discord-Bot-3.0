@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 
-public class SelfRoleFeature(IRoleService roleService, BotLogger logger) : BaseFeature(logger)
+public class SelfRoleFeature(IRoleService roleService, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IRoleService roleService = roleService;
 
-    protected override async Task ExecuteCoreLogicAsync()
+    protected override async Task<bool> ExecuteCoreLogicAsync()
     {
         try
         {
@@ -51,6 +51,8 @@ public class SelfRoleFeature(IRoleService roleService, BotLogger logger) : BaseF
         catch (Exception ex)
         {
             logger.Error("SelfRoleFeature.cs ExecuteCoreLogicAsync", ex);
+            return false;
         }
+        return true;
     }
 }

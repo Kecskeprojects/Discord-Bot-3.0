@@ -48,7 +48,7 @@ public class CommandHandler(
             //The function stops as it could cause an infinite loop
             if (arg.Source is MessageSource.System or MessageSource.Webhook or MessageSource.Bot)
             {
-                if (arg.Channel.GetChannelType() != ChannelType.DM)
+                if (DiscordTools.IsDM(arg))
                 {
                     logger.MesOther(arg.Content, (arg.Channel as SocketGuildChannel).Guild.Name);
                 }
@@ -63,7 +63,7 @@ public class CommandHandler(
             int argPos = 0;
 
             //Check if the message is an embed or not
-            if (context.Message.Channel.GetChannelType() != ChannelType.DM)
+            if (DiscordTools.IsDM(context))
             {
                 logger.MesUser(context.Message.Content, context.Guild.Name);
             }
@@ -77,7 +77,7 @@ public class CommandHandler(
 
             _ = context.Message.HasCharPrefix('!', ref argPos) || context.Message.HasCharPrefix('.', ref argPos)
                 ? ExecuteCommandAsync(context, argPos)
-                : context.Channel.GetChannelType() != ChannelType.DM && DiscordTools.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id, false)
+                : DiscordTools.IsDM(context) && DiscordTools.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id, false)
                     ? HandleRoleAssignmentAsync(context, argPos)
                     : HandleFeatureCheckAsync(context);
         }
@@ -92,7 +92,7 @@ public class CommandHandler(
         using (IServiceScope scope = services.CreateScope())
         {
             ServerResource server = null;
-            if (context.Channel.GetChannelType() != ChannelType.DM)
+            if (DiscordTools.IsDM(context))
             {
                 IServerService serverService = scope.ServiceProvider.GetService<IServerService>();
                 server = await serverService.GetByDiscordIdAsync(context.Guild.Id);
@@ -185,7 +185,7 @@ public class CommandHandler(
     {
         using (IServiceScope scope = services.CreateScope())
         {
-            if (context.Channel.GetChannelType() != ChannelType.DM)
+            if (DiscordTools.IsDM(context as SocketCommandContext))
             {
                 CustomCommandFeature customCommandFeature = scope.ServiceProvider.GetService<CustomCommandFeature>();
                 await customCommandFeature.Run(context as SocketCommandContext);

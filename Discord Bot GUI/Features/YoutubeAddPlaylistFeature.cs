@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Discord_Bot.Core;
+using Discord_Bot.Interfaces.DBServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,15 +9,15 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 
-public class YoutubeAddPlaylistFeature(DiscordSocketClient client, BotLogger logger)
+public class YoutubeAddPlaylistFeature(DiscordSocketClient client, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly DiscordSocketClient client = client;
-    private readonly BotLogger logger = logger;
 
-    public async Task<bool> Run(ulong channelId)
+    protected override async Task<bool> ExecuteCoreLogicAsync()
     {
         try
         {
+            ulong channelId = Parameters;
             IMessageChannel channel = client.GetChannel(channelId) as IMessageChannel;
             IUserMessage message = await channel.SendMessageAsync("You requested a song from a playlist!\n Do you want to me to add the playlist to the queue?");
             await message.AddReactionAsync(new Emoji("\U00002705"));
