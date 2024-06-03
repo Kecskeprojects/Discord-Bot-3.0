@@ -240,35 +240,17 @@ public class UserLastfmCommands(
 
             NowPlayingResult nowPlaying = await lastFmAPI.GetNowPlayingAsync(user.LastFmUsername);
 
-            if (nowPlaying == null)
-            {
-                await ReplyAsync("Unexpected error occured.");
-                return;
-            }
-
             if (string.IsNullOrEmpty(nowPlaying.Message))
             {
-                //Getting base of lastfm embed
-                EmbedBuilder builder = LastFmService.BaseEmbed(nowPlaying.Attr != null ?
-                                                                $"{Global.GetNickName(Context.Channel, Context.User)} is currently listening to..." :
-                                                                $"{Global.GetNickName(Context.Channel, Context.User)} last listened to...",
-                                                                nowPlaying.ImageUrl);
+                string title = nowPlaying.NowPlaying
+                    ? $"{GetCurrentUserNickname()} recently listened to..."
+                    : $"{Global.GetNickName(Context.Channel, Context.User)} last listened to...";
+                Embed[] embed = LastFmNowPlayingEmbedProcessor.CreateEmbed(title, nowPlaying);
 
-                builder.WithTitle(nowPlaying.TrackName);
-                builder.WithUrl(nowPlaying.Url);
-                builder.AddField($"By *{nowPlaying.ArtistName}*", $"**On *{nowPlaying.AlbumName}***");
-
-                builder.WithFooter($"{nowPlaying.TrackPlays} listen \u2022 {nowPlaying.Ranking} most played this month");
-
-                await ReplyAsync("", false, embed: builder.Build());
+                await ReplyAsync(embeds: embed);
                 return;
             }
             await ReplyAsync(nowPlaying.Message);
-        }
-        catch (HttpRequestException ex)
-        {
-            await ReplyAsync("Last.fm is temporarily unavailable!");
-            logger.Error("UserLastfmCommands.cs LfTopTrack", ex);
         }
         catch (Exception ex)
         {

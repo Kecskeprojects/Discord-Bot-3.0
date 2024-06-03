@@ -11,6 +11,7 @@ public static class CollectionTools
     {
         return collection == null || collection.Count == 0;
     }
+
     public static List<MusicRequest> ShufflePlaylist(List<MusicRequest> playlist)
     {
         //Get the server's playlist, and remove the currently playing song, but saving it for later

@@ -160,9 +160,9 @@ public class UserBasedRequests : BaseRequests
         return response;
     }
 
-    public static async Task<GenericResponseItem<Models.Recent.Track>> NowPlaying(string apiKey, string username)
+    public static async Task<GenericResponseItem<Recenttracks>> NowPlaying(string apiKey, string username)
     {
-        GenericResponseItem<Models.Recent.Track> response = new()
+        GenericResponseItem<Recenttracks> response = new()
         {
             ResultCode = LastFmRequestResultEnum.Failure
         };
@@ -177,7 +177,7 @@ public class UserBasedRequests : BaseRequests
 
             UserBasedRequestItem request = new("user.getrecenttracks", username, apiKey)
             {
-                Limit = 1
+                Limit = 2
             };
             response.RequestDetails = new LastFmRequestDetails(request);
 
@@ -186,8 +186,7 @@ public class UserBasedRequests : BaseRequests
             Recent deserialized = JsonConvert.DeserializeObject<Recent>(restResultJSON.Content);
 
             //If the Attr is not empty in the first index, it means the first song is a song that is currently playing
-            response.Response = deserialized.RecentTracks?.Track.Count > 0 ?
-                                deserialized.RecentTracks?.Track[0] : null;
+            response.Response = deserialized.RecentTracks;
             response.ResultCode = deserialized.RecentTracks != null
                                     ? LastFmRequestResultEnum.Success
                                     : !string.IsNullOrEmpty(deserialized.Message)

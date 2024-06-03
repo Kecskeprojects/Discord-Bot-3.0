@@ -1,10 +1,9 @@
 ﻿using Discord;
 using Discord_Bot.Services.Models.LastFm;
-using LastFmApi.Enum;
 using System;
 using System.Collections.Generic;
 
-namespace Discord_Bot.Tools;
+namespace Discord_Bot.Tools.LastFmTools;
 public class LastFmListResultTools
 {
     public static void CreateTopAlbumList(int? limit, LastFmListResult result, List<LastFmApi.Models.TopAlbum.Album> albums)
@@ -83,16 +82,5 @@ public class LastFmListResultTools
                 index++;
             }
         }
-    }
-
-    public static string GetResultMessage(LastFmRequestResultEnum resultCode, string message)
-    {
-        return resultCode switch
-        {
-            LastFmRequestResultEnum.Failure => string.IsNullOrEmpty(message) ? "Unexpected exception during request!" : message,
-            LastFmRequestResultEnum.EmptyResponse => "The response was empty!",
-            LastFmRequestResultEnum.RequiredParameterEmpty => "Required parameter is not set!",
-            _ => "Unexpected response type during request!"
-        };
     }
 }

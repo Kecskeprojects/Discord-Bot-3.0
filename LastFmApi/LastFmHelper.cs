@@ -1,10 +1,10 @@
 ﻿using LastFmApi.Communication;
+using LastFmApi.Enum;
 
 namespace LastFmApi;
 
 public class LastFmHelper
 {
-    #region Input checks
     public static InputParameters LastfmParameterCheck(string[] parameters, bool defaultLimitTo10 = true)
     {
         InputParameters input = new();
@@ -81,5 +81,15 @@ public class LastFmHelper
 
         return period != "";
     }
-    #endregion
+
+    public static string GetResultMessage(LastFmRequestResultEnum resultCode, string message)
+    {
+        return resultCode switch
+        {
+            LastFmRequestResultEnum.Failure => string.IsNullOrEmpty(message) ? "Unexpected exception during request!" : message,
+            LastFmRequestResultEnum.EmptyResponse => "The response was empty!",
+            LastFmRequestResultEnum.RequiredParameterEmpty => "Required parameter is not set!",
+            _ => "Unexpected response type during request!"
+        };
+    }
 }
