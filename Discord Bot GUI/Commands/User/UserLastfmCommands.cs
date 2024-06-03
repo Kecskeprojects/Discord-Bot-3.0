@@ -22,7 +22,6 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
 
-//Todo: Where percentages are shown, change the current rounded ints to double
 public class UserLastfmCommands(
     IUserService userService,
     ILastFmAPI lastFmAPI,
@@ -221,7 +220,7 @@ public class UserLastfmCommands(
     [Command("lf np")]
     [Alias(["lf nowplaying", "lf now playing"])]
     [Summary("Get the currently playing/last played track of the user")]
-    public async Task LfNowPlaying() //Todo: Add previous track to embed
+    public async Task LfNowPlaying()
     {
         try
         {
