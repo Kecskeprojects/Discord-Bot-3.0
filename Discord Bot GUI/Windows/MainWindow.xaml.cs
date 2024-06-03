@@ -1,6 +1,6 @@
 ﻿using Discord_Bot.Communication;
 using Discord_Bot.Core;
-using Discord_Bot.Tools;
+using Discord_Bot.Tools.NativeTools;
 using System;
 using System.Timers;
 using System.Windows;

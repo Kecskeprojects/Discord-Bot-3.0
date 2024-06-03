@@ -5,7 +5,7 @@ using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
-using Discord_Bot.Tools;
+using Discord_Bot.Tools.NativeTools;
 using System;
 using System.Collections.Generic;
 using System.Linq;

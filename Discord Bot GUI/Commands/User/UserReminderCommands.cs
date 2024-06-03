@@ -6,7 +6,7 @@ using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Processors.EmbedProcessors;
 using Discord_Bot.Resources;
-using Discord_Bot.Tools;
+using Discord_Bot.Tools.NativeTools;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -29,7 +29,7 @@ public class UserReminderCommands(
     {
         try
         {
-            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
                 return;
             }
@@ -119,7 +119,7 @@ public class UserReminderCommands(
     {
         try
         {
-            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
                 return;
             }
@@ -179,7 +179,7 @@ public class UserReminderCommands(
     {
         try
         {
-            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
                 return;
             }
@@ -205,7 +205,7 @@ public class UserReminderCommands(
     {
         try
         {
-            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
                 return;
             }

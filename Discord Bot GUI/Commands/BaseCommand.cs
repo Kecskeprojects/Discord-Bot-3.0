@@ -43,11 +43,11 @@ public class BaseCommand(BotLogger logger, Config config, IServerService serverS
         return DiscordTools.GetNickName(Context, user);
     }
 
-    protected async Task<bool> IsCommandAllowedAsync(ChannelTypeEnum type, bool allowLackOfType = true)
+    protected async Task<bool> IsCommandAllowedAsync(ChannelTypeEnum type, bool allowLackOfType = true, bool canBeDM = false)
     {
         if (DiscordTools.IsDM(Context))
         {
-            return false;
+            return canBeDM;
         }
 
         ServerResource server = await GetCurrentServerAsync();

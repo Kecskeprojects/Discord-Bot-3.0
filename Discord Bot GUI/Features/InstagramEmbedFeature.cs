@@ -5,7 +5,7 @@ using Discord_Bot.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.MessageProcessor;
-using Discord_Bot.Tools;
+using Discord_Bot.Tools.NativeTools;
 using System;
 using System.Collections.Generic;
 using System.IO;

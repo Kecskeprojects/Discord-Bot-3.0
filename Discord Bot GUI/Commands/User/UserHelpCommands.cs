@@ -24,7 +24,7 @@ public class UserHelpCommands(
     {
         try
         {
-            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
                 return;
             }

@@ -1,7 +1,7 @@
 ﻿using Discord_Bot.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.Twitch;
-using Discord_Bot.Tools;
+using Discord_Bot.Tools.NativeTools;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.IO;

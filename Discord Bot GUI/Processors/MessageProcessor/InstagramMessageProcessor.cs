@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord_Bot.Services.Models.Instagram;
-using Discord_Bot.Tools;
+using Discord_Bot.Tools.NativeTools;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

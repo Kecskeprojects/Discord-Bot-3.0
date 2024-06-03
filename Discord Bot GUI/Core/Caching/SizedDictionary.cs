@@ -1,4 +1,4 @@
-﻿using Discord_Bot.Tools;
+﻿using Discord_Bot.Tools.NativeTools;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Core.Caching;

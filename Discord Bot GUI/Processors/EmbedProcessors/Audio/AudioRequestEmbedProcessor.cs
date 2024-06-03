@@ -4,7 +4,7 @@ using Discord_Bot.Tools.Extensions;
 using System;
 using System.Xml;
 
-namespace Discord_Bot.Processors.EmbedProcessors;
+namespace Discord_Bot.Processors.EmbedProcessors.Audio;
 public static class AudioRequestEmbedProcessor
 {
     public static Embed[] CreateEmbed(MusicRequest request, int count)

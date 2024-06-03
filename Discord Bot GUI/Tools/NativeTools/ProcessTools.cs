@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Tools;
+namespace Discord_Bot.Tools.NativeTools;
 
 public static class ProcessTools
 {

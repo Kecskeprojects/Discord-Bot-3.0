@@ -3,7 +3,7 @@ using Discord_Bot.Core;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.Twitter;
-using Discord_Bot.Tools;
+using Discord_Bot.Tools.NativeTools;
 using PuppeteerSharp;
 using System;
 using System.Collections.Generic;

@@ -19,7 +19,7 @@ public class UserRandomizeCommands(
     {
         try
         {
-            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
                 return;
             }
@@ -45,7 +45,7 @@ public class UserRandomizeCommands(
     {
         try
         {
-            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
                 return;
             }
@@ -86,7 +86,7 @@ public class UserRandomizeCommands(
     {
         try
         {
-            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
                 return;
             }

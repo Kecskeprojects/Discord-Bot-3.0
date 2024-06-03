@@ -27,7 +27,7 @@ public class UserBiasGameCommands(
     {
         try
         {
-            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
                 return;
             }
@@ -61,7 +61,7 @@ public class UserBiasGameCommands(
     {
         try
         {
-            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
                 return;
             }
@@ -92,7 +92,7 @@ public class UserBiasGameCommands(
     {
         try
         {
-            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText))
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
                 return;
             }

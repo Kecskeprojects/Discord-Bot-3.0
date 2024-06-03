@@ -2,6 +2,7 @@
 using Discord_Bot.Properties;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
+using Discord_Bot.Tools.NativeTools;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;

@@ -4,7 +4,7 @@ using Discord_Bot.Core;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
-using Discord_Bot.Tools;
+using Discord_Bot.Tools.NativeTools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
