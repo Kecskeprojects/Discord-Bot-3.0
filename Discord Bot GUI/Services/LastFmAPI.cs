@@ -6,8 +6,10 @@ using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.LastFm;
 using Discord_Bot.Services.Models.SpotifyAPI;
 using Discord_Bot.Tools;
+using Discord_Bot.Tools.NativeTools;
 using LastFmApi;
 using LastFmApi.Communication;
+using LastFmApi.Enum;
 using LastFmApi.Models.Recent;
 using LastFmApi.Models.TopAlbum;
 using LastFmApi.Models.TopArtist;
@@ -24,6 +26,108 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
     private readonly ISpotifyAPI spotifyAPI = spotifyAPI;
     private readonly BotLogger logger = logger;
     private readonly Config config = config;
+
+    public async Task<LastFmListResult> GetTopAlbumsAsync(string lastFmUsername, int? limit, int? page, string period)
+    {
+        GenericResponseItem<Topalbums> restResult = await UserBasedRequests.TopAlbums(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
+        logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
+        List<LastFmApi.Models.TopAlbum.Album> albums = restResult.Response.Album;
+
+        LastFmListResult result = new();
+        if (restResult.ResultCode != LastFmRequestResultEnum.Success)
+        {
+            result.Message = LastFmListResultTools.GetResultMessage(restResult.ResultCode, restResult.Message);
+            if (restResult.Exception != null)
+            {
+                logger.Error("LastFmAPI.cs GetTopAlbumsAsync", restResult.Exception);
+            }
+            return result;
+        }
+
+        GenericResponseItem<int> playsResponse = await TotalPlaysAsync(lastFmUsername, period);
+        if (!string.IsNullOrEmpty(playsResponse.Message))
+        {
+            result.Message = playsResponse.Message;
+            return result;
+        }
+
+        result.TotalPlays = playsResponse.Response;
+
+        SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(albums[0].Artist.Mbid, albums[0].Artist.Name, albums[0].Name);
+        result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (albums[0].Image?[^1].Text);
+
+        LastFmListResultTools.CreateTopAlbumList(limit, result, albums);
+
+        return result;
+    }
+
+    public async Task<LastFmListResult> GetTopArtistsAsync(string lastFmUsername, int? limit, int? page, string period)
+    {
+        GenericResponseItem<Topartists> restResult = await UserBasedRequests.TopArtists(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
+        logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
+        List<LastFmApi.Models.TopArtist.Artist> artists = restResult.Response.Artist;
+
+        LastFmListResult result = new();
+        if (restResult.ResultCode != LastFmRequestResultEnum.Success)
+        {
+            result.Message = LastFmListResultTools.GetResultMessage(restResult.ResultCode, restResult.Message);
+            if (restResult.Exception != null)
+            {
+                logger.Error("LastFmAPI.cs GetTopArtistsAsync", restResult.Exception);
+            }
+            return result;
+        }
+
+        GenericResponseItem<int> playsResponse = await TotalPlaysAsync(lastFmUsername, period);
+        if (!string.IsNullOrEmpty(playsResponse.Message))
+        {
+            result.Message = playsResponse.Message;
+            return result;
+        }
+
+        result.TotalPlays = playsResponse.Response;
+
+        SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(artists[0].Mbid, artists[0].Name);
+        result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (artists[0].Image?[^1].Text);
+
+        LastFmListResultTools.CreateTopArtistList(limit, result, artists);
+
+        return result;
+    }
+
+    public async Task<LastFmListResult> GetTopTracksAsync(string lastFmUsername, int? limit, int? page, string period)
+    {
+        GenericResponseItem<Toptracks> restResult = await UserBasedRequests.TopTracks(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
+        logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
+        List<LastFmApi.Models.TopTrack.Track> tracks = restResult.Response.Track;
+
+        LastFmListResult result = new();
+        if (restResult.ResultCode != LastFmRequestResultEnum.Success)
+        {
+            result.Message = LastFmListResultTools.GetResultMessage(restResult.ResultCode, restResult.Message);
+            if (restResult.Exception != null)
+            {
+                logger.Error("LastFmAPI.cs GetTopTracksAsync", restResult.Exception);
+            }
+            return result;
+        }
+
+        GenericResponseItem<int> playsResponse = await TotalPlaysAsync(lastFmUsername, period);
+        if (!string.IsNullOrEmpty(playsResponse.Message))
+        {
+            result.Message = playsResponse.Message;
+            return result;
+        }
+
+        result.TotalPlays = playsResponse.Response;
+
+        SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(tracks[0].Artist.Mbid, tracks[0].Artist.Name, tracks[0].Name);
+        result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (tracks[0].Image?[^1].Text);
+
+        LastFmListResultTools.CreateTopTrackList(limit, result, tracks);
+
+        return result;
+    }
 
     public async Task<NowPlayingResult> GetNowPlayingAsync(string lastFmUsername)
     {
@@ -88,228 +192,29 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
         return null;
     }
 
-    public async Task<LastFmListResult> GetTopAlbumsAsync(string lastFmUsername, int? limit, int? page, string period)
-    {
-        LastFmListResult result = new();
-        try
-        {
-            GenericResponseItem<Topalbums> restResult = await UserBasedRequests.TopAlbums(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
-            logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
-
-            if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.Success)
-            {
-                result.TotalPlays = await TotalPlays(lastFmUsername, period);
-
-                SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(restResult.Response.Album[0].Artist.Mbid, restResult.Response.Album[0].Artist.Name, restResult.Response.Album[0].Name);
-                result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (restResult.Response.Album[0].Image?[^1].Text);
-
-                int index = 0;
-                for (int i = 0; i < restResult.Response.Album.Count && i < limit; i++)
-                {
-                    LastFmApi.Models.TopAlbum.Album album = restResult.Response.Album[i];
-                    //One line in the embed
-                    result.EmbedFields[index] += $"`#{i + 1}`**{album.Name}** by **{album.Artist.Name}** - *{Math.Round(double.Parse(album.PlayCount) / result.TotalPlays * 100)}%* (*{album.PlayCount} plays*)\n";
-
-                    //If we went through 10 results, start filling a new list page
-                    if (i > 0 && i % 10 == 0)
-                    {
-                        index++;
-                    }
-                }
-            }
-            else if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.EmptyResponse)
-            {
-                result.Message = "Check to make sure if you set your lastfm username correctly!";
-            }
-            else
-            {
-                result.Message = "Unexpected exception during request!";
-                logger.Error("LastFmAPI.cs GetTopAlbumsAsync", restResult.Exception);
-            }
-            return result;
-        }
-        catch (HttpRequestException ex)
-        {
-            result.Message = "Last.fm is temporarily unavailable!";
-            logger.Error("LastFmAPI.cs GetTopAlbumsAsync", ex);
-            return result;
-        }
-        catch (Exception ex)
-        {
-            if (ex.Message.StartsWith("EmptyResponse"))
-            {
-                result.Message = "A partial result was empty!";
-            }
-            logger.Error("LastFmAPI.cs GetTopAlbumsAsync", ex);
-        }
-        return null;
-    }
-
-    public async Task<LastFmListResult> GetTopArtistsAsync(string lastFmUsername, int? limit, int? page, string period)
-    {
-        LastFmListResult result = new();
-        try
-        {
-            GenericResponseItem<Topartists> restResult = await UserBasedRequests.TopArtists(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
-            logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
-
-            if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.Success)
-            {
-                result.TotalPlays = await TotalPlays(lastFmUsername, period);
-
-                SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(restResult.Response.Artist[0].Mbid, restResult.Response.Artist[0].Name);
-                result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (restResult.Response.Artist[0].Image?[^1].Text);
-
-                int index = 0;
-                for (int i = 0; i < restResult.Response.Artist.Count && i < limit; i++)
-                {
-                    LastFmApi.Models.TopArtist.Artist artist = restResult.Response.Artist[i];
-                    //One line in the embed
-                    result.EmbedFields[index] += $"`#{i + 1}`**{artist.Name}** - *{Math.Round(double.Parse(artist.PlayCount) / result.TotalPlays * 100)}%* (*{artist.PlayCount} plays*)\n";
-
-                    //If we went through 10 results, start filling a new list page
-                    if (i > 0 && i % 10 == 0)
-                    {
-                        index++;
-                    }
-                }
-            }
-            else if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.EmptyResponse)
-            {
-                result.Message = "Check to make sure if you set your lastfm username correctly!";
-            }
-            else
-            {
-                result.Message = "Unexpected exception during request!";
-                logger.Error("LastFmAPI.cs GetTopArtistsAsync", restResult.Exception);
-            }
-            return result;
-        }
-        catch (HttpRequestException ex)
-        {
-            result.Message = "Last.fm is temporarily unavailable!";
-            logger.Error("LastFmAPI.cs GetTopArtistsAsync", ex);
-            return result;
-        }
-        catch (Exception ex)
-        {
-            if (ex.Message.StartsWith("EmptyResponse"))
-            {
-                result.Message = "A partial result was empty!";
-            }
-            logger.Error("LastFmAPI.cs GetTopArtistsAsync", ex);
-        }
-        return null;
-    }
-
-    public async Task<LastFmListResult> GetTopTracksAsync(string lastFmUsername, int? limit, int? page, string period)
-    {
-        LastFmListResult result = new();
-        try
-        {
-            GenericResponseItem<Toptracks> restResult = await UserBasedRequests.TopTracks(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
-            logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
-
-            if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.Success)
-            {
-                result.TotalPlays = await TotalPlays(lastFmUsername, period);
-
-                SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(restResult.Response.Track[0].Artist.Mbid, restResult.Response.Track[0].Artist.Name, restResult.Response.Track[0].Name);
-                result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (restResult.Response.Track[0].Image?[^1].Text);
-
-                int index = 0;
-                for (int i = 0; i < restResult.Response.Track.Count && i < limit; i++)
-                {
-                    LastFmApi.Models.TopTrack.Track track = restResult.Response.Track[i];
-                    //One line in the embed
-                    result.EmbedFields[index] += $"`#{i + 1}`**{track.Name}** by **{track.Artist.Name}** - *{Math.Round(double.Parse(track.PlayCount) / result.TotalPlays * 100)}%* (*{track.PlayCount} plays*)\n";
-
-                    //If we went through 10 results, start filling a new list page
-                    if (i > 0 && i % 10 == 0)
-                    {
-                        index++;
-                    }
-                }
-            }
-            else if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.EmptyResponse)
-            {
-                result.Message = "Check to make sure if you set your lastfm username correctly!";
-            }
-            else
-            {
-                result.Message = "Unexpected exception during request!";
-                logger.Error("LastFmAPI.cs GetTopTracksAsync", restResult.Exception);
-            }
-            return result;
-        }
-        catch (HttpRequestException ex)
-        {
-            result.Message = "Last.fm is temporarily unavailable!";
-            logger.Error("LastFmAPI.cs GetTopTracksAsync", ex);
-            return result;
-        }
-        catch (Exception ex)
-        {
-            if (ex.Message.StartsWith("EmptyResponse"))
-            {
-                result.Message = "A partial result was empty!";
-            }
-            logger.Error("LastFmAPI.cs GetTopTracksAsync", ex);
-        }
-        return null;
-    }
-
     public async Task<LastFmListResult> GetRecentsAsync(string lastFmUsername, int limit)
     {
+        GenericResponseItem<Recenttracks> restResult = await UserBasedRequests.Recents(config.Lastfm_API_Key, lastFmUsername, limit);
+        logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
+        List<LastFmApi.Models.Recent.Track> tracks = restResult.Response.Track;
+
         LastFmListResult result = new();
-        try
+        if (restResult.ResultCode != LastFmRequestResultEnum.Success)
         {
-            GenericResponseItem<Recenttracks> restResult = await UserBasedRequests.Recents(config.Lastfm_API_Key, lastFmUsername, limit);
-            logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
-
-            if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.Success)
+            result.Message = LastFmListResultTools.GetResultMessage(restResult.ResultCode, restResult.Message);
+            if (restResult.Exception != null)
             {
-                SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(restResult.Response.Track[0].Artist.Mbid, restResult.Response.Track[0].Artist.Text, restResult.Response.Track[0].Name);
-                result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (restResult.Response.Track[0].Image?[^1].Text);
-
-                int index = 0;
-                for (int i = 0; i < restResult.Response.Track.Count && i < limit; i++)
-                {
-                    LastFmApi.Models.Recent.Track track = restResult.Response.Track[i];
-
-                    result.EmbedFields[index] += $"`#{i + 1}` **{track.Name}** by **{track.Artist.Text}** - *";
-                    result.EmbedFields[index] += track.Attr != null ? "Now playing*" : TimestampTag.FromDateTime(DateTime.Parse(track.Date.Text), TimestampTagStyles.Relative) + "*";
-                    result.EmbedFields[index] += "\n";
-
-                    //If we went through 10 results, start filling a new list page
-                    if (i > 0 && i % 10 == 0)
-                    {
-                        index++;
-                    }
-                }
-            }
-            else if (restResult.ResultCode == LastFmApi.Enum.LastFmRequestResultEnum.EmptyResponse)
-            {
-                result.Message = "Check to make sure if you set your lastfm username correctly!";
-            }
-            else
-            {
-                result.Message = "Unexpected exception during request!";
                 logger.Error("LastFmAPI.cs GetRecentsAsync", restResult.Exception);
             }
             return result;
         }
-        catch (HttpRequestException ex)
-        {
-            result.Message = "Last.fm is temporarily unavailable!";
-            logger.Error("LastFmAPI.cs GetRecentsAsync", ex);
-            return result;
-        }
-        catch (Exception ex)
-        {
-            logger.Error("LastFmAPI.cs GetRecentsAsync", ex);
-        }
-        return null;
+
+        SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(tracks[0].Artist.Mbid, tracks[0].Artist.Text, tracks[0].Name);
+        result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (tracks[0].Image?[^1].Text);
+
+        LastFmListResultTools.CreateRecentList(limit, result, tracks);
+
+        return result;
     }
 
     public async Task<ArtistStats> GetArtistDataAsync(string username, string artistName)
@@ -540,6 +445,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
         }
     }
 
+    //Todo: Move helper api commands to the api class and up them to the same generic standard
     #region Helper API calls
     private async Task<LastFmApi.Models.ArtistInfo.Artist> GetArtistPlaysAsync(string lastFmUsername, string artistName)
     {
@@ -561,31 +467,28 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
             : restResult.Response;
     }
 
-    private async Task<int> TotalPlays(string lastFmUsername, string period)
+    private async Task<GenericResponseItem<int>> TotalPlaysAsync(string lastFmUsername, string period)
     {
-        int page = 1, totalpage, totalplays = 0;
-        do
+        GenericResponseItem<int> totalPlay = await UtilityRequests.TotalPlays(config.Lastfm_API_Key, lastFmUsername, period);
+
+        if (totalPlay.ResultCode != LastFmRequestResultEnum.Success)
         {
-            GenericResponseItem<Topartists> restResult = await UserBasedRequests.TopArtists(config.Lastfm_API_Key, lastFmUsername, 1000, page, period);
-            logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
-
-            if (restResult.ResultCode != LastFmApi.Enum.LastFmRequestResultEnum.Success)
+            totalPlay.Message = LastFmListResultTools.GetResultMessage(totalPlay.ResultCode, totalPlay.Message);
+            if (totalPlay.Exception != null)
             {
-                throw restResult.Exception ?? new Exception($"{restResult.ResultCode}: Total plays request resulted in an error!");
+                logger.Error("LastFmAPI.cs TotalPlaysAsync", totalPlay.Exception);
             }
+        }
 
-            foreach (LastFmApi.Models.TopArtist.Artist artist in restResult.Response.Artist)
-            {
-                totalplays += int.Parse(artist.PlayCount);
-            }
+        foreach (LastFmRequestDetails item in totalPlay.RequestDetailList)
+        {
+            logger.Query("Last.fm request URL:\n" + item.ToString());
+        }
 
-            totalpage = int.Parse(restResult.Response.Attr.TotalPages);
-            page++;
-        } while (page <= totalpage);
-
-        return totalplays;
+        return totalPlay;
     }
 
+    //Todo: Add try catch, if error is caught, log it and return null, the ranking will be missing from the result
     private async Task<string> GetSongMonthlyRankingAsync(string username, string artist_name, string track_name)
     {
         LastFmApi.Models.TopTrack.Attr attr;

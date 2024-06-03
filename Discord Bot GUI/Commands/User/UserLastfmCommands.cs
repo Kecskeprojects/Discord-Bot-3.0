@@ -6,11 +6,13 @@ using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Processors.EmbedProcessors.LastFm;
 using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.LastFm;
-using Discord_Bot.Tools;
+using Discord_Bot.Tools.NativeTools;
 using LastFmApi;
+using LastFmApi.Communication;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,15 +20,21 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Commands;
+namespace Discord_Bot.Commands.User;
 
-public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoKnowsImageProcessor whoKnowsImageProcessor, IServerService serverService, BotLogger logger, Config config) : BaseCommand(logger, config, serverService)
+//Todo: Where percentages are shown, change the current rounded ints to double
+public class UserLastfmCommands(
+    IUserService userService,
+    ILastFmAPI lastFmAPI,
+    WhoKnowsImageProcessor whoKnowsImageProcessor,
+    IServerService serverService,
+    BotLogger logger,
+    Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IUserService userService = userService;
     private readonly ILastFmAPI lastFmAPI = lastFmAPI;
     private readonly WhoKnowsImageProcessor whoKnowsImageProcessor = whoKnowsImageProcessor;
 
-    //Todo: Where percentages are shown, change the current rounded ints to double
     #region Connect last.fm commands
     [Command("lf conn")]
     [Alias(["lf c", "lf connect"])]
@@ -35,13 +43,9 @@ public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoK
     {
         try
         {
-            if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
-                ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
-                {
-                    return;
-                }
+                return;
             }
 
             DbProcessResultEnum result = await userService.AddLastfmUsernameAsync(Context.User.Id, name);
@@ -60,7 +64,7 @@ public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoK
         }
         catch (Exception ex)
         {
-            logger.Error("LastfmCommands.cs LfConnect", ex);
+            logger.Error("UserLastfmCommands.cs LfConnect", ex);
         }
     }
 
@@ -71,13 +75,9 @@ public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoK
     {
         try
         {
-            if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
-                ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
-                {
-                    return;
-                }
+                return;
             }
 
             DbProcessResultEnum result = await userService.RemoveLastfmUsernameAsync(Context.User.Id);
@@ -96,79 +96,12 @@ public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoK
         }
         catch (Exception ex)
         {
-            logger.Error("LastfmCommands.cs LfDisconnect", ex);
+            logger.Error("UserLastfmCommands.cs LfDisconnect", ex);
         }
     }
     #endregion
 
     #region Last.fm top commands
-    [Command("lf tt")]
-    [Alias(["lf top tracks", "lf top track", "lf toptracks", "lf toptrack"])]
-    [Summary("Get the top listened tracks of the user")]
-    public async Task LfTopTrack(params string[] parameters)
-    {
-        try
-        {
-            if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
-            {
-                ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
-                {
-                    return;
-                }
-            }
-
-            LastFmHelper.LastfmParameterCheck(ref parameters);
-            int limit = int.Parse(parameters[0]);
-            string period = parameters[1];
-
-            UserResource user = await userService.GetUserAsync(Context.User.Id);
-
-            if (user == null)
-            {
-                await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
-                return;
-            }
-
-            LastFmListResult response = await lastFmAPI.GetTopTracksAsync(user.LastFmUsername, limit, null, period);
-
-            if (response == null)
-            {
-                await ReplyAsync("Unexpected error occured.");
-                return;
-            }
-
-            if (string.IsNullOrEmpty(response.Message))
-            {
-                //Getting base of lastfm embed
-                EmbedBuilder builder = LastFmService.BaseEmbed($"{Global.GetNickName(Context.Channel, Context.User)}'s Top Tracks...", response.ImageUrl);
-                builder.WithFooter("Total plays: " + response.TotalPlays);
-
-                //Make each part of the text into separate fields, thus going around the 1024 character limit of a single field
-                foreach (string item in response.EmbedFields)
-                {
-                    if (item != "")
-                    {
-                        builder.AddField("\u200b", item, false);
-                    }
-                }
-
-                await ReplyAsync("", false, embed: builder.Build());
-                return;
-            }
-            await ReplyAsync(response.Message);
-        }
-        catch (HttpRequestException ex)
-        {
-            await ReplyAsync("Last.fm is temporarily unavailable!");
-            logger.Error("LastfmCommands.cs LfTopTrack", ex);
-        }
-        catch (Exception ex)
-        {
-            logger.Error("LastfmCommands.cs LfTopTrack", ex);
-        }
-    }
-
     [Command("lf tal")]
     [Alias(["lf top albums", "lf top album", "lf topalbums", "lf topalbum"])]
     [Summary("Get the top listened albums of the user")]
@@ -176,58 +109,34 @@ public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoK
     {
         try
         {
-            if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
-                ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
-                {
-                    return;
-                }
+                return;
             }
-
-            LastFmHelper.LastfmParameterCheck(ref parameters);
-            int limit = int.Parse(parameters[0]);
-            string period = parameters[1];
 
             UserResource user = await userService.GetUserAsync(Context.User.Id);
 
-            if (user == null)
+            if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
                 await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
                 return;
             }
 
-            LastFmListResult response = await lastFmAPI.GetTopAlbumsAsync(user.LastFmUsername, limit, null, period);
-
-            if (response == null)
-            {
-                await ReplyAsync("Unexpected error occured.");
-                return;
-            }
+            InputParameters input = LastFmHelper.LastfmParameterCheck(parameters);
+            LastFmListResult response = await lastFmAPI.GetTopAlbumsAsync(user.LastFmUsername, input.Limit, null, input.Period);
 
             if (string.IsNullOrEmpty(response.Message))
             {
-                //Getting base of lastfm embed
-                EmbedBuilder builder = LastFmService.BaseEmbed($"{Global.GetNickName(Context.Channel, Context.User)}'s Top Albums...", response.ImageUrl);
-                builder.WithFooter("Total plays: " + response.TotalPlays);
+                Embed[] embed = LastFmListEmbedProcessor.CreateEmbed($"{GetCurrentUserNickname()}'s Top Albums...", response);
 
-                //Make each part of the text into separate fields, thus going around the 1024 character limit of a single field
-                foreach (string item in response.EmbedFields)
-                {
-                    if (item != "")
-                    {
-                        builder.AddField("\u200b", item, false);
-                    }
-                }
-
-                await ReplyAsync("", false, embed: builder.Build());
+                await ReplyAsync(embeds: embed);
                 return;
             }
             await ReplyAsync(response.Message);
         }
         catch (Exception ex)
         {
-            logger.Error("LastfmCommands.cs LfTopAlbum", ex);
+            logger.Error("UserLastfmCommands.cs LfTopAlbum", ex);
         }
     }
 
@@ -238,58 +147,72 @@ public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoK
     {
         try
         {
-            if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
-                ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
-                {
-                    return;
-                }
+                return;
             }
-
-            LastFmHelper.LastfmParameterCheck(ref parameters);
-            int limit = int.Parse(parameters[0]);
-            string period = parameters[1];
 
             UserResource user = await userService.GetUserAsync(Context.User.Id);
 
-            if (user == null)
+            if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
                 await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
                 return;
             }
 
-            LastFmListResult response = await lastFmAPI.GetTopArtistsAsync(user.LastFmUsername, limit, null, period);
-
-            if (response == null)
-            {
-                await ReplyAsync("Unexpected error occured.");
-                return;
-            }
+            InputParameters input = LastFmHelper.LastfmParameterCheck(parameters);
+            LastFmListResult response = await lastFmAPI.GetTopArtistsAsync(user.LastFmUsername, input.Limit, null, input.Period);
 
             if (string.IsNullOrEmpty(response.Message))
             {
-                //Getting base of lastfm embed
-                EmbedBuilder builder = LastFmService.BaseEmbed($"{Global.GetNickName(Context.Channel, Context.User)}'s Top Artists...", response.ImageUrl);
-                builder.WithFooter("Total plays: " + response.TotalPlays);
+                Embed[] embed = LastFmListEmbedProcessor.CreateEmbed($"{GetCurrentUserNickname()}'s Top Artists...", response);
 
-                //Make each part of the text into separate fields, thus going around the 1024 character limit of a single field
-                foreach (string item in response.EmbedFields)
-                {
-                    if (item != "")
-                    {
-                        builder.AddField("\u200b", item, false);
-                    }
-                }
-
-                await ReplyAsync("", false, embed: builder.Build());
+                await ReplyAsync(embeds: embed);
                 return;
             }
             await ReplyAsync(response.Message);
         }
         catch (Exception ex)
         {
-            logger.Error("LastfmCommands.cs LfTopArtist", ex);
+            logger.Error("UserLastfmCommands.cs LfTopArtist", ex);
+        }
+    }
+
+    [Command("lf tt")]
+    [Alias(["lf top tracks", "lf top track", "lf toptracks", "lf toptrack"])]
+    [Summary("Get the top listened tracks of the user")]
+    public async Task LfTopTrack(params string[] parameters)
+    {
+        try
+        {
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
+            {
+                return;
+            }
+
+            UserResource user = await userService.GetUserAsync(Context.User.Id);
+
+            if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
+            {
+                await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
+                return;
+            }
+
+            InputParameters input = LastFmHelper.LastfmParameterCheck(parameters);
+            LastFmListResult response = await lastFmAPI.GetTopTracksAsync(user.LastFmUsername, input.Limit, null, input.Period);
+
+            if (string.IsNullOrEmpty(response.Message))
+            {
+                Embed[] embed = LastFmListEmbedProcessor.CreateEmbed($"{GetCurrentUserNickname()}'s Top Tracks...", response);
+
+                await ReplyAsync(embeds: embed);
+                return;
+            }
+            await ReplyAsync(response.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("UserLastfmCommands.cs LfTopTrack", ex);
         }
     }
     #endregion
@@ -302,18 +225,14 @@ public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoK
     {
         try
         {
-            if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
-                ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
-                {
-                    return;
-                }
+                return;
             }
 
             UserResource user = await userService.GetUserAsync(Context.User.Id);
 
-            if (user == null)
+            if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
                 await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
                 return;
@@ -349,11 +268,11 @@ public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoK
         catch (HttpRequestException ex)
         {
             await ReplyAsync("Last.fm is temporarily unavailable!");
-            logger.Error("LastfmCommands.cs LfTopTrack", ex);
+            logger.Error("UserLastfmCommands.cs LfTopTrack", ex);
         }
         catch (Exception ex)
         {
-            logger.Error("LastfmCommands.cs LfNowPlaying", ex);
+            logger.Error("UserLastfmCommands.cs LfNowPlaying", ex);
         }
     }
 
@@ -364,18 +283,14 @@ public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoK
     {
         try
         {
-            if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
-                ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
-                {
-                    return;
-                }
+                return;
             }
 
             UserResource user = await userService.GetUserAsync(Context.User.Id);
 
-            if (user == null)
+            if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
                 await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
                 return;
@@ -383,33 +298,18 @@ public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoK
 
             LastFmListResult response = await lastFmAPI.GetRecentsAsync(user.LastFmUsername, limit);
 
-            if (response == null)
-            {
-                await ReplyAsync("Unexpected error occured.");
-                return;
-            }
-
             if (string.IsNullOrEmpty(response.Message))
             {
-                EmbedBuilder builder = LastFmService.BaseEmbed($"{Global.GetNickName(Context.Channel, Context.User)} recently listened to...", response.ImageUrl);
+                Embed[] embed = LastFmListEmbedProcessor.CreateEmbed($"{GetCurrentUserNickname()} recently listened to...", response);
 
-                //Make each part of the text into separate fields, thus going around the 1024 character limit of a single field
-                foreach (string item in response.EmbedFields)
-                {
-                    if (item != "")
-                    {
-                        builder.AddField("\u200b", item, false);
-                    }
-                }
-
-                await ReplyAsync("", false, embed: builder.Build());
+                await ReplyAsync(embeds: embed);
                 return;
             }
             await ReplyAsync(response.Message);
         }
         catch (Exception ex)
         {
-            logger.Error("LastfmCommands.cs LfRecent", ex);
+            logger.Error("UserLastfmCommands.cs LfRecent", ex);
         }
     }
     #endregion
@@ -417,22 +317,19 @@ public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoK
     #region Advanced last.fm commands
     [Command("lf artist")]
     [Alias(["lf a"])]
+    [Summary("Get the user's stats on an artist")]
     public async Task LfArtist([Remainder] string artist)
     {
         try
         {
-            if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
-                ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
-                {
-                    return;
-                }
+                return;
             }
 
             UserResource user = await userService.GetUserAsync(Context.User.Id);
 
-            if (user == null)
+            if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
                 await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
                 return;
@@ -477,28 +374,25 @@ public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoK
         catch (HttpRequestException ex)
         {
             await ReplyAsync("Last.fm is temporarily unavailable!");
-            logger.Error("LastfmCommands.cs LfTopTrack", ex);
+            logger.Error("UserLastfmCommands.cs LfTopTrack", ex);
         }
         catch (Exception ex)
         {
-            logger.Error("LastfmCommands.cs LfArtist", ex);
+            logger.Error("UserLastfmCommands.cs LfArtist", ex);
         }
     }
 
     [Command("lf wk")]
     [RequireContext(ContextType.Guild)]
     [Alias(["lf whoknows", "lf whoknow"])]
+    [Summary("Get the server's stats on a song/artist")]
     public async Task LfWhoKnows([Remainder] string input = "")
     {
         try
         {
-            if (Context.Channel.GetChannelType() != Discord.ChannelType.DM)
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
-                ServerResource server = await serverService.GetByDiscordIdAsync(Context.Guild.Id);
-                if (!Global.IsTypeOfChannel(server, ChannelTypeEnum.CommandText, Context.Channel.Id))
-                {
-                    return;
-                }
+                return;
             }
 
             List<UserResource> users = await userService.GetAllLastFmUsersAsync();
@@ -516,9 +410,9 @@ public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoK
             {
                 //Check if they are in the database
                 UserResource user = users.FirstOrDefault(user => user.DiscordId == Context.User.Id);
-                if (user == null)
+                if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
                 {
-                    await Context.Channel.SendMessageAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
+                    await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
                     return;
                 }
 
@@ -553,7 +447,7 @@ public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoK
                     Stream originalImage = await WebTools.GetStream(wk.ImageUrl);
 
                     //Edit the picture to the list format
-                    Discord_Bot.Communication.EditPictureResult modifiedImage = whoKnowsImageProcessor.EditPicture(originalImage, wk.Plays, wk.Searched);
+                    Communication.EditPictureResult modifiedImage = whoKnowsImageProcessor.EditPicture(originalImage, wk.Plays, wk.Searched);
 
                     if (modifiedImage != null)
                     {
@@ -603,7 +497,7 @@ public class LastfmCommands(IUserService userService, ILastFmAPI lastFmAPI, WhoK
         }
         catch (Exception ex)
         {
-            logger.Error("LastfmCommands.cs LfWhoKnows", ex);
+            logger.Error("UserLastfmCommands.cs LfWhoKnows", ex);
         }
     }
     #endregion
