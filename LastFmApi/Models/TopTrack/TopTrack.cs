@@ -1,15 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using LastFmApi.Communication;
+using Newtonsoft.Json;
 
 namespace LastFmApi.Models.TopTrack;
 
-public class TopTrack
+public class TopTrack : BaseResponse
 {
     [JsonProperty("toptracks")]
     public Toptracks TopTracks { get; set; }
-
-    [JsonProperty("message")]
-    public string Message { get; set; }
-
-    [JsonProperty("message")]
-    public int? Error { get; set; }
 }

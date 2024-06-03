@@ -8,4 +8,6 @@ public class GenericResponseItem<T>
     public LastFmRequestResultEnum ResultCode { get; set; }
     public Exception Exception { get; set; }
     public LastFmRequestDetails RequestDetails { get; set; }
+    public List<LastFmRequestDetails> RequestDetailList { get; set; } = [];
+    public string Message { get; set; }
 }
