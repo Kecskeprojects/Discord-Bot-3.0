@@ -2,7 +2,7 @@
 using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
-using Discord_Bot.Tools.NativeTools;
+using Discord_Bot.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;

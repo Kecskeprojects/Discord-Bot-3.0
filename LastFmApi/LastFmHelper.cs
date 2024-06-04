@@ -32,12 +32,12 @@ public class LastFmHelper
             }
             case 1:
             {
-                if(int.TryParse(parameters[0], out int limit))
+                if (int.TryParse(parameters[0], out int limit))
                 {
                     input.Limit = limit;
                     input.Period = "overall";
                 }
-                else if(LastfmTimePeriod(parameters[0], out string period))
+                else if (LastfmTimePeriod(parameters[0], out string period))
                 {
                     input.Limit = 10;
                     input.Period = period;
@@ -57,8 +57,8 @@ public class LastFmHelper
             default:
                 throw new Exception("Too many or too few parameters!");
         }
-        
-        if(defaultLimitTo10 && input.Limit > 30)
+
+        if (defaultLimitTo10 && input.Limit > 30)
         {
             input.Limit = 10;
         }

@@ -8,7 +8,8 @@ public class WhoKnowsRequests
     {
         GenericResponseItem<WhoKnowsResponseItem> response = new()
         {
-            ResultCode = LastFmRequestResultEnum.Failure
+            ResultCode = LastFmRequestResultEnum.Failure,
+            Response = new()
         };
         try
         {
@@ -72,7 +73,8 @@ public class WhoKnowsRequests
     {
         GenericResponseItem<WhoKnowsResponseItem> response = new()
         {
-            ResultCode = LastFmRequestResultEnum.Failure
+            ResultCode = LastFmRequestResultEnum.Failure,
+            Response = new()
         };
         try
         {
@@ -120,7 +122,8 @@ public class WhoKnowsRequests
     {
         GenericResponseItem<WhoKnowsResponseItem> response = new()
         {
-            ResultCode = LastFmRequestResultEnum.Failure
+            ResultCode = LastFmRequestResultEnum.Failure,
+            Response = new()
         };
         try
         {

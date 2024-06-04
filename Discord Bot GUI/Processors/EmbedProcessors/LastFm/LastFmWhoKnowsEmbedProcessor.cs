@@ -3,7 +3,7 @@ using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Services.Models.LastFm;
-using Discord_Bot.Tools.NativeTools;
+using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -37,7 +37,7 @@ public class LastFmWhoKnowsEmbedProcessor(WhoKnowsImageProcessor whoKnowsImagePr
             }
         }
 
-        if(result.ImageData != null)
+        if (result.ImageData != null)
         {
             //Add image reference to the embed
             builder.WithImageUrl($"attachment://{result.ImageName}");

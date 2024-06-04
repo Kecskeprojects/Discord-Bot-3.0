@@ -1,6 +1,7 @@
 ﻿using Discord.WebSocket;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
+using Discord_Bot.Core.Configuration;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
@@ -12,6 +13,7 @@ namespace Discord_Bot.Features;
 public class AudioPlayFeature(
     IYoutubeDownloadService youtubeDownloadService,
     IServerService serverService,
+    Config config,
     BotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IYoutubeDownloadService youtubeStreamService = youtubeDownloadService;
@@ -128,7 +130,7 @@ public class AudioPlayFeature(
     {
         //In case counter reached it's limit, disconnect
         int j = 0;
-        while (audioResource.MusicRequests.Count == 0 && j < 300)//Todo: Move into config
+        while (audioResource.MusicRequests.Count == 0 && j < config.VoiceWaitSeconds)
         {
             j++;
 

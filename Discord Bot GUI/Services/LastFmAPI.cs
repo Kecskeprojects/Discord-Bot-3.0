@@ -1,5 +1,4 @@
-﻿using Discord;
-using Discord_Bot.Core;
+﻿using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
@@ -251,10 +250,10 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
 
         //In case user doesn't give a song, we check if they are playing something
         GenericResponseItem<WhoKnowsResponseItem> restResult;
-        List<string> usernameList = users.Select(x => x.Username).ToList();
+        List<string> usernameList = users.Select(x => x.LastFmUsername).ToList();
         if (input == "")
         {
-            restResult = await WhoKnowsRequests.WhoKnowsByCurrentlyPlayingAsync(config.Lastfm_API_Key, currentUser.Username, usernameList);
+            restResult = await WhoKnowsRequests.WhoKnowsByCurrentlyPlayingAsync(config.Lastfm_API_Key, currentUser.LastFmUsername, usernameList);
         }
         else if (input.Contains('>'))
         {
@@ -283,11 +282,15 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
         }
 
         SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(restResult.Response.ArtistMbid, restResult.Response.ArtistName, restResult.Response.TrackName);
-        result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (restResult.Response.ImageUrl);
+        result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : restResult.Response.ImageUrl;
+        if(spotifyAPI == null)
+        {
+            logger.Log("Spotify image URL was not found, defaulting to last.fm image URL.");
+        }
 
         result.EmbedTitle = restResult.Response.EmbedTitle;
 
-        if (result.Plays.Count == 0)
+        if (restResult.Response.Plays.Count == 0)
         {
             result.Message = "No one has listened to this song/artist according to last.fm!";
             return result;
@@ -342,7 +345,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
             }
         }
         ranking.Response = StringTools.AddNumberPositionIdentifier(ranking.Response);
-        
+
         return ranking.Response;
     }
 

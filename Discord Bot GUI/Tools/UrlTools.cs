@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Discord_Bot.Tools.NativeTools;
+namespace Discord_Bot.Tools;
 
 public static class UrlTools
 {

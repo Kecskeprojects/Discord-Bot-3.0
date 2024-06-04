@@ -36,8 +36,8 @@ public static class AudioQueueEmbedProcessor
         }
 
         int hour = time / 3600;
-        int minute = time / 60 - hour * 60;
-        int second = time - minute * 60 - hour * 3600;
+        int minute = (time / 60) - (hour * 60);
+        int second = time - (minute * 60) - (hour * 3600);
         builder.AddField("Full duration:", "" + (hour > 0 ? hour + "h" : "") + minute + "m" + second + "s", true);
 
         builder.WithTimestamp(DateTime.UtcNow);

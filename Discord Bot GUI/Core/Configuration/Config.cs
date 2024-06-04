@@ -13,6 +13,7 @@ public class Config
         public string environment;
         public string img;
         public int bitrate;
+        public int voice_wait_seconds;
         public string twitch_Client_Id;
         public string spotify_Client_Id;
         public string spotify_Client_Secret;
@@ -37,6 +38,7 @@ public class Config
                 environment = "testing",
                 img = "",
                 bitrate = 0,
+                voice_wait_seconds = 0,
                 twitch_Client_Id = "",
                 spotify_Client_Id = "",
                 spotify_Client_Secret = "",
@@ -70,6 +72,8 @@ public class Config
     public string Img => Configuration.GetSection("img").Get<string>();
 
     public int Bitrate => Configuration.GetSection("bitrate").Get<int>();
+
+    public int VoiceWaitSeconds => Configuration.GetSection("voice_wait_seconds").Get<int>();
 
     public string Twitch_Client_Id => Configuration.GetSection("twitch_client_id").Get<string>();
 

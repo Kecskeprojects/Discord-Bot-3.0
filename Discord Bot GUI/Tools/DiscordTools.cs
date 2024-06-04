@@ -3,7 +3,6 @@ using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Discord_Bot.Communication;
-using Discord_Bot.Core;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using System.Collections.Generic;
@@ -107,7 +106,7 @@ public static class DiscordTools
             if (temp_user != null)
             {
                 //Get their nickname if they have one
-                item.Username = Global.GetNickName(context.Channel, temp_user);
+                item.Username = GetNickNameBase(temp_user, context.Channel);
                 filtered.Add(item);
             }
         }

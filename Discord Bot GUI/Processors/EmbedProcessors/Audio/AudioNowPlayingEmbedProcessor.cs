@@ -13,8 +13,8 @@ public static class AudioNowPlayingEmbedProcessor
 
         int elapsed = Convert.ToInt32(audioResource.AudioVariables.Stopwatch.Elapsed.TotalSeconds);
         int hour = elapsed / 3600;
-        int minute = elapsed / 60 - hour * 60;
-        int second = elapsed - minute * 60 - hour * 3600;
+        int minute = (elapsed / 60) - (hour * 60);
+        int second = elapsed - (minute * 60) - (hour * 3600);
 
         string elapsed_time = "" + (hour > 0 ? hour + "h" : "") + minute + "m" + second + "s";
 

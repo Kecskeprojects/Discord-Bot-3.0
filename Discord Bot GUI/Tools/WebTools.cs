@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 
-namespace Discord_Bot.Tools.NativeTools;
+namespace Discord_Bot.Tools;
 
 public static class WebTools
 {

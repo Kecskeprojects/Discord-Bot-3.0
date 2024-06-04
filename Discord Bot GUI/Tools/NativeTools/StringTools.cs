@@ -7,23 +7,17 @@ public static class StringTools
 {
     public static string AddNumberPositionIdentifier(string position)
     {
-        if (string.IsNullOrEmpty(position))
-        {
-            return null;
-        }
-
-        if (position.Length >= 2 && position[^2..^1] is "11" or "12" or "13")
-        {
-            return $"{position}th";
-        }
-
-        return position[^1] switch
-        {
-            '1' => $"{position}st",
-            '2' => $"{position}nd",
-            '3' => $"{position}rd",
-            _ => $"{position}th"
-        };
+        return string.IsNullOrEmpty(position)
+            ? null
+            : position.Length >= 2 && position[^2..^1] is "11" or "12" or "13"
+            ? $"{position}th"
+            : position[^1] switch
+            {
+                '1' => $"{position}st",
+                '2' => $"{position}nd",
+                '3' => $"{position}rd",
+                _ => $"{position}th"
+            };
     }
 
     public static List<string> GetTimeMeasurements(string amountstring)

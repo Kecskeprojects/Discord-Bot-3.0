@@ -3,6 +3,7 @@
 	"environment": "testing",
 	"img": "",
 	"bitrate": 0,
+	"voice_wait_seconds": 0,
 	"twitch_client_id": "",
 	"spotify_client_id": "",
 	"spotify_client_secret": "",

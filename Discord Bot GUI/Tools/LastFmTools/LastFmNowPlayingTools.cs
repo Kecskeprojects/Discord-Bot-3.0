@@ -28,7 +28,7 @@ public class LastFmNowPlayingTools
         }
 
         result.Ranking = ranking;
-        
+
         result.TrackPlays = userplaycount;
     }
 }
