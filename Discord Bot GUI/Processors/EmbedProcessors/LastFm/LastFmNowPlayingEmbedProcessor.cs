@@ -4,7 +4,7 @@ using Discord_Bot.Services.Models.LastFm;
 namespace Discord_Bot.Processors.EmbedProcessors.LastFm;
 public class LastFmNowPlayingEmbedProcessor : LastFmBaseEmbedProcessor
 {
-    internal static Embed[] CreateEmbed(string title, NowPlayingResult nowPlaying)
+    public static Embed[] CreateEmbed(string title, NowPlayingResult nowPlaying)
     {
         //Getting base of lastfm embed
         EmbedBuilder builder = GetBaseEmbedBuilder(title, nowPlaying.ImageUrl);

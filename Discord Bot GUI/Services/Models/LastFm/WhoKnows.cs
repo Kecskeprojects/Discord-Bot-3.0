@@ -7,7 +7,7 @@ public class WhoKnows(List<UserResource> users)
 {
     public List<UserResource> Users { get; set; } = users;
     public Dictionary<string, int> Plays { get; set; } = [];
-    public string Searched { get; set; }
+    public string EmbedTitle { get; set; }
     public string ImageUrl { get; set; }
     public string Message { get; set; }
 }

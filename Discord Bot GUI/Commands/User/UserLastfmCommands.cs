@@ -1,23 +1,20 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord_Bot.CommandsService;
+using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.EmbedProcessors.LastFm;
-using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.LastFm;
-using Discord_Bot.Tools.NativeTools;
+using Discord_Bot.Tools;
 using LastFmApi;
 using LastFmApi.Communication;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
@@ -25,14 +22,14 @@ namespace Discord_Bot.Commands.User;
 public class UserLastfmCommands(
     IUserService userService,
     ILastFmAPI lastFmAPI,
-    WhoKnowsImageProcessor whoKnowsImageProcessor,
+    LastFmWhoKnowsEmbedProcessor whoKnowsEmbedProcessor,
     IServerService serverService,
     BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IUserService userService = userService;
     private readonly ILastFmAPI lastFmAPI = lastFmAPI;
-    private readonly WhoKnowsImageProcessor whoKnowsImageProcessor = whoKnowsImageProcessor;
+    private readonly LastFmWhoKnowsEmbedProcessor whoKnowsEmbedProcessor = whoKnowsEmbedProcessor;
 
     #region Connect last.fm commands
     [Command("lf conn")]
@@ -114,7 +111,6 @@ public class UserLastfmCommands(
             }
 
             UserResource user = await userService.GetUserAsync(Context.User.Id);
-
             if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
                 await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
@@ -152,7 +148,6 @@ public class UserLastfmCommands(
             }
 
             UserResource user = await userService.GetUserAsync(Context.User.Id);
-
             if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
                 await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
@@ -190,7 +185,6 @@ public class UserLastfmCommands(
             }
 
             UserResource user = await userService.GetUserAsync(Context.User.Id);
-
             if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
                 await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
@@ -230,7 +224,6 @@ public class UserLastfmCommands(
             }
 
             UserResource user = await userService.GetUserAsync(Context.User.Id);
-
             if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
                 await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
@@ -242,8 +235,8 @@ public class UserLastfmCommands(
             if (string.IsNullOrEmpty(nowPlaying.Message))
             {
                 string title = nowPlaying.NowPlaying
-                    ? $"{GetCurrentUserNickname()} recently listened to..."
-                    : $"{Global.GetNickName(Context.Channel, Context.User)} last listened to...";
+                    ? $"{GetCurrentUserNickname()} is currently listening to..."
+                    : $"{GetCurrentUserNickname()} last listened to...";
                 Embed[] embed = LastFmNowPlayingEmbedProcessor.CreateEmbed(title, nowPlaying);
 
                 await ReplyAsync(embeds: embed);
@@ -270,7 +263,6 @@ public class UserLastfmCommands(
             }
 
             UserResource user = await userService.GetUserAsync(Context.User.Id);
-
             if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
                 await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
@@ -309,7 +301,6 @@ public class UserLastfmCommands(
             }
 
             UserResource user = await userService.GetUserAsync(Context.User.Id);
-
             if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
                 await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
@@ -318,44 +309,20 @@ public class UserLastfmCommands(
 
             ArtistStats response = await lastFmAPI.GetArtistDataAsync(user.LastFmUsername, artist);
 
-            if (response == null)
-            {
-                await ReplyAsync("Unexpected error occured during request.");
-                return;
-            }
-
             if (string.IsNullOrEmpty(response.Message))
             {
-                //Getting base of lastfm embed
-                EmbedBuilder builder = LastFmService.BaseEmbed($"{Global.GetNickName(Context.Channel, Context.User)}'s stats for {response.ArtistName}", response.ImageUrl);
+                Embed[] embed = LastFmArtistEmbedProcessor.CreateEmbed($"{GetCurrentUserNickname()}'s stats for {response.ArtistName}", response);
 
-                builder.WithDescription($"You have listened to this artist **{response.Playcount}** times.\nYou listened to **{response.AlbumCount}** of their albums and **{response.TrackCount}** of their tracks.");
-
-                if (!string.IsNullOrEmpty(response.TrackField))
+                if (embed[0].Fields.Length == 0)
                 {
-                    builder.AddField("Top Tracks", response.TrackField, false);
-                }
-
-                if (!string.IsNullOrEmpty(response.AlbumField))
-                {
-                    builder.AddField("Top Albums", response.AlbumField, false);
-                }
-
-                if (builder.Fields.Count == 0)
-                {
-                    await ReplyAsync("Exception during embed building!");
+                    await ReplyAsync("Exception during embed creation!");
                     return;
                 }
 
-                await ReplyAsync("", false, embed: builder.Build());
+                await ReplyAsync(embeds: embed);
                 return;
             }
             await ReplyAsync(response.Message);
-        }
-        catch (HttpRequestException ex)
-        {
-            await ReplyAsync("Last.fm is temporarily unavailable!");
-            logger.Error("UserLastfmCommands.cs LfTopTrack", ex);
         }
         catch (Exception ex)
         {
@@ -377,104 +344,36 @@ public class UserLastfmCommands(
             }
 
             List<UserResource> users = await userService.GetAllLastFmUsersAsync();
+            UserResource currentUser = users.FirstOrDefault(user => user.DiscordId == Context.User.Id);
+            if ((currentUser == null || string.IsNullOrEmpty(currentUser.LastFmUsername)) && string.IsNullOrEmpty(input))
+            {
+                await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
+                return;
+            }
 
             //Download inactive users
             await Context.Guild.DownloadUsersAsync();
 
-            users = LastFmService.FilterToOnlyServerMembers(Context, users);
+            users = DiscordTools.FilterToOnlyServerMembers(Context, users);
 
-            //Variable declarations
-            WhoKnows wk = new(users);
+            WhoKnows wk = await lastFmAPI.GetWhoKnowsDataAsync(input, users, currentUser);
 
-            //In case user doesn't give a song, we check if they are playing something
-            if (input == "")
+            if (string.IsNullOrEmpty(wk.Message))
             {
-                //Check if they are in the database
-                UserResource user = users.FirstOrDefault(user => user.DiscordId == Context.User.Id);
-                if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
+                WhoKnowsEmbedResult embed = await whoKnowsEmbedProcessor.CreateEmbed(wk);
+
+                if (embed.HasImage)
                 {
-                    await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
-                    return;
-                }
-
-                await lastFmAPI.WhoKnowsByCurrentlyPlaying(wk, user);
-            }
-            else if (input.Contains('>'))
-            {
-                await lastFmAPI.WhoKnowsByTrack(wk, input);
-            }
-            else
-            {
-                await lastFmAPI.WhoKnowsByArtist(wk, input);
-            }
-
-            if (!string.IsNullOrEmpty(wk.Message))
-            {
-                await ReplyAsync(wk.Message);
-                return;
-            }
-
-            if (wk.Plays.Count > 0)
-            {
-                wk.Plays = wk.Plays.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
-
-                //Getting base of lastfm embed
-                EmbedBuilder builder = LastFmService.BaseEmbed($"Server ranking for:\n{wk.Searched}");
-
-                if (!string.IsNullOrEmpty(wk.ImageUrl))
-                {
-                    //Download image and get back it's filepath
-                    logger.Query($"Getting album cover image:\n{wk.ImageUrl}");
-                    Stream originalImage = await WebTools.GetStream(wk.ImageUrl);
-
-                    //Edit the picture to the list format
-                    Communication.EditPictureResult modifiedImage = whoKnowsImageProcessor.EditPicture(originalImage, wk.Plays, wk.Searched);
-
-                    if (modifiedImage != null)
-                    {
-                        //Add it to the embed
-                        builder.WithImageUrl($"attachment://{modifiedImage.FileName}");
-
-                        //Must send it as a file upload
-                        await Context.Channel.SendFileAsync(modifiedImage.Stream, modifiedImage.FileName, "", embed: builder.Build());
-                    }
+                    //Image streams as part of embeds must be sent as a file upload
+                    await Context.Channel.SendFileAsync(embed.ImageData, embed.ImageName, embeds: embed.Embed);
                 }
                 else
                 {
-                    string[] list = ["", "", ""];
-                    int i = 1;
-                    int index = 0;
-                    foreach (KeyValuePair<string, int> userplays in wk.Plays)
-                    {
-                        //One line in embed
-                        list[index] += $"`#{i}` **{userplays.Key}** with *{userplays.Value} plays*";
-                        list[index] += "\n";
-
-                        //If we went through 15 results, start filling a new list page
-                        if (i % 15 == 0)
-                        {
-                            index++;
-                        }
-
-                        i++;
-                    }
-
-                    //Make each part of the text into separate fields, thus going around the 1024 character limit of a single field
-                    foreach (string item in list)
-                    {
-                        if (item != "")
-                        {
-                            builder.AddField("\u200b", item, false);
-                        }
-                    }
-
-                    await ReplyAsync("", false, embed: builder.Build());
+                    await ReplyAsync(embeds: embed.Embed);
                 }
+                return;
             }
-            else
-            {
-                await ReplyAsync("No one has listened to this song/artist according to last.fm!");
-            }
+            await ReplyAsync(wk.Message);
         }
         catch (Exception ex)
         {

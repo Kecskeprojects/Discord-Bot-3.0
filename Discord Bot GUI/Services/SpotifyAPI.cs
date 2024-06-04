@@ -139,7 +139,7 @@ public class SpotifyAPI(BotLogger logger, Config config, IYoutubeAPI youtubeAPI,
             logger.Query("Spotify image search:");
 
             SpotifyImageSearchResult result = new();
-            if (songName == "")
+            if (string.IsNullOrEmpty(songName))
             {
                 FullArtist artist = await spotify.Artists.Get(artistId);
 

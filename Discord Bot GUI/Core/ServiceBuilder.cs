@@ -12,6 +12,7 @@ using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors;
+using Discord_Bot.Processors.EmbedProcessors.LastFm;
 using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Services;
 using Discord_Bot.Windows;
@@ -73,6 +74,7 @@ public static class ServiceBuilder
         collection.AddTransient<BiasGameImageProcessor>();
         collection.AddTransient<BiasGameWinnerBracketImageProcessor>();
         collection.AddTransient<BiasScrapingProcessor>();
+        collection.AddTransient<LastFmWhoKnowsEmbedProcessor>();
 
         //Features
         collection.AddTransient<InstagramEmbedFeature>();
