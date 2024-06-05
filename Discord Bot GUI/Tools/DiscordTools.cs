@@ -53,7 +53,7 @@ public static class DiscordTools
 
     public static string GetNickNameBase(IUser user, ISocketMessageChannel channel)
     {
-        return IsDMBase(channel) ?
+        return !IsDMBase(channel) ?
             (user as SocketGuildUser).Nickname ?? user.Username :
             user.Username;
     }

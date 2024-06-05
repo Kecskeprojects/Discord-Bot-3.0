@@ -15,6 +15,7 @@ public class WhoKnowsRequests
         {
             //Check if they are playing something
             GenericResponseItem<Models.Recent.Recenttracks> restNowPlaying = await UserBasedRequests.NowPlaying(apiKey, username);
+            response.RequestDetailList.Add(restNowPlaying.RequestDetails);
 
             if (restNowPlaying.ResultCode != LastFmRequestResultEnum.Success)
             {
@@ -35,6 +36,7 @@ public class WhoKnowsRequests
                 //Get their number of plays on given song
                 GenericResponseItem<Models.TrackInfo.Track> trackInfo =
                     await InfoBasedRequests.TrackPlays(apiKey, user, artist_name, track_name);
+                response.RequestDetailList.Add(trackInfo.RequestDetails);
                 Models.TrackInfo.Track request = trackInfo.Response;
 
                 if (trackInfo.ResultCode != LastFmRequestResultEnum.Success)
@@ -83,6 +85,7 @@ public class WhoKnowsRequests
                 //Get their number of plays on given song
                 GenericResponseItem<Models.TrackInfo.Track> trackInfo =
                     await InfoBasedRequests.TrackPlays(apiKey, user, artistName, trackName);
+                response.RequestDetailList.Add(trackInfo.RequestDetails);
                 Models.TrackInfo.Track request = trackInfo.Response;
 
                 if (trackInfo.ResultCode != LastFmRequestResultEnum.Success)
@@ -131,7 +134,9 @@ public class WhoKnowsRequests
             foreach (string user in usernameList)
             {
                 //Get their number of plays on given artists
-                GenericResponseItem<Models.ArtistInfo.Artist> artistInfo = await InfoBasedRequests.ArtistPlays(apiKey, user, artistName);
+                GenericResponseItem<Models.ArtistInfo.Artist> artistInfo =
+                    await InfoBasedRequests.ArtistPlays(apiKey, user, artistName);
+                response.RequestDetailList.Add(artistInfo.RequestDetails);
                 Models.ArtistInfo.Artist request = artistInfo.Response;
 
                 if (artistInfo.ResultCode != LastFmRequestResultEnum.Success)

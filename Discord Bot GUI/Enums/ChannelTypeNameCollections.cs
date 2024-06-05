@@ -2,6 +2,7 @@
 
 namespace Discord_Bot.Enums;
 
+//Todo: Do something with this
 public class ChannelTypeNameCollections
 {
     public static Dictionary<string, ChannelTypeEnum> NameEnum { get; } = new()

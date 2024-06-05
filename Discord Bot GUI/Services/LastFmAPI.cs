@@ -271,6 +271,11 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
             restResult = await WhoKnowsRequests.WhoKnowsByArtistAsync(config.Lastfm_API_Key, artistName, usernameList);
         }
 
+        foreach (LastFmRequestDetails item in restResult.RequestDetailList)
+        {
+            logger.Query("Last.fm request URL:\n" + item.ToString());
+        }
+
         if (restResult.ResultCode != LastFmRequestResultEnum.Success)
         {
             result.Message = LastFmHelper.GetResultMessage(restResult.ResultCode, restResult.Message);
@@ -283,7 +288,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
 
         SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(restResult.Response.ArtistMbid, restResult.Response.ArtistName, restResult.Response.TrackName);
         result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : restResult.Response.ImageUrl;
-        if(spotifyAPI == null)
+        if(spotifySearch == null)
         {
             logger.Log("Spotify image URL was not found, defaulting to last.fm image URL.");
         }
@@ -296,7 +301,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
             return result;
         }
 
-        result.Plays = restResult.Response.Plays.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+        result.Plays = restResult.Response.Plays.OrderByDescending(x => x.Value).ToDictionary(x => users.First(y => y.LastFmUsername == x.Key).Username, x => x.Value);
 
         return result;
     }
