@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
@@ -19,6 +20,29 @@ public class IdolImageService(
 {
     private readonly IIdolRepository idolRepository = idolRepository;
     private readonly IIdolImageRepository idolImageRepository = idolImageRepository;
+
+    public async Task<DbProcessResultEnum> AddOverrideAsync(int idolId, OverrideImageModal modal)
+    {
+        try
+        {
+            IdolImage currentImage = await idolImageRepository.GetLatestByIdolIdAsync(idolId);
+
+            IdolImage newImage = new()
+            {
+                IdolId = idolId,
+                ImageUrl = modal.ImageUrl,
+                OverriddenUrl = currentImage?.ImageUrl,
+            };
+
+            await idolImageRepository.AddAsync(newImage);
+            return DbProcessResultEnum.Success;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("IdolImageService.cs AddOverrideAsync", ex);
+        }
+        return DbProcessResultEnum.Failure;
+    }
 
     public async Task<DbProcessResultEnum> RemoveIdolImagesAsync(string idol, string group)
     {

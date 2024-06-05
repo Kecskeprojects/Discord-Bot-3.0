@@ -17,14 +17,12 @@ namespace Discord_Bot.Interactions;
 
 public class BiasGameStepInteraction(
     IIdolService idolService,
-    BiasGameImageProcessor biasGameImageProcessor,
     BiasGameWinnerBracketImageProcessor biasGameWinnerBracketImageProcessor,
     IUserIdolStatisticService userIdolStatisticService,
     BotLogger logger,
     Config config) : BaseInteraction(logger, config)
 {
     private readonly IIdolService idolService = idolService;
-    private readonly BiasGameImageProcessor biasGameImageProcessor = biasGameImageProcessor;
     private readonly BiasGameWinnerBracketImageProcessor biasGameWinnerBracketImageProcessor = biasGameWinnerBracketImageProcessor;
     private readonly IUserIdolStatisticService userIdolStatisticService = userIdolStatisticService;
 
@@ -63,7 +61,8 @@ public class BiasGameStepInteraction(
                 data.IdolWithImage[idolIds[1]]
             ];
 
-            Stream combined = biasGameImageProcessor.CombineImages((MemoryStream) files[0].Stream, (MemoryStream) files[1].Stream);
+            logger.Log($"Creating combined image from idols. (ID 1: {idolIds[0]}, ID 2: {idolIds[1]})");
+            Stream combined = BiasGameImageProcessor.CombineImages((MemoryStream) files[0].Stream, (MemoryStream) files[1].Stream);
             files = [new FileAttachment(combined, "combined.png")];
 
             Embed[] embeds = BiasGameEmbedProcessor.CreateEmbed(
@@ -84,7 +83,7 @@ public class BiasGameStepInteraction(
         {
             logger.Error("BiasGameInteraction.cs DebutChosen", ex);
             Global.BiasGames.TryRemove(Context.User.Id, out _);
-            await FollowupAsync("Failure during setup!");
+            await FollowupAsync("Failure during preparing next step!");
         }
     }
 

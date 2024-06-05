@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions;
 
-public class EditIdolModalInteraction(IIdolService idolService, IIdolGroupService idolGroupService, BotLogger logger, Config config) : BaseInteraction(logger, config)
+public class EditIdolModalInteraction(IIdolService idolService, IIdolGroupService idolGroupService, IIdolImageService idolImageService, BotLogger logger, Config config) : BaseInteraction(logger, config)
 {
     private readonly IIdolService idolService = idolService;
     private readonly IIdolGroupService idolGroupService = idolGroupService;
+    private readonly IIdolImageService idolImageService = idolImageService;
 
     [ModalInteraction("EditIdolModal_*")]
     [RequireOwner]
@@ -119,6 +120,28 @@ public class EditIdolModalInteraction(IIdolService idolService, IIdolGroupServic
         catch (Exception ex)
         {
             logger.Error("EditIdolModalInteraction.cs ChangeIdolGroupModalSubmit", ex);
+        }
+        await RespondAsync("Bias could not be edited!");
+    }
+
+    [ModalInteraction("OverrideImageModal_*")]
+    [RequireOwner]
+    public async Task OverrideImageModalSubmit(int idolId, OverrideImageModal modal)
+    {
+        try
+        {
+            logger.Log($"Override Image Modal Submitted for idol with ID {idolId}", LogOnly: true);
+
+            DbProcessResultEnum result = await idolImageService.AddOverrideAsync(idolId, modal);
+            if (result == DbProcessResultEnum.Success)
+            {
+                await RespondAsync("Edited bias successfully!", ephemeral: true);
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("EditIdolModalInteraction.cs OverrideImageModalSubmit", ex);
         }
         await RespondAsync("Bias could not be edited!");
     }

@@ -15,6 +15,7 @@ public static class EditBiasDataMessageProcessor
                             .AddOption("Edit Idol Extended", $"{BiasEditActionTypeEnum.EditIdolExtended};{biasName};{biasGroup}", "Edit idol's extra details")
                             .AddOption("Change Group", $"{BiasEditActionTypeEnum.ChangeGroup};{biasName};{biasGroup}", "Change the group the idol belongs to")
                             .AddOption("Change Profile Link", $"{BiasEditActionTypeEnum.ChangeProfileLink};{biasName};{biasGroup}", "Edit idol's profile page link")
+                            .AddOption("Override Image", $"{BiasEditActionTypeEnum.OverrideImage};{biasName};{biasGroup}", "Replaces currently used image")
                             .AddOption("Remove Images", $"{BiasEditActionTypeEnum.RemoveImage};{biasName};{biasGroup}", "Remove all images stored for idol");
 
         ComponentBuilder builder = new();

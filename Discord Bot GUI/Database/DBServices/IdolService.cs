@@ -135,7 +135,7 @@ public class IdolService(
         return result;
     }
 
-    public async Task UpdateIdolDetailsAsync(IdolResource idolResource, ExtendedBiasData data, AdditionalIdolData additional)
+    public async Task<bool> UpdateIdolDetailsAsync(IdolResource idolResource, ExtendedBiasData data, AdditionalIdolData additional)
     {
         try
         {
@@ -147,7 +147,7 @@ public class IdolService(
 
             if (idol.IdolImages.Count > 3)
             {
-                await idolImageRepository.RemoveAsync(idol.IdolImages.OrderBy(x => x.CreatedOn).Skip(3).ToList());
+                await idolImageRepository.RemoveAsync(idol.IdolImages.OrderByDescending(x => x.CreatedOn).Skip(3).ToList());
             }
 
             if (string.IsNullOrEmpty(idol.ProfileUrl) && data != null)
@@ -157,7 +157,10 @@ public class IdolService(
 
             if (additional != null)
             {
-                idol.IdolImages.Add(new IdolImage() { ImageUrl = additional.ImageUrl });
+                if(!idol.IdolImages.Any(x => x.OverriddenUrl == additional.ImageUrl))
+                {
+                    idol.IdolImages.Add(new IdolImage() { ImageUrl = additional.ImageUrl });
+                }
 
                 if (idol.Group.Name != "soloist" && idol.Group.DebutDate == null)
                 {
@@ -165,11 +168,12 @@ public class IdolService(
                 }
             }
 
-            await idolRepository.UpdateAsync(idol);
+            return await idolRepository.UpdateAsync(idol) > 0;
         }
         catch (Exception ex)
         {
             logger.Error("IdolService.cs UpdateIdolDetailsAsync", ex);
+            return false;
         }
     }
 
@@ -212,7 +216,8 @@ public class IdolService(
             Idol idol = await idolRepository.FirstOrDefaultAsync(
                 i => i.Name == idolName
                 && i.Group.Name == idolGroup,
-                i => i.Group);
+                i => i.Group,
+                i => i.IdolImages);
 
             if (idol == null)
             {
@@ -220,6 +225,9 @@ public class IdolService(
             }
 
             resource = mapper.Map<Idol, IdolExtendedResource>(idol);
+
+            IdolImage image = await idolImageRepository.GetLatestByIdolIdAsync(idol.IdolId);
+            resource.LatestImageUrl = image?.ImageUrl;
         }
         catch (Exception ex)
         {

@@ -65,7 +65,7 @@ public class BiasGameStatInteraction(IUserService userService, BotLogger logger,
         {
             logger.Error("BiasGameInteraction.cs GenderChoosen", ex);
             Global.BiasGames.TryRemove(Context.User.Id, out _);
-            await FollowupAsync("Failure during setup!");
+            await FollowupAsync("Failure during stat collection!");
         }
     }
 }

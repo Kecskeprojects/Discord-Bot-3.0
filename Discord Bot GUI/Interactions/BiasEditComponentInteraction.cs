@@ -4,6 +4,7 @@ using Discord_Bot.Communication.Bias;
 using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
+using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
@@ -28,6 +29,7 @@ public class BiasEditComponentInteraction : BaseInteraction
         Actions.Add(BiasEditActionTypeEnum.EditGroup, CreateEditGroupModalAsync);
         Actions.Add(BiasEditActionTypeEnum.ChangeProfileLink, CreateChangeProfileLinkModalAsync);
         Actions.Add(BiasEditActionTypeEnum.ChangeGroup, CreateChangeGroupModalAsync);
+        Actions.Add(BiasEditActionTypeEnum.OverrideImage, OverrideImageAsync);
         Actions.Add(BiasEditActionTypeEnum.RemoveImage, RemoveImageAsync);
         this.idolService = idolService;
         this.idolGroupService = idolGroupService;
@@ -136,5 +138,15 @@ public class BiasEditComponentInteraction : BaseInteraction
         {
             await RespondAsync("Images could not be removed!");
         }
+    }
+
+    private async Task OverrideImageAsync(string idol, string group)
+    {
+        IdolExtendedResource resource = await idolService.GetIdolDetailsAsync(idol, group);
+
+        void Modify(ModalBuilder builder) => builder
+            .UpdateTextInput("currentimageurl", resource.LatestImageUrl);
+
+        await RespondWithModalAsync<OverrideImageModal>($"OverrideImageModal_{resource.IdolId}", modifyModal: Modify);
     }
 }

@@ -13,5 +13,7 @@ public partial class IdolImage
 
     public DateTime CreatedOn { get; set; }
 
+    public string OverriddenUrl { get; set; }
+
     public virtual Idol Idol { get; set; }
 }

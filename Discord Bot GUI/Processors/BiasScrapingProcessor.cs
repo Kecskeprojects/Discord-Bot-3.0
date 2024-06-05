@@ -27,8 +27,16 @@ public class BiasScrapingProcessor(
         try
         {
             logger.Log("Update Bias Data Logic started!");
-            List<ExtendedBiasData> completeList = await kpopDbScraper.ExtractFromDatabaseTableAsync();
-            logger.Log($"Found {completeList.Count} idols on site that have profile pages.");
+            List<ExtendedBiasData> completeList = [];
+            completeList = await kpopDbScraper.ExtractFromDatabaseTableAsync();
+            if(completeList.Count == 0)
+            {
+                logger.Log($"Scraping ran into an exception, skipping 3rd party database check.");
+            }
+            else
+            {
+                logger.Log($"Found {completeList.Count} idols on site that have profile pages.");
+            }
 
             List<IdolResource> localIdols = await idolService.GetAllIdolsAsync();
             logger.Log($"Found {localIdols.Count} idols in our database.");
@@ -36,8 +44,11 @@ public class BiasScrapingProcessor(
             int count = 0;
             for (int i = 0; i < localIdols.Count; i++)
             {
-                await UpdateBiasAsync(localIdols, completeList, i);
-                count++;
+                bool updated = await UpdateBiasAsync(localIdols, completeList, i);
+                if (updated)
+                {
+                    count++;
+                }
             }
 
             logger.Log($"Updated {count} idol's details.");
@@ -56,14 +67,14 @@ public class BiasScrapingProcessor(
         logger.Log("Update Bias Data Logic ended!");
     }
 
-    private async Task UpdateBiasAsync(List<IdolResource> localIdols, List<ExtendedBiasData> completeList, int i)
+    private async Task<bool> UpdateBiasAsync(List<IdolResource> localIdols, List<ExtendedBiasData> completeList, int i)
     {
         string profileUrl = GetProfileUrl(localIdols[i], completeList, out ExtendedBiasData data);
 
         if (string.IsNullOrEmpty(profileUrl))
         {
             logger.Warning("CoreLogic.cs UpdateExtendedBiasData", $"ProfileUrl empty. DATA: {data?.StageName} of {data?.GroupName} | DB: {localIdols[i].Name} of {localIdols[i].GroupName}");
-            return;
+            return false;
         }
 
         AdditionalIdolData additional = await kpopDbScraper.GetProfileDataAsync(profileUrl, getGroupData: localIdols[i].GroupDebutDate == null);
@@ -71,13 +82,13 @@ public class BiasScrapingProcessor(
         if (additional?.ImageUrl == null)
         {
             logger.Warning("CoreLogic.cs UpdateExtendedBiasData", $"Image not found. DATA: {data?.StageName} of {data?.GroupName} | DB: {localIdols[i].Name} of {localIdols[i].GroupName}");
-            return;
+            return false;
         }
 
         if (localIdols[i].CurrentImageUrl == additional.ImageUrl)
         {
             logger.Log($"Data up to date. DATA: already gathered | DB: {localIdols[i].Name} of {localIdols[i].GroupName}");
-            return;
+            return false;
         }
 
         if (data != null)
@@ -95,7 +106,7 @@ public class BiasScrapingProcessor(
             logger.Log($"Updating details. DATA: Already gathered | DB: {localIdols[i].Name} of {localIdols[i].GroupName}");
         }
 
-        await idolService.UpdateIdolDetailsAsync(localIdols[i], data, additional);
+        return await idolService.UpdateIdolDetailsAsync(localIdols[i], data, additional);
     }
 
     private static string GetProfileUrl(IdolResource resource, List<ExtendedBiasData> completeList, out ExtendedBiasData data)

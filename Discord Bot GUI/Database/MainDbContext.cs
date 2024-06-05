@@ -246,6 +246,9 @@ public partial class MainDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(200)
                 .HasColumnName("ImageURL");
+            entity.Property(e => e.OverriddenUrl)
+                .HasMaxLength(200)
+                .HasColumnName("OverriddenURL");
 
             entity.HasOne(d => d.Idol).WithMany(p => p.IdolImages)
                 .HasForeignKey(d => d.IdolId)

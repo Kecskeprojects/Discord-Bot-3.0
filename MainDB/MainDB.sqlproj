@@ -62,6 +62,7 @@
     <Folder Include="Post-deployment\PostDeployment" />
     <Folder Include="Post-deployment\PostDeployment\Inserts" />
     <Folder Include="Views" />
+    <Folder Include="DB Patch" />
   </ItemGroup>
   <ItemGroup>
     <SqlCmdVariable Include="BuildConfiguration">
@@ -97,6 +98,11 @@
     <None Include="Post-deployment\PostDeployment\Inserts\UserBias_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\UserIdolStatistic_Inserts.sql" />
     <None Include="Post-deployment\ChannelType_Inserts.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DB Patch\Patch_1.sql" />
+    <None Include="DB Patch\Patch_2.sql" />
+    <None Include="DB Patch\Patch_3.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Birthday.sql" />

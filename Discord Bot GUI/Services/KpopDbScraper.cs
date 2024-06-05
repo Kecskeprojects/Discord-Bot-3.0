@@ -3,6 +3,7 @@ using AngleSharp.Dom;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces.Services;
+using Microsoft.Extensions.Logging;
 using PuppeteerSharp;
 using PuppeteerSharp.Input;
 using System;
@@ -56,7 +57,7 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
         await page.DeleteCookieAsync();
         try
         {
-            await page.GoToAsync(BaseUrl.OriginalString, 60000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded]);
+            await page.GoToAsync(BaseUrl.OriginalString, 600000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded]);
         }
         catch (Exception) { }
 
@@ -90,15 +91,15 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
             IDocument document = await GetPageByUrl(mainPage, uri, url.StartsWith("https://kprofiles.com/"));
 
             //A profile link could lead to dbkpop or kprofiles
-            AdditionalIdolData data = new();
+            idolData = new();
             if (!url.StartsWith("https://kprofiles.com/"))
             {
-                data.ImageUrl = document.QuerySelector(".attachment-post-thumbnail")?.GetAttribute("src");
-                await ScrapeGroupData(data, mainPage, document, getGroupData);
+                idolData.ImageUrl = document.QuerySelector(".attachment-post-thumbnail")?.GetAttribute("src");
+                await ScrapeGroupData(idolData, mainPage, document, getGroupData);
             }
             else
             {
-                data.ImageUrl = document.QuerySelector(".entry-content img")?.GetAttribute("src");
+                idolData.ImageUrl = document.QuerySelector(".entry-content img")?.GetAttribute("src");
             }
 
             await mainPage.CloseAsync();

@@ -24,11 +24,6 @@ public static class DiscordTools
         return IsDMBase(context.Channel);
     }
 
-    public static bool IsDM(SocketInteractionContext context)
-    {
-        return IsDMBase(context.Channel);
-    }
-
     public static bool IsDM(SocketMessage message)
     {
         return IsDMBase(message.Channel);

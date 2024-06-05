@@ -79,7 +79,8 @@ public class BiasGameInteraction(
 
             int[] idolIds = data.Pairs[data.CurrentPair];
 
-            Stream combined = biasGameImageProcessor.CombineImages(
+            logger.Log($"Creating combined image from idols. (ID 1: {idolIds[0]}, ID 2: {idolIds[1]})");
+            Stream combined = BiasGameImageProcessor.CombineImages(
                 (MemoryStream) data.IdolWithImage[idolIds[0]].Stream,
                 (MemoryStream) data.IdolWithImage[idolIds[1]].Stream);
             List<FileAttachment> files = [new FileAttachment(combined, "combined.png")];
@@ -120,6 +121,7 @@ public class BiasGameInteraction(
 
         foreach (IdolGameResource idol in idols)
         {
+            logger.Log($"Creating Polaroid for idol. (ID: {idol.IdolId})");
             Stream stream = await biasGameImageProcessor.CreatePolaroid(idol);
             string fileName = $"{Guid.NewGuid()}_{idol.IdolId}.png";
 

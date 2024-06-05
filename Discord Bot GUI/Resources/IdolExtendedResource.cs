@@ -25,4 +25,6 @@ public class IdolExtendedResource
     public DateOnly? DebutDate { get; set; }
 
     public string Gender { get; set; }
+
+    public string LatestImageUrl { get; set; }
 }

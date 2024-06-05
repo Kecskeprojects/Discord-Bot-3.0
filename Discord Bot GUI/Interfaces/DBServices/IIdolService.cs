@@ -14,7 +14,7 @@ public interface IIdolService
     Task<List<IdolResource>> GetIdolsByGroupAsync(string groupName);
     Task<DbProcessResultEnum> RemoveIdolAsync(string idolName, string idolGroup);
     Task<List<IdolResource>> GetAllIdolsAsync();
-    Task UpdateIdolDetailsAsync(IdolResource idolResource, ExtendedBiasData data, AdditionalIdolData additional);
+    Task<bool> UpdateIdolDetailsAsync(IdolResource idolResource, ExtendedBiasData data, AdditionalIdolData additional);
     Task<IdolExtendedResource> GetIdolDetailsAsync(string idolName, string idolGroup);
     Task<DbProcessResultEnum> UpdateAsync(int idolId, EditIdolModal modal);
     Task<DbProcessResultEnum> UpdateAsync(int idolId, EditIdolExtendedModal modal);

@@ -17,4 +17,5 @@ public class BiasEditActionTypeEnum(string value)
     public static BiasEditActionTypeEnum ChangeProfileLink => new("changeprofilelink");
     public static BiasEditActionTypeEnum RemoveImage => new("removeimage");
     public static BiasEditActionTypeEnum EditIdolExtended => new("editidolextended");
+    public static BiasEditActionTypeEnum OverrideImage => new("overrideimage");
 }
