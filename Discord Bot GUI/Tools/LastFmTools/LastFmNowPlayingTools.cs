@@ -8,7 +8,7 @@ public class LastFmNowPlayingTools
 {
     public static void MapNowPlayingData(GenericResponseItem<Recenttracks> restResult, Track track, NowPlayingResult result, SpotifyImageSearchResult spotifySearch, string ranking, string userplaycount)
     {
-        result.NowPlaying = restResult.Response.Track[0].Attr != null;
+        result.NowPlaying = track.Attr != null;
         result.TrackName = track.Name;
         result.ArtistName = track.Artist.Text;
         result.AlbumName = track.Album.Text;
