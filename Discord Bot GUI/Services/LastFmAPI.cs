@@ -30,7 +30,6 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
     {
         GenericResponseItem<Topalbums> restResult = await UserBasedRequests.TopAlbums(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
         logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
-        List<LastFmApi.Models.TopAlbum.Album> albums = restResult.Response.Album;
 
         LastFmListResult result = new();
         if (restResult.ResultCode != LastFmRequestResultEnum.Success)
@@ -42,6 +41,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
             }
             return result;
         }
+        List<LastFmApi.Models.TopAlbum.Album> albums = restResult.Response.Album;
 
         GenericResponseItem<int> playsResponse = await TotalPlaysAsync(lastFmUsername, period);
         if (!string.IsNullOrEmpty(playsResponse.Message))
@@ -64,7 +64,6 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
     {
         GenericResponseItem<Topartists> restResult = await UserBasedRequests.TopArtists(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
         logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
-        List<LastFmApi.Models.TopArtist.Artist> artists = restResult.Response.Artist;
 
         LastFmListResult result = new();
         if (restResult.ResultCode != LastFmRequestResultEnum.Success)
@@ -76,6 +75,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
             }
             return result;
         }
+        List<LastFmApi.Models.TopArtist.Artist> artists = restResult.Response.Artist;
 
         GenericResponseItem<int> playsResponse = await TotalPlaysAsync(lastFmUsername, period);
         if (!string.IsNullOrEmpty(playsResponse.Message))
@@ -98,7 +98,6 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
     {
         GenericResponseItem<Toptracks> restResult = await UserBasedRequests.TopTracks(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
         logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
-        List<LastFmApi.Models.TopTrack.Track> tracks = restResult.Response.Track;
 
         LastFmListResult result = new();
         if (restResult.ResultCode != LastFmRequestResultEnum.Success)
@@ -110,6 +109,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
             }
             return result;
         }
+        List<LastFmApi.Models.TopTrack.Track> tracks = restResult.Response.Track;
 
         GenericResponseItem<int> playsResponse = await TotalPlaysAsync(lastFmUsername, period);
         if (!string.IsNullOrEmpty(playsResponse.Message))
@@ -134,7 +134,6 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
     {
         GenericResponseItem<Recenttracks> restResult = await UserBasedRequests.NowPlaying(config.Lastfm_API_Key, lastFmUsername);
         logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
-        LastFmApi.Models.Recent.Track track = restResult.Response.Track[0];
 
         NowPlayingResult result = new();
         if (restResult.ResultCode != LastFmRequestResultEnum.Success)
@@ -146,6 +145,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
             }
             return result;
         }
+        LastFmApi.Models.Recent.Track track = restResult.Response.Track[0];
 
         SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(track.Artist.Mbid, track.Artist.Text, track.Name);
 
@@ -174,7 +174,6 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
     {
         GenericResponseItem<Recenttracks> restResult = await UserBasedRequests.Recents(config.Lastfm_API_Key, lastFmUsername, limit);
         logger.Query("Last.fm request URL:\n" + restResult.RequestDetails.ToString());
-        List<LastFmApi.Models.Recent.Track> tracks = restResult.Response.Track;
 
         LastFmListResult result = new();
         if (restResult.ResultCode != LastFmRequestResultEnum.Success)
@@ -186,6 +185,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
             }
             return result;
         }
+        List<LastFmApi.Models.Recent.Track> tracks = restResult.Response.Track;
 
         SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(tracks[0].Artist.Mbid, tracks[0].Artist.Text, tracks[0].Name);
         result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (tracks[0].Image?[^1].Text);
@@ -202,7 +202,6 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
         ArtistStats result = new(username);
 
         GenericResponseItem<List<LastFmApi.Models.TopAlbum.Album>> restAlbum = await GetEveryAlbumUserListenedToFromArtistAsync(username, artistName);
-        List<LastFmApi.Models.TopAlbum.Album> albums = restAlbum.Response;
 
         if (restAlbum.ResultCode != LastFmRequestResultEnum.Success)
         {
@@ -213,9 +212,9 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
             }
             return result;
         }
+        List<LastFmApi.Models.TopAlbum.Album> albums = restAlbum.Response;
 
         GenericResponseItem<List<LastFmApi.Models.TopTrack.Track>> restTrack = await GetEveryTrackUserListenedToFromArtistAsync(username, artistName);
-        List<LastFmApi.Models.TopTrack.Track> tracks = restTrack.Response;
 
         if (restTrack.ResultCode != LastFmRequestResultEnum.Success)
         {
@@ -226,6 +225,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
             }
             return result;
         }
+        List<LastFmApi.Models.TopTrack.Track> tracks = restTrack.Response;
 
         //if there are no albums found, they have not listened to the artist
         if (albums.Count == 0 && tracks.Count == 0)
