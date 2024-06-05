@@ -3,7 +3,6 @@ using AngleSharp.Dom;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces.Services;
-using Microsoft.Extensions.Logging;
 using PuppeteerSharp;
 using PuppeteerSharp.Input;
 using System;

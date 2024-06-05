@@ -157,7 +157,7 @@ public class IdolService(
 
             if (additional != null)
             {
-                if(!idol.IdolImages.Any(x => x.OverriddenUrl == additional.ImageUrl))
+                if (!idol.IdolImages.Any(x => x.OverriddenUrl == additional.ImageUrl))
                 {
                     idol.IdolImages.Add(new IdolImage() { ImageUrl = additional.ImageUrl });
                 }

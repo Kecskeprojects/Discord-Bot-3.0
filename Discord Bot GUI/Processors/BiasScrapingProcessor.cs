@@ -29,7 +29,7 @@ public class BiasScrapingProcessor(
             logger.Log("Update Bias Data Logic started!");
             List<ExtendedBiasData> completeList = [];
             completeList = await kpopDbScraper.ExtractFromDatabaseTableAsync();
-            if(completeList.Count == 0)
+            if (completeList.Count == 0)
             {
                 logger.Log($"Scraping ran into an exception, skipping 3rd party database check.");
             }

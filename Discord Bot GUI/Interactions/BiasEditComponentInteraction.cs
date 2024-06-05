@@ -4,7 +4,6 @@ using Discord_Bot.Communication.Bias;
 using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
-using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;

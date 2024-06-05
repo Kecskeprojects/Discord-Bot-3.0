@@ -139,7 +139,7 @@ public class WhoKnowsRequests
                 {
                     return response;
                 }
-                
+
                 if (int.TryParse(request.Stats.Userplaycount, out int playcount) && playcount > 0)
                 {
                     //Add user to dictionary
