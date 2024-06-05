@@ -34,7 +34,7 @@ public class EasterEggFeature(IKeywordService keywordService, IGreetingService g
             }
 
             //Response to keyword
-            if (Context.Message.Content.Length <= 100 && DiscordTools.IsDM(Context))
+            if (Context.Message.Content.Length <= 100 && !DiscordTools.IsDM(Context))
             {
                 KeywordResource keyword = await keywordService.GetKeywordAsync(Context.Guild.Id, Context.Message.Content);
                 if (keyword != null)
