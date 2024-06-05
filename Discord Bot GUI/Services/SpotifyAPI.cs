@@ -120,11 +120,13 @@ public class SpotifyAPI(BotLogger logger, Config config, IYoutubeAPI youtubeAPI,
         {
             if (string.IsNullOrEmpty(artistMbid))
             {
+                logger.Log("Artist MBID is empty, defaulting to last.fm image URL.");
                 return null;
             }
             string url = await musicBrainzAPI.GetArtistSpotifyUrlAsync(artistMbid);
             if (string.IsNullOrEmpty(url))
             {
+                logger.Log("Musicbrainz entry not found for artist, defaulting to last.fm image URL.");
                 return null;
             }
 
@@ -189,6 +191,8 @@ public class SpotifyAPI(BotLogger logger, Config config, IYoutubeAPI youtubeAPI,
         {
             logger.Error("SpotifyAPI.cs SearchItemAsync", ex);
         }
+        logger.Log("Unknown exception during search, defaulting to last.fm image URL.");
+        logger.Query("============================================================================");
         return null;
     }
     #endregion

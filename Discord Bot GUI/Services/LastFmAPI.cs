@@ -288,10 +288,6 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
 
         SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(restResult.Response.ArtistMbid, restResult.Response.ArtistName, restResult.Response.TrackName);
         result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : restResult.Response.ImageUrl;
-        if(spotifySearch == null)
-        {
-            logger.Log("Spotify image URL was not found, defaulting to last.fm image URL.");
-        }
 
         result.EmbedTitle = restResult.Response.EmbedTitle;
 
