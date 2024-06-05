@@ -37,7 +37,7 @@ public class WhoKnowsRequests
                 GenericResponseItem<Models.TrackInfo.Track> trackInfo =
                     await InfoBasedRequests.TrackPlays(apiKey, user, artist_name, track_name);
                 response.RequestDetailList.Add(trackInfo.RequestDetails);
-                Models.TrackInfo.Track request = trackInfo.Response;
+                Models.TrackInfo.Track trackRequest = trackInfo.Response;
 
                 if (trackInfo.ResultCode != LastFmRequestResultEnum.Success)
                 {
@@ -46,16 +46,17 @@ public class WhoKnowsRequests
                     response.ResultCode = trackInfo.ResultCode;
                     return response;
                 }
+
                 if (user == usernameList[0])
                 {
-                    response.Response.EmbedTitle = $"{request.Name} by {request.Artist.Name}";
-                    response.Response.ImageUrl = request.Album?.Image?[^1].Text;
-                    response.Response.ArtistMbid = request.Artist.Mbid;
-                    response.Response.ArtistName = request.Artist.Name;
-                    response.Response.TrackName = request.Name;
+                    await FillArtistDataAsync(apiKey, response, user, artist_name, track_name);
+                    if (!string.IsNullOrEmpty(response.Message))
+                    {
+                        return response;
+                    }
                 }
 
-                if (int.TryParse(request.Userplaycount, out int playcount) && playcount > 0)
+                if (int.TryParse(trackRequest.Userplaycount, out int playcount) && playcount > 0)
                 {
                     //Add user to dictionary
                     response.Response.Plays.Add(user, playcount);
@@ -86,7 +87,7 @@ public class WhoKnowsRequests
                 GenericResponseItem<Models.TrackInfo.Track> trackInfo =
                     await InfoBasedRequests.TrackPlays(apiKey, user, artistName, trackName);
                 response.RequestDetailList.Add(trackInfo.RequestDetails);
-                Models.TrackInfo.Track request = trackInfo.Response;
+                Models.TrackInfo.Track trackRequest = trackInfo.Response;
 
                 if (trackInfo.ResultCode != LastFmRequestResultEnum.Success)
                 {
@@ -98,14 +99,14 @@ public class WhoKnowsRequests
 
                 if (user == usernameList[0])
                 {
-                    response.Response.EmbedTitle = $"{request.Name} by {request.Artist.Name}";
-                    response.Response.ImageUrl = request.Album?.Image?[^1].Text;
-                    response.Response.ArtistMbid = request.Artist.Mbid;
-                    response.Response.ArtistName = request.Artist.Name;
-                    response.Response.TrackName = request.Name;
+                    await FillArtistDataAsync(apiKey, response, user, artistName, trackName);
+                    if (!string.IsNullOrEmpty(response.Message))
+                    {
+                        return response;
+                    }
                 }
 
-                if (int.TryParse(request.Userplaycount, out int playcount) && playcount > 0)
+                if (int.TryParse(trackRequest.Userplaycount, out int playcount) && playcount > 0)
                 {
                     //Add user to dictionary
                     response.Response.Plays.Add(user, playcount);
@@ -133,28 +134,12 @@ public class WhoKnowsRequests
 
             foreach (string user in usernameList)
             {
-                //Get their number of plays on given artists
-                GenericResponseItem<Models.ArtistInfo.Artist> artistInfo =
-                    await InfoBasedRequests.ArtistPlays(apiKey, user, artistName);
-                response.RequestDetailList.Add(artistInfo.RequestDetails);
-                Models.ArtistInfo.Artist request = artistInfo.Response;
-
-                if (artistInfo.ResultCode != LastFmRequestResultEnum.Success)
+                Models.ArtistInfo.Artist request = await FillArtistDataAsync(apiKey, response, user, artistName);
+                if (!string.IsNullOrEmpty(response.Message))
                 {
-                    response.Exception = artistInfo.Exception;
-                    response.Message = artistInfo.Message;
-                    response.ResultCode = artistInfo.ResultCode;
                     return response;
                 }
-
-                if (user == usernameList[0])
-                {
-                    response.Response.EmbedTitle = request.Name;
-                    response.Response.ImageUrl = request.Image?[^1].Text;
-                    response.Response.ArtistMbid = request.Mbid;
-                    response.Response.ArtistName = request.Name;
-                }
-
+                
                 if (int.TryParse(request.Stats.Userplaycount, out int playcount) && playcount > 0)
                 {
                     //Add user to dictionary
@@ -169,5 +154,29 @@ public class WhoKnowsRequests
             response.Exception = ex;
         }
         return response;
+    }
+
+    private static async Task<Models.ArtistInfo.Artist> FillArtistDataAsync(string apiKey, GenericResponseItem<WhoKnowsResponseItem> response, string userName, string artistName, string trackName = null)
+    {
+        //Get artist data for a few stats
+        GenericResponseItem<Models.ArtistInfo.Artist> artistInfo =
+            await InfoBasedRequests.ArtistPlays(apiKey, userName, artistName);
+        response.RequestDetailList.Add(artistInfo.RequestDetails);
+        Models.ArtistInfo.Artist artistRequest = artistInfo.Response;
+
+        if (artistInfo.ResultCode != LastFmRequestResultEnum.Success)
+        {
+            response.Exception = artistInfo.Exception;
+            response.Message = artistInfo.Message;
+            response.ResultCode = artistInfo.ResultCode;
+            return null;
+        }
+        response.Response.EmbedTitle = (string.IsNullOrEmpty(trackName) ? "" : $"{trackName} by ") + $"{artistRequest.Name}";
+        response.Response.ImageUrl = artistRequest.Image?[^1].Text;
+        response.Response.ArtistMbid = artistRequest.Mbid;
+        response.Response.ArtistName = artistRequest.Name;
+        response.Response.TrackName = trackName;
+
+        return artistRequest;
     }
 }
