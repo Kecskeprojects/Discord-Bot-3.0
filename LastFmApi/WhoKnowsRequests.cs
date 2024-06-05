@@ -49,7 +49,7 @@ public class WhoKnowsRequests
                 if (user == usernameList[0])
                 {
                     response.Response.EmbedTitle = $"{request.Name} by {request.Artist.Name}";
-                    response.Response.ImageUrl = request.Album.Image?[^1].Text;
+                    response.Response.ImageUrl = request.Album?.Image?[^1].Text;
                     response.Response.ArtistMbid = request.Artist.Mbid;
                     response.Response.ArtistName = request.Artist.Name;
                     response.Response.TrackName = request.Name;
@@ -99,7 +99,7 @@ public class WhoKnowsRequests
                 if (user == usernameList[0])
                 {
                     response.Response.EmbedTitle = $"{request.Name} by {request.Artist.Name}";
-                    response.Response.ImageUrl = request.Album.Image?[^1].Text;
+                    response.Response.ImageUrl = request.Album?.Image?[^1].Text;
                     response.Response.ArtistMbid = request.Artist.Mbid;
                     response.Response.ArtistName = request.Artist.Name;
                     response.Response.TrackName = request.Name;
