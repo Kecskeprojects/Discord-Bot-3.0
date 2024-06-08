@@ -23,6 +23,7 @@ public class UtilityRequests
                     response.Exception = restResult.Exception;
                     response.Message = restResult.Message;
                     response.ResultCode = restResult.ResultCode;
+                    response.ErrorCode = restResult.ErrorCode;
                     return response;
                 }
 
@@ -66,6 +67,7 @@ public class UtilityRequests
                     response.Exception = restResult.Exception;
                     response.Message = restResult.Message;
                     response.ResultCode = restResult.ResultCode;
+                    response.ErrorCode = restResult.ErrorCode;
                     return response;
                 }
 
@@ -120,6 +122,7 @@ public class UtilityRequests
                     response.Exception = restResult.Exception;
                     response.Message = restResult.Message;
                     response.ResultCode = restResult.ResultCode;
+                    response.ErrorCode = restResult.ErrorCode;
                     return response;
                 }
 
@@ -166,6 +169,7 @@ public class UtilityRequests
                     response.Exception = restResult.Exception;
                     response.Message = restResult.Message;
                     response.ResultCode = restResult.ResultCode;
+                    response.ErrorCode = restResult.ErrorCode;
                     return response;
                 }
 

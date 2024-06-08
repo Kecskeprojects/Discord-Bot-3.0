@@ -10,4 +10,5 @@ public class GenericResponseItem<T>
     public LastFmRequestDetails RequestDetails { get; set; }
     public List<LastFmRequestDetails> RequestDetailList { get; set; } = [];
     public string Message { get; set; }
+    public int? ErrorCode { get; set; }
 }

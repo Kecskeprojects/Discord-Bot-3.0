@@ -38,6 +38,7 @@ public class UserBasedRequests : BaseRequests
                                         ? LastFmRequestResultEnum.Failure
                                         : LastFmRequestResultEnum.EmptyResponse;
             response.Message = deserialized.Message;
+            response.ErrorCode = deserialized.Error;
         }
         catch (Exception ex)
         {
@@ -75,6 +76,7 @@ public class UserBasedRequests : BaseRequests
                                         ? LastFmRequestResultEnum.Failure
                                         : LastFmRequestResultEnum.EmptyResponse;
             response.Message = deserialized.Message;
+            response.ErrorCode = deserialized.Error;
         }
         catch (Exception ex)
         {
@@ -112,6 +114,7 @@ public class UserBasedRequests : BaseRequests
                                         ? LastFmRequestResultEnum.Failure
                                         : LastFmRequestResultEnum.EmptyResponse;
             response.Message = deserialized.Message;
+            response.ErrorCode = deserialized.Error;
         }
         catch (Exception ex)
         {
@@ -152,6 +155,7 @@ public class UserBasedRequests : BaseRequests
                                         ? LastFmRequestResultEnum.Failure
                                         : LastFmRequestResultEnum.EmptyResponse;
             response.Message = deserialized.Message;
+            response.ErrorCode = deserialized.Error;
         }
         catch (Exception ex)
         {
@@ -193,6 +197,7 @@ public class UserBasedRequests : BaseRequests
                                         ? LastFmRequestResultEnum.Failure
                                         : LastFmRequestResultEnum.EmptyResponse;
             response.Message = deserialized.Message;
+            response.ErrorCode = deserialized.Error;
         }
         catch (Exception ex)
         {

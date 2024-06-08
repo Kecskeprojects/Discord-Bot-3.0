@@ -1,5 +1,7 @@
 ﻿using LastFmApi.Communication;
 using LastFmApi.Enum;
+using LastFmApi.Models.TrackInfo;
+using RestSharp.Serializers;
 
 namespace LastFmApi;
 public class WhoKnowsRequests
@@ -22,6 +24,7 @@ public class WhoKnowsRequests
                 response.Exception = restNowPlaying.Exception;
                 response.Message = restNowPlaying.Message;
                 response.ResultCode = restNowPlaying.ResultCode;
+                response.ErrorCode = restNowPlaying.ErrorCode;
                 return response;
             }
 
@@ -44,6 +47,7 @@ public class WhoKnowsRequests
                     response.Exception = trackInfo.Exception;
                     response.Message = trackInfo.Message;
                     response.ResultCode = trackInfo.ResultCode;
+                    response.ErrorCode = trackInfo.ErrorCode;
                     return response;
                 }
 
@@ -94,6 +98,7 @@ public class WhoKnowsRequests
                     response.Exception = trackInfo.Exception;
                     response.Message = trackInfo.Message;
                     response.ResultCode = trackInfo.ResultCode;
+                    response.ErrorCode = trackInfo.ErrorCode;
                     return response;
                 }
 
@@ -169,6 +174,7 @@ public class WhoKnowsRequests
             response.Exception = artistInfo.Exception;
             response.Message = artistInfo.Message;
             response.ResultCode = artistInfo.ResultCode;
+            response.ErrorCode = artistInfo.ErrorCode;
             return null;
         }
         response.Response.EmbedTitle = (string.IsNullOrEmpty(trackName) ? "" : $"{trackName} by ") + $"{artistRequest.Name}";
