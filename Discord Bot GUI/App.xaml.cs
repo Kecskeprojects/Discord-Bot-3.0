@@ -71,7 +71,7 @@ public partial class App : Application
 
         AppDomain.CurrentDomain.ProcessExit += new EventHandler(Closing);
 
-        services = ServiceBuilder.BuildService();
+        services = Discord_Bot.Startup.Run();
         logger = services.GetService<BotLogger>();
         browserService = services.GetService<BrowserService>();
 

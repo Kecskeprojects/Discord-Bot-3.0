@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Database;
@@ -20,11 +21,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace Discord_Bot.Core;
+namespace Discord_Bot;
 
-public static class ServiceBuilder
+public static class Startup
 {
-    public static IServiceProvider BuildService()
+    public static IServiceProvider Run()
     {
         DiscordSocketClient client = new(new DiscordSocketConfig()
         {
