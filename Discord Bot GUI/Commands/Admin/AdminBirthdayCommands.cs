@@ -53,7 +53,7 @@ public class AdminBirthdayCommands(
                 return;
             }
 
-            string[] strings = dateString.Split(StaticLists.DateSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            string[] strings = dateString.Split(Constant.DateSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             if (strings.Length != 3)
             {
                 await ReplyAsync("Incorrect input parameters");

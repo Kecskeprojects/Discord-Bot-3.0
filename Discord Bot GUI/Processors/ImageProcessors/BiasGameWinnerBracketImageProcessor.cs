@@ -1,6 +1,5 @@
 ﻿using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
-using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.Extensions;
@@ -58,7 +57,7 @@ public class BiasGameWinnerBracketImageProcessor(BotLogger logger)
 
     private static MemoryStream EditImage(BiasGameData biasGameData, List<MemoryStream> files, IdolGameResource winner = null)
     {
-        StaticRoundData roundData = StaticLists.BiasGameStaticRoundData[biasGameData.CurrentRound - 1];
+        StaticRoundData roundData = Constant.BiasGameStaticRoundData[biasGameData.CurrentRound - 1];
         using Image winnerBracket = Image.Load<Rgba32>(biasGameData.WinnerBracket.ToArray());
 
         Image idolImage_1 = CreateImageForRanking(files[0], roundData);

@@ -11,6 +11,7 @@ using Google.Apis.YouTube.v3.Data;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -23,9 +24,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
     private readonly YoutubeAddPlaylistFeature youtubeAddPlaylistFeature = youtubeAddPlaylistFeature;
     private readonly BotLogger logger = logger;
     private readonly Config config = config;
-
-    private static readonly Dictionary<string, int> keys = [];
-    private static int youtubeIndex = 0;
+    private static int youtubeApiKeyIndex = 0;
     #endregion
 
     #region Base Methods
@@ -38,7 +37,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
 
         try
         {
-            if (keys.Count != 0)
+            if (!Global.YoutubeApiKeys.IsEmpty)
             {
                 result = await Run(query, username, serverId, channelId);
             }
@@ -51,19 +50,22 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
         catch (Exception ex)
         {
             //switching api keys if quota is exceeded
-            if ((ex.ToString().Contains("quotaExceeded") || ex.ToString().Contains("you have exceeded your")) && keys.Count != 0)
+            if ((ex.ToString().Contains("quotaExceeded") || ex.ToString().Contains("you have exceeded your")) && !Global.YoutubeApiKeys.IsEmpty)
             {
-                string currentKey = config.Youtube_API_Keys[youtubeIndex];
+                string currentKey = config.Youtube_API_Keys[youtubeApiKeyIndex];
 
-                keys.Remove(currentKey);
+                if(!Global.YoutubeApiKeys.TryRemove(currentKey, out _))
+                {
+                    throw new Exception("Youtube API Key could not be removed!");
+                }
 
                 Random r = new();
 
-                youtubeIndex = r.Next(0, keys.Count);
-                currentKey = config.Youtube_API_Keys[youtubeIndex];
+                youtubeApiKeyIndex = r.Next(0, Global.YoutubeApiKeys.Count);
+                currentKey = config.Youtube_API_Keys[youtubeApiKeyIndex];
 
                 logger.Warning("YoutubeAPI.cs Searching", ex, LogOnly: true);
-                logger.Log($"Key switched out to key in {youtubeIndex} position, value: {currentKey}!");
+                logger.Log($"Key switched out to key in {youtubeApiKeyIndex} position, value: {currentKey}!");
 
                 result = await Run(query, username, serverId, channelId);
             }
@@ -78,7 +80,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
     //The function running the query
     private async Task<SearchResultEnum> Run(string query, string username, ulong serverId, ulong channelId)
     {
-        string currentKey = config.Youtube_API_Keys[youtubeIndex];
+        string currentKey = config.Youtube_API_Keys[youtubeApiKeyIndex];
 
         YouTubeService youtubeService = new(new BaseClientService.Initializer()
         {
@@ -130,7 +132,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
     //Searching by video ID
     private async Task<SearchResultEnum> VideoSearch(YouTubeService youtubeService, string query, string username, ulong serverId)
     {
-        string currentKey = config.Youtube_API_Keys[youtubeIndex];
+        string currentKey = config.Youtube_API_Keys[youtubeApiKeyIndex];
 
         VideosResource.ListRequest searchListRequest = youtubeService.Videos.List("snippet,contentDetails");
         searchListRequest.Id = query;
@@ -146,7 +148,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
             logger.Error("YoutubeAPI.cs VideoSearch", ex);
         }
 
-        keys[currentKey] += 1;
+        Global.YoutubeApiKeys[currentKey] += 1;
 
         if (searchListResponse.Items == null || searchListResponse.Items.Count < 1)
         {
@@ -155,7 +157,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
 
         Video video = searchListResponse.Items[0];
 
-        string[] temp = ["https://www.youtube.com/watch?v=" + video.Id, video.Snippet.Title.Replace("&#39;", "'"), video.Snippet.Thumbnails.Default__.Url, video.ContentDetails.Duration];
+        string[] temp = [Path.Combine(Constant.YoutubeBaseUrl, $"watch?v={video.Id}"), video.Snippet.Title.Replace("&#39;", "'"), video.Snippet.Thumbnails.Default__.Url, video.ContentDetails.Duration];
 
         if (!Global.ServerAudioResources.TryGetValue(serverId, out ServerAudioResource audioResource))
         {
@@ -173,7 +175,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
     //Searching by keywords
     private async Task<SearchResultEnum> KeywordSearch(YouTubeService youtubeService, string query, string username, ulong serverId)
     {
-        string currentKey = config.Youtube_API_Keys[youtubeIndex];
+        string currentKey = config.Youtube_API_Keys[youtubeApiKeyIndex];
 
         SearchResource.ListRequest searchListRequest = youtubeService.Search.List("id,snippet");
         searchListRequest.Q = query;
@@ -189,7 +191,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
             logger.Error("YoutubeAPI.cs KeywordSearch", ex);
         }
 
-        keys[currentKey] += 100;
+        Global.YoutubeApiKeys[currentKey] += 100;
 
         if (searchListResponse.Items == null || searchListResponse.Items.Count < 1)
         {
@@ -215,7 +217,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
     //Todo: Be able to choose where to start the 25 songs from a given song/index
     private async Task<SearchResultEnum> PlaylistSearch(YouTubeService youtubeService, string query, string username, ulong serverId)
     {
-        string currentKey = config.Youtube_API_Keys[youtubeIndex];
+        string currentKey = config.Youtube_API_Keys[youtubeApiKeyIndex];
 
         PlaylistItemsResource.ListRequest searchListRequest = youtubeService.PlaylistItems.List("snippet,contentDetails");
 
@@ -232,7 +234,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
             logger.Error("YoutubeAPI.cs PlaylistSearch", ex);
         }
 
-        keys[currentKey] += 1;
+        Global.YoutubeApiKeys[currentKey] += 1;
 
         if (searchListResponse.Items == null || searchListResponse.Items.Count < 1)
         {
@@ -288,13 +290,16 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
     //Resetting API key counters
     public static void KeyReset(string[] configKeys)
     {
-        keys.Clear();
+        Global.YoutubeApiKeys.Clear();
         foreach (string item in configKeys)
         {
-            keys.Add(item, 0);
+            if(Global.YoutubeApiKeys.TryAdd(item, 0))
+            {
+                throw new Exception("Youtube API Key could not be added!");
+            }
         }
 
-        youtubeIndex = new Random().Next(0, keys.Count);
+        youtubeApiKeyIndex = new Random().Next(0, Global.YoutubeApiKeys.Count);
     }
     #endregion
 }

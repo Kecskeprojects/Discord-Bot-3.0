@@ -181,7 +181,7 @@ public class TwitterScraper(BotLogger logger, BrowserService browserService) : I
         string query = new Uri(url).Query;
 
         string newQuery = query.Contains("jpg") ? "?format=jpg" : "?format=png";
-        newQuery += StaticLists.TwitterSmallSizingStrings.Any(query.Contains) //If not in these, the value is either "large" or "orig"
+        newQuery += Constant.TwitterSmallSizingStrings.Any(query.Contains) //If not in these, the value is either "large" or "orig"
                 ? "&name=medium"
                 : "&name=orig";
 

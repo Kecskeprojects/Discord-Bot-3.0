@@ -44,7 +44,7 @@ public class BiasGameImageProcessor(BotLogger logger)
         logger.Query($"Getting latest idol image:\n{idol.LatestImageUrl}");
         using Image idolImage = Image.Load<Rgba32>(await WebTools.GetStream(idol.LatestImageUrl));
 
-        if (!idol.LatestImageUrl.StartsWith("https://dbkpop.com"))
+        if (!idol.LatestImageUrl.StartsWith(Constant.DbKpopBaseUrl))
         {
             ImageTools.CorrectImageRatio(idolImage, acceptableMargin: 0, cutoffTopRatio: 0.1, extraHeight: 0.05);
         }

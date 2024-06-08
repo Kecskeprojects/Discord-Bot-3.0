@@ -22,7 +22,7 @@ public class InstagramEmbedFeature(IInstaLoader instaLoader, IServerService serv
     {
         try
         {
-            List<Uri> urls = UrlTools.LinkSearch(Context.Message.Content, false, "https://instagram.com/");
+            List<Uri> urls = UrlTools.LinkSearch(Context.Message.Content, false, Constant.InstagramBaseUrl);
 
             //Check if message is an instagram link
             if (!CollectionTools.IsNullOrEmpty(urls))

@@ -1,5 +1,5 @@
 ﻿using Discord.WebSocket;
-using Discord_Bot.Enums;
+using Discord_Bot.Core;
 using Discord_Bot.Resources;
 using System;
 
@@ -12,7 +12,7 @@ public static class BirthdayMessageProcessor
         SocketGuildUser user = guild.GetUser(birthday.UserDiscordId);
 
         Random r = new();
-        string baseMessage = StaticLists.BirthdayMessage[r.Next(0, StaticLists.BirthdayMessage.Length)];
+        string baseMessage = Constant.BirthdayMessage[r.Next(0, Constant.BirthdayMessage.Length)];
 
         string message = string.Format(baseMessage, user.Mention, (DateTime.UtcNow.Year - birthday.Date.Year).ToString());
         return message;

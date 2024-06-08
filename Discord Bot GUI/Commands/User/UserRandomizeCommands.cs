@@ -30,7 +30,7 @@ public class UserRandomizeCommands(
                 return;
             }
 
-            await ReplyAsync(StaticLists.Answers8ball[new Random().Next(0, StaticLists.Answers8ball.Length)]);
+            await ReplyAsync(Constant.Answers8ball[new Random().Next(0, Constant.Answers8ball.Length)]);
         }
         catch (Exception ex)
         {

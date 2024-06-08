@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord_Bot.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,8 +7,6 @@ namespace Discord_Bot.Tools;
 
 public static class UrlTools
 {
-    private static readonly char[] whiteSpaceSeparator = [' ', '\n'];
-
     public static List<Uri> LinkSearch(string message, bool ignoreEmbedSuppress, params string[] baseURLs)
     {
         if (string.IsNullOrWhiteSpace(message))
@@ -36,7 +35,7 @@ public static class UrlTools
 
                     string beginningCut = message[startIndex..];
 
-                    string url = beginningCut.Split(whiteSpaceSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)[0];
+                    string url = beginningCut.Split(Constant.WhiteSpaceSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)[0];
 
                     if (url.Contains('<') || url.Contains('>'))
                     {
@@ -79,7 +78,7 @@ public static class UrlTools
 
             string beginningCut = message[startIndex..];
 
-            string url = beginningCut.Split(whiteSpaceSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)[0];
+            string url = beginningCut.Split(Constant.WhiteSpaceSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)[0];
 
             message = message.Replace(url, $"<{url}>");
 

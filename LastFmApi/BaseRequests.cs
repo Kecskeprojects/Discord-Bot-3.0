@@ -5,10 +5,7 @@ namespace LastFmApi;
 
 public class BaseRequests
 {
-    public const string BaseUrl = "http://ws.audioscrobbler.com/2.0/";
-
-    //The main request handling function
-    private static readonly RestClient _client = new(BaseUrl);
+    private static readonly RestClient _client = new(Constant.LastFmApiBaseUri);
     protected static async Task<RestResponse> UserBasedRequestHandler(UserBasedRequestItem item)
     {
         string query = $"?method={item.Type}&user={Uri.EscapeDataString(item.Username)}&api_key={item.ApiKey}";

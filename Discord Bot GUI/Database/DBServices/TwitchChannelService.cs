@@ -9,6 +9,7 @@ using Discord_Bot.Resources;
 using Discord_Bot.Tools.NativeTools;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
@@ -22,7 +23,7 @@ public class TwitchChannelService(IMapper mapper, BotLogger logger, Cache cache,
     {
         try
         {
-            string url = $"https://www.twitch.tv/{twitchUserName}";
+            string url = Path.Combine(Constant.TwitchBaseUrl, twitchUserName);
             Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
             if (server == null)
             {

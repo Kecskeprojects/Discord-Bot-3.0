@@ -41,7 +41,7 @@ public class UserBirthdayCommands(
 
             if (string.IsNullOrEmpty(month) && string.IsNullOrEmpty(day))
             {
-                string[] strings = year.Split(StaticLists.DateSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                string[] strings = year.Split(Constant.DateSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 year = strings[0];
                 month = strings[1];
                 day = strings[2];

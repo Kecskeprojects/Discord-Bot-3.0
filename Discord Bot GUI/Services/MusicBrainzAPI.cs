@@ -4,6 +4,7 @@ using Discord_Bot.Services.Models.MusicBrainz.ArtistLookup;
 using Newtonsoft.Json;
 using RestSharp;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,8 +14,7 @@ public class MusicBrainzAPI(BotLogger logger) : IMusicBrainzAPI
 {
     private readonly BotLogger logger = logger;
 
-    private static Uri BaseUrl { get; } = new("https://musicbrainz.org/ws/2/");
-    private static readonly RestClient _client = new(BaseUrl);
+    private static readonly RestClient _client = new(Constant.MusicBrainzBaseUri);
 
     //https://musicbrainz.org/ws/2/artist/[artistMBID]?inc=url-rels&fmt=json
     public async Task<string> GetArtistSpotifyUrlAsync(string mbid)
@@ -22,7 +22,7 @@ public class MusicBrainzAPI(BotLogger logger) : IMusicBrainzAPI
         try
         {
             string query = $"artist/{mbid}?inc=url-rels&fmt=json";
-            logger.Query("Musicbrainz query Url:\n" + BaseUrl + query);
+            logger.Query($"Musicbrainz query Url:\n{Path.Combine(Constant.MusicBrainzBaseUri.OriginalString, query)}");
 
             RestRequest request = new(query);
             RestResponse resultJSON = await _client.GetAsync(request);

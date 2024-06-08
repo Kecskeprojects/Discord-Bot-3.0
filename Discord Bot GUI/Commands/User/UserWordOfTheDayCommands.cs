@@ -43,7 +43,7 @@ public class UserWordOfTheDayCommands(
             }
             else
             {
-                await ReplyAsync("Language is not supported, here is the list of languages:\n" + string.Join(", ", StaticLists.WotdLanguages.Keys));
+                await ReplyAsync("Language is not supported, here is the list of languages:\n" + string.Join(", ", Constant.WotdLanguages.Keys));
             }
         }
         catch (HttpRequestException)

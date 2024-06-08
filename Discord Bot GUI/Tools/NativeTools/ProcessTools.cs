@@ -1,4 +1,5 @@
 ﻿using Discord_Bot.Communication;
+using Discord_Bot.Core;
 using Discord_Bot.Tools.Extensions;
 using Microsoft.VisualBasic.Devices;
 using System;
@@ -10,18 +11,6 @@ namespace Discord_Bot.Tools.NativeTools;
 
 public static class ProcessTools
 {
-    private static readonly ThreadState[] ActiveStates =
-    [
-        /*ThreadState.Initialized,*/
-        ThreadState.Ready,
-        ThreadState.Running,
-        ThreadState.Standby,
-        /*ThreadState.Terminated,*/
-        ThreadState.Wait,
-        ThreadState.Transition,
-        /*ThreadState.Unknown*/
-    ];
-
     public static async Task<ProcessMetrics> GetStatistics()
     {
         Process process = Process.GetCurrentProcess();
@@ -63,7 +52,7 @@ public static class ProcessTools
         int threadCount = 0;
         for (int i = 0; i < threads.Count; i++)
         {
-            if (ActiveStates.Contains(threads[i].ThreadState))
+            if (Constant.ActiveThreadStates.Contains(threads[i].ThreadState))
             {
                 threadCount++;
             }

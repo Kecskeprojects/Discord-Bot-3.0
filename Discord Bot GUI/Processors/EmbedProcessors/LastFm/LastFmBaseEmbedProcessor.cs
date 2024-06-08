@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord_Bot.Core;
 
 namespace Discord_Bot.Processors.EmbedProcessors.LastFm;
 public class LastFmBaseEmbedProcessor
@@ -7,7 +8,7 @@ public class LastFmBaseEmbedProcessor
     {
         EmbedBuilder builder = new();
 
-        builder.WithAuthor(HeadText, iconUrl: "https://cdn.discordapp.com/attachments/891418209843044354/923401581704118314/last_fm.png");
+        builder.WithAuthor(HeadText, iconUrl: Constant.LastFmIconUrl);
 
         if (image_url != "")
         {

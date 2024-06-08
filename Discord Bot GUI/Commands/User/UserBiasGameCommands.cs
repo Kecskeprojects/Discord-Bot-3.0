@@ -69,7 +69,7 @@ public class UserBiasGameCommands(
             Random r = new();
             if (r.Next(0, 100) == 0)
             {
-                await ReplyAsync(StaticLists.BiasGameStopMessages[r.Next(0, StaticLists.BiasGameStopMessages.Length)]);
+                await ReplyAsync(Constant.BiasGameStopMessages[r.Next(0, Constant.BiasGameStopMessages.Length)]);
                 return;
             }
 

@@ -4,7 +4,7 @@ public class LastFmRequestDetails
 {
     public override string ToString()
     {
-        string FinalUrl = $"{BaseRequests.BaseUrl}?method={Type}";
+        string FinalUrl = $"{Constant.LastFmApiBaseUri.OriginalString}?method={Type}";
 
         if (!string.IsNullOrWhiteSpace(ApiKey))
         {

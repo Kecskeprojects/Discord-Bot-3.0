@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord_Bot.Core;
+using System;
 using System.Linq;
 
 namespace Discord_Bot.Enums;
@@ -16,16 +17,9 @@ public enum ChannelTypeEnum
 
 public static class ChannelTypeEnumExtension
 {
-    private static ChannelTypeEnum[] RestrictedChannelTypes { get; } =
-    [
-        ChannelTypeEnum.RoleText,
-        ChannelTypeEnum.TwitchNotificationText,
-        ChannelTypeEnum.BirthdayText
-    ];
-
     public static bool IsRestrictedChannelType(this ChannelTypeEnum channelType)
     {
-        return RestrictedChannelTypes.Contains(channelType);
+        return Constant.RestrictedChannelTypes.Contains(channelType);
     }
 
     public static string ToCommandString(this ChannelTypeEnum channelTypeEnum)

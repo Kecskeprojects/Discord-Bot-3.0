@@ -7,6 +7,7 @@ using PuppeteerSharp;
 using PuppeteerSharp.Input;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,8 +17,6 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
 {
     private readonly BotLogger logger = logger;
     private readonly BrowserService browserService = browserService;
-
-    private static Uri BaseUrl { get; } = new("https://dbkpop.com/db/all-k-pop-idols/");
 
     public async Task<List<ExtendedBiasData>> ExtractFromDatabaseTableAsync()
     {
@@ -56,7 +55,7 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
         await page.DeleteCookieAsync();
         try
         {
-            await page.GoToAsync(BaseUrl.OriginalString, 600000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded]);
+            await page.GoToAsync(Constant.DbKpopScrapeBaseUri.OriginalString, 600000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded]);
         }
         catch (Exception) { }
 
@@ -87,11 +86,11 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
             IPage mainPage = await browserService.NewPage();
 
             Uri uri = new(url);
-            IDocument document = await GetPageByUrl(mainPage, uri, url.StartsWith("https://kprofiles.com/"));
+            IDocument document = await GetPageByUrl(mainPage, uri, url.StartsWith(Constant.KProfilesBaseUrl));
 
             //A profile link could lead to dbkpop or kprofiles
             idolData = new();
-            if (!url.StartsWith("https://kprofiles.com/"))
+            if (!url.StartsWith(Constant.KProfilesBaseUrl))
             {
                 idolData.ImageUrl = document.QuerySelector(".attachment-post-thumbnail")?.GetAttribute("src");
                 await ScrapeGroupData(idolData, mainPage, document, getGroupData);
@@ -115,7 +114,7 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
     }
     private static async Task ScrapeGroupData(AdditionalIdolData data, IPage page, IDocument document, bool getGroupData)
     {
-        IHtmlCollection<IElement> groups = document.QuerySelectorAll("li>a[href*=\"https://dbkpop.com/group\"]");
+        IHtmlCollection<IElement> groups = document.QuerySelectorAll($"li>a[href*=\"{Path.Combine(Constant.DbKpopBaseUrl, "group")}\"]");
         string groupUrl = "";
         if (groups != null && groups.Length > 0)
         {

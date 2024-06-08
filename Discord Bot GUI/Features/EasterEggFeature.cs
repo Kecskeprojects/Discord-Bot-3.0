@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Discord_Bot.Core;
-using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
@@ -48,7 +47,7 @@ public class EasterEggFeature(IKeywordService keywordService, IGreetingService g
             Random r = new();
             if (r.Next(0, 5000) == 0)
             {
-                await Context.Channel.SendMessageAsync(StaticLists.EasterEggMessages[r.Next(0, StaticLists.EasterEggMessages.Length)]);
+                await Context.Channel.SendMessageAsync(Constant.EasterEggMessages[r.Next(0, Constant.EasterEggMessages.Length)]);
             }
             else if (r.Next(0, 20) == 0)
             {

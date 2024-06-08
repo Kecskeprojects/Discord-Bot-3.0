@@ -232,7 +232,7 @@ public class UserBiasCommands(
                 //Also make the first letter upper case
                 bias = bias.ToUpper();
 
-                string baseMessage = StaticLists.BiasExtraMessage[r.Next(0, StaticLists.BiasExtraMessage.Length)];
+                string baseMessage = Constant.BiasExtraMessage[r.Next(0, Constant.BiasExtraMessage.Length)];
                 string message = string.Format(baseMessage, bias);
 
                 await ReplyAsync(message);

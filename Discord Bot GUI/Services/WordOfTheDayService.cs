@@ -1,5 +1,4 @@
 ﻿using Discord_Bot.Core;
-using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.Wotd;
 using RestSharp;
@@ -15,18 +14,17 @@ public class WordOfTheDayService(BotLogger logger) : IWordOfTheDayService
 {
     private readonly BotLogger logger = logger;
 
-    private static Uri BaseUrl { get; } = new("http://wotd.transparent.com/rss/");
+    private static readonly RestClient _client = new(Constant.WordOfTheDayBaseUri);
 
     public async Task<WotdBase> GetDataAsync(string language)
     {
         WotdBase result = null;
         try
         {
-            if (StaticLists.WotdLanguages.ContainsKey(language.ToLower()))
+            if (Constant.WotdLanguages.ContainsKey(language.ToLower()))
             {
-                RestClient client = new(BaseUrl);
-                RestRequest request = new(StaticLists.WotdLanguages[language.ToLower()]);
-                RestResponse response = await client.GetAsync(request);
+                RestRequest request = new(Constant.WotdLanguages[language.ToLower()]);
+                RestResponse response = await _client.GetAsync(request);
 
                 XmlSerializer serializer = new(typeof(WotdBase));
                 using StringReader reader = new(response.Content);
