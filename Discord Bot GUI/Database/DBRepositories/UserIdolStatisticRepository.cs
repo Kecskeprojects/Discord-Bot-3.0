@@ -11,14 +11,14 @@ namespace Discord_Bot.Database.DBRepositories;
 
 public class UserIdolStatisticRepository(MainDbContext context) : GenericRepository<UserIdolStatistic>(context), IUserIdolStatisticRepository
 {
-    public Task<List<UserIdolStatisticResource>> GetTop10ForUserAsync(int userId, GenderType gender)
+    public Task<List<UserIdolStatisticResource>> GetTop10ForUserAsync(int userId, GenderEnum gender)
     {
         return context.UserIdolStatistics
             .Include(stat => stat.Idol)
             .Include(i => i.Idol.Group)
             .Include(i => i.Idol.IdolImages)
             .Include(i => i.Idol.Users)
-            .Where(stat => stat.UserId == userId && (gender == GenderType.None.ToString() || stat.Idol.Gender == gender.ToString()))
+            .Where(stat => stat.UserId == userId && (gender == GenderEnum.NotSpecified || stat.Idol.Gender == gender.ToFriendlyString()))
             .Select(stat => new UserIdolStatisticResource()
             {
                 IdolGroupFullName = stat.Idol.Group.FullName ?? "Soloist",

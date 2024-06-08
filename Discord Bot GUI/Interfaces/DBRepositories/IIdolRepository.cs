@@ -8,5 +8,5 @@ namespace Discord_Bot.Interfaces.DBRepositories;
 public interface IIdolRepository : IGenericRepository<Idol>
 {
     Task<List<Idol>> GetListByNamesAsync(string idolOrGroupName, string idolGroup, string userId = null);
-    Task<List<Idol>> GetListForGameAsync(GenderType gender, int debutAfter, int debutBefore);
+    Task<List<Idol>> GetListForGameAsync(GenderEnum gender, int debutAfter, int debutBefore);
 }

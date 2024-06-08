@@ -17,7 +17,7 @@ public class BiasGameStatInteraction(IUserService userService, BotLogger logger,
     private readonly IUserService userService = userService;
 
     [ComponentInteraction("BiasStats_Gender_*_*_*")]
-    public async Task GenderChosen(GenderChoiceEnum choiceId, string currentChoiceId, ulong userId)
+    public async Task GenderChosen(GenderEnum chosenGender, GenderEnum currentGender, ulong userId)
     {
         try
         {
@@ -29,20 +29,14 @@ public class BiasGameStatInteraction(IUserService userService, BotLogger logger,
 
             await DeferAsync();
 
-            GenderType gender = choiceId == GenderChoiceEnum.Female ?
-                GenderType.Female :
-                choiceId == GenderChoiceEnum.Male ?
-                    GenderType.Male :
-                    GenderType.None;
-
-            if (gender == currentChoiceId)
+            if (chosenGender == currentGender)
             {
                 return;
             }
 
-            logger.Log($"Bias Stat Gender Chosen: {choiceId}", LogOnly: true);
+            logger.Log($"Bias Stat Gender Chosen: {chosenGender.ToFriendlyString()}", LogOnly: true);
 
-            UserBiasGameStatResource stats = await userService.GetTopIdolsAsync(Context.User.Id, gender);
+            UserBiasGameStatResource stats = await userService.GetTopIdolsAsync(Context.User.Id, chosenGender);
 
             if (stats == null || stats.BiasGameCount == 0 || stats.Stats.Count == 0)
             {
@@ -50,9 +44,9 @@ public class BiasGameStatInteraction(IUserService userService, BotLogger logger,
                 return;
             }
 
-            Embed[] embed = BiasGameStatEmbedProcessor.CreateEmbed(GetCurrentUserNickname(), gender, stats);
+            Embed[] embed = BiasGameStatEmbedProcessor.CreateEmbed(GetCurrentUserNickname(), chosenGender, stats);
 
-            MessageComponent component = BiasGameStatEmbedProcessor.CreateComponent(gender, Context.User.Id);
+            MessageComponent component = BiasGameStatEmbedProcessor.CreateComponent(chosenGender, Context.User.Id);
 
             SocketMessageComponent message = Context.Interaction as SocketMessageComponent;
             await ModifyOriginalResponseAsync(x =>

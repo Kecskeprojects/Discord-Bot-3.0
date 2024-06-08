@@ -249,12 +249,11 @@ public class IdolService(
             idol.ProfileUrl = modal.ProfileURL.Trim();
             idol.DateOfBirth = DateOnly.TryParse(modal.DateOfBirth, out DateOnly dateOfBirth) ? dateOfBirth : idol.DateOfBirth;
             idol.Name = modal.Name.ToLower().Trim();
-            idol.Gender =
-                modal.Gender.Equals(GenderType.Female, StringComparison.OrdinalIgnoreCase) ?
-                    "F" :
-                    (modal.Gender.Equals(GenderType.Male, StringComparison.OrdinalIgnoreCase) ?
-                        "M" :
-                        idol.Gender);
+            idol.Gender = GenderEnum.Female.EqualsString(modal.Gender)
+                            ? "F"
+                            : GenderEnum.Male.EqualsString(modal.Gender)
+                                ? "M"
+                                : idol.Gender;
             idol.Group = await idolGroupService.UpdateOrCreateGroupAsync(idol.Group, modal.Group.ToLower().Trim());
             await idolRepository.SaveChangesAsync();
 
@@ -365,7 +364,7 @@ public class IdolService(
         return result;
     }
 
-    public async Task<List<IdolGameResource>> GetListForGameAsync(GenderType gender, int debutAfter, int debutBefore)
+    public async Task<List<IdolGameResource>> GetListForGameAsync(GenderEnum gender, int debutAfter, int debutBefore)
     {
         List<IdolGameResource> result = null;
         try

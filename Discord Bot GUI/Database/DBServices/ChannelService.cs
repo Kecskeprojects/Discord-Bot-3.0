@@ -46,7 +46,7 @@ public class ChannelService(
                 return DbProcessResultEnum.NotFound;
             }
 
-            if (ChannelTypeNameCollections.RestrictedChannelTypes.Contains(channelTypeId))
+            if (channelTypeId.IsRestrictedChannelType())
             {
                 List<Channel> channels = await channelRepository.GetListAsync(
                     c => c.Server.DiscordId == serverId.ToString()
@@ -108,19 +108,19 @@ public class ChannelService(
             {
                 if (!channel.ChannelTypes.Remove(channelType))
                 {
-                    logger.Log($"No channel of type '{ChannelTypeNameCollections.EnumName[channelTypeId]}' were found!");
+                    logger.Log($"No channel of type '{channelTypeId.ToCommandString()}' were found!");
                     return DbProcessResultEnum.NotFound;
                 }
 
                 await channelRepository.SaveChangesAsync();
 
                 cache.RemoveCachedEntityManually(serverId);
-                logger.Log($"Settings channel of type '{ChannelTypeNameCollections.EnumName[channelTypeId]}' removed successfully!");
+                logger.Log($"Settings channel of type '{channelTypeId.ToCommandString()}' removed successfully!");
                 return DbProcessResultEnum.Success;
             }
             else
             {
-                logger.Log($"No channel of type '{ChannelTypeNameCollections.EnumName[channelTypeId]}' were found!");
+                logger.Log($"No channel of type '{channelTypeId.ToCommandString()}' were found!");
                 return DbProcessResultEnum.NotFound;
             }
         }
@@ -152,12 +152,12 @@ public class ChannelService(
                 await channelRepository.SaveChangesAsync();
 
                 cache.RemoveCachedEntityManually(serverId);
-                logger.Log($"All settings channels of type '{ChannelTypeNameCollections.EnumName[channelTypeId]}' removed successfully!");
+                logger.Log($"All settings channels of type '{channelTypeId.ToCommandString()}' removed successfully!");
                 return DbProcessResultEnum.Success;
             }
             else
             {
-                logger.Log($"No channels of type '{ChannelTypeNameCollections.EnumName[channelTypeId]}' were found!");
+                logger.Log($"No channels of type '{channelTypeId.ToCommandString()}' were found!");
                 return DbProcessResultEnum.NotFound;
             }
         }

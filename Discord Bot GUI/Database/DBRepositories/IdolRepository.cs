@@ -33,12 +33,12 @@ public class IdolRepository(MainDbContext context) : GenericRepository<Idol>(con
             .ToListAsync();
     }
 
-    public Task<List<Idol>> GetListForGameAsync(GenderType gender, int debutAfter, int debutBefore)
+    public Task<List<Idol>> GetListForGameAsync(GenderEnum gender, int debutAfter, int debutBefore)
     {
         return context.Idols
             .Include(x => x.Group)
             .Include(x => x.IdolImages)
-            .Where(x => (gender == GenderType.None.ToString() || x.Gender == gender.ToString()) &&
+            .Where(x => (gender == GenderEnum.NotSpecified || x.Gender == gender.ToString()) &&
                         x.DebutDate.HasValue && x.IdolImages.Count != 0 &&
                         x.DebutDate.Value.Year >= debutAfter &&
                         x.DebutDate.Value.Year <= debutBefore)

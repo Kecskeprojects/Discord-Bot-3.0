@@ -7,7 +7,7 @@ namespace Discord_Bot.Processors.EmbedProcessors.BiasGame;
 
 public static class BiasGameStatEmbedProcessor
 {
-    public static Embed[] CreateEmbed(string nickName, GenderType gender, UserBiasGameStatResource stats)
+    public static Embed[] CreateEmbed(string nickName, GenderEnum gender, UserBiasGameStatResource stats)
     {
         EmbedBuilder builder = new();
         string heartEmoji = ":heart:";
@@ -20,7 +20,7 @@ public static class BiasGameStatEmbedProcessor
 
         builder.WithThumbnailUrl(stats.Stats.First().LatestImageUrl);
         builder.WithCurrentTimestamp();
-        builder.WithFooter($"Gender: {gender}");
+        builder.WithFooter($"Gender: {gender.ToFriendlyString()}");
 
         string list = "";
         for (int i = 0; i < stats.Stats.Count; i++)
@@ -34,20 +34,20 @@ public static class BiasGameStatEmbedProcessor
         return [builder.Build()];
     }
 
-    public static MessageComponent CreateComponent(string genderType, ulong userId)
+    public static MessageComponent CreateComponent(GenderEnum currentGender, ulong userId)
     {
         ActionRowBuilder buttonRow = new();
         buttonRow.WithButton(
             emote: new Emoji("\U0001F57A"), //Man
-            customId: $"BiasStats_Gender_1_{genderType}_{userId}",
+            customId: $"BiasStats_Gender_1_{currentGender}_{userId}",
             style: ButtonStyle.Primary);
         buttonRow.WithButton(
             emote: new Emoji("\U0001F483"), //Woman
-            customId: $"BiasStats_Gender_2_{genderType}_{userId}",
+            customId: $"BiasStats_Gender_2_{currentGender}_{userId}",
             style: ButtonStyle.Primary);
         buttonRow.WithButton(
             emote: new Emoji("\U0001F46B"), //Both
-            customId: $"BiasStats_Gender_3_{genderType}_{userId}",
+            customId: $"BiasStats_Gender_3_{currentGender}_{userId}",
             style: ButtonStyle.Primary);
 
         ComponentBuilder components = new();

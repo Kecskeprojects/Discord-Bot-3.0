@@ -18,7 +18,7 @@ public class BiasGameData
 
     public ulong UserId { get; private set; }
     public DateTime StartedAt { get; private set; } = DateTime.UtcNow;
-    public GenderType Gender { get; private set; }
+    public GenderEnum Gender { get; set; }
     public int DebutYearStart { get; private set; }
     public int DebutYearEnd { get; private set; }
 
@@ -32,13 +32,13 @@ public class BiasGameData
 
     public ulong MessageId { get; set; }//This is only stored so if the game is stopped, the embed can be deleted
 
-    public void SetGender(GenderChoiceEnum gender)
+    public void SetGender(GenderEnum gender)
     {
-        Gender = gender == GenderChoiceEnum.Female ?
-            GenderType.Female :
-            gender == GenderChoiceEnum.Male ?
-                GenderType.Male :
-                GenderType.None;
+        Gender = gender == GenderEnum.Female ?
+            GenderEnum.Female :
+            gender == GenderEnum.Male ?
+                GenderEnum.Male :
+                GenderEnum.NotSpecified;
     }
 
     public void SetDebut(string[] chosenYears)

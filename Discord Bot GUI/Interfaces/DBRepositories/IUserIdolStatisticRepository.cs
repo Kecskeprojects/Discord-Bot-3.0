@@ -8,5 +8,5 @@ namespace Discord_Bot.Interfaces.DBRepositories;
 
 public interface IUserIdolStatisticRepository : IGenericRepository<UserIdolStatistic>
 {
-    Task<List<UserIdolStatisticResource>> GetTop10ForUserAsync(int userId, GenderType gender);
+    Task<List<UserIdolStatisticResource>> GetTop10ForUserAsync(int userId, GenderEnum gender);
 }

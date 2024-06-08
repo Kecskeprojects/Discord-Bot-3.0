@@ -61,7 +61,7 @@ public class UserService(
         return result;
     }
 
-    public async Task<UserBiasGameStatResource> GetTopIdolsAsync(ulong userId, GenderType gender)
+    public async Task<UserBiasGameStatResource> GetTopIdolsAsync(ulong userId, GenderEnum gender)
     {
         UserBiasGameStatResource result = null;
         try

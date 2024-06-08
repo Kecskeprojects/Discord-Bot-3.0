@@ -21,7 +21,7 @@ public interface IIdolService
     Task<DbProcessResultEnum> UpdateAsync(int idolId, ChangeIdolProfileLinkModal modal);
     Task<DbProcessResultEnum> UpdateAsync(int idolId, ChangeIdolGroupModal modal);
     Task<ListWithDbResult<UserResource>> GetUsersByIdolsAsync(string[] nameList);
-    Task<List<IdolGameResource>> GetListForGameAsync(GenderType gender, int debutAfter, int debutBefore);
+    Task<List<IdolGameResource>> GetListForGameAsync(GenderEnum gender, int debutAfter, int debutBefore);
     Task<int> CorrectUpdateErrorsAsync();
     Task<IdolGameResource> GetIdolByIdAsync(int idolId);
 }

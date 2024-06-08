@@ -26,7 +26,7 @@ public class BiasGameInteraction(
     private readonly BiasGameImageProcessor biasGameImageProcessor = biasGameImageProcessor;
 
     [ComponentInteraction("BiasGame_Setup_Gender_*_*")]
-    public async Task GenderChosen(GenderChoiceEnum choiceId, ulong userId)
+    public async Task GenderChosen(GenderEnum chosenGender, ulong userId)
     {
         try
         {
@@ -38,9 +38,9 @@ public class BiasGameInteraction(
 
             await DeferAsync();
 
-            data.SetGender(choiceId);
+            data.Gender = chosenGender;
 
-            logger.Log($"BiasGame Setup Gender Chosen: {choiceId}", LogOnly: true);
+            logger.Log($"BiasGame Setup Gender Chosen: {chosenGender.ToFriendlyString()}", LogOnly: true);
             MessageComponent component = BiasGameDebutEmbedProcessor.CreateComponent(data);
 
             await ModifyOriginalResponseAsync(x => x.Components = component);

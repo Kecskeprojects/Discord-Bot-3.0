@@ -63,7 +63,7 @@ public class BotLogger
     #region Internal Logging
     public void Log(string message, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BaseLog(LogType.Log);
+        Log log = BaseLog(LogTypeEnum.Log);
 
         log.Content += message;
         log.Content = PutTabsOnNewLines(log.Content);
@@ -81,7 +81,7 @@ public class BotLogger
 
     public void Query(string message, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BaseLog(LogType.Query);
+        Log log = BaseLog(LogTypeEnum.Query);
 
         log.Content += message;
         log.Content = PutTabsOnNewLines(log.Content);
@@ -99,7 +99,7 @@ public class BotLogger
 
     public void Client(string message, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BaseLog(LogType.Client);
+        Log log = BaseLog(LogTypeEnum.Client);
 
         log.Content += message;
         log.Content = PutTabsOnNewLines(log.Content);
@@ -119,7 +119,7 @@ public class BotLogger
     #region Message Logging
     public void MesUser(string message, string server = "DM")
     {
-        Log log = BaseLog(LogType.Mes_User);
+        Log log = BaseLog(LogTypeEnum.MesUser);
 
         log.Content += $"Server: {server}, Content: {message}";
         log.Content = PutTabsOnNewLines(log.Content);
@@ -129,7 +129,7 @@ public class BotLogger
 
     public void MesOther(string message, string server = "DM")
     {
-        Log log = BaseLog(LogType.Mes_Other);
+        Log log = BaseLog(LogTypeEnum.MesOther);
 
         log.Content += $"Server: {server}, Content: {message}";
         log.Content = PutTabsOnNewLines(log.Content);
@@ -141,7 +141,7 @@ public class BotLogger
     #region Error Logging
     public void Error(string location, string message, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BaseLog(LogType.Error);
+        Log log = BaseLog(LogTypeEnum.Error);
 
         log.Content += $"Location: {location}\n{message}";
         log.Content = PutTabsOnNewLines(log.Content);
@@ -159,7 +159,7 @@ public class BotLogger
 
     public void Error(string location, Exception ex, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BaseLog(LogType.Error);
+        Log log = BaseLog(LogTypeEnum.Error);
 
         log.Content += $"Location: {location}\n{ex}";
         log.Content = PutTabsOnNewLines(log.Content);
@@ -177,7 +177,7 @@ public class BotLogger
 
     public void Warning(string location, string message, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BaseLog(LogType.Warning);
+        Log log = BaseLog(LogTypeEnum.Warning);
 
         log.Content += $"Location: {location}, Content: {message}";
         log.Content = PutTabsOnNewLines(log.Content);
@@ -195,7 +195,7 @@ public class BotLogger
 
     public void Warning(string location, Exception ex, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BaseLog(LogType.Warning);
+        Log log = BaseLog(LogTypeEnum.Warning);
 
         log.Content += $"Location: {location}, Content: {ex}";
         log.Content = PutTabsOnNewLines(log.Content);
@@ -230,9 +230,9 @@ public class BotLogger
         });
     }
 
-    private static Log BaseLog(LogType type)
+    private static Log BaseLog(LogTypeEnum type)
     {
-        return new(DateTime.Now, type, $"[{DateTimeTools.CurrentTime()}][{type.Value}]:\t");
+        return new(DateTime.Now, type, $"[{DateTimeTools.CurrentTime()}][{type.ToFriendlyString()}]:\t");
     }
 
     private static string PutTabsOnNewLines(string message)

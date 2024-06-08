@@ -8,6 +8,7 @@ using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.EmbedProcessors;
 using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.Twitch;
+using Discord_Bot.Tools;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -56,8 +57,7 @@ public class AdminServerSettingCommands(
         {
             if (type == "" && channelName == "")
             {
-                await ReplyAsync("Current types: " +
-                    string.Join(", ", ChannelTypeNameCollections.NameEnum.Keys.Select(x => $"`{x}`")));
+                await ReplyAsync($"Current types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
                 return;
             }
 
@@ -74,19 +74,18 @@ public class AdminServerSettingCommands(
                 return;
             }
 
-            if (!ChannelTypeNameCollections.NameEnum.TryGetValue(type, out ChannelTypeEnum channelType))
+            if (!ChannelTypeEnumTools.TryGetEnumFromCommandText(type, out ChannelTypeEnum? channelType))
             {
-                await ReplyAsync("Channel type does not currently exist\nCurrent types: " +
-                    string.Join(", ", ChannelTypeNameCollections.NameEnum.Keys.Select(x => $"`{x}`")));
+                await ReplyAsync($"Channel type does not currently exist\nCurrent types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
                 return;
             }
 
             //Adds channel onto list of channels for server, unless conditions say there can only be one of a type of chat, removes server from cache
-            DbProcessResultEnum result = await channelService.AddSettingChannelAsync(Context.Guild.Id, channelType, channel.Id);
+            DbProcessResultEnum result = await channelService.AddSettingChannelAsync(Context.Guild.Id, channelType.Value, channel.Id);
 
             if (result == DbProcessResultEnum.Success)
             {
-                if (ChannelTypeNameCollections.RestrictedChannelTypes.Contains(channelType))
+                if (channelType.Value.IsRestrictedChannelType())
                 {
                     await ReplyAsync("Server settings updated! Previous channel (if there was one) was overwritten as only one of it's type is allowed.");
                     return;
@@ -122,18 +121,21 @@ public class AdminServerSettingCommands(
         {
             if (type == "" && channelName == "all")
             {
-                await ReplyAsync("Current types: " +
-                    string.Join(", ", ChannelTypeNameCollections.NameEnum.Keys.Select(x => $"`{x}`")));
+                await ReplyAsync($"Current types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
+                return;
+            }
+
+            if (!ChannelTypeEnumTools.TryGetEnumFromCommandText(type, out ChannelTypeEnum? channelType))
+            {
+                await ReplyAsync($"Channel type does not currently exist\nCurrent types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
                 return;
             }
 
             DbProcessResultEnum result;
-            ChannelTypeEnum channelType = ChannelTypeNameCollections.NameEnum[type];
-
             if (channelName == "all")
             {
                 //Removess every channel of a type that relates to the server, removes server from cache
-                result = await channelService.RemoveSettingChannelsAsync(Context.Guild.Id, channelType);
+                result = await channelService.RemoveSettingChannelsAsync(Context.Guild.Id, channelType.Value);
             }
             else
             {
@@ -144,14 +146,8 @@ public class AdminServerSettingCommands(
                     await ReplyAsync("Channel not found!");
                 }
 
-                if (!ChannelTypeNameCollections.NameEnum.ContainsKey(type))
-                {
-                    await ReplyAsync("Channel type does not currently exist\nCurrent types: " +
-                        string.Join(", ", ChannelTypeNameCollections.NameEnum.Keys.Select(x => $"`{x}`")));
-                }
-
                 //Removes the given channel of the given type from the settings for the server, removes server from cache
-                result = await channelService.RemovelSettingChannelAsync(Context.Guild.Id, channelType, channel.Id);
+                result = await channelService.RemovelSettingChannelAsync(Context.Guild.Id, channelType.Value, channel.Id);
             }
 
             if (result == DbProcessResultEnum.Success)

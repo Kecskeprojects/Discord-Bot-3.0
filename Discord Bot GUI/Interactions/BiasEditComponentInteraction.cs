@@ -19,7 +19,7 @@ public class BiasEditComponentInteraction : BaseInteraction
     private readonly IIdolGroupService idolGroupService;
     private readonly IIdolImageService idolImageService;
 
-    private Dictionary<string, Func<string, string, Task>> Actions { get; } = [];
+    private Dictionary<BiasEditActionTypeEnum, Func<string, string, Task>> Actions { get; } = [];
 
     public BiasEditComponentInteraction(IIdolService idolService, IIdolGroupService idolGroupService, IIdolImageService idolImageService, BotLogger logger, Config config) : base(logger, config)
     {

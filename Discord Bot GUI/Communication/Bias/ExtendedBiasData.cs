@@ -17,7 +17,11 @@ public class ExtendedBiasData
         DateOfBirth = DateOnly.TryParseExact(dateString, "yyyy-MM-dd", out DateOnly date) ? date : null;
         GroupName = Uri.UnescapeDataString(row.QuerySelector(".column-grp").InnerHtml.Trim());
         string gender = Uri.UnescapeDataString(row.QuerySelector(".column-gender").InnerHtml.Trim());
-        Gender = gender == GenderType.Male ? GenderType.Male : gender == GenderType.Female ? GenderType.Female : null;
+        Gender = gender == GenderEnum.Male.ToFriendlyString()
+                 ? GenderEnum.Male
+                 : gender == GenderEnum.Female.ToFriendlyString()
+                    ? GenderEnum.Female
+                    : null;
     }
 
     public string ProfileUrl { get; private set; }
@@ -27,5 +31,5 @@ public class ExtendedBiasData
     public string KoreanStageName { get; private set; }
     public DateOnly? DateOfBirth { get; private set; }
     public string GroupName { get; private set; }
-    public GenderType Gender { get; private set; }
+    public GenderEnum? Gender { get; private set; }
 }

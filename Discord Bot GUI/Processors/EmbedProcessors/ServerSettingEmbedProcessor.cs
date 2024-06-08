@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
+using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ public static class ServerSettingEmbedProcessor
         EmbedBuilder embed = new();
 
         embed.WithTitle("The server's settings are the following:");
-        foreach (KeyValuePair<ChannelTypeEnum, string> item in ChannelTypeNameCollections.EnumName)
+        foreach (KeyValuePair<ChannelTypeEnum, string> item in ChannelTypeEnumTools.GetNameDictionary())
         {
             if (server.SettingsChannels.TryGetValue(item.Key, out List<ulong> settingsChannels))
             {

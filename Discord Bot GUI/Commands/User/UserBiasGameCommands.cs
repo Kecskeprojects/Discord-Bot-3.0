@@ -97,7 +97,7 @@ public class UserBiasGameCommands(
                 return;
             }
 
-            UserBiasGameStatResource stats = await userService.GetTopIdolsAsync(Context.User.Id, GenderType.None);
+            UserBiasGameStatResource stats = await userService.GetTopIdolsAsync(Context.User.Id, GenderEnum.NotSpecified);
 
             if (stats == null || stats.BiasGameCount == 0 || stats.Stats.Count == 0)
             {
@@ -105,9 +105,9 @@ public class UserBiasGameCommands(
                 return;
             }
 
-            Embed[] embed = BiasGameStatEmbedProcessor.CreateEmbed(GetCurrentUserNickname(), GenderType.None, stats);
+            Embed[] embed = BiasGameStatEmbedProcessor.CreateEmbed(GetCurrentUserNickname(), GenderEnum.NotSpecified, stats);
 
-            MessageComponent component = BiasGameStatEmbedProcessor.CreateComponent(GenderType.None, Context.User.Id);
+            MessageComponent component = BiasGameStatEmbedProcessor.CreateComponent(GenderEnum.NotSpecified, Context.User.Id);
 
             await ReplyAsync(embeds: embed, components: component);
         }

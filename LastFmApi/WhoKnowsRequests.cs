@@ -1,7 +1,5 @@
 ﻿using LastFmApi.Communication;
 using LastFmApi.Enum;
-using LastFmApi.Models.TrackInfo;
-using RestSharp.Serializers;
 
 namespace LastFmApi;
 public class WhoKnowsRequests
