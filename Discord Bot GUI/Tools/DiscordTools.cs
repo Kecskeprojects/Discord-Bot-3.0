@@ -108,4 +108,9 @@ public static class DiscordTools
 
         return filtered;
     }
+
+    public static string GetUserAvatarUrl(IUser user, ImageFormat format = ImageFormat.Png, ushort size = 512)
+    {
+        return user.GetDisplayAvatarUrl(format, size);
+    }
 }

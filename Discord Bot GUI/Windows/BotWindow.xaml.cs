@@ -2,21 +2,24 @@
 using Discord_Bot.Core;
 using Discord_Bot.Tools.NativeTools;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Threading;
 
 namespace Discord_Bot.Windows;
 
-public partial class MainWindow : Window
+public partial class BotWindow : Window
 {
     private readonly Timer diagnosticsTimer;
     private bool AutoScroll = true;
 
     private readonly BotLogger logger;
 
-    public MainWindow(BotLogger logger)
+    public BotWindow(BotLogger logger)
     {
         InitializeComponent();
         this.logger = logger;
@@ -46,7 +49,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            logger.Error("MainWindow.xaml.cs ScrollViewer_ScrollChanged", ex);
+            logger.Error("BotWindow.xaml.cs ScrollViewer_ScrollChanged", ex);
         }
     }
 
@@ -67,7 +70,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            logger.Error("MainWindow.xaml.cs ToolBar_Loaded", ex);
+            logger.Error("BotWindow.xaml.cs ToolBar_Loaded", ex);
         }
     }
 
@@ -79,7 +82,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            logger.Error("MainWindow.xaml.cs ClearLog", ex);
+            logger.Error("BotWindow.xaml.cs ClearLog", ex);
         }
     }
 
@@ -90,9 +93,9 @@ public partial class MainWindow : Window
             ProcessMetrics result = await ProcessTools.GetStatistics();
             Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
             {
-                if (Application.Current.MainWindow != null)
+                if (Application.Current.Windows.OfType<BotWindow>().FirstOrDefault() != null)
                 {
-                    MainWindow main = Application.Current.MainWindow as MainWindow;
+                    BotWindow main = Application.Current.Windows.OfType<BotWindow>().First();
                     main.TotalCPUUsage.Content = $"{result.TotalCPUUsagePercent}%";
                     main.TotalRAMUsage.Content = $"{result.TotalRAMUsagePercent}%";
                     main.ThreadCount.Content = $"{result.ThreadCount}";
@@ -104,7 +107,38 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            logger.Error("MainWindow.xaml.cs OnTimedEvent", ex);
+            logger.Error("BotWindow.xaml.cs OnTimedEvent", ex);
         }
+    }
+
+    public static void ClearWindowLog()
+    {
+        Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
+        {
+            if (Application.Current.Windows.OfType<BotWindow>().FirstOrDefault() != null)
+            {
+                BotWindow main = Application.Current.Windows.OfType<BotWindow>().First();
+                List<Inline> range = main.MainLogText.Inlines.TakeLast(20).ToList();
+                main.MainLogText.Inlines.Clear();
+                main.MainLogText.Inlines.AddRange(range);
+            }
+        });
+    }
+
+    public static void LogToWindow(Log log, System.Windows.Media.Brush color)
+    {
+        string mess = log.Content.Replace(":\t", ":    \t");
+        Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
+        {
+            if (Application.Current.Windows.OfType<BotWindow>().FirstOrDefault() != null)
+            {
+                BotWindow main = Application.Current.Windows.OfType<BotWindow>().First();
+                Run run = new(mess + "\n")
+                {
+                    Foreground = color
+                };
+                main.MainLogText.Inlines.Add(run);
+            }
+        });
     }
 }

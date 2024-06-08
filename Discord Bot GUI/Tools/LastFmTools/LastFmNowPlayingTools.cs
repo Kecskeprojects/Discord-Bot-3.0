@@ -4,7 +4,7 @@ using LastFmApi.Communication;
 using LastFmApi.Models.Recent;
 
 namespace Discord_Bot.Tools.LastFmTools;
-public class LastFmNowPlayingTools
+public static class LastFmNowPlayingTools
 {
     public static void MapNowPlayingData(GenericResponseItem<Recenttracks> restResult, Track track, NowPlayingResult result, SpotifyImageSearchResult spotifySearch, string ranking, string userplaycount)
     {

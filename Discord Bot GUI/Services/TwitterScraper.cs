@@ -19,8 +19,6 @@ public class TwitterScraper(BotLogger logger, BrowserService browserService) : I
     private readonly BrowserService browserService = browserService;
 
     private Root Body { get; set; }
-    private static readonly string[] smallSizingStrings = ["thumb", "small", "medium"];
-    //private static readonly string[] largeSizingStrings = ["large", "orig"];
 
     #region Main Methods
     public async Task<TwitterScrapingResult> GetDataFromUrls(List<Uri> uris)
@@ -183,7 +181,7 @@ public class TwitterScraper(BotLogger logger, BrowserService browserService) : I
         string query = new Uri(url).Query;
 
         string newQuery = query.Contains("jpg") ? "?format=jpg" : "?format=png";
-        newQuery += smallSizingStrings.Any(query.Contains)
+        newQuery += StaticLists.TwitterSmallSizingStrings.Any(query.Contains) //If not in these, the value is either "large" or "orig"
                 ? "&name=medium"
                 : "&name=orig";
 

@@ -5,7 +5,7 @@ namespace LastFmApi;
 
 public class BaseRequests
 {
-    public static string BaseUrl { get; } = "http://ws.audioscrobbler.com/2.0/";
+    public const string BaseUrl = "http://ws.audioscrobbler.com/2.0/";
 
     //The main request handling function
     private static readonly RestClient _client = new(BaseUrl);

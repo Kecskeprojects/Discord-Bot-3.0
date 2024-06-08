@@ -1,15 +1,13 @@
 ﻿using Discord_Bot.Communication;
 using Discord_Bot.Enums;
+using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
 using Discord_Bot.Windows;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Windows;
-using System.Windows.Documents;
 using System.Windows.Media;
-using System.Windows.Threading;
 
 namespace Discord_Bot.Core;
 
@@ -17,20 +15,6 @@ public class BotLogger
 {
     //List of logs, before they are cleared
     public readonly List<Log> Logs = [];
-
-    public static void ClearWindowLog()
-    {
-        Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
-        {
-            if (Application.Current.MainWindow != null)
-            {
-                MainWindow main = Application.Current.MainWindow as MainWindow;
-                List<Inline> range = main.MainLogText.Inlines.TakeLast(20).ToList();
-                main.MainLogText.Inlines.Clear();
-                main.MainLogText.Inlines.AddRange(range);
-            }
-        });
-    }
 
     public void LogToFile()
     {
@@ -63,14 +47,14 @@ public class BotLogger
     #region Internal Logging
     public void Log(string message, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BaseLog(LogTypeEnum.Log);
+        Log log = BotLoggerTools.BaseLog(LogTypeEnum.Log);
 
         log.Content += message;
-        log.Content = PutTabsOnNewLines(log.Content);
+        log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
 
         if (!LogOnly)
         {
-            LogToWindow(log, Brushes.White);
+            BotWindow.LogToWindow(log, Brushes.White);
         }
 
         if (!ConsoleOnly)
@@ -81,14 +65,14 @@ public class BotLogger
 
     public void Query(string message, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BaseLog(LogTypeEnum.Query);
+        Log log = BotLoggerTools.BaseLog(LogTypeEnum.Query);
 
         log.Content += message;
-        log.Content = PutTabsOnNewLines(log.Content);
+        log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
 
         if (!LogOnly)
         {
-            LogToWindow(log, Brushes.DarkCyan);
+            BotWindow.LogToWindow(log, Brushes.DarkCyan);
         }
 
         if (!ConsoleOnly)
@@ -99,14 +83,14 @@ public class BotLogger
 
     public void Client(string message, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BaseLog(LogTypeEnum.Client);
+        Log log = BotLoggerTools.BaseLog(LogTypeEnum.Client);
 
         log.Content += message;
-        log.Content = PutTabsOnNewLines(log.Content);
+        log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
 
         if (!LogOnly)
         {
-            LogToWindow(log, Brushes.DarkGray);
+            BotWindow.LogToWindow(log, Brushes.DarkGray);
         }
 
         if (!ConsoleOnly)
@@ -119,20 +103,20 @@ public class BotLogger
     #region Message Logging
     public void MesUser(string message, string server = "DM")
     {
-        Log log = BaseLog(LogTypeEnum.MesUser);
+        Log log = BotLoggerTools.BaseLog(LogTypeEnum.MesUser);
 
         log.Content += $"Server: {server}, Content: {message}";
-        log.Content = PutTabsOnNewLines(log.Content);
+        log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
 
         Logs.Add(log);
     }
 
     public void MesOther(string message, string server = "DM")
     {
-        Log log = BaseLog(LogTypeEnum.MesOther);
+        Log log = BotLoggerTools.BaseLog(LogTypeEnum.MesOther);
 
         log.Content += $"Server: {server}, Content: {message}";
-        log.Content = PutTabsOnNewLines(log.Content);
+        log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
 
         Logs.Add(log);
     }
@@ -141,14 +125,14 @@ public class BotLogger
     #region Error Logging
     public void Error(string location, string message, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BaseLog(LogTypeEnum.Error);
+        Log log = BotLoggerTools.BaseLog(LogTypeEnum.Error);
 
         log.Content += $"Location: {location}\n{message}";
-        log.Content = PutTabsOnNewLines(log.Content);
+        log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
 
         if (!LogOnly)
         {
-            LogToWindow(log, Brushes.Red);
+            BotWindow.LogToWindow(log, Brushes.Red);
         }
 
         if (!ConsoleOnly)
@@ -159,14 +143,14 @@ public class BotLogger
 
     public void Error(string location, Exception ex, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BaseLog(LogTypeEnum.Error);
+        Log log = BotLoggerTools.BaseLog(LogTypeEnum.Error);
 
         log.Content += $"Location: {location}\n{ex}";
-        log.Content = PutTabsOnNewLines(log.Content);
+        log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
 
         if (!LogOnly)
         {
-            LogToWindow(log, Brushes.Red);
+            BotWindow.LogToWindow(log, Brushes.Red);
         }
 
         if (!ConsoleOnly)
@@ -177,14 +161,14 @@ public class BotLogger
 
     public void Warning(string location, string message, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BaseLog(LogTypeEnum.Warning);
+        Log log = BotLoggerTools.BaseLog(LogTypeEnum.Warning);
 
         log.Content += $"Location: {location}, Content: {message}";
-        log.Content = PutTabsOnNewLines(log.Content);
+        log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
 
         if (!LogOnly)
         {
-            LogToWindow(log, Brushes.Yellow);
+            BotWindow.LogToWindow(log, Brushes.Yellow);
         }
 
         if (!ConsoleOnly)
@@ -195,49 +179,20 @@ public class BotLogger
 
     public void Warning(string location, Exception ex, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BaseLog(LogTypeEnum.Warning);
+        Log log = BotLoggerTools.BaseLog(LogTypeEnum.Warning);
 
         log.Content += $"Location: {location}, Content: {ex}";
-        log.Content = PutTabsOnNewLines(log.Content);
+        log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
 
         if (!LogOnly)
         {
-            LogToWindow(log, Brushes.Yellow);
+            BotWindow.LogToWindow(log, Brushes.Yellow);
         }
 
         if (!ConsoleOnly)
         {
             Logs.Add(log);
         }
-    }
-    #endregion
-
-    #region Helper Methods
-    private static void LogToWindow(Log log, Brush color)
-    {
-        string mess = log.Content.Replace(":\t", ":    \t");
-        Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
-        {
-            if (Application.Current.MainWindow != null)
-            {
-                MainWindow main = Application.Current.MainWindow as MainWindow;
-                Run run = new(mess + "\n")
-                {
-                    Foreground = color
-                };
-                main.MainLogText.Inlines.Add(run);
-            }
-        });
-    }
-
-    private static Log BaseLog(LogTypeEnum type)
-    {
-        return new(DateTime.Now, type, $"[{DateTimeTools.CurrentTime()}][{type.ToFriendlyString()}]:\t");
-    }
-
-    private static string PutTabsOnNewLines(string message)
-    {
-        return message.Replace("\n", "\n\t\t\t");
     }
     #endregion
 }

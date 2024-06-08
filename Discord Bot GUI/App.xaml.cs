@@ -77,7 +77,7 @@ public partial class App : Application
 
         using (IServiceScope scope = services.CreateScope())
         {
-            MainWindow mainWindow = scope.ServiceProvider.GetRequiredService<MainWindow>();
+            BotWindow mainWindow = scope.ServiceProvider.GetRequiredService<BotWindow>();
 
             mainWindow.Show();
 
@@ -117,7 +117,7 @@ public partial class App : Application
                 //Do at GMT+0 midnight every day
                 if (DateTime.UtcNow.Hour == 0 && DateTime.UtcNow.Minute == 0)
                 {
-                    BotLogger.ClearWindowLog();
+                    BotWindow.ClearWindowLog();
                 }
 
                 //Do at GMT+0 6 am every day

@@ -66,7 +66,7 @@ public static class ServiceBuilder
         collection.AddSingleton<BotMain>();
         collection.AddSingleton<InteractionHandler>();
         collection.AddSingleton<CommandHandler>();
-        collection.AddTransient<MainWindow>();
+        collection.AddTransient<BotWindow>();
 
         //Processors
         collection.AddTransient<WhoKnowsImageProcessor>();

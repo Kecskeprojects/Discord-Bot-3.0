@@ -70,7 +70,7 @@ public class UserBonkCommands(
                 if (ulong.TryParse(userName, out ulong userId))
                 {
                     SocketGuildUser user = Context.Guild.GetUser(userId);
-                    url = GetUserAvatar(user);
+                    url = DiscordTools.GetUserAvatarUrl(user);
                 }
                 else
                 {
@@ -78,7 +78,7 @@ public class UserBonkCommands(
                     if (users.Count > 0)
                     {
                         RestGuildUser user = users.First();
-                        url = GetUserAvatar(user);
+                        url = DiscordTools.GetUserAvatarUrl(user);
                     }
                 }
             }

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Discord_Bot.Processors.MessageProcessor;
 
-public class RoleMessageProcessor
+public static class RoleMessageProcessor
 {
     public static string CreateMessage(List<RoleResource> roles)
     {

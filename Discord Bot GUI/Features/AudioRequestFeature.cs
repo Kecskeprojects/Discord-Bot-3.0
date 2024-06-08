@@ -31,12 +31,10 @@ public class AudioRequestFeature(IYoutubeAPI youtubeAPI, ISpotifyAPI spotifyAPI,
             //In case of a spotify link, do a spotify API query before the youtube API query
             SearchResultEnum result = await AddToPlaylistAsync(input);
 
-            string resultMessage = GetResultMessage(result);
-
-            logger.Log(resultMessage);
+            logger.Log(result.ToMessageString());
             if (result is not SearchResultEnum.SpotifyVideoFound and not SearchResultEnum.YoutubeFoundVideo)
             {
-                await Context.Channel.SendMessageAsync(resultMessage);
+                await Context.Channel.SendMessageAsync(result.ToMessageString());
                 return false;
             }
             ServerAudioResource audioResource = GetCurrentAudioResource();
@@ -66,21 +64,5 @@ public class AudioRequestFeature(IYoutubeAPI youtubeAPI, ISpotifyAPI spotifyAPI,
         return input.Contains("spotify.com")
             ? await spotifyAPI.SpotifySearch(input, Context.Guild.Id, Context.Channel.Id, username)
             : await youtubeAPI.Searching(input, username, Context.Guild.Id, Context.Channel.Id);
-    }
-
-    public static string GetResultMessage(SearchResultEnum result)
-    {
-        return result switch
-        {
-            SearchResultEnum.YoutubeNotFound => "No youtube video found or it is unlisted/private!",
-            SearchResultEnum.SpotifyNotFound => "No results found on spotify!",
-            SearchResultEnum.YoutubeFoundVideo => "Youtube result found!",
-            SearchResultEnum.SpotifyVideoFound => "Spotify result found!",
-            SearchResultEnum.YoutubePlaylistFound => "Youtube playlist added!",
-            SearchResultEnum.SpotifyPlaylistFound => "Spotify playlist/album added!",
-            SearchResultEnum.SpotifyFoundYoutubeNotFound => "Result found on spotify, but no youtube video/playlist found or it is unlisted/private!!",
-            SearchResultEnum.YoutubeSearchNotFound => "Youtube video/playlist not found!",
-            _ => "Unexpected result for search!"
-        };
     }
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Discord_Bot.Processors.EmbedProcessors;
 
-public class GreetingListEmbedProcessor
+public static class GreetingListEmbedProcessor
 {
     public static Embed[] CreateEmbed(List<GreetingResource> greetings)
     {

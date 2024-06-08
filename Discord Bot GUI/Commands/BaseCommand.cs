@@ -25,12 +25,7 @@ public class BaseCommand(BotLogger logger, Config config, IServerService serverS
 
     protected string GetCurrentUserAvatar(ImageFormat format = ImageFormat.Png, ushort size = 512)
     {
-        return Context.User.GetDisplayAvatarUrl(format, size);
-    }
-
-    protected static string GetUserAvatar(IUser user, ImageFormat format = ImageFormat.Png, ushort size = 512)
-    {
-        return user.GetDisplayAvatarUrl(format, size);
+        return DiscordTools.GetUserAvatarUrl(Context.User, format, size);
     }
 
     protected string GetCurrentUserNickname()

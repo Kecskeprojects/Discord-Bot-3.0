@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Discord_Bot.Tools;
-public class ChannelTypeEnumTools
+public static class ChannelTypeEnumTools
 {
     public static List<string> GetCommandArray()
     {

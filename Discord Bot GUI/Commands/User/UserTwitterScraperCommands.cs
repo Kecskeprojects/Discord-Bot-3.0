@@ -4,6 +4,7 @@ using Discord.Net;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
+using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.MessageProcessor;
@@ -24,8 +25,6 @@ public class UserTwitterScraperCommands(
 {
     private readonly ITwitterScraper twitterScraper = twitterScraper;
 
-    private static readonly string[] baseURLs = ["https://twitter.com/", "https://x.com/"];
-
     [Command("twt")]
     [Summary("For embedding twitter messages, replacing the built in discord embeds")]
     public async Task ScrapeFromUrl([Remainder] string message)
@@ -37,7 +36,7 @@ public class UserTwitterScraperCommands(
 
         try
         {
-            List<Uri> urls = UrlTools.LinkSearch(message, true, baseURLs);
+            List<Uri> urls = UrlTools.LinkSearch(message, true, StaticLists.BaseTwitterURLs);
 
             //Check if message is an instagram link
             if (urls != null)

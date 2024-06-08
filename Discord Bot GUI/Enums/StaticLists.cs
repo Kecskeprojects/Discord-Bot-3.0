@@ -8,6 +8,20 @@ namespace Discord_Bot.Enums;
 //https://stackoverflow.com/a/479453, https://stackoverflow.com/a/45380679 and https://stackoverflow.com/a/28309084
 public class StaticLists
 {
+    public static string[] BaseTwitterURLs { get; } =
+        [
+            "https://twitter.com/",
+            "https://x.com/"
+        ];
+
+
+    public static string[] TwitterSmallSizingStrings { get; } = 
+        [
+            "thumb",
+            "small",
+            "medium"
+        ];
+
     public static string[] EasterEggMessages { get; } =
         [
             "I know where you live",
