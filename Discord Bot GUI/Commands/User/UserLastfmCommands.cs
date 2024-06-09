@@ -45,18 +45,13 @@ public class UserLastfmCommands(
             }
 
             DbProcessResultEnum result = await userService.AddLastfmUsernameAsync(Context.User.Id, name);
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync($"Username connected to account!");
-            }
-            else if (result == DbProcessResultEnum.AlreadyExists)
-            {
-                await ReplyAsync("you have a lastfm account connected to your discord account already!");
-            }
-            else
-            {
-                await ReplyAsync("Lastfm account could not be connected to account!");
-            }
+                DbProcessResultEnum.Success => "Username connected to account.",
+                DbProcessResultEnum.AlreadyExists => "You have a last.fm account connected to your discord account already.",
+                _ => "Last.fm account could not be connected to account!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -77,18 +72,13 @@ public class UserLastfmCommands(
             }
 
             DbProcessResultEnum result = await userService.RemoveLastfmUsernameAsync(Context.User.Id);
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync("Last.fm has been disconnected from your account!");
-            }
-            else if (result == DbProcessResultEnum.NotFound)
-            {
-                await ReplyAsync("You do not have a lastfm user tied to your account.");
-            }
-            else
-            {
-                await ReplyAsync("Last.fm could not be disconnected from your account!");
-            }
+                DbProcessResultEnum.Success => "Last.fm has been disconnected from your account.",
+                DbProcessResultEnum.NotFound => "You do not have a lastfm user tied to your account.",
+                _ => "Last.fm could not be disconnected from your account!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {

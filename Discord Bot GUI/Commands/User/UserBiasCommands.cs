@@ -65,30 +65,16 @@ public class UserBiasCommands(
             DbProcessResultEnum result = isGroupName
                 ? await userIdolService.AddUserIdolGroupAsync(Context.User.Id, biasGroup)
                 : await userIdolService.AddUserIdolAsync(Context.User.Id, biasName, biasGroup);
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync("Bias(es) added to your list of biases!");
-            }
-            else if (result == DbProcessResultEnum.MultipleResults)
-            {
-                await ReplyAsync("There are multiple biases with that name!\nWrite down the group name too in the following format: [name]-[group]");
-            }
-            else if (result == DbProcessResultEnum.AlreadyExists)
-            {
-                await ReplyAsync("You already have this bias/these biases on your list!");
-            }
-            else if (result == DbProcessResultEnum.MultipleExists)
-            {
-                await ReplyAsync("A bias with that name was found in your list, but you did not specify a group! (format: [name]-[group])");
-            }
-            else if (result == DbProcessResultEnum.NotFound)
-            {
-                await ReplyAsync("Bias not in database!");
-            }
-            else
-            {
-                await ReplyAsync("Bias(es) could not be added!");
-            }
+                DbProcessResultEnum.Success => "Bias(es) added to your list of biases.",
+                DbProcessResultEnum.MultipleResults => "There are multiple biases with that name.\nWrite down the group name too in the following format: [name]-[group].",
+                DbProcessResultEnum.AlreadyExists => "You already have this bias/these biases on your list.",
+                DbProcessResultEnum.MultipleExists => "A bias with that name was found in your list, but you did not specify a group. (format: [name]-[group])",
+                DbProcessResultEnum.NotFound => "Bias not in database.",
+                _ => "Bias(es) could not be added!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -133,22 +119,14 @@ public class UserBiasCommands(
             DbProcessResultEnum result = isGroupName
                 ? await userIdolService.RemoveUserIdolGroupAsync(Context.User.Id, biasGroup)
                 : await userIdolService.RemoveUserIdolAsync(Context.User.Id, biasName, biasGroup);
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync("Bias(es) removed from your list of biases!");
-            }
-            else if (result == DbProcessResultEnum.MultipleResults)
-            {
-                await ReplyAsync("You have multiple biases with that name!\nWrite down the group name too in the following format: [name]-[group]");
-            }
-            else if (result == DbProcessResultEnum.PartialNotFound)
-            {
-                await ReplyAsync("You do not have this bias/these biases on your list!");
-            }
-            else
-            {
-                await ReplyAsync("Bias(es) could not be removed!");
-            }
+                DbProcessResultEnum.Success => "Bias(es) removed from your list of biases.",
+                DbProcessResultEnum.MultipleResults => "You have multiple biases with that name.\nWrite down the group name too in the following format: [name]-[group].",
+                DbProcessResultEnum.PartialNotFound => "You do not have this bias/these biases on your list.",
+                _ => "Bias(es) could not be removed!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -168,14 +146,12 @@ public class UserBiasCommands(
             }
 
             DbProcessResultEnum result = await userIdolService.ClearUserIdolAsync(Context.User.Id);
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync("Your biases have been cleared!");
-            }
-            else
-            {
-                await ReplyAsync("You did not have any biases to clear!");
-            }
+                DbProcessResultEnum.Success => "Your biases have been cleared.",
+                _ => "You did not have any biases to clear!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {

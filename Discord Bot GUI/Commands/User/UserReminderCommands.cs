@@ -66,16 +66,12 @@ public class UserReminderCommands(
                 if (DateTime.Compare(ConvertedDate, DateTime.UtcNow) > 0)
                 {
                     DbProcessResultEnum result = await reminderService.AddReminderAsync(Context.User.Id, ConvertedDate, remindMessage);
-
-                    if (result == DbProcessResultEnum.Success)
+                    string resultMessage = result switch
                     {
-                        await ReplyAsync($"Alright, I will remind you at {TimestampTag.FromDateTime(date, TimestampTagStyles.ShortDateTime)}!");
-                    }
-                    else
-                    {
-                        await ReplyAsync("Reminder could not be added, talk to dumbass owner.");
-                    }
-
+                        DbProcessResultEnum.Success => $"Alright, I will remind you at {TimestampTag.FromDateTime(date, TimestampTagStyles.ShortDateTime)}.",
+                        _ => "Reminder could not be added, talk to dumbass owner!"
+                    };
+                    await ReplyAsync(resultMessage);
                     return;
                 }
             }
@@ -89,16 +85,12 @@ public class UserReminderCommands(
                     {
                         //Add reminder to database
                         DbProcessResultEnum result = await reminderService.AddReminderAsync(Context.User.Id, date, remindMessage);
-
-                        if (result == DbProcessResultEnum.Success)
+                        string resultMessage = result switch
                         {
-                            await ReplyAsync($"Alright, I will remind you at {TimestampTag.FromDateTime(date, TimestampTagStyles.ShortDateTime)}!");
-                        }
-                        else
-                        {
-                            await ReplyAsync("Reminder could not be added, talk to dumbass owner.");
-                        }
-
+                            DbProcessResultEnum.Success => $"Alright, I will remind you at {TimestampTag.FromDateTime(date, TimestampTagStyles.ShortDateTime)}.",
+                            _ => "Reminder could not be added, talk to dumbass owner!"
+                        };
+                        await ReplyAsync(resultMessage);
                         return;
                     }
                 }
@@ -151,15 +143,12 @@ public class UserReminderCommands(
                 }
 
                 DbProcessResultEnum result = await reminderService.AddReminderAsync(Context.User.Id, date, remindMessage);
-
-                if (result == DbProcessResultEnum.Success)
+                string resultMessage = result switch
                 {
-                    await ReplyAsync($"Alright, I will remind you at {TimestampTag.FromDateTime(date, TimestampTagStyles.Relative)}!");
-                }
-                else
-                {
-                    await ReplyAsync("Reminder could not be added, talk to dumbass owner.");
-                }
+                    DbProcessResultEnum.Success => $"Alright, I will remind you at {TimestampTag.FromDateTime(date, TimestampTagStyles.Relative)}.",
+                    _ => "Reminder could not be added, talk to dumbass owner!"
+                };
+                await ReplyAsync(resultMessage);
             }
             else
             {
@@ -211,18 +200,13 @@ public class UserReminderCommands(
             }
 
             DbProcessResultEnum result = await reminderService.RemoveUserReminderAsync(Context.User.Id, reminderOrderId);
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync($"Reminder in position #{reminderOrderId} has been removed!");
-            }
-            else if (result == DbProcessResultEnum.NotFound)
-            {
-                await ReplyAsync("Reminder doesn't exist with that ID or it is not yours!");
-            }
-            else
-            {
-                await ReplyAsync("Reminder could not be removed!");
-            }
+                DbProcessResultEnum.Success => $"Reminder in position #{reminderOrderId} has been removed.",
+                DbProcessResultEnum.NotFound => "Reminder doesn't exist with that ID or it is not yours.",
+                _ => "Reminder could not be removed!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
