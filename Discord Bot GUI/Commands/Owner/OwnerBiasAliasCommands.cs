@@ -33,22 +33,14 @@ public class OwnerBiasAliasCommands(
             }
 
             DbProcessResultEnum result = await idolAliasService.AddIdolAliasAsync(biasAlias, biasName, biasGroup);
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync("Bias alias added to list!");
-            }
-            else if (result == DbProcessResultEnum.AlreadyExists)
-            {
-                await ReplyAsync("Bias alias already in database!");
-            }
-            else if (result == DbProcessResultEnum.NotFound)
-            {
-                await ReplyAsync("Bias with that name not found in database!");
-            }
-            else
-            {
-                await ReplyAsync("Bias alias could not be added!");
-            }
+                DbProcessResultEnum.Success => "Bias alias added to list.",
+                DbProcessResultEnum.AlreadyExists => "Bias alias already in database.",
+                DbProcessResultEnum.NotFound => "Bias with that name not found in database.",
+                _ => "Bias alias could not be added!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -73,18 +65,13 @@ public class OwnerBiasAliasCommands(
             }
 
             DbProcessResultEnum result = await idolAliasService.RemoveIdolAliasAsync(biasAlias, biasName, biasGroup);
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync("Bias alias removed from list!");
-            }
-            else if (result == DbProcessResultEnum.NotFound)
-            {
-                await ReplyAsync("Bias alias not in database!");
-            }
-            else
-            {
-                await ReplyAsync("Bias alias could not be removed!");
-            }
+                DbProcessResultEnum.Success => "Bias alias removed from list.",
+                DbProcessResultEnum.NotFound => "Bias alias not in database.",
+                _ => "Bias alias could not be removed!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {

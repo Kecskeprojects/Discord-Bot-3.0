@@ -37,18 +37,13 @@ public class OwnerBiasCommands(
             }
 
             DbProcessResultEnum result = await idolService.AddIdolAsync(biasName, biasGroup);
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync("Bias added to list!");
-            }
-            else if (result == DbProcessResultEnum.AlreadyExists)
-            {
-                await ReplyAsync("Bias already in database!");
-            }
-            else
-            {
-                await ReplyAsync("Bias could not be added!");
-            }
+                DbProcessResultEnum.Success => "Bias added to list.",
+                DbProcessResultEnum.AlreadyExists => "Bias already in database.",
+                _ => "Bias could not be added!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -68,18 +63,13 @@ public class OwnerBiasCommands(
 
             //Try removing them from the database
             DbProcessResultEnum result = await idolService.RemoveIdolAsync(biasName, biasGroup);
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync("Bias removed from list!");
-            }
-            else if (result == DbProcessResultEnum.NotFound)
-            {
-                await ReplyAsync("Bias could not be found.");
-            }
-            else
-            {
-                await ReplyAsync("Bias could not be removed!");
-            }
+                DbProcessResultEnum.Success => "Bias removed from list.",
+                DbProcessResultEnum.NotFound => "Bias could not be found.",
+                _ => "Bias could not be removed!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {

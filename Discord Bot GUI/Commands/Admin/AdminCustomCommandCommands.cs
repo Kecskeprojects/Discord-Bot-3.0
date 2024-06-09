@@ -29,18 +29,13 @@ public class AdminCustomCommandCommands(
             if (Uri.IsWellFormedUriString(link, UriKind.Absolute))
             {
                 DbProcessResultEnum result = await customCommandService.AddCustomCommandAsync(Context.Guild.Id, name, link);
-                if (result == DbProcessResultEnum.Success)
+                string resultMessage = result switch
                 {
-                    await ReplyAsync($"New command successfully added: {name}");
-                }
-                else if (result == DbProcessResultEnum.AlreadyExists)
-                {
-                    await ReplyAsync("A command with this name already exists on this server!");
-                }
-                else
-                {
-                    await ReplyAsync("Command could not be added!");
-                }
+                    DbProcessResultEnum.Success => $"New command successfully added: {name}.",
+                    DbProcessResultEnum.AlreadyExists => "A command with this name already exists on this server.",
+                    _ => "Command could not be added!"
+                };
+                await ReplyAsync(resultMessage);
             }
             else
             {
@@ -62,18 +57,13 @@ public class AdminCustomCommandCommands(
         try
         {
             DbProcessResultEnum result = await customCommandService.RemoveCustomCommandAsync(Context.Guild.Id, name);
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync($"The {name} command has been removed.");
-            }
-            else if (result == DbProcessResultEnum.NotFound)
-            {
-                await ReplyAsync("Command does not exist.");
-            }
-            else
-            {
-                await ReplyAsync("Command could not be removed!");
-            }
+                DbProcessResultEnum.Success => $"The {name} command has been removed.",
+                DbProcessResultEnum.NotFound => "Command does not exist.",
+                _ => "Command could not be removed!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {

@@ -28,18 +28,13 @@ public class AdminKeywordCommands(
             string[] array = keyword_response.Split(">");
 
             DbProcessResultEnum result = await keywordService.AddKeywordAsync(Context.Guild.Id, array[0], array[1]);
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync("Keyword added to database!");
-            }
-            else if (result == DbProcessResultEnum.AlreadyExists)
-            {
-                await ReplyAsync("Keyword already in database!");
-            }
-            else
-            {
-                await ReplyAsync("Keyword could not be added to database!");
-            }
+                DbProcessResultEnum.Success => "Keyword added to database.",
+                DbProcessResultEnum.AlreadyExists => "Keyword already in database.",
+                _ => "Keyword could not be added to database!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -56,18 +51,13 @@ public class AdminKeywordCommands(
         try
         {
             DbProcessResultEnum result = await keywordService.RemoveKeywordAsync(Context.Guild.Id, keyword);
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync("Keyword removed from database!");
-            }
-            else if (result == DbProcessResultEnum.NotFound)
-            {
-                await ReplyAsync("Keyword could not be found.");
-            }
-            else
-            {
-                await ReplyAsync("Keyword could not be removed from database!");
-            }
+                DbProcessResultEnum.Success => "Keyword removed from database.",
+                DbProcessResultEnum.NotFound => "Keyword could not be found.",
+                _ => "Keyword could not be removed from database!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {

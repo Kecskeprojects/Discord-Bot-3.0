@@ -4,6 +4,7 @@ using Discord.Rest;
 using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
+using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Processors.MessageProcessor;
@@ -38,18 +39,13 @@ public class AdminSelfRoleCommands(
             if (role != null)
             {
                 DbProcessResultEnum result = await roleService.AddSelfRoleAsync(Context.Guild.Id, role.Name.ToLower(), role.Id);
-                if (result == DbProcessResultEnum.Success)
+                string resultMessage = result switch
                 {
-                    await ReplyAsync($"New role successfully added: {role.Name}");
-                }
-                else if (result == DbProcessResultEnum.AlreadyExists)
-                {
-                    await ReplyAsync("Role already in database!");
-                }
-                else
-                {
-                    await ReplyAsync("Role could not be added!");
-                }
+                    DbProcessResultEnum.Success => $"New role successfully added: {role.Name}.",
+                    DbProcessResultEnum.AlreadyExists => "Role already in database.",
+                    _ => "Role could not be added!"
+                };
+                await ReplyAsync(resultMessage);
             }
             else
             {
@@ -76,18 +72,13 @@ public class AdminSelfRoleCommands(
             if (role != null)
             {
                 DbProcessResultEnum result = await roleService.RemoveSelfRoleAsync(Context.Guild.Id, name);
-                if (result == DbProcessResultEnum.Success)
+                string resultMessage = result switch
                 {
-                    await ReplyAsync($"The {role.Name} role has been removed.");
-                }
-                else if (result == DbProcessResultEnum.NotFound)
-                {
-                    await ReplyAsync("Role could not be found.");
-                }
-                else
-                {
-                    await ReplyAsync("Role could not be removed!");
-                }
+                    DbProcessResultEnum.Success => $"The {role.Name} role has been removed.",
+                    DbProcessResultEnum.NotFound => "Role could not be found.",
+                    _ => "Role could not be removed!"
+                };
+                await ReplyAsync(resultMessage);
             }
             else
             {
@@ -131,14 +122,12 @@ public class AdminSelfRoleCommands(
             RestUserMessage newMessage = await channel.SendMessageAsync(message);
 
             DbProcessResultEnum result = await serverService.ChangeRoleMessageIdAsync(Context.Guild.Id, newMessage.Id);
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync($"The role message has been updated.");
-            }
-            else
-            {
-                await ReplyAsync("Role could not be updated!");
-            }
+                DbProcessResultEnum.Success => "The role message has been updated.",
+                _ => "Role message could not be updated!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {

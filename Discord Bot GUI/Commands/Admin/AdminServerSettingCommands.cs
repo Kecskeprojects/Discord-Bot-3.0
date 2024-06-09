@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
+using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
@@ -82,28 +83,16 @@ public class AdminServerSettingCommands(
 
             //Adds channel onto list of channels for server, unless conditions say there can only be one of a type of chat, removes server from cache
             DbProcessResultEnum result = await channelService.AddSettingChannelAsync(Context.Guild.Id, channelType.Value, channel.Id);
-
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                if (channelType.Value.IsRestrictedChannelType())
-                {
-                    await ReplyAsync("Server settings updated! Previous channel (if there was one) was overwritten as only one of it's type is allowed.");
-                    return;
-                }
-                await ReplyAsync("Server settings updated!");
-            }
-            else if (result == DbProcessResultEnum.AlreadyExists)
-            {
-                await ReplyAsync("Channel and type combination already in database!");
-            }
-            else if (result == DbProcessResultEnum.NotFound)
-            {
-                await ReplyAsync("ChannelType or Server not found!");
-            }
-            else
-            {
-                await ReplyAsync("Server settings could not be updated!");
-            }
+                DbProcessResultEnum.Success => channelType.Value.IsRestrictedChannelType()
+                                                ? "Server settings updated! Previous channel (if there was one) was overwritten as only one of it's type is allowed."
+                                                : "Server settings updated.",
+                DbProcessResultEnum.AlreadyExists => "Channel and type combination already in database.",
+                DbProcessResultEnum.NotFound => "ChannelType or Server not found.",
+                _ => "Server settings could not be updated!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -150,18 +139,13 @@ public class AdminServerSettingCommands(
                 result = await channelService.RemovelSettingChannelAsync(Context.Guild.Id, channelType.Value, channel.Id);
             }
 
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync("Server settings updated!");
-            }
-            else if (result == DbProcessResultEnum.NotFound)
-            {
-                await ReplyAsync("This channel is not currently set for this type!");
-            }
-            else
-            {
-                await ReplyAsync("Server settings could not be updated!");
-            }
+                DbProcessResultEnum.Success => "Server settings updated.",
+                DbProcessResultEnum.NotFound => "This channel is not currently set for this type.",
+                _ => "Server settings could not be updated!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -185,19 +169,13 @@ public class AdminServerSettingCommands(
             }
             //Adds the notification role for every checked channel, as of now it will overwrite the previous one, there cannot be multiple, removes server from cache
             DbProcessResultEnum result = await serverService.AddNotificationRoleAsync(Context.Guild.Id, role.Id, role.Name);
-
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync("Notification role updated!");
-            }
-            else if (result == DbProcessResultEnum.AlreadyExists)
-            {
-                await ReplyAsync("Notification role is the currently set one in the database for your server!");
-            }
-            else
-            {
-                await ReplyAsync("Notification role could not be updated!");
-            }
+                DbProcessResultEnum.Success => "Notification role updated.",
+                DbProcessResultEnum.AlreadyExists => "Notification role is the currently set one in the database for your server.",
+                _ => "Notification role could not be updated!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -215,19 +193,13 @@ public class AdminServerSettingCommands(
         {
             //Removes the currently set notification role, removes server from cache
             DbProcessResultEnum result = await serverService.RemoveNotificationRoleAsync(Context.Guild.Id);
-
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync("Notification role removed!");
-            }
-            else if (result == DbProcessResultEnum.NotFound)
-            {
-                await ReplyAsync("Notification role currently not set in database!");
-            }
-            else
-            {
-                await ReplyAsync("Notification role could not be removed!");
-            }
+                DbProcessResultEnum.Success => "Notification role removed.",
+                DbProcessResultEnum.NotFound => "Notification role currently not set in database.",
+                _ => "Notification role could not be removed!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -265,19 +237,13 @@ public class AdminServerSettingCommands(
 
             //Adds the twitch channel to the checked channel's list for the server, removes server from cache
             DbProcessResultEnum result = await twitchChannelService.AddTwitchChannelAsync(Context.Guild.Id, twitchUserId, response.Login);
-
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync("Twitch channel added!");
-            }
-            else if (result == DbProcessResultEnum.AlreadyExists)
-            {
-                await ReplyAsync("Twitch channel already in database for your server!");
-            }
-            else
-            {
-                await ReplyAsync("Twitch channel could not be added!");
-            }
+                DbProcessResultEnum.Success => "Twitch channel added.",
+                DbProcessResultEnum.AlreadyExists => "Twitch channel already in database for your server.",
+                _ => "Twitch channel could not be added!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -315,18 +281,13 @@ public class AdminServerSettingCommands(
                 result = await twitchChannelService.RemoveTwitchChannelAsync(Context.Guild.Id);
             }
 
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync("Twitch channel(s) removed!");
-            }
-            else if (result == DbProcessResultEnum.NotFound)
-            {
-                await ReplyAsync("Twitch channel with that name not found in database!");
-            }
-            else
-            {
-                await ReplyAsync("Twitch channel(s) could not be removed!");
-            }
+                DbProcessResultEnum.Success => "Twitch channel(s) removed.",
+                DbProcessResultEnum.NotFound => "Twitch channel with that name not found in database.",
+                _ => "Twitch channel(s) could not be removed!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {

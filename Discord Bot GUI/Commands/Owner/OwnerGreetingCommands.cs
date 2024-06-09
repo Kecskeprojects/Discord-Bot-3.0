@@ -49,14 +49,12 @@ public class OwnerGreetingCommands(
         try
         {
             DbProcessResultEnum result = await greetingService.AddGreetingAsync(url);
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync("Greeting added!");
-            }
-            else
-            {
-                await ReplyAsync("Greeting could not be added!");
-            }
+                DbProcessResultEnum.Success => "Greeting added.",
+                _ => "Greeting could not be added!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -72,18 +70,13 @@ public class OwnerGreetingCommands(
         try
         {
             DbProcessResultEnum result = await greetingService.RemoveGreetingAsync(id);
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync($"Greeting with the ID {id} has been removed!");
-            }
-            else if (result == DbProcessResultEnum.NotFound)
-            {
-                await ReplyAsync("Greeting doesn't exist with that ID or it is not yours!");
-            }
-            else
-            {
-                await ReplyAsync("Greeting could not be removed!");
-            }
+                DbProcessResultEnum.Success => $"Greeting with the ID {id} has been removed.",
+                DbProcessResultEnum.NotFound => "Greeting doesn't exist with that ID or it is not yours.",
+                _ => "Greeting could not be removed!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {

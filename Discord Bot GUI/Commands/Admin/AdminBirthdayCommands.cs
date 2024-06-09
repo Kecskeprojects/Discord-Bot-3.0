@@ -67,22 +67,14 @@ public class AdminBirthdayCommands(
             if (DateTime.TryParse($"{year}.{month}.{day}", out DateTime date))
             {
                 DbProcessResultEnum result = await birthdayService.AddBirthdayAsync(Context.Guild.Id, user.Id, date);
-                if (result == DbProcessResultEnum.Success)
+                string resultMessage = result switch
                 {
-                    await ReplyAsync("Birthday added to database!");
-                }
-                else if (result == DbProcessResultEnum.UpdatedExisting)
-                {
-                    await ReplyAsync("Birthday updated in database!");
-                }
-                else if (result == DbProcessResultEnum.AlreadyExists)
-                {
-                    await ReplyAsync("Birthday is the currently set one in database!");
-                }
-                else
-                {
-                    await ReplyAsync("Birthday could not be added to database!");
-                }
+                    DbProcessResultEnum.Success => "Birthday added to database.",
+                    DbProcessResultEnum.UpdatedExisting => "Birthday updated in database.",
+                    DbProcessResultEnum.AlreadyExists => "Birthday is the currently set one in database.",
+                    _ => "Birthday could not be added to database!"
+                };
+                await ReplyAsync(resultMessage);
             }
             else
             {
@@ -119,18 +111,13 @@ public class AdminBirthdayCommands(
             }
 
             DbProcessResultEnum result = await birthdayService.RemoveBirthdayAsync(Context.Guild.Id, user.Id);
-            if (result == DbProcessResultEnum.Success)
+            string resultMessage = result switch
             {
-                await ReplyAsync("Birthday removed from database!");
-            }
-            else if (result == DbProcessResultEnum.NotFound)
-            {
-                await ReplyAsync("Birthday not found in database!");
-            }
-            else
-            {
-                await ReplyAsync("Birthday could not be removed from database!");
-            }
+                DbProcessResultEnum.Success => "Birthday removed from database.",
+                DbProcessResultEnum.NotFound => "Birthday not found in database.",
+                _ => "Birthday could not be removed from database!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
