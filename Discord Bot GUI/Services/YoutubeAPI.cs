@@ -293,7 +293,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
         Global.YoutubeApiKeys.Clear();
         foreach (string item in configKeys)
         {
-            if (Global.YoutubeApiKeys.TryAdd(item, 0))
+            if (!Global.YoutubeApiKeys.TryAdd(item, 0))
             {
                 throw new Exception("Youtube API Key could not be added!");
             }
