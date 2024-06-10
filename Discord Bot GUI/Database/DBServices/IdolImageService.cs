@@ -16,7 +16,7 @@ public class IdolImageService(
     IIdolImageRepository idolImageRepository,
     IMapper mapper,
     BotLogger logger,
-    Cache cache) : BaseService(mapper, logger, cache), IIdolImageService
+    ServerCache cache) : BaseService(mapper, logger, cache), IIdolImageService
 {
     private readonly IIdolRepository idolRepository = idolRepository;
     private readonly IIdolImageRepository idolImageRepository = idolImageRepository;

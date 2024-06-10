@@ -16,7 +16,7 @@ public class GreetingService(
     IGreetingRepository greetingRepository,
     IMapper mapper,
     BotLogger logger,
-    Cache cache) : BaseService(mapper, logger, cache), IGreetingService
+    ServerCache cache) : BaseService(mapper, logger, cache), IGreetingService
 {
     private readonly IGreetingRepository greetingRepository = greetingRepository;
 

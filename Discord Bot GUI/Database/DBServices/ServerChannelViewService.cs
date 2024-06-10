@@ -16,7 +16,7 @@ public class ServerChannelViewService(
     IServerChannelViewRepository serverChannelViewRepository,
     IMapper mapper,
     BotLogger logger,
-    Cache cache) : BaseService(mapper, logger, cache), IServerChannelViewService
+    ServerCache cache) : BaseService(mapper, logger, cache), IServerChannelViewService
 {
     private readonly IServerChannelViewRepository serverChannelViewRepository = serverChannelViewRepository;
 

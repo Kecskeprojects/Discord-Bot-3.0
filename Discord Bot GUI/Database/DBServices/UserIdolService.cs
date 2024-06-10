@@ -18,7 +18,7 @@ public class UserIdolService(
     IUserRepository userRepository,
     IMapper mapper,
     BotLogger logger,
-    Cache cache) : BaseService(mapper, logger, cache), IUserIdolService
+    ServerCache cache) : BaseService(mapper, logger, cache), IUserIdolService
 {
     private readonly IIdolRepository idolRepository = idolRepository;
     private readonly IUserRepository userRepository = userRepository;

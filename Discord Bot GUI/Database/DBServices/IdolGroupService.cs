@@ -16,7 +16,7 @@ public class IdolGroupService(
     IIdolGroupRepository idolGroupRepository,
     IMapper mapper,
     BotLogger logger,
-    Cache cache) : BaseService(mapper, logger, cache), IIdolGroupService
+    ServerCache cache) : BaseService(mapper, logger, cache), IIdolGroupService
 {
     private readonly IIdolGroupRepository idolGroupRepository = idolGroupRepository;
 

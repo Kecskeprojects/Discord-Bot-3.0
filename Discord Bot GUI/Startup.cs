@@ -57,7 +57,7 @@ public static class Startup
         collection.AddSingleton(commands);
         collection.AddTransient<Config>(); //This is transient meaning configuration can be edited on the fly
         collection.AddSingleton(new BotLogger());
-        collection.AddSingleton(new Cache());
+        collection.AddSingleton(new ServerCache());
 
         Config config = new();
         collection.AddDbContext<MainDbContext>(options => options.UseSqlServer(config.SqlConnectionString));

@@ -16,7 +16,7 @@ public class UserIdolStatisticService(
     IUserRepository userRepository,
     IMapper mapper,
     BotLogger logger,
-    Cache cache) : BaseService(mapper, logger, cache), IUserIdolStatisticService
+    ServerCache cache) : BaseService(mapper, logger, cache), IUserIdolStatisticService
 {
     private readonly IUserIdolStatisticRepository userIdolStatisticRepository = userIdolStatisticRepository;
 

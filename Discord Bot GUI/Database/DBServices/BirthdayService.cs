@@ -18,7 +18,7 @@ public class BirthdayService(
     IBirthdayRepository birthdayRepository,
     IMapper mapper,
     BotLogger logger,
-    Cache cache) : BaseService(mapper, logger, cache), IBirthdayService
+    ServerCache cache) : BaseService(mapper, logger, cache), IBirthdayService
 {
     private readonly IServerRepository serverRepository = serverRepository;
     private readonly IUserRepository userRepository = userRepository;

@@ -18,7 +18,7 @@ public class ReminderService(
     IUserRepository userRepository,
     IMapper mapper,
     BotLogger logger,
-    Cache cache) : BaseService(mapper, logger, cache), IReminderService
+    ServerCache cache) : BaseService(mapper, logger, cache), IReminderService
 {
     private readonly IReminderRepository reminderRepository = reminderRepository;
     private readonly IUserRepository userRepository = userRepository;
