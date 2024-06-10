@@ -75,11 +75,21 @@ public class CommandHandler(
             //If message is not private message, and the server is not in our database, add it
             ServerResource server = await GetServerAsync(context);
 
-            _ = context.Message.HasCharPrefix('!', ref argPos) || context.Message.HasCharPrefix('.', ref argPos)
-                ? ExecuteCommandAsync(context, argPos)
-                : !DiscordTools.IsDM(context) && DiscordTools.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id, false)
-                    ? HandleRoleAssignmentAsync(context, argPos)
-                    : HandleFeatureCheckAsync(context);
+            if (context.Message.HasCharPrefix('!', ref argPos) || context.Message.HasCharPrefix('.', ref argPos))
+            {
+                //Command execution
+                _ = ExecuteCommandAsync(context, argPos);
+            }
+            else if (!DiscordTools.IsDM(context) && DiscordTools.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id, false))
+            {
+                //Role handling
+                _ = HandleRoleAssignmentAsync(context, argPos);
+            }
+            else
+            {
+                //Feature handling
+                _ = HandleFeatureCheckAsync(context);
+            }
         }
         catch (Exception ex)
         {
