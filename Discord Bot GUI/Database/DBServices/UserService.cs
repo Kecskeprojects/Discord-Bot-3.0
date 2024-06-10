@@ -27,7 +27,10 @@ public class UserService(
         {
             User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
 
-            user ??= new User() { DiscordId = userId.ToString() };
+            user ??= new User()
+            {
+                DiscordId = userId.ToString()
+            };
 
             if (!string.IsNullOrEmpty(user.LastFmusername))
             {

@@ -24,8 +24,6 @@ public class UserIdolStatisticService(
     {
         try
         {
-            int i = 1;
-
             User user = await userRepository.FirstOrDefaultAsync(x => x.DiscordId == userId.ToString());
 
             if (user == null)
@@ -37,6 +35,7 @@ public class UserIdolStatisticService(
                 await userRepository.AddAsync(user);
             }
 
+            int i = 1;
             while (ranking != null && ranking.Count > 0)
             {
                 int idolId = ranking.Pop();

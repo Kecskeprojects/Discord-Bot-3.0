@@ -80,7 +80,6 @@ public class ChannelService(
             }
 
             cache.RemoveCachedEntityManually(serverId);
-
             logger.Log("Settings Channel added successfully!");
             return DbProcessResultEnum.Success;
         }
