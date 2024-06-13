@@ -16,7 +16,7 @@ public static class GenderChoiceEnumExtension
             GenderEnum.Male => "M",
             GenderEnum.Female => "F",
             GenderEnum.NotSpecified => "Both",
-            _ => "Unspecified"
+            _ => "Unexpected"
         };
     }
 

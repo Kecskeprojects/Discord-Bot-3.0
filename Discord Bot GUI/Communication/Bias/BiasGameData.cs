@@ -26,6 +26,7 @@ public class BiasGameData
     public List<int[]> Pairs { get; private set; }
     public int CurrentPair { get; private set; }
     public int CurrentRound { get; private set; } = 0;
+    public bool IsProcessing { get; set; }
 
     public Stack<int> Ranking { get; private set; } = [];
     public MemoryStream WinnerBracket { get; set; } = new MemoryStream();

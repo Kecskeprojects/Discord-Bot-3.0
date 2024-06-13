@@ -38,7 +38,7 @@ public class IdolRepository(MainDbContext context) : GenericRepository<Idol>(con
         return context.Idols
             .Include(x => x.Group)
             .Include(x => x.IdolImages)
-            .Where(x => (gender == GenderEnum.NotSpecified || x.Gender == gender.ToString()) &&
+            .Where(x => (gender == GenderEnum.NotSpecified || x.Gender == gender.ToFriendlyString()) &&
                         x.DebutDate.HasValue && x.IdolImages.Count != 0 &&
                         x.DebutDate.Value.Year >= debutAfter &&
                         x.DebutDate.Value.Year <= debutBefore)

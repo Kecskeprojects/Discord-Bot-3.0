@@ -31,11 +31,18 @@ public class BiasGameStepInteraction(
     {
         try
         {
-            if (Context.User.Id != userId || !Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData data))
+            if (Context.User.Id != userId || !Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData data) )
             {
-                await RespondAsync("You are not the owner of this interaction-", ephemeral: true);
+                await RespondAsync("You are not the owner of this interaction.", ephemeral: true);
                 return;
             }
+
+            if (data.IsProcessing)
+            {
+                return;
+            }
+
+            data.IsProcessing = true;
 
             await DeferAsync();
             logger.Log($"BiasGame Next Step: IdolId: {idolId}", LogOnly: true);
@@ -78,6 +85,8 @@ public class BiasGameStepInteraction(
                 x.Embeds = embeds;
                 x.Components = components;
             });
+
+            data.IsProcessing = false;
         }
         catch (Exception ex)
         {

@@ -36,6 +36,13 @@ public class BiasGameInteraction(
                 return;
             }
 
+            if (data.IsProcessing)
+            {
+                return;
+            }
+
+            data.IsProcessing = true;
+
             await DeferAsync();
 
             data.Gender = chosenGender;
@@ -44,6 +51,7 @@ public class BiasGameInteraction(
             MessageComponent component = BiasGameDebutEmbedProcessor.CreateComponent(data);
 
             await ModifyOriginalResponseAsync(x => x.Components = component);
+            data.IsProcessing = false;
         }
         catch (Exception ex)
         {
@@ -63,6 +71,13 @@ public class BiasGameInteraction(
                 await RespondAsync("You are not the owner of this interaction.", ephemeral: true);
                 return;
             }
+
+            if (data.IsProcessing)
+            {
+                return;
+            }
+
+            data.IsProcessing = true;
 
             data.SetDebut(chosenYears);
 
@@ -97,6 +112,7 @@ public class BiasGameInteraction(
             //Followup will respond with the first embed
             IUserMessage message = await FollowupWithFilesAsync(files, embeds: embeds, components: components);
             data.MessageId = message.Id;
+            data.IsProcessing = false;
         }
         catch (Exception ex)
         {
