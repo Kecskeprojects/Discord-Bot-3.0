@@ -6,8 +6,6 @@ using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Processors.EmbedProcessors.Help;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
@@ -26,14 +24,6 @@ public class UserHelpCommands(
         {
             if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
-                return;
-            }
-
-            Dictionary<string, string> commands = [];
-
-            if (!File.Exists("Assets\\Commands\\Commands.txt"))
-            {
-                await ReplyAsync("List of commands can't be found!");
                 return;
             }
 

@@ -81,10 +81,9 @@ public partial class App : Application
 
             mainWindow.Show();
 
-            string currentDir = Directory.GetCurrentDirectory();
-            if (!Directory.Exists(Path.Combine(currentDir, "Logs")))
+            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Logs")))
             {
-                Directory.CreateDirectory(Path.Combine(currentDir, "Logs"));
+                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "Logs"));
                 logger.Log("Logs folder created!");
             }
 

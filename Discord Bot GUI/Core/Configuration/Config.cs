@@ -29,8 +29,14 @@ public class Config
 
     public Config()
     {
-        string path = Path.Combine(Directory.GetCurrentDirectory(), "Assets");
-        if (!File.Exists(Path.Combine(path, "config.json")))
+        string assetDir = Path.Combine(Directory.GetCurrentDirectory(), "Assets");
+
+        if (!Directory.Exists(assetDir))
+        {
+            Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "Logs"));
+        }
+
+        if (!File.Exists(Path.Combine(assetDir, "config.json")))
         {
             ConfigModel conf = new()
             {
@@ -52,7 +58,7 @@ public class Config
                 headless = true
             };
 
-            using StreamWriter sw = File.AppendText(Path.Combine(path, "config.json"));
+            using StreamWriter sw = File.AppendText(Path.Combine(assetDir, "config.json"));
             sw.WriteLine(JsonConvert.SerializeObject(conf));
 
             return;

@@ -3,11 +3,8 @@ using Discord.Commands;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Interfaces.DBServices;
-using Discord_Bot.Processors.EmbedProcessors;
 using Discord_Bot.Processors.EmbedProcessors.Help;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
@@ -26,14 +23,6 @@ public class AdminHelpCommands(
     {
         try
         {
-            Dictionary<string, string> commands = [];
-
-            if (!File.Exists("Assets\\Commands\\Admin_Commands.txt"))
-            {
-                await ReplyAsync("List of commands can't be found!");
-                return;
-            }
-
             Embed[] embed = HelpAdminEmbedProcessor.CreateEmbed(config.Img);
 
             await ReplyAsync(embeds: embed);
@@ -53,14 +42,6 @@ public class AdminHelpCommands(
     {
         try
         {
-            Dictionary<string, string> commands = [];
-
-            if (!File.Exists("Assets\\Commands\\Features.txt"))
-            {
-                await ReplyAsync("List of commands can't be found!");
-                return;
-            }
-
             Embed[] embed = FeaturesEmbedProcessor.CreateEmbed(config.Img);
 
             await ReplyAsync(embeds: embed);

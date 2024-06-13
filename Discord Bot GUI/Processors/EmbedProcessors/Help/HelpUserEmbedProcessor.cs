@@ -1,6 +1,5 @@
 ﻿using Discord;
 using System.Collections.Generic;
-using System.IO;
 
 namespace Discord_Bot.Processors.EmbedProcessors.Help;
 
@@ -24,34 +23,30 @@ public static class HelpUserEmbedProcessor
     private static Dictionary<string, string> ReadCommandsFile()
     {
         Dictionary<string, string> commands = [];
-        using (StreamReader reader = new("Assets\\Commands\\Commands.txt"))
+        string[] lines = Properties.Resource.User_Commands.Split("\r\n");
+        string curr = "";
+        foreach (string line in lines)
         {
-            string curr = "";
-            while (!reader.EndOfStream)
+            if (line == "")
             {
-                string line = reader.ReadLine();
-
-                if (line == "")
-                {
-                    continue;
-                }
-
-                if (line.StartsWith('!') || line.StartsWith('.'))
-                {
-                    string[] parts = line.Split("\t\t");
-                    commands[curr] += $"`{parts[0]}` {parts[1]}\n";
-                }
-                else if (line.StartsWith('*'))
-                {
-                    commands[curr] += $"{line}\n";
-                }
-                else
-                {
-                    commands.Add(line, "");
-                    curr = line;
-                }
+                continue;
             }
-        };
+
+            if (line.StartsWith('!') || line.StartsWith('.'))
+            {
+                string[] parts = line.Split("\t\t");
+                commands[curr] += $"`{parts[0]}` {parts[1]}\n";
+            }
+            else if (line.StartsWith('*'))
+            {
+                commands[curr] += $"{line}\n";
+            }
+            else
+            {
+                commands.Add(line, "");
+                curr = line;
+            }
+        }
         return commands;
     }
 }
