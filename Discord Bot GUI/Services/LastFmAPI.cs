@@ -16,6 +16,7 @@ using LastFmApi.Models.TopTrack;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TwitchLib.Api.Core.Enums;
 
 namespace Discord_Bot.Services;
 
@@ -187,6 +188,15 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
         }
         List<LastFmApi.Models.Recent.Track> tracks = restResult.Response.Track;
 
+        GenericResponseItem<int> playsResponse = await TotalPlaysAsync(lastFmUsername);
+        if (!string.IsNullOrEmpty(playsResponse.Message))
+        {
+            result.Message = playsResponse.Message;
+            return result;
+        }
+
+        result.TotalPlays = playsResponse.Response;
+
         SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(tracks[0].Artist.Mbid, tracks[0].Artist.Text, tracks[0].Name);
         result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (tracks[0].Image?[^1].Text);
 
@@ -304,7 +314,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
     #endregion
 
     #region Helper API calls
-    private async Task<GenericResponseItem<int>> TotalPlaysAsync(string lastFmUsername, string period)
+    private async Task<GenericResponseItem<int>> TotalPlaysAsync(string lastFmUsername, string period = null)
     {
         GenericResponseItem<int> totalPlay =
             await UtilityRequests.TotalPlays(config.Lastfm_API_Key, lastFmUsername, period);
