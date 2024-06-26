@@ -78,7 +78,7 @@ public class UserReminderCommands(
             else
             {
                 //Try parsing the date
-                if (DateTime.TryParse(datestring, out date))
+                if (DateTime.TryParse(datestring, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out date))
                 {
                     //Check if date is not already in the past
                     if (DateTime.Compare(date, DateTime.UtcNow) > 0)
