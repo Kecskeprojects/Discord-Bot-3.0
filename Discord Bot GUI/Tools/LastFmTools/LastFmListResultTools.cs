@@ -71,11 +71,11 @@ public static class LastFmListResultTools
         {
             LastFmApi.Models.Recent.Track track = tracks[i];
 
-            DateTime listenedOn = DateTime.Parse(track.Date.Text, styles: System.Globalization.DateTimeStyles.AssumeUniversal);
-
             //One line in the embed
             result.EmbedFields[index] += $"`#{i + 1}` **{track.Name}** by **{track.Artist.Text}** - *";
-            result.EmbedFields[index] += track.Attr != null ? "Now playing*" : TimestampTag.FromDateTime(listenedOn, TimestampTagStyles.Relative) + "*";
+            result.EmbedFields[index] += track.Attr != null
+                ? "Now playing*"
+                : TimestampTag.FromDateTime(DateTime.Parse(track.Date.Text, styles: System.Globalization.DateTimeStyles.AssumeUniversal), TimestampTagStyles.Relative) + "*";
             result.EmbedFields[index] += "\n";
 
             //If we went through 10 results, start filling a new list page
