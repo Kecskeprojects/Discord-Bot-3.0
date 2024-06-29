@@ -118,7 +118,15 @@ public class BiasGameInteraction(
         {
             logger.Error("BiasGameInteraction.cs DebutChosen", ex);
             Global.BiasGames.TryRemove(Context.User.Id, out _);
-            await RespondAsync("Failure during setup!");
+
+            if (Context.Interaction.HasResponded)
+            {
+                await FollowupAsync("Failure during setup!");
+            }
+            else
+            {
+                await RespondAsync("Failure during setup!");
+            }
         }
     }
 
