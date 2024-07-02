@@ -77,9 +77,9 @@ public partial class App : Application
 
         using (IServiceScope scope = services.CreateScope())
         {
-            BotWindow mainWindow = scope.ServiceProvider.GetRequiredService<BotWindow>();
+            BotWindow botWindow = scope.ServiceProvider.GetRequiredService<BotWindow>();
 
-            mainWindow.Show();
+            botWindow.Show();
 
             if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Logs")))
             {
