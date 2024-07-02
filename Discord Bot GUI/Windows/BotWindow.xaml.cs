@@ -3,6 +3,8 @@ using Discord_Bot.Core;
 using Discord_Bot.Tools.NativeTools;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Timers;
 using System.Windows;
@@ -83,6 +85,34 @@ public partial class BotWindow : Window
         catch (Exception ex)
         {
             logger.Error("BotWindow.xaml.cs ClearLog", ex);
+        }
+    }
+
+    private void OpenLogFolder(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            Process.Start("explorer.exe", Path.Combine(Directory.GetCurrentDirectory(), "Logs"));
+        }
+        catch (Exception ex)
+        {
+            logger.Error("BotWindow.xaml.cs OpenLogFolder", ex);
+        }
+    }
+
+    private void OpenActiveLogFile(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            logger.LogToFile();
+            if(File.Exists(Path.Combine(Directory.GetCurrentDirectory(), $"Logs\\logs[{DateTimeTools.CurrentDate()}].txt")))
+            {
+                Process.Start("notepad.exe", Path.Combine(Directory.GetCurrentDirectory(), $"Logs\\logs[{DateTimeTools.CurrentDate()}].txt"));
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("BotWindow.xaml.cs OpenActiveLogFile", ex);
         }
     }
 
