@@ -60,12 +60,15 @@ public class InstagramEmbedFeature(IInstaLoader instaLoader, IServerService serv
 
             if (!string.IsNullOrEmpty(errorDuringDownload))
             {
-                logger.Error("ServiceDiscordCommunication.cs GetImagesFromPost", errorDuringDownload);
+                logger.Error("InstagramEmbedFeature.cs SendInstagramPostEmbedAsync", errorDuringDownload);
                 if (errorDuringDownload.Contains("Fetching Post metadata failed"))
                 {
                     await Context.Channel.SendMessageAsync("Posts cannot be accessed anonymously from this account.");
                 }
-                return;
+                if (!errorDuringDownload.Contains("retrying") || !Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), $"Dependencies\\Instagram\\{postId}")))
+                {
+                    return;
+                }
             }
 
             string[] files = Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), $"Dependencies\\Instagram\\{postId}"));
