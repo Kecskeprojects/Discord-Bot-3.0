@@ -249,6 +249,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
         return SearchResultEnum.YoutubePlaylistFound;
     }
 
+    //Todo: Investigate the possibility of a similarity search, some kind of point based system, first came up with Withcha by Apink
     private IList<SearchResult> FilteredResults(IList<SearchResult> items, string query)
     {
         //Filter youtube channels

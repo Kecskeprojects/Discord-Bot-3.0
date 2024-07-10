@@ -371,4 +371,6 @@ public class UserLastfmCommands(
         }
     }
     #endregion
+
+    //Todo: Add a new command that can search for TopTags, this list does not have period or pagination
 }

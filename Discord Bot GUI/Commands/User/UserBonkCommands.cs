@@ -22,7 +22,8 @@ public class UserBonkCommands(
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly BonkGifProcessor bonkGifProcessor = bonkGifProcessor;
-
+    
+    //Todo: Check if bonk command could work with gif profiles images
     [Command("bonk")]
     [RequireContext(ContextType.Guild)]
     [Alias(["hornyjail, hit me please"])]

@@ -16,7 +16,7 @@ namespace Discord_Bot.Windows;
 
 public partial class BotWindow : Window
 {
-    private readonly Timer diagnosticsTimer;
+    private readonly Timer diagnosticsTimer; //Todo: make it so showing diagnostic data is a config setting
     private bool AutoScroll = true;
 
     private readonly BotLogger logger;
@@ -125,7 +125,7 @@ public partial class BotWindow : Window
             {
                 if (Application.Current.Windows.OfType<BotWindow>().FirstOrDefault() != null)
                 {
-                    BotWindow main = Application.Current.Windows.OfType<BotWindow>().First();
+                    BotWindow main = Application.Current.Windows.OfType<BotWindow>().First(); //Todo: Make the different displays exist on a panel so the config can hide them
                     main.TotalCPUUsage.Content = $"{result.TotalCPUUsagePercent}%";
                     main.TotalRAMUsage.Content = $"{result.TotalRAMUsagePercent}%";
                     main.ThreadCount.Content = $"{result.ThreadCount}";

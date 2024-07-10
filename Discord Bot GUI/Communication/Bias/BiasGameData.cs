@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 
 namespace Discord_Bot.Communication.Bias;
-
+//Todo: These functions do not necessarily belong here, or if they do, this file should be moved to some other place
 public class BiasGameData
 {
     public BiasGameData(ulong userId)

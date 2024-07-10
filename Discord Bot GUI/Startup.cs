@@ -37,6 +37,7 @@ public static class Startup
                             | GatewayIntents.GuildMessagePolls | GatewayIntents.DirectMessagePolls,
             LogLevel = LogSeverity.Info
         });
+
         InteractionService interactions = new(client,
             new InteractionServiceConfig()
             {
@@ -55,7 +56,7 @@ public static class Startup
         collection.AddSingleton(client);
         collection.AddSingleton(interactions);
         collection.AddSingleton(commands);
-        collection.AddTransient<Config>(); //This is transient meaning configuration can be edited on the fly
+        collection.AddTransient<Config>(); //Configuration can be edited without stopping the program
         collection.AddSingleton(new BotLogger());
         collection.AddSingleton(new ServerCache());
 
