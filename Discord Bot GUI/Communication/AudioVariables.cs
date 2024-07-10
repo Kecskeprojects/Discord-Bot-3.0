@@ -1,10 +1,11 @@
 ﻿using Discord.Audio;
+using System;
 using System.Diagnostics;
 using System.IO;
 
 namespace Discord_Bot.Communication;
 
-public class AudioVariables
+public class AudioVariables : IDisposable
 {
     public bool Playing { get; set; }
 
@@ -26,5 +27,11 @@ public class AudioVariables
     {
         AbruptDisconnect = false;
         Playing = false;
+    }
+
+    public void Dispose()
+    {
+        FFmpeg.Dispose();
+        Output.Dispose();
     }
 }

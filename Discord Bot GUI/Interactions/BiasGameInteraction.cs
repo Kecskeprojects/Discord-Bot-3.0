@@ -95,24 +95,25 @@ public class BiasGameInteraction(
             int[] idolIds = data.Pairs[data.CurrentPair];
 
             logger.Log($"Creating combined image from idols. (ID 1: {idolIds[0]}, ID 2: {idolIds[1]})");
-            Stream combined = BiasGameImageProcessor.CombineImages(
+            using (Stream combined = BiasGameImageProcessor.CombineImages(
                 (MemoryStream) data.IdolWithImage[idolIds[0]].Stream,
-                (MemoryStream) data.IdolWithImage[idolIds[1]].Stream);
-            List<FileAttachment> files = [new FileAttachment(combined, "combined.png")];
+                (MemoryStream) data.IdolWithImage[idolIds[1]].Stream))
+            using (FileAttachment file = new FileAttachment(combined, "combined.png"))
+            {
+                Embed[] embeds = BiasGameEmbedProcessor.CreateEmbed(
+                    data,
+                    GetCurrentUserAvatar(),
+                    GetCurrentUserNickname());
 
-            Embed[] embeds = BiasGameEmbedProcessor.CreateEmbed(
-                data,
-                GetCurrentUserAvatar(),
-                GetCurrentUserNickname());
+                MessageComponent components = BiasGameEmbedProcessor.CreateComponent(idolIds, Context.User.Id);
 
-            MessageComponent components = BiasGameEmbedProcessor.CreateComponent(idolIds, Context.User.Id);
+                await DeleteOriginalResponseAsync();
 
-            await DeleteOriginalResponseAsync();
-
-            //Followup will respond with the first embed
-            IUserMessage message = await FollowupWithFilesAsync(files, embeds: embeds, components: components);
-            data.MessageId = message.Id;
-            data.IsProcessing = false;
+                //Followup will respond with the first embed
+                IUserMessage message = await FollowupWithFileAsync(file, embeds: embeds, components: components);
+                data.MessageId = message.Id;
+                data.IsProcessing = false;
+            }
         }
         catch (Exception ex)
         {

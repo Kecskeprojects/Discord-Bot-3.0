@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Discord_Bot.Communication.Bias;
 //Todo: These functions do not necessarily belong here, or if they do, this file should be moved to some other place
-public class BiasGameData
+public class BiasGameData : IDisposable
 {
     public BiasGameData(ulong userId)
     {
@@ -66,7 +66,8 @@ public class BiasGameData
     {
         Ranking.Push(idolId);
 
-        IdolWithImage.Remove(idolId, out _);
+        IdolWithImage.Remove(idolId, out FileAttachment value);
+        value.Dispose();
 
         CurrentPair++;
     }
@@ -77,5 +78,14 @@ public class BiasGameData
         CurrentPair = 0;
         CurrentRound++;
         Pairs.Clear();
+    }
+
+    public void Dispose()
+    {
+        WinnerBracket.Dispose();
+        foreach (KeyValuePair<int, FileAttachment> item in IdolWithImage)
+        {
+            item.Value.Dispose();
+        }
     }
 }

@@ -63,30 +63,29 @@ public class BiasGameStepInteraction(
             }
 
             int[] idolIds = data.Pairs[data.CurrentPair];
-            List<FileAttachment> files = [
-                data.IdolWithImage[idolIds[0]],
-                data.IdolWithImage[idolIds[1]]
-            ];
 
             logger.Log($"Creating combined image from idols. (ID 1: {idolIds[0]}, ID 2: {idolIds[1]})");
-            Stream combined = BiasGameImageProcessor.CombineImages((MemoryStream) files[0].Stream, (MemoryStream) files[1].Stream);
-            files = [new FileAttachment(combined, "combined.png")];
-
-            Embed[] embeds = BiasGameEmbedProcessor.CreateEmbed(
-                data,
-                GetCurrentUserAvatar(),
-                GetCurrentUserNickname());
-
-            MessageComponent components = BiasGameEmbedProcessor.CreateComponent(idolIds, Context.User.Id);
-
-            await ModifyOriginalResponseAsync(x =>
+            using (Stream combined = BiasGameImageProcessor.CombineImages(
+                (MemoryStream) data.IdolWithImage[idolIds[0]].Stream,
+                (MemoryStream) data.IdolWithImage[idolIds[1]].Stream))
+            using (FileAttachment file = new(combined, "combined.png"))
             {
-                x.Attachments = files;
-                x.Embeds = embeds;
-                x.Components = components;
-            });
 
-            data.IsProcessing = false;
+                Embed[] embeds = BiasGameEmbedProcessor.CreateEmbed(
+                    data,
+                    GetCurrentUserAvatar(),
+                    GetCurrentUserNickname());
+
+                MessageComponent components = BiasGameEmbedProcessor.CreateComponent(idolIds, Context.User.Id);
+
+                await ModifyOriginalResponseAsync(x =>
+                {
+                    x.Attachments = new List<FileAttachment>() { file };
+                    x.Embeds = embeds;
+                    x.Components = components;
+                });
+                data.IsProcessing = false;
+            }
         }
         catch (Exception ex)
         {
@@ -102,20 +101,23 @@ public class BiasGameStepInteraction(
 
         IdolGameResource idolResource = await idolService.GetIdolByIdAsync(data.IdolWithImage.Keys.First());
         data.WinnerBracket = biasGameWinnerBracketImageProcessor.AddFinal(data, idolResource);
-        List<FileAttachment> file = [new FileAttachment(data.WinnerBracket, "winner-bracket.png")];
-        Embed[] embed = BiasGameEmbedProcessor.CreateFinalEmbed(
-            data,
-            GetCurrentUserAvatar(),
-            GetCurrentUserNickname());
-
-        await ModifyOriginalResponseAsync(x =>
+        using (FileAttachment file = new(data.WinnerBracket, "winner-bracket.png"))
         {
-            x.Attachments = file;
-            x.Embeds = embed;
-            x.Components = null;
-        });
+            Embed[] embed = BiasGameEmbedProcessor.CreateFinalEmbed(
+                data,
+                GetCurrentUserAvatar(),
+                GetCurrentUserNickname());
+
+            await ModifyOriginalResponseAsync(x =>
+            {
+                x.Attachments = new List<FileAttachment>() { file };
+                x.Embeds = embed;
+                x.Components = null;
+            });
+        }
 
         await userIdolStatisticService.UpdateUserStatisticsAsync(data.UserId, data.Ranking);
+        data.Dispose();
         Global.BiasGames.TryRemove(data.UserId, out _);
     }
 }

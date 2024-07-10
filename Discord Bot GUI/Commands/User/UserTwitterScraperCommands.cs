@@ -73,6 +73,7 @@ public class UserTwitterScraperCommands(
                         try
                         {
                             await Context.Channel.SendFilesAsync(attachments, result.TextContent, messageReference: refer);
+                            await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
                         }
                         catch (HttpException ex)
                         {
@@ -90,17 +91,18 @@ public class UserTwitterScraperCommands(
                                 {
                                     await ReplyAsync("Post content too large to send!");
                                 }
-
-                                return;
                             }
                         }
-
-                        await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
-                        return;
+                    }
+                    else
+                    {
+                        await ReplyAsync("No image/videos in tweet.");
                     }
 
-                    await ReplyAsync("No image/videos in tweet.");
-                    return;
+                    foreach (FileAttachment item in attachments)
+                    {
+                        item.Dispose();
+                    }
                 }
             }
         }

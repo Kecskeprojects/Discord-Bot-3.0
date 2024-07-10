@@ -22,7 +22,7 @@ public class UserBonkCommands(
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly BonkGifProcessor bonkGifProcessor = bonkGifProcessor;
-    
+
     //Todo: Check if bonk command could work with gif profiles images
     [Command("bonk")]
     [RequireContext(ContextType.Guild)]
@@ -87,11 +87,10 @@ public class UserBonkCommands(
             if (!string.IsNullOrEmpty(url))
             {
                 logger.Query($"Getting profile image:\n{url}");
-                Stream stream = await WebTools.GetStream(url);
-
-                MemoryStream gifStream = bonkGifProcessor.CreateBonkImage(stream, frameDelay);
-
-                await Context.Channel.SendFileAsync(gifStream, $"bonk_{userName}.gif");
+                using (MemoryStream gifStream = bonkGifProcessor.CreateBonkImage(await WebTools.GetStream(url), frameDelay))
+                {
+                    await Context.Channel.SendFileAsync(gifStream, $"bonk_{userName}.gif");
+                }
             }
         }
         catch (Exception ex)

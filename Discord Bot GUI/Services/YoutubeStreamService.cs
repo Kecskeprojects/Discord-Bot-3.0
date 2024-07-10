@@ -44,14 +44,14 @@ public class YoutubeStreamService(Config config, BotLogger logger) : IYoutubeDow
         catch (OperationCanceledException ex)
         {
             logger.Log("Exception thrown when audio stream is cancelled!");
-            logger.Warning("AudioService.cs Stream", ex, LogOnly: true);
+            logger.Warning("YoutubeStreamService.cs StreamAsync", ex, LogOnly: true);
 
             audioResource.AudioVariables.FFmpeg.Kill();
             audioResource.AudioVariables.AbruptDisconnect = true;
         }
         catch (Exception ex)
         {
-            logger.Error("AudioService.cs Stream", ex);
+            logger.Error("YoutubeStreamService.cs StreamAsync", ex);
         }
 
         if (!audioResource.AudioVariables.FFmpeg.HasExited)

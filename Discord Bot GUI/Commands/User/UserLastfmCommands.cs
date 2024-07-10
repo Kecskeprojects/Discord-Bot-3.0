@@ -350,18 +350,19 @@ public class UserLastfmCommands(
 
             if (string.IsNullOrEmpty(wk.Message))
             {
-                WhoKnowsEmbedResult embed = await whoKnowsEmbedProcessor.CreateEmbed(wk);
-
-                if (embed.HasImage)
+                using (WhoKnowsEmbedResult embed = await whoKnowsEmbedProcessor.CreateEmbed(wk))
                 {
-                    //Image streams as part of embeds must be sent as a file upload
-                    await Context.Channel.SendFileAsync(embed.ImageData, embed.ImageName, embeds: embed.Embed);
+                    if (embed.HasImage)
+                    {
+                        //Image streams as part of embeds must be sent as a file upload
+                        await Context.Channel.SendFileAsync(embed.ImageData, embed.ImageName, embeds: embed.Embed);
+                    }
+                    else
+                    {
+                        await ReplyAsync(embeds: embed.Embed);
+                    }
+                    return;
                 }
-                else
-                {
-                    await ReplyAsync(embeds: embed.Embed);
-                }
-                return;
             }
             await ReplyAsync(wk.Message);
         }
