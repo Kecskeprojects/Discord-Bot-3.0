@@ -37,7 +37,7 @@ public class BiasGameImageProcessor(BotLogger logger)
 
     public async Task<Stream> CreatePolaroid(IdolGameResource idol)
     {
-        MemoryStream polaroidStream = new();
+        using MemoryStream polaroidStream = new();
         Resource.polaroid_base.Save(polaroidStream, System.Drawing.Imaging.ImageFormat.Png);
         using Image polaroidBase = Image.Load<Rgba32>(polaroidStream.ToArray());
 

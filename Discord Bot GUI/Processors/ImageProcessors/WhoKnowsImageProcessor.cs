@@ -24,10 +24,9 @@ public class WhoKnowsImageProcessor(BotLogger logger)
         {
             //Get two instances of the same picture
             using Image mainImage = Image.Load(originalImg);
+            using Image AlbumImage = mainImage.CloneAs<Rgba32>();
 
             ImageTools.CorrectImageRatio(mainImage);
-
-            using Image AlbumImage = mainImage.CloneAs<Rgba32>();
 
             //Get the dominant and contrast colors for the album image
             Tuple<Color, Color> Colors = ImageTools.GetContrastAndDominantColors(mainImage.CloneAs<Rgba32>());

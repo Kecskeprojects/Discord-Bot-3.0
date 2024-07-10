@@ -25,15 +25,16 @@ public class LastFmWhoKnowsEmbedProcessor(WhoKnowsImageProcessor whoKnowsImagePr
         {
             //Download image and get back it's filepath
             logger.Query($"Getting album cover image:\n{wk.ImageUrl}");
-            Stream originalImage = await WebTools.GetStream(wk.ImageUrl);
-
-            //Edit the picture to the list format
-            EditPictureResult modifiedImage = whoKnowsImageProcessor.EditPicture(originalImage, wk.Plays, wk.EmbedTitle);
-
-            if (modifiedImage != null)
+            using (Stream originalImage = await WebTools.GetStream(wk.ImageUrl))
             {
-                result.ImageData = modifiedImage.Stream;
-                result.ImageName = modifiedImage.FileName;
+                //Edit the picture to the list format
+                EditPictureResult modifiedImage = whoKnowsImageProcessor.EditPicture(originalImage, wk.Plays, wk.EmbedTitle);
+
+                if (modifiedImage != null)
+                {
+                    result.ImageData = modifiedImage.Stream;
+                    result.ImageName = modifiedImage.FileName;
+                }
             }
         }
 

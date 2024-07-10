@@ -27,12 +27,12 @@ public class BonkGifProcessor(BotLogger logger)
             {
                 profile.Mutate(x => x.Resize(400, 400).ApplyRoundedCorners(200));
 
-                MemoryStream winter0Stream = new();
+                using MemoryStream winter0Stream = new();
                 Resource.winter0.Save(winter0Stream, System.Drawing.Imaging.ImageFormat.Png);
                 using Image winter0 = Image.Load<Rgba32>(winter0Stream.ToArray());
                 winter0.Mutate(x => x.Resize(width, height));
 
-                MemoryStream winter1Stream = new();
+                using MemoryStream winter1Stream = new();
                 Resource.winter1.Save(winter1Stream, System.Drawing.Imaging.ImageFormat.Png);
                 using Image winter1 = Image.Load<Rgba32>(winter1Stream.ToArray());
                 winter1.Mutate(x => x.Resize(width, height));

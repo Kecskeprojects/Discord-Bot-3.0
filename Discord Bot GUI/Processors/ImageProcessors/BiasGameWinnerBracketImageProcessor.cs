@@ -60,7 +60,7 @@ public class BiasGameWinnerBracketImageProcessor(BotLogger logger)
         StaticRoundData roundData = Constant.BiasGameStaticRoundData[biasGameData.CurrentRound - 1];
         using Image winnerBracket = Image.Load<Rgba32>(biasGameData.WinnerBracket.ToArray());
 
-        Image idolImage_1 = CreateImageForRanking(files[0], roundData);
+        using Image idolImage_1 = CreateImageForRanking(files[0], roundData);
         int position_1 = biasGameData.CurrentPair * 2;
         winnerBracket.Mutate(x => x.DrawImage(idolImage_1, backgroundLocation: new Point(roundData.CalculateX(position_1), roundData.CalculateY(position_1)), 1));
 
