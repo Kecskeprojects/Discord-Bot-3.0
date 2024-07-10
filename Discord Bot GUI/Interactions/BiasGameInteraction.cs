@@ -98,7 +98,7 @@ public class BiasGameInteraction(
             using (Stream combined = BiasGameImageProcessor.CombineImages(
                 (MemoryStream) data.IdolWithImage[idolIds[0]].Stream,
                 (MemoryStream) data.IdolWithImage[idolIds[1]].Stream))
-            using (FileAttachment file = new FileAttachment(combined, "combined.png"))
+            using (FileAttachment file = new(combined, "combined.png"))
             {
                 Embed[] embeds = BiasGameEmbedProcessor.CreateEmbed(
                     data,

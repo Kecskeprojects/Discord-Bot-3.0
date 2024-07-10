@@ -16,7 +16,6 @@ using LastFmApi.Models.TopTrack;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TwitchLib.Api.Core.Enums;
 
 namespace Discord_Bot.Services;
 

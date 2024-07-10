@@ -30,10 +30,7 @@ public class AudioPlayFeature(
                 logger.Log("User must be in a voice channel, or a voice channel must be passed as an argument!");
                 audioResource.AudioVariables.Playing = false;
 
-                if(audioResource.AudioVariables != null)
-                {
-                    audioResource.AudioVariables.Dispose();
-                }
+                audioResource.AudioVariables?.Dispose();
                 audioResource.AudioVariables = new();
                 audioResource.MusicRequests.Clear();
                 return false;
@@ -100,10 +97,7 @@ public class AudioPlayFeature(
             return false;
         }
 
-        if (audioResource.AudioVariables != null)
-        {
-            audioResource.AudioVariables.Dispose();
-        }
+        audioResource.AudioVariables?.Dispose();
         audioResource.AudioVariables = new();
         audioResource.MusicRequests.Clear();
         return true;

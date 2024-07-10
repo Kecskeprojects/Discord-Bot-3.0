@@ -105,7 +105,7 @@ public partial class BotWindow : Window
         try
         {
             logger.LogToFile();
-            if(File.Exists(Path.Combine(Directory.GetCurrentDirectory(), $"Logs\\logs[{DateTimeTools.CurrentDate()}].txt")))
+            if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), $"Logs\\logs[{DateTimeTools.CurrentDate()}].txt")))
             {
                 Process.Start("notepad.exe", Path.Combine(Directory.GetCurrentDirectory(), $"Logs\\logs[{DateTimeTools.CurrentDate()}].txt"));
             }
