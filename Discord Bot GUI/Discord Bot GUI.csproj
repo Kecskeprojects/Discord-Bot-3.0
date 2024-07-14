@@ -29,7 +29,7 @@
 		<PackageReference Include="Discord.Net" Version="3.15.2" />
 		<PackageReference Include="Google.Apis.YouTube.v3" Version="1.68.0.3421" />
 		<PackageReference Include="PuppeteerSharp" Version="18.0.3" />
-		<PackageReference Include="RestSharp" Version="111.3.0" />
+		<PackageReference Include="RestSharp" Version="111.4.0" />
 		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
 		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.3" />
 		<PackageReference Include="SpotifyAPI.Web" Version="7.1.1" />
@@ -66,5 +66,8 @@
 			<Generator>PublicResXFileCodeGenerator</Generator>
 			<LastGenOutput>Resource.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Windows\BotWindow.xaml"/>
 	</ItemGroup>
 </Project>

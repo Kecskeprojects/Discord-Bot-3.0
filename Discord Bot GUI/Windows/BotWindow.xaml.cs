@@ -1,5 +1,6 @@
 ﻿using Discord_Bot.Communication;
 using Discord_Bot.Core;
+using Discord_Bot.Core.Configuration;
 using Discord_Bot.Tools.NativeTools;
 using System;
 using System.Collections.Generic;
@@ -16,21 +17,31 @@ namespace Discord_Bot.Windows;
 
 public partial class BotWindow : Window
 {
-    private readonly Timer diagnosticsTimer; //Todo: make it so showing diagnostic data is a config setting
+    private readonly Timer diagnosticsTimer;
     private bool AutoScroll = true;
 
     private readonly BotLogger logger;
+    private readonly Config config;
 
-    public BotWindow(BotLogger logger)
+    public BotWindow(BotLogger logger, Config config)
     {
         InitializeComponent();
         this.logger = logger;
-        diagnosticsTimer = new(1000) //1 second
+        this.config = config;
+
+        if (config.ShowDiagnostics)
         {
-            AutoReset = true
-        };
-        diagnosticsTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-        diagnosticsTimer.Start();
+            diagnosticsTimer = new(1000) //1 second
+            {
+                AutoReset = true
+            };
+            diagnosticsTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
+            diagnosticsTimer.Start();
+        }
+        else
+        {
+            DiagnosticGrid.Visibility = Visibility.Hidden;
+        }
     }
 
     private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
@@ -125,7 +136,7 @@ public partial class BotWindow : Window
             {
                 if (Application.Current.Windows.OfType<BotWindow>().FirstOrDefault() != null)
                 {
-                    BotWindow main = Application.Current.Windows.OfType<BotWindow>().First(); //Todo: Make the different displays exist on a panel so the config can hide them
+                    BotWindow main = Application.Current.Windows.OfType<BotWindow>().First();
                     main.TotalCPUUsage.Content = $"{result.TotalCPUUsagePercent}%";
                     main.TotalRAMUsage.Content = $"{result.TotalRAMUsagePercent}%";
                     main.ThreadCount.Content = $"{result.ThreadCount}";

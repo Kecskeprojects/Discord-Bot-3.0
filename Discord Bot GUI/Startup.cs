@@ -68,7 +68,7 @@ public static class Startup
         collection.AddSingleton<BotMain>();
         collection.AddSingleton<InteractionHandler>();
         collection.AddSingleton<CommandHandler>();
-        collection.AddTransient<BotWindow>();
+        collection.AddSingleton<BotWindow>();
 
         //Processors
         collection.AddTransient<WhoKnowsImageProcessor>();

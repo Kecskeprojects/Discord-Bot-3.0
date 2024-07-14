@@ -17,7 +17,7 @@ public class BrowserService(BotLogger logger, Config config)
         await browserFetcher.DownloadAsync(PuppeteerSharp.BrowserData.Chrome.DefaultBuildId); //117.0.5938.62 is the last version where videos were sent as media http responses
         Browser = await Puppeteer.LaunchAsync(new LaunchOptions
         {
-            Headless = config.Headless,
+            Headless = config.HeadlessBrowser,
             Args =
             [
                 "--no-sandbox",

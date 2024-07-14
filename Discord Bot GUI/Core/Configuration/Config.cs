@@ -24,7 +24,8 @@ public class Config
         public bool enable_Instagram_Embed;
         public bool enable_Twitter_Embed;
         public string sql_connection_string;
-        public bool headless;
+        public bool headless_browser;
+        public bool show_diagnostics;
     }
 
     public Config()
@@ -55,7 +56,8 @@ public class Config
                 enable_Instagram_Embed = false,
                 enable_Twitter_Embed = false,
                 sql_connection_string = "",
-                headless = true
+                headless_browser = true,
+                show_diagnostics = true,
             };
 
             using StreamWriter sw = File.AppendText(Path.Combine(assetDir, "config.json"));
@@ -101,7 +103,9 @@ public class Config
 
     public string SqlConnectionString => Configuration.GetSection("sql_connection_string").Get<string>();
 
-    public bool Headless => Configuration.GetSection("headless").Get<bool>();
+    public bool HeadlessBrowser => Configuration.GetSection("headless_browser").Get<bool>();
+
+    public bool ShowDiagnostics => Configuration.GetSection("show_diagnostics").Get<bool>();
     #endregion
 
 }

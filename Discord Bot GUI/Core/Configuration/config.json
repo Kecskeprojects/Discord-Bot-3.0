@@ -14,5 +14,6 @@
 	"enable_instagram_embed": false,
 	"enable_twitter_embed": false,
 	"sql_connection_string": "",
-	"Headless": true
+	"headless_browser": true,
+	"show_diagnostics": true
 }

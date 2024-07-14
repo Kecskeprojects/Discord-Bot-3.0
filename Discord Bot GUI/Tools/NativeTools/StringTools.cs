@@ -9,7 +9,7 @@ public static class StringTools
     {
         return string.IsNullOrEmpty(position)
             ? null
-            : position.Length >= 2 && position[^2..^1] is "11" or "12" or "13"
+            : position.Length >= 2 && position[^2..] is "11" or "12" or "13"
             ? $"{position}th"
             : position[^1] switch
             {

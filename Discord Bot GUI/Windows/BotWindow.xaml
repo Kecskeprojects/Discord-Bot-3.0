@@ -18,28 +18,30 @@
             <TextBlock x:Name="MainLogText" Foreground="White" />
         </ScrollViewer>
 
-        <ToolBar x:Name="MainToolBar" Grid.Column="1" Grid.Row="0" Height="20" VerticalAlignment="Top" ToolBarTray.IsLocked="True" Loaded="ToolBar_Loaded"/>
+        <ToolBar Grid.Column="1" x:Name="MainToolBar" VerticalAlignment="Top" ToolBarTray.IsLocked="True" Loaded="ToolBar_Loaded" Height="20"/>
+        <Grid Grid.Column="1" x:Name="DiagnosticGrid" Margin="0,20,80,0">
+            <Label Content="Avg. Total Processor Usage:" Margin="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="12"/>
+            <Label x:Name="TotalCPUUsage" Content="0%" Margin="150,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="12"/>
 
-        <Label Grid.Column="1" Content="Avg. Processor Usage:" Margin="5,0,0,10" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
-        <Label x:Name="CPUUsage" Grid.Column="1" Content="0%" Margin="127,0,0,10" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
+            <Label Content="Total Memory Usage:" Margin="0,30,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="12"/>
+            <Label x:Name="TotalRAMUsage" Content="0%" Margin="120,30,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="12"/>
 
-        <Label Grid.Column="1" Content="Memory Usage:" Margin="5,0,0,40" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
-        <Label x:Name="RAMUsage" Grid.Column="1" Content="0 MB" Margin="94,0,0,40" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
 
-        <Label Grid.Column="1" Content="Number of Child Processes:" Margin="5,0,0,70" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
-        <Label x:Name="ChildProcessCount" Grid.Column="1" Content="0" Margin="156,0,0,70" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
+            <Label Content="Number of Threads:" Margin="0,0,0,95" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
+            <Label x:Name="ThreadCount" Content="0" Margin="110,0,0,95" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
 
-        <Label Grid.Column="1" Content="Number of Threads:" Margin="5,0,0,100" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
-        <Label x:Name="ThreadCount" Grid.Column="1" Content="0" Margin="116,0,0,100" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
+            <Label Content="Number of Child Processes:" Margin="0,0,0,65" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
+            <Label x:Name="ChildProcessCount" Content="0" Margin="150,0,0,65" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
 
-        <Label Grid.Column="1" Content="Total Memory Usage:" Margin="5,50,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="12"/>
-        <Label x:Name="TotalRAMUsage" Grid.Column="1" Content="0%" Margin="122,50,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="12"/>
+            <Label Content="Memory Usage:" Margin="0,0,0,35" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
+            <Label x:Name="RAMUsage" Content="0 MB" Margin="90,0,0,35" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
 
-        <Label Grid.Column="1" Content="Avg. Total Processor Usage:" Margin="5,20,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="12"/>
-        <Label x:Name="TotalCPUUsage" Grid.Column="1" Content="0%" Margin="155,20,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="12"/>
+            <Label Content="Avg. Processor Usage:" Margin="0,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
+            <Label x:Name="CPUUsage" Content="0%" Margin="120,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
+        </Grid>
 
-        <Button x:Name="ClearButton" Grid.Column="1" Grid.Row="0" Content="Manual Clear Log" Click="ClearLog" Margin="0,0,10,10" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="20" Width="100"/>
-        <Button x:Name="OpenLogFolderButton" Grid.Column="1" Grid.Row="0" Content="Open Log Folder" Click="OpenLogFolder" Margin="0,0,10,35" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="20" Width="100"/>
-        <Button x:Name="OpenActiveLogFileButton" Grid.Column="1" Grid.Row="0" Content="Open Active Log" Click="OpenActiveLogFile" Margin="0,0,10,60" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="20" Width="100"/>
+        <Button Grid.Column="1" x:Name="OpenActiveLogFileButton" Content="Open Active Log" Click="OpenActiveLogFile" Margin="0,0,10,60" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="20" Width="100"/>
+        <Button Grid.Column="1" x:Name="OpenLogFolderButton" Content="Open Log Folder" Click="OpenLogFolder" Margin="0,0,10,35" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="20" Width="100"/>
+        <Button Grid.Column="1" x:Name="ClearButton" Content="Manual Clear Log" Click="ClearLog" Margin="0,0,10,10" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="20" Width="100"/>
     </Grid>
 </Window>
