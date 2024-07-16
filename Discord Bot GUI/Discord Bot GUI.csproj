@@ -28,6 +28,7 @@
 		<PackageReference Include="AutoMapper" Version="13.0.1" />
 		<PackageReference Include="Discord.Net" Version="3.15.2" />
 		<PackageReference Include="Google.Apis.YouTube.v3" Version="1.68.0.3421" />
+		<PackageReference Include="Magick.NET-Q16-AnyCPU" Version="13.9.1" />
 		<PackageReference Include="PuppeteerSharp" Version="18.0.3" />
 		<PackageReference Include="RestSharp" Version="111.4.0" />
 		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
@@ -68,6 +69,6 @@
 		</EmbeddedResource>
 	</ItemGroup>
 	<ItemGroup>
-	  <Page Update="Windows\BotWindow.xaml"/>
+	  <Page Update="Windows\BotWindow.xaml" />
 	</ItemGroup>
 </Project>

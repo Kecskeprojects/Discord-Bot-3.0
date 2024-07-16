@@ -42,7 +42,9 @@ public class BiasGameImageProcessor(BotLogger logger)
         using Image polaroidBase = Image.Load<Rgba32>(polaroidStream.ToArray());
 
         logger.Query($"Getting latest idol image:\n{idol.LatestImageUrl}");
-        using Image idolImage = Image.Load<Rgba32>(await WebTools.GetStream(idol.LatestImageUrl));
+        using MemoryStream stream = await WebTools.GetStream(idol.LatestImageUrl);
+        using Image idolImage = Image.Load<Rgba32>(stream);
+        logger.Log("Format: " + idolImage.Metadata.DecodedImageFormat.Name);
 
         if (!idol.LatestImageUrl.StartsWith(Constant.DbKpopBaseUrl))
         {

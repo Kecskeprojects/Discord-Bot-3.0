@@ -87,7 +87,8 @@ public class UserBonkCommands(
             if (!string.IsNullOrEmpty(url))
             {
                 logger.Query($"Getting profile image:\n{url}");
-                using (MemoryStream gifStream = bonkGifProcessor.CreateBonkImage(await WebTools.GetStream(url), frameDelay))
+                using (MemoryStream stream = await WebTools.GetStream(url))
+                using (MemoryStream gifStream = bonkGifProcessor.CreateBonkImage(stream, frameDelay))
                 {
                     await Context.Channel.SendFileAsync(gifStream, $"bonk_{userName}.gif");
                 }

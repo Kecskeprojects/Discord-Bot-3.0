@@ -25,7 +25,7 @@ public class LastFmWhoKnowsEmbedProcessor(WhoKnowsImageProcessor whoKnowsImagePr
         {
             //Download image and get back it's filepath
             logger.Query($"Getting album cover image:\n{wk.ImageUrl}");
-            using (Stream originalImage = await WebTools.GetStream(wk.ImageUrl))
+            using (MemoryStream originalImage = await WebTools.GetStream(wk.ImageUrl))
             {
                 //Edit the picture to the list format
                 EditPictureResult modifiedImage = whoKnowsImageProcessor.EditPicture(originalImage, wk.Plays, wk.EmbedTitle);

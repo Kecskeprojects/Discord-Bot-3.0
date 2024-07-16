@@ -8,18 +8,21 @@ namespace Discord_Bot.Tools;
 
 public static class WebTools
 {
-    public static async Task<Stream> GetStream(string url)
+    public static async Task<MemoryStream> GetStream(string url)
     {
-        Stream imageData = null;
+        MemoryStream imageData = new();
 
         using (HttpClient wc = new()
         {
             Timeout = new TimeSpan(0, 3, 0)
         })
         {
-            imageData = await wc.GetStreamAsync(url);
+            HttpResponseMessage response = await wc.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+            string contentType = response.Content.Headers.ContentType.MediaType;
+            MagickTools.ConvertIfUnsupported(response.Content, contentType, imageData);
         }
 
+        imageData.Position = 0;
         return imageData;
     }
 
