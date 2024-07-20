@@ -22,7 +22,8 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace Discord_Bot;
-public static class Startup
+
+public static class Startup
 {
     public static IServiceProvider Run()
     {
@@ -121,6 +122,8 @@ namespace Discord_Bot;
         collection.AddTransient<IUserIdolService, UserIdolService>();
         collection.AddTransient<IIdolImageService, IdolImageService>();
         collection.AddTransient<IUserIdolStatisticService, UserIdolStatisticService>();
+        collection.AddScoped<IEmbedService, EmbedService>();
+        collection.AddScoped<IEmbedGroupService, EmbedGroupService>();
 
         //Database Repositories
         collection.AddScoped<IServerRepository, ServerRepository>();
@@ -140,6 +143,8 @@ namespace Discord_Bot;
         collection.AddScoped<IIdolAliasRepository, IdolAliasRepository>();
         collection.AddScoped<IIdolImageRepository, IdolImageRepository>();
         collection.AddScoped<IUserIdolStatisticRepository, UserIdolStatisticRepository>();
+        collection.AddScoped<IEmbedRepository, EmbedRepository>();
+        collection.AddScoped<IEmbedGroupRepository, EmbedGroupRepository>();
 
         return collection.BuildServiceProvider();
     }
