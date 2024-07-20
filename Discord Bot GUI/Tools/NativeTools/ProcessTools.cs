@@ -8,8 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Tools.NativeTools;
-
-public static class ProcessTools
+public static class ProcessTools
 {
     public static async Task<ProcessMetrics> GetStatistics()
     {

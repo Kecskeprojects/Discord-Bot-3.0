@@ -10,8 +10,7 @@ using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
-
-public class IdolImageService(
+public class IdolImageService(
     IIdolRepository idolRepository,
     IIdolImageRepository idolImageRepository,
     IMapper mapper,

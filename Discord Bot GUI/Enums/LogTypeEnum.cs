@@ -1,6 +1,5 @@
 ﻿namespace Discord_Bot.Enums;
-
-public enum LogTypeEnum
+public enum LogTypeEnum
 {
     Log = 1,
     Query = 2,
@@ -10,8 +9,7 @@ public enum LogTypeEnum
     Error = 6,
     Warning = 7
 }
-
-public static class LogTypeEnumExtension
+public static class LogTypeEnumExtension
 {
     public static string ToFriendlyString(this LogTypeEnum logType)
     {

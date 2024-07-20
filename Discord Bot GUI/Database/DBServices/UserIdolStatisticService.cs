@@ -10,8 +10,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
-
-public class UserIdolStatisticService(
+public class UserIdolStatisticService(
     IUserIdolStatisticRepository userIdolStatisticRepository,
     IUserRepository userRepository,
     IMapper mapper,

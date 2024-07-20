@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Discord_Bot.Tools;
-
-public static class UrlTools
+public static class UrlTools
 {
     public static List<Uri> LinkSearch(string message, bool ignoreEmbedSuppress, params string[] baseURLs)
     {

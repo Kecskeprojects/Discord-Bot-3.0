@@ -11,8 +11,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
-
-public class RoleService(
+public class RoleService(
     IRoleRepository roleRepository,
     IServerRepository serverRepository,
     IMapper mapper,

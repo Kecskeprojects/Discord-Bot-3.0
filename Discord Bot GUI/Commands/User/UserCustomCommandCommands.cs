@@ -12,8 +12,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
-
-public class UserCustomCommandCommands(
+public class UserCustomCommandCommands(
     ICustomCommandService customCommandService,
     IServerService serverService,
     BotLogger logger,

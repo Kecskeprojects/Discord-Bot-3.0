@@ -11,8 +11,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
-
-public class GreetingService(
+public class GreetingService(
     IGreetingRepository greetingRepository,
     IMapper mapper,
     BotLogger logger,

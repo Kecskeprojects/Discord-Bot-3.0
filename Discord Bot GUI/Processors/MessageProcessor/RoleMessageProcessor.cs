@@ -4,8 +4,7 @@ using System.Globalization;
 using System.Linq;
 
 namespace Discord_Bot.Processors.MessageProcessor;
-
-public static class RoleMessageProcessor
+public static class RoleMessageProcessor
 {
     public static string CreateMessage(List<RoleResource> roles)
     {

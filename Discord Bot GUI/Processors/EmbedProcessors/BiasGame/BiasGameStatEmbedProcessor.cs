@@ -4,8 +4,7 @@ using Discord_Bot.Resources;
 using System.Linq;
 
 namespace Discord_Bot.Processors.EmbedProcessors.BiasGame;
-
-public static class BiasGameStatEmbedProcessor
+public static class BiasGameStatEmbedProcessor
 {
     public static Embed[] CreateEmbed(string nickName, GenderEnum gender, UserBiasGameStatResource stats)
     {

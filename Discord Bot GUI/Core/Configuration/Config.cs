@@ -3,8 +3,7 @@ using Newtonsoft.Json;
 using System.IO;
 
 namespace Discord_Bot.Core.Configuration;
-
-public class Config
+public class Config
 {
     private readonly IConfiguration Configuration;
     public struct ConfigModel

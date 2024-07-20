@@ -11,8 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Processors;
-
-public class BiasScrapingProcessor(
+public class BiasScrapingProcessor(
     IIdolService idolService,
     IKpopDbScraper kpopDbScraper,
     BrowserService browserService,

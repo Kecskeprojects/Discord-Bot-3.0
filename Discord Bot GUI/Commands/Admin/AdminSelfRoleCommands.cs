@@ -15,8 +15,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
-
-public class AdminSelfRoleCommands(
+public class AdminSelfRoleCommands(
     IRoleService roleService,
     IServerService serverService,
     BotLogger logger,

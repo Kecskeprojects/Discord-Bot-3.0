@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 
 namespace Discord_Bot.Tools.NativeTools;
-
-public static class StringTools
+public static class StringTools
 {
     public static string AddNumberPositionIdentifier(string position)
     {

@@ -10,8 +10,7 @@ using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
-
-public class ServerService(
+public class ServerService(
     IServerChannelViewService serverChannelViewService,
     IServerRepository serverRepository,
     IRoleRepository roleRepository,

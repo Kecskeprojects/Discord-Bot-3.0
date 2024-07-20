@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 
 namespace Discord_Bot.Processors.EmbedProcessors.Help;
-
-public static class HelpUserEmbedProcessor
+public static class HelpUserEmbedProcessor
 {
     public static Embed[] CreateEmbed(string imageUrl)
     {

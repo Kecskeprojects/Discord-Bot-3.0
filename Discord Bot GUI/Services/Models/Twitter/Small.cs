@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 
 namespace Discord_Bot.Services.Models.Twitter;
-
-public class Small
+public class Small
 {
     [JsonProperty("faces")]
     public List<Face> Faces { get; set; }

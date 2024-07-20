@@ -1,7 +1,6 @@
 ﻿using Discord_Bot.Database.Models;
 
 namespace Discord_Bot.Interfaces.DBRepositories;
-
-public interface IGreetingRepository : IGenericRepository<Greeting>
+public interface IGreetingRepository : IGenericRepository<Greeting>
 {
 }

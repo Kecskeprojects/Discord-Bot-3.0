@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interfaces.DBServices;
-
-public interface ICustomCommandService
+public interface ICustomCommandService
 {
     Task<DbProcessResultEnum> AddCustomCommandAsync(ulong serverId, string commandName, string link);
     Task<CustomCommandResource> GetCustomCommandAsync(ulong serverId, string commandName);

@@ -1,8 +1,7 @@
 ﻿using Discord.Interactions;
 
 namespace Discord_Bot.Communication.Modal;
-
-public class OverrideImageModal : IModal
+public class OverrideImageModal : IModal
 {
     public string Title => "Override Current Image";
 

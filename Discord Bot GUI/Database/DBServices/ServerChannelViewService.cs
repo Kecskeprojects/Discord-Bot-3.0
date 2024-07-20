@@ -11,8 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
-
-public class ServerChannelViewService(
+public class ServerChannelViewService(
     IServerChannelViewRepository serverChannelViewRepository,
     IMapper mapper,
     BotLogger logger,

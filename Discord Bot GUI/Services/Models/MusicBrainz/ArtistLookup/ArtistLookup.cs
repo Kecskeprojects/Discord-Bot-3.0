@@ -2,8 +2,7 @@
 using System.Text.Json.Serialization;
 
 namespace Discord_Bot.Services.Models.MusicBrainz.ArtistLookup;
-
-public class ArtistLookup
+public class ArtistLookup
 {
     [JsonPropertyName("area")]
     public Area Area { get; set; }

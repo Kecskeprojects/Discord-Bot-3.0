@@ -2,7 +2,6 @@
 using Discord_Bot.Interfaces.DBRepositories;
 
 namespace Discord_Bot.Database.DBRepositories;
-
-public class ChannelTypeRepository(MainDbContext context) : GenericRepository<ChannelType>(context), IChannelTypeRepository
+public class ChannelTypeRepository(MainDbContext context) : GenericRepository<ChannelType>(context), IChannelTypeRepository
 {
 }

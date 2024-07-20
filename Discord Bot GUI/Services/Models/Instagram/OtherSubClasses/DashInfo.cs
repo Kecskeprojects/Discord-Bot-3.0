@@ -1,8 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace Discord_Bot.Services.Models.Instagram.OtherSubClasses;
-
-public class DashInfo
+public class DashInfo
 {
     [JsonProperty("is_dash_eligible")]
     public bool IsDashEligible { get; set; }

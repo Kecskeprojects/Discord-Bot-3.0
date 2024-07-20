@@ -7,8 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Processors.MessageProcessor;
-
-public static class TwitterMessageProcessor
+public static class TwitterMessageProcessor
 {
     public static async Task<List<FileAttachment>> GetAttachments(List<TwitterContent> content, bool sendVideos = true)
     {

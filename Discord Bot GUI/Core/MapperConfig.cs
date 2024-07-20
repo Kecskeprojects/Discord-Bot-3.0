@@ -8,8 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Discord_Bot.Core;
-
-public class MapperConfig : Profile
+public class MapperConfig : Profile
 {
     public MapperConfig()
     {

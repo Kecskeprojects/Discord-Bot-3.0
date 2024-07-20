@@ -15,8 +15,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
-
-public class UserTwitterScraperCommands(
+public class UserTwitterScraperCommands(
     ITwitterScraper twitterScraper,
     IServerService serverService,
     BotLogger logger,

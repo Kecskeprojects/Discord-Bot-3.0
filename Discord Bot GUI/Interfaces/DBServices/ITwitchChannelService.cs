@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interfaces.DBServices;
-
-public interface ITwitchChannelService
+public interface ITwitchChannelService
 {
     Task<DbProcessResultEnum> AddTwitchChannelAsync(ulong serverId, string twitchUserId, string twitchUserName);
     Task<List<TwitchChannelResource>> GetChannelsAsync();

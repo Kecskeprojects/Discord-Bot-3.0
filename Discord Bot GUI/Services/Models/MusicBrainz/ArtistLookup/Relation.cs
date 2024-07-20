@@ -2,8 +2,7 @@
 using System.Text.Json.Serialization;
 
 namespace Discord_Bot.Services.Models.MusicBrainz.ArtistLookup;
-
-public class Relation
+public class Relation
 {
     [JsonPropertyName("attribute-ids")]
     public object AttributeIds { get; set; }

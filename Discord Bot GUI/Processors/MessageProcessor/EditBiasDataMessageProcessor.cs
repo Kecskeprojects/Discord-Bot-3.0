@@ -2,8 +2,7 @@
 using Discord_Bot.Enums;
 
 namespace Discord_Bot.Processors.MessageProcessor;
-
-public static class EditBiasDataMessageProcessor
+public static class EditBiasDataMessageProcessor
 {
     public static MessageComponent CreateComponent(string biasName, string biasGroup)
     {

@@ -1,8 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace Discord_Bot.Services.Models.Twitter;
-
-public class Face
+public class Face
 {
     [JsonProperty("x")]
     public int X { get; set; }

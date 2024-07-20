@@ -1,6 +1,5 @@
 ﻿namespace Discord_Bot.Enums;
-
-public enum SearchResultEnum
+public enum SearchResultEnum
 {
     YoutubeNotFound = 0,
     SpotifyNotFound = 1,
@@ -11,8 +10,7 @@ public enum SearchResultEnum
     SpotifyFoundYoutubeNotFound = 6,
     YoutubeSearchNotFound = 7
 }
-
-public static class SearchResultEnumExtension
+public static class SearchResultEnumExtension
 {
     public static string ToMessageString(this SearchResultEnum result)
     {

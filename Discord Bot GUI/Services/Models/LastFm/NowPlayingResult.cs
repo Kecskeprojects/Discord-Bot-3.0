@@ -1,8 +1,7 @@
 ﻿using LastFmApi.Models.Recent;
 
 namespace Discord_Bot.Services.Models.LastFm;
-
-public class NowPlayingResult
+public class NowPlayingResult
 {
     public string ImageUrl { get; set; }
     public string Message { get; set; }

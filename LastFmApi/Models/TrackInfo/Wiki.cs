@@ -1,8 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.TrackInfo;
-
-public class Wiki
+public class Wiki
 {
     [JsonProperty("published")]
     public string Published { get; set; }

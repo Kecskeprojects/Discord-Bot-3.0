@@ -10,8 +10,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
-
-public class BirthdayFeature(IBirthdayService birthdayService, DiscordSocketClient client, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
+public class BirthdayFeature(IBirthdayService birthdayService, DiscordSocketClient client, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IBirthdayService birthdayService = birthdayService;
     private readonly DiscordSocketClient client = client;

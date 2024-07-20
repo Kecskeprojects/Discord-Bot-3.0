@@ -12,8 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
-
-public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IKpopDbScraper
+public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IKpopDbScraper
 {
     private readonly BotLogger logger = logger;
     private readonly BrowserService browserService = browserService;

@@ -1,13 +1,11 @@
 ﻿namespace Discord_Bot.Enums;
-
-public enum GenderEnum
+public enum GenderEnum
 {
     Male = 1,
     Female = 2,
     NotSpecified = 3
 }
-
-public static class GenderChoiceEnumExtension
+public static class GenderChoiceEnumExtension
 {
     public static string ToFriendlyString(this GenderEnum genderEnum)
     {

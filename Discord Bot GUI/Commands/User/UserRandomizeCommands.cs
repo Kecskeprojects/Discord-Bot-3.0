@@ -7,8 +7,7 @@ using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
-
-public class UserRandomizeCommands(
+public class UserRandomizeCommands(
     IServerService serverService,
     BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)

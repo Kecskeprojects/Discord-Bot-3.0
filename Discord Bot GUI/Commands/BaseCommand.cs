@@ -10,7 +10,6 @@ using Discord_Bot.Tools;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands;
-
 //Todo: after reorganizing, check if anything in especially the longer commands can be moved into tools, processors, etc...
 public class BaseCommand(BotLogger logger, Config config, IServerService serverService) : ModuleBase<SocketCommandContext>
 {

@@ -2,7 +2,6 @@
 using Discord_Bot.Interfaces.DBRepositories;
 
 namespace Discord_Bot.Database.DBRepositories;
-
-public class GreetingRepository(MainDbContext context) : GenericRepository<Greeting>(context), IGreetingRepository
+public class GreetingRepository(MainDbContext context) : GenericRepository<Greeting>(context), IGreetingRepository
 {
 }

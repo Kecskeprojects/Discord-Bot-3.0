@@ -5,7 +5,6 @@ using Discord_Bot.Core.Configuration;
 using Discord_Bot.Tools;
 
 namespace Discord_Bot.Interactions;
-
 //Todo: after reorganizing, check if anything in especially the longer interactions can be moved into tools, processors, etc...
 public class BaseInteraction(BotLogger logger, Config config) : InteractionModuleBase<SocketInteractionContext>
 {

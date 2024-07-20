@@ -3,8 +3,7 @@ using System;
 using System.Linq;
 
 namespace Discord_Bot.Enums;
-
-public enum ChannelTypeEnum
+public enum ChannelTypeEnum
 {
     None = 0,
     RoleText = 1,
@@ -14,8 +13,7 @@ public enum ChannelTypeEnum
     CommandText = 5,
     BirthdayText = 6,
 }
-
-public static class ChannelTypeEnumExtension
+public static class ChannelTypeEnumExtension
 {
     public static bool IsRestrictedChannelType(this ChannelTypeEnum channelType)
     {

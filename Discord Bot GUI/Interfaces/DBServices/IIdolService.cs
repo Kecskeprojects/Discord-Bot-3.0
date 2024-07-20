@@ -7,8 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interfaces.DBServices;
-
-public interface IIdolService
+public interface IIdolService
 {
     Task<DbProcessResultEnum> AddIdolAsync(string idolName, string idolGroup);
     Task<List<IdolResource>> GetIdolsByGroupAsync(string groupName);

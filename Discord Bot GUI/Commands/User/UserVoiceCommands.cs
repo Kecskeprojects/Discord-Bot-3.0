@@ -15,8 +15,7 @@ using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
-
-public class UserVoiceCommands(
+public class UserVoiceCommands(
     AudioPlayFeature audioPlayFeature,
     AudioRequestFeature audioRequestFeature,
     IServerService serverService,

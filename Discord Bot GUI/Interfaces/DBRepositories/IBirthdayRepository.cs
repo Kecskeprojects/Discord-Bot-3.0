@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interfaces.DBRepositories;
-
-public interface IBirthdayRepository : IGenericRepository<Birthday>
+public interface IBirthdayRepository : IGenericRepository<Birthday>
 {
     Task<List<Birthday>> GetListForServerAsync(string serverId);
 }

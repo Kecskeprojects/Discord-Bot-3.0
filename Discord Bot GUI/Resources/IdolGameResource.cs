@@ -1,6 +1,5 @@
 ﻿namespace Discord_Bot.Resources;
-
-public class IdolGameResource
+public class IdolGameResource
 {
     public int IdolId { get; set; }
 

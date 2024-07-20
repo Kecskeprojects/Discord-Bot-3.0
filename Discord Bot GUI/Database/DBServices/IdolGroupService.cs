@@ -11,8 +11,7 @@ using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
-
-public class IdolGroupService(
+public class IdolGroupService(
     IIdolGroupRepository idolGroupRepository,
     IMapper mapper,
     BotLogger logger,

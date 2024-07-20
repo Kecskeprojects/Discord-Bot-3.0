@@ -12,8 +12,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Owner;
-
-public class OwnerGreetingCommands(
+public class OwnerGreetingCommands(
     IGreetingService greetingService,
     IServerService serverService,
     BotLogger logger,

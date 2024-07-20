@@ -10,8 +10,7 @@ using System.Linq;
 using System.Windows.Media;
 
 namespace Discord_Bot.Core;
-
-public class BotLogger
+public class BotLogger
 {
     //List of logs, before they are cleared
     public readonly List<Log> Logs = [];

@@ -8,7 +8,6 @@ using Discord_Bot.Tools;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
-
 //Todo: after reorganizing, check if anything in especially the longer features can be moved into tools, processors, etc...
 public abstract class BaseFeature(IServerService serverService, BotLogger logger)
 {

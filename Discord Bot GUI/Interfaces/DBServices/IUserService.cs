@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interfaces.DBServices;
-
-public interface IUserService
+public interface IUserService
 {
     Task<DbProcessResultEnum> AddLastfmUsernameAsync(ulong userId, string name);
     Task<List<UserResource>> GetAllLastFmUsersAsync();

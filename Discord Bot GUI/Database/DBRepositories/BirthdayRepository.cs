@@ -6,8 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBRepositories;
-
-public class BirthdayRepository(MainDbContext context) : GenericRepository<Birthday>(context), IBirthdayRepository
+public class BirthdayRepository(MainDbContext context) : GenericRepository<Birthday>(context), IBirthdayRepository
 {
     public Task<List<Birthday>> GetListForServerAsync(string serverId)
     {

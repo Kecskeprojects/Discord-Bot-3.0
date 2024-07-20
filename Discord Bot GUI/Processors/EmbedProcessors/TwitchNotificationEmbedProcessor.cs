@@ -2,8 +2,7 @@
 using Discord_Bot.Resources;
 
 namespace Discord_Bot.Processors.EmbedProcessors;
-
-public static class TwitchNotificationEmbedProcessor
+public static class TwitchNotificationEmbedProcessor
 {
     public static Embed[] CreateEmbed(TwitchChannelResource twitchChannel, string thumbnailUrl, string title)
     {

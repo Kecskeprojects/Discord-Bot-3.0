@@ -12,8 +12,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
-
-public class UserWordOfTheDayCommands(
+public class UserWordOfTheDayCommands(
     IWordOfTheDayService wordOfTheDayService,
     IServerService serverService,
     BotLogger logger,

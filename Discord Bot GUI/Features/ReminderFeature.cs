@@ -11,8 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
-
-public class ReminderFeature(IReminderService reminderService, DiscordSocketClient client, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
+public class ReminderFeature(IReminderService reminderService, DiscordSocketClient client, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IReminderService reminderService = reminderService;
     private readonly DiscordSocketClient client = client;

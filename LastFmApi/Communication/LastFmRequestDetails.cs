@@ -1,6 +1,5 @@
 ﻿namespace LastFmApi.Communication;
-
-public class LastFmRequestDetails
+public class LastFmRequestDetails
 {
     public override string ToString()
     {

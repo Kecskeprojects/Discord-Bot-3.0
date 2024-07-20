@@ -1,8 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.TrackInfo;
-
-public class Track
+public class Track
 {
     [JsonProperty("name")]
     public string Name { get; set; }

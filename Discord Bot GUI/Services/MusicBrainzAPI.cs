@@ -9,8 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
-
-public class MusicBrainzAPI(BotLogger logger) : IMusicBrainzAPI
+public class MusicBrainzAPI(BotLogger logger) : IMusicBrainzAPI
 {
     private readonly BotLogger logger = logger;
 

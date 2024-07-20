@@ -1,8 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.Recent;
-
-public class Date
+public class Date
 {
     [JsonProperty("uts")]
     public string Uts { get; set; }

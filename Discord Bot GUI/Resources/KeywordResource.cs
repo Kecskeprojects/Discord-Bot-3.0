@@ -1,6 +1,5 @@
 ﻿namespace Discord_Bot.Resources;
-
-public class KeywordResource
+public class KeywordResource
 {
     public string Trigger { get; set; }
 

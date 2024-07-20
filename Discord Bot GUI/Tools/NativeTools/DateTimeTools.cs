@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 
 namespace Discord_Bot.Tools.NativeTools;
-
-public static class DateTimeTools
+public static class DateTimeTools
 {
     public static string CurrentTime(bool utc = false)
     {

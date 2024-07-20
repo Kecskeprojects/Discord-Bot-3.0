@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 
 namespace Discord_Bot.Services.Models.LastFm;
-
-public class WhoKnows(List<UserResource> users)
+public class WhoKnows(List<UserResource> users)
 {
     public List<UserResource> Users { get; set; } = users;
     public Dictionary<string, int> Plays { get; set; } = [];

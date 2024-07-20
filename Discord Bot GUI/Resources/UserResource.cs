@@ -1,6 +1,5 @@
 ﻿namespace Discord_Bot.Resources;
-
-public class UserResource
+public class UserResource
 {
     public int UserId { get; set; }
 

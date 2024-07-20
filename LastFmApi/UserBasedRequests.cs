@@ -8,8 +8,7 @@ using Newtonsoft.Json;
 using RestSharp;
 
 namespace LastFmApi;
-
-public class UserBasedRequests : BaseRequests
+public class UserBasedRequests : BaseRequests
 {
     public static async Task<GenericResponseItem<Toptracks>> TopTracks(string apiKey, string username, int? limit, int? page, string period)
     {

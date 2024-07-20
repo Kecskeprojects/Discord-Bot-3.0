@@ -15,8 +15,7 @@ using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions;
-
-public class BiasGameInteraction(
+public class BiasGameInteraction(
     IIdolService idolService,
     BiasGameImageProcessor biasGameImageProcessor,
     BotLogger logger,

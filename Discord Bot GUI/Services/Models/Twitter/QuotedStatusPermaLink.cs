@@ -1,8 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace Discord_Bot.Services.Models.Twitter;
-
-public class QuotedStatusPermalink
+public class QuotedStatusPermalink
 {
     [JsonProperty("url")]
     public string Url { get; set; }

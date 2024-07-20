@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 
 namespace Discord_Bot.Core.Caching;
-
-public sealed class SizedDictionary<TKey, TValue>(int size) : Dictionary<TKey, TValue>
+public sealed class SizedDictionary<TKey, TValue>(int size) : Dictionary<TKey, TValue>
 {
 
     private readonly int maxSize = size;

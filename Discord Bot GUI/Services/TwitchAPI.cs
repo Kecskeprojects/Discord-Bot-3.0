@@ -14,8 +14,7 @@ using TwitchLib.Api.Services.Events;
 using TwitchLib.Api.Services.Events.LiveStreamMonitor;
 
 namespace Discord_Bot.Services;
-
-public class TwitchAPI(
+public class TwitchAPI(
     ITwitchCLI twitchCLI,
     ITwitchChannelService twitchChannelService,
     TwitchNotificationFeature twitchNotificationFeature,

@@ -12,8 +12,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions;
-
-public class BiasEditComponentInteraction : BaseInteraction
+public class BiasEditComponentInteraction : BaseInteraction
 {
     private readonly IIdolService idolService;
     private readonly IIdolGroupService idolGroupService;

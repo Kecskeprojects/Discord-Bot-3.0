@@ -1,6 +1,5 @@
 ﻿namespace Discord_Bot.Resources;
-
-public class RoleResource
+public class RoleResource
 {
     public ulong DiscordId { get; set; }
 

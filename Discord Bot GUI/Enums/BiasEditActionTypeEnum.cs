@@ -1,6 +1,5 @@
 ﻿namespace Discord_Bot.Enums;
-
-public enum BiasEditActionTypeEnum
+public enum BiasEditActionTypeEnum
 {
     EditGroup = 1,
     EditIdol = 2,

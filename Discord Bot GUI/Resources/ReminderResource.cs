@@ -1,8 +1,7 @@
 ﻿using System;
 
 namespace Discord_Bot.Resources;
-
-public class ReminderResource
+public class ReminderResource
 {
     public int ReminderId { get; set; }
 

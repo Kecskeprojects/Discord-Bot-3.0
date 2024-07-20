@@ -1,6 +1,5 @@
 ﻿namespace Discord_Bot.Communication;
-
-public class ProcessMetrics
+public class ProcessMetrics
 {
     public double CPUUsagePercent { get; set; }
     public double RAMUsageInMB { get; set; }

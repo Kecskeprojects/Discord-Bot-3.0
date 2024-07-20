@@ -1,6 +1,5 @@
 ﻿namespace Discord_Bot.Resources;
-
-public class UserIdolStatisticResource
+public class UserIdolStatisticResource
 {
     public string IdolStageName { get; set; }
 

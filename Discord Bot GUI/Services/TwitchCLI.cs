@@ -7,8 +7,7 @@ using System.Diagnostics;
 using System.IO;
 
 namespace Discord_Bot.Services;
-
-public class TwitchCLI(BotLogger logger) : ITwitchCLI
+public class TwitchCLI(BotLogger logger) : ITwitchCLI
 {
     private readonly BotLogger logger = logger;
 

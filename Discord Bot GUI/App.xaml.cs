@@ -16,7 +16,6 @@ using System.Timers;
 using System.Windows;
 
 namespace Discord_Bot;
-
 //Todo: Investigate if the various API and other Services can be cleaned up, split up, and also if a base class can be or is needed for them, perhaps multiple base classes
 
 //Additional Feature Ideas:

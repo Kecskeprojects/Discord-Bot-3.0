@@ -4,8 +4,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Processors.EmbedProcessors.BiasGame;
-
-public static class BiasGameDebutEmbedProcessor
+public static class BiasGameDebutEmbedProcessor
 {
     public static MessageComponent CreateComponent(BiasGameData data)
     {

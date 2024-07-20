@@ -4,8 +4,7 @@ using System.Diagnostics;
 using System.IO;
 
 namespace Discord_Bot.Communication;
-
-public class AudioVariables : IDisposable
+public class AudioVariables : IDisposable
 {
     public bool Playing { get; set; }
 

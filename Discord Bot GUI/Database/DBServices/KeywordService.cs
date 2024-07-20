@@ -10,8 +10,7 @@ using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
-
-public class KeywordService(
+public class KeywordService(
     IKeywordRepository keywordRepository,
     IServerRepository serverRepository,
     IMapper mapper,

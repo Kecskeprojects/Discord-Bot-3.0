@@ -11,8 +11,7 @@ using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Processors.ImageProcessors;
-
-public class BiasGameImageProcessor(BotLogger logger)
+public class BiasGameImageProcessor(BotLogger logger)
 {
     private readonly BotLogger logger = logger;
 

@@ -3,8 +3,7 @@ using Discord_Bot.Resources;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Processors.EmbedProcessors;
-
-public static class CustomCommandListEmbedProcessor
+public static class CustomCommandListEmbedProcessor
 {
     public static Embed[] CreateEmbed(List<CustomCommandResource> list)
     {

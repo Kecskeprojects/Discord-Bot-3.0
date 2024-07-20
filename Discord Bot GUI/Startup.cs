@@ -22,8 +22,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace Discord_Bot;
-
-public static class Startup
+public static class Startup
 {
     public static IServiceProvider Run()
     {

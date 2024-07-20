@@ -2,8 +2,7 @@
 using Discord_Bot.Communication.Bias;
 
 namespace Discord_Bot.Processors.EmbedProcessors.BiasGame;
-
-public static class BiasGameEmbedProcessor
+public static class BiasGameEmbedProcessor
 {
     public static MessageComponent CreateComponent(int[] idolIds, ulong userId)
     {

@@ -5,8 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBRepositories;
-
-public class ReminderRepository(MainDbContext context) : GenericRepository<Reminder>(context), IReminderRepository
+public class ReminderRepository(MainDbContext context) : GenericRepository<Reminder>(context), IReminderRepository
 {
     public Task<Reminder> GetByIndexAsync(string userId, int reminderOrderId)
     {

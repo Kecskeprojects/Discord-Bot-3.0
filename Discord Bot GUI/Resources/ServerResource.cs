@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 
 namespace Discord_Bot.Resources;
-
-public class ServerResource
+public class ServerResource
 {
     public int ServerId { get; set; }
 

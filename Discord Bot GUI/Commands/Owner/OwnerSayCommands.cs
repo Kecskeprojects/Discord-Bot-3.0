@@ -8,8 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Owner;
-
-public class OwnerSayCommands(
+public class OwnerSayCommands(
     IServerService serverService,
     BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)

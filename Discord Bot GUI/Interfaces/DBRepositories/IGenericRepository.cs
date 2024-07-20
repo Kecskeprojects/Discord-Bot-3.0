@@ -4,8 +4,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interfaces.DBRepositories;
-
-public interface IGenericRepository<TEntity> where TEntity : class
+public interface IGenericRepository<TEntity> where TEntity : class
 {
     Task<int> AddAsync(TEntity item, bool saveChanges = true);
     Task<int> AddAsync(IEnumerable<TEntity> items, bool saveChanges = true);

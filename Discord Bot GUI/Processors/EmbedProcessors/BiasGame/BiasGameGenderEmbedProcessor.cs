@@ -1,8 +1,7 @@
 ﻿using Discord;
 
 namespace Discord_Bot.Processors.EmbedProcessors.BiasGame;
-
-public static class BiasGameGenderEmbedProcessor
+public static class BiasGameGenderEmbedProcessor
 {
     public static Embed[] CreateEmbed(string userName, string avatarUrl)
     {

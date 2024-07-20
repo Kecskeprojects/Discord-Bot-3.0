@@ -1,8 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace Discord_Bot.Services.Models.Instagram;
-
-public class InstaLoaderBase
+public class InstaLoaderBase
 {
     [JsonProperty("instaloader")]
     public InstaLoader Instaloader { get; set; }

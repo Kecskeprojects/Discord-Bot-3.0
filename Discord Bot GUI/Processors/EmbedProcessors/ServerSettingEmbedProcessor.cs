@@ -8,8 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Discord_Bot.Processors.EmbedProcessors;
-
-public static class ServerSettingEmbedProcessor
+public static class ServerSettingEmbedProcessor
 {
     public static Embed[] CreateEmbed(ServerResource server, IReadOnlyCollection<SocketTextChannel> textChannels, string thumbnailUrl)
     {

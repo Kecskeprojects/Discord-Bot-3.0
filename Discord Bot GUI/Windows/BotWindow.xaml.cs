@@ -14,8 +14,7 @@ using System.Windows.Documents;
 using System.Windows.Threading;
 
 namespace Discord_Bot.Windows;
-
-public partial class BotWindow : Window
+public partial class BotWindow : Window
 {
     private readonly Timer diagnosticsTimer;
     private bool AutoScroll = true;

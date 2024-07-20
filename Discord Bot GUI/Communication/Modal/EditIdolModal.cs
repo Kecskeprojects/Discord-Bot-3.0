@@ -1,8 +1,7 @@
 ﻿using Discord.Interactions;
 
 namespace Discord_Bot.Communication.Modal;
-
-public class EditIdolModal : IModal
+public class EditIdolModal : IModal
 {
     public string Title => "Edit Idol";
 

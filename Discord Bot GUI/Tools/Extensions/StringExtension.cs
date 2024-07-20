@@ -2,8 +2,7 @@
 using System.Text.RegularExpressions;
 
 namespace Discord_Bot.Tools;
-
-public static partial class StringExtension
+public static partial class StringExtension
 {
     public static string RemoveSpecialCharacters(this string str)
     {

@@ -12,8 +12,7 @@ using System.Threading.Tasks;
 using System.Web;
 
 namespace Discord_Bot.Services;
-
-public class TwitterScraper(BotLogger logger, BrowserService browserService) : ITwitterScraper
+public class TwitterScraper(BotLogger logger, BrowserService browserService) : ITwitterScraper
 {
     private readonly BotLogger logger = logger;
     private readonly BrowserService browserService = browserService;

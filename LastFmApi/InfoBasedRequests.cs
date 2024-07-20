@@ -6,8 +6,7 @@ using Newtonsoft.Json;
 using RestSharp;
 
 namespace LastFmApi;
-
-public class InfoBasedRequests : BaseRequests
+public class InfoBasedRequests : BaseRequests
 {
     #region Api getInfo calls
     public static async Task<GenericResponseItem<Models.ArtistInfo.Artist>> ArtistPlays(string apiKey, string username, string artistName)
