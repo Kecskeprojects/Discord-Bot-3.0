@@ -15,6 +15,8 @@ public partial class User
 
     public int BiasGameCount { get; set; }
 
+    public DateTime ModifiedOn { get; set; }
+
     public virtual ICollection<Birthday> Birthdays { get; set; } = new List<Birthday>();
 
     public virtual ICollection<Reminder> Reminders { get; set; } = new List<Reminder>();

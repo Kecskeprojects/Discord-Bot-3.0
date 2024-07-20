@@ -124,5 +124,7 @@
     <Build Include="Tables\UserIdolStatistic.sql" />
     <Build Include="Tables\ChannelType.sql" />
     <Build Include="Views\ServerChannelView.sql" />
+    <Build Include="Tables\EmbedGroup.sql" />
+    <Build Include="Tables\Embed.sql" />
   </ItemGroup>
 </Project>

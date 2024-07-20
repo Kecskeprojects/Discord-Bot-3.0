@@ -10,8 +10,8 @@
     [KoreanStageName] NVARCHAR(100) NULL, 
     [DateOfBirth] DATE NULL, 
     [Gender] VARCHAR(10) NULL, 
-    [CreatedOn] DATETIME NOT NULL DEFAULT GETDATE(), 
-    [ModifiedOn] DATETIME NOT NULL DEFAULT GETDATE(), 
+    [CreatedOn] DATETIME NOT NULL CONSTRAINT [DF_Idol_CreatedOn] DEFAULT GETDATE(), 
+    [ModifiedOn] DATETIME NOT NULL CONSTRAINT [DF_Idol_ModifiedOn] DEFAULT GETDATE(), 
     [DebutDate] DATE NULL, 
     CONSTRAINT [FK_Idol_IdolGroup] FOREIGN KEY ([GroupId]) REFERENCES [IdolGroup]([GroupId]) ON DELETE CASCADE,
     CONSTRAINT [PK_IdolId] PRIMARY KEY ([IdolId])

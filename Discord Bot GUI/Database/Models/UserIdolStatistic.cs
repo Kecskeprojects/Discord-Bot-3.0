@@ -19,6 +19,10 @@ public partial class UserIdolStatistic
 
     public int Placed5 { get; set; }
 
+    public DateTime CreatedOn { get; set; }
+
+    public DateTime ModifiedOn { get; set; }
+
     public virtual Idol Idol { get; set; }
 
     public virtual User User { get; set; }

@@ -15,11 +15,15 @@ public partial class Server
 
     public DateTime CreatedOn { get; set; }
 
+    public DateTime ModifiedOn { get; set; }
+
     public virtual ICollection<Birthday> Birthdays { get; set; } = new List<Birthday>();
 
     public virtual ICollection<Channel> Channels { get; set; } = new List<Channel>();
 
     public virtual ICollection<CustomCommand> CustomCommands { get; set; } = new List<CustomCommand>();
+
+    public virtual ICollection<EmbedGroup> EmbedGroups { get; set; } = new List<EmbedGroup>();
 
     public virtual ICollection<Keyword> Keywords { get; set; } = new List<Keyword>();
 

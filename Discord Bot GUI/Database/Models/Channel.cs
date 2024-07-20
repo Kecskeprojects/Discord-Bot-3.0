@@ -13,6 +13,8 @@ public partial class Channel
 
     public DateTime CreatedOn { get; set; }
 
+    public virtual ICollection<EmbedGroup> EmbedGroups { get; set; } = new List<EmbedGroup>();
+
     public virtual Server Server { get; set; }
 
     public virtual ICollection<ChannelType> ChannelTypes { get; set; } = new List<ChannelType>();

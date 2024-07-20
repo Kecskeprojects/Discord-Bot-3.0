@@ -224,4 +224,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Createdn" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="2e734617-12fa-427b-a37b-86d6243eab16" ChangeDateTime="07/20/2024 14:18:21">
+    <Property Name="ElementName" Value="[dbo].[EmbedGroup].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[EmbedGroup]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="EmbedGroupId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="e1d6c9af-abf0-476f-8867-5a836a01e57f" ChangeDateTime="07/20/2024 14:36:03">
+    <Property Name="ElementName" Value="[dbo].[Embed].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Embed]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="EmbedId" />
+  </Operation>
 </Operations>

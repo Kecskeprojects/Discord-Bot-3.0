@@ -2,6 +2,6 @@
 (
 	[GreetingId] INT NOT NULL IDENTITY, 
     [Url] VARCHAR(500) NOT NULL,
-    [CreatedOn] DATETIME NOT NULL DEFAULT GETDATE(), 
+    [CreatedOn] DATETIME NOT NULL CONSTRAINT [DF_Greeting_CreatedOn] DEFAULT GETDATE(), 
     CONSTRAINT [PK_GreetingId] PRIMARY KEY ([GreetingId])
 )
