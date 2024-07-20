@@ -11,7 +11,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
-public class BirthdayService(
+
+public class BirthdayService(
     IServerRepository serverRepository,
     IUserRepository userRepository,
     IBirthdayRepository birthdayRepository,

@@ -9,7 +9,8 @@ using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
-public class UserHelpCommands(
+
+public class UserHelpCommands(
     IServerService serverService,
     BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)

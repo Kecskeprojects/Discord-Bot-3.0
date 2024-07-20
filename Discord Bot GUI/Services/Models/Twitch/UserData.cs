@@ -2,7 +2,8 @@
 using System;
 
 namespace Discord_Bot.Services.Models.Twitch;
-public class UserData
+
+public class UserData
 {
     [JsonProperty("broadcaster_type")]
     public string BroadcasterType { get; set; }

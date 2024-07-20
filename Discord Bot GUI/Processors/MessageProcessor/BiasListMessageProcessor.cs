@@ -5,7 +5,8 @@ using System;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Processors.MessageProcessor;
-public static class BiasListMessageProcessor
+
+public static class BiasListMessageProcessor
 {
     public static BiasMessageResult BuildBiasMessage(List<IdolResource> list, string groupName, string headMessage, ulong userId, bool isUser)
     {

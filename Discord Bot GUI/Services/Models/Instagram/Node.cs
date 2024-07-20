@@ -4,7 +4,8 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Services.Models.Instagram;
-public class Node
+
+public class Node
 {
     [JsonProperty("__typename")]
     public string Typename { get; set; }

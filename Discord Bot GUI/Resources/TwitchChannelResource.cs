@@ -1,5 +1,6 @@
 ﻿namespace Discord_Bot.Resources;
-public class TwitchChannelResource
+
+public class TwitchChannelResource
 {
     public ulong TwitchDiscordId { get; set; }
 

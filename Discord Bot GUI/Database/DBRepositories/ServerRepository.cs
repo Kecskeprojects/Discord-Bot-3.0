@@ -2,6 +2,7 @@
 using Discord_Bot.Interfaces.DBRepositories;
 
 namespace Discord_Bot.Database.DBRepositories;
-public class ServerRepository(MainDbContext context) : GenericRepository<Server>(context), IServerRepository
+
+public class ServerRepository(MainDbContext context) : GenericRepository<Server>(context), IServerRepository
 {
 }

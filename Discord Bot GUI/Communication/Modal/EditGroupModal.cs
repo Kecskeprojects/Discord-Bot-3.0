@@ -1,7 +1,8 @@
 ﻿using Discord.Interactions;
 
 namespace Discord_Bot.Communication.Modal;
-public class EditGroupModal : IModal
+
+public class EditGroupModal : IModal
 {
     public string Title => "Edit Group";
 

@@ -1,7 +1,8 @@
 ﻿using Discord_Bot.Database.Models;
 
 namespace Discord_Bot.Tools.ModelTools;
-public static class UserIdolStatisticTools
+
+public static class UserIdolStatisticTools
 {
     public static void AddRanking(UserIdolStatistic stat, int pos)
     {

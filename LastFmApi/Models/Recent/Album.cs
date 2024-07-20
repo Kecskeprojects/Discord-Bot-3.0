@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.Recent;
-public class Album
+
+public class Album
 {
     [JsonProperty("mbid")]
     public string Mbid { get; set; }

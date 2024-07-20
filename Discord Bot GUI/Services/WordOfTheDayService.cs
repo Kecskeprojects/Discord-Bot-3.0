@@ -9,7 +9,8 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace Discord_Bot.Services;
-public class WordOfTheDayService(BotLogger logger) : IWordOfTheDayService
+
+public class WordOfTheDayService(BotLogger logger) : IWordOfTheDayService
 {
     private readonly BotLogger logger = logger;
 

@@ -15,7 +15,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
-public class UserBiasCommands(
+
+public class UserBiasCommands(
     IUserIdolService userIdolService,
     IIdolService idolService,
     IIdolGroupService idolGroupService,

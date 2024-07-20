@@ -5,7 +5,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interfaces.DBServices;
-public interface IReminderService
+
+public interface IReminderService
 {
     Task<DbProcessResultEnum> AddReminderAsync(ulong userId, DateTime date, string remindMessage);
     Task<List<ReminderResource>> GetCurrentRemindersAsync(DateTime dateTime);

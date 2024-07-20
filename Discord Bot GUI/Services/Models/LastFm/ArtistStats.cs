@@ -1,5 +1,6 @@
 ﻿namespace Discord_Bot.Services.Models.LastFm;
-public class ArtistStats(string username)
+
+public class ArtistStats(string username)
 {
     public string Username { get; set; } = username;
     public string AlbumField { get; set; } = "";

@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 
 namespace Discord_Bot.Tools.LastFmTools;
-public static class LastFmArtistTools
+
+public static class LastFmArtistTools
 {
     public static void MapArtistData(ArtistStats result, List<LastFmApi.Models.TopAlbum.Album> albums, List<LastFmApi.Models.TopTrack.Track> tracks)
     {

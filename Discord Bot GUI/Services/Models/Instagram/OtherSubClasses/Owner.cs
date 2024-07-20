@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
 
 namespace Discord_Bot.Services.Models.Instagram.OtherSubClasses;
-public class Owner
+
+public class Owner
 {
     [JsonProperty("blocked_by_viewer")]
     public bool BlockedByViewer { get; set; }

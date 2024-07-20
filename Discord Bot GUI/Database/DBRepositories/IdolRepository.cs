@@ -8,7 +8,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBRepositories;
-public class IdolRepository(MainDbContext context) : GenericRepository<Idol>(context), IIdolRepository
+
+public class IdolRepository(MainDbContext context) : GenericRepository<Idol>(context), IIdolRepository
 {
     public Task<List<Idol>> GetListByNamesAsync(string idolOrGroupName, string idolGroup, string userId = null)
     {

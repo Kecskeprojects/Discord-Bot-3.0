@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 
 namespace Discord_Bot.Resources;
-public class UserBiasGameStatResource
+
+public class UserBiasGameStatResource
 {
     public int UserId { get; set; }
 

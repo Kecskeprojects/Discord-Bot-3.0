@@ -4,7 +4,8 @@ using Discord_Bot.Resources;
 using System;
 
 namespace Discord_Bot.Processors.MessageProcessor;
-public static class BirthdayMessageProcessor
+
+public static class BirthdayMessageProcessor
 {
     public static string CreateMessage(BirthdayResource birthday, SocketGuild guild)
     {

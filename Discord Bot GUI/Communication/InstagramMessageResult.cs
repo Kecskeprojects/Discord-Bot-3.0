@@ -1,5 +1,6 @@
 ﻿namespace Discord_Bot.Communication;
-public class InstagramMessageResult
+
+public class InstagramMessageResult
 {
     public InstagramMessageResult()
     {

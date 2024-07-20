@@ -1,5 +1,6 @@
 ﻿namespace LastFmApi.Communication;
-public class UserBasedRequestItem(string type, string username, string apiKey)
+
+public class UserBasedRequestItem(string type, string username, string apiKey)
 {
     public UserBasedRequestItem(string type, string username, string apiKey, int? limit, int? page, string period) : this(type, username, apiKey)
     {

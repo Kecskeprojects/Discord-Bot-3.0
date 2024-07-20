@@ -14,7 +14,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
-public class UserBonkCommands(
+
+public class UserBonkCommands(
     BonkGifProcessor bonkGifProcessor,
     IServerService serverService,
     BotLogger logger,

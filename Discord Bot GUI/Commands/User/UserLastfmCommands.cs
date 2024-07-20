@@ -18,7 +18,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
-public class UserLastfmCommands(
+
+public class UserLastfmCommands(
     IUserService userService,
     ILastFmAPI lastFmAPI,
     LastFmWhoKnowsEmbedProcessor whoKnowsEmbedProcessor,

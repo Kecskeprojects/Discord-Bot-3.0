@@ -68,7 +68,4 @@
 			<LastGenOutput>Resource.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 	</ItemGroup>
-	<ItemGroup>
-	  <Page Update="Windows\BotWindow.xaml" />
-	</ItemGroup>
 </Project>

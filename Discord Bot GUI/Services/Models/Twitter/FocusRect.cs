@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
 
 namespace Discord_Bot.Services.Models.Twitter;
-public class FocusRect
+
+public class FocusRect
 {
     [JsonProperty("x")]
     public int X { get; set; }

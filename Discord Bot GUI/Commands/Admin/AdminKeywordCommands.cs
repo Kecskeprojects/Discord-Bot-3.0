@@ -8,7 +8,8 @@ using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
-public class AdminKeywordCommands(
+
+public class AdminKeywordCommands(
     IKeywordService keywordService,
     IServerService serverService,
     BotLogger logger,

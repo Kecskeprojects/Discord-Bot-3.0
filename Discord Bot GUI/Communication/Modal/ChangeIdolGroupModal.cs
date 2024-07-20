@@ -1,7 +1,8 @@
 ﻿using Discord.Interactions;
 
 namespace Discord_Bot.Communication.Modal;
-public class ChangeIdolGroupModal : IModal
+
+public class ChangeIdolGroupModal : IModal
 {
     public string Title => "Change  Group";
 

@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 
 namespace Discord_Bot.Services.Models.Twitter;
-public class Legacy
+
+public class Legacy
 {
     [JsonProperty("created_at")]
     public string CreatedAt { get; set; }

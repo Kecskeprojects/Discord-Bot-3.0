@@ -12,7 +12,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
-public class ChannelService(
+
+public class ChannelService(
     IChannelRepository channelRepository,
     IServerRepository serverRepository,
     IChannelTypeRepository channelTypeRepository,

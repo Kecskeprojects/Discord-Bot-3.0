@@ -14,7 +14,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions;
-public class BiasGameStepInteraction(
+
+public class BiasGameStepInteraction(
     IIdolService idolService,
     BiasGameWinnerBracketImageProcessor biasGameWinnerBracketImageProcessor,
     IUserIdolStatisticService userIdolStatisticService,

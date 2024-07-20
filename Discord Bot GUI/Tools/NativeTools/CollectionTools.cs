@@ -4,7 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Tools.NativeTools;
-public static class CollectionTools
+
+public static class CollectionTools
 {
     public static bool IsNullOrEmpty<T>(T collection) where T : ICollection
     {

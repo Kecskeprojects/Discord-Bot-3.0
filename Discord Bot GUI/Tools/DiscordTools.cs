@@ -9,7 +9,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Tools;
-public static class DiscordTools
+
+public static class DiscordTools
 {
     public static bool IsTypeOfChannel(ServerResource server, ChannelTypeEnum type, ulong channelId, bool allowLackOfType = true)
     {

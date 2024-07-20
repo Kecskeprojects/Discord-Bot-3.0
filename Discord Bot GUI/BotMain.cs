@@ -8,7 +8,8 @@ using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot;
-public class BotMain(
+
+public class BotMain(
     IServiceProvider services,
     InteractionHandler interactionHandler,
     CommandHandler commandHandler,

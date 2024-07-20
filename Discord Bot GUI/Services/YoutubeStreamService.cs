@@ -9,7 +9,8 @@ using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
-public class YoutubeStreamService(Config config, BotLogger logger) : IYoutubeDownloadService
+
+public class YoutubeStreamService(Config config, BotLogger logger) : IYoutubeDownloadService
 {
     private readonly Config config = config;
     private readonly BotLogger logger = logger;

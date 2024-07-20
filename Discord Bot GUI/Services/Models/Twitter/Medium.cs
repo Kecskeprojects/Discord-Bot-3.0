@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 
 namespace Discord_Bot.Services.Models.Twitter;
-public class Medium
+
+public class Medium
 {
     [JsonProperty("display_url")]
     public string DisplayUrl { get; set; }

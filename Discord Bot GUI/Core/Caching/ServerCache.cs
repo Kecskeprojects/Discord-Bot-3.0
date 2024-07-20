@@ -1,7 +1,8 @@
 ﻿using Discord_Bot.Resources;
 
 namespace Discord_Bot.Core.Caching;
-public class ServerCache
+
+public class ServerCache
 {
     private SizedDictionary<ulong, ServerResource> Cache { get; } = new(50);
 

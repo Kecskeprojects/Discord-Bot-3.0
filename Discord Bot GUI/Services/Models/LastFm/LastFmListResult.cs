@@ -1,5 +1,6 @@
 ﻿namespace Discord_Bot.Services.Models.LastFm;
-public class LastFmListResult
+
+public class LastFmListResult
 {
     public string Message { get; set; }
     public string ImageUrl { get; set; }

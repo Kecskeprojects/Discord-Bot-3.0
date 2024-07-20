@@ -7,7 +7,8 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace Discord_Bot.Processors.MessageProcessor;
-public static class InstagramMessageProcessor
+
+public static class InstagramMessageProcessor
 {
     public static string GetEmbedContent(List<FileAttachment> attachments, string[] files, string url, bool ignoreVideos)
     {

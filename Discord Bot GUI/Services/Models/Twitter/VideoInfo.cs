@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 
 namespace Discord_Bot.Services.Models.Twitter;
-public class VideoInfo
+
+public class VideoInfo
 {
     [JsonProperty("aspect_ratio")]
     public List<int> AspectRatio { get; set; }

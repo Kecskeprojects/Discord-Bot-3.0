@@ -11,7 +11,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
-public class AdminBirthdayCommands(
+
+public class AdminBirthdayCommands(
     IBirthdayService birthdayService,
     IServerService serverService,
     BotLogger logger,

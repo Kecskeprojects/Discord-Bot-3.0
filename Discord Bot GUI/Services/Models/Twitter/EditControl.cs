@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 
 namespace Discord_Bot.Services.Models.Twitter;
-public class EditControl
+
+public class EditControl
 {
     [JsonProperty("edit_tweet_ids")]
     public List<string> EditTweetIds { get; set; }

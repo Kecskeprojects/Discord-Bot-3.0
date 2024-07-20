@@ -5,7 +5,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Discord_Bot.Core;
-public static class Constant
+
+public static class Constant
 {
     #region Urls
     public static readonly Uri DbKpopScrapeBaseUri = new("https://dbkpop.com/db/all-k-pop-idols/");

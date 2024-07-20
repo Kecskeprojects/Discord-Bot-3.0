@@ -10,7 +10,8 @@ using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Owner;
-public class OwnerBiasCommands(
+
+public class OwnerBiasCommands(
     IIdolService idolService,
     IServerService serverService,
     BiasScrapingProcessor biasScrapingProcessor,

@@ -2,7 +2,8 @@
 using Discord_Bot.Services.Models.Wotd;
 
 namespace Discord_Bot.Processors.EmbedProcessors;
-public static class WordOfTheDayEmbedProcessor
+
+public static class WordOfTheDayEmbedProcessor
 {
     public static Embed[] CreateEmbed(WotdBase result)
     {

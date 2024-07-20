@@ -8,7 +8,8 @@ using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
-public class AdminHelpCommands(
+
+public class AdminHelpCommands(
     IServerService serverService,
     BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)

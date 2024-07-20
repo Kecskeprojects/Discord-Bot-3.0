@@ -8,7 +8,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Discord_Bot;
-public class InteractionHandler(
+
+public class InteractionHandler(
     IServiceProvider services,
     DiscordSocketClient client,
     InteractionService interactions,

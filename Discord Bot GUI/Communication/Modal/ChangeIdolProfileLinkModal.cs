@@ -1,7 +1,8 @@
 ﻿using Discord.Interactions;
 
 namespace Discord_Bot.Communication.Modal;
-public class ChangeIdolProfileLinkModal : IModal
+
+public class ChangeIdolProfileLinkModal : IModal
 {
     public string Title => "Change Profile Link";
 

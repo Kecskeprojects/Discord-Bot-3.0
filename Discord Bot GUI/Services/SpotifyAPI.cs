@@ -10,7 +10,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
-public class SpotifyAPI(BotLogger logger, Config config, IYoutubeAPI youtubeAPI, IMusicBrainzAPI musicBrainzAPI) : ISpotifyAPI
+
+public class SpotifyAPI(BotLogger logger, Config config, IYoutubeAPI youtubeAPI, IMusicBrainzAPI musicBrainzAPI) : ISpotifyAPI
 {
     private readonly BotLogger logger = logger;
     private readonly Config config = config;

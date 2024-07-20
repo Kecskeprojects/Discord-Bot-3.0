@@ -7,7 +7,8 @@ using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Owner;
-public class OwnerBiasAliasCommands(
+
+public class OwnerBiasAliasCommands(
     IIdolAliasService idolAliasService,
     IServerService serverService,
     BotLogger logger,

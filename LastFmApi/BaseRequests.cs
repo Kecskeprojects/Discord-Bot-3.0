@@ -2,7 +2,8 @@
 using RestSharp;
 
 namespace LastFmApi;
-public class BaseRequests
+
+public class BaseRequests
 {
     //Todo: Write a custom method that gets daily listens using the Recent endpoint if the limit was 'day' or any other version of it that got converted to 'day'
     //And integrate the logic using this

@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 
 namespace Discord_Bot.Services.Models.Twitter;
-public class Entities
+
+public class Entities
 {
     [JsonProperty("description")]
     public Description Description { get; set; }

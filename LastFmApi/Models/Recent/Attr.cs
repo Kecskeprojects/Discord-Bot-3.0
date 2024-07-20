@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.Recent;
-public class Attr
+
+public class Attr
 {
     [JsonProperty("nowplaying")]
     public string NowPlaying { get; set; }

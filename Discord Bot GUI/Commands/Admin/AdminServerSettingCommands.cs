@@ -14,7 +14,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
-public class AdminServerSettingCommands(
+
+public class AdminServerSettingCommands(
     IChannelService channelService,
     ITwitchChannelService twitchChannelService,
     ITwitchCLI twitchCLI,

@@ -11,7 +11,8 @@ using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
-public class UserBiasGameCommands(
+
+public class UserBiasGameCommands(
     IUserService userService,
     IServerService serverService,
     BotLogger logger,

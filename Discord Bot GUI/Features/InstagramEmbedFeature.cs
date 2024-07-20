@@ -13,7 +13,8 @@ using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
-public class InstagramEmbedFeature(IInstaLoader instaLoader, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
+
+public class InstagramEmbedFeature(IInstaLoader instaLoader, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IInstaLoader instaLoader = instaLoader;
 

@@ -10,7 +10,8 @@ using System.IO;
 using System.Linq;
 
 namespace Discord_Bot.Processors.ImageProcessors;
-public class BonkGifProcessor(BotLogger logger)
+
+public class BonkGifProcessor(BotLogger logger)
 {
     private readonly BotLogger logger = logger;
 

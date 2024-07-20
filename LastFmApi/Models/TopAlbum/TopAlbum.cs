@@ -2,7 +2,8 @@
 using Newtonsoft.Json;
 
 namespace LastFmApi.Models.TopAlbum;
-public class TopAlbum : BaseResponse
+
+public class TopAlbum : BaseResponse
 {
     [JsonProperty("topalbums")]
     public Topalbums TopAlbums { get; set; }

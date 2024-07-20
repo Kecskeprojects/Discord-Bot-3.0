@@ -1,7 +1,8 @@
 ﻿using System;
 
 namespace Discord_Bot.Resources;
-public class BirthdayResource
+
+public class BirthdayResource
 {
     public int BirthdayId { get; set; }
 

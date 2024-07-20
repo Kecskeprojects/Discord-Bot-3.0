@@ -1,5 +1,6 @@
 ﻿namespace Discord_Bot.Enums;
-public enum DbProcessResultEnum
+
+public enum DbProcessResultEnum
 {
     Failure = 0,
     Success = 1,

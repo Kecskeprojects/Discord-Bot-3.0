@@ -5,7 +5,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
-public class BrowserService(BotLogger logger, Config config)
+
+public class BrowserService(BotLogger logger, Config config)
 {
     private readonly BotLogger logger = logger;
     private readonly Config config = config;

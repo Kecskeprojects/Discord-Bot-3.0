@@ -13,7 +13,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
-public class UserBirthdayCommands(
+
+public class UserBirthdayCommands(
     IBirthdayService birthdayService,
     IServerService serverService,
     BotLogger logger,

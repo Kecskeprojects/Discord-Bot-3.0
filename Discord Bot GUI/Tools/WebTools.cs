@@ -5,7 +5,8 @@ using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Tools;
-public static class WebTools
+
+public static class WebTools
 {
     public static async Task<MemoryStream> GetStream(string url)
     {

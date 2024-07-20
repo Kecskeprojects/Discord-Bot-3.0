@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.TopAlbum;
-public class Attr
+
+public class Attr
 {
     [JsonProperty("rank")]
     public string Rank { get; set; }

@@ -1,5 +1,6 @@
 ﻿namespace Discord_Bot.Resources;
-public class CustomCommandResource
+
+public class CustomCommandResource
 {
     public string Command { get; set; }
 

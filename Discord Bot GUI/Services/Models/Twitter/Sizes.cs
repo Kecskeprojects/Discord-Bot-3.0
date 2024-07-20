@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
 
 namespace Discord_Bot.Services.Models.Twitter;
-public class Sizes
+
+public class Sizes
 {
     [JsonProperty("large")]
     public Large Large { get; set; }

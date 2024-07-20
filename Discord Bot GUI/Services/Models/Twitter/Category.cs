@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
 
 namespace Discord_Bot.Services.Models.Twitter;
-public class Category
+
+public class Category
 {
     [JsonProperty("id")]
     public int Id { get; set; }

@@ -8,7 +8,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
-public class YoutubeAddPlaylistFeature(DiscordSocketClient client, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
+
+public class YoutubeAddPlaylistFeature(DiscordSocketClient client, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly DiscordSocketClient client = client;
 

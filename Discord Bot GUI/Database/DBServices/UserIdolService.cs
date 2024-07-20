@@ -12,7 +12,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
-public class UserIdolService(
+
+public class UserIdolService(
     IIdolRepository idolRepository,
     IUserRepository userRepository,
     IMapper mapper,

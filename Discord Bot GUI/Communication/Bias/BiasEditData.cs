@@ -1,7 +1,8 @@
 ﻿using Discord_Bot.Enums;
 
 namespace Discord_Bot.Communication.Bias;
-public class BiasEditData
+
+public class BiasEditData
 {
     public BiasEditData(string data)
     {

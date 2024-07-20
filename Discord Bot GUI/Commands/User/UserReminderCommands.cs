@@ -13,7 +13,8 @@ using System.Globalization;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
-public class UserReminderCommands(
+
+public class UserReminderCommands(
     IReminderService reminderService,
     IServerService serverService,
     BotLogger logger,

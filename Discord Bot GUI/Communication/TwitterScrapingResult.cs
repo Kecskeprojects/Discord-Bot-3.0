@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 
 namespace Discord_Bot.Communication;
-public class TwitterScrapingResult
+
+public class TwitterScrapingResult
 {
     public TwitterScrapingResult()
     {

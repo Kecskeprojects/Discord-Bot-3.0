@@ -1,7 +1,8 @@
 ﻿using System;
 
 namespace Discord_Bot.Resources;
-public class IdolExtendedResource
+
+public class IdolExtendedResource
 {
     public int IdolId { get; set; }
 

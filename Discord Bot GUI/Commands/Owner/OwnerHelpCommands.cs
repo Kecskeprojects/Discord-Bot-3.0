@@ -8,7 +8,8 @@ using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Owner;
-public class OwnerHelpCommands(IServerService serverService, BotLogger logger, Config config) : BaseCommand(logger, config, serverService)
+
+public class OwnerHelpCommands(IServerService serverService, BotLogger logger, Config config) : BaseCommand(logger, config, serverService)
 {
     [Command("help owner")]
     [RequireOwner]

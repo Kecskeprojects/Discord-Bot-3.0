@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 
 namespace Discord_Bot.Resources;
-public class IdolGroupResource
+
+public class IdolGroupResource
 {
     public int GroupId { get; set; }
 

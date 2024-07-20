@@ -16,7 +16,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
-public class IdolService(
+
+public class IdolService(
     IIdolRepository idolRepository,
     IIdolGroupRepository idolGroupRepository,
     IIdolGroupService idolGroupService,

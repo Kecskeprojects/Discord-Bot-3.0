@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interfaces.DBServices;
-public interface IUserIdolService
+
+public interface IUserIdolService
 {
     Task<DbProcessResultEnum> AddUserIdolAsync(ulong userId, string idolName, string idolGroup);
     Task<DbProcessResultEnum> AddUserIdolGroupAsync(ulong userId, string biasGroup);

@@ -3,7 +3,8 @@ using Discord_Bot.Resources;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Processors.EmbedProcessors;
-public static class BirthdayListEmbedProcessor
+
+public static class BirthdayListEmbedProcessor
 {
     public static Embed[] CreateEmbed(List<BirthdayResource> list, List<string> users)
     {

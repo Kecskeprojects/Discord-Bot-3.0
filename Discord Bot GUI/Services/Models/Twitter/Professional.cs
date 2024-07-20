@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 
 namespace Discord_Bot.Services.Models.Twitter;
-public class Professional
+
+public class Professional
 {
     [JsonProperty("rest_id")]
     public string RestId { get; set; }

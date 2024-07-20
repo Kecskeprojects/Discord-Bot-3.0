@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
 
 namespace LastFmApi.Models.TopTrack;
-public class Track
+
+public class Track
 {
     [JsonProperty("streamable")]
     public Streamable Streamable { get; set; }
