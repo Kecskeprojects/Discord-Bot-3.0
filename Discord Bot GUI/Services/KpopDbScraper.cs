@@ -3,11 +3,11 @@ using AngleSharp.Dom;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Tools;
 using PuppeteerSharp;
 using PuppeteerSharp.Input;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -114,7 +114,7 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
     }
     private static async Task ScrapeGroupData(AdditionalIdolData data, IPage page, IDocument document, bool getGroupData)
     {
-        IHtmlCollection<IElement> groups = document.QuerySelectorAll($"li>a[href*=\"{Path.Combine(Constant.DbKpopBaseUrl, "group")}\"]");
+        IHtmlCollection<IElement> groups = document.QuerySelectorAll($"li>a[href*=\"{Constant.DbKpopBaseUrl.UrlCombine("group")}\"]");
         string groupUrl = "";
         if (groups != null && groups.Length > 0)
         {

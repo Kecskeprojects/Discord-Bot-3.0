@@ -1,10 +1,10 @@
 ﻿using Discord_Bot.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.MusicBrainz.ArtistLookup;
+using Discord_Bot.Tools;
 using Newtonsoft.Json;
 using RestSharp;
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -22,7 +22,7 @@ public class MusicBrainzAPI(BotLogger logger) : IMusicBrainzAPI
         try
         {
             string query = $"artist/{mbid}?inc=url-rels&fmt=json";
-            logger.Query($"Musicbrainz query Url:\n{Path.Combine(Constant.MusicBrainzBaseUri.OriginalString, query)}");
+            logger.Query($"Musicbrainz query Url:\n{Constant.MusicBrainzBaseUri.OriginalString.UrlCombine(query)}");
 
             RestRequest request = new(query);
             RestResponse resultJSON = await _client.GetAsync(request);

@@ -6,10 +6,10 @@ using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
+using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
@@ -23,7 +23,7 @@ public class TwitchChannelService(IMapper mapper, BotLogger logger, ServerCache 
     {
         try
         {
-            string url = Path.Combine(Constant.TwitchBaseUrl, twitchUserName);
+            string url = Constant.TwitchBaseUrl.UrlCombine(twitchUserName);
             Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
             if (server == null)
             {

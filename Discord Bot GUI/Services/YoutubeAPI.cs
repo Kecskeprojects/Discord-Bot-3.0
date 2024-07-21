@@ -4,6 +4,7 @@ using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Features;
 using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
@@ -11,7 +12,6 @@ using Google.Apis.YouTube.v3.Data;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -157,7 +157,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
 
         Video video = searchListResponse.Items[0];
 
-        string[] temp = [Path.Combine(Constant.YoutubeBaseUrl, $"watch?v={video.Id}"), video.Snippet.Title.Replace("&#39;", "'"), video.Snippet.Thumbnails.Default__.Url, video.ContentDetails.Duration];
+        string[] temp = [Constant.YoutubeBaseUrl.UrlCombine($"watch?v={video.Id}"), video.Snippet.Title.Replace("&#39;", "'"), video.Snippet.Thumbnails.Default__.Url, video.ContentDetails.Duration];
 
         if (!Global.ServerAudioResources.TryGetValue(serverId, out ServerAudioResource audioResource))
         {

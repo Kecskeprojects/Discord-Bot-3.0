@@ -36,4 +36,38 @@ public static partial class StringExtension
         }
         return newString;
     }
+
+    public static string UrlCombine(this string str, string addition)
+    {
+        if(str == null && addition == null)
+        {
+            return null;
+        }
+
+        if(str == null)
+        {
+            return addition;
+        }
+
+        if (addition == null)
+        {
+            return str;
+        }
+
+        string newString = str;
+
+        if (!newString.EndsWith('/'))
+        {
+            newString += "/";
+        }
+
+        if (addition.StartsWith('/') && addition.Length >= 2)
+        {
+            addition = addition[1..];
+        }
+
+        newString += addition;
+
+        return newString;
+    }
 }
