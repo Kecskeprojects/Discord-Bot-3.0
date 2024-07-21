@@ -51,4 +51,22 @@ public class AdminHelpCommands(
             logger.Error("AdminHelpCommands.cs Features", ex);
         }
     }
+
+    [Command("help channel banner")]
+    [Alias(["help messages", "help banner", "help channel messages"])]
+    [RequireUserPermission(ChannelPermission.ManageChannels)]
+    [RequireContext(ContextType.Guild)]
+    [Summary("Embed guide to managing channel banner messages")]
+    public async Task HelpChannelBanner()
+    {
+        try
+        {
+            //Short explanation, an attached json for example and links to online embed editors
+            await ReplyAsync("HelpChannelBanner Placeholder.");
+        }
+        catch (Exception ex)
+        {
+            logger.Error("AdminHelpCommands.cs HelpChannelBanner", ex);
+        }
+    }
 }

@@ -103,6 +103,7 @@
     <None Include="DB Patch\Patch_1.sql" />
     <None Include="DB Patch\Patch_2.sql" />
     <None Include="DB Patch\Patch_3.sql" />
+    <None Include="DB Patch\Patch_4.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Birthday.sql" />

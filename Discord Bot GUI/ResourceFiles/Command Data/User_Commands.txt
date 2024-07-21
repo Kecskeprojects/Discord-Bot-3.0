@@ -1,6 +1,6 @@
 Text Commands:
 
-!help		List of commands (DM)
+!help		Guide to commands (DM)
 !8ball [question]		8ball game (DM)
 !custom list		List of custom commands
 !coin flip [head] or [tails]		Flip a coin (DM)

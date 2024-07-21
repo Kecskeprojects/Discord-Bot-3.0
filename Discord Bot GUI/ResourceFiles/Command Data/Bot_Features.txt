@@ -7,4 +7,5 @@ Features:
 -Adding roles to users from pre-defined list
 -Very rare random responses
 -Reliable automatic instagram embeds
--Send birthday messages for users that have it set on the day of
+-Send birthday announcements for users that have it set
+-Automatic syncing of bias images for Bias game
