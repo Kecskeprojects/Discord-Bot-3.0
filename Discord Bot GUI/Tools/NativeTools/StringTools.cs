@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Discord_Bot.Tools.NativeTools;
 
@@ -22,42 +21,46 @@ public static class StringTools
 
     public static List<string> GetTimeMeasurements(string amountstring)
     {
-        //Split amounts into a string list, accounting for accidental spaces
-        List<string> amounts = [.. amountstring.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
+        //Spaces are eliminated for a unified solution
+        amountstring = amountstring.Replace(" ", "");
+        List<string> amounts = [];
 
-        //Go through every element in the list and check
-        //if the user missed a space between the number and the corresponding type
-        for (int i = 0; i < amounts.Count; i++)
+        //-1 conveniently solves the issue of the first Add logic, as that will come out to 0 in the logic
+        int lastDigit = -1;
+        int lastChar = -1;
+        bool lastWasDigit = false;
+        bool lastWasChar = false;
+        for (int i = 0; i < amountstring.Length; i++)
         {
-            //Don't check if the element is a number in itself
-            if (!int.TryParse(amounts[i], out _))
+            if (char.IsNumber(amountstring[i]))
             {
-                char[] chars = amounts[i].ToCharArray();
-                int lastValid = -1;
-
-                //Go through the array of chars one by one
-                //until a non number is found, in which case we exit the loop
-                for (int j = 0; j < chars.Length; j++)
+                //Time indicatiors are added to the list here
+                if (lastWasChar)
                 {
-                    if (char.IsDigit(chars[j]))
-                    {
-                        lastValid = j;
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    amounts.Add(amountstring[(lastDigit + 1)..i]);
                 }
 
-                //If any numbers were found in the array,
-                //we rewrite original string and put the number part of it into the list
-                if (lastValid >= 0)
+                lastDigit = i;
+                lastWasDigit = true;
+                lastWasChar = false;
+            }
+            else
+            {
+                //Numbers are added to the list here
+                //The first entry is expected to be a number
+                if (lastWasDigit)
                 {
-                    amounts[i] = amounts[i][(lastValid + 1)..];
-                    amounts.Insert(i, new string(chars, 0, lastValid + 1));
+                    amounts.Add(amountstring[(lastChar + 1)..i]);
                 }
+
+                lastChar = i;
+                lastWasDigit = false;
+                lastWasChar = true;
             }
         }
+        //The last entry will not get added during the loop, so it is added afterwards
+        //It is expected to be non-numeric
+        amounts.Add(amountstring[(lastDigit + 1)..]);
 
         return amounts;
     }

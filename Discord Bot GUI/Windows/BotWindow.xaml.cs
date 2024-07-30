@@ -21,13 +21,11 @@ public partial class BotWindow : Window
     private bool AutoScroll = true;
 
     private readonly BotLogger logger;
-    private readonly Config config;
 
     public BotWindow(BotLogger logger, Config config)
     {
         InitializeComponent();
         this.logger = logger;
-        this.config = config;
 
         if (config.ShowDiagnostics)
         {
