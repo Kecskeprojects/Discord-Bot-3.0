@@ -24,3 +24,6 @@ Admin Commands:
 !banner edit [channel] [order] [content]		Edit message(s) in channel
 !banner get [channel] [order]		Get content of current messages in channel
 !banner order [channel]		Get current messages in channel
+!mute [username]>[amount**]		Mute a user for a given time frame
+!unmute [username]		Unmute user preemptively
+!change mute role [role name]		Change server role

@@ -104,6 +104,7 @@
     <None Include="DB Patch\Patch_2.sql" />
     <None Include="DB Patch\Patch_3.sql" />
     <None Include="DB Patch\Patch_4.sql" />
+    <None Include="DB Patch\Patch_5.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Birthday.sql" />
@@ -127,5 +128,6 @@
     <Build Include="Views\ServerChannelView.sql" />
     <Build Include="Tables\EmbedGroup.sql" />
     <Build Include="Tables\Embed.sql" />
+    <Build Include="Tables\ServerMutedUsers.sql" />
   </ItemGroup>
 </Project>

@@ -21,6 +21,8 @@ public partial class User
 
     public virtual ICollection<Reminder> Reminders { get; set; } = new List<Reminder>();
 
+    public virtual ICollection<ServerMutedUser> ServerMutedUsers { get; set; } = new List<ServerMutedUser>();
+
     public virtual ICollection<UserIdolStatistic> UserIdolStatistics { get; set; } = new List<UserIdolStatistic>();
 
     public virtual ICollection<Idol> Idols { get; set; } = new List<Idol>();

@@ -17,6 +17,8 @@ public partial class Server
 
     public DateTime ModifiedOn { get; set; }
 
+    public int? MuteRoleId { get; set; }
+
     public virtual ICollection<Birthday> Birthdays { get; set; } = new List<Birthday>();
 
     public virtual ICollection<Channel> Channels { get; set; } = new List<Channel>();
@@ -27,9 +29,13 @@ public partial class Server
 
     public virtual ICollection<Keyword> Keywords { get; set; } = new List<Keyword>();
 
+    public virtual Role MuteRole { get; set; }
+
     public virtual Role NotificationRole { get; set; }
 
     public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
+
+    public virtual ICollection<ServerMutedUser> ServerMutedUsers { get; set; } = new List<ServerMutedUser>();
 
     public virtual ICollection<TwitchChannel> TwitchChannels { get; set; } = new List<TwitchChannel>();
 }

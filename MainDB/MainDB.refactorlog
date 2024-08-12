@@ -238,4 +238,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="EmbedId" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="b2883bb5-7dd8-40d6-81ea-90b847f1d5a6" ChangeDateTime="08/12/2024 21:59:47">
+    <Property Name="ElementName" Value="[dbo].[ServerMutedUsers].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ServerMutedUsers]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ServerId" />
+  </Operation>
 </Operations>

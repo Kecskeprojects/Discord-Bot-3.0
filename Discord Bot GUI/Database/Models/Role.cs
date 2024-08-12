@@ -17,5 +17,7 @@ public partial class Role
 
     public virtual Server Server { get; set; }
 
-    public virtual ICollection<Server> Servers { get; set; } = new List<Server>();
+    public virtual ICollection<Server> ServerMuteRoles { get; set; } = new List<Server>();
+
+    public virtual ICollection<Server> ServerNotificationRoles { get; set; } = new List<Server>();
 }

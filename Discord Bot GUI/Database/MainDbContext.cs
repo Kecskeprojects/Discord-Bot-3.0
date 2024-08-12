@@ -44,6 +44,8 @@ public partial class MainDbContext : DbContext
 
     public virtual DbSet<ServerChannelView> ServerChannelViews { get; set; }
 
+    public virtual DbSet<ServerMutedUser> ServerMutedUsers { get; set; }
+
     public virtual DbSet<TwitchChannel> TwitchChannels { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -101,6 +103,7 @@ public partial class MainDbContext : DbContext
                     "ServerSettingChannel",
                     r => r.HasOne<ChannelType>().WithMany()
                         .HasForeignKey("ChannelTypeId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("FK_ServerSettingChannel_ChannelType"),
                     l => l.HasOne<Channel>().WithMany()
                         .HasForeignKey("ChannelId")
@@ -393,10 +396,13 @@ public partial class MainDbContext : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
 
-            entity.HasOne(d => d.NotificationRole).WithMany(p => p.Servers)
+            entity.HasOne(d => d.MuteRole).WithMany(p => p.ServerMuteRoles)
+                .HasForeignKey(d => d.MuteRoleId)
+                .HasConstraintName("FK_Server_MuteRole");
+
+            entity.HasOne(d => d.NotificationRole).WithMany(p => p.ServerNotificationRoles)
                 .HasForeignKey(d => d.NotificationRoleId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK_Server_Role");
+                .HasConstraintName("FK_Server_NotificationRole");
         });
 
         modelBuilder.Entity<ServerChannelView>(entity =>
@@ -414,6 +420,24 @@ public partial class MainDbContext : DbContext
             entity.Property(e => e.ServerDiscordId)
                 .HasMaxLength(20)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<ServerMutedUser>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.ServerId }).HasName("PK_Muted_ServerId_UserId");
+
+            entity.Property(e => e.ServerId).ValueGeneratedOnAdd();
+            entity.Property(e => e.MutedUntil).HasColumnType("datetime");
+
+            entity.HasOne(d => d.Server).WithMany(p => p.ServerMutedUsers)
+                .HasForeignKey(d => d.ServerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ServerMutedUsers_Server");
+
+            entity.HasOne(d => d.User).WithMany(p => p.ServerMutedUsers)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ServerMutedUsers_User");
         });
 
         modelBuilder.Entity<TwitchChannel>(entity =>
