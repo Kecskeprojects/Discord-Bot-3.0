@@ -29,7 +29,7 @@ public class ServerMutedUserService(
             User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
             Server server = await serverRepository.FirstOrDefaultAsync(u => u.DiscordId == serverId.ToString());
 
-            if(await serverMutedUserRepository.ExistsAsync(smu => 
+            if (await serverMutedUserRepository.ExistsAsync(smu =>
                 smu.UserId == user.UserId &&
                 smu.ServerId == server.ServerId &&
                 smu.MutedUntil > DateTime.UtcNow))
@@ -85,7 +85,7 @@ public class ServerMutedUserService(
             Server server = await serverRepository.FirstOrDefaultAsync(u => u.DiscordId == serverId.ToString());
 
             ServerMutedUser mutedUser =
-                await serverMutedUserRepository.FirstOrDefaultAsync(smu => 
+                await serverMutedUserRepository.FirstOrDefaultAsync(smu =>
                     smu.UserId == user.UserId &&
                     smu.ServerId == server.ServerId,
                     smu => smu.User,

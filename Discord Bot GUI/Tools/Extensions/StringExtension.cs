@@ -39,12 +39,12 @@ public static partial class StringExtension
 
     public static string UrlCombine(this string str, string addition)
     {
-        if(str == null && addition == null)
+        if (str == null && addition == null)
         {
             return null;
         }
 
-        if(str == null)
+        if (str == null)
         {
             return addition;
         }

@@ -1,10 +1,10 @@
-﻿using Discord.Commands;
-using Discord;
+﻿using Discord;
+using Discord.Commands;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Interfaces.DBServices;
-using System.Threading.Tasks;
 using System;
+using System.Threading.Tasks;
 
 //Todo: Welcome Message Embed similar to Mee6 bot
 //User can send 10 or 9 images as attachments, this limit goes down depending on the number of separate embeds
@@ -22,7 +22,6 @@ using System;
 //None of the editing sites completely support the way this will work, but a compromise can be made (Images are empty embeds with just the image url field having data)
 //Walls of text and images however should not need a json, rather an order number should suffice in deciding where they are placed in the order
 
-
 //Perhaps we can create 'placeholders' as in empty messages if there are no embeds in it, "** **" will send an empty text
 namespace Discord_Bot.Commands.Admin;
 public class AdminChannelBannerCommands(
@@ -39,7 +38,7 @@ public class AdminChannelBannerCommands(
     {
         try
         {
-            if(order == 0)
+            if (order == 0)
             {
                 //add it to the end of the current mesages
             }

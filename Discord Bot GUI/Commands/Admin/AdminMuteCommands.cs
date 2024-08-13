@@ -88,7 +88,7 @@ public class AdminMuteCommands(
 
             ServerResource server = await GetCurrentServerAsync();
 
-            if(server.MuteRoleDiscordId == null)
+            if (server.MuteRoleDiscordId == null)
             {
                 await ReplyAsync("Mute role not set on server.");
                 return;
