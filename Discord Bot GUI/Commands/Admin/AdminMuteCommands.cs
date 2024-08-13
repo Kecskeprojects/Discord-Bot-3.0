@@ -94,6 +94,7 @@ public class AdminMuteCommands(
                 return;
             }
 
+            //Todo:Remove all other roles on user
             await user.AddRoleAsync(server.MuteRoleDiscordId.Value);
 
             List<string> amounts = StringTools.GetTimeMeasurements(timeData);
@@ -145,6 +146,7 @@ public class AdminMuteCommands(
                 return;
             }
 
+            //Todo:Remove Add back roles taken away from user, these roles should be saved in the ServerMutedUser table as a comma divided string
             await user.RemoveRoleAsync(server.MuteRoleDiscordId.Value);
 
             DbProcessResultEnum result = await serverMutedUserService.RemoveMutedUserAsync(Context.Guild.Id, user.Id);
