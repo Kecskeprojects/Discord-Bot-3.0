@@ -15,6 +15,10 @@ public class ServerResource
 
     public string NotificationRoleName { get; set; }
 
+    public ulong? MuteRoleDiscordId { get; set; }
+
+    public string MuteRoleName { get; set; }
+
     public List<TwitchChannelResource> TwitchChannels { get; set; }
 
     public Dictionary<ChannelTypeEnum, List<ulong>> SettingsChannels { get; set; }

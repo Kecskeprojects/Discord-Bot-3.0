@@ -22,6 +22,8 @@ using System;
 //None of the editing sites completely support the way this will work, but a compromise can be made (Images are empty embeds with just the image url field having data)
 //Walls of text and images however should not need a json, rather an order number should suffice in deciding where they are placed in the order
 
+
+//Perhaps we can create 'placeholders' as in empty messages if there are no embeds in it, "** **" will send an empty text
 namespace Discord_Bot.Commands.Admin;
 public class AdminChannelBannerCommands(
     BotLogger logger,

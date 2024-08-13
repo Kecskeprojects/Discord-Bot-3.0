@@ -56,6 +56,11 @@ public class RoleService(
         return DbProcessResultEnum.Failure;
     }
 
+    public Task<DbProcessResultEnum> ChangeServerMuteRoleAsync(ulong serverId, string roleName, ulong roleId)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<RoleResource> GetRoleAsync(ulong serverId, string roleName)
     {
         RoleResource result = null;

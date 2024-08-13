@@ -86,7 +86,7 @@ public class ServerService(
                 DiscordId = roleId.ToString(),
                 RoleName = roleName,
                 Server = server,
-                Servers = []
+                ServerNotificationRoles = []
             };
 
             if (role.RoleId == server.NotificationRoleId)
@@ -148,7 +148,8 @@ public class ServerService(
             Server server = await serverRepository.FirstOrDefaultAsync(s =>
                 s.DiscordId == serverId.ToString(),
                 s => s.TwitchChannels,
-                s => s.NotificationRole);
+                s => s.NotificationRole,
+                s => s.MuteRole);
             if (server == null)
             {
                 return null;
@@ -165,5 +166,46 @@ public class ServerService(
         }
 
         return result;
+    }
+
+    public async Task<DbProcessResultEnum> ChangeServerMuteRoleAsync(ulong serverId, string roleName, ulong roleId)
+    {
+        try
+        {
+            Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
+            if (server == null)
+            {
+                return DbProcessResultEnum.NotFound;
+            }
+
+            roleName = roleName.Trim().ToLower();
+            Role role = await roleRepository.FirstOrDefaultAsync(r =>
+                r.Server.DiscordId == serverId.ToString()
+                && r.RoleName.Trim().ToLower().Equals(roleName),
+                r => r.Server);
+            role ??= new()
+            {
+                RoleId = 0,
+                DiscordId = roleId.ToString(),
+                RoleName = roleName,
+                Server = server,
+                ServerMuteRoles = []
+            };
+
+            bool updatedExisting = server.MuteRoleId != null;
+
+            server.NotificationRole = role;
+
+            await serverRepository.UpdateAsync(server);
+
+            cache.RemoveCachedEntityManually(serverId);
+
+            return DbProcessResultEnum.Success;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("ServerService.cs ChangeServerMuteRoleAsync", ex);
+        }
+        return DbProcessResultEnum.Failure;
     }
 }

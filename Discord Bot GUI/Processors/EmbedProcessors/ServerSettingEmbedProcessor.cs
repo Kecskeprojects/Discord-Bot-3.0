@@ -32,6 +32,8 @@ public static class ServerSettingEmbedProcessor
             }
         }
 
+        embed.AddField("Mute role:", $"`{server.MuteRoleName ?? "none"}`");
+
         if (server.TwitchChannels.Count > 0)
         {
             embed.AddField("Notification role:", $"`{server.NotificationRoleName ?? "none"}`");
