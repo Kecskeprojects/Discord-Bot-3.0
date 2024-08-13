@@ -14,6 +14,9 @@ public class AdminHelpCommands(
     BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
+    //Todo: Help command has to be separated in a new way, potentially we could divide into categories like in the normal help command however,
+    //With the added change that the help as itself will only send the categories, and adding the category at the end of help would reveal the specific commands and their usage
+    //Do this to every other command, potentially a unified help command could be made that will show the categories based on the user's permissions
     [Command("help admin")]
     [Alias(["help a"])]
     [RequireUserPermission(ChannelPermission.ManageChannels)]

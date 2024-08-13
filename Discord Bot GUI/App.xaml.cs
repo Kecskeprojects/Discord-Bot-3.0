@@ -109,6 +109,7 @@ public partial class App : Application
     {
         try
         {
+            //Todo: Add function that removes the mute role from users once their Until date arrives
             using (IServiceScope scope = services.CreateScope())
             {
                 DiscordSocketClient client = scope.ServiceProvider.GetService<DiscordSocketClient>();
