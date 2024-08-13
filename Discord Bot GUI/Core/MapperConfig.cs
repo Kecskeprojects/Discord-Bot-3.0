@@ -59,6 +59,7 @@ public class MapperConfig : Profile
             .ForMember(dest => dest.LatestImageUrl, opt => opt.MapFrom(i => i.IdolImages.OrderByDescending(x => x.CreatedOn).First().ImageUrl));
         CreateMap<User, UserBiasGameStatResource>()
             .ForMember(dest => dest.Stats, opt => opt.Ignore());
+        CreateMap<ServerMutedUser, ServerMutedUserResource>();
 
         //Communication to Model
         CreateMap<ExtendedBiasData, Idol>()

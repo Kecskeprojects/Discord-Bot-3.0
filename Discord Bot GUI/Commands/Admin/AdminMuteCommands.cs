@@ -94,7 +94,8 @@ public class AdminMuteCommands(
                 return;
             }
 
-            //Todo:Remove all other roles on user
+            List<ulong> roles = [.. user.RoleIds];
+            await user.RemoveRolesAsync(roles);
             await user.AddRoleAsync(server.MuteRoleDiscordId.Value);
 
             List<string> amounts = StringTools.GetTimeMeasurements(timeData);
@@ -107,14 +108,21 @@ public class AdminMuteCommands(
                     return;
                 }
 
-                DbProcessResultEnum result = await serverMutedUserService.AddMutedUserAsync(Context.Guild.Id, user.Id, mutedUntil);
+                DbProcessResultEnum result = await serverMutedUserService.AddMutedUserAsync(Context.Guild.Id, user.Id, mutedUntil, string.Join(";", roles));
                 string resultMessage = result switch
                 {
-                    DbProcessResultEnum.Success => $"User has been muted until {mutedUntil: yyyy/MM/dd HH:mm:ss}",
+                    DbProcessResultEnum.Success => $"User has been muted until {TimestampTag.FromDateTime(mutedUntil, TimestampTagStyles.ShortDateTime)}",
                     DbProcessResultEnum.AlreadyExists => "User Already muted.",
                     _ => "User can't be unmuted because of a database error!"
                 };
+
+                if (result != DbProcessResultEnum.Success)
+                {
+                    await user.AddRolesAsync(roles);
+                }
+
                 await ReplyAsync(resultMessage);
+                await user.SendMessageAsync($"You have been muted in '{Context.Guild.Name}' until {TimestampTag.FromDateTime(mutedUntil, TimestampTagStyles.ShortDateTime)}.");
             }
         }
         catch (Exception ex)
@@ -146,7 +154,15 @@ public class AdminMuteCommands(
                 return;
             }
 
-            //Todo:Remove Add back roles taken away from user, these roles should be saved in the ServerMutedUser table as a comma divided string
+            ServerMutedUserResource mutedUser = await serverMutedUserService.GetMutedUserByUsernameAsync(Context.Guild.Id, user.Id);
+
+            if (string.IsNullOrEmpty(mutedUser.RemovedRoleDiscordIds))
+            {
+                await ReplyAsync("User is not currently muted.");
+                return;
+            }
+
+            await user.AddRolesAsync(mutedUser.RemovedRoleDiscordIds.Split(";").Select(ulong.Parse));
             await user.RemoveRoleAsync(server.MuteRoleDiscordId.Value);
 
             DbProcessResultEnum result = await serverMutedUserService.RemoveMutedUserAsync(Context.Guild.Id, user.Id);
@@ -156,6 +172,7 @@ public class AdminMuteCommands(
                 _ => "User can't be unmuted because of a database error!"
             };
             await ReplyAsync(resultMessage);
+            await user.SendMessageAsync($"You have now been unmuted in '{Context.Guild.Name}'.");
         }
         catch (Exception ex)
         {

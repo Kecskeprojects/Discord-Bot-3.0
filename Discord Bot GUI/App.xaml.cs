@@ -109,7 +109,6 @@ public partial class App : Application
     {
         try
         {
-            //Todo: Add function that removes the mute role from users once their Until date arrives
             using (IServiceScope scope = services.CreateScope())
             {
                 DiscordSocketClient client = scope.ServiceProvider.GetService<DiscordSocketClient>();
@@ -144,6 +143,9 @@ public partial class App : Application
 
                 ReminderFeature reminderFeature = scope.ServiceProvider.GetService<ReminderFeature>();
                 await reminderFeature.Run();
+
+                UnmuteFeature unmuteFeature = scope.ServiceProvider.GetService<UnmuteFeature>();
+                await unmuteFeature.Run();
 
                 logger.LogToFile();
             }

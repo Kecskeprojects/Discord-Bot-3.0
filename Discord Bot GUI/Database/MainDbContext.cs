@@ -428,6 +428,7 @@ public partial class MainDbContext : DbContext
 
             entity.Property(e => e.ServerId).ValueGeneratedOnAdd();
             entity.Property(e => e.MutedUntil).HasColumnType("datetime");
+            entity.Property(e => e.RemovedRoleDiscordIds).IsRequired();
 
             entity.HasOne(d => d.Server).WithMany(p => p.ServerMutedUsers)
                 .HasForeignKey(d => d.ServerId)

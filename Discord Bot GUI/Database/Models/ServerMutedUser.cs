@@ -11,6 +11,8 @@ public partial class ServerMutedUser
 
     public DateTime MutedUntil { get; set; }
 
+    public string RemovedRoleDiscordIds { get; set; }
+
     public virtual Server Server { get; set; }
 
     public virtual User User { get; set; }

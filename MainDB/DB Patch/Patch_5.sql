@@ -78,6 +78,7 @@ CREATE TABLE [dbo].[ServerMutedUsers] (
     [ServerId]   INT      IDENTITY (1, 1) NOT NULL,
     [UserId]     INT      NOT NULL,
     [MutedUntil] DATETIME NOT NULL,
+    [RemovedRoleDiscordIds] NVARCHAR (MAX) NOT NULL,
     CONSTRAINT [PK_Muted_ServerId_UserId] PRIMARY KEY CLUSTERED ([UserId] ASC, [ServerId] ASC)
 );
 

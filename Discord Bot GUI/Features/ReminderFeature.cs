@@ -52,7 +52,7 @@ public class ReminderFeature(IReminderService reminderService, DiscordSocketClie
         }
         catch (Exception ex)
         {
-            logger.Error("ReminderFeature.cs Log ExecuteCoreLogicAsync", ex);
+            logger.Error("ReminderFeature.cs ExecuteCoreLogicAsync", ex);
             return false;
         }
         return true;

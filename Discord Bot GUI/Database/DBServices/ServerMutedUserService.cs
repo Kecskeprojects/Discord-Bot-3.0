@@ -5,7 +5,9 @@ using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Resources;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
@@ -20,14 +22,17 @@ public class ServerMutedUserService(
     private readonly IServerMutedUserRepository serverMutedUserRepository = serverMutedUserRepository;
     private readonly IUserRepository userRepository = userRepository;
 
-    public async Task<DbProcessResultEnum> AddMutedUserAsync(ulong serverId, ulong userId, DateTime mutedUntil)
+    public async Task<DbProcessResultEnum> AddMutedUserAsync(ulong serverId, ulong userId, DateTime mutedUntil, string removedRoles)
     {
         try
         {
             User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
             Server server = await serverRepository.FirstOrDefaultAsync(u => u.DiscordId == serverId.ToString());
 
-            if(await serverMutedUserRepository.ExistsAsync(smu => smu.UserId == user.UserId && smu.ServerId == server.ServerId))
+            if(await serverMutedUserRepository.ExistsAsync(smu => 
+                smu.UserId == user.UserId &&
+                smu.ServerId == server.ServerId &&
+                smu.MutedUntil > DateTime.UtcNow))
             {
                 return DbProcessResultEnum.AlreadyExists;
             }
@@ -35,6 +40,7 @@ public class ServerMutedUserService(
             ServerMutedUser mutedUser = new()
             {
                 MutedUntil = mutedUntil,
+                RemovedRoleDiscordIds = removedRoles,
                 User = user ?? new() { DiscordId = userId.ToString() },
                 Server = server ?? new() { DiscordId = serverId.ToString() },
             };
@@ -49,6 +55,48 @@ public class ServerMutedUserService(
             logger.Error("ServerMutedUserService.cs AddMutedUserAsync", ex);
         }
         return DbProcessResultEnum.Failure;
+    }
+
+    public async Task<List<ServerMutedUserResource>> GetExpiredMutedUsersAsync(DateTime dateTime)
+    {
+        List<ServerMutedUserResource> result = null;
+        try
+        {
+            List<ServerMutedUser> mutedUser =
+                await serverMutedUserRepository.GetListAsync(smu =>
+                    smu.MutedUntil <= dateTime,
+                    smu => smu.User,
+                    smu => smu.Server);
+            result = mapper.Map<List<ServerMutedUserResource>>(mutedUser);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("ServerMutedUserService.cs GetExpiredMutedUsersAsync", ex);
+        }
+        return result;
+    }
+
+    public async Task<ServerMutedUserResource> GetMutedUserByUsernameAsync(ulong serverId, ulong userId)
+    {
+        ServerMutedUserResource result = null;
+        try
+        {
+            User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
+            Server server = await serverRepository.FirstOrDefaultAsync(u => u.DiscordId == serverId.ToString());
+
+            ServerMutedUser mutedUser =
+                await serverMutedUserRepository.FirstOrDefaultAsync(smu => 
+                    smu.UserId == user.UserId &&
+                    smu.ServerId == server.ServerId,
+                    smu => smu.User,
+                    smu => smu.Server);
+            result = mapper.Map<ServerMutedUserResource>(mutedUser);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("ServerMutedUserService.cs GetMutedUserByUsernameAsync", ex);
+        }
+        return result;
     }
 
     public async Task<DbProcessResultEnum> RemoveMutedUserAsync(ulong serverId, ulong userId)

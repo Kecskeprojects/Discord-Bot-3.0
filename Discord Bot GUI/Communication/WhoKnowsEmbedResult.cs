@@ -14,4 +14,9 @@ public class WhoKnowsEmbedResult : IDisposable
     {
         ImageData.Dispose();
     }
+
+    ~WhoKnowsEmbedResult()
+    {
+        Dispose();
+    }
 }
