@@ -194,13 +194,13 @@ public class ServerService(
 
             bool updatedExisting = server.MuteRoleId != null;
 
-            server.NotificationRole = role;
+            server.MuteRole = role;
 
             await serverRepository.UpdateAsync(server);
 
             cache.RemoveCachedEntityManually(serverId);
 
-            return DbProcessResultEnum.Success;
+            return updatedExisting ? DbProcessResultEnum.UpdatedExisting : DbProcessResultEnum.Success;
         }
         catch (Exception ex)
         {

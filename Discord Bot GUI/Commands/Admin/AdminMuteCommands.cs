@@ -20,7 +20,8 @@ public class AdminMuteCommands(
     Config config) : BaseCommand(logger, config, serverService)
 {
 
-    [Command("mute role")]
+    [Command("change mute role")]
+    [Alias("tomr")]
     [RequireUserPermission(ChannelPermission.MuteMembers)]
     [RequireContext(ContextType.Guild)]
     [Summary("Changing server mute role")]
@@ -67,7 +68,7 @@ public class AdminMuteCommands(
             if (data.Split(">").Length == 1)
             {
                 username = data;
-                timeData = "10000y";
+                timeData = "5000y";
             }
             else if (data.Split(">").Length == 2)
             {
@@ -94,8 +95,16 @@ public class AdminMuteCommands(
                 return;
             }
 
-            List<ulong> roles = [.. user.RoleIds];
-            await user.RemoveRolesAsync(roles);
+            int highestRolePosition = Context.Guild.CurrentUser.Roles.Max(x => x.Position);
+
+            List<ulong> userRoles = [.. user.RoleIds];
+
+            List<ulong> roleIdList = Context.Guild.Roles.Where(x =>
+                userRoles.Contains(x.Id) &&
+                !x.IsEveryone &&
+                x.Position < highestRolePosition).Select(x => x.Id).ToList();
+
+            await user.RemoveRolesAsync(roleIdList);
             await user.AddRoleAsync(server.MuteRoleDiscordId.Value);
 
             List<string> amounts = StringTools.GetTimeMeasurements(timeData);
@@ -108,7 +117,7 @@ public class AdminMuteCommands(
                     return;
                 }
 
-                DbProcessResultEnum result = await serverMutedUserService.AddMutedUserAsync(Context.Guild.Id, user.Id, mutedUntil, string.Join(";", roles));
+                DbProcessResultEnum result = await serverMutedUserService.AddMutedUserAsync(Context.Guild.Id, user.Id, mutedUntil, string.Join(";", roleIdList));
                 string resultMessage = result switch
                 {
                     DbProcessResultEnum.Success => $"User has been muted until {TimestampTag.FromDateTime(mutedUntil, TimestampTagStyles.ShortDateTime)}",
@@ -118,11 +127,12 @@ public class AdminMuteCommands(
 
                 if (result != DbProcessResultEnum.Success)
                 {
-                    await user.AddRolesAsync(roles);
+                    await user.RemoveRoleAsync(server.MuteRoleDiscordId.Value);
+                    await user.AddRolesAsync(roleIdList);
                 }
 
                 await ReplyAsync(resultMessage);
-                await user.SendMessageAsync($"You have been muted in '{Context.Guild.Name}' until {TimestampTag.FromDateTime(mutedUntil, TimestampTagStyles.ShortDateTime)}.");
+                await user.SendMessageAsync($"You have been muted in '**{Context.Guild.Name}**' until {TimestampTag.FromDateTime(mutedUntil, TimestampTagStyles.ShortDateTime)}.");
             }
         }
         catch (Exception ex)
@@ -172,7 +182,7 @@ public class AdminMuteCommands(
                 _ => "User can't be unmuted because of a database error!"
             };
             await ReplyAsync(resultMessage);
-            await user.SendMessageAsync($"You have now been unmuted in '{Context.Guild.Name}'.");
+            await user.SendMessageAsync($"You have now been unmuted in '**{Context.Guild.Name}**'.");
         }
         catch (Exception ex)
         {

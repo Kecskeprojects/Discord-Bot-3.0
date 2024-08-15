@@ -75,7 +75,7 @@ PRINT N'Creating Table [dbo].[ServerMutedUsers]...';
 
 GO
 CREATE TABLE [dbo].[ServerMutedUsers] (
-    [ServerId]   INT      IDENTITY (1, 1) NOT NULL,
+    [ServerId]   INT      NOT NULL,
     [UserId]     INT      NOT NULL,
     [MutedUntil] DATETIME NOT NULL,
     [RemovedRoleDiscordIds] NVARCHAR (MAX) NOT NULL,

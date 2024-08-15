@@ -18,7 +18,9 @@ public class MapperConfig : Profile
             .ForMember(dest => dest.DiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.DiscordId)))
             .ForMember(dest => dest.RoleMessageDiscordId, opt => opt.MapFrom(scv => scv.RoleMessageDiscordId))
             .ForMember(dest => dest.NotificationRoleDiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.NotificationRole.DiscordId)))
-            .ForMember(dest => dest.NotificationRoleName, opt => opt.MapFrom(scv => scv.NotificationRole.RoleName));
+            .ForMember(dest => dest.NotificationRoleName, opt => opt.MapFrom(scv => scv.NotificationRole.RoleName))
+            .ForMember(dest => dest.MuteRoleDiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.MuteRole.DiscordId)))
+            .ForMember(dest => dest.MuteRoleName, opt => opt.MapFrom(scv => scv.MuteRole.RoleName));
         CreateMap<IGrouping<int?, ServerChannelView>, KeyValuePair<ChannelTypeEnum, List<ulong>>>()
         .ConstructUsing(scv => new KeyValuePair<ChannelTypeEnum, List<ulong>>(
             scv.Key != null ? (ChannelTypeEnum) scv.Key : ChannelTypeEnum.None,

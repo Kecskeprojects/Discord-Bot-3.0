@@ -55,7 +55,7 @@ public class UnmuteFeature(IServerMutedUserService serverMutedUserService, Disco
                     //If user exists send a direct message to the user
                     if (user != null)
                     {
-                        await user.SendMessageAsync($"You have now been unmuted in '{server.Name}'.");
+                        await user.SendMessageAsync($"You have now been unmuted in '**{server.Name}**'.");
                     }
                     DbProcessResultEnum reminderResult = await serverMutedUserService.RemoveMutedUserAsync(server.Id, user.Id);
                     if (reminderResult == DbProcessResultEnum.Failure)

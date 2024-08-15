@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[ServerMutedUsers]
 (
-	[ServerId] INT NOT NULL IDENTITY, 
+	[ServerId] INT NOT NULL, 
     [UserId] INT NOT NULL, 
     [MutedUntil] DATETIME NOT NULL,
     [RemovedRoleDiscordIds] NVARCHAR(MAX) NOT NULL, 

@@ -89,6 +89,7 @@ public static class Startup
         collection.AddTransient<YoutubeAddPlaylistFeature>();
         collection.AddTransient<AudioPlayFeature>();
         collection.AddTransient<AudioRequestFeature>();
+        collection.AddTransient<UnmuteFeature>();
 
         //Services
         collection.AddSingleton<BrowserService>();
@@ -124,6 +125,7 @@ public static class Startup
         collection.AddTransient<IUserIdolStatisticService, UserIdolStatisticService>();
         collection.AddScoped<IEmbedService, EmbedService>();
         collection.AddScoped<IEmbedGroupService, EmbedGroupService>();
+        collection.AddScoped<IServerMutedUserService, ServerMutedUserService>();
 
         //Database Repositories
         collection.AddScoped<IServerRepository, ServerRepository>();
@@ -145,6 +147,7 @@ public static class Startup
         collection.AddScoped<IUserIdolStatisticRepository, UserIdolStatisticRepository>();
         collection.AddScoped<IEmbedRepository, EmbedRepository>();
         collection.AddScoped<IEmbedGroupRepository, EmbedGroupRepository>();
+        collection.AddScoped<IServerMutedUserRepository, ServerMutedUserRepository>();
 
         return collection.BuildServiceProvider();
     }
