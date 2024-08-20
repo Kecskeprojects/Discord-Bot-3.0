@@ -4,6 +4,7 @@ using LastFmApi.Models.ArtistInfo;
 using LastFmApi.Models.TrackInfo;
 using Newtonsoft.Json;
 using RestSharp;
+using System.Text.Json.Serialization;
 
 namespace LastFmApi;
 

@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Services.Models.Twitter;
 
 public class Hashtag
 {
-    [JsonProperty("indices")]
+    [JsonPropertyName("indices")]
     public List<int> Indices { get; set; }
 
-    [JsonProperty("text")]
+    [JsonPropertyName("text")]
     public string Text { get; set; }
 }

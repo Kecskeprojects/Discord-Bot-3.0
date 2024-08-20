@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Services.Models.Twitter;
 
 public class Orig
 {
-    [JsonProperty("faces")]
+    [JsonPropertyName("faces")]
     public List<Face> Faces { get; set; }
 }
