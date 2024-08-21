@@ -27,6 +27,16 @@ public class BaseCommand(BotLogger logger, Config config, IServerService serverS
         return DiscordTools.GetUserAvatarUrl(Context.User, format, size);
     }
 
+    protected Task<bool> IsOwner()
+    {
+        return DiscordTools.IsOwner(Context);
+    }
+
+    protected bool IsAdmin()
+    {
+        return DiscordTools.IsAdmin(Context);
+    }
+
     protected string GetCurrentUserNickname()
     {
         return DiscordTools.GetNickName(Context);

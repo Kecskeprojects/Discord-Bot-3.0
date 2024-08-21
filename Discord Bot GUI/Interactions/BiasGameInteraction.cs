@@ -19,8 +19,9 @@ namespace Discord_Bot.Interactions;
 public class BiasGameInteraction(
     IIdolService idolService,
     BiasGameImageProcessor biasGameImageProcessor,
+    IServerService serverService,
     BotLogger logger,
-    Config config) : BaseInteraction(logger, config)
+    Config config) : BaseInteraction(serverService, logger, config)
 {
     private readonly IIdolService idolService = idolService;
     private readonly BiasGameImageProcessor biasGameImageProcessor = biasGameImageProcessor;

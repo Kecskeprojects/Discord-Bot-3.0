@@ -12,7 +12,11 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions;
 
-public class BiasGameStatInteraction(IUserService userService, BotLogger logger, Config config) : BaseInteraction(logger, config)
+public class BiasGameStatInteraction(
+    IUserService userService,
+    IServerService serverService,
+    BotLogger logger,
+    Config config) : BaseInteraction(serverService, logger, config)
 {
     private readonly IUserService userService = userService;
 

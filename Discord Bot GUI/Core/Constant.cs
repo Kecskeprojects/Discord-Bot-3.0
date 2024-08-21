@@ -88,11 +88,11 @@ public static class Constant
         "Hey look, {0} has their birthday today! Send some nice wishes!",
         "Oh wow, it's birthday time! Happy birthday {0}!",
         "Happy birthday {0}!",
-        "The day of reckoning is upon us, it's {0}'s birthday today!",
-        "Get the cakes out bitches, {0} is turning {1}!",
+        "The day of reckoning is upon us, it's {0}'s birthday today and they are {1}!",
+        "Get the cakes out, {0} is turning {1}!",
         "Happy birthday {0}! I am suddenly hungry for some cakes...",
         "Yay, what a special day, it's {0}'s birthday!",
-        "Damn you are turning {1} huh, better get a crutch now {0}.",
+        "Damn you are turning {1} huh, better get a cane now {0}.",
         "You are turning {1} {0}, you have the Big Bang on VHS don't you?"
     ];
 
@@ -108,6 +108,7 @@ public static class Constant
     #region Utilities
     public static readonly char[] DateSeparator = [',', '/', '\\', '-', '.', ' '];
     public static readonly char[] WhiteSpaceSeparator = [' ', '\n'];
+    public static readonly string[] SpecialCommandParameterDividers = ["-", ">"];
 
     public static readonly string[] TwitterSmallSizingStrings =
     [

@@ -19,6 +19,42 @@ public static class DiscordTools
             : value.Contains(channelId));
     }
 
+    public static Task<bool> IsOwner(SocketInteractionContext context)
+    {
+        return IsOwnerBase(context.Client, context.User.Id);
+    }
+
+    public static Task<bool> IsOwner(SocketCommandContext context)
+    {
+        return IsOwnerBase(context.Client, context.User.Id);
+    }
+
+    private static async Task<bool> IsOwnerBase(DiscordSocketClient client, ulong userId)
+    {
+        IApplication application = await client.GetApplicationInfoAsync();
+        return userId != application.Owner.Id;
+    }
+
+    public static bool IsAdmin(SocketInteractionContext context)
+    {
+        return IsAdminBase(context.User);
+    }
+
+    public static bool IsAdmin(SocketCommandContext context)
+    {
+        return IsAdminBase(context.User);
+    }
+
+    private static bool IsAdminBase(SocketUser user)
+    {
+        return user is IGuildUser guildUser && guildUser.GuildPermissions.Has(GuildPermission.Administrator);
+    }
+
+    public static bool IsDM(SocketInteractionContext context)
+    {
+        return IsDMBase(context.Channel);
+    }
+
     public static bool IsDM(SocketCommandContext context)
     {
         return IsDMBase(context.Channel);

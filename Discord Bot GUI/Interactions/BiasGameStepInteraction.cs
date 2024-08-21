@@ -19,8 +19,9 @@ public class BiasGameStepInteraction(
     IIdolService idolService,
     BiasGameWinnerBracketImageProcessor biasGameWinnerBracketImageProcessor,
     IUserIdolStatisticService userIdolStatisticService,
+    IServerService serverService,
     BotLogger logger,
-    Config config) : BaseInteraction(logger, config)
+    Config config) : BaseInteraction(serverService, logger, config)
 {
     private readonly IIdolService idolService = idolService;
     private readonly BiasGameWinnerBracketImageProcessor biasGameWinnerBracketImageProcessor = biasGameWinnerBracketImageProcessor;

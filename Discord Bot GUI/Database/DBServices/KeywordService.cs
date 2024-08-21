@@ -7,6 +7,7 @@ using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
@@ -70,6 +71,23 @@ public class KeywordService(
         catch (Exception ex)
         {
             logger.Error("KeywordService.cs GetKeywordAsync", ex);
+        }
+        return result;
+    }
+
+    public async Task<List<KeywordResource>> ListKeywordsByServerIdAsync(ulong serverId)
+    {
+        List<KeywordResource> result = null;
+        try
+        {
+            List<Keyword> keywords = await keywordRepository.GetListAsync(
+                kw => kw.Server.DiscordId == serverId.ToString(),
+                kw => kw.Server);
+            result = mapper.Map<List<Keyword>, List<KeywordResource>>(keywords);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("KeywordService.cs ListKeywordsByServerIdAsync", ex);
         }
         return result;
     }

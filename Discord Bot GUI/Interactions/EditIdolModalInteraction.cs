@@ -9,7 +9,13 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions;
 
-public class EditIdolModalInteraction(IIdolService idolService, IIdolGroupService idolGroupService, IIdolImageService idolImageService, BotLogger logger, Config config) : BaseInteraction(logger, config)
+public class EditIdolModalInteraction(
+    IIdolService idolService,
+    IIdolGroupService idolGroupService,
+    IIdolImageService idolImageService,
+    IServerService serverService,
+    BotLogger logger,
+    Config config) : BaseInteraction(serverService, logger, config)
 {
     private readonly IIdolService idolService = idolService;
     private readonly IIdolGroupService idolGroupService = idolGroupService;
