@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
 
+[Name("Custom Command")]
+[Remarks("Admin")]
+[Summary("Modifying list of server specific commands")]
 public class AdminCustomCommandCommands(
     ICustomCommandService customCommandService,
     IServerService serverService,
@@ -20,18 +23,18 @@ public class AdminCustomCommandCommands(
     [Command("command add")]
     [RequireUserPermission(ChannelPermission.ManageMessages)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Custom command adding, gifs and pics mainly")]
-    public async Task CustomCommandAdd(string name, string link)
+    [Summary("Adding command to server, mainly gifs and pictures")]
+    public async Task CustomCommandAdd(string commandName, string responseLink)
     {
         try
         {
             //Check if the url is a valid url, not just a string of characters
-            if (Uri.IsWellFormedUriString(link, UriKind.Absolute))
+            if (Uri.IsWellFormedUriString(responseLink, UriKind.Absolute))
             {
-                DbProcessResultEnum result = await customCommandService.AddCustomCommandAsync(Context.Guild.Id, name, link);
+                DbProcessResultEnum result = await customCommandService.AddCustomCommandAsync(Context.Guild.Id, commandName, responseLink);
                 string resultMessage = result switch
                 {
-                    DbProcessResultEnum.Success => $"New command successfully added: {name}.",
+                    DbProcessResultEnum.Success => $"New command successfully added: {commandName}.",
                     DbProcessResultEnum.AlreadyExists => "A command with this name already exists on this server.",
                     _ => "Command could not be added!"
                 };
@@ -51,15 +54,15 @@ public class AdminCustomCommandCommands(
     [Command("command remove")]
     [RequireUserPermission(ChannelPermission.ManageMessages)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Custom command removing, gifs and pics mainly")]
-    public async Task CustomCommandRemove(string name)
+    [Summary("Removing command from server")]
+    public async Task CustomCommandRemove(string commandName)
     {
         try
         {
-            DbProcessResultEnum result = await customCommandService.RemoveCustomCommandAsync(Context.Guild.Id, name);
+            DbProcessResultEnum result = await customCommandService.RemoveCustomCommandAsync(Context.Guild.Id, commandName);
             string resultMessage = result switch
             {
-                DbProcessResultEnum.Success => $"The {name} command has been removed.",
+                DbProcessResultEnum.Success => $"The {commandName} command has been removed.",
                 DbProcessResultEnum.NotFound => "Command does not exist.",
                 _ => "Command could not be removed!"
             };

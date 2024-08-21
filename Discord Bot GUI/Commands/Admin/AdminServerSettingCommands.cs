@@ -15,6 +15,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
 
+[Name("Server Settings")]
+[Remarks("Admin")]
+[Summary("Managing server configuration")]
 public class AdminServerSettingCommands(
     IChannelService channelService,
     ITwitchChannelService twitchChannelService,
@@ -31,7 +34,7 @@ public class AdminServerSettingCommands(
     [Alias(["serversettings", "serversetting", "server setting"])]
     [RequireUserPermission(ChannelPermission.ManageChannels)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Lists server settings")]
+    [Summary("Details of the various settings on the server")]
     public async Task ServerSettings()
     {
         try
@@ -50,23 +53,23 @@ public class AdminServerSettingCommands(
     [Command("channel add")]
     [RequireUserPermission(ChannelPermission.ManageChannels)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Server setting channel modification")]
-    public async Task ChannelAdd(string type = "", [Remainder] string channelName = "")
+    [Summary("Set/add a type of channel for setting up/limiting other features")]
+    public async Task ChannelAdd(string channeltype = "", [Remainder] string channelname = "")
     {
         try
         {
-            if (type == "" && channelName == "")
+            if (channeltype == "" && channelname == "")
             {
                 await ReplyAsync($"Current types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
                 return;
             }
 
-            if (channelName == "")
+            if (channelname == "")
             {
                 return;
             }
 
-            IMessageChannel channel = Context.Guild.TextChannels.Where(x => x.Name.Equals(channelName.Trim(), StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            IMessageChannel channel = Context.Guild.TextChannels.Where(x => x.Name.Equals(channelname.Trim(), StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
             if (channel == null)
             {
@@ -74,17 +77,17 @@ public class AdminServerSettingCommands(
                 return;
             }
 
-            if (!ChannelTypeEnumTools.TryGetEnumFromCommandText(type, out ChannelTypeEnum? channelType))
+            if (!ChannelTypeEnumTools.TryGetEnumFromCommandText(channeltype, out ChannelTypeEnum? channelTypeEnum))
             {
-                await ReplyAsync($"Channel type does not currently exist\nCurrent types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
+                await ReplyAsync($"Channel type does not currently exist.\nCurrent types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
                 return;
             }
 
             //Adds channel onto list of channels for server, unless conditions say there can only be one of a type of chat, removes server from cache
-            DbProcessResultEnum result = await channelService.AddSettingChannelAsync(Context.Guild.Id, channelType.Value, channel.Id);
+            DbProcessResultEnum result = await channelService.AddSettingChannelAsync(Context.Guild.Id, channelTypeEnum.Value, channel.Id);
             string resultMessage = result switch
             {
-                DbProcessResultEnum.Success => channelType.Value.IsRestrictedChannelType()
+                DbProcessResultEnum.Success => channelTypeEnum.Value.IsRestrictedChannelType()
                                                 ? "Server settings updated! Previous channel (if there was one) was overwritten as only one of it's type is allowed."
                                                 : "Server settings updated.",
                 DbProcessResultEnum.AlreadyExists => "Channel and type combination already in database.",
@@ -102,32 +105,32 @@ public class AdminServerSettingCommands(
     [Command("channel remove")]
     [RequireUserPermission(ChannelPermission.ManageChannels)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Server setting channel modification")]
-    public async Task ChannelRemove(string type = "", [Remainder] string channelName = "all")
+    [Summary("Remove one or all set channels of a type")]
+    public async Task ChannelRemove(string channeltype = "", [Remainder] string channelname = "all")
     {
         try
         {
-            if (type == "" && channelName == "all")
+            if (channeltype == "" && channelname == "all")
             {
                 await ReplyAsync($"Current types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
                 return;
             }
 
-            if (!ChannelTypeEnumTools.TryGetEnumFromCommandText(type, out ChannelTypeEnum? channelType))
+            if (!ChannelTypeEnumTools.TryGetEnumFromCommandText(channeltype, out ChannelTypeEnum? channelTypeEnum))
             {
                 await ReplyAsync($"Channel type does not currently exist\nCurrent types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
                 return;
             }
 
             DbProcessResultEnum result;
-            if (channelName == "all")
+            if (channelname == "all")
             {
                 //Removess every channel of a type that relates to the server, removes server from cache
-                result = await channelService.RemoveSettingChannelsAsync(Context.Guild.Id, channelType.Value);
+                result = await channelService.RemoveSettingChannelsAsync(Context.Guild.Id, channelTypeEnum.Value);
             }
             else
             {
-                IMessageChannel channel = Context.Guild.TextChannels.Where(x => x.Name.Equals(channelName.Trim(), StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                IMessageChannel channel = Context.Guild.TextChannels.Where(x => x.Name.Equals(channelname.Trim(), StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
                 if (channel == null)
                 {
@@ -135,7 +138,7 @@ public class AdminServerSettingCommands(
                 }
 
                 //Removes the given channel of the given type from the settings for the server, removes server from cache
-                result = await channelService.RemovelSettingChannelAsync(Context.Guild.Id, channelType.Value, channel.Id);
+                result = await channelService.RemovelSettingChannelAsync(Context.Guild.Id, channelTypeEnum.Value, channel.Id);
             }
 
             string resultMessage = result switch
@@ -155,12 +158,12 @@ public class AdminServerSettingCommands(
     [Command("twitch role add")]
     [RequireUserPermission(ChannelPermission.ManageChannels)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Server setting twitch role change")]
-    public async Task TwitchRoleAdd([Remainder] string name)
+    [Summary("Add the role that will be notified upon any channel going online")]
+    public async Task TwitchRoleAdd([Remainder] string rolename)
     {
         try
         {
-            IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(rolename, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
             if (role == null)
             {
                 await ReplyAsync("Role not found!");
@@ -185,7 +188,7 @@ public class AdminServerSettingCommands(
     [Command("twitch role remove")]
     [RequireUserPermission(ChannelPermission.ManageChannels)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Server setting twitch role removal")]
+    [Summary("Remove the role to notify users, notifications will be sent regardless")]
     public async Task TwitchRoleRemove()
     {
         try
@@ -209,22 +212,22 @@ public class AdminServerSettingCommands(
     [Command("twitch add")]
     [RequireUserPermission(ChannelPermission.ManageChannels)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Server setting twitch channel addition")]
-    public async Task TwitchAdd([Remainder] string name)
+    [Summary("Add a new twitch channel to be notified of on the server")]
+    public async Task TwitchAdd([Remainder] string twitchchannellink)
     {
         try
         {
-            if (Uri.IsWellFormedUriString(name, UriKind.Absolute))
+            if (Uri.IsWellFormedUriString(twitchchannellink, UriKind.Absolute))
             {
-                Uri uri = new(name);
+                Uri uri = new(twitchchannellink);
                 if (uri.Segments.Length < 2)
                 {
                     await ReplyAsync("Url is not channel url!");
                     return;
                 }
-                name = uri.Segments[1].Replace("/", "");
+                twitchchannellink = uri.Segments[1].Replace("/", "");
             }
-            UserData response = twitchCLI.GetChannel(name);
+            UserData response = twitchCLI.GetChannel(twitchchannellink);
 
             if (response == null)
             {
@@ -253,26 +256,26 @@ public class AdminServerSettingCommands(
     [Command("twitch remove")]
     [RequireUserPermission(ChannelPermission.ManageChannels)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Server setting twitch channel removal")]
-    public async Task TwitchRemove([Remainder] string name = "all")
+    [Summary("Remove one or all channels currently checked for the server")]
+    public async Task TwitchRemove([Remainder] string twitchchannellink = "all")
     {
         try
         {
             DbProcessResultEnum result;
-            if (!string.IsNullOrEmpty(name) && name != "all")
+            if (!string.IsNullOrEmpty(twitchchannellink) && twitchchannellink != "all")
             {
-                if (Uri.IsWellFormedUriString(name, UriKind.Absolute))
+                if (Uri.IsWellFormedUriString(twitchchannellink, UriKind.Absolute))
                 {
-                    Uri uri = new(name);
+                    Uri uri = new(twitchchannellink);
                     if (uri.Segments.Length < 2)
                     {
                         await ReplyAsync("Url is not channel url!");
                         return;
                     }
-                    name = uri.Segments[1].Replace("/", "");
+                    twitchchannellink = uri.Segments[1].Replace("/", "");
                 }
                 //Removes the twitch channel with the given name, removes server from cache
-                result = await twitchChannelService.RemoveTwitchChannelAsync(Context.Guild.Id, name);
+                result = await twitchChannelService.RemoveTwitchChannelAsync(Context.Guild.Id, twitchchannellink);
             }
             else
             {

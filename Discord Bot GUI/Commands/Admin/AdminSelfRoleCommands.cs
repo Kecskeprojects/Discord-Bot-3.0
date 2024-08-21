@@ -16,6 +16,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
 
+[Name("Self Role")]
+[Remarks("Admin")]
+[Summary("Managing server specific self assignable roles")]
 public class AdminSelfRoleCommands(
     IRoleService roleService,
     IServerService serverService,
@@ -27,13 +30,13 @@ public class AdminSelfRoleCommands(
     [Command("self role add")]
     [RequireUserPermission(ChannelPermission.ManageRoles)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Adding self role to database")]
-    public async Task SelfRoleAdd([Remainder] string name)
+    [Summary("Add self assignable role to list of roles on the server")]
+    public async Task SelfRoleAdd([Remainder] string rolename)
     {
         try
         {
             //Check if role with that name exists
-            IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(rolename, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
             if (role != null)
             {
@@ -60,17 +63,17 @@ public class AdminSelfRoleCommands(
     [Command("self role remove")]
     [RequireUserPermission(ChannelPermission.ManageRoles)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Removing self role from database")]
-    public async Task SelfRoleRemove([Remainder] string name)
+    [Summary("Remove self assignable role from list of roles on the server")]
+    public async Task SelfRoleRemove([Remainder] string rolename)
     {
         try
         {
             //Check if role with that name exists
-            IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(rolename, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
             if (role != null)
             {
-                DbProcessResultEnum result = await roleService.RemoveSelfRoleAsync(Context.Guild.Id, name);
+                DbProcessResultEnum result = await roleService.RemoveSelfRoleAsync(Context.Guild.Id, rolename);
                 string resultMessage = result switch
                 {
                     DbProcessResultEnum.Success => $"The {role.Name} role has been removed.",
@@ -93,7 +96,7 @@ public class AdminSelfRoleCommands(
     [Command("update role message")]
     [RequireUserPermission(ChannelPermission.ManageRoles)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Sends a message of the roles that currently can be self assigned")]
+    [Summary("Updates the role message in the role chat of the server, if any are assigned")]
     public async Task SendSelfRoleMessage()
     {
         try

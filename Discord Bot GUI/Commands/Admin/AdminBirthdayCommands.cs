@@ -12,6 +12,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
 
+[Name("Birthday")]
+[Remarks("Admin")]
+[Summary("Override commands for user birthdays")]
 public class AdminBirthdayCommands(
     IBirthdayService birthdayService,
     IServerService serverService,
@@ -23,14 +26,14 @@ public class AdminBirthdayCommands(
     [Command("birthday a add")]
     [RequireContext(ContextType.Guild)]
     [RequireUserPermission(ChannelPermission.ManageRoles)]
-    [Summary("Adding a birthday to be reminded about on a given server for a given user")]
-    public async Task BirthdayAddForUser([Remainder] string inputParams)
+    [Summary("Adding/overriding birthday of any user on the server\n*Most date separators accepted using year/month/day order")]
+    public async Task BirthdayAddForUser([Name("user ID/username>date*")][Remainder] string parameters)
     {
         try
         {
             //Get artist's name and the track for search
-            string userIdOrName = inputParams.Split('>')[0].Trim().ToLower();
-            string dateString = inputParams.Split('>')[1].Trim().ToLower();
+            string userIdOrName = parameters.Split('>')[0].Trim().ToLower();
+            string dateString = parameters.Split('>')[1].Trim().ToLower();
 
             IUser user = null;
             if (ulong.TryParse(userIdOrName, out ulong id))
@@ -90,8 +93,8 @@ public class AdminBirthdayCommands(
     [Command("birthday a remove")]
     [RequireContext(ContextType.Guild)]
     [RequireUserPermission(ChannelPermission.ManageRoles)]
-    [Summary("Removing a birthday to be reminded about on a given server for a given user")]
-    public async Task BirthdayRemoveForUser([Remainder] string userIdOrName)
+    [Summary("Removing birthday of any user on the server")]
+    public async Task BirthdayRemoveForUser([Name("user ID/username")][Remainder] string userIdOrName)
     {
         try
         {

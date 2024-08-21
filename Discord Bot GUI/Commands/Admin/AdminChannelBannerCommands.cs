@@ -24,6 +24,10 @@ using System.Threading.Tasks;
 
 //Perhaps we can create 'placeholders' as in empty messages if there are no embeds in it, "** **" will send an empty text
 namespace Discord_Bot.Commands.Admin;
+
+//[Name("Channel Banner")]
+//[Remarks("Admin")]
+//[Summary("")]
 public class AdminChannelBannerCommands(
     BotLogger logger,
     Config config,

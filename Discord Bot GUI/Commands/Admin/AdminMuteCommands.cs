@@ -13,6 +13,10 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
+
+[Name("Mute")]
+[Remarks("Admin")]
+[Summary("Mute functionality using specified role")]
 public class AdminMuteCommands(
     IServerMutedUserService serverMutedUserService,
     IServerService serverService,
@@ -21,16 +25,16 @@ public class AdminMuteCommands(
 {
 
     [Command("change mute role")]
-    [Alias("tomr")]
+    [Alias(["tomr"])]
     [RequireUserPermission(ChannelPermission.MuteMembers)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Changing server mute role")]
-    public async Task ChangeServerMuteRole([Remainder] string name)
+    [Summary("Setting the server specific mute role that will be used by the other commands")]
+    public async Task ChangeServerMuteRole([Remainder] string rolename)
     {
         try
         {
             //Check if role with that name exists
-            IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(rolename, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
             if (role != null)
             {
@@ -58,22 +62,22 @@ public class AdminMuteCommands(
     [Command("mute")]
     [RequireUserPermission(ChannelPermission.MuteMembers)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Adding mute role to user")]
-    public async Task MuteUser([Remainder] string data)
+    [Summary("Muting user with server specific mute role, also removes all other roles\n*if left empty, user will be muted permanently, amount of time in years to minutes (e.g.: '15h 5year6day' is a valid amount)")]
+    public async Task MuteUser([Name("username>amount*")][Remainder] string parameters)
     {
         try
         {
             string username = "";
             string timeData = "";
-            if (data.Split(">").Length == 1)
+            if (parameters.Split(">").Length == 1)
             {
-                username = data;
+                username = parameters;
                 timeData = "5000y";
             }
-            else if (data.Split(">").Length == 2)
+            else if (parameters.Split(">").Length == 2)
             {
-                username = data.Split(">")[0];
-                timeData = data.Split(">")[1];
+                username = parameters.Split(">")[0];
+                timeData = parameters.Split(">")[1];
             }
             else
             {
@@ -144,7 +148,7 @@ public class AdminMuteCommands(
     [Command("unmute")]
     [RequireUserPermission(ChannelPermission.MuteMembers)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Removing mute role from user")]
+    [Summary("Unmuting user by removing server specific mute role, also adds all other roles that were removed upon muting")]
     public async Task UnmuteUser([Remainder] string username)
     {
         try

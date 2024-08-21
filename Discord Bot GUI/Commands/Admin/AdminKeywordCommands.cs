@@ -4,11 +4,17 @@ using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Processors.EmbedProcessors;
+using Discord_Bot.Resources;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
 
+[Name("Keyword")]
+[Remarks("Admin")]
+[Summary("Managing server specific keywords")]
 public class AdminKeywordCommands(
     IKeywordService keywordService,
     IServerService serverService,
@@ -17,17 +23,37 @@ public class AdminKeywordCommands(
 {
     private readonly IKeywordService keywordService = keywordService;
 
-    [Command("keyword add")]
+    [Command("keyword list")]
     [RequireUserPermission(ChannelPermission.ManageMessages)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Keyword addition to database")]
-    public async Task KeywordAdd([Remainder] string keyword_response)
+    [Summary("Check current trigger words/sentences and their responses on the server")]
+    public async Task KeywordList()
     {
         try
         {
-            string[] array = keyword_response.Split(">");
+            List<KeywordResource> keywords = await keywordService.ListKeywordsByServerIdAsync(Context.Guild.Id);
+            Embed[] embed = KeywordListEmbedProcessor.CreateEmbed(Context.Guild.Name, keywords);
 
-            DbProcessResultEnum result = await keywordService.AddKeywordAsync(Context.Guild.Id, array[0], array[1]);
+            await ReplyAsync(embeds: embed);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("AdminKeywordCommands.cs KeywordList", ex);
+        }
+    }
+
+    [Command("keyword add")]
+    [RequireUserPermission(ChannelPermission.ManageMessages)]
+    [RequireContext(ContextType.Guild)]
+    [Summary("Add trigger word/sentence to current server that if typed in itself will warrant a reaction from the bot\n*Limited to 100 characters\n**Limited to 300 characters")]
+    public async Task KeywordAdd([Name("keyword*>response**")][Remainder] string parameters)
+    {
+        try
+        {
+            string keyword = parameters.Split(">")[0];
+            string response = parameters.Split(">")[1];
+
+            DbProcessResultEnum result = await keywordService.AddKeywordAsync(Context.Guild.Id, keyword, response);
             string resultMessage = result switch
             {
                 DbProcessResultEnum.Success => "Keyword added to database.",
@@ -45,8 +71,8 @@ public class AdminKeywordCommands(
     [Command("keyword remove")]
     [RequireUserPermission(ChannelPermission.ManageMessages)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Keyword removal to database")]
-    public async Task KeywordRemove(string keyword)
+    [Summary("Remove trigger word from current server")]
+    public async Task KeywordRemove([Remainder] string keyword)
     {
         try
         {
