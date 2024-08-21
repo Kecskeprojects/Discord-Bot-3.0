@@ -37,7 +37,7 @@ public class HelpComponentInteraction(
             }
 
             IReadOnlyList<CommandInfo> commands = commandService.Modules
-                .Where(x => x.Remarks == CommandLevelEnum.User.ToFriendlyString() && x.Name == category)
+                .Where(x => x.Remarks == commandLevel.ToFriendlyString() && x.Name == category)
                 .First()
                 .Commands;
 
