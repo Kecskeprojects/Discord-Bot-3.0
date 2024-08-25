@@ -13,6 +13,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Owner;
 
+[Name("Greeting")]
+[Remarks("Owner")]
+[Summary("Manage greeting gifs of bot, one is choosen if the bot is pinged as a response")]
 public class OwnerGreetingCommands(
     IGreetingService greetingService,
     IServerService serverService,
@@ -23,7 +26,7 @@ public class OwnerGreetingCommands(
 
     [Command("greeting list")]
     [RequireOwner]
-    [Summary("Command for owner to list global greeting gifs")]
+    [Summary("Check global list of greeting gifs")]
     public async Task GreetingList()
     {
         try
@@ -43,12 +46,12 @@ public class OwnerGreetingCommands(
 
     [Command("greeting add")]
     [RequireOwner]
-    [Summary("Command for owner to add global greeting gifs")]
-    public async Task GreetingAdd(string url)
+    [Summary("Add a new greeting gif")]
+    public async Task GreetingAdd([Name("gif link")] string giflink)
     {
         try
         {
-            DbProcessResultEnum result = await greetingService.AddGreetingAsync(url);
+            DbProcessResultEnum result = await greetingService.AddGreetingAsync(giflink);
             string resultMessage = result switch
             {
                 DbProcessResultEnum.Success => "Greeting added.",
@@ -64,7 +67,7 @@ public class OwnerGreetingCommands(
 
     [Command("greeting remove")]
     [RequireOwner]
-    [Summary("Command for owner to remove global greeting gifs")]
+    [Summary("Remove a greeting gif based on it's ID, that is displayed in the '!greeting list' command")]
     public async Task GreetingRemove(int id)
     {
         try

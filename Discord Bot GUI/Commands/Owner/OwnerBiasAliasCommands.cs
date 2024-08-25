@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Owner;
 
+[Name("Bias Alias")]
+[Remarks("Owner")]
+[Summary("Managing aliases (alternative names) for idols")]
 public class OwnerBiasAliasCommands(
     IIdolAliasService idolAliasService,
     IServerService serverService,
@@ -18,14 +21,14 @@ public class OwnerBiasAliasCommands(
 
     [Command("bias alias add")]
     [RequireOwner]
-    [Summary("Admin command for adding a new bias alias into our lists")]
-    public async Task AddBiasAlias([Remainder] string biasData)
+    [Summary("Adding a new alias for an existing idol")]
+    public async Task AddBiasAlias([Name("alias-stage name-group")][Remainder] string parameters)
     {
         try
         {
-            string biasAlias = biasData.ToLower().Split('-')[0].Trim();
-            string biasName = biasData.ToLower().Split('-')[1].Trim();
-            string biasGroup = biasData.ToLower().Split('-')[2].Trim();
+            string biasAlias = parameters.ToLower().Split('-')[0].Trim();
+            string biasName = parameters.ToLower().Split('-')[1].Trim();
+            string biasGroup = parameters.ToLower().Split('-')[2].Trim();
 
             if (string.IsNullOrEmpty(biasName) || string.IsNullOrEmpty(biasGroup))
             {
@@ -50,14 +53,14 @@ public class OwnerBiasAliasCommands(
 
     [Command("bias alias remove")]
     [RequireOwner]
-    [Summary("Admin command for removing a bias alias from our lists")]
-    public async Task RemoveBiasAlias([Remainder] string biasData)
+    [Summary("Removing a specific alias tied to a specific idol")]
+    public async Task RemoveBiasAlias([Name("alias-stage name-group")][Remainder] string parameters)
     {
         try
         {
-            string biasAlias = biasData.ToLower().Split('-')[0].Trim();
-            string biasName = biasData.ToLower().Split('-')[1].Trim();
-            string biasGroup = biasData.ToLower().Split('-')[2].Trim();
+            string biasAlias = parameters.ToLower().Split('-')[0].Trim();
+            string biasName = parameters.ToLower().Split('-')[1].Trim();
+            string biasGroup = parameters.ToLower().Split('-')[2].Trim();
 
             if (string.IsNullOrEmpty(biasName) || string.IsNullOrEmpty(biasGroup))
             {

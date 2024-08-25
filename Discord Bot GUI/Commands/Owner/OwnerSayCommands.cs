@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Owner;
 
+//Todo: Change where role, user and channel names or ids are used as parameters to this implementation in the !say command
+[Name("Say")]
+[Remarks("Owner")]
+[Summary("Send messages as the bot, the channel must be in the same server as the command")]
 public class OwnerSayCommands(
     IServerService serverService,
     BotLogger logger,
@@ -17,8 +21,8 @@ public class OwnerSayCommands(
     [Command("say")]
     [RequireOwner]
     [RequireContext(ContextType.Guild)]
-    [Summary("Command for owner, the bot says in whatever channel you gave it what you told it to say")]
-    public async Task Say(IMessageChannel channel, [Remainder] string text)
+    [Summary("Send messages as the bot")]
+    public async Task Say([Name("channel name")] IMessageChannel channel, [Remainder] string message)
     {
         try
         {
@@ -26,7 +30,7 @@ public class OwnerSayCommands(
             {
                 await Context.Message.DeleteAsync();
 
-                await channel.SendMessageAsync(text);
+                await channel.SendMessageAsync(message);
             }
         }
         catch (Exception ex)

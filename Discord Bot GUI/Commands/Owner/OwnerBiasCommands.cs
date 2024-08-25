@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Owner;
 
+[Name("Bias")]
+[Remarks("Owner")]
+[Summary("Managing idols")]
 public class OwnerBiasCommands(
     IIdolService idolService,
     IServerService serverService,
@@ -23,13 +26,13 @@ public class OwnerBiasCommands(
 
     [Command("biaslist add")]
     [RequireOwner]
-    [Summary("Admin command for adding a new bias into our lists")]
-    public async Task AddBiasList([Remainder] string biasData)
+    [Summary("Adding a new idol to the database")]
+    public async Task AddBiasList([Name("stage name-group")][Remainder] string parameters)
     {
         try
         {
-            string biasName = biasData.ToLower().Split('-')[0].Trim();
-            string biasGroup = biasData.ToLower().Split('-')[1].Trim();
+            string biasName = parameters.ToLower().Split('-')[0].Trim();
+            string biasGroup = parameters.ToLower().Split('-')[1].Trim();
 
             if (string.IsNullOrEmpty(biasName) || string.IsNullOrEmpty(biasGroup))
             {
@@ -53,13 +56,13 @@ public class OwnerBiasCommands(
 
     [Command("biaslist remove")]
     [RequireOwner]
-    [Summary("Admin command for removing a bias from our lists")]
-    public async Task RemoveBiasList([Remainder] string biasData)
+    [Summary("Removing an idol and related data from database")]
+    public async Task RemoveBiasList([Name("stage name-group")][Remainder] string parameters)
     {
         try
         {
-            string biasName = biasData.ToLower().Split('-')[0].Trim();
-            string biasGroup = biasData.ToLower().Split('-')[1].Trim();
+            string biasName = parameters.ToLower().Split('-')[0].Trim();
+            string biasGroup = parameters.ToLower().Split('-')[1].Trim();
 
             //Try removing them from the database
             DbProcessResultEnum result = await idolService.RemoveIdolAsync(biasName, biasGroup);
@@ -80,7 +83,7 @@ public class OwnerBiasCommands(
     [Command("manual update bias")]
     [Alias(["manual update idol", "mass update bias", "mass update idol"])]
     [RequireOwner]
-    [Summary("Update the extended information of idols manually from www.dbkpop.com")]
+    [Summary("Start update process of extended information for idols")]
     public async Task ManualUpdateBias()
     {
         try
@@ -96,8 +99,8 @@ public class OwnerBiasCommands(
     [Command("edit biasdata")]
     [Alias(["editbiasdata", "edit bias data", "edit bias", "editbias", "editidol", "edit idol", "editidoldata", "edit idol data", "edit idoldata"])]
     [RequireOwner]
-    [Summary("Edit bias related data")]
-    public async Task EditBiasData([Remainder] string biasData)
+    [Summary("Edit all existing data of an idol")]
+    public async Task EditBiasData([Name("stage name-group")][Remainder] string parameters)
     {
         try
         {
@@ -105,17 +108,17 @@ public class OwnerBiasCommands(
             string biasName = "";
             string biasGroup = "";
 
-            if (biasData.Contains('-'))
+            if (parameters.Contains('-'))
             {
-                biasName = biasData.ToLower().Split('-')[0].Trim();
-                biasGroup = biasData.ToLower().Split('-')[1].Trim();
+                biasName = parameters.ToLower().Split('-')[0].Trim();
+                biasGroup = parameters.ToLower().Split('-')[1].Trim();
             }
             else
             {
-                biasName = biasData.ToLower().Trim();
+                biasName = parameters.ToLower().Trim();
             }
 
-            if (biasData.Split("-").Length > 2 || string.IsNullOrWhiteSpace(biasName) || string.IsNullOrWhiteSpace(biasGroup))
+            if (parameters.Split("-").Length > 2 || string.IsNullOrWhiteSpace(biasName) || string.IsNullOrWhiteSpace(biasGroup))
             {
                 return;
             }
