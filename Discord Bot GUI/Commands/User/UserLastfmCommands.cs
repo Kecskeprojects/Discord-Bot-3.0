@@ -324,8 +324,8 @@ public class UserLastfmCommands(
     }
 
     [Command("lf whoknows")]
-    [RequireContext(ContextType.Guild)]
     [Alias(["lf wk", "lf whoknow"])]
+    [RequireContext(ContextType.Guild)]
     [Summary("Get the server's stats on a song/artist, if left empty, your currently playing song will be checked")]
     public async Task LfWhoKnows([Name("artist>track")][Remainder] string parameters = "")
     {
