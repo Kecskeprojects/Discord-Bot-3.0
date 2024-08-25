@@ -3,7 +3,7 @@ using Discord.Commands;
 using Discord_Bot.Enums;
 using System.Collections.Generic;
 
-namespace Discord_Bot.Processors.EmbedProcessors;
+namespace Discord_Bot.Processors.EmbedProcessors.Help;
 public class HelpEmbedProcessor
 {
     public static Embed[] CreateEmbed(CommandLevelEnum commandLevel, List<ModuleInfo> modules, string imageUrl)

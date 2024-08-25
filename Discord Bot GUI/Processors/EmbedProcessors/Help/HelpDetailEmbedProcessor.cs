@@ -5,7 +5,7 @@ using Discord_Bot.Enums;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Discord_Bot.Processors.EmbedProcessors;
+namespace Discord_Bot.Processors.EmbedProcessors.Help;
 public class HelpDetailEmbedProcessor
 {
     public static Embed[] CreateEmbed(CommandLevelEnum commandLevel, string category, List<CommandInfo> commands, string imageUrl)
