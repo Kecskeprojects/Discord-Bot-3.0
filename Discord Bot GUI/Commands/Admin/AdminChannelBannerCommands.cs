@@ -35,7 +35,7 @@ public class AdminChannelBannerCommands(
 {
     [Command("banner add")]
     [Alias(["message add", "banner message add"])]
-    [RequireUserPermission(ChannelPermission.ManageMessages)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Add to existing or create new banner message")]
     public async Task BannerAdd(string channelName, int order = 0, [Remainder] string content = "")
@@ -60,7 +60,7 @@ public class AdminChannelBannerCommands(
 
     [Command("banner remove")]
     [Alias(["message remove", "banner message remove"])]
-    [RequireUserPermission(ChannelPermission.ManageMessages)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Remove from existing banner message")]
     public async Task BannerRemove(string channelName, int order = 0)
@@ -82,7 +82,7 @@ public class AdminChannelBannerCommands(
 
     [Command("banner edit")]
     [Alias(["message edit", "banner message edit"])]
-    [RequireUserPermission(ChannelPermission.ManageMessages)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Edit existing banner message")]
     public async Task BannerEdit(string channelName, int order = 0, [Remainder] string content = "")
@@ -106,7 +106,7 @@ public class AdminChannelBannerCommands(
 
     [Command("banner get")]
     [Alias(["message get", "banner message get"])]
-    [RequireUserPermission(ChannelPermission.ManageMessages)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Get existing banner message")]
     public async Task BannerGet(string channelName, int order = 0)
@@ -129,7 +129,7 @@ public class AdminChannelBannerCommands(
 
     [Command("banner order")]
     [Alias(["message order", "banner message order"])]
-    [RequireUserPermission(ChannelPermission.ManageMessages)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Get existing banner message order")]
     public async Task BannerOrder(string channelName)

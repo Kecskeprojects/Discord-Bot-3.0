@@ -31,8 +31,8 @@ public class AdminServerSettingCommands(
     private readonly ITwitchCLI twitchCLI = twitchCLI;
 
     [Command("server settings")]
-    [Alias(["serversettings", "serversetting", "server setting"])]
-    [RequireUserPermission(ChannelPermission.ManageChannels)]
+    [Alias(["serversettings", "server setting", "serversetting"])]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Details of the various settings on the server")]
     public async Task ServerSettings()
@@ -51,10 +51,10 @@ public class AdminServerSettingCommands(
     }
 
     [Command("channel add")]
-    [RequireUserPermission(ChannelPermission.ManageChannels)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Set/add a type of channel for setting up/limiting other features")]
-    public async Task ChannelAdd(string channeltype = "", [Remainder] string channelname = "")
+    public async Task ChannelAdd([Name("channel type")] string channeltype = "", [Name("channel name")][Remainder] string channelname = "")
     {
         try
         {
@@ -103,10 +103,10 @@ public class AdminServerSettingCommands(
     }
 
     [Command("channel remove")]
-    [RequireUserPermission(ChannelPermission.ManageChannels)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Remove one or all set channels of a type")]
-    public async Task ChannelRemove(string channeltype = "", [Remainder] string channelname = "all")
+    public async Task ChannelRemove([Name("channel type")] string channeltype = "", [Name("channel name")][Remainder] string channelname = "all")
     {
         try
         {
@@ -156,10 +156,10 @@ public class AdminServerSettingCommands(
     }
 
     [Command("twitch role add")]
-    [RequireUserPermission(ChannelPermission.ManageChannels)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Add the role that will be notified upon any channel going online")]
-    public async Task TwitchRoleAdd([Remainder] string rolename)
+    public async Task TwitchRoleAdd([Name("role name")][Remainder] string rolename)
     {
         try
         {
@@ -186,7 +186,7 @@ public class AdminServerSettingCommands(
     }
 
     [Command("twitch role remove")]
-    [RequireUserPermission(ChannelPermission.ManageChannels)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Remove the role to notify users, notifications will be sent regardless")]
     public async Task TwitchRoleRemove()
@@ -210,24 +210,24 @@ public class AdminServerSettingCommands(
     }
 
     [Command("twitch add")]
-    [RequireUserPermission(ChannelPermission.ManageChannels)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Add a new twitch channel to be notified of on the server")]
-    public async Task TwitchAdd([Remainder] string twitchchannellink)
+    public async Task TwitchAdd([Name("twitch username/channel link")][Remainder] string twitchchannel)
     {
         try
         {
-            if (Uri.IsWellFormedUriString(twitchchannellink, UriKind.Absolute))
+            if (Uri.IsWellFormedUriString(twitchchannel, UriKind.Absolute))
             {
-                Uri uri = new(twitchchannellink);
+                Uri uri = new(twitchchannel);
                 if (uri.Segments.Length < 2)
                 {
                     await ReplyAsync("Url is not channel url!");
                     return;
                 }
-                twitchchannellink = uri.Segments[1].Replace("/", "");
+                twitchchannel = uri.Segments[1].Replace("/", "");
             }
-            UserData response = twitchCLI.GetChannel(twitchchannellink);
+            UserData response = twitchCLI.GetChannel(twitchchannel);
 
             if (response == null)
             {
@@ -254,10 +254,10 @@ public class AdminServerSettingCommands(
     }
 
     [Command("twitch remove")]
-    [RequireUserPermission(ChannelPermission.ManageChannels)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Remove one or all channels currently checked for the server")]
-    public async Task TwitchRemove([Remainder] string twitchchannellink = "all")
+    public async Task TwitchRemove([Name("twitch username/channel link")][Remainder] string twitchchannellink = "all")
     {
         try
         {

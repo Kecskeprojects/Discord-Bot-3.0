@@ -21,10 +21,10 @@ public class AdminCustomCommandCommands(
     private readonly ICustomCommandService customCommandService = customCommandService;
 
     [Command("command add")]
-    [RequireUserPermission(ChannelPermission.ManageMessages)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Adding command to server, mainly gifs and pictures")]
-    public async Task CustomCommandAdd(string commandname, string responselink)
+    public async Task CustomCommandAdd([Name("command name")] string commandname, [Name("response link")] string responselink)
     {
         try
         {
@@ -52,10 +52,10 @@ public class AdminCustomCommandCommands(
     }
 
     [Command("command remove")]
-    [RequireUserPermission(ChannelPermission.ManageMessages)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Removing command from server")]
-    public async Task CustomCommandRemove(string commandname)
+    public async Task CustomCommandRemove([Name("command name")] string commandname)
     {
         try
         {

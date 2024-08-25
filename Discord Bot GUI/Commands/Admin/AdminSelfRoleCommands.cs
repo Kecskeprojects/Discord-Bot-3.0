@@ -28,10 +28,10 @@ public class AdminSelfRoleCommands(
     private readonly IRoleService roleService = roleService;
 
     [Command("self role add")]
-    [RequireUserPermission(ChannelPermission.ManageRoles)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Add self assignable role to list of roles on the server")]
-    public async Task SelfRoleAdd([Remainder] string rolename)
+    public async Task SelfRoleAdd([Name("role name")][Remainder] string rolename)
     {
         try
         {
@@ -61,10 +61,10 @@ public class AdminSelfRoleCommands(
     }
 
     [Command("self role remove")]
-    [RequireUserPermission(ChannelPermission.ManageRoles)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Remove self assignable role from list of roles on the server")]
-    public async Task SelfRoleRemove([Remainder] string rolename)
+    public async Task SelfRoleRemove([Name("role name")][Remainder] string rolename)
     {
         try
         {
@@ -94,7 +94,7 @@ public class AdminSelfRoleCommands(
     }
 
     [Command("update role message")]
-    [RequireUserPermission(ChannelPermission.ManageRoles)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Updates the role message in the role chat of the server, if any are assigned")]
     public async Task SendSelfRoleMessage()

@@ -24,7 +24,7 @@ public class AdminKeywordCommands(
     private readonly IKeywordService keywordService = keywordService;
 
     [Command("keyword list")]
-    [RequireUserPermission(ChannelPermission.ManageMessages)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Check current trigger words/sentences and their responses on the server")]
     public async Task KeywordList()
@@ -43,7 +43,7 @@ public class AdminKeywordCommands(
     }
 
     [Command("keyword add")]
-    [RequireUserPermission(ChannelPermission.ManageMessages)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Add trigger word/sentence to current server that if typed in itself will warrant a reaction from the bot\n*Limited to 100 characters\n**Limited to 300 characters")]
     public async Task KeywordAdd([Name("keyword*>response**")][Remainder] string parameters)
@@ -69,7 +69,7 @@ public class AdminKeywordCommands(
     }
 
     [Command("keyword remove")]
-    [RequireUserPermission(ChannelPermission.ManageMessages)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Remove trigger word from current server")]
     public async Task KeywordRemove([Remainder] string keyword)

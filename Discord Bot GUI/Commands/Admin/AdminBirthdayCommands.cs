@@ -24,8 +24,8 @@ public class AdminBirthdayCommands(
     private readonly IBirthdayService birthdayService = birthdayService;
 
     [Command("birthday a add")]
-    [RequireContext(ContextType.Guild)]
     [RequireUserPermission(ChannelPermission.ManageRoles)]
+    [RequireContext(ContextType.Guild)]
     [Summary("Adding/overriding birthday of any user on the server\n*Most date separators accepted using year/month/day order")]
     public async Task BirthdayAddForUser([Name("user ID/username>date*")][Remainder] string parameters)
     {
@@ -91,8 +91,8 @@ public class AdminBirthdayCommands(
     }
 
     [Command("birthday a remove")]
-    [RequireContext(ContextType.Guild)]
     [RequireUserPermission(ChannelPermission.ManageRoles)]
+    [RequireContext(ContextType.Guild)]
     [Summary("Removing birthday of any user on the server")]
     public async Task BirthdayRemoveForUser([Name("user ID/username")][Remainder] string userIdOrName)
     {
