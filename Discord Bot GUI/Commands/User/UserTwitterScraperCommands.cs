@@ -16,6 +16,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
 
+[Name("Twitter")]
+[Remarks("User")]
+[Summary("Twitter related commands")]
 public class UserTwitterScraperCommands(
     ITwitterScraper twitterScraper,
     IServerService serverService,
@@ -25,8 +28,8 @@ public class UserTwitterScraperCommands(
     private readonly ITwitterScraper twitterScraper = twitterScraper;
 
     [Command("twt")]
-    [Summary("For embedding twitter messages, replacing the built in discord embeds")]
-    public async Task ScrapeFromUrl([Remainder] string message)
+    [Summary("For embedding twitter links, replacing the built in discord embeds\n*Has to be separated by at least a space")]
+    public async Task ScrapeFromUrl([Name("links*")][Remainder] string message)
     {
         if (!config.Enable_Twitter_Embed)
         {

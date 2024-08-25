@@ -19,6 +19,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
 
+[Name("Last.fm")]
+[Remarks("User")]
+[Summary("Showing listening statistics using http://last.fm/")]
 public class UserLastfmCommands(
     IUserService userService,
     ILastFmAPI lastFmAPI,
@@ -32,10 +35,10 @@ public class UserLastfmCommands(
     private readonly LastFmWhoKnowsEmbedProcessor whoKnowsEmbedProcessor = whoKnowsEmbedProcessor;
 
     #region Connect last.fm commands
-    [Command("lf conn")]
-    [Alias(["lf c", "lf connect"])]
+    [Command("lf connect")]
+    [Alias(["lf c", "lf conn"])]
     [Summary("Connect lastfm username to your discord user")]
-    public async Task LfConnect(string name)
+    public async Task LfConnect([Name("last.fm username")] string name)
     {
         try
         {
@@ -59,9 +62,9 @@ public class UserLastfmCommands(
         }
     }
 
-    [Command("lf del")]
-    [Alias(["lf d", "lf delete", "lf disc", "lf disconnect"])]
-    [Summary("Disconnect lastfm username to your discord user")]
+    [Command("lf delete")]
+    [Alias(["lf d", "lf del", "lf disc", "lf disconnect"])]
+    [Summary("Disconnect lastfm username from your discord user")]
     public async Task LfDisconnect()
     {
         try
@@ -90,8 +93,8 @@ public class UserLastfmCommands(
     #region Last.fm top commands
     [Command("lf tal")]
     [Alias(["lf top albums", "lf top album", "lf topalbums", "lf topalbum"])]
-    [Summary("Get the top listened albums of the user")]
-    public async Task LfTopAlbum(params string[] parameters)
+    [Summary("Get your top listened albums\n*overall, 7day, 1month, 3month, 6month, 12month")]
+    public async Task LfTopAlbum([Name("length(1 to 30)  period*")] params string[] parameters)
     {
         try
         {
@@ -127,8 +130,8 @@ public class UserLastfmCommands(
 
     [Command("lf tar")]
     [Alias(["lf top artists", "lf top artist", "lf topartist", "lf topartists"])]
-    [Summary("Get the top listened artists of the user")]
-    public async Task LfTopArtist(params string[] parameters)
+    [Summary("Get your top listened artists\n*overall, 7day, 1month, 3month, 6month, 12month")]
+    public async Task LfTopArtist([Name("length(1 to 30)  period*")] params string[] parameters)
     {
         try
         {
@@ -164,8 +167,8 @@ public class UserLastfmCommands(
 
     [Command("lf tt")]
     [Alias(["lf top tracks", "lf top track", "lf toptracks", "lf toptrack"])]
-    [Summary("Get the top listened tracks of the user")]
-    public async Task LfTopTrack(params string[] parameters)
+    [Summary("Get your top listened tracks\n*overall, 7day, 1month, 3month, 6month, 12month")]
+    public async Task LfTopTrack([Name("length(1 to 30)  period*")] params string[] parameters)
     {
         try
         {
@@ -203,7 +206,7 @@ public class UserLastfmCommands(
     #region Last.fm recent commands
     [Command("lf np")]
     [Alias(["lf nowplaying", "lf now playing"])]
-    [Summary("Get the currently playing/last played track of the user")]
+    [Summary("Get your currently playing/last played track")]
     public async Task LfNowPlaying()
     {
         try
@@ -242,8 +245,8 @@ public class UserLastfmCommands(
 
     [Command("lf rc")]
     [Alias(["lf recent", "lf recents"])]
-    [Summary("Get the recently listened tracks of the user")]
-    public async Task LfRecent(int limit = 10)
+    [Summary("Get your recently listened tracks")]
+    public async Task LfRecent([Name("length(1-30)")] int limit = 10)
     {
         try
         {
@@ -280,7 +283,7 @@ public class UserLastfmCommands(
     #region Advanced last.fm commands
     [Command("lf artist")]
     [Alias(["lf a"])]
-    [Summary("Get the user's stats on an artist")]
+    [Summary("Get the your track and album stats on an artist")]
     public async Task LfArtist([Remainder] string artist)
     {
         try
@@ -320,11 +323,11 @@ public class UserLastfmCommands(
         }
     }
 
-    [Command("lf wk")]
+    [Command("lf whoknows")]
     [RequireContext(ContextType.Guild)]
-    [Alias(["lf whoknows", "lf whoknow"])]
-    [Summary("Get the server's stats on a song/artist")]
-    public async Task LfWhoKnows([Remainder] string input = "")
+    [Alias(["lf wk", "lf whoknow"])]
+    [Summary("Get the server's stats on a song/artist, if left empty, your currently playing song will be checked")]
+    public async Task LfWhoKnows([Name("artist>track")][Remainder] string parameters = "")
     {
         try
         {
@@ -335,7 +338,7 @@ public class UserLastfmCommands(
 
             List<UserResource> users = await userService.GetAllLastFmUsersAsync();
             UserResource currentUser = users.FirstOrDefault(user => user.DiscordId == Context.User.Id);
-            if ((currentUser == null || string.IsNullOrEmpty(currentUser.LastFmUsername)) && string.IsNullOrEmpty(input))
+            if ((currentUser == null || string.IsNullOrEmpty(currentUser.LastFmUsername)) && string.IsNullOrEmpty(parameters))
             {
                 await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
                 return;
@@ -346,7 +349,7 @@ public class UserLastfmCommands(
 
             users = DiscordTools.FilterToOnlyServerMembers(Context, users);
 
-            WhoKnows wk = await lastFmAPI.GetWhoKnowsDataAsync(input, users, currentUser);
+            WhoKnows wk = await lastFmAPI.GetWhoKnowsDataAsync(parameters, users, currentUser);
 
             if (string.IsNullOrEmpty(wk.Message))
             {

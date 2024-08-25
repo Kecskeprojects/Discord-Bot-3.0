@@ -16,6 +16,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
 
+[Name("Bias")]
+[Remarks("User")]
+[Summary("User bias related commands")]
 public class UserBiasCommands(
     IUserIdolService userIdolService,
     IIdolService idolService,
@@ -29,8 +32,8 @@ public class UserBiasCommands(
     private readonly IIdolGroupService idolGroupService = idolGroupService;
 
     [Command("bias add")]
-    [Summary("Command for adding a new bias into a user's list")]
-    public async Task AddBias([Remainder] string biasData)
+    [Summary("Adding a new bias to your list, the group is optional but may be needed if multiple idols of the same stage name exist")]
+    public async Task AddBias([Name("stage name-group")][Remainder] string parameters)
     {
         try
         {
@@ -44,21 +47,21 @@ public class UserBiasCommands(
             string biasGroup = "";
 
             bool isGroupName = false;
-            if (biasData.Contains('-'))
+            if (parameters.Contains('-'))
             {
-                biasName = biasData.ToLower().Split('-')[0].Trim();
-                biasGroup = biasData.ToLower().Split('-')[1].Trim();
+                biasName = parameters.ToLower().Split('-')[0].Trim();
+                biasGroup = parameters.ToLower().Split('-')[1].Trim();
             }
             else
             {
-                isGroupName = await idolGroupService.GroupExistsAsnyc(biasData.ToLower().Trim());
+                isGroupName = await idolGroupService.GroupExistsAsnyc(parameters.ToLower().Trim());
                 if (isGroupName)
                 {
-                    biasGroup = biasData.ToLower().Trim();
+                    biasGroup = parameters.ToLower().Trim();
                 }
                 else
                 {
-                    biasName = biasData.ToLower().Trim();
+                    biasName = parameters.ToLower().Trim();
                 }
             }
 
@@ -83,8 +86,8 @@ public class UserBiasCommands(
     }
 
     [Command("bias remove")]
-    [Summary("Command for removing a bias from a user's list")]
-    public async Task RemoveBias([Remainder] string biasData)
+    [Summary("Removing a new bias from your list, the group is optional but may be needed if multiple idols of the same stage name exist")]
+    public async Task RemoveBias([Name("stage name-group")][Remainder] string parameters)
     {
         try
         {
@@ -98,21 +101,21 @@ public class UserBiasCommands(
             string biasGroup = "";
 
             bool isGroupName = false;
-            if (biasData.Contains('-'))
+            if (parameters.Contains('-'))
             {
-                biasName = biasData.ToLower().Split('-')[0].Trim();
-                biasGroup = biasData.ToLower().Split('-')[1].Trim();
+                biasName = parameters.ToLower().Split('-')[0].Trim();
+                biasGroup = parameters.ToLower().Split('-')[1].Trim();
             }
             else
             {
-                isGroupName = await idolGroupService.GroupExistsAsnyc(biasData.ToLower().Trim());
+                isGroupName = await idolGroupService.GroupExistsAsnyc(parameters.ToLower().Trim());
                 if (isGroupName)
                 {
-                    biasGroup = biasData.ToLower().Trim();
+                    biasGroup = parameters.ToLower().Trim();
                 }
                 else
                 {
-                    biasName = biasData.ToLower().Trim();
+                    biasName = parameters.ToLower().Trim();
                 }
             }
 
@@ -135,7 +138,7 @@ public class UserBiasCommands(
     }
 
     [Command("bias clear")]
-    [Summary("Command for clearing the user's bias list")]
+    [Summary("Remove all your current biases, this action cannot be reversed")]
     public async Task ClearBias()
     {
         try
@@ -161,8 +164,8 @@ public class UserBiasCommands(
 
     [Command("my biases")]
     [Alias(["mybiases", "biases", "my bias"])]
-    [Summary("Command to check a user's current list of biases")]
-    public async Task MyBiases([Remainder] string groupName = "")
+    [Summary("Check your current list of biases, if a group name is given, only that group's members are shown")]
+    public async Task MyBiases([Name("group")][Remainder] string groupName = "")
     {
         try
         {
@@ -221,8 +224,8 @@ public class UserBiasCommands(
     }
 
     [Command("bias list")]
-    [Summary("Command for checking our biases as a whole")]
-    public async Task BiasList([Remainder] string groupName = "")
+    [Summary("Command to check all current idols in the database, if a group name is given, only that group's members are shown")]
+    public async Task BiasList([Name("group")][Remainder] string groupName = "")
     {
         try
         {
@@ -266,8 +269,8 @@ public class UserBiasCommands(
 
     [Command("ping")]
     [RequireContext(ContextType.Guild)]
-    [Summary("Command for pinging biases")]
-    public async Task PingBias([Remainder] string biasNames)
+    [Summary("Command for pinging people with a given bias\n*Can also be group name, leading to all people getting pinged who have a bias in the group")]
+    public async Task PingBias([Name("stage name, stage name,...*")][Remainder] string biasNames)
     {
         try
         {

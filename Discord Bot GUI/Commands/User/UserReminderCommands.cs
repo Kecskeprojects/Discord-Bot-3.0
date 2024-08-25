@@ -9,11 +9,14 @@ using Discord_Bot.Resources;
 using Discord_Bot.Tools.NativeTools;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
+//using System.Globalization;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
 
+[Name("Reminder")]
+[Remarks("User")]
+[Summary("Adding/Removing personal reminders that will be sent to user as a DM")]
 public class UserReminderCommands(
     IReminderService reminderService,
     IServerService serverService,
@@ -22,10 +25,92 @@ public class UserReminderCommands(
 {
     private readonly IReminderService reminderService = reminderService;
 
-    [Command("remind at")]
-    [Alias(["reminder at"])]
-    [Summary("Adding reminding messages to database via dates")]
-    public async Task RemindAt([Remainder] string message)
+    //[Command("remind at")]
+    //[Alias(["reminder at"])]
+    //[Summary("Adding a new reminder using a date\n*Year only needs last two digits and can be left off if reminder is current year, use the following format:\n(year/)month/day Hour:Minute +-Timezone\n**Limited to 150 characters")]
+    //public async Task RemindAt([Name("date*>message**")][Remainder] string parameters)
+    //{
+    //    try
+    //    {
+    //        if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
+    //        {
+    //            return;
+    //        }
+
+    //        if (parameters.Split(">").Length < 2)
+    //        {
+    //            return;
+    //        }
+
+    //        //Take the message apart and clear trailing whitespaces
+    //        string datestring = parameters.Split(">")[0].Trim();
+    //        string remindMessage = parameters.Split(">")[1].Trim();
+
+    //        //Length check, the message row of the database only accepts lengths of up to 150
+    //        if (remindMessage.Length > 150)
+    //        {
+    //            await ReplyAsync("Reminder message too long!(maximum **150** characters)");
+    //            return;
+    //        }
+
+    //        //Add last two digits of current year to beginning in case it was left off as the datetime parse doesn't always assume a year
+    //        if (datestring.Split(".").Length == 2)
+    //        {
+    //            datestring = datestring.Insert(0, $"{DateTime.UtcNow.Year.ToString()[2..]}.");
+    //        }
+
+    //        //Try parsing date into an exact format, in which case one can write timezones
+    //        if (DateTime.TryParseExact(datestring, "yy.MM.dd HH:mm z", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime date))
+    //        {
+    //            //Convert date to local timezone
+    //            DateTime ConvertedDate = date.ToUniversalTime();
+
+    //            //Check if date is not already in the past
+    //            if (DateTime.Compare(ConvertedDate, DateTime.UtcNow) > 0)
+    //            {
+    //                DbProcessResultEnum result = await reminderService.AddReminderAsync(Context.User.Id, ConvertedDate, remindMessage);
+    //                string resultMessage = result switch
+    //                {
+    //                    DbProcessResultEnum.Success => $"Alright, I will remind you at {TimestampTag.FromDateTime(date, TimestampTagStyles.ShortDateTime)}.",
+    //                    _ => "Reminder could not be added, talk to dumbass owner!"
+    //                };
+    //                await ReplyAsync(resultMessage);
+    //                return;
+    //            }
+    //        }
+    //        else
+    //        {
+    //            //Try parsing the date
+    //            if (DateTime.TryParse(datestring, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out date))
+    //            {
+    //                //Check if date is not already in the past
+    //                if (DateTime.Compare(date, DateTime.UtcNow) > 0)
+    //                {
+    //                    //Add reminder to database
+    //                    DbProcessResultEnum result = await reminderService.AddReminderAsync(Context.User.Id, date, remindMessage);
+    //                    string resultMessage = result switch
+    //                    {
+    //                        DbProcessResultEnum.Success => $"Alright, I will remind you at {TimestampTag.FromDateTime(date, TimestampTagStyles.ShortDateTime)}.",
+    //                        _ => "Reminder could not be added, talk to dumbass owner!"
+    //                    };
+    //                    await ReplyAsync(resultMessage);
+    //                    return;
+    //                }
+    //            }
+    //        }
+
+    //        await ReplyAsync("Invalit input format, the order is the following:\n`[year].[month].[day] [hour]:[minute] +-[timezone]`\nYear, hour, minute are optional unless using timezones!");
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        logger.Error("UserReminderCommands.cs RemindAt", ex);
+    //    }
+    //}
+
+    [Command("reminder in")]
+    [Alias(["remind in", "remind at", "reminder at"])]
+    [Summary("Adding a new reminder using amounts of time compared to sending command\n*Amount of time in years to minutes (e.g.: '15h 5year6day' is a valid amount)\n**Limited to 150 characters")]
+    public async Task RemindIn([Name("amount*>message**")][Remainder] string parameters)
     {
         try
         {
@@ -34,96 +119,14 @@ public class UserReminderCommands(
                 return;
             }
 
-            if (message.Split(">").Length < 2)
+            if (parameters.Split(">").Length < 2)
             {
                 return;
             }
 
             //Take the message apart and clear trailing whitespaces
-            string datestring = message.Split(">")[0].Trim();
-            string remindMessage = message.Split(">")[1].Trim();
-
-            //Length check, the message row of the database only accepts lengths of up to 150
-            if (remindMessage.Length > 150)
-            {
-                await ReplyAsync("Reminder message too long!(maximum **150** characters)");
-                return;
-            }
-
-            //Add last two digits of current year to beginning in case it was left off as the datetime parse doesn't always assume a year
-            if (datestring.Split(".").Length == 2)
-            {
-                datestring = datestring.Insert(0, $"{DateTime.UtcNow.Year.ToString()[2..]}.");
-            }
-
-            //Try parsing date into an exact format, in which case one can write timezones
-            if (DateTime.TryParseExact(datestring, "yy.MM.dd HH:mm z", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime date))
-            {
-                //Convert date to local timezone
-                DateTime ConvertedDate = date.ToUniversalTime();
-
-                //Check if date is not already in the past
-                if (DateTime.Compare(ConvertedDate, DateTime.UtcNow) > 0)
-                {
-                    DbProcessResultEnum result = await reminderService.AddReminderAsync(Context.User.Id, ConvertedDate, remindMessage);
-                    string resultMessage = result switch
-                    {
-                        DbProcessResultEnum.Success => $"Alright, I will remind you at {TimestampTag.FromDateTime(date, TimestampTagStyles.ShortDateTime)}.",
-                        _ => "Reminder could not be added, talk to dumbass owner!"
-                    };
-                    await ReplyAsync(resultMessage);
-                    return;
-                }
-            }
-            else
-            {
-                //Try parsing the date
-                if (DateTime.TryParse(datestring, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out date))
-                {
-                    //Check if date is not already in the past
-                    if (DateTime.Compare(date, DateTime.UtcNow) > 0)
-                    {
-                        //Add reminder to database
-                        DbProcessResultEnum result = await reminderService.AddReminderAsync(Context.User.Id, date, remindMessage);
-                        string resultMessage = result switch
-                        {
-                            DbProcessResultEnum.Success => $"Alright, I will remind you at {TimestampTag.FromDateTime(date, TimestampTagStyles.ShortDateTime)}.",
-                            _ => "Reminder could not be added, talk to dumbass owner!"
-                        };
-                        await ReplyAsync(resultMessage);
-                        return;
-                    }
-                }
-            }
-
-            await ReplyAsync("Invalit input format, the order is the following:\n`[year].[month].[day] [hour]:[minute] +-[timezone]`\nYear, hour, minute are optional unless using timezones!");
-        }
-        catch (Exception ex)
-        {
-            logger.Error("UserReminderCommands.cs RemindAt", ex);
-        }
-    }
-
-    [Command("remind in")]
-    [Alias(["reminder in"])]
-    [Summary("Adding reminding messages to database via amounts of time from current date")]
-    public async Task RemindIn([Remainder] string message)
-    {
-        try
-        {
-            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
-            {
-                return;
-            }
-
-            if (message.Split(">").Length < 2)
-            {
-                return;
-            }
-
-            //Take the message apart and clear trailing whitespaces
-            string amountstring = message.Split(">")[0].Trim();
-            string remindMessage = message.Split(">")[1].Trim();
+            string amountstring = parameters.Split(">")[0].Trim();
+            string remindMessage = parameters.Split(">")[1].Trim();
             List<string> amounts = StringTools.GetTimeMeasurements(amountstring);
 
             //Length check, the message row of the database only accepts lengths of up to 150
@@ -161,9 +164,9 @@ public class UserReminderCommands(
         }
     }
 
-    [Command("remind list")]
-    [Alias(["reminder list"])]
-    [Summary("Remove a reminder from their list of reminders")]
+    [Command("reminder list")]
+    [Alias(["remind list"])]
+    [Summary("Show your currently set reminders")]
     public async Task RemindList()
     {
         try
@@ -187,10 +190,10 @@ public class UserReminderCommands(
         }
     }
 
-    [Command("remind remove")]
-    [Alias(["reminder remove"])]
-    [Summary("Remove a reminder from the user's list of reminders")]
-    public async Task RemindRemove(int reminderOrderId)
+    [Command("reminder remove")]
+    [Alias(["remind remove"])]
+    [Summary("Remove reminder by their position in the '!remind list' command")]
+    public async Task RemindRemove([Name("order number")]int reminderOrderId)
     {
         try
         {

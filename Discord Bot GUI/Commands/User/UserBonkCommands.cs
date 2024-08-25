@@ -15,6 +15,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
 
+[Name("Bonk")]
+[Remarks("User")]
+[Summary("Bonk")]
 public class UserBonkCommands(
     BonkGifProcessor bonkGifProcessor,
     IServerService serverService,
@@ -24,11 +27,12 @@ public class UserBonkCommands(
     private readonly BonkGifProcessor bonkGifProcessor = bonkGifProcessor;
 
     //Todo: Check if bonk command could work with gif profiles images
+    //Todo: This command could also use the !say solution if it works for users
     [Command("bonk")]
-    [RequireContext(ContextType.Guild)]
     [Alias(["hornyjail, hit me please"])]
-    [Summary("Inserts a gif with the user's local profile picture")]
-    public async Task Bonk([Remainder] string parameters = "")
+    [RequireContext(ContextType.Guild)]
+    [Summary("Inserts a gif with the user's local profile picture, if no user is given, it will be yourself")]
+    public async Task Bonk([Name("username  delay(ms)")][Remainder] string parameters = "")
     {
         try
         {

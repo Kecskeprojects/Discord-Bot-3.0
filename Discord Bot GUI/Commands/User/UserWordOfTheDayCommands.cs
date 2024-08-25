@@ -13,6 +13,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
 
+[Name("Word of the Day")]
+[Remarks("User")]
+[Summary("Daily updating words and their translations using http://wotd.transparent.com/")]
 public class UserWordOfTheDayCommands(
     IWordOfTheDayService wordOfTheDayService,
     IServerService serverService,
@@ -23,8 +26,8 @@ public class UserWordOfTheDayCommands(
 
     [Command("wotd")]
     [Alias(["word of the day"])]
-    [Summary("Learn a word a day command")]
-    public async Task WotdFunction(string language = "korean")
+    [Summary("Check the word of the day in a language")]
+    public async Task WotdFunction([Name("language name")]string language = "korean")
     {
         try
         {

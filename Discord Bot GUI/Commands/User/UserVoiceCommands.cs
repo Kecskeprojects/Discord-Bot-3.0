@@ -31,7 +31,7 @@ public class UserVoiceCommands(
     [Command("play")]
     [Alias(["p"])]
     [RequireContext(ContextType.Guild)]
-    [Summary("Play music on the channel the you are connected to")]
+    [Summary("Play music on the channel you are connected to")]
     public async Task Play([Name("youtube/spotify link or keyword")][Remainder] string searchparameter)
     {
         try
@@ -64,7 +64,7 @@ public class UserVoiceCommands(
     [Command("leave")]
     [Alias(["disconnect", "disconn", "disc", "dc"])]
     [RequireContext(ContextType.Guild)]
-    [Summary("Leaves the voice channel and clears the playlist")]
+    [Summary("Leaves the current voice channel and clears the playlist")]
     public async Task Leave()
     {
         try
@@ -92,7 +92,7 @@ public class UserVoiceCommands(
     [Command("queue")]
     [Alias(["q"])]
     [RequireContext(ContextType.Guild)]
-    [Summary("Current music request playlist")]
+    [Summary("Current music request playlist, only shows 10 items per page")]
     public async Task Queue(int page = 1)
     {
         try

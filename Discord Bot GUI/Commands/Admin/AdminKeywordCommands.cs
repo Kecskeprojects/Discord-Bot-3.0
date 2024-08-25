@@ -45,7 +45,7 @@ public class AdminKeywordCommands(
     [Command("keyword add")]
     [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Add trigger word/sentence to current server that if typed in itself will warrant a reaction from the bot\n*Limited to 100 characters\n**Limited to 300 characters")]
+    [Summary("Add trigger word/sentence to current server that if typed in itself will trigger a reaction from the bot\n*Limited to 100 characters\n**Limited to 300 characters")]
     public async Task KeywordAdd([Name("keyword*>response**")][Remainder] string parameters)
     {
         try

@@ -12,6 +12,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
 
+[Name("Bias Game")]
+[Remarks("User")]
+[Summary("Elimination tournament to decide your favorite idol")]
 public class UserBiasGameCommands(
     IUserService userService,
     IServerService serverService,
@@ -22,7 +25,7 @@ public class UserBiasGameCommands(
 
     [Command("bias game")]
     [Alias(["bg", "biasgame"])]
-    [Summary("A game of choosing favorites")]
+    [Summary("Start a new game for you")]
     public async Task BiasGame()
     {
         try
@@ -56,7 +59,7 @@ public class UserBiasGameCommands(
 
     [Command("bias game stop")]
     [Alias(["bgs", "biasgamestop"])]
-    [Summary("Stop current game")]
+    [Summary("Stop your current game, if any are ongoing")]
     public async Task BiasGameStop()
     {
         try

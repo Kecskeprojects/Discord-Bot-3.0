@@ -108,7 +108,7 @@ public static class Constant
     #region Utilities
     public static readonly char[] DateSeparator = [',', '/', '\\', '-', '.', ' '];
     public static readonly char[] WhiteSpaceSeparator = [' ', '\n'];
-    public static readonly string[] SpecialCommandParameterDividers = ["-", ">"];
+    public static readonly string[] SpecialCommandParameterDividers = ["-", ">", " or ", "  "];
 
     public static readonly string[] TwitterSmallSizingStrings =
     [

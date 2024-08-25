@@ -28,7 +28,7 @@ public class AdminMuteCommands(
     [Alias(["tomr"])]
     [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Setting the server specific mute role that will be used by the other commands")]
+    [Summary("Setting the server specific mute role that will be used by the mute commands")]
     public async Task ChangeServerMuteRole([Name("role name")][Remainder] string rolename)
     {
         try
@@ -62,7 +62,7 @@ public class AdminMuteCommands(
     [Command("mute")]
     [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Muting user with server specific mute role, also removes all other roles\n*if left empty, user will be muted permanently, amount of time in years to minutes (e.g.: '15h 5year6day' is a valid amount)")]
+    [Summary("Muting user with server specific mute role, also removes all other roles from user\n*if left empty, user will be muted permanently, amount of time in years to minutes (e.g.: '15h 5year6day' is a valid amount)")]
     public async Task MuteUser([Name("username>amount*")][Remainder] string parameters)
     {
         try

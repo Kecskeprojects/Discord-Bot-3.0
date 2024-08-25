@@ -13,6 +13,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
 
+[Name("Custom Command")]
+[Remarks("User")]
+[Summary("Server specific command related commands")]
 public class UserCustomCommandCommands(
     ICustomCommandService customCommandService,
     IServerService serverService,
@@ -24,7 +27,7 @@ public class UserCustomCommandCommands(
     [Command("custom list")]
     [Alias(["customlist", "customcommands"])]
     [RequireContext(ContextType.Guild)]
-    [Summary("Command to list out all the currently available commands")]
+    [Summary("List of currently existing custom commands")]
     public async Task CustomList()
     {
         try

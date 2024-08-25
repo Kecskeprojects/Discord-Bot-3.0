@@ -8,13 +8,16 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
 
+[Name("Randomizer")]
+[Remarks("User")]
+[Summary("Random result generator")]
 public class UserRandomizeCommands(
     IServerService serverService,
     BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     [Command("8ball")]
-    [Summary("8ball game, takes in the whole message, returns random 8ball answer from array")]
+    [Summary("8ball game, takes in a question, returns a cryptic response")]
     public async Task Eightball([Remainder] string question)
     {
         try
@@ -41,7 +44,7 @@ public class UserRandomizeCommands(
     [Command("coin flip")]
     [Alias(["flip a coin", "flip coin", "flipcoin", "cf", "fc", "cofl", "flco", "coin", "flip", "coinflip", "50/50", "pick"])]
     [Summary("A 50/50 type decision maker")]
-    public async Task CoinFlip([Remainder] string choice = "")
+    public async Task CoinFlip([Name("choice 1 or choice 2")][Remainder] string choice = "")
     {
         try
         {
@@ -81,8 +84,8 @@ public class UserRandomizeCommands(
     }
 
     [Command("decide")]
-    [Summary("Random from multiple options")]
-    public async Task Decide([Remainder] string optionString)
+    [Summary("Random choice from multiple options")]
+    public async Task Decide([Name("opt1,opt2...")][Remainder] string optionString)
     {
         try
         {
