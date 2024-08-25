@@ -30,7 +30,6 @@ public class AudioPlayFeature(
                 logger.Log("User must be in a voice channel, or a voice channel must be passed as an argument!");
                 audioResource.AudioVariables.Playing = false;
 
-                audioResource.AudioVariables?.Dispose();
                 audioResource.AudioVariables = new();
                 audioResource.MusicRequests.Clear();
                 return false;
@@ -38,14 +37,9 @@ public class AudioPlayFeature(
 
             while (audioResource.MusicRequests.Count > 0)
             {
-                if (audioResource.AudioVariables.AbruptDisconnect)
+                if (!await DiscordTools.CheckAndReconnectBotIfNeeded(Context, audioResource))
                 {
-                    await Task.Delay(5000);
-
-                    if (!await DiscordTools.ReConnectBot(Context, audioResource))
-                    {
-                        throw new Exception("Bot could not reconnect after gateway disconnect");
-                    }
+                    throw new Exception("Bot could not reconnect after gateway disconnect");
                 }
 
                 MusicRequest current = audioResource.MusicRequests[0];
@@ -97,7 +91,7 @@ public class AudioPlayFeature(
             return false;
         }
 
-        audioResource.AudioVariables?.Dispose();
+        audioResource.AudioVariables.Playing = false;
         audioResource.AudioVariables = new();
         audioResource.MusicRequests.Clear();
         return true;

@@ -5,6 +5,7 @@ using Discord_Bot.Core.Configuration;
 using Discord_Bot.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot;
@@ -75,6 +76,22 @@ public class BotMain(
                     break;
                 }
                 case "WebSocket connection was closed":
+                {
+                    string message = arg.Exception.Message;
+                    if (message.EndsWith('.'))
+                    {
+                        message = message[..^1];
+                    }
+
+                    foreach (KeyValuePair<ulong, Communication.ServerAudioResource> item in Global.ServerAudioResources)
+                    {
+                        item.Value.AudioVariables.CancellationTokenSource?.Cancel(false);
+                    }
+
+                    logger.Client($"{message}!", ConsoleOnly: true);
+                    logger.Warning("BotMain.cs ClientLog", arg.Exception, LogOnly: true);
+                    break;
+                }
                 case "WebSocket session expired":
                 case "A task was canceled.":
                 {

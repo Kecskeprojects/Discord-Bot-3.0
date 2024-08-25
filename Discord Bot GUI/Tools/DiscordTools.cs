@@ -32,7 +32,7 @@ public static class DiscordTools
     private static async Task<bool> IsOwnerBase(DiscordSocketClient client, ulong userId)
     {
         IApplication application = await client.GetApplicationInfoAsync();
-        return userId != application.Owner.Id;
+        return userId == application.Owner.Id;
     }
 
     public static bool IsAdmin(SocketInteractionContext context)
@@ -113,18 +113,22 @@ public static class DiscordTools
         return false;
     }
 
-    public static async Task<bool> ReConnectBot(SocketCommandContext context, ServerAudioResource audioResource)
+    public static async Task<bool> CheckAndReconnectBotIfNeeded(SocketCommandContext context, ServerAudioResource audioResource)
     {
-        SocketVoiceChannel channel = context.Guild.GetVoiceChannel(audioResource.AudioVariables.FallbackVoiceChannelId);
-
-        audioResource.AudioVariables.AudioClient = await channel.ConnectAsync();
-
-        if (audioResource.AudioVariables.AudioClient != null)
+        SocketGuildUser clientUser = await context.Channel.GetUserAsync(context.Client.CurrentUser.Id) as SocketGuildUser;
+        if (clientUser.VoiceChannel == null)
         {
-            audioResource.AudioVariables.AbruptDisconnect = false;
-            return true;
+            SocketVoiceChannel channel = context.Guild.GetVoiceChannel(audioResource.AudioVariables.FallbackVoiceChannelId);
+
+            audioResource.AudioVariables.AudioClient = await channel.ConnectAsync(disconnect: false);
+
+            if (audioResource.AudioVariables.AudioClient != null)
+            {
+                return true;
+            }
+            return false;
         }
-        return false;
+        return true;
     }
 
     public static List<UserResource> FilterToOnlyServerMembers(SocketCommandContext context, List<UserResource> users)

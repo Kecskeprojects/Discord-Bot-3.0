@@ -9,13 +9,15 @@ using Discord_Bot.Features;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Processors.EmbedProcessors.Audio;
 using Discord_Bot.Resources;
-using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
 using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
 
+[Name("Voice")]
+[Remarks("User")]
+[Summary("Voice channel commands")]
 public class UserVoiceCommands(
     AudioPlayFeature audioPlayFeature,
     AudioRequestFeature audioRequestFeature,
@@ -29,8 +31,8 @@ public class UserVoiceCommands(
     [Command("play")]
     [Alias(["p"])]
     [RequireContext(ContextType.Guild)]
-    [Summary("Play music on the channel the user is connected to")]
-    public async Task Play([Remainder] string content)
+    [Summary("Play music on the channel the you are connected to")]
+    public async Task Play([Name("youtube/spotify link or keyword")][Remainder] string searchparameter)
     {
         try
         {
@@ -42,11 +44,10 @@ public class UserVoiceCommands(
 
             ServerResource server = await GetCurrentServerAsync();
 
-            await audioRequestFeature.Run(Context, content);
+            await audioRequestFeature.Run(Context, searchparameter);
             if (!audioResource.AudioVariables.Playing)
             {
                 audioResource.AudioVariables.Playing = true;
-                audioResource.AudioVariables.AbruptDisconnect = false;
 
                 if (audioResource.MusicRequests.Count > 0)
                 {
@@ -60,34 +61,10 @@ public class UserVoiceCommands(
         }
     }
 
-    #region Voice connection commands
-    [Command("join")]
-    [Alias(["connect", "conn"])]
-    [RequireContext(ContextType.Guild)]
-    [Summary("Joins the bot to the user's voice channel")]
-    public async Task Join()
-    {
-        try
-        {
-            ServerAudioResource audioResource = GetCurrentAudioResource();
-            if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText))
-            {
-                return;
-            }
-
-            ServerResource server = await GetCurrentServerAsync();
-            await DiscordTools.ConnectBot(Context, audioResource, server);
-        }
-        catch (Exception ex)
-        {
-            logger.Error("UserVoiceCommands.cs Join", ex);
-        }
-    }
-
     [Command("leave")]
     [Alias(["disconnect", "disconn", "disc", "dc"])]
     [RequireContext(ContextType.Guild)]
-    [Summary("Leaves the current voice channel")]
+    [Summary("Leaves the voice channel and clears the playlist")]
     public async Task Leave()
     {
         try
@@ -103,22 +80,20 @@ public class UserVoiceCommands(
             IUser clientUser = await Context.Channel.GetUserAsync(Context.Client.CurrentUser.Id);
             await (clientUser as SocketGuildUser).VoiceChannel.DisconnectAsync();
 
-            audioResource.AudioVariables.FFmpeg.Kill();
-            audioResource.AudioVariables.Output.Dispose();
+            audioResource.AudioVariables.CancellationTokenSource.Cancel(false);
         }
         catch (Exception ex)
         {
             logger.Error("UserVoiceCommands.cs Leave", ex);
         }
     }
-    #endregion
 
     #region Playlist related commands
     [Command("queue")]
     [Alias(["q"])]
     [RequireContext(ContextType.Guild)]
-    [Summary("Current music request queue")]
-    public async Task Queue(int index = 1)
+    [Summary("Current music request playlist")]
+    public async Task Queue(int page = 1)
     {
         try
         {
@@ -131,9 +106,9 @@ public class UserVoiceCommands(
             int songcount = audioResource.MusicRequests.Count;
 
             //If queue does not have songs on that page, do not show a queue
-            if (index * 10 <= songcount || ((index - 1) * 10 < songcount && index * 10 >= songcount))
+            if (page * 10 <= songcount || ((page - 1) * 10 < songcount && page * 10 >= songcount))
             {
-                Embed[] embed = AudioQueueEmbedProcessor.CreateEmbed(audioResource, index);
+                Embed[] embed = AudioQueueEmbedProcessor.CreateEmbed(audioResource, page);
 
                 await ReplyAsync(embeds: embed);
             }
@@ -144,10 +119,10 @@ public class UserVoiceCommands(
         }
     }
 
-    [Command("np")]
-    [Alias(["now playing", "nowplaying"])]
+    [Command("now playing")]
+    [Alias(["np", "nowplaying"])]
     [RequireContext(ContextType.Guild)]
-    [Summary("The currently playing song")]
+    [Summary("Data about the currently playing song")]
     public async Task NowPlaying()
     {
         try
@@ -170,7 +145,7 @@ public class UserVoiceCommands(
 
     [Command("clear")]
     [RequireContext(ContextType.Guild)]
-    [Summary("Clear playlist and leave voice channel")]
+    [Summary("Stop currently playing song and clear playlist")]
     public async Task Clear()
     {
         try
@@ -185,8 +160,7 @@ public class UserVoiceCommands(
 
             await Context.Channel.SendMessageAsync("The queue has been cleared!");
 
-            audioResource.AudioVariables.FFmpeg.Kill();
-            audioResource.AudioVariables.Output.Dispose();
+            audioResource.AudioVariables.CancellationTokenSource.Cancel(false);
         }
         catch (Exception ex)
         {
@@ -196,7 +170,7 @@ public class UserVoiceCommands(
 
     [Command("skip")]
     [RequireContext(ContextType.Guild)]
-    [Summary("Skip current song")]
+    [Summary("Stop current song and start playing next one")]
     public async Task Skip()
     {
         try
@@ -209,8 +183,7 @@ public class UserVoiceCommands(
 
             await Context.Channel.SendMessageAsync("Song skipped!");
 
-            audioResource.AudioVariables.FFmpeg.Kill();
-            audioResource.AudioVariables.Output.Dispose();
+            audioResource.AudioVariables.CancellationTokenSource.Cancel(false);
         }
         catch (Exception ex)
         {
@@ -221,7 +194,7 @@ public class UserVoiceCommands(
     [Command("remove")]
     [Alias(["r"])]
     [RequireContext(ContextType.Guild)]
-    [Summary("Removes the song at the given position")]
+    [Summary("Removes the song at the given position in the playlist, can't remove currently playing song")]
     public async Task Remove(int position)
     {
         try

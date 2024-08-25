@@ -1,37 +1,18 @@
 ﻿using Discord.Audio;
-using System;
 using System.Diagnostics;
-using System.IO;
+using System.Threading;
 
 namespace Discord_Bot.Communication;
 
-public class AudioVariables : IDisposable
+public class AudioVariables
 {
-    public bool Playing { get; set; }
-
-    public bool AbruptDisconnect { get; set; }
+    public bool Playing { get; set; } = false;
 
     public ulong FallbackVoiceChannelId { get; set; }
 
     public IAudioClient AudioClient { get; set; }
 
-    public Process FFmpeg { get; set; }
-
-    public Stream Output { get; set; }
-
-    public AudioOutStream Discord { get; set; }
-
     public Stopwatch Stopwatch { get; set; }
 
-    public AudioVariables()
-    {
-        AbruptDisconnect = false;
-        Playing = false;
-    }
-
-    public void Dispose()
-    {
-        FFmpeg.Dispose();
-        Output.Dispose();
-    }
+    public CancellationTokenSource CancellationTokenSource { get; set; }
 }

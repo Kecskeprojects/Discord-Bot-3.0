@@ -6,6 +6,7 @@ using Discord_Bot.Interfaces.Services;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
@@ -17,51 +18,42 @@ public class YoutubeStreamService(Config config, BotLogger logger) : IYoutubeDow
 
     public async Task StreamAsync(ServerAudioResource audioResource, string url)
     {
+        Process ffmpeg = CreateYoutubeStream(url);
         try
         {
-            audioResource.AudioVariables.FFmpeg = CreateYoutubeStream(url);
-            audioResource.AudioVariables.Output = audioResource.AudioVariables.FFmpeg.StandardOutput.BaseStream;
-
             audioResource.AudioVariables.Stopwatch = Stopwatch.StartNew();
+            audioResource.AudioVariables.CancellationTokenSource = new();
 
             //Audio streaming
-            using (audioResource.AudioVariables.Discord = audioResource.AudioVariables.AudioClient.CreatePCMStream(AudioApplication.Mixed, config.Bitrate, 3000))
+            using (AudioOutStream stream = audioResource.AudioVariables.AudioClient.CreatePCMStream(AudioApplication.Mixed, config.Bitrate, 3000))
             {
                 logger.Log("Audio stream starting!");
-
-                await audioResource.AudioVariables.Output.CopyToAsync(audioResource.AudioVariables.Discord);
-                await audioResource.AudioVariables.Discord.FlushAsync();
+                await ffmpeg.StandardOutput.BaseStream.CopyToAsync(stream, audioResource.AudioVariables.CancellationTokenSource.Token);
+                await stream.FlushAsync();
             };
-
-            audioResource.AudioVariables.FFmpeg.WaitForExit();
         }
-        //Exception thrown with current version of skipping song
-        catch (ObjectDisposedException)
-        {
-            logger.Log("Exception throw when skipping song!");
-        }
-        //Exception thrown when bot abruptly leaves voice channel
+        //Exception thrown with current version of skipping song or bot disconnecting from channel
         catch (OperationCanceledException ex)
         {
             logger.Log("Exception thrown when audio stream is cancelled!");
             logger.Warning("YoutubeStreamService.cs StreamAsync", ex, LogOnly: true);
 
-            audioResource.AudioVariables.FFmpeg.Kill();
-            audioResource.AudioVariables.AbruptDisconnect = true;
+            ffmpeg?.Kill();
         }
         catch (Exception ex)
         {
             logger.Error("YoutubeStreamService.cs StreamAsync", ex);
         }
-
-        if (!audioResource.AudioVariables.FFmpeg.HasExited)
+        finally
         {
-            audioResource.AudioVariables.FFmpeg.WaitForExit();
-        }
-        audioResource.AudioVariables.Stopwatch.Stop();
+            if (ffmpeg?.HasExited == false)
+            {
+                ffmpeg?.WaitForExit(new TimeSpan(0, 1, 0));
+            }
+            audioResource.AudioVariables.Stopwatch?.Stop();
 
-        logger.Log("Audio stream finished!");
-        return;
+            logger.Log("Audio stream finished!");
+        }
     }
 
     //Use yt-dlp and ffmpeg to stream audio from youtube to discord
