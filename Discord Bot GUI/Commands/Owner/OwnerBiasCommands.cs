@@ -80,22 +80,6 @@ public class OwnerBiasCommands(
         }
     }
 
-    [Command("manual update bias")]
-    [Alias(["manual update idol", "mass update bias", "mass update idol"])]
-    [RequireOwner]
-    [Summary("Start update process of extended information for idols")]
-    public async Task ManualUpdateBias()
-    {
-        try
-        {
-            await biasScrapingProcessor.RunUpdateBiasDataAsync();
-        }
-        catch (Exception ex)
-        {
-            logger.Error("OwnerBiasCommands.cs ManualUpdateBias", ex);
-        }
-    }
-
     [Command("edit biasdata")]
     [Alias(["editbiasdata", "edit bias data", "edit bias", "editbias", "editidol", "edit idol", "editidoldata", "edit idol data", "edit idoldata"])]
     [RequireOwner]
@@ -130,6 +114,22 @@ public class OwnerBiasCommands(
         catch (Exception ex)
         {
             logger.Error("OwnerBiasCommands.cs EditBiasData", ex);
+        }
+    }
+
+    [Command("manual update bias")]
+    [Alias(["manual update idol", "mass update bias", "mass update idol"])]
+    [RequireOwner]
+    [Summary("Start update process of extended information for idols")]
+    public async Task ManualUpdateBias()
+    {
+        try
+        {
+            await biasScrapingProcessor.RunUpdateBiasDataAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.Error("OwnerBiasCommands.cs ManualUpdateBias", ex);
         }
     }
 }

@@ -26,7 +26,7 @@ public class HelpEmbedProcessor
 
         foreach (ModuleInfo module in modules)
         {
-            builder.AddField(module.Name, module.Summary, true);
+            builder.AddField(module.Name, module.Summary);
         }
 
         builder.WithThumbnailUrl(imageUrl);
