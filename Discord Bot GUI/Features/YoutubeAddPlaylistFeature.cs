@@ -17,7 +17,7 @@ public class YoutubeAddPlaylistFeature(DiscordSocketClient client, IServerServic
     {
         try
         {
-            ulong channelId = Parameters;
+            ulong channelId = (ulong) Parameters;
             IMessageChannel channel = client.GetChannel(channelId) as IMessageChannel;
             IUserMessage message = await channel.SendMessageAsync("You requested a song from a playlist!\n Do you want to me to add the playlist to the queue?");
             await message.AddReactionAsync(new Emoji("\U00002705"));

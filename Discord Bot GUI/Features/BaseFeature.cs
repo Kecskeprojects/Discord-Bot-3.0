@@ -9,14 +9,13 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 //Todo: after reorganizing, check if anything in especially the longer features can be moved into tools, processors, etc...
-//Todo: Replace dynamic with object
 public abstract class BaseFeature(IServerService serverService, BotLogger logger)
 {
     protected readonly IServerService serverService = serverService;
     protected readonly BotLogger logger = logger;
 
     protected SocketCommandContext Context { get; private set; }
-    protected dynamic Parameters { get; private set; }
+    protected object Parameters { get; private set; }
 
     public async Task<bool> Run()
     {
@@ -30,14 +29,14 @@ public abstract class BaseFeature(IServerService serverService, BotLogger logger
         return await ExecuteCoreLogicAsync();
     }
 
-    public async Task<bool> Run(dynamic parameters)
+    public async Task<bool> Run(object parameters)
     {
         Parameters = parameters;
 
         return await ExecuteCoreLogicAsync();
     }
 
-    public async Task<bool> Run(SocketCommandContext context, dynamic parameters)
+    public async Task<bool> Run(SocketCommandContext context, object parameters)
     {
         Context = context;
         Parameters = parameters;

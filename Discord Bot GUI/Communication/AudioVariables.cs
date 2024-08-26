@@ -1,11 +1,14 @@
 ﻿using Discord.Audio;
+using System;
 using System.Diagnostics;
 using System.Threading;
 
 namespace Discord_Bot.Communication;
 
-public class AudioVariables
+public class AudioVariables : IDisposable
 {
+    private bool _isDisposed;
+
     public bool Playing { get; set; } = false;
 
     public ulong FallbackVoiceChannelId { get; set; }
@@ -15,4 +18,18 @@ public class AudioVariables
     public Stopwatch Stopwatch { get; set; }
 
     public CancellationTokenSource CancellationTokenSource { get; set; }
+
+    public void Dispose()
+    {
+        if (!_isDisposed)
+        {
+            AudioClient.Dispose();
+            _isDisposed = true;
+        }
+    }
+
+    ~AudioVariables()
+    {
+        Dispose();
+    }
 }

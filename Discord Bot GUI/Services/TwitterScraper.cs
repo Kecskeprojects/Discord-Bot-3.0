@@ -25,29 +25,31 @@ public class TwitterScraper(BotLogger logger, BrowserService browserService) : I
     {
         try
         {
-            IPage mainPage = await browserService.NewPage();
-            mainPage.Response += TwitterScraperResponse;
-
             TwitterScrapingResult result = new();
 
-            string messages = "";
-            for (int i = 0; i < uris.Count; i++)
+            using (IPage mainPage = await browserService.NewPage())
             {
-                Body = null;
-                string mess = await ExtractFromUrl(mainPage, uris[i], uris.Count == 1, result);
-                if (uris.Count > 1 && mess != "")
+                mainPage.Response += TwitterScraperResponse;
+
+                string messages = "";
+                for (int i = 0; i < uris.Count; i++)
                 {
-                    messages += $"\n#{i + 1} ";
+                    Body = null;
+                    string mess = await ExtractFromUrl(mainPage, uris[i], uris.Count == 1, result);
+                    if (uris.Count > 1 && mess != "")
+                    {
+                        messages += $"\n#{i + 1} ";
+                    }
+                    if (mess != "")
+                    {
+                        messages += $"Link could not be embedded:\n{mess}";
+                    }
                 }
-                if (mess != "")
-                {
-                    messages += $"Link could not be embedded:\n{mess}";
-                }
+
+                await mainPage.CloseAsync();
+
+                result.ErrorMessage = messages;
             }
-
-            await mainPage.CloseAsync();
-
-            result.ErrorMessage = messages;
             return result;
         }
         catch (Exception ex)

@@ -15,22 +15,23 @@ public class TwitchCLI(BotLogger logger) : ITwitchCLI
     //Responsible for generating the access tokens to Twitch's api requests
     public string GenerateToken()
     {
-        Process process = new()
+        ProcessStartInfo twitchcli = new()
         {
-            StartInfo = new ProcessStartInfo()
-            {
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                FileName = "cmd.exe",
-                Arguments = "/C twitch.exe token",
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-                WorkingDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Dependencies")
-            }
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            FileName = "cmd.exe",
+            Arguments = "/C twitch.exe token",
+            RedirectStandardError = true,
+            RedirectStandardOutput = true,
+            WorkingDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Dependencies")
         };
-        process.Start();
-        string response = process.StandardError.ReadToEnd();
-        process.WaitForExit();
+
+        string response = "";
+        using (Process process = Process.Start(twitchcli))
+        {
+            response = process.StandardError.ReadToEnd();
+            process.WaitForExit();
+        }
 
         response = response.Substring(response.IndexOf("Token: ") + 7, 30);
         logger.Query($"Twitch API token: {response}");

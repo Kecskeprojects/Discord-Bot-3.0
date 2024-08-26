@@ -3,7 +3,7 @@ using Discord_Bot.Resources;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Processors.EmbedProcessors;
-internal class KeywordListEmbedProcessor
+public class KeywordListEmbedProcessor
 {
     public static Embed[] CreateEmbed(string serverName, List<KeywordResource> keywords)
     {

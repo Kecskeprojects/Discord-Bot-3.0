@@ -44,7 +44,10 @@ public static class InstagramMessageProcessor
     {
         if (attachments.Count > 0)
         {
-            attachments.ForEach(x => x.Dispose());
+            foreach (FileAttachment item in attachments)
+            {
+                item.Dispose();
+            }
             attachments.Clear();
         }
 

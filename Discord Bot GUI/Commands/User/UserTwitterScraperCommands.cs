@@ -106,6 +106,7 @@ public class UserTwitterScraperCommands(
                     {
                         item.Dispose();
                     }
+                    attachments.Clear();
                 }
             }
         }

@@ -364,8 +364,8 @@ public class UserLastfmCommands(
                     {
                         await ReplyAsync(embeds: embed.Embed);
                     }
-                    return;
                 }
+                return;
             }
             await ReplyAsync(wk.Message);
         }

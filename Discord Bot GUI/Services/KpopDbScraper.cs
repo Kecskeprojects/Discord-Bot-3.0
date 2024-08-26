@@ -23,20 +23,21 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
         List<ExtendedBiasData> biasDataList = [];
         try
         {
-            IPage mainPage = await browserService.NewPage();
-
-            IDocument document = await GetPageAndSetSettingsAsync(mainPage);
-
-            IElement table = document.QuerySelector("#table_1>tbody");
-
-            IHtmlCollection<IElement> rows = table.GetElementsByTagName("tr");
-
-            foreach (IElement row in rows)
+            using (IBrowsingContext context = BrowsingContext.New(Configuration.Default))
+            using (IPage mainPage = await browserService.NewPage())
+            using (IDocument document = await GetPageAndSetSettingsAsync(context, mainPage))
             {
-                biasDataList.Add(new ExtendedBiasData(row));
-            }
+                IElement table = document.QuerySelector("#table_1>tbody");
 
-            await mainPage.CloseAsync();
+                IHtmlCollection<IElement> rows = table.GetElementsByTagName("tr");
+
+                foreach (IElement row in rows)
+                {
+                    biasDataList.Add(new ExtendedBiasData(row));
+                }
+
+                await mainPage.CloseAsync();
+            }
         }
         catch (NavigationException ex)
         {
@@ -50,7 +51,7 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
         return biasDataList;
     }
 
-    private static async Task<IDocument> GetPageAndSetSettingsAsync(IPage page)
+    private static async Task<IDocument> GetPageAndSetSettingsAsync(IBrowsingContext context, IPage page)
     {
         await page.DeleteCookieAsync();
         try
@@ -72,8 +73,7 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
         await page.WaitForSelectorAsync("#table_1_length .dropdown-menu", new WaitForSelectorOptions() { Hidden = true, Timeout = 0 });
 
         string content = await page.GetContentAsync();
-
-        IBrowsingContext context = BrowsingContext.New(Configuration.Default);
+;
         IDocument document = await context.OpenAsync(req => req.Content(content));
         return document;
     }
@@ -83,24 +83,24 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
         AdditionalIdolData idolData = null;
         try
         {
-            IPage mainPage = await browserService.NewPage();
-
-            Uri uri = new(url);
-            IDocument document = await GetPageByUrl(mainPage, uri, url.StartsWith(Constant.KProfilesBaseUrl));
-
-            //A profile link could lead to dbkpop or kprofiles
-            idolData = new();
-            if (!url.StartsWith(Constant.KProfilesBaseUrl))
+            using (IBrowsingContext context = BrowsingContext.New(Configuration.Default))
+            using (IPage mainPage = await browserService.NewPage())
+            using (IDocument document = await GetPageByUrl(context, mainPage, new Uri(url), url.StartsWith(Constant.KProfilesBaseUrl)))
             {
-                idolData.ImageUrl = document.QuerySelector(".attachment-post-thumbnail")?.GetAttribute("src");
-                await ScrapeGroupData(idolData, mainPage, document, getGroupData);
-            }
-            else
-            {
-                idolData.ImageUrl = document.QuerySelector(".entry-content img")?.GetAttribute("src");
-            }
+                //A profile link could lead to dbkpop or kprofiles
+                idolData = new();
+                if (!url.StartsWith(Constant.KProfilesBaseUrl))
+                {
+                    idolData.ImageUrl = document.QuerySelector(".attachment-post-thumbnail")?.GetAttribute("src");
+                    await ScrapeGroupData(context, mainPage, document, idolData, getGroupData);
+                }
+                else
+                {
+                    idolData.ImageUrl = document.QuerySelector(".entry-content img")?.GetAttribute("src");
+                }
 
-            await mainPage.CloseAsync();
+                await mainPage.CloseAsync();
+            }
         }
         catch (NavigationException ex)
         {
@@ -112,7 +112,7 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
         }
         return idolData;
     }
-    private static async Task ScrapeGroupData(AdditionalIdolData data, IPage page, IDocument document, bool getGroupData)
+    private static async Task ScrapeGroupData(IBrowsingContext context, IPage page, IDocument document, AdditionalIdolData data, bool getGroupData)
     {
         IHtmlCollection<IElement> groups = document.QuerySelectorAll($"li>a[href*=\"{Constant.DbKpopBaseUrl.UrlCombine("group")}\"]");
         string groupUrl = "";
@@ -124,7 +124,7 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
 
         if (getGroupData && !string.IsNullOrEmpty(groupUrl))
         {
-            document = await GetPageByUrl(page, new Uri(groupUrl), false);
+            document = await GetPageByUrl(context, page, new Uri(groupUrl), false);
             IHtmlCollection<IElement> details = document.QuerySelectorAll(".wpb-content-wrapper .vc_sw-align-left");
             if (details.Length >= 3)
             {
@@ -136,7 +136,7 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
     }
 
     #region Helper Methods
-    private static async Task<IDocument> GetPageByUrl(IPage page, Uri uri, bool isKprofiles)
+    private static async Task<IDocument> GetPageByUrl(IBrowsingContext context, IPage page, Uri uri, bool isKprofiles)
     {
         await page.DeleteCookieAsync();
         try
@@ -149,7 +149,6 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
 
         string content = await page.GetContentAsync();
 
-        IBrowsingContext context = BrowsingContext.New(Configuration.Default);
         IDocument document = await context.OpenAsync(req => req.Content(content));
         return document;
     }

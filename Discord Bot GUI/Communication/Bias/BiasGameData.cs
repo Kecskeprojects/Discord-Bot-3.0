@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 
 namespace Discord_Bot.Communication.Bias;
-//Todo: These functions do not necessarily belong here, or if they do, this file should be moved to some other place
 public class BiasGameData : IDisposable
 {
     public BiasGameData(ulong userId)
@@ -15,6 +14,8 @@ public class BiasGameData : IDisposable
         UserId = userId;
         Resource.winner_bracket.Save(WinnerBracket, System.Drawing.Imaging.ImageFormat.Png);
     }
+
+    private bool _isDisposed;
 
     public ulong UserId { get; private set; }
     public DateTime StartedAt { get; private set; } = DateTime.UtcNow;
@@ -32,15 +33,6 @@ public class BiasGameData : IDisposable
     public MemoryStream WinnerBracket { get; set; } = new MemoryStream();
 
     public ulong MessageId { get; set; }//This is only stored so if the game is stopped, the embed can be deleted
-
-    public void SetGender(GenderEnum gender)
-    {
-        Gender = gender == GenderEnum.Female ?
-            GenderEnum.Female :
-            gender == GenderEnum.Male ?
-                GenderEnum.Male :
-                GenderEnum.NotSpecified;
-    }
 
     public void SetDebut(string[] chosenYears)
     {
@@ -82,10 +74,19 @@ public class BiasGameData : IDisposable
 
     public void Dispose()
     {
-        WinnerBracket.Dispose();
-        foreach (KeyValuePair<int, FileAttachment> item in IdolWithImage)
+        if (!_isDisposed)
         {
-            item.Value.Dispose();
+            WinnerBracket.Dispose();
+            foreach (KeyValuePair<int, FileAttachment> item in IdolWithImage)
+            {
+                item.Value.Dispose();
+            }
+            _isDisposed = true;
         }
+    }
+
+    ~BiasGameData()
+    {
+        Dispose();
     }
 }

@@ -31,9 +31,12 @@ public class InstaLoader(BotLogger logger) : IInstaLoader
                 WorkingDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Dependencies\\Instagram")
             };
             logger.Log("Downloading images");
-            Process process = Process.Start(instaloader);
-            errorDuringDownload = process.StandardError.ReadToEnd();
-            process.WaitForExit();
+            using (Process process = Process.Start(instaloader))
+            {
+                errorDuringDownload = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+            }
+
             return errorDuringDownload;
         }
         catch (Exception ex)

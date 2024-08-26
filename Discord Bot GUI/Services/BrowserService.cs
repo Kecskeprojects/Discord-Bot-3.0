@@ -11,7 +11,7 @@ public class BrowserService(BotLogger logger, Config config)
     private readonly BotLogger logger = logger;
     private readonly Config config = config;
     private IBrowser Browser { get; set; }
-    public async Task OpenBroser()
+    public async Task OpenBrowser()
     {
         BrowserFetcher browserFetcher = new(SupportedBrowser.Chrome);
         await browserFetcher.DownloadAsync(PuppeteerSharp.BrowserData.Chrome.DefaultBuildId); //117.0.5938.62 is the last version where videos were sent as media http responses
@@ -38,6 +38,7 @@ public class BrowserService(BotLogger logger, Config config)
         if (Browser != null && !Browser.IsClosed)
         {
             await Browser.CloseAsync();
+            Browser.Dispose();
             logger.Log("Browser closed!");
         }
     }
@@ -46,7 +47,7 @@ public class BrowserService(BotLogger logger, Config config)
     {
         if (Browser == null || Browser.IsClosed)
         {
-            await OpenBroser();
+            await OpenBrowser();
         }
 
         IPage[] pages = await Browser.PagesAsync();
@@ -56,7 +57,7 @@ public class BrowserService(BotLogger logger, Config config)
 
         Dictionary<string, string> headers = new()
             {
-                //{ "user-agent", $"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{PuppeteerSharp.BrowserData.Chrome.DefaultBuildId} Safari/537.36" },
+                //{ "user-agent", $"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{PuppeteerSharp.BrowserData.Chrome.DefaultBuildId} Safari/537.36" }, //Twitter doesn't work properly with user agent header
                 { "upgrade-insecure-requests", "1" },
                 { "accept", "text/html,application/xhtml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3" },
                 { "accept-encoding", "gzip, deflate, br" },

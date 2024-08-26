@@ -6,6 +6,7 @@ using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -38,8 +39,8 @@ public class BonkGifProcessor(BotLogger logger)
                 winter1.Mutate(x => x.Resize(width, height));
 
                 // For demonstration: use images with different colors.
-                Image[] images = [null, null];
-                Image[] winterFrame = [winter0, winter1];
+                List<Image> images = [null, null];
+                List<Image> winterFrame = [winter0, winter1];
                 for (int i = 0; i < 2; i++)
                 {
                     Image background = new Image<Rgba32>(width, height, new Rgba32(1, 1, 1, 0.5f));
@@ -57,7 +58,7 @@ public class BonkGifProcessor(BotLogger logger)
 
                 // Set the delay until the next image is displayed.
                 GifFrameMetadata metadata = gif.Frames.RootFrame.Metadata.GetGifMetadata();
-                for (int i = 0; i < images.Length; i++)
+                for (int i = 0; i < images.Count; i++)
                 {
                     // Set the delay until the next image is displayed.
                     metadata = images[i].Frames.RootFrame.Metadata.GetGifMetadata();
@@ -68,11 +69,22 @@ public class BonkGifProcessor(BotLogger logger)
                     gif.Frames.AddFrame(images[i].Frames.RootFrame);
                 }
                 gif.Frames.RemoveFrame(0);
-                images.ToList().ForEach(x => x.Dispose());
 
                 // Save the final result.
                 MemoryStream gifStream = new();
                 gif.SaveAsGif(gifStream);
+
+                foreach (Image item in images)
+                {
+                    item.Dispose();
+                }
+                images.Clear();
+
+                foreach (Image item in winterFrame)
+                {
+                    item.Dispose();
+                }
+                winterFrame.Clear();
 
                 return gifStream;
             }

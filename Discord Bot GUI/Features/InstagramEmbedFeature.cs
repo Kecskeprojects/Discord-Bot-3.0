@@ -96,7 +96,10 @@ public class InstagramEmbedFeature(IInstaLoader instaLoader, IServerService serv
 
         if (result.HasFileDownloadHappened)
         {
-            attachments.ForEach(x => x.Dispose());
+            foreach (FileAttachment item in attachments)
+            {
+                item.Dispose();
+            }
             attachments.Clear();
             Directory.Delete(Path.Combine(Directory.GetCurrentDirectory(), $"Dependencies\\Instagram\\{postId}"), true);
         }

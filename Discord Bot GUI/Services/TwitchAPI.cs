@@ -1,4 +1,5 @@
-﻿using Discord_Bot.Core;
+﻿using Discord_Bot.Communication;
+using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Features;
 using Discord_Bot.Interfaces.DBServices;
@@ -112,7 +113,13 @@ public class TwitchAPI(
                     !channelStatus &&
                     channel.TwitchId == e.Stream.UserId)
                 {
-                    await twitchNotificationFeature.Run(new { TwitchChannel = channel, e.Stream.ThumbnailUrl, e.Stream.Title });
+                    TwitchNotificationData data = new()
+                    {
+                        TwitchChannel = channel,
+                        ThumbnailUrl = e.Stream.ThumbnailUrl,
+                        Title = e.Stream.Title
+                    };
+                    await twitchNotificationFeature.Run(data);
                     channelStatuses[channel.TwitchId] = true;
                 }
             }

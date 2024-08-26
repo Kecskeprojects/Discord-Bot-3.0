@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
@@ -20,21 +21,19 @@ public class TwitchNotificationFeature(DiscordSocketClient client, IServerServic
     {
         try
         {
-            TwitchChannelResource twitchChannel = Parameters.TwitchChannel;
-            string thumbnailUrl = Parameters.ThumbnailUrl;
-            string title = Parameters.Title;
+            TwitchNotificationData data = (TwitchNotificationData) Parameters;
 
-            ServerResource server = await serverService.GetByDiscordIdAsync(twitchChannel.ServerDiscordId);
+            ServerResource server = await serverService.GetByDiscordIdAsync(data.TwitchChannel.ServerDiscordId);
 
             //Do not send a message if a channel was not set
             if (server.SettingsChannels.TryGetValue(ChannelTypeEnum.TwitchNotificationText, out List<ulong> notificationChannels))
             {
                 foreach (ulong channelId in notificationChannels)
                 {
-                    Embed[] embed = TwitchNotificationEmbedProcessor.CreateEmbed(twitchChannel, thumbnailUrl, title);
+                    Embed[] embed = TwitchNotificationEmbedProcessor.CreateEmbed(data.TwitchChannel, data.ThumbnailUrl, data.Title);
 
                     //If there is no notification role set on the server, we just send a message without the role ping
-                    string notifRole = !NumberTools.IsNullOrZero(twitchChannel.NotificationRoleDiscordId) ? $"<@&{twitchChannel.NotificationRoleDiscordId}>" : "";
+                    string notifRole = !NumberTools.IsNullOrZero(data.TwitchChannel.NotificationRoleDiscordId) ? $"<@&{data.TwitchChannel.NotificationRoleDiscordId}>" : "";
 
                     if (client.GetChannel(channelId) is not IMessageChannel channel)
                     {

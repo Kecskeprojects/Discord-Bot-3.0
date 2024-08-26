@@ -20,8 +20,8 @@ public class AudioRequestFeature(IYoutubeAPI youtubeAPI, ISpotifyAPI spotifyAPI,
     {
         try
         {
-            string input = Parameters;
-            if (input == "" || (Context.User as SocketGuildUser).VoiceChannel == null)
+            string input = (string) Parameters;
+            if (string.IsNullOrEmpty(input) || (Context.User as SocketGuildUser).VoiceChannel == null)
             {
                 return false;
             }

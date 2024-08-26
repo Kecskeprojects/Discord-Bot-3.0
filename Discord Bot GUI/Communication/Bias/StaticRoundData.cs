@@ -1,5 +1,4 @@
 ﻿namespace Discord_Bot.Communication.Bias;
-//Todo: These functions do not necessarily belong here, or if they do, this file should be moved to some other place
 public class StaticRoundData(int baseLeftX, int baseRightX, int baseDiagonal, int baseY, int spacing, int totalPositions)
 {
     public int BaseLeftX { get; set; } = baseLeftX;
