@@ -11,7 +11,11 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
-public class AudioRequestFeature(IYoutubeAPI youtubeAPI, ISpotifyAPI spotifyAPI, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
+public class AudioRequestFeature(
+    IYoutubeAPI youtubeAPI,
+    ISpotifyAPI spotifyAPI,
+    IServerService serverService,
+    BotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IYoutubeAPI youtubeAPI = youtubeAPI;
     private readonly ISpotifyAPI spotifyAPI = spotifyAPI;

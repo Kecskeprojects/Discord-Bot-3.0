@@ -9,7 +9,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 
-public class YoutubeAddPlaylistFeature(DiscordSocketClient client, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
+public class YoutubeAddPlaylistFeature(
+    DiscordSocketClient client,
+    IServerService serverService,
+    BotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly DiscordSocketClient client = client;
 
@@ -42,7 +45,7 @@ public class YoutubeAddPlaylistFeature(DiscordSocketClient client, IServerServic
         }
         catch (Exception ex)
         {
-            logger.Error("YoutubeAddPlaylistFeature.cs Run", ex);
+            logger.Error("YoutubeAddPlaylistFeature.cs ExecuteCoreLogicAsync", ex);
         }
         return false;
     }

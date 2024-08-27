@@ -11,7 +11,12 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 
-public class EasterEggFeature(IKeywordService keywordService, IGreetingService greetingService, DiscordSocketClient client, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
+public class EasterEggFeature(
+    IKeywordService keywordService,
+    IGreetingService greetingService,
+    DiscordSocketClient client,
+    IServerService serverService,
+    BotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IKeywordService keywordService = keywordService;
     private readonly IGreetingService greetingService = greetingService;

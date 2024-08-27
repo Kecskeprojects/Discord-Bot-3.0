@@ -13,7 +13,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 
-public class TwitchNotificationFeature(DiscordSocketClient client, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
+public class TwitchNotificationFeature(
+    DiscordSocketClient client,
+    IServerService serverService,
+    BotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly DiscordSocketClient client = client;
 
@@ -47,7 +50,7 @@ public class TwitchNotificationFeature(DiscordSocketClient client, IServerServic
         }
         catch (Exception ex)
         {
-            logger.Error("TwitchNotificationFeature.cs Run", ex);
+            logger.Error("TwitchNotificationFeature.cs ExecuteCoreLogicAsync", ex);
             return false;
         }
         return true;

@@ -11,7 +11,11 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
-public class UnmuteFeature(IServerMutedUserService serverMutedUserService, DiscordSocketClient client, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
+public class UnmuteFeature(
+    IServerMutedUserService serverMutedUserService,
+    DiscordSocketClient client,
+    IServerService serverService,
+    BotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IServerMutedUserService serverMutedUserService = serverMutedUserService;
     private readonly DiscordSocketClient client = client;

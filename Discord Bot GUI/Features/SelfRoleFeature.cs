@@ -9,7 +9,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 
-public class SelfRoleFeature(IRoleService roleService, IServerService serverService, BotLogger logger) : BaseFeature(serverService, logger)
+public class SelfRoleFeature(
+    IRoleService roleService,
+    IServerService serverService,
+    BotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IRoleService roleService = roleService;
 

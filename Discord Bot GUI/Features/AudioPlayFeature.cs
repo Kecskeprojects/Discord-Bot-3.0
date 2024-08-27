@@ -13,8 +13,8 @@ using System.Xml;
 namespace Discord_Bot.Features;
 public class AudioPlayFeature(
     IYoutubeDownloadService youtubeDownloadService,
-    IServerService serverService,
     Config config,
+    IServerService serverService,
     BotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IYoutubeDownloadService youtubeStreamService = youtubeDownloadService;
@@ -26,7 +26,7 @@ public class AudioPlayFeature(
         {
             while (audioResource.MusicRequests.Count > 0)
             {
-                VoiceConnectionResultEnum connectResult = await CheckAndReconnectBotIfNeeded(Context, audioResource);
+                VoiceConnectionResultEnum connectResult = await CheckAndReconnectBotIfNeededAsync(Context, audioResource);
                 logger.Log($"Voice connection result: {connectResult}");
                 switch (connectResult)
                 {
@@ -88,7 +88,7 @@ public class AudioPlayFeature(
         return true;
     }
 
-    public async Task<VoiceConnectionResultEnum> CheckAndReconnectBotIfNeeded(SocketCommandContext context, ServerAudioResource audioResource)
+    public async Task<VoiceConnectionResultEnum> CheckAndReconnectBotIfNeededAsync(SocketCommandContext context, ServerAudioResource audioResource)
     {
         SocketGuildUser clientUser = await Context.Channel.GetUserAsync(Context.Client.CurrentUser.Id) as SocketGuildUser;
         VoiceConnectionResultEnum result = VoiceConnectionResultEnum.AlreadyConnected;
