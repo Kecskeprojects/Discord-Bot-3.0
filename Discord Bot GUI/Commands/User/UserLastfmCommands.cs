@@ -94,7 +94,7 @@ public class UserLastfmCommands(
     [Command("lf tal")]
     [Alias(["lf top albums", "lf top album", "lf topalbums", "lf topalbum"])]
     [Summary("Get your top listened albums\n*overall, 7day, 1month, 3month, 6month, 12month")]
-    public async Task LfTopAlbum([Name("length(1 to 30)  period*")] params string[] parameters)
+    public async Task LfTopAlbum([Name("period*  length(1 to 30)")] params string[] parameters)
     {
         try
         {
@@ -131,7 +131,7 @@ public class UserLastfmCommands(
     [Command("lf tar")]
     [Alias(["lf top artists", "lf top artist", "lf topartist", "lf topartists"])]
     [Summary("Get your top listened artists\n*overall, 7day, 1month, 3month, 6month, 12month")]
-    public async Task LfTopArtist([Name("length(1 to 30)  period*")] params string[] parameters)
+    public async Task LfTopArtist([Name("period*  length(1 to 30)")] params string[] parameters)
     {
         try
         {
@@ -168,7 +168,7 @@ public class UserLastfmCommands(
     [Command("lf tt")]
     [Alias(["lf top tracks", "lf top track", "lf toptracks", "lf toptrack"])]
     [Summary("Get your top listened tracks\n*overall, 7day, 1month, 3month, 6month, 12month")]
-    public async Task LfTopTrack([Name("length(1 to 30)  period*")] params string[] parameters)
+    public async Task LfTopTrack([Name("period*  length(1 to 30)")] params string[] parameters)
     {
         try
         {

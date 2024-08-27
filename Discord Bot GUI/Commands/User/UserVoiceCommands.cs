@@ -32,7 +32,7 @@ public class UserVoiceCommands(
     [Alias(["p"])]
     [RequireContext(ContextType.Guild)]
     [Summary("Play music on the channel you are connected to")]
-    public async Task Play([Name("youtube/spotify link or keyword")][Remainder] string searchparameter)
+    public async Task Play([Name("youtube/spotify link/search keywords")][Remainder] string searchparameter)
     {
         try
         {

@@ -169,6 +169,7 @@ public class CommandHandler(
                 case null:
                     break;
                 case CommandError.UnmetPrecondition:
+                case CommandError.ObjectNotFound:
                 {
                     await context.Channel.SendMessageAsync(result.ErrorReason);
                     break;

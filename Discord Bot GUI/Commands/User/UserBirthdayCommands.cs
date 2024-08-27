@@ -28,7 +28,7 @@ public class UserBirthdayCommands(
     [Command("birthday add")]
     [RequireContext(ContextType.Guild)]
     [Summary("Adding your birthday to be reminded about on a given server\n*Most date separators accepted using year/month/day order")]
-    public async Task BirthdayAdd([Name("date*")] string dateString)
+    public async Task BirthdayAdd([Name("date*")][Remainder] string dateString)
     {
         try
         {

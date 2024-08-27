@@ -10,7 +10,6 @@ using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.Twitch;
 using Discord_Bot.Tools;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
@@ -54,32 +53,24 @@ public class AdminServerSettingCommands(
     [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Set/add a type of channel for setting up/limiting other features")]
-    public async Task ChannelAdd([Name("channel type")] string channeltype = "", [Name("channel name")][Remainder] string channelname = "")
+    public async Task ChannelAdd([Name("channel type")] string channeltype = "", [Name("channel name")] IChannel channel = null)
     {
         try
         {
-            if (channeltype == "" && channelname == "")
+            if (channeltype == "")
             {
                 await ReplyAsync($"Current types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
-                return;
-            }
-
-            if (channelname == "")
-            {
-                return;
-            }
-
-            IMessageChannel channel = Context.Guild.TextChannels.Where(x => x.Name.Equals(channelname.Trim(), StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-
-            if (channel == null)
-            {
-                await ReplyAsync("Channel not found!");
                 return;
             }
 
             if (!ChannelTypeEnumTools.TryGetEnumFromCommandText(channeltype, out ChannelTypeEnum? channelTypeEnum))
             {
                 await ReplyAsync($"Channel type does not currently exist.\nCurrent types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
+                return;
+            }
+
+            if (channel == null)
+            {
                 return;
             }
 
@@ -105,12 +96,12 @@ public class AdminServerSettingCommands(
     [Command("channel remove")]
     [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
-    [Summary("Remove one or all set channels of a type")]
-    public async Task ChannelRemove([Name("channel type")] string channeltype = "", [Name("channel name")][Remainder] string channelname = "all")
+    [Summary("Remove one or all set channels of a type\n*If no channel is given, all of given type will be removed")]
+    public async Task ChannelRemove([Name("channel type")] string channeltype = "", [Name("channel name*")] IChannel channel = null)
     {
         try
         {
-            if (channeltype == "" && channelname == "all")
+            if (channeltype == "")
             {
                 await ReplyAsync($"Current types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
                 return;
@@ -123,20 +114,13 @@ public class AdminServerSettingCommands(
             }
 
             DbProcessResultEnum result;
-            if (channelname == "all")
+            if (channel == null)
             {
                 //Removess every channel of a type that relates to the server, removes server from cache
                 result = await channelService.RemoveSettingChannelsAsync(Context.Guild.Id, channelTypeEnum.Value);
             }
             else
             {
-                IMessageChannel channel = Context.Guild.TextChannels.Where(x => x.Name.Equals(channelname.Trim(), StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-
-                if (channel == null)
-                {
-                    await ReplyAsync("Channel not found!");
-                }
-
                 //Removes the given channel of the given type from the settings for the server, removes server from cache
                 result = await channelService.RemovelSettingChannelAsync(Context.Guild.Id, channelTypeEnum.Value, channel.Id);
             }
@@ -159,16 +143,10 @@ public class AdminServerSettingCommands(
     [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Add the role that will be notified upon any channel going online")]
-    public async Task TwitchRoleAdd([Name("role name")][Remainder] string rolename)
+    public async Task TwitchRoleAdd([Name("role name")] IRole role)
     {
         try
         {
-            IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(rolename, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-            if (role == null)
-            {
-                await ReplyAsync("Role not found!");
-                return;
-            }
             //Adds the notification role for every checked channel, as of now it will overwrite the previous one, there cannot be multiple, removes server from cache
             DbProcessResultEnum result = await serverService.AddNotificationRoleAsync(Context.Guild.Id, role.Id, role.Name);
             string resultMessage = result switch

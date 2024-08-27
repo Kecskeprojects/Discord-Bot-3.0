@@ -10,8 +10,6 @@ using Discord_Bot.Processors.MessageProcessor;
 using Discord_Bot.Resources;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
@@ -31,28 +29,18 @@ public class AdminSelfRoleCommands(
     [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Add self assignable role to list of roles on the server")]
-    public async Task SelfRoleAdd([Name("role name")][Remainder] string rolename)
+    public async Task SelfRoleAdd([Name("role name")] IRole role)
     {
         try
         {
-            //Check if role with that name exists
-            IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(rolename, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-
-            if (role != null)
+            DbProcessResultEnum result = await roleService.AddSelfRoleAsync(Context.Guild.Id, role.Name.ToLower(), role.Id);
+            string resultMessage = result switch
             {
-                DbProcessResultEnum result = await roleService.AddSelfRoleAsync(Context.Guild.Id, role.Name.ToLower(), role.Id);
-                string resultMessage = result switch
-                {
-                    DbProcessResultEnum.Success => $"New role successfully added: {role.Name}.",
-                    DbProcessResultEnum.AlreadyExists => "Role already in database.",
-                    _ => "Role could not be added!"
-                };
-                await ReplyAsync(resultMessage);
-            }
-            else
-            {
-                await ReplyAsync("Role not found!");
-            }
+                DbProcessResultEnum.Success => $"New role successfully added: {role.Name}.",
+                DbProcessResultEnum.AlreadyExists => "Role already in database.",
+                _ => "Role could not be added!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -64,28 +52,18 @@ public class AdminSelfRoleCommands(
     [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Remove self assignable role from list of roles on the server")]
-    public async Task SelfRoleRemove([Name("role name")][Remainder] string rolename)
+    public async Task SelfRoleRemove([Name("role name")] IRole role)
     {
         try
         {
-            //Check if role with that name exists
-            IRole role = Context.Guild.Roles.Where(x => x.Name.Equals(rolename, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-
-            if (role != null)
+            DbProcessResultEnum result = await roleService.RemoveSelfRoleAsync(Context.Guild.Id, role.Name.ToLower());
+            string resultMessage = result switch
             {
-                DbProcessResultEnum result = await roleService.RemoveSelfRoleAsync(Context.Guild.Id, rolename);
-                string resultMessage = result switch
-                {
-                    DbProcessResultEnum.Success => $"The {role.Name} role has been removed.",
-                    DbProcessResultEnum.NotFound => "Role could not be found.",
-                    _ => "Role could not be removed!"
-                };
-                await ReplyAsync(resultMessage);
-            }
-            else
-            {
-                await ReplyAsync("Role does not exist!");
-            }
+                DbProcessResultEnum.Success => $"The {role.Name} role has been removed.",
+                DbProcessResultEnum.NotFound => "Role could not be found.",
+                _ => "Role could not be removed!"
+            };
+            await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {

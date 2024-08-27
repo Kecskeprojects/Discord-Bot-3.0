@@ -4,12 +4,10 @@ using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Interfaces.DBServices;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Owner;
 
-//Todo: Change where role, user and channel names or ids are used as parameters to this implementation in the !say command
 [Name("Say")]
 [Remarks("Owner")]
 [Summary("Send messages as the bot, the channel must be in the same server as the command")]
@@ -26,12 +24,9 @@ public class OwnerSayCommands(
     {
         try
         {
-            if (Context.Guild.TextChannels.Contains(channel))
-            {
-                await Context.Message.DeleteAsync();
+            await Context.Message.DeleteAsync();
 
-                await channel.SendMessageAsync(message);
-            }
+            await channel.SendMessageAsync(message);
         }
         catch (Exception ex)
         {
