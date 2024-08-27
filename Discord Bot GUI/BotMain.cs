@@ -83,9 +83,12 @@ public class BotMain(
                         message = message[..^1];
                     }
 
-                    foreach (KeyValuePair<ulong, Communication.ServerAudioResource> item in Global.ServerAudioResources)
+                    if(arg.Exception.ToString().Contains("The server sent close 1001"))
                     {
-                        item.Value.AudioVariables.CancellationTokenSource?.Cancel(false);
+                        foreach (KeyValuePair<ulong, Communication.ServerAudioResource> item in Global.ServerAudioResources)
+                        {
+                            item.Value.AudioVariables.CancellationTokenSource?.Cancel(false);
+                        }
                     }
 
                     logger.Client($"{message}!", ConsoleOnly: true);
