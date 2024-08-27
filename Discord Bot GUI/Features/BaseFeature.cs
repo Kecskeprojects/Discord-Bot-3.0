@@ -76,4 +76,15 @@ public abstract class BaseFeature(IServerService serverService, BotLogger logger
     {
         return DiscordTools.GetNickName(Context);
     }
+
+    protected async Task<bool> IsCommandAllowedAsync(ChannelTypeEnum type, bool allowLackOfType = true, bool canBeDM = false)
+    {
+        if (DiscordTools.IsDM(Context))
+        {
+            return canBeDM;
+        }
+
+        ServerResource server = await GetCurrentServerAsync();
+        return DiscordTools.IsTypeOfChannel(server, type, Context.Channel.Id, allowLackOfType);
+    }
 }

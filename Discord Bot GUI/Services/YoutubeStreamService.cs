@@ -38,6 +38,7 @@ public class YoutubeStreamService(Config config, BotLogger logger) : IYoutubeDow
             logger.Warning("YoutubeStreamService.cs StreamAsync", ex, LogOnly: true);
 
             ffmpeg?.Kill();
+            await Task.Delay(1000);
         }
         catch (Exception ex)
         {

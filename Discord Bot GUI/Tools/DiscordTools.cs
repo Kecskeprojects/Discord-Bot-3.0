@@ -5,6 +5,7 @@ using Discord.WebSocket;
 using Discord_Bot.Communication;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -87,44 +88,6 @@ public static class DiscordTools
         return !IsDMBase(channel) ?
             (user as SocketGuildUser).Nickname ?? user.Username :
             user.Username;
-    }
-
-    public static async Task<bool> ConnectBot(SocketCommandContext context, ServerAudioResource audioResource, ServerResource server)
-    {
-        SocketGuildUser clientUser = await context.Channel.GetUserAsync(context.Client.CurrentUser.Id) as SocketGuildUser;
-
-        SocketVoiceChannel channel = (context.User as SocketGuildUser).VoiceChannel;
-
-        if (clientUser.VoiceChannel != null)
-        {
-            await clientUser.VoiceChannel.DisconnectAsync();
-        }
-
-        if (channel != null && IsTypeOfChannel(server, ChannelTypeEnum.MusicVoice, channel.Id, allowLackOfType: true))
-        {
-            audioResource.AudioVariables.AudioClient = await channel.ConnectAsync();
-
-            if (audioResource.AudioVariables.AudioClient != null)
-            {
-                audioResource.AudioVariables.FallbackVoiceChannelId = channel.Id;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static async Task<bool> CheckAndReconnectBotIfNeeded(SocketCommandContext context, ServerAudioResource audioResource)
-    {
-        SocketGuildUser clientUser = await context.Channel.GetUserAsync(context.Client.CurrentUser.Id) as SocketGuildUser;
-        if (clientUser.VoiceChannel == null)
-        {
-            SocketVoiceChannel channel = context.Guild.GetVoiceChannel(audioResource.AudioVariables.FallbackVoiceChannelId);
-
-            audioResource.AudioVariables.AudioClient = await channel.ConnectAsync(disconnect: false);
-
-            return audioResource.AudioVariables.AudioClient != null;
-        }
-        return true;
     }
 
     public static List<UserResource> FilterToOnlyServerMembers(SocketCommandContext context, List<UserResource> users)

@@ -47,10 +47,9 @@ public class UserVoiceCommands(
             await audioRequestFeature.Run(Context, searchparameter);
             if (!audioResource.AudioVariables.Playing)
             {
-                audioResource.AudioVariables.Playing = true;
-
                 if (audioResource.MusicRequests.Count > 0)
                 {
+                    audioResource.AudioVariables.Playing = true;
                     _ = audioPlayFeature.Run(Context);
                 }
             }

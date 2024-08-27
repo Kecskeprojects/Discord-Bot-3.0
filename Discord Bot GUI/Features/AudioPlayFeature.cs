@@ -1,13 +1,14 @@
-﻿using Discord.WebSocket;
+﻿using Discord.Commands;
+using Discord.WebSocket;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
+using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
-using Discord_Bot.Resources;
-using Discord_Bot.Tools;
 using System;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace Discord_Bot.Features;
 public class AudioPlayFeature(
@@ -21,25 +22,24 @@ public class AudioPlayFeature(
     protected override async Task<bool> ExecuteCoreLogicAsync()
     {
         ServerAudioResource audioResource = GetCurrentAudioResource();
-        ServerResource server = await GetCurrentServerAsync();
         try
         {
-            //If function returns false, it means it could not connect correctly for some reason
-            if (!await DiscordTools.ConnectBot(Context, audioResource, server))
-            {
-                logger.Log("User must be in a voice channel, or a voice channel must be passed as an argument!");
-                audioResource.AudioVariables.Playing = false;
-
-                audioResource.AudioVariables = new();
-                audioResource.MusicRequests.Clear();
-                return false;
-            }
-
             while (audioResource.MusicRequests.Count > 0)
             {
-                if (!await DiscordTools.CheckAndReconnectBotIfNeeded(Context, audioResource))
+                VoiceConnectionResultEnum connectResult = await CheckAndReconnectBotIfNeeded(Context, audioResource);
+                logger.Log($"Voice connection result: {connectResult}");
+                switch (connectResult)
                 {
-                    throw new Exception("Bot could not reconnect after gateway disconnect");
+                    case VoiceConnectionResultEnum.UserNotInVoiceChannel:
+                    {
+                        await Context.Channel.SendMessageAsync("You must be in a valid voice channel!");
+                        return false;
+                    }
+                    case VoiceConnectionResultEnum.VoiceChannelNotMusicChannel:
+                    {
+                        await Context.Channel.SendMessageAsync("Current voice channel is not music channel!");
+                        return false;
+                    }
                 }
 
                 MusicRequest current = audioResource.MusicRequests[0];
@@ -59,20 +59,8 @@ public class AudioPlayFeature(
                 {
                     logger.Log("Playlist empty!");
 
-                    int waitedSeconds = await WaitAsync(audioResource);
-
-                    //In case counter reached it's limit, disconnect,
-                    //or if the bot disconnected for some other reason, leave the loop and clear the request list
-                    SocketGuildUser clientUser = await Context.Channel.GetUserAsync(Context.Client.CurrentUser.Id) as SocketGuildUser;
-                    if (waitedSeconds > 299 || clientUser.VoiceChannel == null)
+                    if (await WaitAsync(audioResource))
                     {
-                        if (waitedSeconds > 299 && clientUser.VoiceChannel != null)
-                        {
-                            await Context.Channel.SendMessageAsync("`Disconnected due to inactivity.`");
-
-                            await clientUser.VoiceChannel.DisconnectAsync();
-                        }
-
                         break;
                     }
                 }
@@ -90,11 +78,52 @@ public class AudioPlayFeature(
             logger.Error("AudioPlayFeature.cs ExecuteCoreLogicAsync", ex);
             return false;
         }
+        finally
+        {
+            audioResource.AudioVariables.Playing = false;
+            audioResource.AudioVariables = new();
+            audioResource.MusicRequests.Clear();
+        }
 
-        audioResource.AudioVariables.Playing = false;
-        audioResource.AudioVariables = new();
-        audioResource.MusicRequests.Clear();
         return true;
+    }
+
+    public async Task<VoiceConnectionResultEnum> CheckAndReconnectBotIfNeeded(SocketCommandContext context, ServerAudioResource audioResource)
+    {
+        SocketGuildUser clientUser = await Context.Channel.GetUserAsync(Context.Client.CurrentUser.Id) as SocketGuildUser;
+        VoiceConnectionResultEnum result = VoiceConnectionResultEnum.AlreadyConnected;
+        //First connection
+        if (audioResource.AudioVariables.FallbackVoiceChannelId == 0)
+        {
+            SocketVoiceChannel channel = (context.User as SocketGuildUser).VoiceChannel;
+
+            if (channel == null)
+            {
+                return VoiceConnectionResultEnum.UserNotInVoiceChannel;
+            }
+
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicVoice, allowLackOfType: true))
+            {
+                return VoiceConnectionResultEnum.VoiceChannelNotMusicChannel;
+            }
+
+            audioResource.AudioVariables.AudioClient = await channel.ConnectAsync();
+
+            audioResource.AudioVariables.FallbackVoiceChannelId = channel.Id;
+            result = VoiceConnectionResultEnum.Connected;
+        }
+        //Reconnection
+        else if (clientUser.VoiceChannel == null)
+        {
+            SocketVoiceChannel channel = context.Guild.GetVoiceChannel(audioResource.AudioVariables.FallbackVoiceChannelId);
+
+            audioResource.AudioVariables.AudioClient = await channel.ConnectAsync(disconnect: false);
+            result = VoiceConnectionResultEnum.Reconnected;
+        }
+
+        return audioResource.AudioVariables.AudioClient != null
+            ? result
+            : throw new Exception("Bot could not reconnect after an unexpected disconnect");
     }
 
     private async Task StreamAudioAsync(ServerAudioResource audioResource, MusicRequest current)
@@ -102,7 +131,7 @@ public class AudioPlayFeature(
         //Streaming the music
         try
         {
-            double length = System.Xml.XmlConvert.ToTimeSpan(current.Duration).TotalMilliseconds;
+            double length = XmlConvert.ToTimeSpan(current.Duration).TotalMilliseconds;
 
             if (length > 3000)
             {
@@ -120,23 +149,40 @@ public class AudioPlayFeature(
         }
     }
 
-    private async Task<int> WaitAsync(ServerAudioResource audioResource)
+    private async Task<bool> WaitAsync(ServerAudioResource audioResource)
     {
-        //In case counter reached it's limit, disconnect
-        int j = 0;
-        while (audioResource.MusicRequests.Count == 0 && j < config.VoiceWaitSeconds)
+        int waitedSeconds = 0;
+        SocketGuildUser clientUser;
+        do
         {
-            j++;
-
-            SocketGuildUser clientUser = await Context.Channel.GetUserAsync(Context.Client.CurrentUser.Id) as SocketGuildUser;
+            clientUser = await Context.Channel.GetUserAsync(Context.Client.CurrentUser.Id) as SocketGuildUser;
+            //if the bot disconnected for some other reason, leave the loop and clear the request list
             if (clientUser.VoiceChannel == null)
             {
                 logger.Log("Bot not in voice channel anymore!");
-                break;
+                return true;
             }
 
             await Task.Delay(1000);
+            waitedSeconds++;
         }
-        return j;
+        while (audioResource.MusicRequests.Count == 0 && waitedSeconds < config.VoiceWaitSeconds);
+
+        //In case counter reached it's limit, disconnect,
+        //or if the bot disconnected for some other reason, leave the loop and clear the request list
+        if (waitedSeconds >= config.VoiceWaitSeconds)
+        {
+            if (clientUser.VoiceChannel != null)
+            {
+                await Context.Channel.SendMessageAsync("`Disconnected due to inactivity.`");
+
+                await clientUser.VoiceChannel.DisconnectAsync();
+            }
+
+            return true;
+        }
+
+        //This is only reached if a new request has been added to the list since bot started waiting
+        return false;
     }
 }
