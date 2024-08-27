@@ -27,7 +27,7 @@ public class UserWordOfTheDayCommands(
     [Command("wotd")]
     [Alias(["word of the day"])]
     [Summary("Check the word of the day in a language")]
-    public async Task WotdFunction([Name("language name")]string language = "korean")
+    public async Task WotdFunction([Name("language name")] string language = "korean")
     {
         try
         {

@@ -122,11 +122,7 @@ public static class DiscordTools
 
             audioResource.AudioVariables.AudioClient = await channel.ConnectAsync(disconnect: false);
 
-            if (audioResource.AudioVariables.AudioClient != null)
-            {
-                return true;
-            }
-            return false;
+            return audioResource.AudioVariables.AudioClient != null;
         }
         return true;
     }

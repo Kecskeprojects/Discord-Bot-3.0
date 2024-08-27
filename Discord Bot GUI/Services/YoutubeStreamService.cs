@@ -6,7 +6,6 @@ using Discord_Bot.Interfaces.Services;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;

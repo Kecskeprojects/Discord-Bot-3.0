@@ -8,7 +8,6 @@ using SixLabors.ImageSharp.Processing;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace Discord_Bot.Processors.ImageProcessors;
 

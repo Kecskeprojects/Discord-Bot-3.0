@@ -18,7 +18,7 @@ public static class ServerSettingEmbedProcessor
         embed.WithTitle("The server's settings are the following:");
         foreach (KeyValuePair<ChannelTypeEnum, string> item in ChannelTypeEnumTools.GetNameDictionary())
         {
-            if(item.Key == ChannelTypeEnum.None)
+            if (item.Key == ChannelTypeEnum.None)
             {
                 continue;
             }

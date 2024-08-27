@@ -73,7 +73,7 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
         await page.WaitForSelectorAsync("#table_1_length .dropdown-menu", new WaitForSelectorOptions() { Hidden = true, Timeout = 0 });
 
         string content = await page.GetContentAsync();
-;
+
         IDocument document = await context.OpenAsync(req => req.Content(content));
         return document;
     }

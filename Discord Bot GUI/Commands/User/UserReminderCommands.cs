@@ -193,7 +193,7 @@ public class UserReminderCommands(
     [Command("reminder remove")]
     [Alias(["remind remove"])]
     [Summary("Remove reminder by their position in the '!remind list' command")]
-    public async Task RemindRemove([Name("order number")]int reminderOrderId)
+    public async Task RemindRemove([Name("order number")] int reminderOrderId)
     {
         try
         {
