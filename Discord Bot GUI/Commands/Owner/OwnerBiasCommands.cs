@@ -31,8 +31,14 @@ public class OwnerBiasCommands(
     {
         try
         {
-            string biasName = parameters.ToLower().Split('-')[0].Trim();
-            string biasGroup = parameters.ToLower().Split('-')[1].Trim();
+            string[] paramArray = GetParametersBySplit(parameters, '-');
+            if (paramArray.Length != 2)
+            {
+                return;
+            }
+
+            string biasName = paramArray[0];
+            string biasGroup = paramArray[1];
 
             if (string.IsNullOrEmpty(biasName) || string.IsNullOrEmpty(biasGroup))
             {
@@ -61,8 +67,14 @@ public class OwnerBiasCommands(
     {
         try
         {
-            string biasName = parameters.ToLower().Split('-')[0].Trim();
-            string biasGroup = parameters.ToLower().Split('-')[1].Trim();
+            string[] paramArray = GetParametersBySplit(parameters, '-');
+            if (paramArray.Length != 2)
+            {
+                return;
+            }
+
+            string biasName = paramArray[0];
+            string biasGroup = paramArray[1];
 
             //Try removing them from the database
             DbProcessResultEnum result = await idolService.RemoveIdolAsync(biasName, biasGroup);
@@ -89,23 +101,14 @@ public class OwnerBiasCommands(
         try
         {
             //Make the name lowercase and clear and accidental spaces
-            string biasName = "";
-            string biasGroup = "";
-
-            if (parameters.Contains('-'))
-            {
-                biasName = parameters.ToLower().Split('-')[0].Trim();
-                biasGroup = parameters.ToLower().Split('-')[1].Trim();
-            }
-            else
-            {
-                biasName = parameters.ToLower().Trim();
-            }
-
-            if (parameters.Split("-").Length > 2 || string.IsNullOrWhiteSpace(biasName) || string.IsNullOrWhiteSpace(biasGroup))
+            string[] paramArray = GetParametersBySplit(parameters, '-');
+            if (paramArray.Length != 2)
             {
                 return;
             }
+
+            string biasName = paramArray[0];
+            string biasGroup = paramArray[1];
 
             MessageComponent component = EditBiasDataMessageProcessor.CreateComponent(biasName, biasGroup);
 

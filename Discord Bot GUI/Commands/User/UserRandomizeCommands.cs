@@ -59,9 +59,10 @@ public class UserRandomizeCommands(
             string[] choices = ["Heads", "Tails"];
 
             //If choice options are given, we switch out the original strings
-            if (choice != "" && choice.Contains(" or "))
+            string[] paramArray = GetParametersBySplit(choice, " or ");
+            if (paramArray.Length > 1)
             {
-                choices = choice.Split(" or ");
+                choices = paramArray;
             }
 
             if (chance < 50)
@@ -89,14 +90,14 @@ public class UserRandomizeCommands(
     {
         try
         {
+            string[] options = GetParametersBySplit(optionString, ',', false);
+
             if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
                 return;
             }
 
             Random r = new();
-
-            string[] options = optionString.Split(",", options: StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
             string chosen = options[r.Next(0, options.Length)];
 

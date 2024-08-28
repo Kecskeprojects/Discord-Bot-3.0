@@ -37,7 +37,7 @@ public class UserBirthdayCommands(
                 return;
             }
 
-            string[] strings = dateString.Split(Constant.DateSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            string[] strings = GetDateParameterParts(dateString);
             if (strings.Length != 3)
             {
                 await ReplyAsync("Incorrect input parameters");

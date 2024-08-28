@@ -9,7 +9,6 @@ using Discord_Bot.Tools;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions;
-//Todo: after reorganizing, check if anything in especially the longer interactions can be moved into tools, processors, etc...
 public class BaseInteraction(IServerService serverService, BotLogger logger, Config config) : InteractionModuleBase<SocketInteractionContext>
 {
     private readonly IServerService serverService = serverService;

@@ -26,9 +26,15 @@ public class OwnerBiasAliasCommands(
     {
         try
         {
-            string biasAlias = parameters.ToLower().Split('-')[0].Trim();
-            string biasName = parameters.ToLower().Split('-')[1].Trim();
-            string biasGroup = parameters.ToLower().Split('-')[2].Trim();
+            string[] paramArray = GetParametersBySplit(parameters, '-');
+            if (paramArray.Length != 3)
+            {
+                return;
+            }
+
+            string biasAlias = paramArray[0];
+            string biasName = paramArray[1];
+            string biasGroup = paramArray[2];
 
             if (string.IsNullOrEmpty(biasName) || string.IsNullOrEmpty(biasGroup))
             {
@@ -58,9 +64,15 @@ public class OwnerBiasAliasCommands(
     {
         try
         {
-            string biasAlias = parameters.ToLower().Split('-')[0].Trim();
-            string biasName = parameters.ToLower().Split('-')[1].Trim();
-            string biasGroup = parameters.ToLower().Split('-')[2].Trim();
+            string[] paramArray = GetParametersBySplit(parameters, '-');
+            if (paramArray.Length != 3)
+            {
+                return;
+            }
+
+            string biasAlias = paramArray[0];
+            string biasName = paramArray[1];
+            string biasGroup = paramArray[2];
 
             if (string.IsNullOrEmpty(biasName) || string.IsNullOrEmpty(biasGroup))
             {

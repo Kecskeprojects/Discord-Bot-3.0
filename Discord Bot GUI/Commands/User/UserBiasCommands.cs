@@ -37,6 +37,8 @@ public class UserBiasCommands(
     {
         try
         {
+            string[] paramArray = GetParametersBySplit(parameters, '-');
+
             if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
                 return;
@@ -47,10 +49,10 @@ public class UserBiasCommands(
             string biasGroup = "";
 
             bool isGroupName = false;
-            if (parameters.Contains('-'))
+            if (paramArray.Length == 2)
             {
-                biasName = parameters.ToLower().Split('-')[0].Trim();
-                biasGroup = parameters.ToLower().Split('-')[1].Trim();
+                biasName = paramArray[0];
+                biasGroup = paramArray[1];
             }
             else
             {
@@ -91,6 +93,8 @@ public class UserBiasCommands(
     {
         try
         {
+            string[] paramArray = GetParametersBySplit(parameters, '-');
+
             if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
                 return;
@@ -101,10 +105,10 @@ public class UserBiasCommands(
             string biasGroup = "";
 
             bool isGroupName = false;
-            if (parameters.Contains('-'))
+            if (paramArray.Length == 2)
             {
-                biasName = parameters.ToLower().Split('-')[0].Trim();
-                biasGroup = parameters.ToLower().Split('-')[1].Trim();
+                biasName = paramArray[0];
+                biasGroup = paramArray[1];
             }
             else
             {
@@ -274,8 +278,7 @@ public class UserBiasCommands(
     {
         try
         {
-            //Make the name lowercase and split up names
-            string[] nameList = biasNames.ToLower().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            string[] nameList = GetParametersBySplit(biasNames, ',');
 
             //Get the users that have the bias with the following names, if the bias exists
             ListWithDbResult<UserResource> result = await idolService.GetUsersByIdolsAsync(nameList);

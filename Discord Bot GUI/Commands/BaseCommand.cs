@@ -7,10 +7,10 @@ using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
+using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands;
-//Todo: after reorganizing, check if anything in especially the longer commands can be moved into tools, processors, etc...
 public class BaseCommand(BotLogger logger, Config config, IServerService serverService) : ModuleBase<SocketCommandContext>
 {
     protected readonly BotLogger logger = logger;
@@ -66,5 +66,30 @@ public class BaseCommand(BotLogger logger, Config config, IServerService serverS
             Global.ServerAudioResources.TryAdd(Context.Guild.Id, audioResource);
         }
         return audioResource;
+    }
+
+    protected static string[] GetParametersBySplit(string parameters, char splitCharacter = '>', bool toLower = true)
+    {
+        if (toLower)
+        {
+            parameters = parameters.ToLower();
+        }
+
+        return parameters.Split(splitCharacter, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    }
+
+    protected static string[] GetParametersBySplit(string parameters, string splitCharacter = ">", bool toLower = true)
+    {
+        if (toLower)
+        {
+            parameters = parameters.ToLower();
+        }
+
+        return parameters.Split(splitCharacter, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    }
+
+    protected static string[] GetDateParameterParts(string parameters)
+    {
+        return parameters.Split(Constant.DateSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
     }
 }

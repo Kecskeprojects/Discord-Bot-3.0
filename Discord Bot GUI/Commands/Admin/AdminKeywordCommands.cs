@@ -50,8 +50,14 @@ public class AdminKeywordCommands(
     {
         try
         {
-            string keyword = parameters.Split(">")[0];
-            string response = parameters.Split(">")[1];
+            string[] paramArray = GetParametersBySplit(parameters, '>', false);
+            if (paramArray.Length != 2)
+            {
+                return;
+            }
+
+            string keyword = paramArray[0];
+            string response = paramArray[1];
 
             DbProcessResultEnum result = await keywordService.AddKeywordAsync(Context.Guild.Id, keyword, response);
             string resultMessage = result switch
