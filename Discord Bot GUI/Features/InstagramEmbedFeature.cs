@@ -121,7 +121,18 @@ public class InstagramEmbedFeature(
         if (attachments.Count > 0)
         {
             result.HasFileDownloadHappened = true;
-            await Context.Channel.SendFilesAsync(attachments, message, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
+            for (int i = 0; i < Math.Ceiling(attachments.Count / 10.0); i++)
+            {
+                int count = attachments.Count - i * 10 >= 10 ? 10 : attachments.Count - i * 10;
+                if(i == 0)
+                {
+                    await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count), message, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
+                }
+                else
+                {
+                    await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count));
+                }
+            }
             result.ShouldMessageBeSuppressed = true;
         }
         //Ignore videos is a second try at sending so that is when we can know if the post is too large to send

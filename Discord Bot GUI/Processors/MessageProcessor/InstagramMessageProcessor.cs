@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Discord_Bot.Processors.MessageProcessor;
 
@@ -51,20 +52,27 @@ public static class InstagramMessageProcessor
             attachments.Clear();
         }
 
-        for (int i = 0; i < files.Length; i++)
+        string[] orderedFiles = files.OrderBy(x =>
         {
-            if (files[i].EndsWith(".txt"))
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(x);
+            bool parsed = int.TryParse(fileNameWithoutExtension.Split("_")[^1], out int position);
+            return (parsed ? position : attachments.Count) - 1;
+        }).ToArray();
+
+        for (int i = 0; i < orderedFiles.Length; i++)
+        {
+            if (orderedFiles[i].EndsWith(".txt"))
             {
-                caption = File.ReadAllText(files[i]);
+                caption = File.ReadAllText(orderedFiles[i]);
                 continue;
             }
-            else if (files[i].EndsWith(".json"))
+            else if (orderedFiles[i].EndsWith(".json"))
             {
-                metadata = JsonConvert.DeserializeObject<InstaLoaderBase>(File.ReadAllText(files[i])).Node;
+                metadata = JsonConvert.DeserializeObject<InstaLoaderBase>(File.ReadAllText(orderedFiles[i])).Node;
             }
-            else if (attachments.Count < 10 && (!ignoreVideos || files[i].EndsWith(".jpg") || files[i].EndsWith(".png")))
+            else if (!ignoreVideos || orderedFiles[i].EndsWith(".jpg") || orderedFiles[i].EndsWith(".png"))
             {
-                attachments.Add(new FileAttachment(files[i]));
+                attachments.Add(new FileAttachment(orderedFiles[i]));
             }
         }
     }
