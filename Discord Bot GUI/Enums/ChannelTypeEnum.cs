@@ -38,7 +38,7 @@ public static class ChannelTypeEnumExtension
 
     public static bool EqualsCommandString(this ChannelTypeEnum channelTypeEnum, string value)
     {
-        return value.Equals(channelTypeEnum.ToFriendlyString(), StringComparison.OrdinalIgnoreCase);
+        return value.Equals(channelTypeEnum.ToCommandString(), StringComparison.OrdinalIgnoreCase);
     }
 
     public static string ToFriendlyString(this ChannelTypeEnum channelTypeEnum)

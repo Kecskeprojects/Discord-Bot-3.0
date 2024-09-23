@@ -26,8 +26,8 @@
 	<ItemGroup>
 		<PackageReference Include="AngleSharp" Version="1.1.2" />
 		<PackageReference Include="AutoMapper" Version="13.0.1" />
-		<PackageReference Include="Discord.Net" Version="3.15.3" />
-		<PackageReference Include="Google.Apis.YouTube.v3" Version="1.68.0.3513" />
+		<PackageReference Include="Discord.Net" Version="3.16.0" />
+		<PackageReference Include="Google.Apis.YouTube.v3" Version="1.68.0.3539" />
 		<PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.0.0" />
 		<PackageReference Include="PuppeteerSharp" Version="20.0.0" />
 		<PackageReference Include="RestSharp" Version="112.0.0" />

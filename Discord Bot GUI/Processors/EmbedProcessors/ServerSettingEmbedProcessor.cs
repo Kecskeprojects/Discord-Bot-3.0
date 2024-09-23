@@ -18,11 +18,6 @@ public static class ServerSettingEmbedProcessor
         embed.WithTitle("The server's settings are the following:");
         foreach (KeyValuePair<ChannelTypeEnum, string> item in ChannelTypeEnumTools.GetNameDictionary())
         {
-            if (item.Key == ChannelTypeEnum.None)
-            {
-                continue;
-            }
-
             if (server.SettingsChannels.TryGetValue(item.Key, out List<ulong> settingsChannels))
             {
                 IEnumerable<string> channels = settingsChannels.Select(x => textChannels.FirstOrDefault(n => n.Id == x))
