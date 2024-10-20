@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Text.Json.Serialization;
 
-namespace Discord_Bot.Services.Models.Instagram;
+namespace Discord_Bot.Services.Models.InstaLoader;
 
 public class InstaLoaderBase
 {

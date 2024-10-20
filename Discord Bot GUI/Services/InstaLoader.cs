@@ -22,7 +22,7 @@ public class InstaLoader(BotLogger logger) : IInstaLoader
             {
                 FileName = "cmd.exe",
                 Arguments = @"/C instaloader.exe " +
-                            @"--quiet --no-video-thumbnails --no-compress-json " +
+                            @"--quiet --no-video-thumbnails --no-compress-json --no-iphone " +
                             @"--filename-pattern={date_utc}_{shortcode} --dirname-pattern={shortcode} -- -" +
                             postId,
                 UseShellExecute = false,

@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Text.Json.Serialization;
 
-namespace Discord_Bot.Services.Models.Instagram.OtherSubClasses;
+namespace Discord_Bot.Services.Models.InstaLoader.OtherSubClasses;
 
 public class DashInfo
 {

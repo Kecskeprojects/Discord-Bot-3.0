@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace Discord_Bot.Services.Models.Instagram.Edge;
+namespace Discord_Bot.Services.Models.InstaLoader.Edge;
 
-public class EdgeMediaToSponsorUser
+public class EdgeMediaToTaggedUser
 {
     [JsonProperty("edges")]
     [JsonPropertyName("edges")]
-    public List<object> Edges { get; set; }
+    public List<Edge> Edges { get; set; }
 }

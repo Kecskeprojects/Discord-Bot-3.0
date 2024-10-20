@@ -1,10 +1,10 @@
-﻿using Discord_Bot.Services.Models.Instagram.Edge;
-using Discord_Bot.Services.Models.Instagram.OtherSubClasses;
+﻿using Discord_Bot.Services.Models.InstaLoader.Edge;
+using Discord_Bot.Services.Models.InstaLoader.OtherSubClasses;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace Discord_Bot.Services.Models.Instagram;
+namespace Discord_Bot.Services.Models.InstaLoader;
 
 public class Node
 {
