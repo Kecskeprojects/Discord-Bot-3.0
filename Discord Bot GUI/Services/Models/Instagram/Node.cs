@@ -85,6 +85,10 @@ public class Node
     [JsonPropertyName("text")]
     public string Text { get; set; }
 
+    [JsonProperty("id")]
+    [JsonPropertyName("id")]
+    public string Id { get; set; }
+
     [JsonProperty("did_report_as_spam")]
     [JsonPropertyName("did_report_as_spam")]
     public bool DidReportAsSpam { get; set; }

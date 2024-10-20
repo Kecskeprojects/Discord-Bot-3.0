@@ -55,7 +55,7 @@ public class XdtShortcodeMedia
 
     [JsonProperty("media_preview")]
     [JsonPropertyName("media_preview")]
-    public object MediaPreview { get; set; }
+    public string MediaPreview { get; set; }
 
     [JsonProperty("display_url")]
     [JsonPropertyName("display_url")]
@@ -64,6 +64,50 @@ public class XdtShortcodeMedia
     [JsonProperty("display_resources")]
     [JsonPropertyName("display_resources")]
     public List<DisplayResource> DisplayResources { get; set; }
+
+    [JsonProperty("dash_info")]
+    [JsonPropertyName("dash_info")]
+    public DashInfo DashInfo { get; set; }
+
+    [JsonProperty("has_audio")]
+    [JsonPropertyName("has_audio")]
+    public bool HasAudio { get; set; }
+
+    [JsonProperty("video_url")]
+    [JsonPropertyName("video_url")]
+    public string VideoUrl { get; set; }
+
+    [JsonProperty("video_view_count")]
+    [JsonPropertyName("video_view_count")]
+    public int VideoViewCount { get; set; }
+
+    [JsonProperty("video_play_count")]
+    [JsonPropertyName("video_play_count")]
+    public int VideoPlayCount { get; set; }
+
+    [JsonProperty("encoding_status")]
+    [JsonPropertyName("encoding_status")]
+    public object EncodingStatus { get; set; }
+
+    [JsonProperty("is_published")]
+    [JsonPropertyName("is_published")]
+    public bool IsPublished { get; set; }
+
+    [JsonProperty("product_type")]
+    [JsonPropertyName("product_type")]
+    public string ProductType { get; set; }
+
+    [JsonProperty("title")]
+    [JsonPropertyName("title")]
+    public string Title { get; set; }
+
+    [JsonProperty("video_duration")]
+    [JsonPropertyName("video_duration")]
+    public double VideoDuration { get; set; }
+
+    [JsonProperty("clips_music_attribution_info")]
+    [JsonPropertyName("clips_music_attribution_info")]
+    public ClipsMusicAttributionInfo ClipsMusicAttributionInfo { get; set; }
 
     [JsonProperty("is_video")]
     [JsonPropertyName("is_video")]
