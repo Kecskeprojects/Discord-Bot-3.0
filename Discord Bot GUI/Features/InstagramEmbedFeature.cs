@@ -79,7 +79,7 @@ public class InstagramEmbedFeature(
                 }
             }
 
-            List<FileAttachment> attachments = await SocialMessageProcessor.GetAttachments("instagram", result.Content);
+            List<FileAttachment> attachments = await SocialMessageProcessor.GetAttachments("instagram", result.Content, limit: 1000);
             if (!CollectionTools.IsNullOrEmpty(attachments))
             {
                 try
@@ -93,7 +93,12 @@ public class InstagramEmbedFeature(
                     {
                         logger.Warning("InstagramEmbedFeature.cs SendInstagramPostEmbedAsync", "Embed too large, only sending images!");
 
-                        attachments = await SocialMessageProcessor.GetAttachments("instagram", result.Content, false);
+                        foreach (FileAttachment item in attachments)
+                        {
+                            item.Dispose();
+                        }
+                        attachments.Clear();
+                        attachments = await SocialMessageProcessor.GetAttachments("instagram", result.Content, sendVideos:false, limit: 1000);
                         if (!CollectionTools.IsNullOrEmpty(attachments))
                         {
                             await SendInstagramMessageAsync(attachments, result.TextContent, refer, true);

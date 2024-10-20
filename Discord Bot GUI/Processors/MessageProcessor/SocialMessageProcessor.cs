@@ -10,12 +10,12 @@ namespace Discord_Bot.Processors.MessageProcessor;
 
 public static class SocialMessageProcessor
 {
-    public static async Task<List<FileAttachment>> GetAttachments(string socialMedia, List<MediaContent> content, bool sendVideos = true)
+    public static async Task<List<FileAttachment>> GetAttachments(string socialMedia, List<MediaContent> content, bool sendVideos = true, int limit = 10)
     {
         List<FileAttachment> Embeds = [];
         string commonFileName = $"{socialMedia}_{DateTime.UtcNow:yyMMdd}_{DateTime.UtcNow:HHmmss}";
 
-        for (int i = 0; i < content.Count && Embeds.Count < 10; i++)
+        for (int i = 0; i < content.Count && Embeds.Count < limit; i++)
         {
             if (!sendVideos && content[i].Type == MediaContentTypeEnum.Video)
             {

@@ -83,7 +83,7 @@ public class BotMain(
                         message = message[..^1];
                     }
 
-                    if(arg.Exception.ToString().Contains("The server sent close 1001"))
+                    if (arg.Exception.ToString().Contains("The server sent close 1001"))
                     {
                         foreach (KeyValuePair<ulong, Communication.ServerAudioResource> item in Global.ServerAudioResources)
                         {

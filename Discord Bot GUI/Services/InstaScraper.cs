@@ -50,11 +50,10 @@ public class InstaScraper(BotLogger logger, BrowserService browserService) : IIn
     {
         try
         {
-            logger.Log(e.Response.Url, ConsoleOnly: true);
             if (e.Response.Url == "https://www.instagram.com/graphql/query")
             {
                 Root body = await e.Response.JsonAsync<Root>();
-                if(body?.Data?.XdtShortcodeMedia == null)
+                if (body?.Data?.XdtShortcodeMedia == null)
                 {
                     return;
                 }
@@ -85,13 +84,14 @@ public class InstaScraper(BotLogger logger, BrowserService browserService) : IIn
             {
                 //Refresh and retry, the query call is sometimes missing
                 await page.ReloadAsync();
+                count = 0;
                 while (Body == null && count < 30)
                 {
                     count++;
                     await Task.Delay(500);
                 }
 
-                if(Body == null)
+                if (Body == null)
                 {
                     return "Timeout while getting content.";
                 }

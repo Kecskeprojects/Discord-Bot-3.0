@@ -2,10 +2,8 @@
 using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Discord_Bot.Communication;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
