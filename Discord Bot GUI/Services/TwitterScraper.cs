@@ -21,11 +21,11 @@ public class TwitterScraper(BotLogger logger, BrowserService browserService) : I
     private Root Body { get; set; }
 
     #region Main Methods
-    public async Task<TwitterScrapingResult> GetDataFromUrls(List<Uri> uris)
+    public async Task<SocialScrapingResult> GetDataFromUrls(List<Uri> uris)
     {
         try
         {
-            TwitterScrapingResult result = new();
+            SocialScrapingResult result = new();
 
             using (IPage mainPage = await browserService.NewPage())
             {
@@ -55,7 +55,7 @@ public class TwitterScraper(BotLogger logger, BrowserService browserService) : I
         catch (Exception ex)
         {
             logger.Error("TwitterScraper.cs GetDataFromUrls", ex);
-            return new TwitterScrapingResult("Unexpected error occured");
+            return new SocialScrapingResult("Unexpected error occured");
         }
     }
 
@@ -74,7 +74,7 @@ public class TwitterScraper(BotLogger logger, BrowserService browserService) : I
         }
     }
 
-    private async Task<string> ExtractFromUrl(IPage page, Uri uri, bool singleLink, TwitterScrapingResult result)
+    private async Task<string> ExtractFromUrl(IPage page, Uri uri, bool singleLink, SocialScrapingResult result)
     {
         try
         {
@@ -113,7 +113,7 @@ public class TwitterScraper(BotLogger logger, BrowserService browserService) : I
         return "";
     }
 
-    private void GetData(bool singleLink, TwitterScrapingResult result)
+    private void GetData(bool singleLink, SocialScrapingResult result)
     {
         List<Uri> links = [];
         Legacy tweet = Body?.Data?.TweetResult?.Result?.Legacy;
@@ -154,7 +154,7 @@ public class TwitterScraper(BotLogger logger, BrowserService browserService) : I
 
     #region Helper Methods
 
-    private static List<Uri> GetMediaUris(TwitterScrapingResult result, List<Medium> list)
+    private static List<Uri> GetMediaUris(SocialScrapingResult result, List<Medium> list)
     {
         List<Uri> tempMedia = [];
         foreach (Medium item in list)
@@ -162,12 +162,12 @@ public class TwitterScraper(BotLogger logger, BrowserService browserService) : I
             if (item.Type == "photo")
             {
                 Uri url = ModifyImageUrl(item.MediaUrlHttps);
-                result.Content.Add(new(url, TwitterContentTypeEnum.Image));
+                result.Content.Add(new(url, MediaContentTypeEnum.Image));
             }
             else if (item.VideoInfo != null)
             {
                 Uri url = new(item.VideoInfo.Variants[^1].Url);
-                result.Content.Add(new(url, TwitterContentTypeEnum.Video));
+                result.Content.Add(new(url, MediaContentTypeEnum.Video));
             }
         }
         return tempMedia;

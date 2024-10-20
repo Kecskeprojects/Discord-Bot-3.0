@@ -1,6 +1,6 @@
 ﻿namespace Discord_Bot.Enums;
 
-public enum TwitterContentTypeEnum
+public enum MediaContentTypeEnum
 {
     None = 0,
     Image = 1,

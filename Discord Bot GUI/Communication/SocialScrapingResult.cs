@@ -2,23 +2,23 @@
 
 namespace Discord_Bot.Communication;
 
-public class TwitterScrapingResult
+public class SocialScrapingResult
 {
-    public TwitterScrapingResult()
+    public SocialScrapingResult()
     {
         ErrorMessage = "";
         TextContent = "";
         Content = [];
     }
 
-    public TwitterScrapingResult(string message)
+    public SocialScrapingResult(string message)
     {
         ErrorMessage = message;
         TextContent = "";
         Content = [];
     }
 
-    public List<TwitterContent> Content { get; set; }
+    public List<MediaContent> Content { get; set; }
     public string ErrorMessage { get; set; }
     public string TextContent { get; set; }
 }

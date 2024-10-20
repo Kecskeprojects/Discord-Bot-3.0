@@ -8,24 +8,24 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Processors.MessageProcessor;
 
-public static class TwitterMessageProcessor
+public static class SocialMessageProcessor
 {
-    public static async Task<List<FileAttachment>> GetAttachments(List<TwitterContent> content, bool sendVideos = true)
+    public static async Task<List<FileAttachment>> GetAttachments(string socialMedia, List<MediaContent> content, bool sendVideos = true)
     {
         List<FileAttachment> Embeds = [];
-        string commonFileName = $"twitter_{DateTime.UtcNow:yyMMdd}_{DateTime.UtcNow:HHmmss}";
+        string commonFileName = $"{socialMedia}_{DateTime.UtcNow:yyMMdd}_{DateTime.UtcNow:HHmmss}";
 
         for (int i = 0; i < content.Count && Embeds.Count < 10; i++)
         {
-            if (!sendVideos && content[i].Type == TwitterContentTypeEnum.Video)
+            if (!sendVideos && content[i].Type == MediaContentTypeEnum.Video)
             {
                 continue;
             }
 
             string fileName = content[i].Type switch
             {
-                TwitterContentTypeEnum.Video => $"{commonFileName}_video_{i + 1}.mp4",
-                TwitterContentTypeEnum.Image => $"{commonFileName}_image_{i + 1}.png",
+                MediaContentTypeEnum.Video => $"{commonFileName}_video_{i + 1}.mp4",
+                MediaContentTypeEnum.Image => $"{commonFileName}_image_{i + 1}.png",
                 _ => ""
             };
 

@@ -7,5 +7,5 @@ namespace Discord_Bot.Interfaces.Services;
 
 public interface ITwitterScraper
 {
-    Task<TwitterScrapingResult> GetDataFromUrls(List<Uri> uris);
+    Task<SocialScrapingResult> GetDataFromUrls(List<Uri> uris);
 }

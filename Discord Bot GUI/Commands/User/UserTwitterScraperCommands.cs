@@ -40,7 +40,6 @@ public class UserTwitterScraperCommands(
         {
             List<Uri> urls = UrlTools.LinkSearch(message, true, Constant.TwitterBaseURLs);
 
-            //Check if message is an instagram link
             if (urls != null)
             {
                 urls = urls.Where(x => x.Segments.Length >= 3 && x.Segments[2] == "status/").ToList();
@@ -48,7 +47,7 @@ public class UserTwitterScraperCommands(
                 {
                     logger.Log($"Embed message from following links: \n{string.Join("\n", urls)}");
 
-                    TwitterScrapingResult result = await twitterScraper.GetDataFromUrls(urls);
+                    SocialScrapingResult result = await twitterScraper.GetDataFromUrls(urls);
 
                     MessageReference refer = new(Context.Message.Id, Context.Channel.Id, Context.Guild.Id, false);
 
@@ -61,7 +60,7 @@ public class UserTwitterScraperCommands(
                         else
                         {
                             await ReplyAsync("Error message too long to display!");
-                            logger.Log(result.ErrorMessage);
+                            logger.Error("UserTwitterScraperCommands.cs ScrapeFromUrl", result.ErrorMessage);
                         }
 
                         if (CollectionTools.IsNullOrEmpty(result.Content))
@@ -70,7 +69,7 @@ public class UserTwitterScraperCommands(
                         }
                     }
 
-                    List<FileAttachment> attachments = await TwitterMessageProcessor.GetAttachments(result.Content);
+                    List<FileAttachment> attachments = await SocialMessageProcessor.GetAttachments("twitter", result.Content);
                     if (!CollectionTools.IsNullOrEmpty(attachments))
                     {
                         try
@@ -82,9 +81,9 @@ public class UserTwitterScraperCommands(
                         {
                             if (ex.Message.Contains("40005"))
                             {
-                                logger.Warning("InstagramEmbedFeature.cs SendInstagramPostEmbedAsync", "Embed too large, only sending images!");
+                                logger.Warning("UserTwitterScraperCommands.cs ScrapeFromUrl", "Embed too large, only sending images!");
 
-                                attachments = await TwitterMessageProcessor.GetAttachments(result.Content, false);
+                                attachments = await SocialMessageProcessor.GetAttachments("twitter", result.Content, false);
                                 if (!CollectionTools.IsNullOrEmpty(attachments))
                                 {
                                     await Context.Channel.SendFilesAsync(attachments, result.TextContent, messageReference: refer);
