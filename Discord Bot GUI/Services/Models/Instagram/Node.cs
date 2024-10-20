@@ -9,6 +9,18 @@ public class Node
     [JsonPropertyName("__typename")]
     public string Typename { get; set; }
 
+    [JsonProperty("user")]
+    [JsonPropertyName("user")]
+    public User User { get; set; }
+
+    [JsonProperty("x")]
+    [JsonPropertyName("x")]
+    public double X { get; set; }
+
+    [JsonProperty("y")]
+    [JsonPropertyName("y")]
+    public double Y { get; set; }
+
     [JsonProperty("id")]
     [JsonPropertyName("id")]
     public string Id { get; set; }
@@ -77,6 +89,26 @@ public class Node
     [JsonPropertyName("edge_media_to_tagged_user")]
     public EdgeMediaToTaggedUser EdgeMediaToTaggedUser { get; set; }
 
+    [JsonProperty("dash_info")]
+    [JsonPropertyName("dash_info")]
+    public DashInfo DashInfo { get; set; }
+
+    [JsonProperty("has_audio")]
+    [JsonPropertyName("has_audio")]
+    public bool? HasAudio { get; set; }
+
+    [JsonProperty("video_url")]
+    [JsonPropertyName("video_url")]
+    public string VideoUrl { get; set; }
+
+    [JsonProperty("video_view_count")]
+    [JsonPropertyName("video_view_count")]
+    public int? VideoViewCount { get; set; }
+
+    [JsonProperty("video_play_count")]
+    [JsonPropertyName("video_play_count")]
+    public object VideoPlayCount { get; set; }
+
     [JsonProperty("created_at")]
     [JsonPropertyName("created_at")]
     public string CreatedAt { get; set; }
@@ -84,10 +116,6 @@ public class Node
     [JsonProperty("text")]
     [JsonPropertyName("text")]
     public string Text { get; set; }
-
-    [JsonProperty("id")]
-    [JsonPropertyName("id")]
-    public string Id { get; set; }
 
     [JsonProperty("did_report_as_spam")]
     [JsonPropertyName("did_report_as_spam")]
