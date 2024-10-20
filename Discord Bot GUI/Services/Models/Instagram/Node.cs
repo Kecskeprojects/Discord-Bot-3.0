@@ -111,7 +111,7 @@ public class Node
 
     [JsonProperty("created_at")]
     [JsonPropertyName("created_at")]
-    public string CreatedAt { get; set; }
+    public object CreatedAt { get; set; }
 
     [JsonProperty("text")]
     [JsonPropertyName("text")]

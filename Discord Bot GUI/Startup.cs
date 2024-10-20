@@ -97,7 +97,8 @@ public static class Startup
         collection.AddTransient<ITwitchCLI, TwitchCLI>();
         collection.AddTransient<ISpotifyAPI, Services.SpotifyAPI>();
         collection.AddTransient<IYoutubeAPI, YoutubeAPI>();
-        collection.AddTransient<IInstaLoader, InstaLoader>();
+        //collection.AddTransient<IInstaLoader, InstaLoader>();
+        collection.AddTransient<IInstaScraper, InstaScraper>();
         collection.AddTransient<IWordOfTheDayService, WordOfTheDayService>();
         collection.AddTransient<IYoutubeDownloadService, YoutubeStreamService>();
         collection.AddTransient<ILastFmAPI, LastFmAPI>();

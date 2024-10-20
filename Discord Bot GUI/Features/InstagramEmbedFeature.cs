@@ -9,17 +9,19 @@ using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 
 public class InstagramEmbedFeature(
-    IInstaLoader instaLoader,
+    //IInstaLoader instaLoader,
+    IInstaScraper instaScraper,
     IServerService serverService,
     BotLogger logger) : BaseFeature(serverService, logger)
 {
-    private readonly IInstaLoader instaLoader = instaLoader;
+    private readonly IInstaScraper instaScraper = instaScraper;
+
+    //private readonly IInstaLoader instaLoader = instaLoader;
 
     protected override async Task<bool> ExecuteCoreLogicAsync()
     {
@@ -53,78 +55,83 @@ public class InstagramEmbedFeature(
 
     private async Task SendInstagramPostEmbedAsync(Uri uri)
     {
-        InstagramMessageResult result = new();
-        List<FileAttachment> attachments = [];
-        string postId = uri.Segments[2].EndsWith('/') ? uri.Segments[2][..^1] : uri.Segments[2];
-
         try
         {
-            string errorDuringDownload = instaLoader.DownloadFromInstagram(postId);
+            SocialScrapingResult result = await instaScraper.GetDataFromUrl(uri);
 
-            if (!string.IsNullOrEmpty(errorDuringDownload))
+            MessageReference refer = new(Context.Message.Id, Context.Channel.Id, Context.Guild.Id, false);
+
+            if (!string.IsNullOrEmpty(result.ErrorMessage))
             {
-                logger.Error("InstagramEmbedFeature.cs SendInstagramPostEmbedAsync", errorDuringDownload);
-                if (errorDuringDownload.Contains("Fetching Post metadata failed"))
+                if (result.ErrorMessage.Length < 150)
                 {
-                    await Context.Channel.SendMessageAsync("Posts cannot be accessed anonymously from this account.");
+                    await Context.Channel.SendMessageAsync(result.ErrorMessage);
                 }
-                if (!errorDuringDownload.Contains("retrying") || !Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), $"Dependencies\\Instagram\\{postId}")))
+                else
+                {
+                    await Context.Channel.SendMessageAsync("Error message too long to display!");
+                    logger.Error("InstagramEmbedFeature.cs SendInstagramPostEmbedAsync", result.ErrorMessage);
+                }
+
+                if (CollectionTools.IsNullOrEmpty(result.Content))
                 {
                     return;
                 }
             }
 
-            string[] files = Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), $"Dependencies\\Instagram\\{postId}"));
-            MessageReference refer = new(Context.Message.Id, Context.Channel.Id, Context.Guild.Id, false);
-
-            try
+            List<FileAttachment> attachments = await SocialMessageProcessor.GetAttachments("instagram", result.Content);
+            if (!CollectionTools.IsNullOrEmpty(attachments))
             {
-                result = await SendInstagramMessageAsync(attachments, files, uri.OriginalString, refer, false);
-            }
-            catch (Exception ex)
-            {
-                if (ex is not HttpException and not ArgumentException)
+                try
                 {
-                    throw;
+                    await SendInstagramMessageAsync(attachments, result.TextContent, refer, false);
+                    await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
                 }
+                catch (HttpException ex)
+                {
+                    if (ex.Message.Contains("40005"))
+                    {
+                        logger.Warning("InstagramEmbedFeature.cs SendInstagramPostEmbedAsync", "Embed too large, only sending images!");
 
-                logger.Warning("InstagramEmbedFeature.cs SendInstagramPostEmbedAsync", "Embed too large, only sending images!");
-                result = await SendInstagramMessageAsync(attachments, files, uri.OriginalString, refer, ignoreVideos: true);
+                        attachments = await SocialMessageProcessor.GetAttachments("instagram", result.Content, false);
+                        if (!CollectionTools.IsNullOrEmpty(attachments))
+                        {
+                            await SendInstagramMessageAsync(attachments, result.TextContent, refer, true);
+                            await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
+                        }
+                        else
+                        {
+                            await Context.Channel.SendMessageAsync("Post content too large to send!");
+                        }
+                    }
+                }
             }
-        }
-        catch (Exception ex)
-        {
-            logger.Error("InstagramEmbedFeature.cs SendInstagramPostEmbedAsync", ex);
-        }
+            else
+            {
+                await Context.Channel.SendMessageAsync("No image/videos in tweet.");
+            }
 
-        if (result.HasFileDownloadHappened)
-        {
             foreach (FileAttachment item in attachments)
             {
                 item.Dispose();
             }
             attachments.Clear();
-            Directory.Delete(Path.Combine(Directory.GetCurrentDirectory(), $"Dependencies\\Instagram\\{postId}"), true);
         }
-
-        if (result.ShouldMessageBeSuppressed)
+        catch (Exception ex)
         {
-            await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
+            logger.Error("InstagramEmbedFeature.cs SendInstagramPostEmbedAsync", ex);
         }
     }
 
-    private async Task<InstagramMessageResult> SendInstagramMessageAsync(List<FileAttachment> attachments, string[] files, string url, MessageReference refer, bool ignoreVideos)
+    private async Task<InstagramMessageResult> SendInstagramMessageAsync(List<FileAttachment> attachments, string message, MessageReference refer, bool ignoreVideos)
     {
-        string message = InstagramMessageProcessor.GetEmbedContent(attachments, files, url, ignoreVideos);
-
         InstagramMessageResult result = new();
         if (attachments.Count > 0)
         {
-            result.HasFileDownloadHappened = true;
             for (int i = 0; i < Math.Ceiling(attachments.Count / 10.0); i++)
             {
-                int count = attachments.Count - i * 10 >= 10 ? 10 : attachments.Count - i * 10;
-                if(i == 0)
+                int count = attachments.Count - (i * 10) >= 10 ? 10 : attachments.Count - (i * 10);
+                if (i == 0)
                 {
                     await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count), message, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
                 }
@@ -133,7 +140,6 @@ public class InstagramEmbedFeature(
                     await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count));
                 }
             }
-            result.ShouldMessageBeSuppressed = true;
         }
         //Ignore videos is a second try at sending so that is when we can know if the post is too large to send
         else if (ignoreVideos == true)
@@ -143,4 +149,97 @@ public class InstagramEmbedFeature(
 
         return result;
     }
+
+    //private async Task SendInstagramPostEmbedAsync(Uri uri)
+    //{
+    //    InstagramMessageResult result = new();
+    //    List<FileAttachment> attachments = [];
+    //    string postId = uri.Segments[2].EndsWith('/') ? uri.Segments[2][..^1] : uri.Segments[2];
+
+    //    try
+    //    {
+    //        string errorDuringDownload = instaLoader.DownloadFromInstagram(postId);
+
+    //        if (!string.IsNullOrEmpty(errorDuringDownload))
+    //        {
+    //            logger.Error("InstagramEmbedFeature.cs SendInstagramPostEmbedAsync", errorDuringDownload);
+    //            if (errorDuringDownload.Contains("Fetching Post metadata failed"))
+    //            {
+    //                await Context.Channel.SendMessageAsync("Posts cannot be accessed anonymously from this account.");
+    //            }
+    //            if (!errorDuringDownload.Contains("retrying") || !Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), $"Dependencies\\Instagram\\{postId}")))
+    //            {
+    //                return;
+    //            }
+    //        }
+
+    //        string[] files = Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), $"Dependencies\\Instagram\\{postId}"));
+    //        MessageReference refer = new(Context.Message.Id, Context.Channel.Id, Context.Guild.Id, false);
+
+    //        try
+    //        {
+    //            result = await SendInstagramMessageAsync(attachments, files, uri.OriginalString, refer, false);
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            if (ex is not HttpException and not ArgumentException)
+    //            {
+    //                throw;
+    //            }
+
+    //            logger.Warning("InstagramEmbedFeature.cs SendInstagramPostEmbedAsync", "Embed too large, only sending images!");
+    //            result = await SendInstagramMessageAsync(attachments, files, uri.OriginalString, refer, ignoreVideos: true);
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        logger.Error("InstagramEmbedFeature.cs SendInstagramPostEmbedAsync", ex);
+    //    }
+
+    //    if (result.HasFileDownloadHappened)
+    //    {
+    //        foreach (FileAttachment item in attachments)
+    //        {
+    //            item.Dispose();
+    //        }
+    //        attachments.Clear();
+    //        Directory.Delete(Path.Combine(Directory.GetCurrentDirectory(), $"Dependencies\\Instagram\\{postId}"), true);
+    //    }
+
+    //    if (result.ShouldMessageBeSuppressed)
+    //    {
+    //        await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
+    //    }
+    //}
+
+    //private async Task<InstagramMessageResult> SendInstagramMessageAsync(List<FileAttachment> attachments, string[] files, string url, MessageReference refer, bool ignoreVideos)
+    //{
+    //    string message = InstagramMessageProcessor.GetEmbedContent(attachments, files, url, ignoreVideos);
+
+    //    InstagramMessageResult result = new();
+    //    if (attachments.Count > 0)
+    //    {
+    //        result.HasFileDownloadHappened = true;
+    //        for (int i = 0; i < Math.Ceiling(attachments.Count / 10.0); i++)
+    //        {
+    //            int count = attachments.Count - i * 10 >= 10 ? 10 : attachments.Count - i * 10;
+    //            if(i == 0)
+    //            {
+    //                await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count), message, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
+    //            }
+    //            else
+    //            {
+    //                await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count));
+    //            }
+    //        }
+    //        result.ShouldMessageBeSuppressed = true;
+    //    }
+    //    //Ignore videos is a second try at sending so that is when we can know if the post is too large to send
+    //    else if (ignoreVideos == true)
+    //    {
+    //        await Context.Channel.SendMessageAsync("Post content too large to send!");
+    //    }
+
+    //    return result;
+    //}
 }

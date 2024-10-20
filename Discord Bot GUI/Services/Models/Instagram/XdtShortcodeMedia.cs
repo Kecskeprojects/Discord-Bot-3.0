@@ -179,7 +179,7 @@ public class XdtShortcodeMedia
 
     [JsonProperty("taken_at_timestamp")]
     [JsonPropertyName("taken_at_timestamp")]
-    public int TakenAtTimestamp { get; set; }
+    public long TakenAtTimestamp { get; set; }
 
     [JsonProperty("edge_media_preview_like")]
     [JsonPropertyName("edge_media_preview_like")]
