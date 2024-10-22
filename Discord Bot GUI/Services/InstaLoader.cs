@@ -12,7 +12,7 @@ public class InstaLoader(BotLogger logger) : IInstaLoader
 
     //https://instaloader.github.io/basic-usage.html
     //https://github.com/instaloader/instaloader
-    //instaloader.exe --quiet --filename-pattern={date_utc}_{shortcode} --dirname-pattern={ shortcode} --no-video-thumbnails --no-compress-json -- -CfGa5x0FCak -Cppwn5qjMJA
+    //instaloader.exe --quiet --filename-pattern={date_utc}_{shortcode} --dirname-pattern={ shortcode} --no-video-thumbnails --no-compress-json -- -[postId]
     public string DownloadFromInstagram(string postId)
     {
         string errorDuringDownload = "";

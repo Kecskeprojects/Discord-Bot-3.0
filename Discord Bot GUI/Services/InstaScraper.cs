@@ -29,6 +29,7 @@ public class InstaScraper(BotLogger logger, BrowserService browserService) : IIn
             using (IPage mainPage = await browserService.NewPage())
             {
                 mainPage.Response += InstaScraperResponse;
+                //await mainPage.SetCacheEnabledAsync(false);
 
                 Body = null;
                 string messages = await ExtractFromUrl(mainPage, uri, result);
@@ -74,27 +75,24 @@ public class InstaScraper(BotLogger logger, BrowserService browserService) : IIn
             await page.GoToAsync(uri.OriginalString);
 
             int count = 0;
-            while (Body == null && count < 30)
+            while (Body == null && count < 120)
             {
                 count++;
+
+                //Refresh and retry, the query call is sometimes missing
+                if (count % 30 == 0 && count != 0 && count != 120)
+                {
+                    logger.Log($"Reload {count / 30} for getting data");
+                    await page.DeleteCookieAsync();
+                    await page.ReloadAsync();
+                }
+
                 await Task.Delay(500);
             }
 
             if (Body == null)
             {
-                //Refresh and retry, the query call is sometimes missing
-                await page.ReloadAsync();
-                count = 0;
-                while (Body == null && count < 30)
-                {
-                    count++;
-                    await Task.Delay(500);
-                }
-
-                if (Body == null)
-                {
-                    return "Timeout while getting content.";
-                }
+                return "Timeout while getting content.";
             }
 
             string status = Body.Status;
