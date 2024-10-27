@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace Discord_Bot.Communication;
 
-public class AudioVariables : IDisposable
+public partial class AudioVariables : IDisposable
 {
     private bool _isDisposed;
 

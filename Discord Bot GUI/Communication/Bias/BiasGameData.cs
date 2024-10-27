@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 
 namespace Discord_Bot.Communication.Bias;
-public class BiasGameData : IDisposable
+public partial class BiasGameData : IDisposable
 {
     public BiasGameData(ulong userId)
     {

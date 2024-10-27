@@ -6,6 +6,8 @@ using Discord_Bot.Interfaces.DBServices;
 using System;
 using System.Threading.Tasks;
 
+//Remove pragma once commands are finished
+#pragma warning disable IDE0060 // Remove unused parameter
 //Todo: Welcome Message Embed similar to Mee6 bot
 //User can send 10 or 9 images as attachments, this limit goes down depending on the number of separate embeds
 //User can send json in form of file or as the text message (2000 character limit)
@@ -145,3 +147,5 @@ public class AdminChannelBannerCommands(
         }
     }
 }
+//Remove pragma once commands are finished
+#pragma warning restore IDE0060 // Remove unused parameter

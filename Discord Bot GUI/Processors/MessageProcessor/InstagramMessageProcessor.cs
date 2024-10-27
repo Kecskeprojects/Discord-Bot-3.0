@@ -52,28 +52,31 @@ public static class InstagramMessageProcessor
             attachments.Clear();
         }
 
-        string[] orderedFiles = files.OrderBy(x =>
+        IOrderedEnumerable<string> orderedFiles = files.OrderBy(x =>
         {
             string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(x);
             bool parsed = int.TryParse(fileNameWithoutExtension.Split("_")[^1], out int position);
             return (parsed ? position : attachments.Count) - 1;
-        }).ToArray();
+        });
 
-        for (int i = 0; i < orderedFiles.Length; i++)
+        foreach (string file in orderedFiles)
         {
-            if (orderedFiles[i].EndsWith(".txt"))
+            if (file.EndsWith(".txt"))
             {
-                caption = File.ReadAllText(orderedFiles[i]);
+                caption = File.ReadAllText(file);
                 continue;
             }
-            else if (orderedFiles[i].EndsWith(".json"))
+            else if (file.EndsWith(".json"))
             {
-                metadata = JsonConvert.DeserializeObject<InstaLoaderBase>(File.ReadAllText(orderedFiles[i])).Node;
+                metadata = JsonConvert.DeserializeObject<InstaLoaderBase>(File.ReadAllText(file)).Node;
             }
-            else if (!ignoreVideos || orderedFiles[i].EndsWith(".jpg") || orderedFiles[i].EndsWith(".png"))
+            else if (!ignoreVideos || file.EndsWith(".jpg") || file.EndsWith(".png"))
             {
-                attachments.Add(new FileAttachment(orderedFiles[i]));
+                attachments.Add(new FileAttachment(file));
             }
+        }
+        for (int i = 0; i < orderedFiles.Count(); i++)
+        {
         }
     }
 }

@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Discord_Bot.Communication;
 
-public class EditPictureResult(string fileName, Stream stream) : IDisposable
+public partial class EditPictureResult(string fileName, Stream stream) : IDisposable
 {
     private bool _isDisposed;
 

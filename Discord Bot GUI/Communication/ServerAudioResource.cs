@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Discord_Bot.Communication;
 
-public class ServerAudioResource(ulong serverDiscordId) : IDisposable
+public partial class ServerAudioResource(ulong serverDiscordId) : IDisposable
 {
     private bool _isDisposed;
 

@@ -3,7 +3,7 @@ using System;
 using System.IO;
 
 namespace Discord_Bot.Communication;
-public class WhoKnowsEmbedResult : IDisposable
+public partial class WhoKnowsEmbedResult : IDisposable
 {
     private bool _isDisposed;
 

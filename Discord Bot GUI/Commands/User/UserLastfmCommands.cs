@@ -19,6 +19,12 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
 
+//Todo: Add support (in all list commands) for specifying year (maybe even half, quarter, month and week depending on the implementation)
+//This will list out data according to that past period
+//user.getWeekly*Chart endpoints can be used to get older data
+//https://ws.audioscrobbler.com/2.0/?method=user.getweeklychartlist&user=[username]&api_key=[API_KEY]&format=json
+//https://ws.audioscrobbler.com/2.0/?method=user.getweeklyartistchart&user=[username]&api_key=[API_KEY]&from=1704067200&to=1735689599&format=json
+//https://www.epochconverter.com/
 [Name("Last.fm")]
 [Remarks("User")]
 [Summary("Showing listening statistics using http://last.fm/")]
@@ -283,7 +289,7 @@ public class UserLastfmCommands(
     #region Advanced last.fm commands
     [Command("lf artist")]
     [Alias(["lf a"])]
-    [Summary("Get the your track and album stats on an artist")]
+    [Summary("Get your track and album stats on an artist")]
     public async Task LfArtist([Remainder] string artist)
     {
         try
@@ -377,4 +383,5 @@ public class UserLastfmCommands(
     #endregion
 
     //Todo: Add a new command that can search for TopTags, this list does not have period or pagination
+    //Todo: Add a config array that contains key-value pairs for easier usage (gidle -> (G)I-DLE) for lastfm search
 }
