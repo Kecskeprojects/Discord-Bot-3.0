@@ -9,6 +9,7 @@
 	"spotify_client_secret": "",
 	"lastfm_api_key": "",
 	"lastfm_api_secret": "",
+	"lastfm_artist_input_replacement": {},
 	"youtube_api_keys": [],
 	"youtube_filter_words": [],
 	"enable_instagram_embed": false,

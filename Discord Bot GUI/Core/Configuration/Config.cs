@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Discord_Bot.Core.Configuration;
@@ -19,6 +20,7 @@ public class Config
         public string spotify_Client_Secret;
         public string lastfm_API_Key;
         public string lastfm_API_Secret;
+        internal Dictionary<string, string> lastfm_artist_input_replacement;
         public string[] youtube_API_Keys;
         public string[] youtube_Filter_Words;
         public bool enable_Instagram_Embed;
@@ -51,6 +53,7 @@ public class Config
                 spotify_Client_Secret = "",
                 lastfm_API_Key = "",
                 lastfm_API_Secret = "",
+                lastfm_artist_input_replacement = [],
                 youtube_API_Keys = [],
                 youtube_Filter_Words = [],
                 enable_Instagram_Embed = false,
@@ -92,6 +95,8 @@ public class Config
     public string Lastfm_API_Key => Configuration.GetSection("lastfm_api_key").Get<string>();
 
     public string Lastfm_API_Secret => Configuration.GetSection("lastfm_api_secret").Get<string>();
+
+    public Dictionary<string, string> Lastfm_Artist_Input_Replacement => Configuration.GetSection("lastfm_artist_input_replacement").Get<Dictionary<string, string>>();
 
     public string[] Youtube_API_Keys => Configuration.GetSection("youtube_api_keys").Get<string[]>();
 

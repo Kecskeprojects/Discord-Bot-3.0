@@ -208,6 +208,10 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
     #region Last.fm advanced calls
     public async Task<ArtistStats> GetArtistDataAsync(string username, string artistName)
     {
+        artistName = config.Lastfm_Artist_Input_Replacement.TryGetValue(artistName, out string value)
+            ? value
+            : artistName;
+
         ArtistStats result = new(username);
 
         GenericResponseItem<List<LastFmApi.Models.TopAlbum.Album>> restAlbum = await GetEveryAlbumUserListenedToFromArtistAsync(username, artistName);
@@ -268,6 +272,10 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
         {
             //Get artist's name and the track for search
             string artistName = input.Split('>')[0].Trim().ToLower();
+            artistName =
+                config.Lastfm_Artist_Input_Replacement.ContainsKey(artistName)
+                ? config.Lastfm_Artist_Input_Replacement[artistName]
+                : artistName;
             string trackName = input.Split('>')[1].Trim().ToLower();
 
             restResult = await WhoKnowsRequests.WhoKnowsByTrackAsync(config.Lastfm_API_Key, artistName, trackName, usernameList);
@@ -276,6 +284,9 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
         {
             //Get artist's name for search
             string artistName = input.Trim().ToLower();
+            artistName = config.Lastfm_Artist_Input_Replacement.TryGetValue(artistName, out string value)
+                ? value
+                : artistName;
 
             restResult = await WhoKnowsRequests.WhoKnowsByArtistAsync(config.Lastfm_API_Key, artistName, usernameList);
         }
