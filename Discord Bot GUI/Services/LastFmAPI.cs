@@ -272,9 +272,8 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
         {
             //Get artist's name and the track for search
             string artistName = input.Split('>')[0].Trim().ToLower();
-            artistName =
-                config.Lastfm_Artist_Input_Replacement.ContainsKey(artistName)
-                ? config.Lastfm_Artist_Input_Replacement[artistName]
+            artistName = config.Lastfm_Artist_Input_Replacement.TryGetValue(artistName, out string value)
+                ? value
                 : artistName;
             string trackName = input.Split('>')[1].Trim().ToLower();
 

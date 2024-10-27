@@ -306,7 +306,7 @@ public class UserLastfmCommands(
                 return;
             }
 
-            ArtistStats response = await lastFmAPI.GetArtistDataAsync(user.LastFmUsername, artist);
+            ArtistStats response = await lastFmAPI.GetArtistDataAsync(user.LastFmUsername, artist.Trim().ToLower());
 
             if (string.IsNullOrEmpty(response.Message))
             {
