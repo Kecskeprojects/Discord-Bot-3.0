@@ -129,6 +129,10 @@ public class InstaScraper(BotLogger logger, BrowserService browserService) : IIn
         {
             result.Content.Add(new(new Uri(Body.Data.XdtShortcodeMedia.VideoUrl), MediaContentTypeEnum.Video));
         }
+        if (content == null)
+        {
+            result.Content.Add(new(new Uri(Body.Data.XdtShortcodeMedia.DisplayResources.Last().Src), MediaContentTypeEnum.Image));
+        }
         else
         {
             GetMediaUris(result, content);

@@ -98,7 +98,7 @@ public class InstagramEmbedFeature(
                             item.Dispose();
                         }
                         attachments.Clear();
-                        attachments = await SocialMessageProcessor.GetAttachments("instagram", result.Content, sendVideos:false, limit: 1000);
+                        attachments = await SocialMessageProcessor.GetAttachments("instagram", result.Content, sendVideos: false, limit: 1000);
                         if (!CollectionTools.IsNullOrEmpty(attachments))
                         {
                             await SendInstagramMessageAsync(attachments, result.TextContent, refer, true);

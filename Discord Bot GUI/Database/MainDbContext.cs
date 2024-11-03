@@ -42,8 +42,6 @@ public partial class MainDbContext : DbContext
 
     public virtual DbSet<Server> Servers { get; set; }
 
-    public virtual DbSet<ServerChannelView> ServerChannelViews { get; set; }
-
     public virtual DbSet<ServerMutedUser> ServerMutedUsers { get; set; }
 
     public virtual DbSet<TwitchChannel> TwitchChannels { get; set; }
@@ -403,23 +401,6 @@ public partial class MainDbContext : DbContext
             entity.HasOne(d => d.NotificationRole).WithMany(p => p.ServerNotificationRoles)
                 .HasForeignKey(d => d.NotificationRoleId)
                 .HasConstraintName("FK_Server_NotificationRole");
-        });
-
-        modelBuilder.Entity<ServerChannelView>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToView("ServerChannelView");
-
-            entity.Property(e => e.ChannelDiscordId)
-                .HasMaxLength(20)
-                .IsUnicode(false);
-            entity.Property(e => e.ChannelTypeName)
-                .HasMaxLength(100)
-                .IsUnicode(false);
-            entity.Property(e => e.ServerDiscordId)
-                .HasMaxLength(20)
-                .IsUnicode(false);
         });
 
         modelBuilder.Entity<ServerMutedUser>(entity =>

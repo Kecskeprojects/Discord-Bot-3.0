@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Database.Models;
-using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Discord_Bot.Core;
@@ -21,10 +19,6 @@ public class MapperConfig : Profile
             .ForMember(dest => dest.NotificationRoleName, opt => opt.MapFrom(scv => scv.NotificationRole.RoleName))
             .ForMember(dest => dest.MuteRoleDiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.MuteRole.DiscordId)))
             .ForMember(dest => dest.MuteRoleName, opt => opt.MapFrom(scv => scv.MuteRole.RoleName));
-        CreateMap<IGrouping<int?, ServerChannelView>, KeyValuePair<ChannelTypeEnum, List<ulong>>>()
-        .ConstructUsing(scv => new KeyValuePair<ChannelTypeEnum, List<ulong>>(
-            scv.Key != null ? (ChannelTypeEnum) scv.Key : ChannelTypeEnum.None,
-            scv.Select(x => ulong.Parse(x.ChannelDiscordId)).ToList()));
         CreateMap<TwitchChannel, TwitchChannelResource>();
         CreateMap<Greeting, GreetingResource>();
         CreateMap<TwitchChannel, TwitchChannelResource>()

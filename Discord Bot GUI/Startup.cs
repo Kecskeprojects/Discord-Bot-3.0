@@ -108,7 +108,6 @@ public static class Startup
 
         //Database Services
         collection.AddTransient<IServerService, ServerService>();
-        collection.AddTransient<IServerChannelViewService, ServerChannelViewService>();
         collection.AddTransient<IGreetingService, GreetingService>();
         collection.AddTransient<ITwitchChannelService, TwitchChannelService>();
         collection.AddTransient<ICustomCommandService, CustomCommandService>();
@@ -130,7 +129,6 @@ public static class Startup
 
         //Database Repositories
         collection.AddScoped<IServerRepository, ServerRepository>();
-        collection.AddScoped<IServerChannelViewRepository, ServerChannelViewRepository>();
         collection.AddScoped<IGreetingRepository, GreetingRepository>();
         collection.AddScoped<ITwitchChannelRepository, TwitchChannelRepository>();
         collection.AddScoped<ICustomCommandRepository, CustomCommandRepository>();

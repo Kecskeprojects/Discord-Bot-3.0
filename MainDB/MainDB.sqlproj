@@ -105,6 +105,7 @@
     <None Include="DB Patch\Patch_3.sql" />
     <None Include="DB Patch\Patch_4.sql" />
     <None Include="DB Patch\Patch_5.sql" />
+    <None Include="DB Patch\Patch_6.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Birthday.sql" />
@@ -125,7 +126,6 @@
     <Build Include="Tables\UserBias.sql" />
     <Build Include="Tables\UserIdolStatistic.sql" />
     <Build Include="Tables\ChannelType.sql" />
-    <Build Include="Views\ServerChannelView.sql" />
     <Build Include="Tables\EmbedGroup.sql" />
     <Build Include="Tables\Embed.sql" />
     <Build Include="Tables\ServerMutedUsers.sql" />

@@ -12,14 +12,14 @@ using System.Threading.Tasks;
 namespace Discord_Bot.Database.DBServices;
 
 public class ServerService(
-    IServerChannelViewService serverChannelViewService,
+    IChannelService channelService,
     IServerRepository serverRepository,
     IRoleRepository roleRepository,
     IMapper mapper,
     BotLogger logger,
     ServerCache cache) : BaseService(mapper, logger, cache), IServerService
 {
-    private readonly IServerChannelViewService serverChannelViewService = serverChannelViewService;
+    private readonly IChannelService channelService = channelService;
     private readonly IServerRepository serverRepository = serverRepository;
     private readonly IRoleRepository roleRepository = roleRepository;
 
@@ -156,7 +156,7 @@ public class ServerService(
             }
 
             result = mapper.Map<Server, ServerResource>(server);
-            result.SettingsChannels = await serverChannelViewService.GetServerChannelsAsync(result.ServerId);
+            result.SettingsChannels = await channelService.GetServerChannelsAsync(result.ServerId);
 
             cache.TryAddValue(result.DiscordId, result);
         }
