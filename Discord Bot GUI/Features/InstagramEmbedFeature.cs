@@ -79,7 +79,7 @@ public class InstagramEmbedFeature(
                 }
             }
 
-            List<FileAttachment> attachments = await SocialMessageProcessor.GetAttachments("instagram", result.Content, limit: 1000);
+            List<FileAttachment> attachments = await SocialMessageProcessor.GetAttachments("instagram", result.Content, limit: 30);
             if (!CollectionTools.IsNullOrEmpty(attachments))
             {
                 try

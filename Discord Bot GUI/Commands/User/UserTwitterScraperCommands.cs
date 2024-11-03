@@ -69,12 +69,12 @@ public class UserTwitterScraperCommands(
                         }
                     }
 
-                    List<FileAttachment> attachments = await SocialMessageProcessor.GetAttachments("twitter", result.Content);
+                    List<FileAttachment> attachments = await SocialMessageProcessor.GetAttachments("twitter", result.Content, limit: 30);
                     if (!CollectionTools.IsNullOrEmpty(attachments))
                     {
                         try
                         {
-                            await Context.Channel.SendFilesAsync(attachments, result.TextContent, messageReference: refer);
+                            await SendTwitterMessageAsync(attachments, result.TextContent, refer, true);
                             await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
                         }
                         catch (HttpException ex)
@@ -83,10 +83,10 @@ public class UserTwitterScraperCommands(
                             {
                                 logger.Warning("UserTwitterScraperCommands.cs ScrapeFromUrl", "Embed too large, only sending images!");
 
-                                attachments = await SocialMessageProcessor.GetAttachments("twitter", result.Content, false);
+                                attachments = await SocialMessageProcessor.GetAttachments("twitter", result.Content, sendVideos: false, limit: 30);
                                 if (!CollectionTools.IsNullOrEmpty(attachments))
                                 {
-                                    await Context.Channel.SendFilesAsync(attachments, result.TextContent, messageReference: refer);
+                                    await SendTwitterMessageAsync(attachments, result.TextContent, refer, true);
                                     await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
                                 }
                                 else
@@ -113,5 +113,32 @@ public class UserTwitterScraperCommands(
         {
             logger.Error("UserTwitterScraperCommands.cs ScrapeFromUrl", ex);
         }
+    }
+
+    private async Task<InstagramMessageResult> SendTwitterMessageAsync(List<FileAttachment> attachments, string message, MessageReference refer, bool ignoreVideos)
+    {
+        InstagramMessageResult result = new();
+        if (attachments.Count > 0)
+        {
+            for (int i = 0; i < Math.Ceiling(attachments.Count / 10.0); i++)
+            {
+                int count = attachments.Count - (i * 10) >= 10 ? 10 : attachments.Count - (i * 10);
+                if (i == 0)
+                {
+                    await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count), message, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
+                }
+                else
+                {
+                    await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count));
+                }
+            }
+        }
+        //Ignore videos is a second try at sending so that is when we can know if the post is too large to send
+        else if (ignoreVideos == true)
+        {
+            await Context.Channel.SendMessageAsync("Post content too large to send!");
+        }
+
+        return result;
     }
 }
