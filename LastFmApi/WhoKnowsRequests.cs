@@ -63,6 +63,8 @@ public class WhoKnowsRequests
                     //Add user to dictionary
                     response.Response.Plays.Add(user, playcount);
                 }
+
+                await Task.Delay(50);
             }
 
             response.ResultCode = LastFmRequestResultEnum.Success;
@@ -114,6 +116,8 @@ public class WhoKnowsRequests
                     //Add user to dictionary
                     response.Response.Plays.Add(user, playcount);
                 }
+
+                await Task.Delay(50);
             }
 
             response.ResultCode = LastFmRequestResultEnum.Success;
@@ -148,6 +152,8 @@ public class WhoKnowsRequests
                     //Add user to dictionary
                     response.Response.Plays.Add(user, playcount);
                 }
+
+                await Task.Delay(50);
             }
 
             response.ResultCode = LastFmRequestResultEnum.Success;
