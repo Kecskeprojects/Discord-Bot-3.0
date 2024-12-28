@@ -27,11 +27,14 @@
             <Label x:Name="TotalRAMUsage" Content="0%" Margin="120,30,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="12"/>
 
 
-            <Label Content="Number of Threads:" Margin="0,0,0,95" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
-            <Label x:Name="ThreadCount" Content="0" Margin="110,0,0,95" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
+            <Label Content="Number of Threads:" Margin="0,0,0,125" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
+            <Label x:Name="ThreadCount" Content="0" Margin="110,0,0,125" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
 
-            <Label Content="Number of Child Processes:" Margin="0,0,0,65" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
-            <Label x:Name="ChildProcessCount" Content="0" Margin="150,0,0,65" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
+            <Label Content="Number of Child Processes:" Margin="0,0,0,95" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
+            <Label x:Name="ChildProcessCount" Content="0" Margin="150,0,0,95" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
+
+            <Label Content="Reserved Memory:" Margin="0,0,0,65" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
+            <Label x:Name="ReservedRAM" Content="0 MB" Margin="105,0,0,65" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
 
             <Label Content="Memory Usage:" Margin="0,0,0,35" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>
             <Label x:Name="RAMUsage" Content="0 MB" Margin="90,0,0,35" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="12"/>

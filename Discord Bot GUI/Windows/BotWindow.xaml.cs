@@ -141,6 +141,7 @@ public partial class BotWindow : Window
                     main.ChildProcessCount.Content = $"{result.ChildProcessCount}";
                     main.CPUUsage.Content = $"{result.CPUUsagePercent}%";
                     main.RAMUsage.Content = $"{result.RAMUsageInMB} MB";
+                    main.ReservedRAM.Content = $"{result.ReservedRAMInMB} MB";
                 }
             });
         }

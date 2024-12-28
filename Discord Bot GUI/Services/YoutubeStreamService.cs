@@ -50,7 +50,7 @@ public class YoutubeStreamService(Config config, BotLogger logger) : IYoutubeDow
             {
                 ffmpeg?.WaitForExit(new TimeSpan(0, 1, 0));
             }
-            ffmpeg.Dispose();
+            ffmpeg?.Dispose();
             audioResource.AudioVariables.Stopwatch?.Stop();
 
             logger.Log("Audio stream finished!");
