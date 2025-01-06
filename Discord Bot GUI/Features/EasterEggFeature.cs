@@ -12,13 +12,11 @@ using System.Threading.Tasks;
 namespace Discord_Bot.Features;
 
 public class EasterEggFeature(
-    IKeywordService keywordService,
     IGreetingService greetingService,
     DiscordSocketClient client,
     IServerService serverService,
     BotLogger logger) : BaseFeature(serverService, logger)
 {
-    private readonly IKeywordService keywordService = keywordService;
     private readonly IGreetingService greetingService = greetingService;
     private readonly DiscordSocketClient client = client;
 
@@ -33,17 +31,6 @@ public class EasterEggFeature(
                 if (!CollectionTools.IsNullOrEmpty(list))
                 {
                     await Context.Channel.SendMessageAsync(list[new Random().Next(0, list.Count)].Url);
-                    return false;
-                }
-            }
-
-            //Response to keyword
-            if (Context.Message.Content.Length <= 100 && !DiscordTools.IsDM(Context))
-            {
-                KeywordResource keyword = await keywordService.GetKeywordAsync(Context.Guild.Id, Context.Message.Content);
-                if (keyword != null)
-                {
-                    await Context.Channel.SendMessageAsync(keyword.Response);
                     return false;
                 }
             }

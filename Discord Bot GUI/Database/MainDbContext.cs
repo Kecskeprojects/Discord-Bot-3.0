@@ -34,8 +34,6 @@ public partial class MainDbContext : DbContext
 
     public virtual DbSet<IdolImage> IdolImages { get; set; }
 
-    public virtual DbSet<Keyword> Keywords { get; set; }
-
     public virtual DbSet<Reminder> Reminders { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
@@ -300,30 +298,6 @@ public partial class MainDbContext : DbContext
             entity.HasOne(d => d.Idol).WithMany(p => p.IdolImages)
                 .HasForeignKey(d => d.IdolId)
                 .HasConstraintName("FK_IdolImage_Idol");
-        });
-
-        modelBuilder.Entity<Keyword>(entity =>
-        {
-            entity.HasKey(e => e.KeywordId).HasName("PK_KeywordId");
-
-            entity.ToTable("Keyword");
-
-            entity.Property(e => e.CreatedOn)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Response)
-                .IsRequired()
-                .HasMaxLength(300)
-                .IsUnicode(false);
-            entity.Property(e => e.Trigger)
-                .IsRequired()
-                .HasMaxLength(100)
-                .IsUnicode(false);
-
-            entity.HasOne(d => d.Server).WithMany(p => p.Keywords)
-                .HasForeignKey(d => d.ServerId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Keyword_Server");
         });
 
         modelBuilder.Entity<Reminder>(entity =>

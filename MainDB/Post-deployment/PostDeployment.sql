@@ -28,7 +28,6 @@ BEGIN
     :r .\PostDeployment\Inserts\Idol_Inserts.sql
     :r .\PostDeployment\Inserts\IdolAlias_Inserts.sql
     :r .\PostDeployment\Inserts\IdolImage_Inserts.sql
-    :r .\PostDeployment\Inserts\Keyword_Inserts.sql
     :r .\PostDeployment\Inserts\TwitchChannel_Inserts.sql
     :r .\PostDeployment\Inserts\UserBias_Inserts.sql
     :r .\PostDeployment\Inserts\UserIdolStatistic_Inserts.sql

@@ -112,7 +112,6 @@ public static class Startup
         collection.AddTransient<ITwitchChannelService, TwitchChannelService>();
         collection.AddTransient<ICustomCommandService, CustomCommandService>();
         collection.AddTransient<IRoleService, RoleService>();
-        collection.AddTransient<IKeywordService, KeywordService>();
         collection.AddTransient<IReminderService, ReminderService>();
         collection.AddTransient<IChannelService, ChannelService>();
         collection.AddTransient<IBirthdayService, BirthdayService>();
@@ -133,7 +132,6 @@ public static class Startup
         collection.AddScoped<ITwitchChannelRepository, TwitchChannelRepository>();
         collection.AddScoped<ICustomCommandRepository, CustomCommandRepository>();
         collection.AddScoped<IRoleRepository, RoleRepository>();
-        collection.AddScoped<IKeywordRepository, KeywordRepository>();
         collection.AddScoped<IReminderRepository, ReminderRepository>();
         collection.AddScoped<IUserRepository, UserRepository>();
         collection.AddScoped<IChannelRepository, ChannelRepository>();

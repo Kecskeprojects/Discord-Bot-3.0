@@ -25,11 +25,11 @@
 		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="AngleSharp" Version="1.1.2" />
+		<PackageReference Include="AngleSharp" Version="1.2.0" />
 		<PackageReference Include="AutoMapper" Version="13.0.1" />
 		<PackageReference Include="Discord.Net" Version="3.17.0" />
 		<PackageReference Include="Google.Apis.YouTube.v3" Version="1.68.0.3624" />
-		<PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.3.0" />
+		<PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.4.0" />
 		<PackageReference Include="PuppeteerSharp" Version="20.0.5" />
 		<PackageReference Include="RestSharp" Version="112.1.0" />
 		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.6" />

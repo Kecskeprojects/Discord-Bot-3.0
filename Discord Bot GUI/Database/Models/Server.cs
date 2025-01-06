@@ -27,8 +27,6 @@ public partial class Server
 
     public virtual ICollection<EmbedGroup> EmbedGroups { get; set; } = new List<EmbedGroup>();
 
-    public virtual ICollection<Keyword> Keywords { get; set; } = new List<Keyword>();
-
     public virtual Role MuteRole { get; set; }
 
     public virtual Role NotificationRole { get; set; }

@@ -88,7 +88,6 @@
     <None Include="Post-deployment\PostDeployment\Inserts\IdolAlias_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\IdolGroup_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\IdolImage_Inserts.sql" />
-    <None Include="Post-deployment\PostDeployment\Inserts\Keyword_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\Reminder_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\Role_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\Server_Inserts.sql" />
@@ -100,14 +99,6 @@
     <None Include="Post-deployment\ChannelType_Inserts.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="DB Patch\Patch_1.sql" />
-    <None Include="DB Patch\Patch_2.sql" />
-    <None Include="DB Patch\Patch_3.sql" />
-    <None Include="DB Patch\Patch_4.sql" />
-    <None Include="DB Patch\Patch_5.sql" />
-    <None Include="DB Patch\Patch_6.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <Build Include="Tables\Birthday.sql" />
     <Build Include="Tables\Channel.sql" />
     <Build Include="Tables\CustomCommand.sql" />
@@ -116,7 +107,6 @@
     <Build Include="Tables\IdolAlias.sql" />
     <Build Include="Tables\IdolGroup.sql" />
     <Build Include="Tables\IdolImage.sql" />
-    <Build Include="Tables\Keyword.sql" />
     <Build Include="Tables\Reminder.sql" />
     <Build Include="Tables\Role.sql" />
     <Build Include="Tables\Server.sql" />
@@ -129,5 +119,14 @@
     <Build Include="Tables\EmbedGroup.sql" />
     <Build Include="Tables\Embed.sql" />
     <Build Include="Tables\ServerMutedUsers.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DB Patch\Patch_1.sql" />
+    <None Include="DB Patch\Patch_2.sql" />
+    <None Include="DB Patch\Patch_3.sql" />
+    <None Include="DB Patch\Patch_4.sql" />
+    <None Include="DB Patch\Patch_5.sql" />
+    <None Include="DB Patch\Patch_6.sql" />
+    <None Include="DB Patch\Patch_7.sql" />
   </ItemGroup>
 </Project>
