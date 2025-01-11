@@ -28,12 +28,12 @@
 		<PackageReference Include="AngleSharp" Version="1.2.0" />
 		<PackageReference Include="AutoMapper" Version="13.0.1" />
 		<PackageReference Include="Discord.Net" Version="3.17.0" />
-		<PackageReference Include="Google.Apis.YouTube.v3" Version="1.68.0.3624" />
+		<PackageReference Include="Google.Apis.YouTube.v3" Version="1.68.0.3653" />
 		<PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.4.0" />
 		<PackageReference Include="PuppeteerSharp" Version="20.0.5" />
 		<PackageReference Include="RestSharp" Version="112.1.0" />
 		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.6" />
-		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.4" />
+		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.5" />
 		<PackageReference Include="SpotifyAPI.Web" Version="7.2.1" />
 		<PackageReference Include="TwitchLib.Api" Version="3.9.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
