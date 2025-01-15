@@ -48,6 +48,12 @@ public partial class MainDbContext : DbContext
 
     public virtual DbSet<UserIdolStatistic> UserIdolStatistics { get; set; }
 
+    public virtual DbSet<WeeklyPoll> WeeklyPolls { get; set; }
+
+    public virtual DbSet<WeeklyPollOption> WeeklyPollOptions { get; set; }
+
+    public virtual DbSet<WeeklyPollOptionPreset> WeeklyPollOptionPresets { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.UseCollation("SQL_Latin1_General_CP1_CI_AS");
@@ -381,7 +387,6 @@ public partial class MainDbContext : DbContext
         {
             entity.HasKey(e => new { e.UserId, e.ServerId }).HasName("PK_Muted_ServerId_UserId");
 
-            entity.Property(e => e.ServerId).ValueGeneratedOnAdd();
             entity.Property(e => e.MutedUntil).HasColumnType("datetime");
             entity.Property(e => e.RemovedRoleDiscordIds).IsRequired();
 
@@ -485,6 +490,52 @@ public partial class MainDbContext : DbContext
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_UserIdolStatistic_User");
+        });
+
+        modelBuilder.Entity<WeeklyPoll>(entity =>
+        {
+            entity.HasKey(e => e.WeeklyPollId).HasName("PK_WeeklyPollId");
+
+            entity.ToTable("WeeklyPoll");
+
+            entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+            entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
+            entity.Property(e => e.RepeatOnDayOfWeek)
+                .IsRequired()
+                .HasMaxLength(10)
+                .IsUnicode(false);
+            entity.Property(e => e.Title)
+                .IsRequired()
+                .HasMaxLength(300);
+        });
+
+        modelBuilder.Entity<WeeklyPollOption>(entity =>
+        {
+            entity.HasKey(e => e.WeeklyPollOptionId).HasName("PK_WeeklyPollOptionId");
+
+            entity.ToTable("WeeklyPollOption");
+
+            entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+            entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
+            entity.Property(e => e.Title)
+                .IsRequired()
+                .HasMaxLength(55);
+        });
+
+        modelBuilder.Entity<WeeklyPollOptionPreset>(entity =>
+        {
+            entity.HasKey(e => e.WeeklyPollOptionPresetId).HasName("PK_WeeklyPollOptionPresetId");
+
+            entity.ToTable("WeeklyPollOptionPreset");
+
+            entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+            entity.Property(e => e.Description)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(100);
         });
 
         OnModelCreatingPartial(modelBuilder);

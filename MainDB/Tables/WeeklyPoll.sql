@@ -1,0 +1,20 @@
+﻿CREATE TABLE [dbo].[WeeklyPoll]
+(
+	[WeeklyPollId] INT NOT NULL IDENTITY, 
+    [ServerId] INT NOT NULL, 
+    [ChannelId] INT NOT NULL, 
+    [RoleId] INT NULL, 
+    [Title] NVARCHAR(300) NOT NULL, 
+    [CloseInTimeSpanTicks] BIGINT NOT NULL, 
+    [RepeatOnDayOfWeek] VARCHAR(10) NOT NULL, 
+    [IsMultipleAnswer] BIT NOT NULL, 
+    [OptionPresetId] INT NULL, 
+    [CreatedOn] DATETIME NOT NULL CONSTRAINT [DF_WeeklyPoll_CreatedOn] DEFAULT GETDATE(), 
+    [ModifiedOn] DATETIME NOT NULL CONSTRAINT [DF_WeeklyPoll_ModifiedOn] DEFAULT GETDATE(),
+    CONSTRAINT [PK_WeeklyPollId] PRIMARY KEY ([WeeklyPollId]),
+    CONSTRAINT [FK_WeeklyPoll_ServerId] FOREIGN KEY ([ServerId]) REFERENCES [Server]([ServerId]),
+    CONSTRAINT [FK_WeeklyPoll_ChannelId] FOREIGN KEY ([ChannelId]) REFERENCES [Channel]([ChannelId]),
+    CONSTRAINT [FK_WeeklyPoll_RoleId] FOREIGN KEY ([RoleId]) REFERENCES [Role]([RoleId]),
+    CONSTRAINT [FK_WeeklyPoll_WeeklyPollOptionPresetId] FOREIGN KEY ([OptionPresetId]) REFERENCES [WeeklyPollOptionPreset]([WeeklyPollOptionPresetId]),
+    CONSTRAINT [CK_WeeklyPoll_RepeatOnDayOfWeek] CHECK ([RepeatOnDayOfWeek] IN ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')), 
+)

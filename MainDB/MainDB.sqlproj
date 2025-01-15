@@ -119,6 +119,9 @@
     <Build Include="Tables\EmbedGroup.sql" />
     <Build Include="Tables\Embed.sql" />
     <Build Include="Tables\ServerMutedUsers.sql" />
+    <Build Include="Tables\WeeklyPoll.sql" />
+    <Build Include="Tables\WeeklyPollOption.sql" />
+    <Build Include="Tables\WeeklyPollOptionPreset.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DB Patch\Patch_1.sql" />

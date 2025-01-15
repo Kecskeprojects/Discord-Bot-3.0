@@ -245,4 +245,95 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="ServerId" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="207577b6-d947-4aef-bcd2-155b6a3c3470" ChangeDateTime="01/11/2025 17:57:20">
+    <Property Name="ElementName" Value="[dbo].[WeeklyPoll].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[WeeklyPoll]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="WeeklyPollId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="bc0bae62-5b14-46de-a13c-ac0d3aad6088" ChangeDateTime="01/11/2025 17:58:53">
+    <Property Name="ElementName" Value="[dbo].[WeeklyPoll].[PollTitle]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[WeeklyPoll]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Title" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="689ad98d-2570-40b2-bf46-d3ea8fa32728" ChangeDateTime="01/11/2025 18:01:22">
+    <Property Name="ElementName" Value="[dbo].[WeeklyPoll].[PollCloseInInterval]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[WeeklyPoll]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="PollCloseInTimeSpanTicks" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="cf065e26-8fc7-4176-8a98-71a6dca9811a" ChangeDateTime="01/11/2025 18:01:38">
+    <Property Name="ElementName" Value="[dbo].[WeeklyPoll].[PollCloseInTimeSpanTicks]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[WeeklyPoll]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="PollCloseInTicks" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f4d7b05c-fc37-4ef9-ba73-5cfb9186c190" ChangeDateTime="01/11/2025 18:04:32">
+    <Property Name="ElementName" Value="[dbo].[WeeklyPoll].[RepeatOn]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[WeeklyPoll]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="RepeatOnDay" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="19d09f66-174e-494c-9789-7030617bc7fb" ChangeDateTime="01/11/2025 18:04:37">
+    <Property Name="ElementName" Value="[dbo].[WeeklyPoll].[RepeatOnDay]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[WeeklyPoll]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="RepeatOnDayOfWeek" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="7a7dd630-35ce-4d04-9aa0-34acaaef5733" ChangeDateTime="01/11/2025 18:05:53">
+    <Property Name="ElementName" Value="[dbo].[WeeklyPoll].[OptionPresetId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[WeeklyPoll]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="WeeklyPollOptionPresetId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2fb38c42-d074-4fc4-9ca8-914c5787985e" ChangeDateTime="01/11/2025 18:08:27">
+    <Property Name="ElementName" Value="[dbo].[WeeklyPoll].[PollCloseInTicks]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[WeeklyPoll]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CloseInTimeSpanTicks" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="8c883e6a-6a4c-418d-a85f-d93256e767cf" ChangeDateTime="01/11/2025 18:08:33">
+    <Property Name="ElementName" Value="[dbo].[WeeklyPoll].[WeeklyPollOptionPresetId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[WeeklyPoll]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="OptionPresetId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="e925e534-52de-4679-8f5e-7120c04a3c9e" ChangeDateTime="01/11/2025 18:09:14">
+    <Property Name="ElementName" Value="[dbo].[WeeklyPollOption].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[WeeklyPollOption]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="WeeklyPollOptionId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6c554721-fd22-4d3d-9375-22325503d367" ChangeDateTime="01/11/2025 18:09:34">
+    <Property Name="ElementName" Value="[dbo].[WeeklyPollOption].[PresetId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[WeeklyPollOption]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="OptionPresetId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d5cd4a43-7f60-4209-a180-439d46ff6289" ChangeDateTime="01/11/2025 19:28:18">
+    <Property Name="ElementName" Value="[dbo].[WeeklyPollOptionPreset].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[WeeklyPollOptionPreset]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="WeeklyPollOptionPresetId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="eb18290c-7419-4b00-b5ce-a9ac96cc7b78" ChangeDateTime="01/11/2025 19:28:25">
+    <Property Name="ElementName" Value="[dbo].[WeeklyPollOption].[OptionPresetId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[WeeklyPollOption]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="WeeklyPollOptionPresetId" />
+  </Operation>
 </Operations>
