@@ -383,5 +383,4 @@ public class UserLastfmCommands(
     #endregion
 
     //Todo: Add a new command that can search for TopTags, this list does not have period or pagination
-    //Todo: Add a config array that contains key-value pairs for easier usage (gidle -> (G)I-DLE) for lastfm search
 }
