@@ -29,7 +29,7 @@ public class AdminSelfRoleCommands(
     [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Add self assignable role to list of roles on the server")]
-    public async Task SelfRoleAdd([Name("role name")] IRole role)
+    public async Task SelfRoleAdd([Remainder][Name("role name")] IRole role)
     {
         try
         {
@@ -52,7 +52,7 @@ public class AdminSelfRoleCommands(
     [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Remove self assignable role from list of roles on the server")]
-    public async Task SelfRoleRemove([Name("role name")] IRole role)
+    public async Task SelfRoleRemove([Remainder][Name("role name")] IRole role)
     {
         try
         {

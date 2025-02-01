@@ -53,7 +53,7 @@ public class AdminServerSettingCommands(
     [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Set/add a type of channel for setting up/limiting other features")]
-    public async Task ChannelAdd([Name("channel type")] string channeltype = "", [Name("channel name")] IChannel channel = null)
+    public async Task ChannelAdd([Name("channel type")] string channeltype = "", [Remainder][Name("channel name")] IChannel channel = null)
     {
         try
         {
@@ -97,7 +97,7 @@ public class AdminServerSettingCommands(
     [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Remove one or all set channels of a type\n*If no channel is given, all of given type will be removed")]
-    public async Task ChannelRemove([Name("channel type")] string channeltype = "", [Name("channel name*")] IChannel channel = null)
+    public async Task ChannelRemove([Name("channel type")] string channeltype = "", [Remainder][Name("channel name*")] IChannel channel = null)
     {
         try
         {
@@ -143,7 +143,7 @@ public class AdminServerSettingCommands(
     [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Add the role that will be notified upon any channel going online")]
-    public async Task TwitchRoleAdd([Name("role name")] IRole role)
+    public async Task TwitchRoleAdd([Remainder][Name("role name")] IRole role)
     {
         try
         {

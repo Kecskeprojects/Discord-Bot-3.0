@@ -1,10 +1,13 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Rest;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
@@ -24,10 +27,35 @@ public class AdminBirthdayCommands(
     [RequireUserPermission(ChannelPermission.ManageRoles)]
     [RequireContext(ContextType.Guild)]
     [Summary("Adding/overriding birthday of any user on the server\n*Most date separators accepted using year/month/day order")]
-    public async Task BirthdayAddForUser([Name("user name")] IUser user, [Name("date*")][Remainder] string dateString)
+    public async Task BirthdayAddForUser([Remainder][Name("username>date*")] string parameters)
     {
         try
         {
+            //Get artist's name and the track for search
+            string userIdOrName = parameters.Split('>')[0].Trim().ToLower();
+            string dateString = parameters.Split('>')[1].Trim().ToLower();
+
+            IUser user = null;
+            if (ulong.TryParse(userIdOrName, out ulong id))
+            {
+                user = await Context.Client.GetUserAsync(id);
+            }
+            else
+            {
+                await Context.Guild.DownloadUsersAsync();
+                IReadOnlyCollection<RestGuildUser> users = await Context.Guild.SearchUsersAsync(userIdOrName, 1);
+                if (users.Count > 0)
+                {
+                    user = users.First();
+                }
+            }
+
+            if (user == null)
+            {
+                await ReplyAsync("No user was found with that ID!");
+                return;
+            }
+
             string[] strings = GetDateParameterParts(dateString);
             if (strings.Length != 3)
             {
@@ -66,7 +94,7 @@ public class AdminBirthdayCommands(
     [RequireUserPermission(ChannelPermission.ManageRoles)]
     [RequireContext(ContextType.Guild)]
     [Summary("Removing birthday of any user on the server")]
-    public async Task BirthdayRemoveForUser([Name("user name")] IUser user)
+    public async Task BirthdayRemoveForUser([Remainder][Name("user name")] IUser user)
     {
         try
         {
