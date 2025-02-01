@@ -123,6 +123,7 @@ CREATE TABLE [dbo].[WeeklyPoll] (
     [ServerId]             INT            NOT NULL,
     [ChannelId]            INT            NOT NULL,
     [RoleId]               INT            NULL,
+    [Name]                NVARCHAR (50) NOT NULL,
     [Title]                NVARCHAR (300) NOT NULL,
     [CloseInTimeSpanTicks] BIGINT         NOT NULL,
     [RepeatOnDayOfWeek]    VARCHAR (10)   NOT NULL,

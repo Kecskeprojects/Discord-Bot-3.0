@@ -176,14 +176,13 @@ public class TwitchAPI(
                 logger.Log("120 queries have been completed!");
             }
 
-            if (TokenTick % 5 == 0)
-            {
-                List<string> lst = await GetChannelsAsync();
+            List<string> lst = await GetChannelsAsync();
 
-                if (!CollectionTools.IsNullOrEmpty(lst) && Monitor.ChannelsToMonitor.Except(lst).Any())
-                {
-                    Monitor.SetChannelsById(lst);
-                }
+            if (!CollectionTools.IsNullOrEmpty(lst)
+                && (Monitor.ChannelsToMonitor.Except(lst).Any()
+                    || lst.Except(Monitor.ChannelsToMonitor).Any()))
+            {
+                Monitor.SetChannelsById(lst);
             }
         }
         catch (Exception ex)

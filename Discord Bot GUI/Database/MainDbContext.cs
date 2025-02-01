@@ -500,6 +500,9 @@ public partial class MainDbContext : DbContext
 
             entity.Property(e => e.CreatedOn).HasColumnType("datetime");
             entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(50);
             entity.Property(e => e.RepeatOnDayOfWeek)
                 .IsRequired()
                 .HasMaxLength(10)
