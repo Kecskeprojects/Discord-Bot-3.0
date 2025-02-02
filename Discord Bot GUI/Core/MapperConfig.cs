@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Discord;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Resources;
+using Discord_Bot.Tools;
 using System;
 using System.Linq;
 
@@ -55,6 +57,8 @@ public class MapperConfig : Profile
         CreateMap<User, UserBiasGameStatResource>()
             .ForMember(dest => dest.Stats, opt => opt.Ignore());
         CreateMap<ServerMutedUser, ServerMutedUserResource>();
+        CreateMap<WeeklyPoll, WeeklyPollResource>()
+            .ForMember(dest => dest.Options, opt => opt.MapFrom(x => PollTools.GetAnswerOptions(x)));
 
         //Communication to Model
         CreateMap<ExtendedBiasData, Idol>()
@@ -67,5 +71,13 @@ public class MapperConfig : Profile
             .ForMember(dest => dest.FullKoreanName, opt => opt.MapFrom(e => e.GroupFullKoreanName))
             .ForMember(dest => dest.DebutDate, opt => opt.MapFrom(e => e.DebutDate))
             .ForMember(dest => dest.ModifiedOn, opt => opt.MapFrom(x => DateTime.UtcNow));
+
+        //Other
+        CreateMap<WeeklyPollResource, PollProperties>()
+            .ForMember(dest => dest.Answers, opt => opt.MapFrom(x => x.Options.Select(PollTools.CreateTitle)))
+            .ForMember(dest => dest.AllowMultiselect, opt => opt.MapFrom(x => x.IsMultipleAnswer))
+            .ForMember(dest => dest.Duration, opt => opt.MapFrom(x => PollTools.GetDuration(x.CloseInTimeSpanTicks)))
+            .ForMember(dest => dest.LayoutType, opt => opt.MapFrom(x => PollLayout.Default))
+            .ForMember(dest => dest.Question, opt => opt.MapFrom(x => PollTools.CreateTitle(x.Title)));
     }
 }

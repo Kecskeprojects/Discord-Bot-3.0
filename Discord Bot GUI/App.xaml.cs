@@ -130,6 +130,9 @@ public partial class App : Application
                     BirthdayFeature birthdayFeature = scope.ServiceProvider.GetService<BirthdayFeature>();
                     await birthdayFeature.Run();
 
+                    WeeklyPollFeature weeklyPollFeature = scope.ServiceProvider.GetService<WeeklyPollFeature>();
+                    await weeklyPollFeature.Run();
+
                     Config config = scope.ServiceProvider.GetService<Config>();
                     YoutubeAPI.KeyReset(config.Youtube_API_Keys);
                     logger.Log("Youtube keys reset!");

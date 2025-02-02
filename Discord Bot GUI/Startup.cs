@@ -90,6 +90,7 @@ public static class Startup
         collection.AddTransient<AudioPlayFeature>();
         collection.AddTransient<AudioRequestFeature>();
         collection.AddTransient<UnmuteFeature>();
+        collection.AddTransient<WeeklyPollFeature>();
 
         //Services
         collection.AddSingleton<BrowserService>();
@@ -122,9 +123,12 @@ public static class Startup
         collection.AddTransient<IUserIdolService, UserIdolService>();
         collection.AddTransient<IIdolImageService, IdolImageService>();
         collection.AddTransient<IUserIdolStatisticService, UserIdolStatisticService>();
-        collection.AddScoped<IEmbedService, EmbedService>();
-        collection.AddScoped<IEmbedGroupService, EmbedGroupService>();
-        collection.AddScoped<IServerMutedUserService, ServerMutedUserService>();
+        collection.AddTransient<IWeeklyPollOptionPresetService, WeeklyPollOptionPresetService>();
+        collection.AddTransient<IWeeklyPollOptionService, WeeklyPollOptionService>();
+        collection.AddTransient<IWeeklyPollService, WeeklyPollService>();
+        collection.AddTransient<IEmbedService, EmbedService>();
+        collection.AddTransient<IEmbedGroupService, EmbedGroupService>();
+        collection.AddTransient<IServerMutedUserService, ServerMutedUserService>();
 
         //Database Repositories
         collection.AddScoped<IServerRepository, ServerRepository>();
@@ -142,6 +146,9 @@ public static class Startup
         collection.AddScoped<IIdolAliasRepository, IdolAliasRepository>();
         collection.AddScoped<IIdolImageRepository, IdolImageRepository>();
         collection.AddScoped<IUserIdolStatisticRepository, UserIdolStatisticRepository>();
+        collection.AddScoped<IWeeklyPollOptionPresetRepository, WeeklyPollOptionPresetRepository>();
+        collection.AddScoped<IWeeklyPollOptionRepository, WeeklyPollOptionRepository>();
+        collection.AddScoped<IWeeklyPollRepository, WeeklyPollRepository>();
         collection.AddScoped<IEmbedRepository, EmbedRepository>();
         collection.AddScoped<IEmbedGroupRepository, EmbedGroupRepository>();
         collection.AddScoped<IServerMutedUserRepository, ServerMutedUserRepository>();

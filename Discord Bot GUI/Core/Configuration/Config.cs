@@ -20,7 +20,7 @@ public class Config
         public string spotify_Client_Secret;
         public string lastfm_API_Key;
         public string lastfm_API_Secret;
-        internal Dictionary<string, string> lastfm_artist_input_replacement;
+        public Dictionary<string, string> lastfm_artist_input_replacement;
         public string[] youtube_API_Keys;
         public string[] youtube_Filter_Words;
         public bool enable_Instagram_Embed;

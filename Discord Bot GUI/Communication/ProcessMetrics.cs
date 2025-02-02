@@ -4,7 +4,7 @@ public class ProcessMetrics
 {
     public double CPUUsagePercent { get; set; }
     public double RAMUsageInMB { get; set; }
-    public double ReservedRAMInMB { get; internal set; }
+    public double ReservedRAMInMB { get; set; }
     public double TotalCPUUsagePercent { get; set; }
     public double TotalRAMUsagePercent { get; set; }
     public int ChildProcessCount { get; set; }
