@@ -58,7 +58,7 @@ public static class PollTools
         List<string> days = [];
         for (int i = 1; i < 8; i++)
         {
-            days.Add(DateTime.UtcNow.AddDays(i).ToString("MMMM.dd (dddd)", CultureInfo.GetCultureInfo(cultureCode)));
+            days.Add(DateTime.UtcNow.AddDays(i).ToString("MMMM dd. (dddd)", CultureInfo.GetCultureInfo(cultureCode)));
         }
         return days;
     }

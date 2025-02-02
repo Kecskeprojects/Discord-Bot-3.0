@@ -23,15 +23,18 @@ public class WeeklyPollService(
         List<WeeklyPollResource> result = null;
         try
         {
-            List<WeeklyPoll> idols = await weeklyPollRepository.GetListAsync(
+            List<WeeklyPoll> polls = await weeklyPollRepository.GetListAsync(
                 wp => wp.RepeatOnDayOfWeek == dayOfWeek.ToString(),
                 includes: [
+                    wp => wp.Server,
+                    wp => wp.Role,
+                    wp => wp.Channel,
                     wp => wp.WeeklyPollOptions,
                     wp => wp.OptionPreset,
                     wp => wp.OptionPreset.WeeklyPollOptions
                 ]);
 
-            result = mapper.Map<List<WeeklyPoll>, List<WeeklyPollResource>>(idols);
+            result = mapper.Map<List<WeeklyPoll>, List<WeeklyPollResource>>(polls);
         }
         catch (Exception ex)
         {
