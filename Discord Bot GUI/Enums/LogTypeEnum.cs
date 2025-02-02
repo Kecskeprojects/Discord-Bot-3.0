@@ -13,7 +13,7 @@ public enum LogTypeEnum
 
 public static class LogTypeEnumExtension
 {
-    public static string ToFriendlyString(this LogTypeEnum logType)
+    public static string ToLogFriendlyString(this LogTypeEnum logType)
     {
         return logType switch
         {

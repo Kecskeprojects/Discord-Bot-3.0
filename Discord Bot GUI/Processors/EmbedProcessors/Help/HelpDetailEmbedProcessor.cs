@@ -11,7 +11,7 @@ public class HelpDetailEmbedProcessor
     public static Embed[] CreateEmbed(CommandLevelEnum commandLevel, string category, List<CommandInfo> commands, string imageUrl)
     {
         EmbedBuilder builder = new();
-        builder.WithTitle($"{commandLevel.ToFriendlyString()} {category} Commands:");
+        builder.WithTitle($"{commandLevel} {category} Commands:");
 
         foreach (CommandInfo command in commands)
         {

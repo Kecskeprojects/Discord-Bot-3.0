@@ -18,7 +18,7 @@ public class UserIdolStatisticRepository(MainDbContext context) : GenericReposit
             .Include(i => i.Idol.Group)
             .Include(i => i.Idol.IdolImages)
             .Include(i => i.Idol.Users)
-            .Where(stat => stat.UserId == userId && (gender == GenderEnum.NotSpecified || stat.Idol.Gender == gender.ToFriendlyString()))
+            .Where(stat => stat.UserId == userId && (gender == GenderEnum.NotSpecified || stat.Idol.Gender == gender.ToDatabaseFriendlyString()))
             .Select(stat => new UserIdolStatisticResource()
             {
                 IdolGroupFullName = stat.Idol.Group.FullName ?? "Soloist",

@@ -48,7 +48,7 @@ public class BiasGameInteraction(
 
             data.Gender = chosenGender;
 
-            logger.Log($"BiasGame Setup Gender Chosen: {chosenGender.ToFriendlyString()}", LogOnly: true);
+            logger.Log($"BiasGame Setup Gender Chosen: {chosenGender.ToDatabaseFriendlyString()}", LogOnly: true);
             MessageComponent component = BiasGameDebutEmbedProcessor.CreateComponent(data);
 
             await ModifyOriginalResponseAsync(x => x.Components = component);

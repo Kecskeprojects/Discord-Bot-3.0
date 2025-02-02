@@ -20,7 +20,7 @@ public static class BiasGameStatEmbedProcessor
 
         builder.WithThumbnailUrl(stats.Stats.First().LatestImageUrl);
         builder.WithCurrentTimestamp();
-        builder.WithFooter($"Gender: {gender.ToFriendlyString()}");
+        builder.WithFooter($"Gender: {gender.ToDatabaseFriendlyString()}");
 
         string list = "";
         for (int i = 0; i < stats.Stats.Count; i++)

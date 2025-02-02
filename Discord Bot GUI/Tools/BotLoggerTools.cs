@@ -8,7 +8,7 @@ public static class BotLoggerTools
 {
     public static Log BaseLog(LogTypeEnum type)
     {
-        return new(DateTime.Now, type, $"[{DateTimeTools.CurrentTime()}][{type.ToFriendlyString()}]:\t");
+        return new(DateTime.Now, type, $"[{DateTimeTools.CurrentTime()}][{type.ToLogFriendlyString()}]:\t");
     }
 
     public static string PutTabsOnNewLines(string message)

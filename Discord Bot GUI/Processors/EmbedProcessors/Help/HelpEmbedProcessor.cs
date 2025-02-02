@@ -9,7 +9,7 @@ public class HelpEmbedProcessor
     public static Embed[] CreateEmbed(CommandLevelEnum commandLevel, List<ModuleInfo> modules, string imageUrl)
     {
         EmbedBuilder builder = new();
-        builder.WithTitle($"{commandLevel.ToFriendlyString()} Commands");
+        builder.WithTitle($"{commandLevel} Commands");
 
         switch (commandLevel)
         {

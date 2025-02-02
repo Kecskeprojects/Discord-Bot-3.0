@@ -43,7 +43,7 @@ public class HelpCommands(
             }
 
             List<ModuleInfo> modules = commandService.Modules
-                .Where(x => x.Remarks == commandLevelEnum.ToFriendlyString())
+                .Where(x => x.Remarks == commandLevelEnum.ToString())
                 .ToList();
 
             Embed[] embed = HelpEmbedProcessor.CreateEmbed(commandLevelEnum, modules, config.Img);

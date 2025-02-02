@@ -9,7 +9,7 @@ public enum GenderEnum
 
 public static class GenderChoiceEnumExtension
 {
-    public static string ToFriendlyString(this GenderEnum genderEnum)
+    public static string ToDatabaseFriendlyString(this GenderEnum genderEnum)
     {
         return genderEnum switch
         {
@@ -22,6 +22,6 @@ public static class GenderChoiceEnumExtension
 
     public static bool EqualsString(this GenderEnum genderEnum, string value)
     {
-        return value.Equals(genderEnum.ToFriendlyString(), System.StringComparison.OrdinalIgnoreCase);
+        return value.Equals(genderEnum.ToDatabaseFriendlyString(), System.StringComparison.OrdinalIgnoreCase);
     }
 }
