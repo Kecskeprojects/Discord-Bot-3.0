@@ -32,6 +32,11 @@ public class WeeklyPollFeature(
             {
                 foreach (WeeklyPollResource poll in result)
                 {
+                    if (poll.Options.Count == 0)
+                    {
+                        continue;
+                    }
+
                     PollProperties pollProp = mapper.Map<PollProperties>(poll);
 
                     SocketGuild server = client.GetGuild(poll.ServerDiscordId);
