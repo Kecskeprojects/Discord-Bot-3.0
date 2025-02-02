@@ -25,9 +25,11 @@ public class WeeklyPollService(
         {
             List<WeeklyPoll> idols = await weeklyPollRepository.GetListAsync(
                 wp => wp.RepeatOnDayOfWeek == dayOfWeek.ToString(),
-                includes: [wp => wp.WeeklyPollOptions,
-                wp => wp.OptionPreset,
-                wp => wp.OptionPreset.WeeklyPollOptions]);
+                includes: [
+                    wp => wp.WeeklyPollOptions,
+                    wp => wp.OptionPreset,
+                    wp => wp.OptionPreset.WeeklyPollOptions
+                ]);
 
             result = mapper.Map<List<WeeklyPoll>, List<WeeklyPollResource>>(idols);
         }
