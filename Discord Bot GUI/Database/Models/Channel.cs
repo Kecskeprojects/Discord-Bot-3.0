@@ -17,5 +17,7 @@ public partial class Channel
 
     public virtual Server Server { get; set; }
 
+    public virtual ICollection<WeeklyPoll> WeeklyPolls { get; set; } = new List<WeeklyPoll>();
+
     public virtual ICollection<ChannelType> ChannelTypes { get; set; } = new List<ChannelType>();
 }

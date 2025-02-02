@@ -18,4 +18,8 @@ public partial class WeeklyPollOption
     public DateTime CreatedOn { get; set; }
 
     public DateTime ModifiedOn { get; set; }
+
+    public virtual WeeklyPoll WeeklyPoll { get; set; }
+
+    public virtual WeeklyPollOptionPreset WeeklyPollOptionPreset { get; set; }
 }

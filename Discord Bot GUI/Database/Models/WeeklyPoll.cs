@@ -28,4 +28,14 @@ public partial class WeeklyPoll
     public DateTime CreatedOn { get; set; }
 
     public DateTime ModifiedOn { get; set; }
+
+    public virtual Channel Channel { get; set; }
+
+    public virtual WeeklyPollOptionPreset OptionPreset { get; set; }
+
+    public virtual Role Role { get; set; }
+
+    public virtual Server Server { get; set; }
+
+    public virtual ICollection<WeeklyPollOption> WeeklyPollOptions { get; set; } = new List<WeeklyPollOption>();
 }

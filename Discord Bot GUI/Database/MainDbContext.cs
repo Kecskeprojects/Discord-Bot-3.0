@@ -498,8 +498,12 @@ public partial class MainDbContext : DbContext
 
             entity.ToTable("WeeklyPoll");
 
-            entity.Property(e => e.CreatedOn).HasColumnType("datetime");
-            entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.ModifiedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(50);
@@ -510,6 +514,24 @@ public partial class MainDbContext : DbContext
             entity.Property(e => e.Title)
                 .IsRequired()
                 .HasMaxLength(300);
+
+            entity.HasOne(d => d.Channel).WithMany(p => p.WeeklyPolls)
+                .HasForeignKey(d => d.ChannelId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_WeeklyPoll_ChannelId");
+
+            entity.HasOne(d => d.OptionPreset).WithMany(p => p.WeeklyPolls)
+                .HasForeignKey(d => d.OptionPresetId)
+                .HasConstraintName("FK_WeeklyPoll_WeeklyPollOptionPresetId");
+
+            entity.HasOne(d => d.Role).WithMany(p => p.WeeklyPolls)
+                .HasForeignKey(d => d.RoleId)
+                .HasConstraintName("FK_WeeklyPoll_RoleId");
+
+            entity.HasOne(d => d.Server).WithMany(p => p.WeeklyPolls)
+                .HasForeignKey(d => d.ServerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_WeeklyPoll_ServerId");
         });
 
         modelBuilder.Entity<WeeklyPollOption>(entity =>
@@ -518,11 +540,23 @@ public partial class MainDbContext : DbContext
 
             entity.ToTable("WeeklyPollOption");
 
-            entity.Property(e => e.CreatedOn).HasColumnType("datetime");
-            entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.ModifiedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Title)
                 .IsRequired()
                 .HasMaxLength(55);
+
+            entity.HasOne(d => d.WeeklyPoll).WithMany(p => p.WeeklyPollOptions)
+                .HasForeignKey(d => d.WeeklyPollId)
+                .HasConstraintName("FK_WeeklyPollOption_WeeklyPollId");
+
+            entity.HasOne(d => d.WeeklyPollOptionPreset).WithMany(p => p.WeeklyPollOptions)
+                .HasForeignKey(d => d.WeeklyPollOptionPresetId)
+                .HasConstraintName("FK_WeeklyPollOption_WeeklyPollOptionPresetId");
         });
 
         modelBuilder.Entity<WeeklyPollOptionPreset>(entity =>
@@ -531,11 +565,15 @@ public partial class MainDbContext : DbContext
 
             entity.ToTable("WeeklyPollOptionPreset");
 
-            entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Description)
                 .IsRequired()
                 .HasMaxLength(100);
-            entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
+            entity.Property(e => e.ModifiedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(100);

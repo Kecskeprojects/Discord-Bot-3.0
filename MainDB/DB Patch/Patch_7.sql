@@ -45,7 +45,6 @@ GO
 Table [dbo].[Keyword] is being dropped.
 */
 
-GO
 PRINT N'Rename refactoring operation with key 207577b6-d947-4aef-bcd2-155b6a3c3470 is skipped, element [dbo].[WeeklyPoll].[Id] (SqlSimpleColumn) will not be renamed to WeeklyPollId';
 
 
@@ -123,7 +122,7 @@ CREATE TABLE [dbo].[WeeklyPoll] (
     [ServerId]             INT            NOT NULL,
     [ChannelId]            INT            NOT NULL,
     [RoleId]               INT            NULL,
-    [Name]                NVARCHAR (50) NOT NULL,
+    [Name]                 NVARCHAR (50)  NOT NULL,
     [Title]                NVARCHAR (300) NOT NULL,
     [CloseInTimeSpanTicks] BIGINT         NOT NULL,
     [RepeatOnDayOfWeek]    VARCHAR (10)   NOT NULL,

@@ -16,4 +16,8 @@ public partial class WeeklyPollOptionPreset
     public DateTime CreatedOn { get; set; }
 
     public DateTime ModifiedOn { get; set; }
+
+    public virtual ICollection<WeeklyPollOption> WeeklyPollOptions { get; set; } = new List<WeeklyPollOption>();
+
+    public virtual ICollection<WeeklyPoll> WeeklyPolls { get; set; } = new List<WeeklyPoll>();
 }

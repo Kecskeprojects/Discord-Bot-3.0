@@ -36,4 +36,6 @@ public partial class Server
     public virtual ICollection<ServerMutedUser> ServerMutedUsers { get; set; } = new List<ServerMutedUser>();
 
     public virtual ICollection<TwitchChannel> TwitchChannels { get; set; } = new List<TwitchChannel>();
+
+    public virtual ICollection<WeeklyPoll> WeeklyPolls { get; set; } = new List<WeeklyPoll>();
 }
