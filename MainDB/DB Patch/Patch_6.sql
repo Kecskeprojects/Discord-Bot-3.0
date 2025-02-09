@@ -42,13 +42,9 @@ USE [$(DatabaseName)];
 
 GO
 /*
-Table [dbo].[Keyword] is being dropped.  Deployment will halt if the table contains data.
+Table [dbo].[Keyword] is being dropped.
 */
 
-IF EXISTS (select top 1 1 from [dbo].[Keyword])
-    RAISERROR (N'Rows were detected. The schema update is terminating because data loss might occur.', 16, 127) WITH NOWAIT
-
-GO
 PRINT N'Rename refactoring operation with key 207577b6-d947-4aef-bcd2-155b6a3c3470 is skipped, element [dbo].[WeeklyPoll].[Id] (SqlSimpleColumn) will not be renamed to WeeklyPollId';
 
 

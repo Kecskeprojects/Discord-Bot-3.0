@@ -63,6 +63,7 @@
     <Folder Include="Post-deployment\PostDeployment\Inserts" />
     <Folder Include="Views" />
     <Folder Include="DB Patch" />
+    <Folder Include="DB Patch\Patched" />
   </ItemGroup>
   <ItemGroup>
     <SqlCmdVariable Include="BuildConfiguration">
@@ -123,13 +124,13 @@
     <Build Include="Tables\WeeklyPoll.sql" />
     <Build Include="Tables\WeeklyPollOption.sql" />
     <Build Include="Tables\WeeklyPollOptionPreset.sql" />
+    <None Include="DB Patch\Patched\Patch_1.sql" />
+    <None Include="DB Patch\Patched\Patch_2.sql" />
+    <None Include="DB Patch\Patched\Patch_3.sql" />
+    <None Include="DB Patch\Patched\Patch_4.sql" />
+    <None Include="DB Patch\Patched\Patch_5.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="DB Patch\Patch_1.sql" />
-    <None Include="DB Patch\Patch_2.sql" />
-    <None Include="DB Patch\Patch_3.sql" />
-    <None Include="DB Patch\Patch_4.sql" />
-    <None Include="DB Patch\Patch_5.sql" />
     <None Include="DB Patch\Patch_6.sql" />
   </ItemGroup>
 </Project>
