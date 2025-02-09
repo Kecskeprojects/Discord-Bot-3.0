@@ -10,6 +10,7 @@
     [RepeatOnDayOfWeek] VARCHAR(10) NOT NULL, 
     [IsMultipleAnswer] BIT NOT NULL, 
     [OptionPresetId] INT NULL, 
+    [IsActive] BIT NOT NULL CONSTRAINT [DF_WeeklyPoll_IsActive] DEFAULT 1, 
     [CreatedOn] DATETIME NOT NULL CONSTRAINT [DF_WeeklyPoll_CreatedOn] DEFAULT GETDATE(), 
     [ModifiedOn] DATETIME NOT NULL CONSTRAINT [DF_WeeklyPoll_ModifiedOn] DEFAULT GETDATE(),
     CONSTRAINT [PK_WeeklyPollId] PRIMARY KEY ([WeeklyPollId]),
