@@ -5,7 +5,6 @@ using Discord_Bot.Database.Models;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Discord_Bot.Core;

@@ -67,7 +67,7 @@ public static class PollTools
     public static PollCloseInEnum GetEnumFromTicks(long ticks)
     {
         TimeSpan span = new(ticks);
-        return (int)span.TotalHours switch
+        return (int) span.TotalHours switch
         {
             1 => PollCloseInEnum.OneHour,
             4 => PollCloseInEnum.FourHour,
