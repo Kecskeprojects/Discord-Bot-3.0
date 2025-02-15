@@ -120,7 +120,7 @@ GO
 CREATE TABLE [dbo].[WeeklyPoll] (
     [WeeklyPollId]         INT            IDENTITY (1, 1) NOT NULL,
     [ServerId]             INT            NOT NULL,
-    [ChannelId]            INT            NOT NULL,
+    [ChannelId]            INT            NULL,
     [RoleId]               INT            NULL,
     [Name]                 NVARCHAR (50)  NOT NULL,
     [Title]                NVARCHAR (300) NOT NULL,

@@ -9,7 +9,7 @@ public partial class WeeklyPoll
 
     public int ServerId { get; set; }
 
-    public int ChannelId { get; set; }
+    public int? ChannelId { get; set; }
 
     public int? RoleId { get; set; }
 
