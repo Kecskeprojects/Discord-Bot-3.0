@@ -8,6 +8,7 @@ public class WeeklyPollResource
     public ulong RoleDiscordId { get; set; }
     public bool IsMultipleAnswer { get; set; }
     public string Title { get; set; }
+    public string Name { get; set; }
     public long CloseInTimeSpanTicks { get; set; }
 
     public List<string> Options { get; set; }
