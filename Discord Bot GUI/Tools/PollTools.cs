@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord_Bot.Database.Models;
+using Discord_Bot.Enums;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -61,5 +62,20 @@ public static class PollTools
             days.Add(DateTime.UtcNow.AddDays(i).ToString("MMMM dd. (dddd)", CultureInfo.GetCultureInfo(cultureCode)));
         }
         return days;
+    }
+
+    public static PollCloseInEnum GetEnumFromTicks(long ticks)
+    {
+        TimeSpan span = new(ticks);
+        return (int)span.TotalHours switch
+        {
+            1 => PollCloseInEnum.OneHour,
+            4 => PollCloseInEnum.FourHour,
+            8 => PollCloseInEnum.EightHour,
+            24 => PollCloseInEnum.OneDay,
+            72 => PollCloseInEnum.ThreeDay,
+            168 => PollCloseInEnum.OneWeek,
+            _ => PollCloseInEnum.OneWeek
+        };
     }
 }
