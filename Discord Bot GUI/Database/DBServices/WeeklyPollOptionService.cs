@@ -11,4 +11,5 @@ public class WeeklyPollOptionService(
     BotLogger logger,
     ServerCache cache) : BaseService(mapper, logger, cache), IWeeklyPollOptionService
 {
+    private readonly IWeeklyPollOptionRepository weeklyPollOptionRepository = weeklyPollOptionRepository;
 }

@@ -5,6 +5,7 @@ using Discord_Bot.Database.Models;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Discord_Bot.Core;
@@ -59,6 +60,9 @@ public class MapperConfig : Profile
         CreateMap<ServerMutedUser, ServerMutedUserResource>();
         CreateMap<WeeklyPoll, WeeklyPollResource>()
             .ForMember(dest => dest.Options, opt => opt.MapFrom(x => PollTools.GetAnswerOptions(x)));
+        CreateMap<WeeklyPollOptionPreset, WeeklyPollOptionPresetResource>();
+        CreateMap<WeeklyPoll, WeeklyPollEditResource>()
+            .ForMember(dest => dest.Options, opt => opt.MapFrom(x => x.WeeklyPollOptions));
 
         //Communication to Model
         CreateMap<ExtendedBiasData, Idol>()
