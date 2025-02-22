@@ -1,8 +1,13 @@
 ﻿using AutoMapper;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
+using Discord_Bot.Database.Models;
+using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Resources;
+using System;
+using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
 public class WeeklyPollOptionService(
@@ -12,4 +17,56 @@ public class WeeklyPollOptionService(
     ServerCache cache) : BaseService(mapper, logger, cache), IWeeklyPollOptionService
 {
     private readonly IWeeklyPollOptionRepository weeklyPollOptionRepository = weeklyPollOptionRepository;
+
+    public async Task<WeeklyPollOptionResource> GetOrCreateOptionAsync(int pollId, int optionId, byte orderNumber)
+    {
+        WeeklyPollOptionResource result = null;
+        try
+        {
+            WeeklyPollOption pollOption = optionId == 0
+                ? new()
+                {
+                    OrderNumber = orderNumber,
+                    WeeklyPollId = pollId,
+                    Title = string.Empty,
+                    CreatedOn = DateTime.UtcNow,
+                    ModifiedOn = DateTime.UtcNow,
+                }
+                : await weeklyPollOptionRepository.FirstOrDefaultAsync(wp => wp.WeeklyPollOptionId == optionId);
+
+            result = mapper.Map<WeeklyPollOption, WeeklyPollOptionResource>(pollOption);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("WeeklyPollOptionService.cs GetOrCreateOptionAsync", ex);
+        }
+        return result;
+    }
+
+    public async Task<DbProcessResultEnum> UpdateAsync(int pollOptionId, string optionTitle)
+    {
+        try
+        {
+            WeeklyPollOption pollOption = await weeklyPollOptionRepository.FirstOrDefaultAsync(p => p.WeeklyPollId == pollOptionId);
+            if (pollOption != null)
+            {
+                pollOption.Title = optionTitle;
+                pollOption.ModifiedOn = DateTime.UtcNow;
+
+                await weeklyPollOptionRepository.SaveChangesAsync();
+                logger.Log("Poll Option updated successfully!");
+                return DbProcessResultEnum.Success;
+            }
+            else
+            {
+                logger.Log("Poll Option not found!");
+                return DbProcessResultEnum.NotFound;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("WeeklyPollService.cs RemovePollByNameAsync", ex);
+        }
+        return DbProcessResultEnum.Failure;
+    }
 }

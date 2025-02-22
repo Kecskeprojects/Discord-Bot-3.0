@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Discord;
+using Discord.Rest;
 using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces.DBServices;
@@ -46,7 +47,11 @@ public class WeeklyPollFeature(
                         SocketRole role = server.GetRole(poll.RoleDiscordId);
                         string notifRole = role != null ? $"<@&{role.Id}>" : "";
 
-                        await channel.SendMessageAsync(notifRole, poll: pollProp);
+                        RestUserMessage message = await channel.SendMessageAsync(notifRole, poll: pollProp);
+                        if (poll.IsPinned)
+                        {
+                            await message.PinAsync();
+                        }
                     }
                 }
             }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
@@ -8,12 +9,15 @@ using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
 public class WeeklyPollService(
     IWeeklyPollRepository weeklyPollRepository,
     IServerRepository serverRepository,
+    IChannelRepository channelRepository,
+    IRoleRepository roleRepository,
     IMapper mapper,
     BotLogger logger,
     ServerCache cache) : BaseService(mapper, logger, cache), IWeeklyPollService
@@ -61,6 +65,44 @@ public class WeeklyPollService(
         return result;
     }
 
+    public async Task<WeeklyPollResource> GetPollByIdAsync(int pollId)
+    {
+        WeeklyPollResource result = null;
+        try
+        {
+            WeeklyPoll poll = await weeklyPollRepository.FirstOrDefaultAsync(
+                wp => wp.WeeklyPollId == pollId,
+                includes: [wp => wp.Role,
+                wp => wp.Channel,
+                wp => wp.WeeklyPollOptions]);
+
+            result = mapper.Map<WeeklyPoll, WeeklyPollResource>(poll);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("WeeklyPollService.cs GetPollByIdAsync", ex);
+        }
+        return result;
+    }
+
+    public async Task<WeeklyPollEditResource> GetPollByIdForEditAsync(int pollId)
+    {
+        WeeklyPollEditResource result = null;
+        try
+        {
+            WeeklyPoll poll = await weeklyPollRepository.FirstOrDefaultAsync(
+                wp => wp.WeeklyPollId == pollId,
+                wp => wp.WeeklyPollOptions);
+
+            result = mapper.Map<WeeklyPoll, WeeklyPollEditResource>(poll);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("WeeklyPollService.cs GetPollByIdForEditAsync", ex);
+        }
+        return result;
+    }
+
     public async Task<WeeklyPollEditResource> GetPollByNameForEditAsync(ulong serverId, string pollName)
     {
         WeeklyPollEditResource result = null;
@@ -86,8 +128,7 @@ public class WeeklyPollService(
         try
         {
             List<WeeklyPoll> polls = await weeklyPollRepository.GetListAsync(
-                wp => wp.RepeatOnDayOfWeek == dayOfWeek.ToString()
-                    && wp.IsActive,
+                wp => wp.RepeatOnDayOfWeek == dayOfWeek.ToString() && wp.IsActive,
                 includes: [
                     wp => wp.Server,
                     wp => wp.Role,
@@ -112,7 +153,7 @@ public class WeeklyPollService(
         try
         {
             List<WeeklyPoll> polls = await weeklyPollRepository.GetListAsync(
-                wp => wp.Server.DiscordId == serverId.ToString(),
+                wp => wp.Server.DiscordId == serverId.ToString() && !string.IsNullOrEmpty(wp.Name),
                 includes: [
                     wp => wp.Server,
                     wp => wp.Role,
@@ -153,6 +194,76 @@ public class WeeklyPollService(
         catch (Exception ex)
         {
             logger.Error("WeeklyPollService.cs RemovePollByNameAsync", ex);
+        }
+        return DbProcessResultEnum.Failure;
+    }
+
+    public async Task<DbProcessResultEnum> UpdateAsync(int pollId, EditWeeklyPollModal modal, ulong channelId, ulong? roleId)
+    {
+        try
+        {
+            WeeklyPoll poll = await weeklyPollRepository.FirstOrDefaultAsync(p => p.WeeklyPollId == pollId);
+            if (poll != null)
+            {
+                Channel channel = await channelRepository.FirstOrDefaultAsync(c => c.DiscordId == channelId.ToString());
+                channel ??= new Channel()
+                {
+                    DiscordId = channelId.ToString()
+                };
+
+                Role role = await roleRepository.FirstOrDefaultAsync(r => r.DiscordId == roleId.ToString());
+                if (roleId.HasValue)
+                {
+                    role ??= new Role()
+                    {
+                        DiscordId = roleId.ToString()
+                    };
+                }
+
+                poll.Name = modal.Name;
+                poll.Title = modal.PollTitle;
+                poll.Channel = channel;
+                poll.Role = role;
+                poll.ModifiedOn = DateTime.UtcNow;
+
+                await weeklyPollRepository.SaveChangesAsync();
+                logger.Log("Poll updated successfully!");
+                return DbProcessResultEnum.Success;
+            }
+            else
+            {
+                logger.Log("Poll not found!");
+                return DbProcessResultEnum.NotFound;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("WeeklyPollService.cs RemovePollByNameAsync", ex);
+        }
+        return DbProcessResultEnum.Failure;
+    }
+
+    public async Task<DbProcessResultEnum> UpdateFieldAsync(int pollId, string fieldName, string newValue)
+    {
+        try
+        {
+            WeeklyPoll poll = await weeklyPollRepository.FirstOrDefaultAsync(p => p.WeeklyPollId == pollId);
+
+            PropertyInfo property = poll.GetType().GetProperty(fieldName);
+
+            //Get the type we need to cast to.
+            Enum.TryParse(property.PropertyType.Name, true, out TypeCode enumValue); //Get the type based on typecode
+
+            object convertedValue = Convert.ChangeType(newValue, enumValue); //Convert the value to that of the typecode
+
+            property.SetValue(this, convertedValue); // Set the converted value
+
+            poll.ModifiedOn = DateTime.UtcNow;
+            await weeklyPollRepository.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.Error("WeeklyPollService.cs UpdateFieldAsync", ex);
         }
         return DbProcessResultEnum.Failure;
     }

@@ -5,6 +5,7 @@ public class WeeklyPollEditResource
 {
     public int WeeklyPollId { get; set; }
     public bool IsActive { get; set; }
+    public bool IsPinned { get; set; }
     public bool IsMultipleAnswer { get; set; }
     public int? OptionPresetId { get; set; }
     public long CloseInTimeSpanTicks { get; set; }

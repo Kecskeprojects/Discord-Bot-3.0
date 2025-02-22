@@ -10,8 +10,21 @@ public class PollEditEmbedProcessor
 {
     public static Embed[] CreateEmbed(WeeklyPollEditResource poll, bool isEdit)
     {
-        EmbedBuilder builder = new();
+        EmbedBuilder builder = CreateEmbedBase();
         builder.WithTitle($"{(isEdit ? $"Edit '{poll.Name}'" : "Create new Weekly Poll")}");
+        return [builder.Build()];
+    }
+
+    public static Embed[] CreateEmbed(WeeklyPollResource poll, bool isEdit)
+    {
+        EmbedBuilder builder = CreateEmbedBase();
+        builder.WithTitle($"{(isEdit ? $"Edit '{poll.Name}'" : "Create new Weekly Poll")}");
+        return [builder.Build()];
+    }
+
+    public static EmbedBuilder CreateEmbedBase()
+    {
+        EmbedBuilder builder = new();
 
         builder.AddField("Edit Button", "Name of Poll, Title of Poll, Channel the poll is sent to and Role that can be optionally set");
 
@@ -22,7 +35,7 @@ public class PollEditEmbedProcessor
         builder.AddField("4th Select Field", "If visible, selecting an option allows the creation/editing of an answer\nIf an option is empty, it is a potential answer that can still be defined");
 
         builder.WithColor(Color.DarkBlue);
-        return [builder.Build()];
+        return builder;
     }
 
     public static MessageComponent CreateComponent(WeeklyPollEditResource poll, List<WeeklyPollOptionPresetResource> presets)
@@ -37,7 +50,10 @@ public class PollEditEmbedProcessor
                             , style: ButtonStyle.Primary)
             .WithButton(label: poll.IsActive ? "Active" : "Inactive"
                             , customId: $"Poll_Change_IsActive_{poll.WeeklyPollId}_{poll.IsActive}"
-                            , style: poll.IsActive ? ButtonStyle.Success : ButtonStyle.Danger);
+                            , style: poll.IsActive ? ButtonStyle.Success : ButtonStyle.Danger)
+            .WithButton(label: poll.IsActive ? "Pin" : "Don't Pin"
+                            , customId: $"Poll_Change_IsPinned_{poll.WeeklyPollId}_{poll.IsPinned}"
+                            , style: ButtonStyle.Primary);
 
         ActionRowBuilder closePollInRow = CreateClosePollInRow(poll);
         ActionRowBuilder dayOfWeekRow = CreateDayOfWeekRow(poll);
@@ -63,7 +79,7 @@ public class PollEditEmbedProcessor
     {
         SelectMenuBuilder dayOfWeekSelect = new()
         {
-            CustomId = $"Poll_Change_DayOfWeek_{poll.WeeklyPollId}",
+            CustomId = $"Poll_Change_DayOfWeek_{poll.WeeklyPollId}_{null}",
             Placeholder = $"Select when poll is sent weekly",
             MinValues = 1,
             MaxValues = 1,
@@ -86,7 +102,7 @@ public class PollEditEmbedProcessor
     {
         SelectMenuBuilder closePollInSelect = new()
         {
-            CustomId = $"Poll_Change_CloseInTimeSpanTicks_{poll.WeeklyPollId}",
+            CustomId = $"Poll_Change_CloseInTimeSpanTicks_{poll.WeeklyPollId}_{null}",
             Placeholder = $"Select how long until poll is closed",
             MinValues = 1,
             MaxValues = 1,
@@ -110,7 +126,7 @@ public class PollEditEmbedProcessor
     {
         SelectMenuBuilder optionPresetSelect = new()
         {
-            CustomId = $"Poll_Change_OptionPreset_{poll.WeeklyPollId}",
+            CustomId = $"Poll_Change_OptionPreset_{poll.WeeklyPollId}_{null}",
             Placeholder = $"Select which preset to use for answers",
             MinValues = 1,
             MaxValues = 1,
@@ -127,7 +143,7 @@ public class PollEditEmbedProcessor
         {
             optionPresetSelect.AddOption(
                 preset.Name
-                , null
+                , preset.OptionPresetId.ToString()
                 , preset.Description
                 , isDefault: poll.OptionPresetId == preset.OptionPresetId);
         }
@@ -141,7 +157,7 @@ public class PollEditEmbedProcessor
     {
         SelectMenuBuilder optionPresetSelect = new()
         {
-            CustomId = $"Poll_Change_CustomOption_{poll.WeeklyPollId}",
+            CustomId = $"PollOption_Change_CustomOption_{poll.WeeklyPollId}",
             Placeholder = $"Select an option to edit it",
             MinValues = 1,
             MaxValues = 1,
@@ -151,9 +167,11 @@ public class PollEditEmbedProcessor
         //Values can be separated by the _ character so that we have both an order number and an ID as values
         for (int i = 0; i < 10; i++)
         {
-            if (poll.Options.Count > i)
+            WeeklyPollOptionResource option = poll.Options.FirstOrDefault(x => x.OrderNumber == i);
+            if (option != null)
             {
-                optionPresetSelect.AddOption($"{i + 1}# {poll.Options[i].Title}", $"{i}_{poll.Options[i].WeeklyPollOptionId}");
+                
+                optionPresetSelect.AddOption($"{i + 1}# {option.Title}", $"{i}_{option.WeeklyPollOptionId}");
             }
             else
             {
