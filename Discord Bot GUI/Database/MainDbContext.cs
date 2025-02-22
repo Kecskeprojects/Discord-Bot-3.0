@@ -501,7 +501,6 @@ public partial class MainDbContext : DbContext
             entity.Property(e => e.CreatedOn)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.ModifiedOn)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
@@ -518,7 +517,6 @@ public partial class MainDbContext : DbContext
 
             entity.HasOne(d => d.Channel).WithMany(p => p.WeeklyPolls)
                 .HasForeignKey(d => d.ChannelId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_WeeklyPoll_ChannelId");
 
             entity.HasOne(d => d.OptionPreset).WithMany(p => p.WeeklyPolls)

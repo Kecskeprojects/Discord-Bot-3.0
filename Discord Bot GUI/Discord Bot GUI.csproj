@@ -30,7 +30,7 @@
 		<PackageReference Include="Discord.Net" Version="3.17.1" />
 		<PackageReference Include="Google.Apis.YouTube.v3" Version="1.69.0.3680" />
 		<PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.4.0" />
-		<PackageReference Include="PuppeteerSharp" Version="20.1.0" />
+		<PackageReference Include="PuppeteerSharp" Version="20.1.2" />
 		<PackageReference Include="RestSharp" Version="112.1.0" />
 		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.6" />
 		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.5" />

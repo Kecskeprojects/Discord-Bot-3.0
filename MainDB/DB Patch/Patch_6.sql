@@ -129,6 +129,7 @@ CREATE TABLE [dbo].[WeeklyPoll] (
     [IsMultipleAnswer]     BIT            NOT NULL,
     [OptionPresetId]       INT            NULL,
     [IsActive]             BIT            NOT NULL,
+    [IsPinned]             BIT            NOT NULL,
     [CreatedOn]            DATETIME       NOT NULL,
     [ModifiedOn]           DATETIME       NOT NULL,
     CONSTRAINT [PK_WeeklyPollId] PRIMARY KEY CLUSTERED ([WeeklyPollId] ASC)
@@ -175,7 +176,16 @@ PRINT N'Creating Default Constraint [dbo].[DF_WeeklyPoll_IsActive]...';
 
 GO
 ALTER TABLE [dbo].[WeeklyPoll]
-    ADD CONSTRAINT [DF_WeeklyPoll_IsActive] DEFAULT 1 FOR [IsActive];
+    ADD CONSTRAINT [DF_WeeklyPoll_IsActive] DEFAULT 0 FOR [IsActive];
+
+
+GO
+PRINT N'Creating Default Constraint [dbo].[DF_WeeklyPoll_IsPinned]...';
+
+
+GO
+ALTER TABLE [dbo].[WeeklyPoll]
+    ADD CONSTRAINT [DF_WeeklyPoll_IsPinned] DEFAULT 0 FOR [IsPinned];
 
 
 GO
