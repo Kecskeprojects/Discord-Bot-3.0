@@ -29,7 +29,7 @@ public class YoutubeStreamService(Config config, BotLogger logger) : IYoutubeDow
                 logger.Log("Audio stream starting!");
                 await ffmpeg.StandardOutput.BaseStream.CopyToAsync(stream, audioResource.AudioVariables.CancellationTokenSource.Token);
                 await stream.FlushAsync();
-            };
+            }
         }
         //Exception thrown with current version of skipping song or bot disconnecting from channel
         catch (OperationCanceledException ex)

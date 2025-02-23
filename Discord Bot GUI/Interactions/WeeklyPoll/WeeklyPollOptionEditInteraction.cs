@@ -37,7 +37,7 @@ Config config) : BaseInteraction(serverService, logger, config)
             WeeklyPollOptionResource resource = await weeklyPollOptionService.GetOrCreateOptionAsync(pollId, optionId, orderNumber);
 
             void Modify(ModalBuilder builder) => builder
-                .UpdateTextInput("optiontitle", string.IsNullOrEmpty(resource.Title) ? null: resource.Title);
+                .UpdateTextInput("optiontitle", string.IsNullOrEmpty(resource.Title) ? null : resource.Title);
 
             await RespondWithModalAsync<EditWeeklyPollOptionModal>($"EditPollOptionModal_{resource.WeeklyPollId}_{resource.WeeklyPollOptionId}", modifyModal: Modify);
             return;

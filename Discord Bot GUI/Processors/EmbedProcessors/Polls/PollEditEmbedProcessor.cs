@@ -167,7 +167,6 @@ public class PollEditEmbedProcessor
             WeeklyPollOptionResource option = poll.Options.FirstOrDefault(x => x.OrderNumber == i);
             if (option != null)
             {
-                
                 optionPresetSelect.AddOption($"{i + 1}# {option.Title}", $"{i}_{option.WeeklyPollOptionId}");
             }
             else

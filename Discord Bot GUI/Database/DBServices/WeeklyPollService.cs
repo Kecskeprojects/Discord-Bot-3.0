@@ -253,7 +253,7 @@ public class WeeklyPollService(
     {
         try
         {
-            if(newValue == "custom")
+            if (newValue == "custom")
             {
                 newValue = null;
             }
