@@ -129,8 +129,6 @@
     <None Include="DB Patch\Patched\Patch_3.sql" />
     <None Include="DB Patch\Patched\Patch_4.sql" />
     <None Include="DB Patch\Patched\Patch_5.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="DB Patch\Patch_6.sql" />
+    <None Include="DB Patch\Patched\Patch_6.sql" />
   </ItemGroup>
 </Project>
