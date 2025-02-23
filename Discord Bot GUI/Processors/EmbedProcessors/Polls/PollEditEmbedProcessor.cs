@@ -11,14 +11,14 @@ public class PollEditEmbedProcessor
     public static Embed[] CreateEmbed(WeeklyPollEditResource poll, bool isEdit)
     {
         EmbedBuilder builder = CreateEmbedBase();
-        builder.WithTitle($"{(isEdit ? $"Edit '{poll.Name}'" : "Create new Weekly Poll")}");
+        builder.WithTitle($"{(isEdit && !string.IsNullOrEmpty(poll.Name) ? $"Edit '{poll.Name}' Poll" : "Create new Weekly Poll")}");
         return [builder.Build()];
     }
 
     public static Embed[] CreateEmbed(WeeklyPollResource poll, bool isEdit)
     {
         EmbedBuilder builder = CreateEmbedBase();
-        builder.WithTitle($"{(isEdit ? $"Edit '{poll.Name}'" : "Create new Weekly Poll")}");
+        builder.WithTitle($"{(isEdit && !string.IsNullOrEmpty(poll.Name) ? $"Edit '{poll.Name}' Poll" : "Create new Weekly Poll")}");
         return [builder.Build()];
     }
 
@@ -46,12 +46,12 @@ public class PollEditEmbedProcessor
                             , customId: $"EditPoll_{poll.WeeklyPollId}"
                             , style: ButtonStyle.Primary)
             .WithButton(label: poll.IsMultipleAnswer ? "Multi Answer" : "Single Answer"
-                            , customId: $"Poll_Change_IsMultiAnswer_{poll.WeeklyPollId}_{poll.IsMultipleAnswer}"
+                            , customId: $"Poll_Change_IsMultipleAnswer_{poll.WeeklyPollId}_{poll.IsMultipleAnswer}"
                             , style: ButtonStyle.Primary)
             .WithButton(label: poll.IsActive ? "Active" : "Inactive"
                             , customId: $"Poll_Change_IsActive_{poll.WeeklyPollId}_{poll.IsActive}"
                             , style: poll.IsActive ? ButtonStyle.Success : ButtonStyle.Danger)
-            .WithButton(label: poll.IsActive ? "Pin" : "Don't Pin"
+            .WithButton(label: poll.IsPinned ? "Pin" : "Don't Pin"
                             , customId: $"Poll_Change_IsPinned_{poll.WeeklyPollId}_{poll.IsPinned}"
                             , style: ButtonStyle.Primary);
 
@@ -79,7 +79,7 @@ public class PollEditEmbedProcessor
     {
         SelectMenuBuilder dayOfWeekSelect = new()
         {
-            CustomId = $"Poll_Change_DayOfWeek_{poll.WeeklyPollId}_{null}",
+            CustomId = $"Poll_SelectChange_RepeatOnDayOfWeek_{poll.WeeklyPollId}",
             Placeholder = $"Select when poll is sent weekly",
             MinValues = 1,
             MaxValues = 1,
@@ -88,10 +88,7 @@ public class PollEditEmbedProcessor
 
         Enum.GetNames<DayOfWeek>()
             .ToList()
-            .ForEach(y => dayOfWeekSelect.AddOption(
-                            y.ToString(),
-                            y.ToString(),
-                            isDefault: poll.RepeatOnDayOfWeek == y.ToString()));
+            .ForEach(y => dayOfWeekSelect.AddOption(y, y, isDefault: poll.RepeatOnDayOfWeek == y));
 
         ActionRowBuilder dayOfWeekRow = new();
         dayOfWeekRow.WithSelectMenu(dayOfWeekSelect);
@@ -102,7 +99,7 @@ public class PollEditEmbedProcessor
     {
         SelectMenuBuilder closePollInSelect = new()
         {
-            CustomId = $"Poll_Change_CloseInTimeSpanTicks_{poll.WeeklyPollId}_{null}",
+            CustomId = $"Poll_SelectChange_CloseInTimeSpanTicks_{poll.WeeklyPollId}",
             Placeholder = $"Select how long until poll is closed",
             MinValues = 1,
             MaxValues = 1,
@@ -126,7 +123,7 @@ public class PollEditEmbedProcessor
     {
         SelectMenuBuilder optionPresetSelect = new()
         {
-            CustomId = $"Poll_Change_OptionPreset_{poll.WeeklyPollId}_{null}",
+            CustomId = $"Poll_SelectChange_OptionPresetId_{poll.WeeklyPollId}",
             Placeholder = $"Select which preset to use for answers",
             MinValues = 1,
             MaxValues = 1,
@@ -143,9 +140,9 @@ public class PollEditEmbedProcessor
         {
             optionPresetSelect.AddOption(
                 preset.Name
-                , preset.OptionPresetId.ToString()
+                , preset.WeeklyPollOptionPresetId.ToString()
                 , preset.Description
-                , isDefault: poll.OptionPresetId == preset.OptionPresetId);
+                , isDefault: poll.OptionPresetId == preset.WeeklyPollOptionPresetId);
         }
 
         ActionRowBuilder optionPresetRow = new();

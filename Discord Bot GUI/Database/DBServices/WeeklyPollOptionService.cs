@@ -23,16 +23,23 @@ public class WeeklyPollOptionService(
         WeeklyPollOptionResource result = null;
         try
         {
-            WeeklyPollOption pollOption = optionId == 0
-                ? new()
+            WeeklyPollOption pollOption;
+            if (optionId == 0)
+            {
+                pollOption = new()
                 {
                     OrderNumber = orderNumber,
                     WeeklyPollId = pollId,
                     Title = string.Empty,
                     CreatedOn = DateTime.UtcNow,
                     ModifiedOn = DateTime.UtcNow,
-                }
-                : await weeklyPollOptionRepository.FirstOrDefaultAsync(wp => wp.WeeklyPollOptionId == optionId);
+                };
+                await weeklyPollOptionRepository.AddAsync(pollOption);
+            }
+            else
+            {
+                pollOption = await weeklyPollOptionRepository.FirstOrDefaultAsync(wp => wp.WeeklyPollOptionId == optionId);
+            }
 
             result = mapper.Map<WeeklyPollOption, WeeklyPollOptionResource>(pollOption);
         }
@@ -47,7 +54,7 @@ public class WeeklyPollOptionService(
     {
         try
         {
-            WeeklyPollOption pollOption = await weeklyPollOptionRepository.FirstOrDefaultAsync(p => p.WeeklyPollId == pollOptionId);
+            WeeklyPollOption pollOption = await weeklyPollOptionRepository.FirstOrDefaultAsync(p => p.WeeklyPollOptionId == pollOptionId);
             if (pollOption != null)
             {
                 pollOption.Title = optionTitle;

@@ -59,7 +59,7 @@ public class AdminWeeklyPollCommands(
             WeeklyPollEditResource resource = await weeklyPollService.GetPollByNameForEditAsync(Context.Guild.Id, pollName);
             List<WeeklyPollOptionPresetResource> presets = await weeklyPollOptionPresetService.GetActivePresetsAsync();
 
-            Embed[] embeds = PollEditEmbedProcessor.CreateEmbed(resource, false);
+            Embed[] embeds = PollEditEmbedProcessor.CreateEmbed(resource, true);
             MessageComponent component = PollEditEmbedProcessor.CreateComponent(resource, presets);
 
             await ReplyAsync(embeds: embeds, components: component);

@@ -5,8 +5,8 @@ public class WeeklyPollResource
 {
     public int WeeklyPollId { get; set; }
     public ulong ServerDiscordId { get; set; }
-    public ulong ChannelDiscordId { get; set; }
-    public ulong RoleDiscordId { get; set; }
+    public ulong? ChannelDiscordId { get; set; }
+    public ulong? RoleDiscordId { get; set; }
     public bool IsMultipleAnswer { get; set; }
     public string Title { get; set; }
     public string Name { get; set; }

@@ -208,7 +208,8 @@ public class WeeklyPollService(
                 Channel channel = await channelRepository.FirstOrDefaultAsync(c => c.DiscordId == channelId.ToString());
                 channel ??= new Channel()
                 {
-                    DiscordId = channelId.ToString()
+                    DiscordId = channelId.ToString(),
+                    ServerId = poll.ServerId
                 };
 
                 Role role = await roleRepository.FirstOrDefaultAsync(r => r.DiscordId == roleId.ToString());
@@ -216,8 +217,13 @@ public class WeeklyPollService(
                 {
                     role ??= new Role()
                     {
-                        DiscordId = roleId.ToString()
+                        DiscordId = roleId.ToString(),
+                        ServerId = poll.ServerId
                     };
+                }
+                else
+                {
+                    poll.RoleId = null;
                 }
 
                 poll.Name = modal.Name;
@@ -238,7 +244,7 @@ public class WeeklyPollService(
         }
         catch (Exception ex)
         {
-            logger.Error("WeeklyPollService.cs RemovePollByNameAsync", ex);
+            logger.Error("WeeklyPollService.cs UpdateAsync", ex);
         }
         return DbProcessResultEnum.Failure;
     }
@@ -247,19 +253,33 @@ public class WeeklyPollService(
     {
         try
         {
+            if(newValue == "custom")
+            {
+                newValue = null;
+            }
+
             WeeklyPoll poll = await weeklyPollRepository.FirstOrDefaultAsync(p => p.WeeklyPollId == pollId);
 
             PropertyInfo property = poll.GetType().GetProperty(fieldName);
 
             //Get the type we need to cast to.
-            Enum.TryParse(property.PropertyType.Name, true, out TypeCode enumValue); //Get the type based on typecode
+            object convertedValue;
+            if (property.PropertyType == typeof(Nullable<Int32>))
+            {
+                convertedValue = int.TryParse(newValue, out int tempValue) ? tempValue : null;
+            }
+            else
+            {
+                Enum.TryParse(property.PropertyType.Name, true, out TypeCode enumValue); //Get the type based on typecode
 
-            object convertedValue = Convert.ChangeType(newValue, enumValue); //Convert the value to that of the typecode
+                convertedValue = Convert.ChangeType(newValue, enumValue); //Convert the value to that of the typecode
+            }
 
-            property.SetValue(this, convertedValue); // Set the converted value
+            property.SetValue(poll, convertedValue); // Set the converted value
 
             poll.ModifiedOn = DateTime.UtcNow;
-            await weeklyPollRepository.SaveChangesAsync();
+            await weeklyPollRepository.UpdateAsync(poll);
+            return DbProcessResultEnum.Success;
         }
         catch (Exception ex)
         {

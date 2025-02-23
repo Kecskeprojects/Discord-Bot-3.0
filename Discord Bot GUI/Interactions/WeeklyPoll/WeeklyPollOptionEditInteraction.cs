@@ -37,15 +37,15 @@ Config config) : BaseInteraction(serverService, logger, config)
             WeeklyPollOptionResource resource = await weeklyPollOptionService.GetOrCreateOptionAsync(pollId, optionId, orderNumber);
 
             void Modify(ModalBuilder builder) => builder
-                .UpdateTextInput("title", resource.Title);
+                .UpdateTextInput("optiontitle", string.IsNullOrEmpty(resource.Title) ? null: resource.Title);
 
-            await RespondWithModalAsync<EditWeeklyPollModal>($"EditPollOptionModal_{resource.WeeklyPollOptionId}", modifyModal: Modify);
+            await RespondWithModalAsync<EditWeeklyPollOptionModal>($"EditPollOptionModal_{resource.WeeklyPollId}_{resource.WeeklyPollOptionId}", modifyModal: Modify);
+            return;
         }
         catch (Exception ex)
         {
             logger.Error("WeeklyPollOptionEditInteraction.cs EditWeeklyPollOptionHandler", ex);
         }
-
         await RespondAsync("Something went wrong during the process.");
     }
 
@@ -55,6 +55,7 @@ Config config) : BaseInteraction(serverService, logger, config)
     {
         try
         {
+            await DeferAsync();
             logger.Log($"Edit Poll Option Modal Submitted for poll option with ID {pollOptionId}", LogOnly: true);
 
             DbProcessResultEnum result = await weeklyPollOptionService.UpdateAsync(pollOptionId, modal.OptionTitle);
@@ -66,8 +67,6 @@ Config config) : BaseInteraction(serverService, logger, config)
                 MessageComponent embeds = PollEditEmbedProcessor.CreateComponent(resource, presets);
 
                 await ModifyOriginalResponseAsync(x => x.Components = embeds);
-
-                await FollowupAsync("Edited poll option successfully!", ephemeral: true);
                 return;
             }
         }
@@ -75,6 +74,6 @@ Config config) : BaseInteraction(serverService, logger, config)
         {
             logger.Error("WeeklyPollOptionEditInteraction.cs EditWeeklyPollOptionModalSubmit", ex);
         }
-        await RespondAsync("Poll Option could not be edited!");
+        await FollowupAsync("Something went wrong during the process.");
     }
 }

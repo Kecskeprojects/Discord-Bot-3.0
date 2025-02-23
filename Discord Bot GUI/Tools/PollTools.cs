@@ -38,10 +38,9 @@ public static class PollTools
             tempList = poll.WeeklyPollOptions;
         }
 
-        return tempList
+        return [.. tempList
             .OrderBy(x => x.OrderNumber)
-            .Select(x => x.Title)
-            .ToList();
+            .Select(x => x.Title)];
     }
 
     private static List<string> GetSpecialAnswers(string name)

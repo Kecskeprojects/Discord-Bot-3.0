@@ -42,9 +42,9 @@ public class WeeklyPollFeature(
 
                     SocketGuild server = client.GetGuild(poll.ServerDiscordId);
 
-                    if (server?.GetChannel(poll.ChannelDiscordId) is ISocketMessageChannel channel)
+                    if (poll.ChannelDiscordId.HasValue && server?.GetChannel(poll.ChannelDiscordId.Value) is ISocketMessageChannel channel)
                     {
-                        SocketRole role = server.GetRole(poll.RoleDiscordId);
+                        SocketRole role = poll.RoleDiscordId.HasValue ? server.GetRole(poll.RoleDiscordId.Value) : null;
                         string notifRole = role != null ? $"<@&{role.Id}>" : "";
 
                         RestUserMessage message = await channel.SendMessageAsync(notifRole, poll: pollProp);

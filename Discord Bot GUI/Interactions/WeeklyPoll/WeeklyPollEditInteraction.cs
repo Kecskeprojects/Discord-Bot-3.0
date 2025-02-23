@@ -5,7 +5,6 @@ using Discord.WebSocket;
 using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
-using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Processors.EmbedProcessors.Polls;
@@ -35,16 +34,21 @@ public class WeeklyPollEditInteraction(
         {
             WeeklyPollResource resource = await weeklyPollService.GetPollByIdAsync(pollId);
 
-            RestRole role = await Context.Guild.GetRoleAsync(resource.RoleDiscordId);
-            SocketGuildChannel channel = Context.Guild.GetChannel(resource.ChannelDiscordId);
+            RestRole role = resource.RoleDiscordId.HasValue
+                ? await Context.Guild.GetRoleAsync(resource.RoleDiscordId.Value)
+                : null;
+            SocketGuildChannel channel = resource.ChannelDiscordId.HasValue
+                ? Context.Guild.GetChannel(resource.ChannelDiscordId.Value)
+                : null;
 
             void Modify(ModalBuilder builder) => builder
-                .UpdateTextInput("name", resource.Name)
-                .UpdateTextInput("title", resource.Title)
+                .UpdateTextInput("name", string.IsNullOrEmpty(resource.Name) ? null : resource.Name)
+                .UpdateTextInput("title", string.IsNullOrEmpty(resource.Title) ? null : resource.Title)
                 .UpdateTextInput("channel", channel?.Name)
                 .UpdateTextInput("role", role?.Name);
 
             await RespondWithModalAsync<EditWeeklyPollModal>($"EditPollModal_{resource.WeeklyPollId}", modifyModal: Modify);
+            return;
         }
         catch (Exception ex)
         {
@@ -60,6 +64,7 @@ public class WeeklyPollEditInteraction(
     {
         try
         {
+            await DeferAsync();
             logger.Log($"Edit Poll Modal Submitted for poll with ID {pollId}", LogOnly: true);
 
             SocketGuildChannel channel = Context.Guild.Channels.FirstOrDefault(x => x.Name.Equals(modal.Channel.Trim(), StringComparison.OrdinalIgnoreCase));
@@ -87,18 +92,46 @@ public class WeeklyPollEditInteraction(
         {
             logger.Error("WeeklyPollEditInteraction.cs EditWeeklyPollModalSubmit", ex);
         }
-        await RespondAsync("Poll could not be edited!");
+        await FollowupAsync("Something went wrong during the process.");
     }
 
     [ComponentInteraction("Poll_Change_*_*_*")]
     [RequireUserPermission(ChannelPermission.SendPolls)]
     [RequireContext(ContextType.Guild)]
-    public async Task DynamicChangeWeeklyPollPropertyHandler(string fieldName, int pollId, bool? value, string[] selectedValues)
+    public async Task DynamicChangeWeeklyPollButtonHandler(string fieldName, int pollId, bool? value)
     {
         try
         {
-            string newValue = value.HasValue ? value.ToString() : selectedValues[0];
-            DbProcessResultEnum result = await weeklyPollService.UpdateFieldAsync(pollId, fieldName, newValue);
+            await DeferAsync();
+            DbProcessResultEnum result = await weeklyPollService.UpdateFieldAsync(pollId, fieldName, (!value).ToString());
+
+            if (result == DbProcessResultEnum.Success)
+            {
+                WeeklyPollEditResource resource = await weeklyPollService.GetPollByIdForEditAsync(pollId);
+                List<WeeklyPollOptionPresetResource> presets = await weeklyPollOptionPresetService.GetActivePresetsAsync();
+
+                MessageComponent component = PollEditEmbedProcessor.CreateComponent(resource, presets);
+
+                await ModifyOriginalResponseAsync(x => x.Components = component);
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("WeeklyPollEditInteraction.cs DynamicChangeWeeklyPollButtonHandler", ex);
+        }
+        await FollowupAsync("Something went wrong during the process.");
+    }
+
+    [ComponentInteraction("Poll_SelectChange_*_*")]
+    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireContext(ContextType.Guild)]
+    public async Task DynamicChangeWeeklyPollSelectHandler(string fieldName, int pollId, string[] selectedValues)
+    {
+        try
+        {
+            await DeferAsync();
+            DbProcessResultEnum result = await weeklyPollService.UpdateFieldAsync(pollId, fieldName, selectedValues[0]);
 
             if (result == DbProcessResultEnum.Success)
             {
@@ -108,16 +141,13 @@ public class WeeklyPollEditInteraction(
                 MessageComponent embeds = PollEditEmbedProcessor.CreateComponent(resource, presets);
 
                 await ModifyOriginalResponseAsync(x => x.Components = embeds);
-
-                await FollowupAsync("Edited poll successfully!", ephemeral: true);
                 return;
             }
         }
         catch (Exception ex)
         {
-            logger.Error("WeeklyPollEditInteraction.cs DynamicChangeWeeklyPollPropertyHandler", ex);
+            logger.Error("WeeklyPollEditInteraction.cs DynamicChangeWeeklyPollSelectHandler", ex);
         }
-
-        await RespondAsync("Something went wrong during the process.");
+        await FollowupAsync("Something went wrong during the process.");
     }
 }
