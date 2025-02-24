@@ -76,7 +76,7 @@ public class WeeklyPollEditInteraction(
             }
             SocketRole role = Context.Guild.Roles.FirstOrDefault(x => x.Name.Equals(modal.Role.Trim(), StringComparison.OrdinalIgnoreCase));
 
-            DbProcessResultEnum result = await weeklyPollService.UpdateAsync(pollId, modal, channel.Id, role?.Id);
+            DbProcessResultEnum result = await weeklyPollService.UpdateAsync(pollId, modal, channel.Id, role?.Id, role?.Name);
             if (result == DbProcessResultEnum.Success)
             {
                 WeeklyPollResource resource = await weeklyPollService.GetPollByIdAsync(pollId);
@@ -93,7 +93,7 @@ public class WeeklyPollEditInteraction(
         {
             logger.Error("WeeklyPollEditInteraction.cs EditWeeklyPollModalSubmit", ex);
         }
-        await FollowupAsync("Something went wrong during the process.");
+        await FollowupAsync("Something went wrong during the process.", ephemeral: true);
     }
 
     [ComponentInteraction("Poll_Change_*_*_*")]
@@ -121,7 +121,7 @@ public class WeeklyPollEditInteraction(
         {
             logger.Error("WeeklyPollEditInteraction.cs DynamicChangeWeeklyPollButtonHandler", ex);
         }
-        await FollowupAsync("Something went wrong during the process.");
+        await FollowupAsync("Something went wrong during the process.", ephemeral: true);
     }
 
     [ComponentInteraction("Poll_SelectChange_*_*")]
@@ -149,6 +149,6 @@ public class WeeklyPollEditInteraction(
         {
             logger.Error("WeeklyPollEditInteraction.cs DynamicChangeWeeklyPollSelectHandler", ex);
         }
-        await FollowupAsync("Something went wrong during the process.");
+        await FollowupAsync("Something went wrong during the process.", ephemeral: true);
     }
 }

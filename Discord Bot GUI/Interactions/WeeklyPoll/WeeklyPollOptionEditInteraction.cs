@@ -46,7 +46,7 @@ Config config) : BaseInteraction(serverService, logger, config)
         {
             logger.Error("WeeklyPollOptionEditInteraction.cs EditWeeklyPollOptionHandler", ex);
         }
-        await RespondAsync("Something went wrong during the process.");
+        await RespondAsync("Something went wrong during the process.", ephemeral: true);
     }
 
     [ModalInteraction("EditPollOptionModal_*_*")]
@@ -75,6 +75,6 @@ Config config) : BaseInteraction(serverService, logger, config)
         {
             logger.Error("WeeklyPollOptionEditInteraction.cs EditWeeklyPollOptionModalSubmit", ex);
         }
-        await FollowupAsync("Something went wrong during the process.");
+        await FollowupAsync("Something went wrong during the process.", ephemeral: true);
     }
 }

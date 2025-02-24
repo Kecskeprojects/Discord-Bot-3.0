@@ -198,7 +198,7 @@ public class WeeklyPollService(
         return DbProcessResultEnum.Failure;
     }
 
-    public async Task<DbProcessResultEnum> UpdateAsync(int pollId, EditWeeklyPollModal modal, ulong channelId, ulong? roleId)
+    public async Task<DbProcessResultEnum> UpdateAsync(int pollId, EditWeeklyPollModal modal, ulong channelId, ulong? roleId, string roleName)
     {
         try
         {
@@ -218,6 +218,7 @@ public class WeeklyPollService(
                     role ??= new Role()
                     {
                         DiscordId = roleId.ToString(),
+                        RoleName = roleName,
                         ServerId = poll.ServerId
                     };
                 }
