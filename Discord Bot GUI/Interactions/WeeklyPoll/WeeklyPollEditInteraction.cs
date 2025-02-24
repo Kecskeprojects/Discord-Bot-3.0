@@ -59,7 +59,8 @@ public class WeeklyPollEditInteraction(
     }
 
     [ModalInteraction("EditPollModal_*")]
-    [RequireOwner]
+    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireContext(ContextType.Guild)]
     public async Task EditWeeklyPollModalSubmit(int pollId, EditWeeklyPollModal modal)
     {
         try

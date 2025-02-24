@@ -50,7 +50,8 @@ Config config) : BaseInteraction(serverService, logger, config)
     }
 
     [ModalInteraction("EditPollOptionModal_*_*")]
-    [RequireOwner]
+    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireContext(ContextType.Guild)]
     public async Task EditWeeklyPollOptionModalSubmit(int pollId, int pollOptionId, EditWeeklyPollOptionModal modal)
     {
         try
