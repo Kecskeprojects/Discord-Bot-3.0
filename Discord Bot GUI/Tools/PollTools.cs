@@ -57,7 +57,7 @@ public static class PollTools
     private static List<string> GetNext7Days(string cultureCode)
     {
         List<string> days = [];
-        for (int i = 1; i < 8; i++)
+        for (int i = 0; i < 7; i++)
         {
             days.Add(DateTime.UtcNow.AddDays(i).ToString("MMMM dd. (dddd)", CultureInfo.GetCultureInfo(cultureCode)));
         }
