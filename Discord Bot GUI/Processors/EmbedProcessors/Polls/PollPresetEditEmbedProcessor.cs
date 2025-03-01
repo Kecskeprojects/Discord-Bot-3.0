@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord_Bot.Resources;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Discord_Bot.Processors.EmbedProcessors.Polls;

@@ -39,7 +39,7 @@ Config config) : BaseInteraction(serverService, logger, config)
             void Modify(ModalBuilder builder) => builder
                 .UpdateTextInput("optiontitle", string.IsNullOrEmpty(resource.Title) ? null : resource.Title);
 
-            await RespondWithModalAsync<EditWeeklyPollOptionModal>($"EditPollOption{(isPresetOption ? "Preset": "")}Modal_{Id}_{resource.WeeklyPollOptionId}", modifyModal: Modify);
+            await RespondWithModalAsync<EditWeeklyPollOptionModal>($"EditPollOption{(isPresetOption ? "Preset" : "")}Modal_{Id}_{resource.WeeklyPollOptionId}", modifyModal: Modify);
             return;
         }
         catch (Exception ex)

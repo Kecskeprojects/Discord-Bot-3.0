@@ -2,7 +2,6 @@
 using Discord.Commands;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
-using Discord_Bot.Database.DBServices;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Processors.EmbedProcessors.Polls;
