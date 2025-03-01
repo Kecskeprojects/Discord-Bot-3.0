@@ -18,7 +18,7 @@ public class WeeklyPollOptionService(
 {
     private readonly IWeeklyPollOptionRepository weeklyPollOptionRepository = weeklyPollOptionRepository;
 
-    public async Task<WeeklyPollOptionResource> GetOrCreateOptionAsync(int pollId, int optionId, byte orderNumber)
+    public async Task<WeeklyPollOptionResource> GetOrCreateOptionAsync(bool isPresetOption, int foreignId, int optionId, byte orderNumber)
     {
         WeeklyPollOptionResource result = null;
         try
@@ -29,7 +29,8 @@ public class WeeklyPollOptionService(
                 pollOption = new()
                 {
                     OrderNumber = orderNumber,
-                    WeeklyPollId = pollId,
+                    WeeklyPollId = isPresetOption ? null : foreignId,
+                    WeeklyPollOptionPresetId = isPresetOption ? foreignId : null,
                     Title = string.Empty,
                     CreatedOn = DateTime.UtcNow,
                     ModifiedOn = DateTime.UtcNow,

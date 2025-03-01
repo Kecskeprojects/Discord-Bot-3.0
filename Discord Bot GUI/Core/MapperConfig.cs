@@ -59,7 +59,8 @@ public class MapperConfig : Profile
         CreateMap<ServerMutedUser, ServerMutedUserResource>();
         CreateMap<WeeklyPoll, WeeklyPollResource>()
             .ForMember(dest => dest.Options, opt => opt.MapFrom(x => PollTools.GetAnswerOptions(x)));
-        CreateMap<WeeklyPollOptionPreset, WeeklyPollOptionPresetResource>();
+        CreateMap<WeeklyPollOptionPreset, WeeklyPollOptionPresetResource>()
+            .ForMember(dest => dest.Options, opt => opt.MapFrom(x => x.WeeklyPollOptions));
         CreateMap<WeeklyPollOption, WeeklyPollOptionResource>();
         CreateMap<WeeklyPoll, WeeklyPollEditResource>()
             .ForMember(dest => dest.Options, opt => opt.MapFrom(x => x.WeeklyPollOptions));

@@ -154,7 +154,7 @@ public class PollEditEmbedProcessor
     {
         SelectMenuBuilder optionPresetSelect = new()
         {
-            CustomId = $"PollOption_Change_CustomOption_{poll.WeeklyPollId}",
+            CustomId = $"PollOption_Change_CustomOption_{true}_{poll.WeeklyPollId}",
             Placeholder = $"Select an option to edit it",
             MinValues = 1,
             MaxValues = 1,

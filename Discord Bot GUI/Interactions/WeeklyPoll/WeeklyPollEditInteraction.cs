@@ -43,7 +43,7 @@ public class WeeklyPollEditInteraction(
 
             void Modify(ModalBuilder builder) => builder
                 .UpdateTextInput("name", string.IsNullOrEmpty(resource.Name) ? null : resource.Name)
-                .UpdateTextInput("title", string.IsNullOrEmpty(resource.Title) ? null : resource.Title)
+                .UpdateTextInput("polltitle", string.IsNullOrEmpty(resource.Title) ? null : resource.Title)
                 .UpdateTextInput("channel", channel?.Name)
                 .UpdateTextInput("role", role?.Name);
 

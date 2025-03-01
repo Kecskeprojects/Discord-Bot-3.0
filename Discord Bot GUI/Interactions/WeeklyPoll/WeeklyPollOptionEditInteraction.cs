@@ -25,21 +25,21 @@ Config config) : BaseInteraction(serverService, logger, config)
     private readonly IWeeklyPollOptionService weeklyPollOptionService = weeklyPollOptionService;
     private readonly IWeeklyPollService weeklyPollService = weeklyPollService;
 
-    [ComponentInteraction("PollOption_Change_CustomOption_*")]
+    [ComponentInteraction("PollOption_Change_CustomOption_*_*")]
     [RequireUserPermission(ChannelPermission.SendPolls)]
     [RequireContext(ContextType.Guild)]
-    public async Task EditWeeklyPollOptionHandler(int pollId, string[] selectedOption)
+    public async Task EditWeeklyPollOptionHandler(bool isPresetOption, int Id, string[] selectedOption)
     {
         try
         {
             byte orderNumber = byte.Parse(selectedOption[0].Split("_")[0]);
             int optionId = int.Parse(selectedOption[0].Split("_")[1]);
-            WeeklyPollOptionResource resource = await weeklyPollOptionService.GetOrCreateOptionAsync(pollId, optionId, orderNumber);
+            WeeklyPollOptionResource resource = await weeklyPollOptionService.GetOrCreateOptionAsync(isPresetOption, Id, optionId, orderNumber);
 
             void Modify(ModalBuilder builder) => builder
                 .UpdateTextInput("optiontitle", string.IsNullOrEmpty(resource.Title) ? null : resource.Title);
 
-            await RespondWithModalAsync<EditWeeklyPollOptionModal>($"EditPollOptionModal_{resource.WeeklyPollId}_{resource.WeeklyPollOptionId}", modifyModal: Modify);
+            await RespondWithModalAsync<EditWeeklyPollOptionModal>($"EditPollOption{(isPresetOption ? "Preset": "")}Modal_{Id}_{resource.WeeklyPollOptionId}", modifyModal: Modify);
             return;
         }
         catch (Exception ex)
@@ -66,6 +66,34 @@ Config config) : BaseInteraction(serverService, logger, config)
                 List<WeeklyPollOptionPresetResource> presets = await weeklyPollOptionPresetService.GetActivePresetsAsync();
 
                 MessageComponent embeds = PollEditEmbedProcessor.CreateComponent(resource, presets);
+
+                await ModifyOriginalResponseAsync(x => x.Components = embeds);
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("WeeklyPollOptionEditInteraction.cs EditWeeklyPollOptionModalSubmit", ex);
+        }
+        await FollowupAsync("Something went wrong during the process.", ephemeral: true);
+    }
+
+    [ModalInteraction("EditPollOptionPresetModal_*_*")]
+    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireContext(ContextType.Guild)]
+    public async Task EditWeeklyPollOptionPresetModalSubmit(int presetId, int pollOptionId, EditWeeklyPollOptionModal modal)
+    {
+        try
+        {
+            await DeferAsync();
+            logger.Log($"Edit Poll Option Modal Submitted for poll option with ID {pollOptionId}", LogOnly: true);
+
+            DbProcessResultEnum result = await weeklyPollOptionService.UpdateAsync(pollOptionId, modal.OptionTitle);
+            if (result == DbProcessResultEnum.Success)
+            {
+                WeeklyPollOptionPresetResource resource = await weeklyPollOptionPresetService.GetPresetByIdAsync(presetId);
+
+                MessageComponent embeds = PollPresetEditEmbedProcessor.CreateComponent(resource);
 
                 await ModifyOriginalResponseAsync(x => x.Components = embeds);
                 return;

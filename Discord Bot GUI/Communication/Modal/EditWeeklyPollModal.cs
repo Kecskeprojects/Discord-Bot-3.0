@@ -12,7 +12,7 @@ public class EditWeeklyPollModal : IModal
 
     [RequiredInput(true)]
     [InputLabel("Poll Title")]
-    [ModalTextInput("title", placeholder: "Title shown in poll", maxLength: 300)]
+    [ModalTextInput("polltitle", placeholder: "Title shown in poll", maxLength: 300)]
     public string PollTitle { get; set; }
 
     [RequiredInput(true)]

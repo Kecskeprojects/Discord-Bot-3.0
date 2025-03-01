@@ -4,7 +4,7 @@ namespace Discord_Bot.Communication.Modal;
 
 public class EditWeeklyPollOptionModal : IModal
 {
-    public string Title => "Edit Weekly Poll";
+    public string Title => "Edit Weekly Poll Option";
 
     [RequiredInput(true)]
     [InputLabel("Option Title")]
