@@ -57,6 +57,7 @@ public class UtilityRequests
             Models.TopTrack.Attr attr = null;
             int page = 1, totalpage;
             string position = "";
+            int totalGroups = 0;
             do
             {
                 GenericResponseItem<Models.TopTrack.Toptracks> restResult = await UserBasedRequests.TopTracks(apiKey, username, 1000, page, "1month");
@@ -71,14 +72,17 @@ public class UtilityRequests
                     return response;
                 }
 
-                for (int i = 0; i < restResult.Response.Track.Count; i++)
+                List<IGrouping<int, Models.TopTrack.Track>> groups = restResult.Response.Track.GroupBy(t => int.Parse(t.PlayCount)).OrderByDescending(x => x.Key).ToList();
+
+                for (int i = 0; i < groups.Count; i++)
                 {
-                    Models.TopTrack.Track track = restResult.Response.Track[i];
-                    if (track.Name == track_name && track.Artist.Name == artist_name)
+                    IGrouping<int, Models.TopTrack.Track> playcountGroup = groups[i];
+                    if (playcountGroup.Any(track => track.Name == track_name && track.Artist.Name == artist_name))
                     {
-                        position = $"{i + 1 + ((page - 1) * 1000)}";
+                        position = $"{i + 1 + totalGroups}";
                     }
                 }
+                totalGroups = groups.Count;
 
                 totalpage = int.Parse(restResult.Response.Attr.TotalPages);
                 attr ??= restResult.Response.Attr;
