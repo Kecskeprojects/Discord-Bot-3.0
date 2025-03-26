@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.Interactions;
+using Discord.Rest;
 using Discord.WebSocket;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
@@ -30,7 +31,7 @@ public static class DiscordTools
 
     private static async Task<bool> IsOwnerBase(DiscordSocketClient client, ulong userId)
     {
-        IApplication application = await client.GetApplicationInfoAsync();
+        RestApplication application = await client.GetApplicationInfoAsync();
         return userId == application.Owner.Id;
     }
 

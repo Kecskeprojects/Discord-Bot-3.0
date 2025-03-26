@@ -1,5 +1,4 @@
-﻿using Discord;
-using Discord.Rest;
+﻿using Discord.Rest;
 using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces.DBServices;
@@ -25,7 +24,7 @@ public class SelfRoleFeature(
             RestUserMessage reply = null;
             if (role != null)
             {
-                IRole discordRole = Context.Guild.GetRole(role.DiscordId);
+                SocketRole discordRole = Context.Guild.GetRole(role.DiscordId);
 
                 switch (Context.Message.Content[0])
                 {

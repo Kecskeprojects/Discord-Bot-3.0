@@ -8,10 +8,7 @@ public class ServerCache
 
     public void RemoveCachedEntityManually(ulong key)
     {
-        if (Cache.ContainsKey(key))
-        {
-            Cache.Remove(key);
-        }
+        Cache.Remove(key);
     }
 
     public void ClearCachedEntityManually()
