@@ -1,5 +1,6 @@
 ﻿using LastFmApi.Communication;
 using LastFmApi.Enum;
+using System.Text.RegularExpressions;
 
 namespace LastFmApi;
 public class UtilityRequests
@@ -54,10 +55,9 @@ public class UtilityRequests
         };
         try
         {
-            Models.TopTrack.Attr attr = null;
-            int page = 1, totalpage;
-            string position = "";
-            int totalGroups = 0;
+            int page = 1;
+            int totalpage;
+            List<Models.TopTrack.Track> allPlays = [];
             do
             {
                 GenericResponseItem<Models.TopTrack.Toptracks> restResult = await UserBasedRequests.TopTracks(apiKey, username, 1000, page, "1month");
@@ -72,30 +72,29 @@ public class UtilityRequests
                     return response;
                 }
 
-                List<IGrouping<int, Models.TopTrack.Track>> groups = restResult.Response.Track.GroupBy(t => int.Parse(t.PlayCount)).OrderByDescending(x => x.Key).ToList();
-
-                for (int i = 0; i < groups.Count; i++)
-                {
-                    IGrouping<int, Models.TopTrack.Track> playcountGroup = groups[i];
-                    if (playcountGroup.Any(track => track.Name == track_name && track.Artist.Name == artist_name))
-                    {
-                        position = $"{i + 1 + totalGroups}";
-                    }
-                }
-                totalGroups += groups.Count;
+                allPlays.AddRange(restResult.Response.Track);
 
                 totalpage = int.Parse(restResult.Response.Attr.TotalPages);
-                attr ??= restResult.Response.Attr;
                 page++;
             } while (page <= totalpage);
 
-            if (position == "")
-            {
-                position = (totalGroups + 1).ToString();
+            List<IGrouping<int, Models.TopTrack.Track>> totalGroups = allPlays
+                .GroupBy(t => int.Parse(t.PlayCount))
+                .OrderByDescending(x => x.Key)
+                .ToList();
 
+            string position = null;
+            for (int i = 0; i < totalGroups.Count; i++)
+            {
+                IGrouping<int, Models.TopTrack.Track> playcountGroup = totalGroups[i];
+                if (playcountGroup.Any(track => track.Name == track_name && track.Artist.Name == artist_name))
+                {
+                    position = $"{i + 1}";
+                    break;
+                }
             }
 
-            response.Response = position;
+            response.Response = position ?? $"{totalGroups.Count + 1}";
             response.ResultCode = LastFmRequestResultEnum.Success;
         }
         catch (Exception ex)
