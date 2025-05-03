@@ -74,6 +74,11 @@ public class UtilityRequests
 
                 allPlays.AddRange(restResult.Response.Track);
 
+                if(allPlays.Any(track => track.Name == track_name && track.Artist.Name == artist_name))
+                {
+                    break;
+                }
+
                 totalpage = int.Parse(restResult.Response.Attr.TotalPages);
                 page++;
             } while (page <= totalpage);
