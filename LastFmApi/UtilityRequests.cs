@@ -82,7 +82,7 @@ public class UtilityRequests
                         position = $"{i + 1 + totalGroups}";
                     }
                 }
-                totalGroups = groups.Count;
+                totalGroups += groups.Count;
 
                 totalpage = int.Parse(restResult.Response.Attr.TotalPages);
                 attr ??= restResult.Response.Attr;
@@ -91,7 +91,7 @@ public class UtilityRequests
 
             if (position == "")
             {
-                position = attr.Total;
+                position = (totalGroups + 1).ToString();
 
             }
 
