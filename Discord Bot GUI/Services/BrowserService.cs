@@ -43,7 +43,7 @@ public class BrowserService(BotLogger logger, Config config)
         }
     }
 
-    public async Task<IPage> NewPage()
+    public async Task<IPage> NewPage(params KeyValuePair<string, string>[] additionalHeaders)
     {
         if (Browser == null || Browser.IsClosed)
         {
@@ -63,6 +63,12 @@ public class BrowserService(BotLogger logger, Config config)
                 { "accept-encoding", "gzip, deflate, br" },
                 { "accept-language", "en-US,en;q=0.9,en;q=0.8" }
             };
+
+        foreach (KeyValuePair<string, string> item in additionalHeaders)
+        {
+            headers.Add(item.Key, item.Value);
+        }
+
         await mainPage.SetExtraHttpHeadersAsync(headers);
 
         return mainPage;
