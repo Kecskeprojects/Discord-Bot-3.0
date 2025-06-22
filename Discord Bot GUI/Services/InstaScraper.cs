@@ -75,12 +75,12 @@ public class InstaScraper(BotLogger logger, BrowserService browserService) : IIn
             await page.GoToAsync(uri.OriginalString);
 
             int count = 0;
-            while (Body == null && count < 120)
+            while (Body == null && count < 240)
             {
                 count++;
 
                 //Refresh and retry, the query call is sometimes missing
-                if (count % 30 == 0 && count != 0 && count != 120)
+                if (count % 30 == 0 && count != 0 && count != 240)
                 {
                     logger.Log($"Reload {count / 30} for getting data");
                     await page.DeleteCookieAsync();
