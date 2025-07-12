@@ -153,6 +153,8 @@ public static class Startup
         collection.AddScoped<IEmbedGroupRepository, EmbedGroupRepository>();
         collection.AddScoped<IServerMutedUserRepository, ServerMutedUserRepository>();
 
+        collection.AddLogging();
+
         return collection.BuildServiceProvider();
     }
 }
