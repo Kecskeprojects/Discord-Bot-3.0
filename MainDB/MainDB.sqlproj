@@ -76,7 +76,7 @@
     <None Include="Local_Release.publish.xml" />
     <None Include="Main_Release.publish.xml" />
     <RefactorLog Include="MainDB.refactorlog" />
-    <None Include="DB Patch\Patch_7.sql" />
+    <None Include="DB Patch\Patch_8.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Post-deployment\PostDeployment.sql" />
@@ -94,7 +94,7 @@
     <None Include="Post-deployment\PostDeployment\Inserts\Role_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\Server_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\ServerSettingChannel_Inserts.sql" />
-    <None Include="Post-deployment\PostDeployment\Inserts\TwitchChannel_Inserts.sql" />
+    <None Include="Post-deployment\PostDeployment\Inserts\ServerTrackedStreamSource_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\User_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\UserBias_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\UserIdolStatistic_Inserts.sql" />
@@ -130,5 +130,7 @@
     <None Include="DB Patch\Patched\Patch_4.sql" />
     <None Include="DB Patch\Patched\Patch_5.sql" />
     <None Include="DB Patch\Patched\Patch_6.sql" />
+    <Build Include="Tables\ServerTrackedStreamSource.sql" />
+    <None Include="DB Patch\Patched\Patch_7.sql" />
   </ItemGroup>
 </Project>

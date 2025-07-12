@@ -5,7 +5,7 @@
     [DebutDate] DATE NULL, 
     [FullName] NVARCHAR(100) NULL, 
     [FullKoreanName] NVARCHAR(100) NULL, 
-    [CreatedOn] DATETIME NOT NULL CONSTRAINT [DF_IdolGroup_CreatedOn] DEFAULT GETDATE(), 
-    [ModifiedOn] DATETIME NOT NULL CONSTRAINT [DF_IdolGroup_ModifiedOn] DEFAULT GETDATE(), 
+    [CreatedOn] DATETIME NOT NULL CONSTRAINT [DF_IdolGroup_CreatedOn] DEFAULT GETUTCDATE(), 
+    [ModifiedOn] DATETIME NOT NULL CONSTRAINT [DF_IdolGroup_ModifiedOn] DEFAULT GETUTCDATE(), 
     CONSTRAINT [PK_GroupId] PRIMARY KEY ([GroupId])
 )
