@@ -12,7 +12,7 @@ public class EditIdolExtendedModal : IModal
     public string StageName { get; set; }
 
     [RequiredInput(false)]
-    [InputLabel("FullName")]
+    [InputLabel("Full Name")]
     [ModalTextInput("fullname", maxLength: 100)]
     public string FullName { get; set; }
 
