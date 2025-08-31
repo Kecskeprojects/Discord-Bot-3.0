@@ -9,6 +9,7 @@ using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
@@ -228,7 +229,7 @@ public class InstagramEmbedFeature(
     //        for (int i = 0; i < Math.Ceiling(attachments.Count / 10.0); i++)
     //        {
     //            int count = attachments.Count - i * 10 >= 10 ? 10 : attachments.Count - i * 10;
-    //            if(i == 0)
+    //            if (i == 0)
     //            {
     //                await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count), message, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
     //            }

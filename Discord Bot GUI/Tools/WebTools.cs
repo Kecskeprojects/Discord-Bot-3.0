@@ -26,6 +26,18 @@ public static class WebTools
         return imageData;
     }
 
+    public static async Task<string> GetBody(string url)
+    {
+        using (HttpClient wc = new()
+        {
+            Timeout = new TimeSpan(0, 3, 0)
+        })
+        {
+            HttpResponseMessage response = await wc.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+            return await response.Content.ReadAsStringAsync();
+        }
+    }
+
     public static bool TestConnection()
     {
         try

@@ -29,7 +29,7 @@
 		<PackageReference Include="AutoMapper" Version="15.0.1" />
 		<PackageReference Include="Discord.Net" Version="3.18.0" />
 		<PackageReference Include="Google.Apis.YouTube.v3" Version="1.70.0.3847" />
-		<PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.7.0" />
+		<PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.8.1" />
 		<PackageReference Include="PuppeteerSharp" Version="20.2.2" />
 		<PackageReference Include="RestSharp" Version="112.1.0" />
 		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />

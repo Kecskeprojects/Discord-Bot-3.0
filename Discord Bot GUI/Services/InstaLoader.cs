@@ -12,7 +12,7 @@ public class InstaLoader(BotLogger logger) : IInstaLoader
 
     //https://instaloader.github.io/basic-usage.html
     //https://github.com/instaloader/instaloader
-    //instaloader.exe --quiet --filename-pattern={date_utc}_{shortcode} --dirname-pattern={ shortcode} --no-video-thumbnails --no-compress-json -- -[postId]
+    //instaloader.exe --quiet --filename-pattern={date_utc}_{shortcode} --dirname-pattern={shortcode} --no-resume --no-video-thumbnails --no-compress-json -- -[postId]
     public string DownloadFromInstagram(string postId)
     {
         string errorDuringDownload = "";
@@ -22,7 +22,7 @@ public class InstaLoader(BotLogger logger) : IInstaLoader
             {
                 FileName = "cmd.exe",
                 Arguments = @"/C instaloader.exe " +
-                            @"--quiet --no-video-thumbnails --no-compress-json --no-iphone " +
+                            @"--quiet --no-video-thumbnails --no-compress-json --no-iphone --no-resume " +
                             @"--filename-pattern={date_utc}_{shortcode} --dirname-pattern={shortcode} -- -" +
                             postId,
                 UseShellExecute = false,

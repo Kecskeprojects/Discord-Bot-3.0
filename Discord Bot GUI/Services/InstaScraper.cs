@@ -4,7 +4,7 @@ using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.Instagram;
 using Discord_Bot.Tools;
-using PuppeteerSharp;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,32 +12,17 @@ using System.Threading.Tasks;
 using System.Web;
 
 namespace Discord_Bot.Services;
-public class InstaScraper(BotLogger logger, BrowserService browserService) : IInstaScraper
+public class InstaScraper(BotLogger logger) : IInstaScraper
 {
     private readonly BotLogger logger = logger;
-    private readonly BrowserService browserService = browserService;
-
-    private Root Body { get; set; }
 
     #region Main Methods
     public async Task<SocialScrapingResult> GetDataFromUrl(Uri uri)
     {
         try
         {
-            SocialScrapingResult result = new();
+            SocialScrapingResult result = await ExtractFromUrl(uri);
 
-            using (IPage mainPage = await browserService.NewPage())
-            {
-                mainPage.Response += InstaScraperResponse;
-                //await mainPage.SetCacheEnabledAsync(false);
-
-                Body = null;
-                string messages = await ExtractFromUrl(mainPage, uri, result);
-
-                await mainPage.CloseAsync();
-
-                result.ErrorMessage = messages;
-            }
             return result;
         }
         catch (Exception ex)
@@ -47,104 +32,75 @@ public class InstaScraper(BotLogger logger, BrowserService browserService) : IIn
         }
     }
 
-    private async void InstaScraperResponse(object sender, ResponseCreatedEventArgs e)
+    private async Task<SocialScrapingResult> ExtractFromUrl(Uri uri)
     {
         try
         {
-            if (e.Response.Url == "https://www.instagram.com/graphql/query")
+            string lastSegment = uri.Segments[^1].Replace("\\", "/");
+            int slashIndex = lastSegment.IndexOf('/');
+
+            string shortcode = lastSegment[..slashIndex];
+
+            string response =
+                await WebTools.GetBody($"https://www.instagram.com/graphql/query/?doc_id=8845758582119845&variables={{\"shortcode\":\"{shortcode}\"}}");
+
+            Root body = JsonConvert.DeserializeObject<Root>(response);
+
+            if (body?.Data?.XdtShortcodeMedia == null)
             {
-                Root body = await e.Response.JsonAsync<Root>();
-                if (body?.Data?.XdtShortcodeMedia == null)
-                {
-                    return;
-                }
-                Body = body;
-            }
-        }
-        catch (Exception ex)
-        {
-            logger.Error("InstaScraper.cs InstaScraperResponse", ex);
-        }
-    }
-
-    private async Task<string> ExtractFromUrl(IPage page, Uri uri, SocialScrapingResult result)
-    {
-        try
-        {
-            await page.DeleteCookieAsync();
-            await page.GoToAsync(uri.OriginalString);
-
-            int count = 0;
-            while (Body == null && count < 240)
-            {
-                count++;
-
-                //Refresh and retry, the query call is sometimes missing
-                if (count % 30 == 0 && count != 0 && count != 240)
-                {
-                    logger.Log($"Reload {count / 30} for getting data");
-                    await page.DeleteCookieAsync();
-                    await page.ReloadAsync();
-                }
-
-                await Task.Delay(500);
+                return new SocialScrapingResult("Error during request.");
             }
 
-            if (Body == null)
-            {
-                return "Timeout while getting content.";
-            }
-
-            string status = Body.Status;
+            string status = body.Status;
             if (status != "ok")
             {
-                return $"Request was returned with status: {status}";
+                return new SocialScrapingResult($"Request was returned with status: {status}");
             }
 
-            if (!Body.Data.XdtShortcodeMedia.IsVideo && Body.Data.XdtShortcodeMedia.EdgeSidecarToChildren?.Edges?.Count == 0)
-            {
-                return "No content was found in post.";
-            }
-
-            GetData(result, uri);
+            return !body.Data.XdtShortcodeMedia.IsVideo && body.Data.XdtShortcodeMedia.EdgeSidecarToChildren?.Edges?.Count == 0
+                ? new SocialScrapingResult("No content was found in post.")
+                : GetData(body, uri);
         }
         catch (Exception ex)
         {
             logger.Error("InstaScraper.cs ExtractFromUrl", ex);
         }
 
-        return "";
+        return null;
     }
 
-    private void GetData(SocialScrapingResult result, Uri uri)
+    private static SocialScrapingResult GetData(Root body, Uri uri)
     {
-        List<Edge> content = Body.Data.XdtShortcodeMedia.EdgeSidecarToChildren?.Edges;
+        SocialScrapingResult result = new();
+        List<Edge> content = body.Data.XdtShortcodeMedia.EdgeSidecarToChildren?.Edges;
 
-        if (Body.Data.XdtShortcodeMedia.EdgeMediaToCaption?.Edges?.Count > 0)
+        if (body.Data.XdtShortcodeMedia.EdgeMediaToCaption?.Edges?.Count > 0)
         {
-            GetTextContent(result, uri);
+            GetTextContent(body, result, uri);
         }
 
-        if (Body.Data.XdtShortcodeMedia.IsVideo)
+        if (body.Data.XdtShortcodeMedia.IsVideo)
         {
-            result.Content.Add(new(new Uri(Body.Data.XdtShortcodeMedia.VideoUrl), MediaContentTypeEnum.Video));
+            result.Content.Add(new(new Uri(body.Data.XdtShortcodeMedia.VideoUrl), MediaContentTypeEnum.Video));
         }
         else if (content == null)
         {
-            result.Content.Add(new(new Uri(Body.Data.XdtShortcodeMedia.DisplayResources.Last().Src), MediaContentTypeEnum.Image));
+            result.Content.Add(new(new Uri(body.Data.XdtShortcodeMedia.DisplayResources.Last().Src), MediaContentTypeEnum.Image));
         }
         else
         {
             GetMediaUris(result, content);
         }
+
+        return result;
     }
 
-    private void GetTextContent(SocialScrapingResult result, Uri uri)
+    private static void GetTextContent(Root body, SocialScrapingResult result, Uri uri)
     {
-        result.TextContent = DateTimeOffset.FromUnixTimeSeconds(Body.Data.XdtShortcodeMedia.TakenAtTimestamp).ToString("yyyy\\.MM\\.dd");
-        result.TextContent += $" **{Body.Data.XdtShortcodeMedia.Owner.Username}**'s [post](<{uri.OriginalString}>)\n\n";
+        result.TextContent = DateTimeOffset.FromUnixTimeSeconds(body.Data.XdtShortcodeMedia.TakenAtTimestamp).ToString("yyyy\\.MM\\.dd");
+        result.TextContent += $" **{body.Data.XdtShortcodeMedia.Owner.Username}**'s [post](<{uri.OriginalString}>)\n\n";
 
-        string caption = string.Join("\n\n", Body.Data.XdtShortcodeMedia.EdgeMediaToCaption.Edges.Select(x => x.Node.Text));
+        string caption = string.Join("\n\n", body.Data.XdtShortcodeMedia.EdgeMediaToCaption.Edges.Select(x => x.Node.Text));
         caption = caption.Split("\n\n#")[0];
         int indexOfTag = caption.ToLower().LastIndexOf("tags:");
         if (indexOfTag != -1)
@@ -168,16 +124,18 @@ public class InstaScraper(BotLogger logger, BrowserService browserService) : IIn
     {
         foreach (Edge item in list)
         {
-            if (item.Node.IsVideo)
-            {
-                Uri url = new(item.Node.VideoUrl);
-                result.Content.Add(new(url, MediaContentTypeEnum.Video));
-            }
-            else
-            {
-                Uri url = new(item.Node.DisplayResources.Last().Src);
-                result.Content.Add(new(url, MediaContentTypeEnum.Image));
-            }
+            Uri url = new(item.Node.DisplayResources.Last().Src);
+            result.Content.Add(new(url, MediaContentTypeEnum.Image));
+            //if (item.Node.IsVideo)
+            //{
+            //    Uri url = new(item.Node.VideoUrl);
+            //    result.Content.Add(new(url, MediaContentTypeEnum.Video));
+            //}
+            //else
+            //{
+            //    Uri url = new(item.Node.DisplayResources.Last().Src);
+            //    result.Content.Add(new(url, MediaContentTypeEnum.Image));
+            //}
         }
     }
     #endregion

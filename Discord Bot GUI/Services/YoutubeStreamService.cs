@@ -69,7 +69,7 @@ public class YoutubeStreamService(Config config, BotLogger logger) : IYoutubeDow
             CreateNoWindow = true,
             WorkingDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Dependencies\\Audio")
         };
-
+        
         logger.Log($"Yt-dlp audio stream created for '{url}'!");
         return Process.Start(ffmpeg);
     }
