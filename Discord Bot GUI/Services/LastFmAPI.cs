@@ -212,7 +212,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
             ? value
             : artistName;
 
-        ArtistStats result = new(username);
+        ArtistStats result = new();
 
         GenericResponseItem<List<LastFmApi.Models.TopAlbum.Album>> restAlbum = await GetEveryAlbumUserListenedToFromArtistAsync(username, artistName);
 
@@ -251,7 +251,19 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
         SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(mbid, tracks[0].Artist.Name, tracks[0].Name);
         result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (albums.Count == 0 ? tracks[0].Image?[^1].Text : albums[0].Image?[^1].Text);
 
-        LastFmArtistTools.MapArtistData(result, albums, tracks);
+        GenericResponseItem<LastFmApi.Models.ArtistInfo.Artist> artistInfo =
+            await InfoBasedRequests.ArtistPlays(config.Lastfm_API_Key, username, artistName);
+        if (restTrack.ResultCode != LastFmRequestResultEnum.Success)
+        {
+            result.Message = LastFmHelper.GetResultMessage(restTrack.ResultCode, restTrack.Message);
+            if (restTrack.Exception != null)
+            {
+                logger.Error("LastFmAPI.cs GetArtistDataAsync", restTrack.Exception);
+            }
+            return result;
+        }
+
+        LastFmArtistTools.MapArtistData(result, albums, tracks, artistInfo.Response);
 
         return result;
     }

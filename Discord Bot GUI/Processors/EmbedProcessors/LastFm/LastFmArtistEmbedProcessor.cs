@@ -8,7 +8,7 @@ public class LastFmArtistEmbedProcessor : LastFmBaseEmbedProcessor
     {
         //Getting base of lastfm embed
         EmbedBuilder builder = GetBaseEmbedBuilder(titleText, data.ImageUrl);
-        builder.WithDescription($"You have listened to this artist **{data.Playcount}** times.\nYou listened to **{data.AlbumCount}** of their albums and **{data.TrackCount}** of their tracks.");
+        builder.WithDescription($"You have listened to this artist **{data.Playcount}** times");
 
         if (!string.IsNullOrEmpty(data.TrackField))
         {

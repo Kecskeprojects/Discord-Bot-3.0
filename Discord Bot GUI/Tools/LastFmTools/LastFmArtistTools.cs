@@ -5,17 +5,12 @@ namespace Discord_Bot.Tools.LastFmTools;
 
 public static class LastFmArtistTools
 {
-    public static void MapArtistData(ArtistStats result, List<LastFmApi.Models.TopAlbum.Album> albums, List<LastFmApi.Models.TopTrack.Track> tracks)
+    public static void MapArtistData(ArtistStats result, List<LastFmApi.Models.TopAlbum.Album> albums, List<LastFmApi.Models.TopTrack.Track> tracks, LastFmApi.Models.ArtistInfo.Artist artistInfo)
     {
         result.ArtistName = albums.Count == 0 ? tracks[0].Artist.Name : albums[0].Artist.Name;
-        result.AlbumCount = albums.Count;
-        result.TrackCount = tracks.Count;
 
         //Total plays of artist
-        foreach (LastFmApi.Models.TopTrack.Track track in tracks)
-        {
-            result.Playcount += int.Parse(track.PlayCount);
-        }
+        result.Playcount = int.Parse(artistInfo.Stats.Userplaycount);
 
         //Assembling list of top albums
         for (int i = 0; i < albums.Count; i++)
