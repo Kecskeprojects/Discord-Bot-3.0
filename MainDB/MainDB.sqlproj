@@ -61,7 +61,6 @@
     <Folder Include="Post-deployment" />
     <Folder Include="Post-deployment\PostDeployment" />
     <Folder Include="Post-deployment\PostDeployment\Inserts" />
-    <Folder Include="Views" />
     <Folder Include="DB Patch" />
     <Folder Include="DB Patch\Patched" />
   </ItemGroup>
@@ -94,7 +93,6 @@
     <None Include="Post-deployment\PostDeployment\Inserts\Role_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\Server_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\ServerSettingChannel_Inserts.sql" />
-    <None Include="Post-deployment\PostDeployment\Inserts\ServerTrackedStreamSource_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\User_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\UserBias_Inserts.sql" />
     <None Include="Post-deployment\PostDeployment\Inserts\UserIdolStatistic_Inserts.sql" />
@@ -118,8 +116,6 @@
     <Build Include="Tables\UserBias.sql" />
     <Build Include="Tables\UserIdolStatistic.sql" />
     <Build Include="Tables\ChannelType.sql" />
-    <Build Include="Tables\EmbedGroup.sql" />
-    <Build Include="Tables\Embed.sql" />
     <Build Include="Tables\ServerMutedUsers.sql" />
     <Build Include="Tables\WeeklyPoll.sql" />
     <Build Include="Tables\WeeklyPollOption.sql" />
@@ -130,7 +126,6 @@
     <None Include="DB Patch\Patched\Patch_4.sql" />
     <None Include="DB Patch\Patched\Patch_5.sql" />
     <None Include="DB Patch\Patched\Patch_6.sql" />
-    <Build Include="Tables\ServerTrackedStreamSource.sql" />
     <None Include="DB Patch\Patched\Patch_7.sql" />
   </ItemGroup>
 </Project>
