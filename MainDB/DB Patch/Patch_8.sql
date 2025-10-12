@@ -41,6 +41,22 @@ USE [$(DatabaseName)];
 
 
 GO
+/*
+Table [dbo].[Embed] is being dropped.  Deployment will halt if the table contains data.
+*/
+
+IF EXISTS (select top 1 1 from [dbo].[Embed])
+    RAISERROR (N'Rows were detected. The schema update is terminating because data loss might occur.', 16, 127) WITH NOWAIT
+
+GO
+/*
+Table [dbo].[EmbedGroup] is being dropped.  Deployment will halt if the table contains data.
+*/
+
+IF EXISTS (select top 1 1 from [dbo].[EmbedGroup])
+    RAISERROR (N'Rows were detected. The schema update is terminating because data loss might occur.', 16, 127) WITH NOWAIT
+
+GO
 PRINT N'Dropping Default Constraint [dbo].[DF_Birthday_CreatedOn]...';
 
 
@@ -70,30 +86,6 @@ PRINT N'Dropping Default Constraint [dbo].[DF_CustomCommand_CreatedOn]...';
 
 GO
 ALTER TABLE [dbo].[CustomCommand] DROP CONSTRAINT [DF_CustomCommand_CreatedOn];
-
-
-GO
-PRINT N'Dropping Default Constraint [dbo].[DF_Embed_CreatedOn]...';
-
-
-GO
-ALTER TABLE [dbo].[Embed] DROP CONSTRAINT [DF_Embed_CreatedOn];
-
-
-GO
-PRINT N'Dropping Default Constraint [dbo].[DF_Embed_ModifiedOn]...';
-
-
-GO
-ALTER TABLE [dbo].[Embed] DROP CONSTRAINT [DF_Embed_ModifiedOn];
-
-
-GO
-PRINT N'Dropping Default Constraint [dbo].[DF_EmbedGroup_CreatedOn]...';
-
-
-GO
-ALTER TABLE [dbo].[EmbedGroup] DROP CONSTRAINT [DF_EmbedGroup_CreatedOn];
 
 
 GO
@@ -273,6 +265,62 @@ ALTER TABLE [dbo].[WeeklyPollOptionPreset] DROP CONSTRAINT [DF_WeeklyPollOptionP
 
 
 GO
+PRINT N'Dropping Default Constraint [dbo].[DF_Embed_ContentType]...';
+
+
+GO
+ALTER TABLE [dbo].[Embed] DROP CONSTRAINT [DF_Embed_ContentType];
+
+
+GO
+PRINT N'Dropping Default Constraint [dbo].[DF_Embed_CreatedOn]...';
+
+
+GO
+ALTER TABLE [dbo].[Embed] DROP CONSTRAINT [DF_Embed_CreatedOn];
+
+
+GO
+PRINT N'Dropping Default Constraint [dbo].[DF_Embed_ModifiedOn]...';
+
+
+GO
+ALTER TABLE [dbo].[Embed] DROP CONSTRAINT [DF_Embed_ModifiedOn];
+
+
+GO
+PRINT N'Dropping Default Constraint [dbo].[DF_EmbedGroup_CreatedOn]...';
+
+
+GO
+ALTER TABLE [dbo].[EmbedGroup] DROP CONSTRAINT [DF_EmbedGroup_CreatedOn];
+
+
+GO
+PRINT N'Dropping Foreign Key [dbo].[FK_Embed_EmbedGroup]...';
+
+
+GO
+ALTER TABLE [dbo].[Embed] DROP CONSTRAINT [FK_Embed_EmbedGroup];
+
+
+GO
+PRINT N'Dropping Foreign Key [dbo].[FK_EmbedGroup_Server]...';
+
+
+GO
+ALTER TABLE [dbo].[EmbedGroup] DROP CONSTRAINT [FK_EmbedGroup_Server];
+
+
+GO
+PRINT N'Dropping Foreign Key [dbo].[FK_EmbedGroup_Channel]...';
+
+
+GO
+ALTER TABLE [dbo].[EmbedGroup] DROP CONSTRAINT [FK_EmbedGroup_Channel];
+
+
+GO
 PRINT N'Dropping Check Constraint [dbo].[CK_WeeklyPoll_RepeatOnDayOfWeek]...';
 
 
@@ -281,20 +329,19 @@ ALTER TABLE [dbo].[WeeklyPoll] DROP CONSTRAINT [CK_WeeklyPoll_RepeatOnDayOfWeek]
 
 
 GO
-PRINT N'Creating Table [dbo].[ServerTrackedStreamSource]...';
+PRINT N'Dropping Table [dbo].[Embed]...';
 
 
 GO
-CREATE TABLE [dbo].[ServerTrackedStreamSource] (
-    [ServerTrackedStreamSourceId] INT           IDENTITY (1, 1) NOT NULL,
-    [SourceSite]                  VARCHAR (100) NOT NULL,
-    [SourceLink]                  VARCHAR (300) NOT NULL,
-    [SourceUsername]              VARCHAR (150) NOT NULL,
-    [ServerId]                    INT           NOT NULL,
-    [CreatedOn]                   DATETIME      NOT NULL,
-    [TwitchId]                    VARCHAR (12)  NOT NULL,
-    CONSTRAINT [PK_ServerTrackedStreamSourceId] PRIMARY KEY CLUSTERED ([ServerTrackedStreamSourceId] ASC)
-);
+DROP TABLE [dbo].[Embed];
+
+
+GO
+PRINT N'Dropping Table [dbo].[EmbedGroup]...';
+
+
+GO
+DROP TABLE [dbo].[EmbedGroup];
 
 
 GO
@@ -331,33 +378,6 @@ PRINT N'Creating Default Constraint [dbo].[DF_CustomCommand_CreatedOn]...';
 GO
 ALTER TABLE [dbo].[CustomCommand]
     ADD CONSTRAINT [DF_CustomCommand_CreatedOn] DEFAULT GETUTCDATE() FOR [CreatedOn];
-
-
-GO
-PRINT N'Creating Default Constraint [dbo].[DF_Embed_CreatedOn]...';
-
-
-GO
-ALTER TABLE [dbo].[Embed]
-    ADD CONSTRAINT [DF_Embed_CreatedOn] DEFAULT GETUTCDATE() FOR [CreatedOn];
-
-
-GO
-PRINT N'Creating Default Constraint [dbo].[DF_Embed_ModifiedOn]...';
-
-
-GO
-ALTER TABLE [dbo].[Embed]
-    ADD CONSTRAINT [DF_Embed_ModifiedOn] DEFAULT GETUTCDATE() FOR [ModifiedOn];
-
-
-GO
-PRINT N'Creating Default Constraint [dbo].[DF_EmbedGroup_CreatedOn]...';
-
-
-GO
-ALTER TABLE [dbo].[EmbedGroup]
-    ADD CONSTRAINT [DF_EmbedGroup_CreatedOn] DEFAULT GETUTCDATE() FOR [CreatedOn];
 
 
 GO
@@ -559,24 +579,6 @@ ALTER TABLE [dbo].[WeeklyPollOptionPreset]
 
 
 GO
-PRINT N'Creating Default Constraint [dbo].[DF_ServerTrackedStreamSource_CreatedOn]...';
-
-
-GO
-ALTER TABLE [dbo].[ServerTrackedStreamSource]
-    ADD CONSTRAINT [DF_ServerTrackedStreamSource_CreatedOn] DEFAULT GETUTCDATE() FOR [CreatedOn];
-
-
-GO
-PRINT N'Creating Foreign Key [dbo].[FK_ServerTrackedStreamSource_Server]...';
-
-
-GO
-ALTER TABLE [dbo].[ServerTrackedStreamSource] WITH NOCHECK
-    ADD CONSTRAINT [FK_ServerTrackedStreamSource_Server] FOREIGN KEY ([ServerId]) REFERENCES [dbo].[Server] ([ServerId]);
-
-
-GO
 PRINT N'Creating Check Constraint [dbo].[CK_WeeklyPoll_RepeatOnDayOfWeek]...';
 
 
@@ -594,8 +596,6 @@ USE [$(DatabaseName)];
 
 
 GO
-ALTER TABLE [dbo].[ServerTrackedStreamSource] WITH CHECK CHECK CONSTRAINT [FK_ServerTrackedStreamSource_Server];
-
 ALTER TABLE [dbo].[WeeklyPoll] WITH CHECK CHECK CONSTRAINT [CK_WeeklyPoll_RepeatOnDayOfWeek];
 
 
