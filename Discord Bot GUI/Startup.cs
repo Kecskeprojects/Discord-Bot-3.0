@@ -126,8 +126,6 @@ public static class Startup
         collection.AddTransient<IWeeklyPollOptionPresetService, WeeklyPollOptionPresetService>();
         collection.AddTransient<IWeeklyPollOptionService, WeeklyPollOptionService>();
         collection.AddTransient<IWeeklyPollService, WeeklyPollService>();
-        collection.AddTransient<IEmbedService, EmbedService>();
-        collection.AddTransient<IEmbedGroupService, EmbedGroupService>();
         collection.AddTransient<IServerMutedUserService, ServerMutedUserService>();
 
         //Database Repositories
@@ -149,8 +147,6 @@ public static class Startup
         collection.AddScoped<IWeeklyPollOptionPresetRepository, WeeklyPollOptionPresetRepository>();
         collection.AddScoped<IWeeklyPollOptionRepository, WeeklyPollOptionRepository>();
         collection.AddScoped<IWeeklyPollRepository, WeeklyPollRepository>();
-        collection.AddScoped<IEmbedRepository, EmbedRepository>();
-        collection.AddScoped<IEmbedGroupRepository, EmbedGroupRepository>();
         collection.AddScoped<IServerMutedUserRepository, ServerMutedUserRepository>();
 
         collection.AddLogging();
