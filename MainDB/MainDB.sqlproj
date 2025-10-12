@@ -75,7 +75,6 @@
     <None Include="Local_Release.publish.xml" />
     <None Include="Main_Release.publish.xml" />
     <RefactorLog Include="MainDB.refactorlog" />
-    <None Include="DB Patch\Patch_8.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Post-deployment\PostDeployment.sql" />
@@ -127,5 +126,6 @@
     <None Include="DB Patch\Patched\Patch_5.sql" />
     <None Include="DB Patch\Patched\Patch_6.sql" />
     <None Include="DB Patch\Patched\Patch_7.sql" />
+    <None Include="DB Patch\Patched\Patch_8.sql" />
   </ItemGroup>
 </Project>
