@@ -127,5 +127,8 @@
     <None Include="DB Patch\Patched\Patch_6.sql" />
     <None Include="DB Patch\Patched\Patch_7.sql" />
     <None Include="DB Patch\Patched\Patch_8.sql" />
+    <Build Include="Tables\Embed.sql" />
+    <Build Include="Tables\EmbedGroup.sql" />
+    <None Include="DB Patch\Patch_Channel_Banner.sql" />
   </ItemGroup>
 </Project>

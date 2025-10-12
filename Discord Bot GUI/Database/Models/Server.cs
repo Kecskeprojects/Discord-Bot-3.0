@@ -25,6 +25,8 @@ public partial class Server
 
     public virtual ICollection<CustomCommand> CustomCommands { get; set; } = new List<CustomCommand>();
 
+    public virtual ICollection<EmbedGroup> EmbedGroups { get; set; } = new List<EmbedGroup>();
+
     public virtual Role MuteRole { get; set; }
 
     public virtual Role NotificationRole { get; set; }

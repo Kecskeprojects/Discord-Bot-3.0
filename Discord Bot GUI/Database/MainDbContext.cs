@@ -20,6 +20,10 @@ public partial class MainDbContext : DbContext
 
     public virtual DbSet<CustomCommand> CustomCommands { get; set; }
 
+    public virtual DbSet<Embed> Embeds { get; set; }
+
+    public virtual DbSet<EmbedGroup> EmbedGroups { get; set; }
+
     public virtual DbSet<Greeting> Greetings { get; set; }
 
     public virtual DbSet<Idol> Idols { get; set; }
@@ -152,6 +156,48 @@ public partial class MainDbContext : DbContext
                 .HasForeignKey(d => d.ServerId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_CustomCommand_Server");
+        });
+
+        modelBuilder.Entity<Embed>(entity =>
+        {
+            entity.HasKey(e => e.EmbedId).HasName("PK_EmbedId");
+
+            entity.ToTable("Embed");
+
+            entity.HasIndex(e => new { e.EmbedGroupId, e.Order }, "UQ_Embed").IsUnique();
+
+            entity.Property(e => e.ContentType).HasDefaultValue(1);
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getutcdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.ModifiedOn)
+                .HasDefaultValueSql("(getutcdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.EmbedGroup).WithMany(p => p.Embeds)
+                .HasForeignKey(d => d.EmbedGroupId)
+                .HasConstraintName("FK_Embed_EmbedGroup");
+        });
+
+        modelBuilder.Entity<EmbedGroup>(entity =>
+        {
+            entity.HasKey(e => e.EmbedGroupId).HasName("PK_EmbedGroupId");
+
+            entity.ToTable("EmbedGroup");
+
+            entity.HasIndex(e => new { e.ServerId, e.ChannelId, e.MessageId }, "UQ_EmbedGroup").IsUnique();
+
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getutcdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Channel).WithMany(p => p.EmbedGroups)
+                .HasForeignKey(d => d.ChannelId)
+                .HasConstraintName("FK_EmbedGroup_Channel");
+
+            entity.HasOne(d => d.Server).WithMany(p => p.EmbedGroups)
+                .HasForeignKey(d => d.ServerId)
+                .HasConstraintName("FK_EmbedGroup_Server");
         });
 
         modelBuilder.Entity<Greeting>(entity =>
