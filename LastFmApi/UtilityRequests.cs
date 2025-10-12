@@ -138,17 +138,17 @@ public class UtilityRequests
                     if (album.Artist.Name.Equals(artistName, StringComparison.OrdinalIgnoreCase))
                     {
                         albums.Add(album);
-                    }
 
-                    if(albums.Count >= 5)
-                    {
-                        break;
+                        if (albums.Count >= 5)
+                        {
+                            break;
+                        }
                     }
                 }
 
                 totalpage = int.Parse(restResult.Response.Attr.TotalPages);
                 page++;
-            } while (page <= totalpage);
+            } while (page <= totalpage && albums.Count < 5);
 
             response.Response = albums;
             response.ResultCode = LastFmRequestResultEnum.Success;
@@ -190,17 +190,17 @@ public class UtilityRequests
                     if (track.Artist.Name.Equals(artistName, StringComparison.OrdinalIgnoreCase))
                     {
                         tracks.Add(track);
-                    }
 
-                    if (tracks.Count >= 8)
-                    {
-                        break;
+                        if (tracks.Count >= 8)
+                        {
+                            break;
+                        }
                     }
                 }
 
                 totalpage = int.Parse(restResult.Response.Attr.TotalPages);
                 page++;
-            } while (page <= totalpage);
+            } while (page <= totalpage && tracks.Count < 8);
 
             response.Response = tracks;
             response.ResultCode = LastFmRequestResultEnum.Success;
