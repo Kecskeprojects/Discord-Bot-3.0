@@ -18,13 +18,13 @@ public static class LastFmArtistTools
         }
 
         //Assembling list of top albums
-        for (int i = 0; i < 5 && i < albums.Count; i++)
+        for (int i = 0; i < albums.Count; i++)
         {
             result.AlbumField += $"`#{i + 1}` **{albums[i].Name}**  (*{albums[i].PlayCount} plays*)\n";
         }
 
         //Assembling list of top tracks
-        for (int i = 0; i < 8 && i < tracks.Count; i++)
+        for (int i = 0; i < tracks.Count; i++)
         {
             result.TrackField += $"`#{i + 1}` **{tracks[i].Name}**  (*{tracks[i].PlayCount} plays*)\n";
         }

@@ -1,6 +1,5 @@
 ﻿using LastFmApi.Communication;
 using LastFmApi.Enum;
-using System.Text.RegularExpressions;
 
 namespace LastFmApi;
 public class UtilityRequests
@@ -140,6 +139,11 @@ public class UtilityRequests
                     {
                         albums.Add(album);
                     }
+
+                    if(albums.Count >= 5)
+                    {
+                        break;
+                    }
                 }
 
                 totalpage = int.Parse(restResult.Response.Attr.TotalPages);
@@ -186,6 +190,11 @@ public class UtilityRequests
                     if (track.Artist.Name.Equals(artistName, StringComparison.OrdinalIgnoreCase))
                     {
                         tracks.Add(track);
+                    }
+
+                    if (tracks.Count >= 8)
+                    {
+                        break;
                     }
                 }
 
