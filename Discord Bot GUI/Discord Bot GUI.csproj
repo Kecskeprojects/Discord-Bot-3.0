@@ -57,6 +57,7 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 			<TargetPath>%(RecursiveDir)\%(Filename)%(Extension)</TargetPath>
 		</Content>
+		<Content Update="$(NuGetPackageRoot)\microsoft.codeanalysis.workspaces.msbuild\**\**" Visible="false" />
 		<ProjectReference Include="..\LastFmApi\LastFmApi.csproj" />
 		<Resource Include="ResourceFiles\Kim_Synthji.ico" />
 		<Compile Update="Properties\Resource.Designer.cs">
