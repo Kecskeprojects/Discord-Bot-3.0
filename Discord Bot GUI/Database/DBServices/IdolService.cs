@@ -58,7 +58,7 @@ public class IdolService(
                 Group = group,
                 Name = idolName,
             };
-            await idolRepository.AddAsync(idol);
+            _ = await idolRepository.AddAsync(idol);
 
             logger.Log($"Idol [{idolName}]-[{idolGroup}] added successfully!");
             return DbProcessResultEnum.Success;
@@ -101,7 +101,7 @@ public class IdolService(
                 i => i.Group);
             if (idol != null)
             {
-                await idolRepository.RemoveAsync(idol);
+                _ = await idolRepository.RemoveAsync(idol);
 
                 logger.Log($"Idol [{idolName}]-[{idolGroup}] removed successfully!");
                 return DbProcessResultEnum.Success;
@@ -147,12 +147,12 @@ public class IdolService(
 
             if (idol.IdolImages.Count > 3)
             {
-                await idolImageRepository.RemoveAsync(idol.IdolImages.OrderByDescending(x => x.CreatedOn).Skip(3).ToList());
+                _ = await idolImageRepository.RemoveAsync(idol.IdolImages.OrderByDescending(x => x.CreatedOn).Skip(3).ToList());
             }
 
             if (string.IsNullOrEmpty(idol.ProfileUrl) && data != null)
             {
-                mapper.Map(data, idol);
+                _ = mapper.Map(data, idol);
             }
 
             if (additional != null)
@@ -164,7 +164,7 @@ public class IdolService(
 
                 if (idol.Group.Name != "soloist" && idol.Group.DebutDate == null)
                 {
-                    mapper.Map(additional, idol.Group);
+                    _ = mapper.Map(additional, idol.Group);
                 }
             }
 
@@ -196,7 +196,7 @@ public class IdolService(
                     item.DebutDate = item.Group.DebutDate;
                 }
 
-                await idolRepository.SaveChangesAsync();
+                _ = await idolRepository.SaveChangesAsync();
                 count = idols.Count;
             }
         }
@@ -255,7 +255,7 @@ public class IdolService(
                                 ? "M"
                                 : idol.Gender;
             idol.Group = await idolGroupService.UpdateOrCreateGroupAsync(idol.Group, modal.Group.ToLower().Trim());
-            await idolRepository.SaveChangesAsync();
+            _ = await idolRepository.SaveChangesAsync();
 
             logger.Log($"Idol with ID {idolId} updated successfully!");
             return DbProcessResultEnum.Success;
@@ -279,7 +279,7 @@ public class IdolService(
             idol.FullName = modal.FullName.Trim();
             idol.KoreanFullName = modal.KoreanFullName.Trim();
             idol.DebutDate = DateOnly.TryParse(modal.DebutDate, out DateOnly debutDate) ? debutDate : idol.DebutDate;
-            await idolRepository.SaveChangesAsync();
+            _ = await idolRepository.SaveChangesAsync();
 
             logger.Log($"Idol with ID {idolId} updated successfully!");
             return DbProcessResultEnum.Success;
@@ -299,7 +299,7 @@ public class IdolService(
                 .FirstOrDefaultAsync(i => i.IdolId == idolId);
 
             idol.ProfileUrl = modal.ProfileURL.Trim();
-            await idolRepository.SaveChangesAsync();
+            _ = await idolRepository.SaveChangesAsync();
 
             logger.Log($"Idol with ID {idolId} updated successfully!");
             return DbProcessResultEnum.Success;
@@ -319,7 +319,7 @@ public class IdolService(
                 .FirstOrDefaultAsync(i => i.IdolId == idolId);
 
             idol.Group = await idolGroupService.UpdateOrCreateGroupAsync(idol.Group, modal.Group.ToLower().Trim());
-            await idolRepository.SaveChangesAsync();
+            _ = await idolRepository.SaveChangesAsync();
 
             logger.Log($"Idol with ID {idolId} updated successfully!");
             return DbProcessResultEnum.Success;

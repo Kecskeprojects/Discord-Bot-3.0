@@ -21,15 +21,15 @@ public static class BiasGameDebutEmbedProcessor
         }
 
         SelectMenuBuilder selectMenu = new();
-        selectMenu.WithCustomId($"BiasGame_Setup_Debut_{data.UserId}");
-        selectMenu.WithPlaceholder("Select TWO years as a start and end date!");
-        selectMenu.WithMinValues(2);
-        selectMenu.WithMaxValues(2);
+        _ = selectMenu.WithCustomId($"BiasGame_Setup_Debut_{data.UserId}");
+        _ = selectMenu.WithPlaceholder("Select TWO years as a start and end date!");
+        _ = selectMenu.WithMinValues(2);
+        _ = selectMenu.WithMaxValues(2);
 
         options.ForEach(y => selectMenu.AddOption(y.ToString(), y.ToString()));
 
         ComponentBuilder components = new();
-        components.WithSelectMenu(selectMenu);
+        _ = components.WithSelectMenu(selectMenu);
         return components.Build();
     }
 }

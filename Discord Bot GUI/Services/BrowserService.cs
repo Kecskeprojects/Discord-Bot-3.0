@@ -14,7 +14,7 @@ public class BrowserService(BotLogger logger, Config config)
     public async Task OpenBrowser()
     {
         BrowserFetcher browserFetcher = new(SupportedBrowser.Chrome);
-        await browserFetcher.DownloadAsync(PuppeteerSharp.BrowserData.Chrome.DefaultBuildId); //117.0.5938.62 is the last version where videos were sent as media http responses
+        _ = await browserFetcher.DownloadAsync(PuppeteerSharp.BrowserData.Chrome.DefaultBuildId); //117.0.5938.62 is the last version where videos were sent as media http responses
         Browser = await Puppeteer.LaunchAsync(new LaunchOptions
         {
             Headless = config.HeadlessBrowser,

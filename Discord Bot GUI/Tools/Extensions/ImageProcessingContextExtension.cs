@@ -15,7 +15,7 @@ public static class ImageProcessingContextExtension
         Size size = context.GetCurrentSize();
         IPathCollection corners = BuildCorners(size.Width, size.Height, cornerRadius);
 
-        context.SetGraphicsOptions(new GraphicsOptions()
+        _ = context.SetGraphicsOptions(new GraphicsOptions()
         {
             Antialias = true,
 

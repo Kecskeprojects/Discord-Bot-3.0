@@ -31,7 +31,7 @@ public class ServerService(
             {
                 DiscordId = serverId.ToString()
             };
-            await serverRepository.AddAsync(server);
+            _ = await serverRepository.AddAsync(server);
 
             logger.Log($"Server added with the following ID: {serverId}");
             return DbProcessResultEnum.Success;
@@ -51,7 +51,7 @@ public class ServerService(
 
             server.RoleMessageDiscordId = messageId.ToString();
 
-            await serverRepository.SaveChangesAsync();
+            _ = await serverRepository.SaveChangesAsync();
 
             cache.RemoveCachedEntityManually(serverId);
 
@@ -96,7 +96,7 @@ public class ServerService(
 
             server.NotificationRole = role;
 
-            await serverRepository.UpdateAsync(server);
+            _ = await serverRepository.UpdateAsync(server);
 
             cache.RemoveCachedEntityManually(serverId);
 
@@ -121,7 +121,7 @@ public class ServerService(
 
             server.NotificationRole = null;
 
-            await serverRepository.SaveChangesAsync();
+            _ = await serverRepository.SaveChangesAsync();
 
             cache.RemoveCachedEntityManually(serverId);
 
@@ -196,7 +196,7 @@ public class ServerService(
 
             server.MuteRole = role;
 
-            await serverRepository.UpdateAsync(server);
+            _ = await serverRepository.UpdateAsync(server);
 
             cache.RemoveCachedEntityManually(serverId);
 

@@ -76,10 +76,10 @@ public static class BiasListMessageProcessor
 
                 for (int i = 25 * selectCount; i < remaininglistCount; i++)
                 {
-                    menuBuilder.AddOption(keys[i].ToUpper(), keys[i] + (isUser ? $"><{userId}" : ""), $"{groups[keys[i]].Count} biases...");
+                    _ = menuBuilder.AddOption(keys[i].ToUpper(), keys[i] + (isUser ? $"><{userId}" : ""), $"{groups[keys[i]].Count} biases...");
                 }
 
-                builder.WithSelectMenu(menuBuilder);
+                _ = builder.WithSelectMenu(menuBuilder);
 
                 selectCount++;
             }

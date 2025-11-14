@@ -78,7 +78,7 @@ public class UserIdolService(
 
             user.Idols.Add(idol);
 
-            await userRepository.UpdateAsync(user);
+            _ = await userRepository.UpdateAsync(user);
 
             logger.Log($"{userId} user's idol [{idolName}]-[{(noGroup ? "No group specified" : idolGroup)}] added successfully!");
             return DbProcessResultEnum.Success;
@@ -121,7 +121,7 @@ public class UserIdolService(
                 user.Idols.Add(idol);
             }
 
-            await userRepository.UpdateAsync(user);
+            _ = await userRepository.UpdateAsync(user);
 
             logger.Log($"{userId} user's idols from group [{biasGroup}] added successfully!");
             return DbProcessResultEnum.Success;
@@ -141,7 +141,7 @@ public class UserIdolService(
             user ??= new User() { DiscordId = userId.ToString() };
             user.Idols = [];
 
-            await userRepository.UpdateAsync(user);
+            _ = await userRepository.UpdateAsync(user);
 
             logger.Log("User idol added successfully!");
             return DbProcessResultEnum.Success;
@@ -173,9 +173,9 @@ public class UserIdolService(
                 return DbProcessResultEnum.MultipleResults;
             }
             Idol idol = idols[0];
-            user.Idols.Remove(idol);
+            _ = user.Idols.Remove(idol);
 
-            await userRepository.UpdateAsync(user);
+            _ = await userRepository.UpdateAsync(user);
 
             logger.Log($"{userId} user's idol [{idolName}]-[{(noGroup ? "No group specified" : idolGroup)}] removed successfully!");
             return DbProcessResultEnum.Success;
@@ -208,10 +208,10 @@ public class UserIdolService(
 
             foreach (Idol idol in userIdols)
             {
-                user.Idols.Remove(idol);
+                _ = user.Idols.Remove(idol);
             }
 
-            await userRepository.UpdateAsync(user);
+            _ = await userRepository.UpdateAsync(user);
 
             logger.Log($"{userId} user's idols from group [{biasGroup}] removed successfully!");
             return DbProcessResultEnum.Success;

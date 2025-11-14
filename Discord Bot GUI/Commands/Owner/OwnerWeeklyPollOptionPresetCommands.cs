@@ -37,7 +37,7 @@ public class OwnerWeeklyPollOptionPresetCommands(
             Embed[] embeds = PollPresetEditEmbedProcessor.CreateEmbed(resource, false);
             MessageComponent component = PollPresetEditEmbedProcessor.CreateComponent(resource);
 
-            await ReplyAsync(embeds: embeds, components: component);
+            _ = await ReplyAsync(embeds: embeds, components: component);
         }
         catch (Exception ex)
         {
@@ -59,7 +59,7 @@ public class OwnerWeeklyPollOptionPresetCommands(
             Embed[] embeds = PollPresetEditEmbedProcessor.CreateEmbed(resource, true);
             MessageComponent component = PollPresetEditEmbedProcessor.CreateComponent(resource);
 
-            await ReplyAsync(embeds: embeds, components: component);
+            _ = await ReplyAsync(embeds: embeds, components: component);
         }
         catch (Exception ex)
         {
@@ -83,7 +83,7 @@ public class OwnerWeeklyPollOptionPresetCommands(
                 DbProcessResultEnum.NotFound => "Preset does not exist.",
                 _ => "Preset could not be removed!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -104,7 +104,7 @@ public class OwnerWeeklyPollOptionPresetCommands(
 
             Embed[] embed = PollPresetListEmbedProcessor.CreateEmbed(weeklyPollResources);
 
-            await ReplyAsync(embeds: embed);
+            _ = await ReplyAsync(embeds: embed);
         }
         catch (Exception ex)
         {

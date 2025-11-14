@@ -1,6 +1,7 @@
 ﻿using System.Xml.Serialization;
 
 namespace Discord_Bot.Services.Models.Wotd;
+
 [XmlRoot(ElementName = "xml")]
 public class WotdBase
 {

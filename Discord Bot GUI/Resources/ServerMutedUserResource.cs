@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace Discord_Bot.Resources;
+
 public class ServerMutedUserResource
 {
     public string ServerDiscordId { get; set; }

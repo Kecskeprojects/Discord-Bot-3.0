@@ -1,4 +1,5 @@
 ﻿namespace Discord_Bot.Resources;
+
 public class WeeklyPollOptionResource
 {
     public int WeeklyPollId { get; set; }

@@ -9,7 +9,7 @@ public static class CustomCommandListEmbedProcessor
     public static Embed[] CreateEmbed(List<CustomCommandResource> list)
     {
         EmbedBuilder builder = new();
-        builder.WithTitle("Custom commands:");
+        _ = builder.WithTitle("Custom commands:");
         string commands = "";
 
         foreach (CustomCommandResource command in list)
@@ -23,8 +23,8 @@ public static class CustomCommandListEmbedProcessor
                 commands += " , !" + command.Command;
             }
         }
-        builder.WithDescription(commands);
-        builder.WithColor(Color.Teal);
+        _ = builder.WithDescription(commands);
+        _ = builder.WithColor(Color.Teal);
         return [builder.Build()];
     }
 }

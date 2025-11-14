@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 
 namespace Discord_Bot.Tools;
+
 public static class PollTools
 {
     public static PollMediaProperties CreateTitle(string text)

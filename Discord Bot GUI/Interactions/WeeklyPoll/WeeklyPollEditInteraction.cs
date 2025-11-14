@@ -15,6 +15,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions.WeeklyPoll;
+
 public class WeeklyPollEditInteraction(
     IWeeklyPollOptionPresetService weeklyPollOptionPresetService,
     IWeeklyPollService weeklyPollService,
@@ -83,9 +84,9 @@ public class WeeklyPollEditInteraction(
 
                 Embed[] embeds = PollEditEmbedProcessor.CreateEmbed(resource, true);
 
-                await ModifyOriginalResponseAsync(x => x.Embeds = embeds);
+                _ = await ModifyOriginalResponseAsync(x => x.Embeds = embeds);
 
-                await FollowupAsync("Edited poll successfully!", ephemeral: true);
+                _ = await FollowupAsync("Edited poll successfully!", ephemeral: true);
                 return;
             }
         }
@@ -93,7 +94,7 @@ public class WeeklyPollEditInteraction(
         {
             logger.Error("WeeklyPollEditInteraction.cs EditWeeklyPollModalSubmit", ex);
         }
-        await FollowupAsync("Something went wrong during the process.", ephemeral: true);
+        _ = await FollowupAsync("Something went wrong during the process.", ephemeral: true);
     }
 
     [ComponentInteraction("Poll_Change_*_*_*")]
@@ -113,7 +114,7 @@ public class WeeklyPollEditInteraction(
 
                 MessageComponent component = PollEditEmbedProcessor.CreateComponent(resource, presets);
 
-                await ModifyOriginalResponseAsync(x => x.Components = component);
+                _ = await ModifyOriginalResponseAsync(x => x.Components = component);
                 return;
             }
         }
@@ -121,7 +122,7 @@ public class WeeklyPollEditInteraction(
         {
             logger.Error("WeeklyPollEditInteraction.cs DynamicChangeWeeklyPollButtonHandler", ex);
         }
-        await FollowupAsync("Something went wrong during the process.", ephemeral: true);
+        _ = await FollowupAsync("Something went wrong during the process.", ephemeral: true);
     }
 
     [ComponentInteraction("Poll_SelectChange_*_*")]
@@ -141,7 +142,7 @@ public class WeeklyPollEditInteraction(
 
                 MessageComponent embeds = PollEditEmbedProcessor.CreateComponent(resource, presets);
 
-                await ModifyOriginalResponseAsync(x => x.Components = embeds);
+                _ = await ModifyOriginalResponseAsync(x => x.Components = embeds);
                 return;
             }
         }
@@ -149,6 +150,6 @@ public class WeeklyPollEditInteraction(
         {
             logger.Error("WeeklyPollEditInteraction.cs DynamicChangeWeeklyPollSelectHandler", ex);
         }
-        await FollowupAsync("Something went wrong during the process.", ephemeral: true);
+        _ = await FollowupAsync("Something went wrong during the process.", ephemeral: true);
     }
 }

@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Discord_Bot;
+
 public class CommandHandler(
     IServiceProvider services,
     DiscordSocketClient client,
@@ -31,7 +32,7 @@ public class CommandHandler(
     {
         client.MessageReceived += HandleCommandAsync;
         commands.CommandExecuted += HandleCommandExecutionAsync;
-        await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
+        _ = await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
     }
 
     #region Handle Command
@@ -122,7 +123,7 @@ public class CommandHandler(
     {
         using (IServiceScope scope = services.CreateScope())
         {
-            await commands.ExecuteAsync(context, argPos, scope.ServiceProvider);
+            _ = await commands.ExecuteAsync(context, argPos, scope.ServiceProvider);
         }
     }
 
@@ -134,7 +135,7 @@ public class CommandHandler(
             {
                 //self roles
                 SelfRoleFeature selfRoleFeature = scope.ServiceProvider.GetService<SelfRoleFeature>();
-                await selfRoleFeature.Run(context);
+                _ = await selfRoleFeature.Run(context);
             }
 
             await context.Message.DeleteAsync();
@@ -147,13 +148,13 @@ public class CommandHandler(
         {
             EasterEggFeature easterEggFeature = scope.ServiceProvider.GetService<EasterEggFeature>();
             Config config = scope.ServiceProvider.GetService<Config>();
-            await easterEggFeature.Run(context);
+            _ = await easterEggFeature.Run(context);
 
             //Make embed for instagram links
             if (config.Enable_Instagram_Embed)
             {
                 InstagramEmbedFeature instagramEmbedFeature = scope.ServiceProvider.GetService<InstagramEmbedFeature>();
-                await instagramEmbedFeature.Run(context);
+                _ = await instagramEmbedFeature.Run(context);
             }
         }
     }
@@ -171,7 +172,7 @@ public class CommandHandler(
                 case CommandError.UnmetPrecondition:
                 case CommandError.ObjectNotFound:
                 {
-                    await context.Channel.SendMessageAsync(result.ErrorReason);
+                    _ = await context.Channel.SendMessageAsync(result.ErrorReason);
                     break;
                 }
                 case CommandError.UnknownCommand:
@@ -199,7 +200,7 @@ public class CommandHandler(
             if (!DiscordTools.IsDM(context as SocketCommandContext))
             {
                 CustomCommandFeature customCommandFeature = scope.ServiceProvider.GetService<CustomCommandFeature>();
-                await customCommandFeature.Run(context as SocketCommandContext);
+                _ = await customCommandFeature.Run(context as SocketCommandContext);
             }
         }
     }

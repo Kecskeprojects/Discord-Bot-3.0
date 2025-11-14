@@ -44,7 +44,7 @@ public class TwitchNotificationFeature(
                         return false;
                     }
 
-                    await channel.SendMessageAsync(notifRole, embeds: embed);
+                    _ = await channel.SendMessageAsync(notifRole, embeds: embed);
                 }
             }
         }

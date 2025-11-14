@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
+
 public class UnmuteFeature(
     IServerMutedUserService serverMutedUserService,
     DiscordSocketClient client,
@@ -59,7 +60,7 @@ public class UnmuteFeature(
                     //If user exists send a direct message to the user
                     if (user != null)
                     {
-                        await user.SendMessageAsync($"You have now been unmuted in '**{server.Name}**'.");
+                        _ = await user.SendMessageAsync($"You have now been unmuted in '**{server.Name}**'.");
                     }
                     DbProcessResultEnum reminderResult = await serverMutedUserService.RemoveMutedUserAsync(server.Id, user.Id);
                     if (reminderResult == DbProcessResultEnum.Failure)

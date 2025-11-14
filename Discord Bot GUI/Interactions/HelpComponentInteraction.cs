@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions;
+
 public class HelpComponentInteraction(
     CommandService commandService,
     IServerService serverService,
@@ -43,7 +44,7 @@ public class HelpComponentInteraction(
 
             Embed[] embed = HelpDetailEmbedProcessor.CreateEmbed(commandLevel, category, [.. commands], config.Img);
 
-            await FollowupAsync(embeds: embed, ephemeral: true);
+            _ = await FollowupAsync(embeds: embed, ephemeral: true);
         }
         catch (Exception ex)
         {

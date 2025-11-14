@@ -9,22 +9,22 @@ public class PollPresetEditEmbedProcessor
     public static Embed[] CreateEmbed(WeeklyPollOptionPresetResource preset, bool isEdit)
     {
         EmbedBuilder builder = new();
-        builder.WithTitle($"{(isEdit && !string.IsNullOrEmpty(preset.Name) ? $"Edit '{preset.Name}' Preset" : "Create new Weekly Poll Option Preset")}");
+        _ = builder.WithTitle($"{(isEdit && !string.IsNullOrEmpty(preset.Name) ? $"Edit '{preset.Name}' Preset" : "Create new Weekly Poll Option Preset")}");
 
-        builder.AddField("Edit Button", "Edit Name and Description of Preset");
+        _ = builder.AddField("Edit Button", "Edit Name and Description of Preset");
 
-        builder.AddField("Other Buttons", "They describe the current state of what they edit\nClicking it will switch back and forth between it's two states");
+        _ = builder.AddField("Other Buttons", "They describe the current state of what they edit\nClicking it will switch back and forth between it's two states");
 
-        builder.AddField("Select Field", "If visible, this field is to edit options tied to the Preset unless it's a special preset");
+        _ = builder.AddField("Select Field", "If visible, this field is to edit options tied to the Preset unless it's a special preset");
 
-        builder.WithColor(Color.DarkBlue);
+        _ = builder.WithColor(Color.DarkBlue);
         return [builder.Build()];
     }
 
     public static MessageComponent CreateComponent(WeeklyPollOptionPresetResource preset)
     {
         ActionRowBuilder buttonRow = new();
-        buttonRow
+        _ = buttonRow
             .WithButton(label: "Edit Preset"
                             , customId: $"EditPollPreset_{preset.WeeklyPollOptionPresetId}"
                             , style: ButtonStyle.Primary)
@@ -36,12 +36,12 @@ public class PollPresetEditEmbedProcessor
                             , style: preset.IsActive ? ButtonStyle.Success : ButtonStyle.Danger);
 
         ComponentBuilder components = new();
-        components.AddRow(buttonRow);
+        _ = components.AddRow(buttonRow);
 
         if (!preset.IsSpecialPreset)
         {
             ActionRowBuilder customOptionRow = CreateCustomOptionRow(preset);
-            components.AddRow(customOptionRow);
+            _ = components.AddRow(customOptionRow);
         }
 
         return components.Build();
@@ -62,18 +62,13 @@ public class PollPresetEditEmbedProcessor
         for (int i = 0; i < 10; i++)
         {
             WeeklyPollOptionResource option = preset.Options.FirstOrDefault(x => x.OrderNumber == i);
-            if (option != null)
-            {
-                optionPresetSelect.AddOption($"{i + 1}# {option.Title}", $"{i}_{option.WeeklyPollOptionPresetId}");
-            }
-            else
-            {
-                optionPresetSelect.AddOption($"{i + 1}#", $"{i}_0");
-            }
+            _ = option != null
+                ? optionPresetSelect.AddOption($"{i + 1}# {option.Title}", $"{i}_{option.WeeklyPollOptionPresetId}")
+                : optionPresetSelect.AddOption($"{i + 1}#", $"{i}_0");
         }
 
         ActionRowBuilder optionPresetRow = new();
-        optionPresetRow.WithSelectMenu(optionPresetSelect);
+        _ = optionPresetRow.WithSelectMenu(optionPresetSelect);
         return optionPresetRow;
     }
 }

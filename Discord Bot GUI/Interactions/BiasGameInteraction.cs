@@ -51,14 +51,14 @@ public class BiasGameInteraction(
             logger.Log($"BiasGame Setup Gender Chosen: {chosenGender.ToDatabaseFriendlyString()}", LogOnly: true);
             MessageComponent component = BiasGameDebutEmbedProcessor.CreateComponent(data);
 
-            await ModifyOriginalResponseAsync(x => x.Components = component);
+            _ = await ModifyOriginalResponseAsync(x => x.Components = component);
             data.IsProcessing = false;
         }
         catch (Exception ex)
         {
             logger.Error("BiasGameInteraction.cs GenderChoosen", ex);
-            Global.BiasGames.TryRemove(Context.User.Id, out _);
-            await FollowupAsync("Failure during setup!");
+            _ = Global.BiasGames.TryRemove(Context.User.Id, out _);
+            _ = await FollowupAsync("Failure during setup!");
         }
     }
 
@@ -119,11 +119,11 @@ public class BiasGameInteraction(
         catch (Exception ex)
         {
             logger.Error("BiasGameInteraction.cs DebutChosen", ex);
-            Global.BiasGames.TryRemove(Context.User.Id, out _);
+            _ = Global.BiasGames.TryRemove(Context.User.Id, out _);
 
             if (Context.Interaction.HasResponded)
             {
-                await FollowupAsync("Failure during setup!");
+                _ = await FollowupAsync("Failure during setup!");
             }
             else
             {
@@ -140,8 +140,8 @@ public class BiasGameInteraction(
         {
             await DeleteOriginalResponseAsync();
 
-            await FollowupAsync("Not enough idols with your selected parameters!");
-            Global.BiasGames.TryRemove(Context.User.Id, out _);
+            _ = await FollowupAsync("Not enough idols with your selected parameters!");
+            _ = Global.BiasGames.TryRemove(Context.User.Id, out _);
             return;
         }
 

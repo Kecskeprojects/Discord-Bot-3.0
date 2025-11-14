@@ -101,7 +101,7 @@ public partial class BotWindow : Window
     {
         try
         {
-            Process.Start("explorer.exe", Path.Combine(Directory.GetCurrentDirectory(), "Logs"));
+            _ = Process.Start("explorer.exe", Path.Combine(Directory.GetCurrentDirectory(), "Logs"));
         }
         catch (Exception ex)
         {
@@ -116,7 +116,7 @@ public partial class BotWindow : Window
             logger.LogToFile();
             if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), $"Logs\\logs[{DateTimeTools.CurrentDate()}].txt")))
             {
-                Process.Start("notepad.exe", Path.Combine(Directory.GetCurrentDirectory(), $"Logs\\logs[{DateTimeTools.CurrentDate()}].txt"));
+                _ = Process.Start("notepad.exe", Path.Combine(Directory.GetCurrentDirectory(), $"Logs\\logs[{DateTimeTools.CurrentDate()}].txt"));
             }
         }
         catch (Exception ex)
@@ -130,7 +130,7 @@ public partial class BotWindow : Window
         try
         {
             ProcessMetrics result = await ProcessTools.GetStatistics();
-            Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
+            _ = (Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
             {
                 if (Application.Current.Windows.OfType<BotWindow>().FirstOrDefault() != null)
                 {
@@ -143,7 +143,7 @@ public partial class BotWindow : Window
                     main.RAMUsage.Content = $"{result.RAMUsageInMB} MB";
                     main.ReservedRAM.Content = $"{result.ReservedRAMInMB} MB";
                 }
-            });
+            }));
         }
         catch (Exception ex)
         {
@@ -153,7 +153,7 @@ public partial class BotWindow : Window
 
     public static void ClearWindowLog()
     {
-        Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
+        _ = (Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
         {
             if (Application.Current.Windows.OfType<BotWindow>().FirstOrDefault() != null)
             {
@@ -162,13 +162,13 @@ public partial class BotWindow : Window
                 main.MainLogText.Inlines.Clear();
                 main.MainLogText.Inlines.AddRange(range);
             }
-        });
+        }));
     }
 
     public static void LogToWindow(Log log, System.Windows.Media.Brush color)
     {
         string mess = log.Content.Replace(":\t", ":    \t");
-        Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
+        _ = (Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
         {
             if (Application.Current.Windows.OfType<BotWindow>().FirstOrDefault() != null)
             {
@@ -179,6 +179,6 @@ public partial class BotWindow : Window
                 };
                 main.MainLogText.Inlines.Add(run);
             }
-        });
+        }));
     }
 }

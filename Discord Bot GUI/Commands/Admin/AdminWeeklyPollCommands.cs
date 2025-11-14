@@ -39,7 +39,7 @@ public class AdminWeeklyPollCommands(
             Embed[] embeds = PollEditEmbedProcessor.CreateEmbed(resource, false);
             MessageComponent component = PollEditEmbedProcessor.CreateComponent(resource, presets);
 
-            await ReplyAsync(embeds: embeds, components: component);
+            _ = await ReplyAsync(embeds: embeds, components: component);
         }
         catch (Exception ex)
         {
@@ -62,7 +62,7 @@ public class AdminWeeklyPollCommands(
             Embed[] embeds = PollEditEmbedProcessor.CreateEmbed(resource, true);
             MessageComponent component = PollEditEmbedProcessor.CreateComponent(resource, presets);
 
-            await ReplyAsync(embeds: embeds, components: component);
+            _ = await ReplyAsync(embeds: embeds, components: component);
         }
         catch (Exception ex)
         {
@@ -86,7 +86,7 @@ public class AdminWeeklyPollCommands(
                 DbProcessResultEnum.NotFound => "Poll does not exist.",
                 _ => "Poll could not be removed!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -107,7 +107,7 @@ public class AdminWeeklyPollCommands(
 
             Embed[] embed = PollListEmbedProcessor.CreateEmbed(weeklyPollResources);
 
-            await ReplyAsync(embeds: embed);
+            _ = await ReplyAsync(embeds: embed);
         }
         catch (Exception ex)
         {

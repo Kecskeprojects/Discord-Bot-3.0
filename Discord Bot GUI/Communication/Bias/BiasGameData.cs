@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 
 namespace Discord_Bot.Communication.Bias;
+
 public partial class BiasGameData : IDisposable
 {
     public BiasGameData(ulong userId)
@@ -44,7 +45,7 @@ public partial class BiasGameData : IDisposable
 
     public void AddImage(int idolId, Stream stream, string fileName)
     {
-        IdolWithImage.TryAdd(idolId, new FileAttachment(stream, fileName));
+        _ = IdolWithImage.TryAdd(idolId, new FileAttachment(stream, fileName));
     }
 
     public void CreatePairs()
@@ -58,7 +59,7 @@ public partial class BiasGameData : IDisposable
     {
         Ranking.Push(idolId);
 
-        IdolWithImage.Remove(idolId, out FileAttachment value);
+        _ = IdolWithImage.Remove(idolId, out FileAttachment value);
         value.Dispose();
 
         CurrentPair++;

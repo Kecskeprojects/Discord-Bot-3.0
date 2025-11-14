@@ -26,7 +26,7 @@ public class OwnerSayCommands(
         {
             await Context.Message.DeleteAsync();
 
-            await channel.SendMessageAsync(message);
+            _ = await channel.SendMessageAsync(message);
         }
         catch (Exception ex)
         {

@@ -9,7 +9,6 @@ using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
@@ -66,11 +65,11 @@ public class InstagramEmbedFeature(
             {
                 if (result.ErrorMessage.Length < 150)
                 {
-                    await Context.Channel.SendMessageAsync(result.ErrorMessage);
+                    _ = await Context.Channel.SendMessageAsync(result.ErrorMessage);
                 }
                 else
                 {
-                    await Context.Channel.SendMessageAsync("Error message too long to display!");
+                    _ = await Context.Channel.SendMessageAsync("Error message too long to display!");
                     logger.Error("InstagramEmbedFeature.cs SendInstagramPostEmbedAsync", result.ErrorMessage);
                 }
 
@@ -85,7 +84,7 @@ public class InstagramEmbedFeature(
             {
                 try
                 {
-                    await SendInstagramMessageAsync(attachments, result.TextContent, refer, false);
+                    _ = await SendInstagramMessageAsync(attachments, result.TextContent, refer, false);
                     await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
                 }
                 catch (HttpException ex)
@@ -102,19 +101,19 @@ public class InstagramEmbedFeature(
                         attachments = await SocialMessageProcessor.GetAttachments("instagram", result.Content, sendVideos: false, limit: 1000);
                         if (!CollectionTools.IsNullOrEmpty(attachments))
                         {
-                            await SendInstagramMessageAsync(attachments, result.TextContent, refer, true);
+                            _ = await SendInstagramMessageAsync(attachments, result.TextContent, refer, true);
                             await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
                         }
                         else
                         {
-                            await Context.Channel.SendMessageAsync("Post content too large to send!");
+                            _ = await Context.Channel.SendMessageAsync("Post content too large to send!");
                         }
                     }
                 }
             }
             else
             {
-                await Context.Channel.SendMessageAsync("No image/videos in tweet.");
+                _ = await Context.Channel.SendMessageAsync("No image/videos in tweet.");
             }
 
             foreach (FileAttachment item in attachments)
@@ -137,20 +136,15 @@ public class InstagramEmbedFeature(
             for (int i = 0; i < Math.Ceiling(attachments.Count / 10.0); i++)
             {
                 int count = attachments.Count - (i * 10) >= 10 ? 10 : attachments.Count - (i * 10);
-                if (i == 0)
-                {
-                    await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count), message, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
-                }
-                else
-                {
-                    await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count));
-                }
+                _ = i == 0
+                    ? await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count), message, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None))
+                    : await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count));
             }
         }
         //Ignore videos is a second try at sending so that is when we can know if the post is too large to send
         else if (ignoreVideos == true)
         {
-            await Context.Channel.SendMessageAsync("Post content too large to send!");
+            _ = await Context.Channel.SendMessageAsync("Post content too large to send!");
         }
 
         return result;

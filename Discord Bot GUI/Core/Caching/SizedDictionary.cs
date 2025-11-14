@@ -21,7 +21,7 @@ public sealed class SizedDictionary<TKey, TValue>(int size) : Dictionary<TKey, T
             keys.Enqueue(key);
             if (keys.Count > maxSize)
             {
-                base.Remove(keys.Dequeue());
+                _ = base.Remove(keys.Dequeue());
             }
 
             return true;
@@ -43,7 +43,7 @@ public sealed class SizedDictionary<TKey, TValue>(int size) : Dictionary<TKey, T
         keys.Enqueue(key);
         if (keys.Count > maxSize)
         {
-            base.Remove(keys.Dequeue());
+            _ = base.Remove(keys.Dequeue());
         }
     }
 

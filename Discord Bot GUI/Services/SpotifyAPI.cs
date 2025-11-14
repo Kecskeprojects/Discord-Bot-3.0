@@ -101,7 +101,7 @@ public class SpotifyAPI(BotLogger logger, Config config, IYoutubeAPI youtubeAPI,
                     foreach (string track in list)
                     {
                         logger.Query($"List item: {track}");
-                        await youtubeAPI.Searching(track, username, serverId, channelId);
+                        _ = await youtubeAPI.Searching(track, username, serverId, channelId);
                     }
 
                     return SearchResultEnum.SpotifyPlaylistFound;

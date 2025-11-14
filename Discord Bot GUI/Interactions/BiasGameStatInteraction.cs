@@ -44,7 +44,7 @@ public class BiasGameStatInteraction(
 
             if (stats == null || stats.BiasGameCount == 0 || stats.Stats.Count == 0)
             {
-                await FollowupAsync("Not enough choices made for this gender!", ephemeral: true);
+                _ = await FollowupAsync("Not enough choices made for this gender!", ephemeral: true);
                 return;
             }
 
@@ -53,7 +53,7 @@ public class BiasGameStatInteraction(
             MessageComponent component = BiasGameStatEmbedProcessor.CreateComponent(chosenGender, Context.User.Id);
 
             SocketMessageComponent message = Context.Interaction as SocketMessageComponent;
-            await ModifyOriginalResponseAsync(x =>
+            _ = await ModifyOriginalResponseAsync(x =>
             {
                 x.Embeds = embed;
                 x.Components = component;
@@ -62,8 +62,8 @@ public class BiasGameStatInteraction(
         catch (Exception ex)
         {
             logger.Error("BiasGameInteraction.cs GenderChoosen", ex);
-            Global.BiasGames.TryRemove(Context.User.Id, out _);
-            await FollowupAsync("Failure during stat collection!");
+            _ = Global.BiasGames.TryRemove(Context.User.Id, out _);
+            _ = await FollowupAsync("Failure during stat collection!");
         }
     }
 }

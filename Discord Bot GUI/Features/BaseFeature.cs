@@ -8,6 +8,7 @@ using Discord_Bot.Tools;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
+
 public abstract class BaseFeature(IServerService serverService, BotLogger logger)
 {
     protected readonly IServerService serverService = serverService;
@@ -50,7 +51,7 @@ public abstract class BaseFeature(IServerService serverService, BotLogger logger
         if (!Global.ServerAudioResources.TryGetValue(Context.Guild.Id, out ServerAudioResource audioResource))
         {
             audioResource = new(Context.Guild.Id);
-            Global.ServerAudioResources.TryAdd(Context.Guild.Id, audioResource);
+            _ = Global.ServerAudioResources.TryAdd(Context.Guild.Id, audioResource);
         }
         return audioResource;
     }

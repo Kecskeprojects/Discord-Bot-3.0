@@ -53,103 +53,103 @@ public static class Startup
         IServiceCollection collection = new ServiceCollection();
 
         //Core
-        collection.AddSingleton(client);
-        collection.AddSingleton(interactions);
-        collection.AddSingleton(commands);
-        collection.AddTransient<Config>(); //Configuration can be edited without stopping the program
-        collection.AddSingleton(new BotLogger());
-        collection.AddSingleton(new ServerCache());
+        _ = collection.AddSingleton(client);
+        _ = collection.AddSingleton(interactions);
+        _ = collection.AddSingleton(commands);
+        _ = collection.AddTransient<Config>(); //Configuration can be edited without stopping the program
+        _ = collection.AddSingleton(new BotLogger());
+        _ = collection.AddSingleton(new ServerCache());
 
         Config config = new();
-        collection.AddDbContext<MainDbContext>(options => options.UseSqlServer(config.SqlConnectionString));
+        _ = collection.AddDbContext<MainDbContext>(options => options.UseSqlServer(config.SqlConnectionString));
 
-        collection.AddAutoMapper(x => x.AddProfile<MapperConfig>());
+        _ = collection.AddAutoMapper(x => x.AddProfile<MapperConfig>());
 
-        collection.AddSingleton<BotMain>();
-        collection.AddSingleton<InteractionHandler>();
-        collection.AddSingleton<CommandHandler>();
-        collection.AddSingleton<BotWindow>();
+        _ = collection.AddSingleton<BotMain>();
+        _ = collection.AddSingleton<InteractionHandler>();
+        _ = collection.AddSingleton<CommandHandler>();
+        _ = collection.AddSingleton<BotWindow>();
 
         //Processors
-        collection.AddTransient<WhoKnowsImageProcessor>();
-        collection.AddTransient<BonkGifProcessor>();
-        collection.AddTransient<BiasGameImageProcessor>();
-        collection.AddTransient<BiasGameWinnerBracketImageProcessor>();
-        collection.AddTransient<BiasScrapingProcessor>();
-        collection.AddTransient<LastFmWhoKnowsEmbedProcessor>();
+        _ = collection.AddTransient<WhoKnowsImageProcessor>();
+        _ = collection.AddTransient<BonkGifProcessor>();
+        _ = collection.AddTransient<BiasGameImageProcessor>();
+        _ = collection.AddTransient<BiasGameWinnerBracketImageProcessor>();
+        _ = collection.AddTransient<BiasScrapingProcessor>();
+        _ = collection.AddTransient<LastFmWhoKnowsEmbedProcessor>();
 
         //Features
-        collection.AddTransient<InstagramEmbedFeature>();
-        collection.AddTransient<SelfRoleFeature>();
-        collection.AddTransient<EasterEggFeature>();
-        collection.AddTransient<CustomCommandFeature>();
-        collection.AddTransient<BirthdayFeature>();
-        collection.AddTransient<ReminderFeature>();
-        collection.AddTransient<TwitchNotificationFeature>();
-        collection.AddTransient<YoutubeAddPlaylistFeature>();
-        collection.AddTransient<AudioPlayFeature>();
-        collection.AddTransient<AudioRequestFeature>();
-        collection.AddTransient<UnmuteFeature>();
-        collection.AddTransient<WeeklyPollFeature>();
+        _ = collection.AddTransient<InstagramEmbedFeature>();
+        _ = collection.AddTransient<SelfRoleFeature>();
+        _ = collection.AddTransient<EasterEggFeature>();
+        _ = collection.AddTransient<CustomCommandFeature>();
+        _ = collection.AddTransient<BirthdayFeature>();
+        _ = collection.AddTransient<ReminderFeature>();
+        _ = collection.AddTransient<TwitchNotificationFeature>();
+        _ = collection.AddTransient<YoutubeAddPlaylistFeature>();
+        _ = collection.AddTransient<AudioPlayFeature>();
+        _ = collection.AddTransient<AudioRequestFeature>();
+        _ = collection.AddTransient<UnmuteFeature>();
+        _ = collection.AddTransient<WeeklyPollFeature>();
 
         //Services
-        collection.AddSingleton<BrowserService>();
-        collection.AddTransient<ITwitchAPI, TwitchAPI>();
-        collection.AddTransient<ITwitchCLI, TwitchCLI>();
-        collection.AddTransient<ISpotifyAPI, Services.SpotifyAPI>();
-        collection.AddTransient<IYoutubeAPI, YoutubeAPI>();
+        _ = collection.AddSingleton<BrowserService>();
+        _ = collection.AddTransient<ITwitchAPI, TwitchAPI>();
+        _ = collection.AddTransient<ITwitchCLI, TwitchCLI>();
+        _ = collection.AddTransient<ISpotifyAPI, Services.SpotifyAPI>();
+        _ = collection.AddTransient<IYoutubeAPI, YoutubeAPI>();
         //collection.AddTransient<IInstaLoader, InstaLoader>();
-        collection.AddTransient<IInstaScraper, InstaScraper>();
-        collection.AddTransient<IWordOfTheDayService, WordOfTheDayService>();
-        collection.AddTransient<IYoutubeDownloadService, YoutubeStreamService>();
-        collection.AddTransient<ILastFmAPI, LastFmAPI>();
-        collection.AddTransient<IMusicBrainzAPI, MusicBrainzAPI>();
-        collection.AddTransient<ITwitterScraper, TwitterScraper>();
-        collection.AddTransient<IKpopDbScraper, KpopDbScraper>();
+        _ = collection.AddTransient<IInstaScraper, InstaScraper>();
+        _ = collection.AddTransient<IWordOfTheDayService, WordOfTheDayService>();
+        _ = collection.AddTransient<IYoutubeDownloadService, YoutubeStreamService>();
+        _ = collection.AddTransient<ILastFmAPI, LastFmAPI>();
+        _ = collection.AddTransient<IMusicBrainzAPI, MusicBrainzAPI>();
+        _ = collection.AddTransient<ITwitterScraper, TwitterScraper>();
+        _ = collection.AddTransient<IKpopDbScraper, KpopDbScraper>();
 
         //Database Services
-        collection.AddTransient<IServerService, ServerService>();
-        collection.AddTransient<IGreetingService, GreetingService>();
-        collection.AddTransient<ITwitchChannelService, TwitchChannelService>();
-        collection.AddTransient<ICustomCommandService, CustomCommandService>();
-        collection.AddTransient<IRoleService, RoleService>();
-        collection.AddTransient<IReminderService, ReminderService>();
-        collection.AddTransient<IChannelService, ChannelService>();
-        collection.AddTransient<IBirthdayService, BirthdayService>();
-        collection.AddTransient<IIdolService, IdolService>();
-        collection.AddTransient<IUserService, UserService>();
-        collection.AddTransient<IIdolAliasService, IdolAliasService>();
-        collection.AddTransient<IIdolGroupService, IdolGroupService>();
-        collection.AddTransient<IUserIdolService, UserIdolService>();
-        collection.AddTransient<IIdolImageService, IdolImageService>();
-        collection.AddTransient<IUserIdolStatisticService, UserIdolStatisticService>();
-        collection.AddTransient<IWeeklyPollOptionPresetService, WeeklyPollOptionPresetService>();
-        collection.AddTransient<IWeeklyPollOptionService, WeeklyPollOptionService>();
-        collection.AddTransient<IWeeklyPollService, WeeklyPollService>();
-        collection.AddTransient<IServerMutedUserService, ServerMutedUserService>();
+        _ = collection.AddTransient<IServerService, ServerService>();
+        _ = collection.AddTransient<IGreetingService, GreetingService>();
+        _ = collection.AddTransient<ITwitchChannelService, TwitchChannelService>();
+        _ = collection.AddTransient<ICustomCommandService, CustomCommandService>();
+        _ = collection.AddTransient<IRoleService, RoleService>();
+        _ = collection.AddTransient<IReminderService, ReminderService>();
+        _ = collection.AddTransient<IChannelService, ChannelService>();
+        _ = collection.AddTransient<IBirthdayService, BirthdayService>();
+        _ = collection.AddTransient<IIdolService, IdolService>();
+        _ = collection.AddTransient<IUserService, UserService>();
+        _ = collection.AddTransient<IIdolAliasService, IdolAliasService>();
+        _ = collection.AddTransient<IIdolGroupService, IdolGroupService>();
+        _ = collection.AddTransient<IUserIdolService, UserIdolService>();
+        _ = collection.AddTransient<IIdolImageService, IdolImageService>();
+        _ = collection.AddTransient<IUserIdolStatisticService, UserIdolStatisticService>();
+        _ = collection.AddTransient<IWeeklyPollOptionPresetService, WeeklyPollOptionPresetService>();
+        _ = collection.AddTransient<IWeeklyPollOptionService, WeeklyPollOptionService>();
+        _ = collection.AddTransient<IWeeklyPollService, WeeklyPollService>();
+        _ = collection.AddTransient<IServerMutedUserService, ServerMutedUserService>();
 
         //Database Repositories
-        collection.AddScoped<IServerRepository, ServerRepository>();
-        collection.AddScoped<IGreetingRepository, GreetingRepository>();
-        collection.AddScoped<ITwitchChannelRepository, TwitchChannelRepository>();
-        collection.AddScoped<ICustomCommandRepository, CustomCommandRepository>();
-        collection.AddScoped<IRoleRepository, RoleRepository>();
-        collection.AddScoped<IReminderRepository, ReminderRepository>();
-        collection.AddScoped<IUserRepository, UserRepository>();
-        collection.AddScoped<IChannelRepository, ChannelRepository>();
-        collection.AddScoped<IChannelTypeRepository, ChannelTypeRepository>();
-        collection.AddScoped<IBirthdayRepository, BirthdayRepository>();
-        collection.AddScoped<IIdolRepository, IdolRepository>();
-        collection.AddScoped<IIdolGroupRepository, IdolGroupRepository>();
-        collection.AddScoped<IIdolAliasRepository, IdolAliasRepository>();
-        collection.AddScoped<IIdolImageRepository, IdolImageRepository>();
-        collection.AddScoped<IUserIdolStatisticRepository, UserIdolStatisticRepository>();
-        collection.AddScoped<IWeeklyPollOptionPresetRepository, WeeklyPollOptionPresetRepository>();
-        collection.AddScoped<IWeeklyPollOptionRepository, WeeklyPollOptionRepository>();
-        collection.AddScoped<IWeeklyPollRepository, WeeklyPollRepository>();
-        collection.AddScoped<IServerMutedUserRepository, ServerMutedUserRepository>();
+        _ = collection.AddScoped<IServerRepository, ServerRepository>();
+        _ = collection.AddScoped<IGreetingRepository, GreetingRepository>();
+        _ = collection.AddScoped<ITwitchChannelRepository, TwitchChannelRepository>();
+        _ = collection.AddScoped<ICustomCommandRepository, CustomCommandRepository>();
+        _ = collection.AddScoped<IRoleRepository, RoleRepository>();
+        _ = collection.AddScoped<IReminderRepository, ReminderRepository>();
+        _ = collection.AddScoped<IUserRepository, UserRepository>();
+        _ = collection.AddScoped<IChannelRepository, ChannelRepository>();
+        _ = collection.AddScoped<IChannelTypeRepository, ChannelTypeRepository>();
+        _ = collection.AddScoped<IBirthdayRepository, BirthdayRepository>();
+        _ = collection.AddScoped<IIdolRepository, IdolRepository>();
+        _ = collection.AddScoped<IIdolGroupRepository, IdolGroupRepository>();
+        _ = collection.AddScoped<IIdolAliasRepository, IdolAliasRepository>();
+        _ = collection.AddScoped<IIdolImageRepository, IdolImageRepository>();
+        _ = collection.AddScoped<IUserIdolStatisticRepository, UserIdolStatisticRepository>();
+        _ = collection.AddScoped<IWeeklyPollOptionPresetRepository, WeeklyPollOptionPresetRepository>();
+        _ = collection.AddScoped<IWeeklyPollOptionRepository, WeeklyPollOptionRepository>();
+        _ = collection.AddScoped<IWeeklyPollRepository, WeeklyPollRepository>();
+        _ = collection.AddScoped<IServerMutedUserRepository, ServerMutedUserRepository>();
 
-        collection.AddLogging();
+        _ = collection.AddLogging();
 
         return collection.BuildServiceProvider();
     }

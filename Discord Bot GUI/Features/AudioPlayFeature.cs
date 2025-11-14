@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Xml;
 
 namespace Discord_Bot.Features;
+
 public class AudioPlayFeature(
     IYoutubeDownloadService youtubeDownloadService,
     Config config,
@@ -32,19 +33,19 @@ public class AudioPlayFeature(
                 {
                     case VoiceConnectionResultEnum.UserNotInVoiceChannel:
                     {
-                        await Context.Channel.SendMessageAsync("You must be in a valid voice channel!");
+                        _ = await Context.Channel.SendMessageAsync("You must be in a valid voice channel!");
                         return false;
                     }
                     case VoiceConnectionResultEnum.VoiceChannelNotMusicChannel:
                     {
-                        await Context.Channel.SendMessageAsync("Current voice channel is not music channel!");
+                        _ = await Context.Channel.SendMessageAsync("Current voice channel is not music channel!");
                         return false;
                     }
                 }
 
                 MusicRequest current = audioResource.MusicRequests[0];
 
-                await Context.Channel.SendMessageAsync($"Now Playing:\n`{current.Title}`");
+                _ = await Context.Channel.SendMessageAsync($"Now Playing:\n`{current.Title}`");
 
                 await StreamAudioAsync(audioResource, current);
 
@@ -174,7 +175,7 @@ public class AudioPlayFeature(
         {
             if (clientUser.VoiceChannel != null)
             {
-                await Context.Channel.SendMessageAsync("`Disconnected due to inactivity.`");
+                _ = await Context.Channel.SendMessageAsync("`Disconnected due to inactivity.`");
 
                 await clientUser.VoiceChannel.DisconnectAsync();
             }

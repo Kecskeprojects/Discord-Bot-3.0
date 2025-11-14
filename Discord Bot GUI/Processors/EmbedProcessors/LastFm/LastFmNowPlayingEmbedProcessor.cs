@@ -2,6 +2,7 @@
 using Discord_Bot.Services.Models.LastFm;
 
 namespace Discord_Bot.Processors.EmbedProcessors.LastFm;
+
 public class LastFmNowPlayingEmbedProcessor : LastFmBaseEmbedProcessor
 {
     public static Embed[] CreateEmbed(string title, NowPlayingResult nowPlaying)
@@ -9,10 +10,10 @@ public class LastFmNowPlayingEmbedProcessor : LastFmBaseEmbedProcessor
         //Getting base of lastfm embed
         EmbedBuilder builder = GetBaseEmbedBuilder(title, nowPlaying.ImageUrl);
 
-        builder.WithTitle(nowPlaying.TrackName);
-        builder.WithUrl(nowPlaying.Url);
-        builder.AddField($"By *{nowPlaying.ArtistName}*", $"**On *{nowPlaying.AlbumName}***");
-        builder.AddField("__Previous Track__", $"*{nowPlaying.SecondTrackName}* By *{nowPlaying.SecondTrackArtist}*");
+        _ = builder.WithTitle(nowPlaying.TrackName);
+        _ = builder.WithUrl(nowPlaying.Url);
+        _ = builder.AddField($"By *{nowPlaying.ArtistName}*", $"**On *{nowPlaying.AlbumName}***");
+        _ = builder.AddField("__Previous Track__", $"*{nowPlaying.SecondTrackName}* By *{nowPlaying.SecondTrackArtist}*");
 
         string footerString = !string.IsNullOrEmpty(nowPlaying.TrackPlays) ? $"{nowPlaying.TrackPlays} listen" : "";
 
@@ -25,7 +26,7 @@ public class LastFmNowPlayingEmbedProcessor : LastFmBaseEmbedProcessor
             footerString += $"{nowPlaying.Ranking} most played this month";
         }
 
-        builder.WithFooter(footerString);
+        _ = builder.WithFooter(footerString);
 
         return [builder.Build()];
     }

@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 
 namespace Discord_Bot.Services.Models.Instagram;
+
 public class Root
 {
     [JsonProperty("data")]

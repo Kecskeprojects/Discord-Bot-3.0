@@ -9,12 +9,12 @@ public static class UserReminderListEmbedProcessor
     public static Embed[] CreateEmbed(List<ReminderResource> list)
     {
         EmbedBuilder builder = new();
-        builder.WithTitle("Your reminders:");
+        _ = builder.WithTitle("Your reminders:");
 
         int i = 1;
         foreach (ReminderResource reminder in list)
         {
-            builder.AddField($"#{i} {TimestampTag.FromDateTime(reminder.Date, TimestampTagStyles.ShortDateTime)}", reminder.Message);
+            _ = builder.AddField($"#{i} {TimestampTag.FromDateTime(reminder.Date, TimestampTagStyles.ShortDateTime)}", reminder.Message);
             i++;
         }
         return [builder.Build()];

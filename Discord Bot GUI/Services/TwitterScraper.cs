@@ -79,7 +79,7 @@ public class TwitterScraper(BotLogger logger, BrowserService browserService) : I
         try
         {
             await page.DeleteCookieAsync();
-            await page.GoToAsync(uri.OriginalString);
+            _ = await page.GoToAsync(uri.OriginalString);
 
             int count = 0;
             while (Body == null && count < 120)

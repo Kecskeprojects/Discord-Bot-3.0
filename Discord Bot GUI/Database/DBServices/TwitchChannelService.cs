@@ -47,7 +47,7 @@ public class TwitchChannelService(IMapper mapper, BotLogger logger, ServerCache 
                 Server = server
             };
 
-            await twitchChannelRepository.AddAsync(channel);
+            _ = await twitchChannelRepository.AddAsync(channel);
 
             cache.RemoveCachedEntityManually(serverId);
 
@@ -94,7 +94,7 @@ public class TwitchChannelService(IMapper mapper, BotLogger logger, ServerCache 
                 return DbProcessResultEnum.NotFound;
             }
 
-            await twitchChannelRepository.RemoveAsync(channels);
+            _ = await twitchChannelRepository.RemoveAsync(channels);
 
             cache.RemoveCachedEntityManually(serverId);
 

@@ -79,7 +79,7 @@ public class BiasGameStepInteraction(
 
                 MessageComponent components = BiasGameEmbedProcessor.CreateComponent(idolIds, Context.User.Id);
 
-                await ModifyOriginalResponseAsync(x =>
+                _ = await ModifyOriginalResponseAsync(x =>
                 {
                     x.Attachments = new List<FileAttachment>() { file };
                     x.Embeds = embeds;
@@ -91,8 +91,8 @@ public class BiasGameStepInteraction(
         catch (Exception ex)
         {
             logger.Error("BiasGameInteraction.cs DebutChosen", ex);
-            Global.BiasGames.TryRemove(Context.User.Id, out _);
-            await FollowupAsync("Failure during preparing next step!");
+            _ = Global.BiasGames.TryRemove(Context.User.Id, out _);
+            _ = await FollowupAsync("Failure during preparing next step!");
         }
     }
 
@@ -109,7 +109,7 @@ public class BiasGameStepInteraction(
                 GetCurrentUserAvatar(),
                 GetCurrentUserNickname());
 
-            await ModifyOriginalResponseAsync(x =>
+            _ = await ModifyOriginalResponseAsync(x =>
             {
                 x.Attachments = new List<FileAttachment>() { file };
                 x.Embeds = embed;
@@ -119,6 +119,6 @@ public class BiasGameStepInteraction(
 
         await userIdolStatisticService.UpdateUserStatisticsAsync(data.UserId, data.Ranking);
         data.Dispose();
-        Global.BiasGames.TryRemove(data.UserId, out _);
+        _ = Global.BiasGames.TryRemove(data.UserId, out _);
     }
 }

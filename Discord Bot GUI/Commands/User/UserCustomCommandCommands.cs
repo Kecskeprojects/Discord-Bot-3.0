@@ -40,13 +40,13 @@ public class UserCustomCommandCommands(
             List<CustomCommandResource> list = await customCommandService.GetServerCustomCommandListAsync(Context.Guild.Id);
             if (CollectionTools.IsNullOrEmpty(list))
             {
-                await ReplyAsync("There are no custom commands on this server!");
+                _ = await ReplyAsync("There are no custom commands on this server!");
                 return;
             }
 
             Embed[] embed = CustomCommandListEmbedProcessor.CreateEmbed(list);
 
-            await ReplyAsync(embeds: embed);
+            _ = await ReplyAsync(embeds: embed);
         }
         catch (Exception ex)
         {

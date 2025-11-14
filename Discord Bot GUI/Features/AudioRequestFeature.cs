@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
+
 public class AudioRequestFeature(
     IYoutubeAPI youtubeAPI,
     ISpotifyAPI spotifyAPI,
@@ -38,7 +39,7 @@ public class AudioRequestFeature(
             logger.Log(result.ToMessageString());
             if (result is not SearchResultEnum.SpotifyVideoFound and not SearchResultEnum.YoutubeFoundVideo)
             {
-                await Context.Channel.SendMessageAsync(result.ToMessageString());
+                _ = await Context.Channel.SendMessageAsync(result.ToMessageString());
                 return false;
             }
             ServerAudioResource audioResource = GetCurrentAudioResource();
@@ -50,7 +51,7 @@ public class AudioRequestFeature(
 
                 Embed[] embed = AudioRequestEmbedProcessor.CreateEmbed(request, count);
 
-                await Context.Channel.SendMessageAsync(embeds: embed);
+                _ = await Context.Channel.SendMessageAsync(embeds: embed);
             }
         }
         catch (Exception ex)

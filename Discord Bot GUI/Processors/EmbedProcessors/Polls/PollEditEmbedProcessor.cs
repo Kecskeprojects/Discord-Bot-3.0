@@ -6,19 +6,20 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Discord_Bot.Processors.EmbedProcessors.Polls;
+
 public class PollEditEmbedProcessor
 {
     public static Embed[] CreateEmbed(WeeklyPollEditResource poll, bool isEdit)
     {
         EmbedBuilder builder = CreateEmbedBase();
-        builder.WithTitle($"{(isEdit && !string.IsNullOrEmpty(poll.Name) ? $"Edit '{poll.Name}' Poll" : "Create new Weekly Poll")}");
+        _ = builder.WithTitle($"{(isEdit && !string.IsNullOrEmpty(poll.Name) ? $"Edit '{poll.Name}' Poll" : "Create new Weekly Poll")}");
         return [builder.Build()];
     }
 
     public static Embed[] CreateEmbed(WeeklyPollResource poll, bool isEdit)
     {
         EmbedBuilder builder = CreateEmbedBase();
-        builder.WithTitle($"{(isEdit && !string.IsNullOrEmpty(poll.Name) ? $"Edit '{poll.Name}' Poll" : "Create new Weekly Poll")}");
+        _ = builder.WithTitle($"{(isEdit && !string.IsNullOrEmpty(poll.Name) ? $"Edit '{poll.Name}' Poll" : "Create new Weekly Poll")}");
         return [builder.Build()];
     }
 
@@ -26,22 +27,22 @@ public class PollEditEmbedProcessor
     {
         EmbedBuilder builder = new();
 
-        builder.AddField("Edit Button", "Name of Poll, Title of Poll, Channel the poll is sent to and Role that can be optionally set");
+        _ = builder.AddField("Edit Button", "Name of Poll, Title of Poll, Channel the poll is sent to and Role that can be optionally set");
 
-        builder.AddField("Other Buttons", "They describe the current state of what they edit\nClicking it will switch back and forth between it's two states");
+        _ = builder.AddField("Other Buttons", "They describe the current state of what they edit\nClicking it will switch back and forth between it's two states");
 
-        builder.AddField("First 3 Select Fields", "They describe the current state of what they edit\nClicking it will switch back and forth between it's two states");
+        _ = builder.AddField("First 3 Select Fields", "They describe the current state of what they edit\nClicking it will switch back and forth between it's two states");
 
-        builder.AddField("4th Select Field", "If visible, selecting an option allows the creation/editing of an answer\nIf an option is empty, it is a potential answer that can still be defined");
+        _ = builder.AddField("4th Select Field", "If visible, selecting an option allows the creation/editing of an answer\nIf an option is empty, it is a potential answer that can still be defined");
 
-        builder.WithColor(Color.DarkBlue);
+        _ = builder.WithColor(Color.DarkBlue);
         return builder;
     }
 
     public static MessageComponent CreateComponent(WeeklyPollEditResource poll, List<WeeklyPollOptionPresetResource> presets)
     {
         ActionRowBuilder buttonRow = new();
-        buttonRow
+        _ = buttonRow
             .WithButton(label: "Edit Poll"
                             , customId: $"EditPoll_{poll.WeeklyPollId}"
                             , style: ButtonStyle.Primary)
@@ -60,7 +61,7 @@ public class PollEditEmbedProcessor
         ActionRowBuilder optionPresetRow = CreateOptionPresetRow(poll, presets);
 
         ComponentBuilder components = new();
-        components
+        _ = components
             .AddRow(buttonRow)
             .AddRow(closePollInRow)
             .AddRow(dayOfWeekRow)
@@ -69,7 +70,7 @@ public class PollEditEmbedProcessor
         if (!poll.OptionPresetId.HasValue)
         {
             ActionRowBuilder customOptionRow = CreateCustomOptionRow(poll);
-            components.AddRow(customOptionRow);
+            _ = components.AddRow(customOptionRow);
         }
 
         return components.Build();
@@ -91,7 +92,7 @@ public class PollEditEmbedProcessor
             .ForEach(y => dayOfWeekSelect.AddOption(y, y, isDefault: poll.RepeatOnDayOfWeek == y));
 
         ActionRowBuilder dayOfWeekRow = new();
-        dayOfWeekRow.WithSelectMenu(dayOfWeekSelect);
+        _ = dayOfWeekRow.WithSelectMenu(dayOfWeekSelect);
         return dayOfWeekRow;
     }
 
@@ -115,7 +116,7 @@ public class PollEditEmbedProcessor
                         isDefault: y.ConvertToTimeSpanTicks() == poll.CloseInTimeSpanTicks));
 
         ActionRowBuilder closePollInRow = new();
-        closePollInRow.WithSelectMenu(closePollInSelect);
+        _ = closePollInRow.WithSelectMenu(closePollInSelect);
         return closePollInRow;
     }
 
@@ -130,7 +131,7 @@ public class PollEditEmbedProcessor
             Type = ComponentType.SelectMenu
         };
 
-        optionPresetSelect.AddOption(
+        _ = optionPresetSelect.AddOption(
             "Custom Options"
             , "custom"
             , "You will be able to define the answers yourself"
@@ -138,7 +139,7 @@ public class PollEditEmbedProcessor
 
         foreach (WeeklyPollOptionPresetResource preset in presets)
         {
-            optionPresetSelect.AddOption(
+            _ = optionPresetSelect.AddOption(
                 preset.Name
                 , preset.WeeklyPollOptionPresetId.ToString()
                 , preset.Description
@@ -146,7 +147,7 @@ public class PollEditEmbedProcessor
         }
 
         ActionRowBuilder optionPresetRow = new();
-        optionPresetRow.WithSelectMenu(optionPresetSelect);
+        _ = optionPresetRow.WithSelectMenu(optionPresetSelect);
         return optionPresetRow;
     }
 
@@ -165,18 +166,13 @@ public class PollEditEmbedProcessor
         for (int i = 0; i < 10; i++)
         {
             WeeklyPollOptionResource option = poll.Options.FirstOrDefault(x => x.OrderNumber == i);
-            if (option != null)
-            {
-                optionPresetSelect.AddOption($"{i + 1}# {option.Title}", $"{i}_{option.WeeklyPollOptionId}");
-            }
-            else
-            {
-                optionPresetSelect.AddOption($"{i + 1}#", $"{i}_0");
-            }
+            _ = option != null
+                ? optionPresetSelect.AddOption($"{i + 1}# {option.Title}", $"{i}_{option.WeeklyPollOptionId}")
+                : optionPresetSelect.AddOption($"{i + 1}#", $"{i}_0");
         }
 
         ActionRowBuilder optionPresetRow = new();
-        optionPresetRow.WithSelectMenu(optionPresetSelect);
+        _ = optionPresetRow.WithSelectMenu(optionPresetSelect);
         return optionPresetRow;
     }
 }

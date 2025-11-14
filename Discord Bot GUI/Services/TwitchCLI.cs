@@ -54,7 +54,7 @@ public class TwitchCLI(BotLogger logger) : ITwitchCLI
                 WorkingDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Dependencies")
             }
         };
-        process.Start();
+        _ = process.Start();
         string response = process.StandardOutput.ReadToEnd();
         process.WaitForExit();
 

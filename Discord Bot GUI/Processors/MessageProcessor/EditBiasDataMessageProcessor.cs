@@ -19,7 +19,7 @@ public static class EditBiasDataMessageProcessor
                             .AddOption("Remove Images", $"{(int) BiasEditActionTypeEnum.RemoveImage};{biasName};{biasGroup}", "Remove all images stored for idol");
 
         ComponentBuilder builder = new();
-        builder.WithSelectMenu(menuBuilder);
+        _ = builder.WithSelectMenu(menuBuilder);
         return builder.Build();
     }
 }

@@ -9,11 +9,11 @@ public static class GreetingListEmbedProcessor
     public static Embed[] CreateEmbed(List<GreetingResource> greetings)
     {
         EmbedBuilder builder = new();
-        builder.WithTitle("Greetings:");
+        _ = builder.WithTitle("Greetings:");
 
         foreach (GreetingResource greeting in greetings)
         {
-            builder.AddField($"ID:{greeting.GreetingId}", greeting.Url);
+            _ = builder.AddField($"ID:{greeting.GreetingId}", greeting.Url);
         }
 
         return [builder.Build()];

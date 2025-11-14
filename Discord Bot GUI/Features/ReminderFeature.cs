@@ -41,7 +41,7 @@ public class ReminderFeature(
                     //If user exists send a direct message to the user
                     if (user != null)
                     {
-                        await user.SendMessageAsync(reminder.Message);
+                        _ = await user.SendMessageAsync(reminder.Message);
                     }
                 }
 

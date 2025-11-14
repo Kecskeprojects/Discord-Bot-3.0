@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace Discord_Bot.Services.Models.Instagram;
+
 public class Node
 {
     [JsonProperty("__typename")]

@@ -60,7 +60,7 @@ public class UserLastfmCommands(
                 DbProcessResultEnum.AlreadyExists => "You have a last.fm account connected to your discord account already.",
                 _ => "Last.fm account could not be connected to account!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -87,7 +87,7 @@ public class UserLastfmCommands(
                 DbProcessResultEnum.NotFound => "You do not have a lastfm user tied to your account.",
                 _ => "Last.fm could not be disconnected from your account!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -112,7 +112,7 @@ public class UserLastfmCommands(
             UserResource user = await userService.GetUserAsync(Context.User.Id);
             if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
-                await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
+                _ = await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
                 return;
             }
 
@@ -123,10 +123,10 @@ public class UserLastfmCommands(
             {
                 Embed[] embed = LastFmListEmbedProcessor.CreateEmbed($"{GetCurrentUserNickname()}'s Top Albums...", response);
 
-                await ReplyAsync(embeds: embed);
+                _ = await ReplyAsync(embeds: embed);
                 return;
             }
-            await ReplyAsync(response.Message);
+            _ = await ReplyAsync(response.Message);
         }
         catch (Exception ex)
         {
@@ -149,7 +149,7 @@ public class UserLastfmCommands(
             UserResource user = await userService.GetUserAsync(Context.User.Id);
             if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
-                await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
+                _ = await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
                 return;
             }
 
@@ -160,10 +160,10 @@ public class UserLastfmCommands(
             {
                 Embed[] embed = LastFmListEmbedProcessor.CreateEmbed($"{GetCurrentUserNickname()}'s Top Artists...", response);
 
-                await ReplyAsync(embeds: embed);
+                _ = await ReplyAsync(embeds: embed);
                 return;
             }
-            await ReplyAsync(response.Message);
+            _ = await ReplyAsync(response.Message);
         }
         catch (Exception ex)
         {
@@ -186,7 +186,7 @@ public class UserLastfmCommands(
             UserResource user = await userService.GetUserAsync(Context.User.Id);
             if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
-                await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
+                _ = await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
                 return;
             }
 
@@ -197,10 +197,10 @@ public class UserLastfmCommands(
             {
                 Embed[] embed = LastFmListEmbedProcessor.CreateEmbed($"{GetCurrentUserNickname()}'s Top Tracks...", response);
 
-                await ReplyAsync(embeds: embed);
+                _ = await ReplyAsync(embeds: embed);
                 return;
             }
-            await ReplyAsync(response.Message);
+            _ = await ReplyAsync(response.Message);
         }
         catch (Exception ex)
         {
@@ -225,7 +225,7 @@ public class UserLastfmCommands(
             UserResource user = await userService.GetUserAsync(Context.User.Id);
             if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
-                await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
+                _ = await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
                 return;
             }
 
@@ -238,10 +238,10 @@ public class UserLastfmCommands(
                     : $"{GetCurrentUserNickname()} last listened to...";
                 Embed[] embed = LastFmNowPlayingEmbedProcessor.CreateEmbed(title, nowPlaying);
 
-                await ReplyAsync(embeds: embed);
+                _ = await ReplyAsync(embeds: embed);
                 return;
             }
-            await ReplyAsync(nowPlaying.Message);
+            _ = await ReplyAsync(nowPlaying.Message);
         }
         catch (Exception ex)
         {
@@ -264,7 +264,7 @@ public class UserLastfmCommands(
             UserResource user = await userService.GetUserAsync(Context.User.Id);
             if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
-                await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
+                _ = await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
                 return;
             }
 
@@ -274,10 +274,10 @@ public class UserLastfmCommands(
             {
                 Embed[] embed = LastFmListEmbedProcessor.CreateEmbed($"{GetCurrentUserNickname()} recently listened to...", response);
 
-                await ReplyAsync(embeds: embed);
+                _ = await ReplyAsync(embeds: embed);
                 return;
             }
-            await ReplyAsync(response.Message);
+            _ = await ReplyAsync(response.Message);
         }
         catch (Exception ex)
         {
@@ -302,7 +302,7 @@ public class UserLastfmCommands(
             UserResource user = await userService.GetUserAsync(Context.User.Id);
             if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
-                await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
+                _ = await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
                 return;
             }
 
@@ -314,14 +314,14 @@ public class UserLastfmCommands(
 
                 if (embed[0].Fields.Length == 0)
                 {
-                    await ReplyAsync("Exception during embed creation!");
+                    _ = await ReplyAsync("Exception during embed creation!");
                     return;
                 }
 
-                await ReplyAsync(embeds: embed);
+                _ = await ReplyAsync(embeds: embed);
                 return;
             }
-            await ReplyAsync(response.Message);
+            _ = await ReplyAsync(response.Message);
         }
         catch (Exception ex)
         {
@@ -346,7 +346,7 @@ public class UserLastfmCommands(
             UserResource currentUser = users.FirstOrDefault(user => user.DiscordId == Context.User.Id);
             if ((currentUser == null || string.IsNullOrEmpty(currentUser.LastFmUsername)) && string.IsNullOrEmpty(parameters))
             {
-                await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
+                _ = await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
                 return;
             }
 
@@ -364,16 +364,16 @@ public class UserLastfmCommands(
                     if (embed.HasImage)
                     {
                         //Image streams as part of embeds must be sent as a file upload
-                        await Context.Channel.SendFileAsync(embed.ImageData, embed.ImageName, embeds: embed.Embed);
+                        _ = await Context.Channel.SendFileAsync(embed.ImageData, embed.ImageName, embeds: embed.Embed);
                     }
                     else
                     {
-                        await ReplyAsync(embeds: embed.Embed);
+                        _ = await ReplyAsync(embeds: embed.Embed);
                     }
                 }
                 return;
             }
-            await ReplyAsync(wk.Message);
+            _ = await ReplyAsync(wk.Message);
         }
         catch (Exception ex)
         {

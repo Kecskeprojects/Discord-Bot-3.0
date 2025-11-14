@@ -1,4 +1,5 @@
 ﻿namespace Discord_Bot.Enums;
+
 public enum VoiceConnectionResultEnum
 {
     Connected = 0,

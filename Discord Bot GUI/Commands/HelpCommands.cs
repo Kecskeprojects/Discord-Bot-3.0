@@ -49,7 +49,7 @@ public class HelpCommands(
             Embed[] embed = HelpEmbedProcessor.CreateEmbed(commandLevelEnum, modules, config.Img);
             MessageComponent moduleSelector = HelpEmbedProcessor.CreateComponent(commandLevelEnum, modules);
 
-            await ReplyAsync(embeds: embed, components: moduleSelector);
+            _ = await ReplyAsync(embeds: embed, components: moduleSelector);
         }
         catch (Exception ex)
         {

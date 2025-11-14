@@ -48,7 +48,7 @@ public class UserBonkCommands(
                 {
                     if (frameDelay is < 1 or > 1000)
                     {
-                        await ReplyAsync("Invalid frame delay length. (1-1000)");
+                        _ = await ReplyAsync("Invalid frame delay length. (1-1000)");
                         return;
                     }
                 }
@@ -56,7 +56,7 @@ public class UserBonkCommands(
                 {
                     frameDelay = 10;
                 }
-                paramParts.Remove(frameDelay.ToString());
+                _ = paramParts.Remove(frameDelay.ToString());
                 userName = string.Join(" ", paramParts);
             }
 
@@ -94,7 +94,7 @@ public class UserBonkCommands(
                 using (MemoryStream stream = await WebTools.GetStream(url))
                 using (MemoryStream gifStream = bonkGifProcessor.CreateBonkImage(stream, frameDelay))
                 {
-                    await Context.Channel.SendFileAsync(gifStream, $"bonk_{userName}.gif");
+                    _ = await Context.Channel.SendFileAsync(gifStream, $"bonk_{userName}.gif");
                 }
             }
         }

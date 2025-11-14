@@ -38,11 +38,11 @@ public class AdminCustomCommandCommands(
                     DbProcessResultEnum.AlreadyExists => "A command with this name already exists on this server.",
                     _ => "Command could not be added!"
                 };
-                await ReplyAsync(resultMessage);
+                _ = await ReplyAsync(resultMessage);
             }
             else
             {
-                await ReplyAsync("That link is invalid!");
+                _ = await ReplyAsync("That link is invalid!");
             }
         }
         catch (Exception ex)
@@ -66,7 +66,7 @@ public class AdminCustomCommandCommands(
                 DbProcessResultEnum.NotFound => "Command does not exist.",
                 _ => "Command could not be removed!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {

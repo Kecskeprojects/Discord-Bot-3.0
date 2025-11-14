@@ -40,7 +40,7 @@ public class AdminSelfRoleCommands(
                 DbProcessResultEnum.AlreadyExists => "Role already in database.",
                 _ => "Role could not be added!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -63,7 +63,7 @@ public class AdminSelfRoleCommands(
                 DbProcessResultEnum.NotFound => "Role could not be found.",
                 _ => "Role could not be removed!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -107,7 +107,7 @@ public class AdminSelfRoleCommands(
                 DbProcessResultEnum.Success => "The role message has been updated.",
                 _ => "Role message could not be updated!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {

@@ -52,14 +52,14 @@ public class AdminBirthdayCommands(
 
             if (user == null)
             {
-                await ReplyAsync("No user was found with that ID!");
+                _ = await ReplyAsync("No user was found with that ID!");
                 return;
             }
 
             string[] strings = GetDateParameterParts(dateString);
             if (strings.Length != 3)
             {
-                await ReplyAsync("Incorrect input parameters");
+                _ = await ReplyAsync("Incorrect input parameters");
                 return;
             }
 
@@ -77,11 +77,11 @@ public class AdminBirthdayCommands(
                     DbProcessResultEnum.AlreadyExists => "Birthday is the currently set one in database.",
                     _ => "Birthday could not be added to database!"
                 };
-                await ReplyAsync(resultMessage);
+                _ = await ReplyAsync(resultMessage);
             }
             else
             {
-                await ReplyAsync("Date is of an unrecognizable format. The order is 'year month day'.");
+                _ = await ReplyAsync("Date is of an unrecognizable format. The order is 'year month day'.");
             }
         }
         catch (Exception ex)
@@ -105,7 +105,7 @@ public class AdminBirthdayCommands(
                 DbProcessResultEnum.NotFound => "Birthday not found in database.",
                 _ => "Birthday could not be removed from database!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {

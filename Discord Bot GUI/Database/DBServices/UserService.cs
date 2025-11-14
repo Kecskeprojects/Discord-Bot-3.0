@@ -37,7 +37,7 @@ public class UserService(
                 return DbProcessResultEnum.AlreadyExists;
             }
             user.LastFmusername = name;
-            await userRepository.UpdateAsync(user);
+            _ = await userRepository.UpdateAsync(user);
 
             logger.Log("Lastfm username added successfully!");
             return DbProcessResultEnum.Success;
@@ -107,7 +107,7 @@ public class UserService(
                 return DbProcessResultEnum.NotFound;
             }
             user.LastFmusername = null;
-            await userRepository.SaveChangesAsync();
+            _ = await userRepository.SaveChangesAsync();
 
             logger.Log("Lastfm username added successfully!");
             return DbProcessResultEnum.Success;

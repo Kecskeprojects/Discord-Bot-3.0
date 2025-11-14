@@ -56,7 +56,7 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
         await page.DeleteCookieAsync();
         try
         {
-            await page.GoToAsync(Constant.DbKpopScrapeBaseUri.OriginalString, 600000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded]);
+            _ = await page.GoToAsync(Constant.DbKpopScrapeBaseUri.OriginalString, 600000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded]);
         }
         catch (Exception) { }
 
@@ -67,10 +67,10 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
 
         //Show all entries
         await page.ClickAsync("#table_1_length .dropdown-toggle");
-        await page.WaitForSelectorAsync("#table_1_length .dropdown-menu", new WaitForSelectorOptions() { Visible = true, Timeout = 0 });
+        _ = await page.WaitForSelectorAsync("#table_1_length .dropdown-menu", new WaitForSelectorOptions() { Visible = true, Timeout = 0 });
 
         await page.ClickAsync("#table_1_length .dropdown-menu>ul>li[data-original-index=\"6\"]>a");
-        await page.WaitForSelectorAsync("#table_1_length .dropdown-menu", new WaitForSelectorOptions() { Hidden = true, Timeout = 0 });
+        _ = await page.WaitForSelectorAsync("#table_1_length .dropdown-menu", new WaitForSelectorOptions() { Hidden = true, Timeout = 0 });
 
         string content = await page.GetContentAsync();
 
@@ -141,7 +141,7 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
         await page.DeleteCookieAsync();
         try
         {
-            await page.GoToAsync(uri.OriginalString, 60000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded]);
+            _ = await page.GoToAsync(uri.OriginalString, 60000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded]);
         }
         catch (Exception) { }
 
@@ -173,7 +173,7 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
 
             try
             {
-                await page.WaitForSelectorAsync("ins.ezfound");
+                _ = await page.WaitForSelectorAsync("ins.ezfound");
                 await page.ClickAsync("ins.ezfound", new ClickOptions() { Button = MouseButton.Right, OffSet = new Offset(10, 10) });
             }
             catch (Exception) { }

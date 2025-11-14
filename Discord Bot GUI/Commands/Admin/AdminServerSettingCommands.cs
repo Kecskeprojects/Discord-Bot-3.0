@@ -41,7 +41,7 @@ public class AdminServerSettingCommands(
             ServerResource server = await GetCurrentServerAsync();
             Embed[] embed = ServerSettingEmbedProcessor.CreateEmbed(server, Context.Guild.TextChannels, config.Img);
 
-            await ReplyAsync(embeds: embed);
+            _ = await ReplyAsync(embeds: embed);
         }
         catch (Exception ex)
         {
@@ -59,13 +59,13 @@ public class AdminServerSettingCommands(
         {
             if (channeltype == "")
             {
-                await ReplyAsync($"Current types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
+                _ = await ReplyAsync($"Current types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
                 return;
             }
 
             if (!ChannelTypeEnumTools.TryGetEnumFromCommandText(channeltype, out ChannelTypeEnum? channelTypeEnum))
             {
-                await ReplyAsync($"Channel type does not currently exist.\nCurrent types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
+                _ = await ReplyAsync($"Channel type does not currently exist.\nCurrent types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
                 return;
             }
 
@@ -85,7 +85,7 @@ public class AdminServerSettingCommands(
                 DbProcessResultEnum.NotFound => "ChannelType or Server not found.",
                 _ => "Server settings could not be updated!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -103,13 +103,13 @@ public class AdminServerSettingCommands(
         {
             if (channeltype == "")
             {
-                await ReplyAsync($"Current types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
+                _ = await ReplyAsync($"Current types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
                 return;
             }
 
             if (!ChannelTypeEnumTools.TryGetEnumFromCommandText(channeltype, out ChannelTypeEnum? channelTypeEnum))
             {
-                await ReplyAsync($"Channel type does not currently exist\nCurrent types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
+                _ = await ReplyAsync($"Channel type does not currently exist\nCurrent types: {string.Join(", ", ChannelTypeEnumTools.GetCommandArray())}");
                 return;
             }
 
@@ -131,7 +131,7 @@ public class AdminServerSettingCommands(
                 DbProcessResultEnum.NotFound => "This channel is not currently set for this type.",
                 _ => "Server settings could not be updated!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -155,7 +155,7 @@ public class AdminServerSettingCommands(
                 DbProcessResultEnum.AlreadyExists => "Notification role is the currently set one in the database for your server.",
                 _ => "Notification role could not be updated!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -179,7 +179,7 @@ public class AdminServerSettingCommands(
                 DbProcessResultEnum.NotFound => "Notification role currently not set in database.",
                 _ => "Notification role could not be removed!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -200,7 +200,7 @@ public class AdminServerSettingCommands(
                 Uri uri = new(twitchchannel);
                 if (uri.Segments.Length < 2)
                 {
-                    await ReplyAsync("Url is not channel url!");
+                    _ = await ReplyAsync("Url is not channel url!");
                     return;
                 }
                 twitchchannel = uri.Segments[1].Replace("/", "");
@@ -209,7 +209,7 @@ public class AdminServerSettingCommands(
 
             if (response == null)
             {
-                await ReplyAsync("Twitch user not found!");
+                _ = await ReplyAsync("Twitch user not found!");
                 return;
             }
 
@@ -223,7 +223,7 @@ public class AdminServerSettingCommands(
                 DbProcessResultEnum.AlreadyExists => "Twitch channel already in database for your server.",
                 _ => "Twitch channel could not be added!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -247,7 +247,7 @@ public class AdminServerSettingCommands(
                     Uri uri = new(twitchchannellink);
                     if (uri.Segments.Length < 2)
                     {
-                        await ReplyAsync("Url is not channel url!");
+                        _ = await ReplyAsync("Url is not channel url!");
                         return;
                     }
                     twitchchannellink = uri.Segments[1].Replace("/", "");
@@ -267,7 +267,7 @@ public class AdminServerSettingCommands(
                 DbProcessResultEnum.NotFound => "Twitch channel with that name not found in database.",
                 _ => "Twitch channel(s) could not be removed!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {

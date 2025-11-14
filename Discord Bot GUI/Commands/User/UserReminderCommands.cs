@@ -51,7 +51,7 @@ public class UserReminderCommands(
             //Length check, the message row of the database only accepts lengths of up to 150
             if (remindMessage.Length > 150)
             {
-                await ReplyAsync("Reminder message too long!(maximum **150** characters)");
+                _ = await ReplyAsync("Reminder message too long!(maximum **150** characters)");
                 return;
             }
 
@@ -70,11 +70,11 @@ public class UserReminderCommands(
                     DbProcessResultEnum.Success => $"Alright, I will remind you {TimestampTag.FromDateTime(date, TimestampTagStyles.Relative)}.",
                     _ => "Reminder could not be added, talk to dumbass owner!"
                 };
-                await ReplyAsync(resultMessage);
+                _ = await ReplyAsync(resultMessage);
             }
             else
             {
-                await ReplyAsync("Incorrect number of inputs!");
+                _ = await ReplyAsync("Incorrect number of inputs!");
             }
         }
         catch (Exception ex)
@@ -100,7 +100,7 @@ public class UserReminderCommands(
             if (list.Count > 0)
             {
                 Embed[] embed = UserReminderListEmbedProcessor.CreateEmbed(list);
-                await ReplyAsync(embeds: embed);
+                _ = await ReplyAsync(embeds: embed);
             }
         }
         catch (Exception ex)
@@ -128,7 +128,7 @@ public class UserReminderCommands(
                 DbProcessResultEnum.NotFound => "Reminder doesn't exist with that ID or it is not yours.",
                 _ => "Reminder could not be removed!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {

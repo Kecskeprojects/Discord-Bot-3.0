@@ -30,7 +30,7 @@ public class EasterEggFeature(
                 List<GreetingResource> list = await greetingService.GetAllGreetingAsync();
                 if (!CollectionTools.IsNullOrEmpty(list))
                 {
-                    await Context.Channel.SendMessageAsync(list[new Random().Next(0, list.Count)].Url);
+                    _ = await Context.Channel.SendMessageAsync(list[new Random().Next(0, list.Count)].Url);
                     return false;
                 }
             }
@@ -39,7 +39,7 @@ public class EasterEggFeature(
             Random r = new();
             if (r.Next(0, 5000) == 0)
             {
-                await Context.Channel.SendMessageAsync(Constant.EasterEggMessages[r.Next(0, Constant.EasterEggMessages.Length)]);
+                _ = await Context.Channel.SendMessageAsync(Constant.EasterEggMessages[r.Next(0, Constant.EasterEggMessages.Length)]);
             }
             else if (r.Next(0, 20) == 0)
             {
@@ -47,19 +47,14 @@ public class EasterEggFeature(
                 string mess = Context.Message.Content.ToLower();
                 if (mess.StartsWith("i think"))
                 {
-                    if (r.Next(0, 2) == 0)
-                    {
-                        await Context.Channel.SendMessageAsync("I agree wholeheartedly!", messageReference: refer);
-                    }
-                    else
-                    {
-                        await Context.Channel.SendMessageAsync(Context.Message.Content.ToMockText(), messageReference: refer);
-                    }
+                    _ = r.Next(0, 2) == 0
+                        ? await Context.Channel.SendMessageAsync("I agree wholeheartedly!", messageReference: refer)
+                        : await Context.Channel.SendMessageAsync(Context.Message.Content.ToMockText(), messageReference: refer);
                 }
                 else if ((mess.StartsWith("i am") && mess != "i am") || (mess.StartsWith("i'm") && mess != "i'm"))
                 {
                     string message = string.Concat("Hey ", Context.Message.Content.AsSpan(mess.StartsWith("i am") ? 5 : 4), ", I'm Kim Synthji!");
-                    await Context.Channel.SendMessageAsync(message, messageReference: refer);
+                    _ = await Context.Channel.SendMessageAsync(message, messageReference: refer);
                 }
             }
         }

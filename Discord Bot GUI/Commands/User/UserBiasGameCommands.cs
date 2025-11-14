@@ -39,17 +39,17 @@ public class UserBiasGameCommands(
             {
                 if (data.StartedAt > DateTime.UtcNow.AddMinutes(-30))
                 {
-                    await ReplyAsync("You already have a game going!");
+                    _ = await ReplyAsync("You already have a game going!");
                     return;
                 }
-                Global.BiasGames.TryRemove(Context.User.Id, out _);
+                _ = Global.BiasGames.TryRemove(Context.User.Id, out _);
             }
 
-            Global.BiasGames.TryAdd(Context.User.Id, new BiasGameData(Context.User.Id));
+            _ = Global.BiasGames.TryAdd(Context.User.Id, new BiasGameData(Context.User.Id));
             Embed[] embed = BiasGameGenderEmbedProcessor.CreateEmbed(GetCurrentUserNickname(), GetCurrentUserAvatar());
             MessageComponent components = BiasGameGenderEmbedProcessor.CreateComponent(Context.User.Id);
 
-            await ReplyAsync(components: components, embeds: embed);
+            _ = await ReplyAsync(components: components, embeds: embed);
         }
         catch (Exception ex)
         {
@@ -72,13 +72,13 @@ public class UserBiasGameCommands(
             Random r = new();
             if (r.Next(0, 100) == 0)
             {
-                await ReplyAsync(Constant.BiasGameStopMessages[r.Next(0, Constant.BiasGameStopMessages.Length)]);
+                _ = await ReplyAsync(Constant.BiasGameStopMessages[r.Next(0, Constant.BiasGameStopMessages.Length)]);
                 return;
             }
 
             if (Global.BiasGames.TryRemove(Context.User.Id, out BiasGameData data))
             {
-                await ReplyAsync("Game stopped!");
+                _ = await ReplyAsync("Game stopped!");
                 await Context.Channel.DeleteMessageAsync(data.MessageId);
             }
         }
@@ -104,7 +104,7 @@ public class UserBiasGameCommands(
 
             if (stats == null || stats.BiasGameCount == 0 || stats.Stats.Count == 0)
             {
-                await ReplyAsync("You have not played any games!");
+                _ = await ReplyAsync("You have not played any games!");
                 return;
             }
 
@@ -112,7 +112,7 @@ public class UserBiasGameCommands(
 
             MessageComponent component = BiasGameStatEmbedProcessor.CreateComponent(GenderEnum.NotSpecified, Context.User.Id);
 
-            await ReplyAsync(embeds: embed, components: component);
+            _ = await ReplyAsync(embeds: embed, components: component);
         }
         catch (Exception ex)
         {

@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
+
 public class ServerMutedUserService(
     IServerMutedUserRepository serverMutedUserRepository,
     IUserRepository userRepository,
@@ -45,7 +46,7 @@ public class ServerMutedUserService(
                 Server = server ?? new() { DiscordId = serverId.ToString() },
             };
 
-            await serverMutedUserRepository.AddAsync(mutedUser);
+            _ = await serverMutedUserRepository.AddAsync(mutedUser);
 
             logger.Log($"MutedUser added with the following ID: {serverId}");
             return DbProcessResultEnum.Success;
@@ -112,7 +113,7 @@ public class ServerMutedUserService(
                 return DbProcessResultEnum.NotFound;
             }
 
-            await serverMutedUserRepository.RemoveAsync(mutedUser);
+            _ = await serverMutedUserRepository.RemoveAsync(mutedUser);
 
             logger.Log($"MutedUser removed with the following ID: {serverId}");
             return DbProcessResultEnum.Success;

@@ -10,6 +10,7 @@ using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
+
 public class WeeklyPollOptionService(
     IWeeklyPollOptionRepository weeklyPollOptionRepository,
     IMapper mapper,
@@ -35,7 +36,7 @@ public class WeeklyPollOptionService(
                     CreatedOn = DateTime.UtcNow,
                     ModifiedOn = DateTime.UtcNow,
                 };
-                await weeklyPollOptionRepository.AddAsync(pollOption);
+                _ = await weeklyPollOptionRepository.AddAsync(pollOption);
             }
             else
             {
@@ -61,7 +62,7 @@ public class WeeklyPollOptionService(
                 pollOption.Title = optionTitle;
                 pollOption.ModifiedOn = DateTime.UtcNow;
 
-                await weeklyPollOptionRepository.SaveChangesAsync();
+                _ = await weeklyPollOptionRepository.SaveChangesAsync();
                 logger.Log("Poll Option updated successfully!");
                 return DbProcessResultEnum.Success;
             }

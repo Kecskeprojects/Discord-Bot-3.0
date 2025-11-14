@@ -36,7 +36,7 @@ public class Config
 
         if (!Directory.Exists(assetDir))
         {
-            Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "Logs"));
+            _ = Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "Logs"));
         }
 
         if (!File.Exists(Path.Combine(assetDir, "config.json")))

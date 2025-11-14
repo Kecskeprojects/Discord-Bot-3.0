@@ -26,7 +26,7 @@ public class InteractionHandler(
     {
         client.InteractionCreated += HandleInteractionAsync;
         interactions.InteractionExecuted += HandleInteractionExecutionAsync;
-        await interactions.AddModulesAsync(Assembly.GetEntryAssembly(), services);
+        _ = await interactions.AddModulesAsync(Assembly.GetEntryAssembly(), services);
     }
 
     #region Handle Interaction
@@ -48,7 +48,7 @@ public class InteractionHandler(
     {
         using (IServiceScope scope = services.CreateScope())
         {
-            await interactions.ExecuteCommandAsync(context, scope.ServiceProvider);
+            _ = await interactions.ExecuteCommandAsync(context, scope.ServiceProvider);
         }
     }
     #endregion

@@ -3,6 +3,7 @@ using System.IO;
 using System.Net.Http;
 
 namespace Discord_Bot.Tools;
+
 public static class MagickTools
 {
     public static void ConvertIfUnsupported(HttpContent content, string contentType, MemoryStream imageData)

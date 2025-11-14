@@ -19,11 +19,11 @@ public static class ProcessTools
         PerformanceCounter cpu = new("Process", "% Processor Time", process.ProcessName, true);
         PerformanceCounter reservedRam = new("Process", "Private Bytes", process.ProcessName, true);
         PerformanceCounter ram = new("Process", "Working Set - Private", process.ProcessName, true); //This is what is shown in task manager
-        cpu.NextValue();
-        reservedRam.NextValue();
-        ram.NextValue();
-        total_cpu.NextValue();
-        available_ram.NextValue();
+        _ = cpu.NextValue();
+        _ = reservedRam.NextValue();
+        _ = ram.NextValue();
+        _ = total_cpu.NextValue();
+        _ = available_ram.NextValue();
 
         await Task.Delay(500);
 

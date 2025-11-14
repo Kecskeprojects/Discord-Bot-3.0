@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 
 namespace Discord_Bot.Services.Models.Instagram;
+
 public class SharingFrictionInfo
 {
     [JsonProperty("should_have_sharing_friction")]

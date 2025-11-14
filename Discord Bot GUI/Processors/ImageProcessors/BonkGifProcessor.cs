@@ -65,7 +65,7 @@ public class BonkGifProcessor(BotLogger logger)
                     metadata.DisposalMethod = GifDisposalMethod.RestoreToBackground;
 
                     // Add the color image to the gif.
-                    gif.Frames.AddFrame(images[i].Frames.RootFrame);
+                    _ = gif.Frames.AddFrame(images[i].Frames.RootFrame);
                 }
                 gif.Frames.RemoveFrame(0);
 

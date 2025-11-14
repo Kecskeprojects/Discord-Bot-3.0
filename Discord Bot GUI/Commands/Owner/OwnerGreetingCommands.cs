@@ -35,7 +35,7 @@ public class OwnerGreetingCommands(
             if (!CollectionTools.IsNullOrEmpty(greetings))
             {
                 Embed[] embed = GreetingListEmbedProcessor.CreateEmbed(greetings);
-                await ReplyAsync(embeds: embed);
+                _ = await ReplyAsync(embeds: embed);
             }
         }
         catch (Exception ex)
@@ -57,7 +57,7 @@ public class OwnerGreetingCommands(
                 DbProcessResultEnum.Success => "Greeting added.",
                 _ => "Greeting could not be added!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -79,7 +79,7 @@ public class OwnerGreetingCommands(
                 DbProcessResultEnum.NotFound => "Greeting doesn't exist with that ID or it is not yours.",
                 _ => "Greeting could not be removed!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {

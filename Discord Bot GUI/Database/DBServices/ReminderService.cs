@@ -35,7 +35,7 @@ public class ReminderService(
                 Date = date,
                 Message = remindMessage
             };
-            await reminderRepository.AddAsync(reminder);
+            _ = await reminderRepository.AddAsync(reminder);
 
             logger.Log($"Reminder added for the following user: {userId}\nwith the following date: {date:yyyy.MM.dd HH:mm:ss}");
             return DbProcessResultEnum.Success;
@@ -102,7 +102,7 @@ public class ReminderService(
 
             if (!CollectionTools.IsNullOrEmpty(reminders))
             {
-                await reminderRepository.RemoveAsync(reminders);
+                _ = await reminderRepository.RemoveAsync(reminders);
 
                 logger.Log($"Reminders removed with the following IDs: {string.Join(",", reminderIds)}");
             }
@@ -127,7 +127,7 @@ public class ReminderService(
 
             if (reminder != null)
             {
-                await reminderRepository.RemoveAsync(reminder);
+                _ = await reminderRepository.RemoveAsync(reminder);
 
                 logger.Log($"Reminders removed by the following user: {userId}\nwith the following ID: {reminderOrderId}");
                 return DbProcessResultEnum.Success;

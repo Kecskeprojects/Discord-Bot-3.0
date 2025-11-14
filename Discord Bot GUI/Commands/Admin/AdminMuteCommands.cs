@@ -42,7 +42,7 @@ public class AdminMuteCommands(
                 DbProcessResultEnum.NotFound => "Server not found.",
                 _ => "Role could not be changed!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -81,7 +81,7 @@ public class AdminMuteCommands(
 
             if (user == null)
             {
-                await ReplyAsync("No user was found with that ID!");
+                _ = await ReplyAsync("No user was found with that ID!");
                 return;
             }
 
@@ -91,7 +91,7 @@ public class AdminMuteCommands(
 
             if (server.MuteRoleDiscordId == null)
             {
-                await ReplyAsync("Mute role not set on server.");
+                _ = await ReplyAsync("Mute role not set on server.");
                 return;
             }
 
@@ -130,8 +130,8 @@ public class AdminMuteCommands(
                     await guildUser.AddRolesAsync(roleList);
                 }
 
-                await ReplyAsync(resultMessage);
-                await guildUser.SendMessageAsync($"You have been muted in '**{Context.Guild.Name}**' until {TimestampTag.FromDateTime(mutedUntil, TimestampTagStyles.ShortDateTime)}.");
+                _ = await ReplyAsync(resultMessage);
+                _ = await guildUser.SendMessageAsync($"You have been muted in '**{Context.Guild.Name}**' until {TimestampTag.FromDateTime(mutedUntil, TimestampTagStyles.ShortDateTime)}.");
             }
         }
         catch (Exception ex)
@@ -153,7 +153,7 @@ public class AdminMuteCommands(
 
             if (server.MuteRoleDiscordId == null)
             {
-                await ReplyAsync("Mute role not set on server.");
+                _ = await ReplyAsync("Mute role not set on server.");
                 return;
             }
 
@@ -161,7 +161,7 @@ public class AdminMuteCommands(
 
             if (string.IsNullOrEmpty(mutedUser.RemovedRoleDiscordIds))
             {
-                await ReplyAsync("User is not currently muted.");
+                _ = await ReplyAsync("User is not currently muted.");
                 return;
             }
 
@@ -174,8 +174,8 @@ public class AdminMuteCommands(
                 DbProcessResultEnum.Success => $"User has been unmuted.",
                 _ => "User can't be unmuted because of a database error!"
             };
-            await ReplyAsync(resultMessage);
-            await guildUser.SendMessageAsync($"You have now been unmuted in '**{Context.Guild.Name}**'.");
+            _ = await ReplyAsync(resultMessage);
+            _ = await guildUser.SendMessageAsync($"You have now been unmuted in '**{Context.Guild.Name}**'.");
         }
         catch (Exception ex)
         {

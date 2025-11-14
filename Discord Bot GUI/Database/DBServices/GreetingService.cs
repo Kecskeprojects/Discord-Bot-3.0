@@ -44,7 +44,7 @@ public class GreetingService(
                 GreetingId = 0,
                 Url = url
             };
-            await greetingRepository.AddAsync(greeting);
+            _ = await greetingRepository.AddAsync(greeting);
 
             logger.Log("Greeting added successfully!");
             return DbProcessResultEnum.Success;
@@ -63,7 +63,7 @@ public class GreetingService(
             Greeting greeting = await greetingRepository.FindByIdAsync(id);
             if (greeting != null)
             {
-                await greetingRepository.RemoveAsync(greeting);
+                _ = await greetingRepository.RemoveAsync(greeting);
 
                 logger.Log($"Greeting with ID: {id} removed successfully!");
                 return DbProcessResultEnum.Success;

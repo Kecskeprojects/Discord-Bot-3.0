@@ -45,7 +45,7 @@ public class CustomCommandService(
                 Url = link
 
             };
-            await customCommandRepository.AddAsync(command);
+            _ = await customCommandRepository.AddAsync(command);
 
             logger.Log("Custom command added successfully!");
             return DbProcessResultEnum.Success;
@@ -106,7 +106,7 @@ public class CustomCommandService(
                 cc => cc.Server);
             if (customCommand != null)
             {
-                await customCommandRepository.RemoveAsync(customCommand);
+                _ = await customCommandRepository.RemoveAsync(customCommand);
 
                 logger.Log($"Custom command {commandName} removed successfully!");
                 return DbProcessResultEnum.Success;

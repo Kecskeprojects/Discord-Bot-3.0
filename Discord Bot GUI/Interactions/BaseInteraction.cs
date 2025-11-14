@@ -9,6 +9,7 @@ using Discord_Bot.Tools;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions;
+
 public class BaseInteraction(IServerService serverService, BotLogger logger, Config config) : InteractionModuleBase<SocketInteractionContext>
 {
     private readonly IServerService serverService = serverService;

@@ -4,34 +4,35 @@ using Discord_Bot.Enums;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Processors.EmbedProcessors.Help;
+
 public class HelpEmbedProcessor
 {
     public static Embed[] CreateEmbed(CommandLevelEnum commandLevel, List<ModuleInfo> modules, string imageUrl)
     {
         EmbedBuilder builder = new();
-        builder.WithTitle($"{commandLevel} Commands");
+        _ = builder.WithTitle($"{commandLevel} Commands");
 
         switch (commandLevel)
         {
             case CommandLevelEnum.Owner:
-                builder.AddField("!help [o/own/owner]", "List out command categories for the owner");
+                _ = builder.AddField("!help [o/own/owner]", "List out command categories for the owner");
                 break;
             case CommandLevelEnum.Admin:
-                builder.AddField("!help [a/adm/admin]", "List out command categories for admins");
+                _ = builder.AddField("!help [a/adm/admin]", "List out command categories for admins");
                 break;
             case CommandLevelEnum.User:
-                builder.AddField("!help", "List out command categories for users");
+                _ = builder.AddField("!help", "List out command categories for users");
                 break;
         }
 
         foreach (ModuleInfo module in modules)
         {
-            builder.AddField(module.Name, module.Summary);
+            _ = builder.AddField(module.Name, module.Summary);
         }
 
-        builder.WithThumbnailUrl(imageUrl);
-        builder.WithColor(Color.Orange);
-        builder.WithCurrentTimestamp();
+        _ = builder.WithThumbnailUrl(imageUrl);
+        _ = builder.WithColor(Color.Orange);
+        _ = builder.WithCurrentTimestamp();
         return [builder.Build()];
     }
 
@@ -39,13 +40,13 @@ public class HelpEmbedProcessor
     {
 
         SelectMenuBuilder selectMenu = new();
-        selectMenu.WithCustomId($"HelpMenu_{commandLevel}");
-        selectMenu.WithPlaceholder("Select a category to see details of commands...");
+        _ = selectMenu.WithCustomId($"HelpMenu_{commandLevel}");
+        _ = selectMenu.WithPlaceholder("Select a category to see details of commands...");
 
         modules.ForEach(y => selectMenu.AddOption(y.Name, y.Name, $"{y.Commands.Count} commands..."));
 
         ComponentBuilder components = new();
-        components.WithSelectMenu(selectMenu);
+        _ = components.WithSelectMenu(selectMenu);
         return components.Build();
     }
 }

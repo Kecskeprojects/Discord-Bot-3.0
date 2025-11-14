@@ -53,7 +53,7 @@ public class IdolAliasService(
             };
             idol.IdolAliases.Add(alias);
 
-            await idolRepository.UpdateAsync(idol);
+            _ = await idolRepository.UpdateAsync(idol);
 
             logger.Log($"Idol Alias [{idolAlias}-{idolName}]-[{idolGroup}] added successfully!");
             return DbProcessResultEnum.Success;
@@ -77,7 +77,7 @@ public class IdolAliasService(
                 ia => ia.Idol.Group);
             if (idolAlias != null)
             {
-                await idolAliasRepository.RemoveAsync(idolAliasItem);
+                _ = await idolAliasRepository.RemoveAsync(idolAliasItem);
 
                 logger.Log($"Idol Alias [{idolAlias}-{idolName}]-[{idolGroup}] removed successfully!");
                 return DbProcessResultEnum.Success;

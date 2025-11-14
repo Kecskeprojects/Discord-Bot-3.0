@@ -42,16 +42,16 @@ public class UserWordOfTheDayCommands(
             {
                 Embed[] embed = WordOfTheDayEmbedProcessor.CreateEmbed(result);
 
-                await ReplyAsync(embeds: embed);
+                _ = await ReplyAsync(embeds: embed);
             }
             else
             {
-                await ReplyAsync("Language is not supported, here is the list of languages:\n" + string.Join(", ", Constant.WotdLanguages.Keys));
+                _ = await ReplyAsync("Language is not supported, here is the list of languages:\n" + string.Join(", ", Constant.WotdLanguages.Keys));
             }
         }
         catch (HttpRequestException)
         {
-            await ReplyAsync("Site is currently unavailable, try again in a little bit");
+            _ = await ReplyAsync("Site is currently unavailable, try again in a little bit");
         }
         catch (Exception ex)
         {

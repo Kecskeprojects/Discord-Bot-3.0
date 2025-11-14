@@ -67,7 +67,7 @@ Config config) : BaseInteraction(serverService, logger, config)
 
                 MessageComponent embeds = PollEditEmbedProcessor.CreateComponent(resource, presets);
 
-                await ModifyOriginalResponseAsync(x => x.Components = embeds);
+                _ = await ModifyOriginalResponseAsync(x => x.Components = embeds);
                 return;
             }
         }
@@ -75,7 +75,7 @@ Config config) : BaseInteraction(serverService, logger, config)
         {
             logger.Error("WeeklyPollOptionEditInteraction.cs EditWeeklyPollOptionModalSubmit", ex);
         }
-        await FollowupAsync("Something went wrong during the process.", ephemeral: true);
+        _ = await FollowupAsync("Something went wrong during the process.", ephemeral: true);
     }
 
     [ModalInteraction("EditPollOptionPresetModal_*_*")]
@@ -95,7 +95,7 @@ Config config) : BaseInteraction(serverService, logger, config)
 
                 MessageComponent embeds = PollPresetEditEmbedProcessor.CreateComponent(resource);
 
-                await ModifyOriginalResponseAsync(x => x.Components = embeds);
+                _ = await ModifyOriginalResponseAsync(x => x.Components = embeds);
                 return;
             }
         }
@@ -103,6 +103,6 @@ Config config) : BaseInteraction(serverService, logger, config)
         {
             logger.Error("WeeklyPollOptionEditInteraction.cs EditWeeklyPollOptionModalSubmit", ex);
         }
-        await FollowupAsync("Something went wrong during the process.", ephemeral: true);
+        _ = await FollowupAsync("Something went wrong during the process.", ephemeral: true);
     }
 }

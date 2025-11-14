@@ -67,7 +67,7 @@ public class IdolGroupService(
             idolGroup.FullKoreanName = modal.FullKoreanName.Trim();
             idolGroup.DebutDate = DateOnly.TryParse(modal.DebutDate, out DateOnly debutDate) ? debutDate : idolGroup.DebutDate;
 
-            await idolGroupRepository.SaveChangesAsync();
+            _ = await idolGroupRepository.SaveChangesAsync();
 
             logger.Log($"Group with ID {groupId} updated successfully!");
             return DbProcessResultEnum.Success;
@@ -96,7 +96,7 @@ public class IdolGroupService(
                 ModifiedOn = DateTime.UtcNow
             };
 
-            await idolGroupRepository.AddAsync(newGroup);
+            _ = await idolGroupRepository.AddAsync(newGroup);
         }
         return newGroup;
     }

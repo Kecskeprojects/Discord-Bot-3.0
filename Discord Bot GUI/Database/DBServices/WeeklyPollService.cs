@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
+
 public class WeeklyPollService(
     IWeeklyPollRepository weeklyPollRepository,
     IServerRepository serverRepository,
@@ -53,7 +54,7 @@ public class WeeklyPollService(
                     ModifiedOn = DateTime.UtcNow,
                     Server = server,
                 };
-                await weeklyPollRepository.AddAsync(poll);
+                _ = await weeklyPollRepository.AddAsync(poll);
             }
 
             result = mapper.Map<WeeklyPoll, WeeklyPollEditResource>(poll);
@@ -180,7 +181,7 @@ public class WeeklyPollService(
             WeeklyPoll poll = await weeklyPollRepository.FirstOrDefaultAsync(p => p.Server.DiscordId == serverId.ToString() && p.Name.ToLower() == pollName);
             if (poll != null)
             {
-                await weeklyPollRepository.RemoveAsync(poll);
+                _ = await weeklyPollRepository.RemoveAsync(poll);
 
                 logger.Log("Poll removed successfully!");
                 return DbProcessResultEnum.Success;
@@ -233,7 +234,7 @@ public class WeeklyPollService(
                 poll.Role = role;
                 poll.ModifiedOn = DateTime.UtcNow;
 
-                await weeklyPollRepository.SaveChangesAsync();
+                _ = await weeklyPollRepository.SaveChangesAsync();
                 logger.Log("Poll updated successfully!");
                 return DbProcessResultEnum.Success;
             }
@@ -271,7 +272,7 @@ public class WeeklyPollService(
             }
             else
             {
-                Enum.TryParse(property.PropertyType.Name, true, out TypeCode enumValue); //Get the type based on typecode
+                _ = Enum.TryParse(property.PropertyType.Name, true, out TypeCode enumValue); //Get the type based on typecode
 
                 convertedValue = Convert.ChangeType(newValue, enumValue); //Convert the value to that of the typecode
             }
@@ -279,7 +280,7 @@ public class WeeklyPollService(
             property.SetValue(poll, convertedValue); // Set the converted value
 
             poll.ModifiedOn = DateTime.UtcNow;
-            await weeklyPollRepository.UpdateAsync(poll);
+            _ = await weeklyPollRepository.UpdateAsync(poll);
             return DbProcessResultEnum.Success;
         }
         catch (Exception ex)

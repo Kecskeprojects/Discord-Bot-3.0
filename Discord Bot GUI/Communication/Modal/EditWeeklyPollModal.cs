@@ -1,6 +1,7 @@
 ﻿using Discord.Interactions;
 
 namespace Discord_Bot.Communication.Modal;
+
 public class EditWeeklyPollModal : IModal
 {
     public string Title => "Edit Weekly Poll";

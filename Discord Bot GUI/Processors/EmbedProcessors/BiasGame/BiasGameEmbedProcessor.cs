@@ -9,12 +9,12 @@ public static class BiasGameEmbedProcessor
     {
         //The idol IDs are reversed, the selected button sends the idol to delete from the list
         ActionRowBuilder buttonRow = new();
-        buttonRow.WithButton(label: "\U000025C4", customId: $"BiasGame_Next_{idolIds[1]}_{userId}", style: ButtonStyle.Primary); //Left Arrow 
-        buttonRow.WithButton(label: "Who do you pick?", customId: $"BiasGame_Next_Disabled", disabled: true, style: ButtonStyle.Secondary);
-        buttonRow.WithButton(label: "\U000025BA", customId: $"BiasGame_Next_{idolIds[0]}_{userId}", style: ButtonStyle.Primary); //Right Arrow
+        _ = buttonRow.WithButton(label: "\U000025C4", customId: $"BiasGame_Next_{idolIds[1]}_{userId}", style: ButtonStyle.Primary); //Left Arrow 
+        _ = buttonRow.WithButton(label: "Who do you pick?", customId: $"BiasGame_Next_Disabled", disabled: true, style: ButtonStyle.Secondary);
+        _ = buttonRow.WithButton(label: "\U000025BA", customId: $"BiasGame_Next_{idolIds[0]}_{userId}", style: ButtonStyle.Primary); //Right Arrow
 
         ComponentBuilder components = new();
-        components.AddRow(buttonRow);
+        _ = components.AddRow(buttonRow);
 
         return components.Build();
     }
@@ -23,14 +23,14 @@ public static class BiasGameEmbedProcessor
     {
         EmbedBuilder main = new();
 
-        main.WithDescription($"**BIAS GAME MATCH {data.CurrentPair + 1} OUT OF {data.Pairs.Count}**");
+        _ = main.WithDescription($"**BIAS GAME MATCH {data.CurrentPair + 1} OUT OF {data.Pairs.Count}**");
 
         EmbedFooterBuilder footer = new();
-        footer.WithIconUrl(avatarUrl);
-        footer.WithText($"{userName} | {data.Gender} | {data.DebutYearStart}-{data.DebutYearEnd}");
-        main.WithFooter(footer);
+        _ = footer.WithIconUrl(avatarUrl);
+        _ = footer.WithText($"{userName} | {data.Gender} | {data.DebutYearStart}-{data.DebutYearEnd}");
+        _ = main.WithFooter(footer);
 
-        main.WithImageUrl($"attachment://combined.png");
+        _ = main.WithImageUrl($"attachment://combined.png");
 
         return [main.Build()];
     }
@@ -39,13 +39,13 @@ public static class BiasGameEmbedProcessor
     {
         EmbedBuilder main = new();
 
-        main.WithDescription("**BIAS GAME MATCH RESULT**");
+        _ = main.WithDescription("**BIAS GAME MATCH RESULT**");
 
         EmbedFooterBuilder footer = new();
-        footer.WithIconUrl(avatarUrl);
-        footer.WithText($"{userName} | {data.Gender} | {data.DebutYearStart}-{data.DebutYearEnd}");
-        main.WithFooter(footer);
-        main.WithImageUrl("attachment://winner-bracket.png");
+        _ = footer.WithIconUrl(avatarUrl);
+        _ = footer.WithText($"{userName} | {data.Gender} | {data.DebutYearStart}-{data.DebutYearEnd}");
+        _ = main.WithFooter(footer);
+        _ = main.WithImageUrl("attachment://winner-bracket.png");
 
         return [main.Build()];
     }

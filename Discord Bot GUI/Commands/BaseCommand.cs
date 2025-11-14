@@ -11,6 +11,7 @@ using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands;
+
 public class BaseCommand(BotLogger logger, Config config, IServerService serverService) : ModuleBase<SocketCommandContext>
 {
     protected readonly BotLogger logger = logger;
@@ -63,7 +64,7 @@ public class BaseCommand(BotLogger logger, Config config, IServerService serverS
         if (!Global.ServerAudioResources.TryGetValue(Context.Guild.Id, out ServerAudioResource audioResource))
         {
             audioResource = new(Context.Guild.Id);
-            Global.ServerAudioResources.TryAdd(Context.Guild.Id, audioResource);
+            _ = Global.ServerAudioResources.TryAdd(Context.Guild.Id, audioResource);
         }
         return audioResource;
     }

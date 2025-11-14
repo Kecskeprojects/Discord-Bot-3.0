@@ -79,7 +79,7 @@ public class UserBiasCommands(
                 DbProcessResultEnum.NotFound => "Bias not in database.",
                 _ => "Bias(es) could not be added!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -133,7 +133,7 @@ public class UserBiasCommands(
                 DbProcessResultEnum.PartialNotFound => "You do not have this bias/these biases on your list.",
                 _ => "Bias(es) could not be removed!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -158,7 +158,7 @@ public class UserBiasCommands(
                 DbProcessResultEnum.Success => "Your biases have been cleared.",
                 _ => "You did not have any biases to clear!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -184,27 +184,15 @@ public class UserBiasCommands(
             //Check if you have any
             if (CollectionTools.IsNullOrEmpty(list))
             {
-                if (groupName != "")
-                {
-                    await ReplyAsync("No biases from that group are in your list!");
-                }
-                else
-                {
-                    await ReplyAsync("You do not have any biases set yet!");
-                }
+                _ = groupName != ""
+                    ? await ReplyAsync("No biases from that group are in your list!")
+                    : await ReplyAsync("You do not have any biases set yet!");
 
                 return;
             }
 
             BiasMessageResult result = BiasListMessageProcessor.BuildBiasMessage(list, groupName, $"{GetCurrentUserNickname()}'s biases by group", Context.User.Id, true);
-            if (result.Component == null)
-            {
-                await ReplyAsync(result.Message);
-            }
-            else
-            {
-                await ReplyAsync(result.Message, components: result.Component);
-            }
+            _ = result.Component == null ? await ReplyAsync(result.Message) : await ReplyAsync(result.Message, components: result.Component);
 
             //Generate a random number, 10% chance for an additional message to appear
             Random r = new();
@@ -218,7 +206,7 @@ public class UserBiasCommands(
                 string baseMessage = Constant.BiasExtraMessage[r.Next(0, Constant.BiasExtraMessage.Length)];
                 string message = string.Format(baseMessage, bias);
 
-                await ReplyAsync(message);
+                _ = await ReplyAsync(message);
             }
         }
         catch (Exception ex)
@@ -244,26 +232,14 @@ public class UserBiasCommands(
             //Check if we have any items on the list
             if (idols.Count == 0)
             {
-                if (groupName != "")
-                {
-                    await ReplyAsync("No biases from that group are in the database!");
-                }
-                else
-                {
-                    await ReplyAsync("No biases have been added to database yet!");
-                }
+                _ = groupName != ""
+                    ? await ReplyAsync("No biases from that group are in the database!")
+                    : await ReplyAsync("No biases have been added to database yet!");
                 return;
             }
 
             BiasMessageResult result = BiasListMessageProcessor.BuildBiasMessage(idols, groupName, "Which group do you want to see?", Context.User.Id, false);
-            if (result.Component == null)
-            {
-                await ReplyAsync(result.Message);
-            }
-            else
-            {
-                await ReplyAsync(result.Message, components: result.Component);
-            }
+            _ = result.Component == null ? await ReplyAsync(result.Message) : await ReplyAsync(result.Message, components: result.Component);
         }
         catch (Exception ex)
         {
@@ -285,12 +261,12 @@ public class UserBiasCommands(
 
             if (result.ProcessResultEnum == DbProcessResultEnum.NotFound)
             {
-                await ReplyAsync("No bias found with that name/those names!");
+                _ = await ReplyAsync("No bias found with that name/those names!");
                 return;
             }
             else if (result.ProcessResultEnum == DbProcessResultEnum.Failure || result.List == null)
             {
-                await ReplyAsync("Exception during search for users!");
+                _ = await ReplyAsync("Exception during search for users!");
                 return;
             }
             else
@@ -319,7 +295,7 @@ public class UserBiasCommands(
                 //If only one person has the bias and it's the command sender, send unique message
                 if (guildUsers.Count == 0)
                 {
-                    await ReplyAsync(isUsersBias ?
+                    _ = await ReplyAsync(isUsersBias ?
                                     "Only you have that bias for now! Time to convert people." :
                                     "Not even you have this bias, that's just shameful really...");
                     return;
@@ -330,7 +306,7 @@ public class UserBiasCommands(
 
                 //delete command and send mentions
                 await Context.Message.DeleteAsync();
-                await ReplyAsync(message);
+                _ = await ReplyAsync(message);
             }
         }
         catch (Exception ex)

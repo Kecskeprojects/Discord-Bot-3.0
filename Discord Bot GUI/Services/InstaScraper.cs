@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Web;
 
 namespace Discord_Bot.Services;
+
 public class InstaScraper(BotLogger logger) : IInstaScraper
 {
     private readonly BotLogger logger = logger;
@@ -52,12 +53,9 @@ public class InstaScraper(BotLogger logger) : IInstaScraper
             }
 
             string status = body.Status;
-            if (status != "ok")
-            {
-                return new SocialScrapingResult($"Request was returned with status: {status}");
-            }
-
-            return !body.Data.XdtShortcodeMedia.IsVideo && body.Data.XdtShortcodeMedia.EdgeSidecarToChildren?.Edges?.Count == 0
+            return status != "ok"
+                ? new SocialScrapingResult($"Request was returned with status: {status}")
+                : !body.Data.XdtShortcodeMedia.IsVideo && body.Data.XdtShortcodeMedia.EdgeSidecarToChildren?.Edges?.Count == 0
                 ? new SocialScrapingResult("No content was found in post.")
                 : GetData(body, uri);
         }

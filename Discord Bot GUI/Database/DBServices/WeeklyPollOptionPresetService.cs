@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
+
 public class WeeklyPollOptionPresetService(
     IWeeklyPollOptionPresetRepository weeklyPollOptionPresetRepository,
     IMapper mapper,
@@ -62,7 +63,7 @@ public class WeeklyPollOptionPresetService(
                     CreatedOn = DateTime.UtcNow,
                     ModifiedOn = DateTime.UtcNow,
                 };
-                await weeklyPollOptionPresetRepository.AddAsync(preset);
+                _ = await weeklyPollOptionPresetRepository.AddAsync(preset);
             }
 
             result = mapper.Map<WeeklyPollOptionPreset, WeeklyPollOptionPresetResource>(preset);
@@ -142,7 +143,7 @@ public class WeeklyPollOptionPresetService(
                 wp => wp.WeeklyPollOptions);
             if (poll != null)
             {
-                await weeklyPollOptionPresetRepository.RemoveAsync(poll);
+                _ = await weeklyPollOptionPresetRepository.RemoveAsync(poll);
 
                 logger.Log("Poll removed successfully!");
                 return DbProcessResultEnum.Success;
@@ -171,7 +172,7 @@ public class WeeklyPollOptionPresetService(
                 poll.Description = modal.Description;
                 poll.ModifiedOn = DateTime.UtcNow;
 
-                await weeklyPollOptionPresetRepository.SaveChangesAsync();
+                _ = await weeklyPollOptionPresetRepository.SaveChangesAsync();
                 logger.Log("Poll updated successfully!");
                 return DbProcessResultEnum.Success;
             }
@@ -196,14 +197,14 @@ public class WeeklyPollOptionPresetService(
 
             PropertyInfo property = poll.GetType().GetProperty(fieldName);
 
-            Enum.TryParse(property.PropertyType.Name, true, out TypeCode enumValue); //Get the type based on typecode
+            _ = Enum.TryParse(property.PropertyType.Name, true, out TypeCode enumValue); //Get the type based on typecode
 
             object convertedValue = Convert.ChangeType(newValue, enumValue); //Convert the value to that of the typecode
 
             property.SetValue(poll, convertedValue); // Set the converted value
 
             poll.ModifiedOn = DateTime.UtcNow;
-            await weeklyPollOptionPresetRepository.UpdateAsync(poll);
+            _ = await weeklyPollOptionPresetRepository.UpdateAsync(poll);
             return DbProcessResultEnum.Success;
         }
         catch (Exception ex)

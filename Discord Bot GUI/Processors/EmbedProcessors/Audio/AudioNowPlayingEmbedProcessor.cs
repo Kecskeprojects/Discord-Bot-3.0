@@ -5,6 +5,7 @@ using System;
 using System.Xml;
 
 namespace Discord_Bot.Processors.EmbedProcessors.Audio;
+
 public static class AudioNowPlayingEmbedProcessor
 {
     public static Embed[] CreateEmbed(ServerAudioResource audioResource)
@@ -19,17 +20,17 @@ public static class AudioNowPlayingEmbedProcessor
         string elapsed_time = "" + (hour > 0 ? hour + "h" : "") + minute + "m" + second + "s";
 
         EmbedBuilder builder = new();
-        builder.WithTitle(nowPlaying.Title);
-        builder.WithUrl(nowPlaying.URL);
+        _ = builder.WithTitle(nowPlaying.Title);
+        _ = builder.WithUrl(nowPlaying.URL);
 
-        builder.WithThumbnailUrl(nowPlaying.Thumbnail);
+        _ = builder.WithThumbnailUrl(nowPlaying.Thumbnail);
 
         TimeSpan span = XmlConvert.ToTimeSpan(nowPlaying.Duration);
-        builder.AddField("Requested by:", nowPlaying.User, false);
-        builder.AddField("Song duration:", elapsed_time + " / " + span.ToTimeString(), false);
+        _ = builder.AddField("Requested by:", nowPlaying.User, false);
+        _ = builder.AddField("Song duration:", elapsed_time + " / " + span.ToTimeString(), false);
 
-        builder.WithTimestamp(DateTime.UtcNow);
-        builder.WithColor(Color.DarkBlue);
+        _ = builder.WithTimestamp(DateTime.UtcNow);
+        _ = builder.WithColor(Color.DarkBlue);
 
         return [builder.Build()];
     }

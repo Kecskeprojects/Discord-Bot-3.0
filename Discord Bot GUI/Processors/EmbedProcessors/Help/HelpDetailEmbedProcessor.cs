@@ -6,12 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Discord_Bot.Processors.EmbedProcessors.Help;
+
 public class HelpDetailEmbedProcessor
 {
     public static Embed[] CreateEmbed(CommandLevelEnum commandLevel, string category, List<CommandInfo> commands, string imageUrl)
     {
         EmbedBuilder builder = new();
-        builder.WithTitle($"{commandLevel} {category} Commands:");
+        _ = builder.WithTitle($"{commandLevel} {category} Commands:");
 
         foreach (CommandInfo command in commands)
         {
@@ -25,15 +26,15 @@ public class HelpDetailEmbedProcessor
 
             string aliases = string.Join(", ", command.Aliases.SkipWhile(x => x == command.Name));
 
-            builder.AddField(
+            _ = builder.AddField(
                 $"!{command.Name} {parameters}",
                 $"{(canBeUsedInDM ? "(DM) " : "")}{command.Summary}{(!string.IsNullOrEmpty(aliases) ? $"\nAliases: {aliases}" : "")}"
                 );
         }
 
-        builder.WithThumbnailUrl(imageUrl);
-        builder.WithColor(Color.Orange);
-        builder.WithCurrentTimestamp();
+        _ = builder.WithThumbnailUrl(imageUrl);
+        _ = builder.WithColor(Color.Orange);
+        _ = builder.WithCurrentTimestamp();
         return [builder.Build()];
     }
 }

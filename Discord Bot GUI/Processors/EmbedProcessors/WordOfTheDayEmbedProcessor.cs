@@ -9,13 +9,13 @@ public static class WordOfTheDayEmbedProcessor
     {
         EmbedBuilder embed = new();
 
-        embed.WithTitle($"{result.Words.Langname} word of the day:");
+        _ = embed.WithTitle($"{result.Words.Langname} word of the day:");
 
-        embed.AddField("Word:", $"{result.Words.Word} ([Audio]({result.Words.Wordsound}))\n\n**Translation:**\n{result.Words.Translation}", true);
-        embed.AddField("Example:", $"{result.Words.Fnphrase} ([Audio]({result.Words.Phrasesound}))\n\n**Translation:**\n{result.Words.Enphrase}", true);
+        _ = embed.AddField("Word:", $"{result.Words.Word} ([Audio]({result.Words.Wordsound}))\n\n**Translation:**\n{result.Words.Translation}", true);
+        _ = embed.AddField("Example:", $"{result.Words.Fnphrase} ([Audio]({result.Words.Phrasesound}))\n\n**Translation:**\n{result.Words.Enphrase}", true);
 
-        embed.WithColor(Color.Gold);
-        embed.WithCurrentTimestamp();
+        _ = embed.WithColor(Color.Gold);
+        _ = embed.WithCurrentTimestamp();
         return [embed.Build()];
     }
 }

@@ -34,7 +34,7 @@ public class IdolImageService(
                 OverriddenUrl = currentImage?.ImageUrl,
             };
 
-            await idolImageRepository.AddAsync(newImage);
+            _ = await idolImageRepository.AddAsync(newImage);
             return DbProcessResultEnum.Success;
         }
         catch (Exception ex)
@@ -55,7 +55,7 @@ public class IdolImageService(
                 i => i.IdolImages);
             if (idolForImage != null)
             {
-                await idolImageRepository.RemoveAsync(idolForImage.IdolImages);
+                _ = await idolImageRepository.RemoveAsync(idolForImage.IdolImages);
 
                 logger.Log("Idol Images removed successfully!");
                 return DbProcessResultEnum.Success;

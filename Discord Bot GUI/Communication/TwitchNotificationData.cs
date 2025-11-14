@@ -1,6 +1,7 @@
 ﻿using Discord_Bot.Resources;
 
 namespace Discord_Bot.Communication;
+
 public class TwitchNotificationData
 {
     public TwitchChannelResource TwitchChannel { get; set; }

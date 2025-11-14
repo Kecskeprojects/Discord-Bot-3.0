@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
+
 public class WeeklyPollFeature(
     IWeeklyPollService weeklyPollService,
     DiscordSocketClient client,

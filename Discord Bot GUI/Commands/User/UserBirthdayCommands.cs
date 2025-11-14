@@ -40,7 +40,7 @@ public class UserBirthdayCommands(
             string[] strings = GetDateParameterParts(dateString);
             if (strings.Length != 3)
             {
-                await ReplyAsync("Incorrect input parameters");
+                _ = await ReplyAsync("Incorrect input parameters");
                 return;
             }
             string year = strings[0];
@@ -57,11 +57,11 @@ public class UserBirthdayCommands(
                     DbProcessResultEnum.UpdatedExisting => "Birthday updated in database.",
                     _ => "Birthday could not be added to database!"
                 };
-                await ReplyAsync(resultMessage);
+                _ = await ReplyAsync(resultMessage);
             }
             else
             {
-                await ReplyAsync("Date is of an unrecognizable format. The order is 'year month day'.");
+                _ = await ReplyAsync("Date is of an unrecognizable format. The order is 'year month day'.");
             }
         }
         catch (Exception ex)
@@ -89,7 +89,7 @@ public class UserBirthdayCommands(
                 DbProcessResultEnum.NotFound => "Birthday not found in database.",
                 _ => "Birthday could not be removed from database!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -112,7 +112,7 @@ public class UserBirthdayCommands(
             List<BirthdayResource> list = await birthdayService.GetServerBirthdayListAsync(Context.Guild.Id);
             if (CollectionTools.IsNullOrEmpty(list))
             {
-                await ReplyAsync("There are no birthdays set on this server!");
+                _ = await ReplyAsync("There are no birthdays set on this server!");
                 return;
             }
 
@@ -127,7 +127,7 @@ public class UserBirthdayCommands(
 
             Embed[] embed = BirthdayListEmbedProcessor.CreateEmbed(list, users);
 
-            await ReplyAsync(embeds: embed);
+            _ = await ReplyAsync(embeds: embed);
         }
         catch (Exception ex)
         {

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Tools.LastFmTools;
+
 public static class LastFmListResultTools
 {
     public static void CreateTopAlbumList(int? limit, LastFmListResult result, List<LastFmApi.Models.TopAlbum.Album> albums)

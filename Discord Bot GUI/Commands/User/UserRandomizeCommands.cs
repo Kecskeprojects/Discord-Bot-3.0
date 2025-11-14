@@ -29,11 +29,11 @@ public class UserRandomizeCommands(
 
             if (string.IsNullOrWhiteSpace(question))
             {
-                await ReplyAsync("Ask me about something!");
+                _ = await ReplyAsync("Ask me about something!");
                 return;
             }
 
-            await ReplyAsync(Constant.Answers8ball[new Random().Next(0, Constant.Answers8ball.Length)]);
+            _ = await ReplyAsync(Constant.Answers8ball[new Random().Next(0, Constant.Answers8ball.Length)]);
         }
         catch (Exception ex)
         {
@@ -67,15 +67,11 @@ public class UserRandomizeCommands(
 
             if (chance < 50)
             {
-                await ReplyAsync("The coin landed on: " + choices[0].Trim());
-            }
-            else if (chance > 51)
-            {
-                await ReplyAsync("The coin landed on: " + choices[1].Trim());
+                _ = await ReplyAsync("The coin landed on: " + choices[0].Trim());
             }
             else
             {
-                await ReplyAsync("The coin landed on it's edge");
+                _ = chance > 51 ? await ReplyAsync("The coin landed on: " + choices[1].Trim()) : await ReplyAsync("The coin landed on it's edge");
             }
         }
         catch (Exception ex)
@@ -101,7 +97,7 @@ public class UserRandomizeCommands(
 
             string chosen = options[r.Next(0, options.Length)];
 
-            await ReplyAsync(chosen);
+            _ = await ReplyAsync(chosen);
         }
         catch (Exception ex)
         {

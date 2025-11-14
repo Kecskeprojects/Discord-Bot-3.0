@@ -55,7 +55,7 @@ public class BirthdayFeature(
 
             string message = BirthdayMessageProcessor.CreateMessage(birthday, guild);
 
-            await channel.SendMessageAsync(message);
+            _ = await channel.SendMessageAsync(message);
         }
     }
 }

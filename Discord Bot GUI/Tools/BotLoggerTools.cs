@@ -4,6 +4,7 @@ using Discord_Bot.Tools.NativeTools;
 using System;
 
 namespace Discord_Bot.Tools;
+
 public static class BotLoggerTools
 {
     public static Log BaseLog(LogTypeEnum type)

@@ -8,7 +8,7 @@ public class ServerCache
 
     public void RemoveCachedEntityManually(ulong key)
     {
-        Cache.Remove(key);
+        _ = Cache.Remove(key);
     }
 
     public void ClearCachedEntityManually()
@@ -27,6 +27,6 @@ public class ServerCache
         {
             Cache[discordId] = result;
         }
-        Cache.TryAdd(discordId, result);
+        _ = Cache.TryAdd(discordId, result);
     }
 }

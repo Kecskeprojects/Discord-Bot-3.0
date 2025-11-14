@@ -243,7 +243,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
 
         foreach (PlaylistItem item in searchListResponse.Items)
         {
-            await VideoSearch(youtubeService, item.ContentDetails.VideoId, username, serverId);
+            _ = await VideoSearch(youtubeService, item.ContentDetails.VideoId, username, serverId);
         }
 
         return SearchResultEnum.YoutubePlaylistFound;
@@ -279,7 +279,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
             //Todo: Check if the given song is part of the first 25 songs that will be imported, and do not import it twice
             if (result)
             {
-                await PlaylistSearch(youtubeService, queryPart["list"], username, serverId);
+                _ = await PlaylistSearch(youtubeService, queryPart["list"], username, serverId);
             }
         }
         catch (Exception ex)

@@ -88,7 +88,7 @@ public partial class App : Application
 
             if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Logs")))
             {
-                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "Logs"));
+                _ = Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "Logs"));
                 logger.Log("Logs folder created!");
             }
 
@@ -131,10 +131,10 @@ public partial class App : Application
                 if (DateTime.UtcNow.Hour == 6 && DateTime.UtcNow.Minute == 0)
                 {
                     BirthdayFeature birthdayFeature = scope.ServiceProvider.GetService<BirthdayFeature>();
-                    await birthdayFeature.Run();
+                    _ = await birthdayFeature.Run();
 
                     WeeklyPollFeature weeklyPollFeature = scope.ServiceProvider.GetService<WeeklyPollFeature>();
-                    await weeklyPollFeature.Run();
+                    _ = await weeklyPollFeature.Run();
 
                     Config config = scope.ServiceProvider.GetService<Config>();
                     YoutubeAPI.KeyReset(config.Youtube_API_Keys);
@@ -148,10 +148,10 @@ public partial class App : Application
                 }
 
                 ReminderFeature reminderFeature = scope.ServiceProvider.GetService<ReminderFeature>();
-                await reminderFeature.Run();
+                _ = await reminderFeature.Run();
 
                 UnmuteFeature unmuteFeature = scope.ServiceProvider.GetService<UnmuteFeature>();
-                await unmuteFeature.Run();
+                _ = await unmuteFeature.Run();
 
                 logger.LogToFile();
             }

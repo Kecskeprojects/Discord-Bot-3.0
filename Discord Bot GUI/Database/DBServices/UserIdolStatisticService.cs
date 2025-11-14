@@ -32,7 +32,7 @@ public class UserIdolStatisticService(
                 {
                     DiscordId = userId.ToString()
                 };
-                await userRepository.AddAsync(user);
+                _ = await userRepository.AddAsync(user);
             }
 
             int i = 1;
@@ -53,17 +53,17 @@ public class UserIdolStatisticService(
                         User = user
                     };
 
-                    await userIdolStatisticRepository.AddAsync(userIdolStatistic, saveChanges: false);
+                    _ = await userIdolStatisticRepository.AddAsync(userIdolStatistic, saveChanges: false);
                 }
 
                 UserIdolStatisticTools.AddRanking(userIdolStatistic, i);
-                await userIdolStatisticRepository.SaveChangesAsync();
+                _ = await userIdolStatisticRepository.SaveChangesAsync();
 
                 i++;
             }
 
             user.BiasGameCount++;
-            await userRepository.SaveChangesAsync();
+            _ = await userRepository.SaveChangesAsync();
         }
         catch (Exception ex)
         {

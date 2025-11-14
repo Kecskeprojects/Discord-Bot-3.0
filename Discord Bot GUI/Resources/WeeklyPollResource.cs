@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 
 namespace Discord_Bot.Resources;
+
 public class WeeklyPollResource
 {
     public int WeeklyPollId { get; set; }

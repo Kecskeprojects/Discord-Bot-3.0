@@ -119,7 +119,7 @@ public class TwitchAPI(
                         ThumbnailUrl = e.Stream.ThumbnailUrl,
                         Title = e.Stream.Title
                     };
-                    await twitchNotificationFeature.Run(data);
+                    _ = await twitchNotificationFeature.Run(data);
                     channelStatuses[channel.TwitchId] = true;
                 }
             }
@@ -227,7 +227,7 @@ public class TwitchAPI(
         {
             foreach (TwitchChannelResource channel in channels)
             {
-                channelStatuses.TryAdd(channel.TwitchId, false);
+                _ = channelStatuses.TryAdd(channel.TwitchId, false);
                 lst.Add(channel.TwitchId);
             }
         }

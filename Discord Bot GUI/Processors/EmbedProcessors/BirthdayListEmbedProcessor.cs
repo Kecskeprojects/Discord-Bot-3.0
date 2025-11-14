@@ -9,7 +9,7 @@ public static class BirthdayListEmbedProcessor
     public static Embed[] CreateEmbed(List<BirthdayResource> list, List<string> users)
     {
         EmbedBuilder builder = new();
-        builder.WithTitle("Server birthdays:");
+        _ = builder.WithTitle("Server birthdays:");
 
         List<string> embedFields = [""];
         int index = 0;
@@ -26,9 +26,9 @@ public static class BirthdayListEmbedProcessor
 
         foreach (string field in embedFields)
         {
-            builder.AddField("\u200b", field);
+            _ = builder.AddField("\u200b", field);
         }
-        builder.WithColor(Color.LightOrange);
+        _ = builder.WithColor(Color.LightOrange);
         return [builder.Build()];
     }
 }

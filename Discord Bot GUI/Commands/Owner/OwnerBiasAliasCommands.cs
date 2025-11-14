@@ -49,7 +49,7 @@ public class OwnerBiasAliasCommands(
                 DbProcessResultEnum.NotFound => "Bias with that name not found in database.",
                 _ => "Bias alias could not be added!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -86,7 +86,7 @@ public class OwnerBiasAliasCommands(
                 DbProcessResultEnum.NotFound => "Bias alias not in database.",
                 _ => "Bias alias could not be removed!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {

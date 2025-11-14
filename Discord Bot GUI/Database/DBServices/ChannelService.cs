@@ -55,7 +55,7 @@ public class ChannelService(
                     && c.ChannelTypes.FirstOrDefault(ct => ct.ChannelTypeId == (int) channelTypeId) != null,
                     c => c.ChannelTypes,
                     c => c.Server);
-                channels.ForEach((channel) => { channel.ChannelTypes.Remove(channelType); });
+                channels.ForEach((channel) => { _ = channel.ChannelTypes.Remove(channelType); });
             }
 
             if (channel == null)
@@ -67,7 +67,7 @@ public class ChannelService(
                     ChannelTypes = [channelType],
                     DiscordId = channelId.ToString()
                 };
-                await channelRepository.AddAsync(channel);
+                _ = await channelRepository.AddAsync(channel);
             }
             else
             {
@@ -77,7 +77,7 @@ public class ChannelService(
                 }
 
                 channel.ChannelTypes.Add(channelType);
-                await channelRepository.SaveChangesAsync();
+                _ = await channelRepository.SaveChangesAsync();
             }
 
             cache.RemoveCachedEntityManually(serverId);
@@ -112,7 +112,7 @@ public class ChannelService(
                     return DbProcessResultEnum.NotFound;
                 }
 
-                await channelRepository.SaveChangesAsync();
+                _ = await channelRepository.SaveChangesAsync();
 
                 cache.RemoveCachedEntityManually(serverId);
                 logger.Log($"Settings channel of type '{channelTypeId.ToCommandString()}' removed successfully!");
@@ -147,9 +147,9 @@ public class ChannelService(
             }
             if (!CollectionTools.IsNullOrEmpty(channels))
             {
-                channels.ForEach((channel) => { channel.ChannelTypes.Remove(channelType); });
+                channels.ForEach((channel) => { _ = channel.ChannelTypes.Remove(channelType); });
 
-                await channelRepository.SaveChangesAsync();
+                _ = await channelRepository.SaveChangesAsync();
 
                 cache.RemoveCachedEntityManually(serverId);
                 logger.Log($"All settings channels of type '{channelTypeId.ToCommandString()}' removed successfully!");

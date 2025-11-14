@@ -44,7 +44,7 @@ public class RoleService(
                 DiscordId = roleId.ToString()
 
             };
-            await roleRepository.AddAsync(role);
+            _ = await roleRepository.AddAsync(role);
 
             logger.Log("Role added successfully!");
             return DbProcessResultEnum.Success;
@@ -107,7 +107,7 @@ public class RoleService(
                 && r.RoleName.Trim().ToLower().Equals(roleName));
             if (role != null)
             {
-                await roleRepository.RemoveAsync(role);
+                _ = await roleRepository.RemoveAsync(role);
 
                 logger.Log($"Role {roleName} removed successfully!");
                 return DbProcessResultEnum.Success;

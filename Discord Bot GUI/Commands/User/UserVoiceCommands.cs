@@ -44,7 +44,7 @@ public class UserVoiceCommands(
 
             ServerResource server = await GetCurrentServerAsync();
 
-            await audioRequestFeature.Run(Context, searchparameter);
+            _ = await audioRequestFeature.Run(Context, searchparameter);
             if (!audioResource.AudioVariables.Playing)
             {
                 if (audioResource.MusicRequests.Count > 0)
@@ -109,7 +109,7 @@ public class UserVoiceCommands(
             {
                 Embed[] embed = AudioQueueEmbedProcessor.CreateEmbed(audioResource, page);
 
-                await ReplyAsync(embeds: embed);
+                _ = await ReplyAsync(embeds: embed);
             }
         }
         catch (Exception ex)
@@ -134,7 +134,7 @@ public class UserVoiceCommands(
 
             Embed[] embed = AudioNowPlayingEmbedProcessor.CreateEmbed(audioResource);
 
-            await Context.Channel.SendMessageAsync(embeds: embed);
+            _ = await Context.Channel.SendMessageAsync(embeds: embed);
         }
         catch (Exception ex)
         {
@@ -157,7 +157,7 @@ public class UserVoiceCommands(
 
             audioResource.MusicRequests.Clear();
 
-            await Context.Channel.SendMessageAsync("The queue has been cleared!");
+            _ = await Context.Channel.SendMessageAsync("The queue has been cleared!");
 
             audioResource.AudioVariables.CancellationTokenSource.Cancel(false);
         }
@@ -180,7 +180,7 @@ public class UserVoiceCommands(
                 return;
             }
 
-            await Context.Channel.SendMessageAsync("Song skipped!");
+            _ = await Context.Channel.SendMessageAsync("Song skipped!");
 
             audioResource.AudioVariables.CancellationTokenSource.Cancel(false);
         }
@@ -204,7 +204,7 @@ public class UserVoiceCommands(
                 return;
             }
 
-            await ReplyAsync($"`{audioResource.MusicRequests[position].Title}` has been removed from the playlist!");
+            _ = await ReplyAsync($"`{audioResource.MusicRequests[position].Title}` has been removed from the playlist!");
 
             audioResource.MusicRequests.RemoveAt(position);
         }
@@ -229,7 +229,7 @@ public class UserVoiceCommands(
 
             audioResource.MusicRequests = CollectionTools.ShufflePlaylist(audioResource.MusicRequests);
 
-            await ReplyAsync("Shuffle complete!");
+            _ = await ReplyAsync("Shuffle complete!");
         }
         catch (Exception ex)
         {

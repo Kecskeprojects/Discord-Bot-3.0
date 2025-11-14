@@ -55,11 +55,11 @@ public class UserTwitterScraperCommands(
                     {
                         if (result.ErrorMessage.Length < 150)
                         {
-                            await ReplyAsync(result.ErrorMessage);
+                            _ = await ReplyAsync(result.ErrorMessage);
                         }
                         else
                         {
-                            await ReplyAsync("Error message too long to display!");
+                            _ = await ReplyAsync("Error message too long to display!");
                             logger.Error("UserTwitterScraperCommands.cs ScrapeFromUrl", result.ErrorMessage);
                         }
 
@@ -74,7 +74,7 @@ public class UserTwitterScraperCommands(
                     {
                         try
                         {
-                            await SendTwitterMessageAsync(attachments, result.TextContent, refer, true);
+                            _ = await SendTwitterMessageAsync(attachments, result.TextContent, refer, true);
                             await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
                         }
                         catch (HttpException ex)
@@ -86,19 +86,19 @@ public class UserTwitterScraperCommands(
                                 attachments = await SocialMessageProcessor.GetAttachments("twitter", result.Content, sendVideos: false, limit: 30);
                                 if (!CollectionTools.IsNullOrEmpty(attachments))
                                 {
-                                    await SendTwitterMessageAsync(attachments, result.TextContent, refer, true);
+                                    _ = await SendTwitterMessageAsync(attachments, result.TextContent, refer, true);
                                     await Context.Message.ModifyAsync(x => x.Flags = MessageFlags.SuppressEmbeds);
                                 }
                                 else
                                 {
-                                    await ReplyAsync("Post content too large to send!");
+                                    _ = await ReplyAsync("Post content too large to send!");
                                 }
                             }
                         }
                     }
                     else
                     {
-                        await ReplyAsync("No image/videos in tweet.");
+                        _ = await ReplyAsync("No image/videos in tweet.");
                     }
 
                     foreach (FileAttachment item in attachments)
@@ -123,20 +123,15 @@ public class UserTwitterScraperCommands(
             for (int i = 0; i < Math.Ceiling(attachments.Count / 10.0); i++)
             {
                 int count = attachments.Count - (i * 10) >= 10 ? 10 : attachments.Count - (i * 10);
-                if (i == 0)
-                {
-                    await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count), message, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
-                }
-                else
-                {
-                    await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count));
-                }
+                _ = i == 0
+                    ? await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count), message, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None))
+                    : await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count));
             }
         }
         //Ignore videos is a second try at sending so that is when we can know if the post is too large to send
         else if (ignoreVideos == true)
         {
-            await Context.Channel.SendMessageAsync("Post content too large to send!");
+            _ = await Context.Channel.SendMessageAsync("Post content too large to send!");
         }
 
         return result;

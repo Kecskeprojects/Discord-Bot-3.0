@@ -9,15 +9,15 @@ public class PollPresetListEmbedProcessor
     public static Embed[] CreateEmbed(List<WeeklyPollOptionPresetResource> list)
     {
         EmbedBuilder builder = new();
-        builder.WithTitle("Weekly Poll Presets:");
+        _ = builder.WithTitle("Weekly Poll Presets:");
 
         foreach (WeeklyPollOptionPresetResource preset in list)
         {
             string body = $"{(preset.IsActive ? "Active" : "Inactive")} {(preset.IsSpecialPreset ? "Special" : "Standard")} option preset\nDescription: {preset.Description}";
-            builder.AddField(preset.Name, body);
+            _ = builder.AddField(preset.Name, body);
         }
 
-        builder.WithColor(Color.DarkBlue);
+        _ = builder.WithColor(Color.DarkBlue);
         return [builder.Build()];
     }
 }

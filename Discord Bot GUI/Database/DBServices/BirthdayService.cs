@@ -39,7 +39,7 @@ public class BirthdayService(
                 if (birthday.Date != datePart)
                 {
                     birthday.Date = datePart;
-                    await birthdayRepository.SaveChangesAsync();
+                    _ = await birthdayRepository.SaveChangesAsync();
                     logger.Log("Birthday updated successfully!");
                     return DbProcessResultEnum.UpdatedExisting;
                 }
@@ -58,7 +58,7 @@ public class BirthdayService(
                 User = user ?? new User() { DiscordId = userId.ToString() },
                 Server = server ?? new Server() { DiscordId = serverId.ToString() },
             };
-            await birthdayRepository.AddAsync(birthday);
+            _ = await birthdayRepository.AddAsync(birthday);
 
             logger.Log("Birthday added successfully!");
             return DbProcessResultEnum.Success;
@@ -112,7 +112,7 @@ public class BirthdayService(
                 b => b.Server);
             if (birthday != null)
             {
-                await birthdayRepository.RemoveAsync(birthday);
+                _ = await birthdayRepository.RemoveAsync(birthday);
 
                 logger.Log("Birthday removed successfully!");
                 return DbProcessResultEnum.Success;

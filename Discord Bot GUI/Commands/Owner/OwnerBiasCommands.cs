@@ -52,7 +52,7 @@ public class OwnerBiasCommands(
                 DbProcessResultEnum.AlreadyExists => "Bias already in database.",
                 _ => "Bias could not be added!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -84,7 +84,7 @@ public class OwnerBiasCommands(
                 DbProcessResultEnum.NotFound => "Bias could not be found.",
                 _ => "Bias could not be removed!"
             };
-            await ReplyAsync(resultMessage);
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
@@ -112,7 +112,7 @@ public class OwnerBiasCommands(
 
             MessageComponent component = EditBiasDataMessageProcessor.CreateComponent(biasName, biasGroup);
 
-            await ReplyAsync("What action would you like to perform", components: component);
+            _ = await ReplyAsync("What action would you like to perform", components: component);
         }
         catch (Exception ex)
         {
