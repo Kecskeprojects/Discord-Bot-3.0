@@ -2,6 +2,7 @@
 using LastFmApi.Enum;
 
 namespace LastFmApi;
+
 public class UtilityRequests
 {
     public static async Task<GenericResponseItem<int>> TotalPlays(string apiKey, string username, string period)
@@ -73,7 +74,7 @@ public class UtilityRequests
 
                 allPlays.AddRange(restResult.Response.Track);
 
-                if(allPlays.Any(track => track.Name == track_name && track.Artist.Name == artist_name))
+                if (allPlays.Any(track => track.Name == track_name && track.Artist.Name == artist_name))
                 {
                     break;
                 }

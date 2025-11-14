@@ -1,4 +1,5 @@
 ﻿namespace LastFmApi.Communication;
+
 public class WhoKnowsResponseItem
 {
     public Dictionary<string, int> Plays { get; set; } = [];

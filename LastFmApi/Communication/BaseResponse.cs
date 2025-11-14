@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 
 namespace LastFmApi.Communication;
+
 public class BaseResponse
 {
     [JsonProperty("message")]

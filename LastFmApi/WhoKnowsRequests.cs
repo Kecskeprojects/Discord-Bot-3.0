@@ -2,6 +2,7 @@
 using LastFmApi.Enum;
 
 namespace LastFmApi;
+
 public class WhoKnowsRequests
 {
     public static async Task<GenericResponseItem<WhoKnowsResponseItem>> WhoKnowsByCurrentlyPlayingAsync(string apiKey, string username, List<string> usernameList)
@@ -51,7 +52,7 @@ public class WhoKnowsRequests
 
                 if (user == usernameList[0])
                 {
-                    await FillArtistDataAsync(apiKey, response, user, artist_name, track_name);
+                    _ = await FillArtistDataAsync(apiKey, response, user, artist_name, track_name);
                     if (!string.IsNullOrEmpty(response.Message))
                     {
                         return response;
@@ -104,7 +105,7 @@ public class WhoKnowsRequests
 
                 if (user == usernameList[0])
                 {
-                    await FillArtistDataAsync(apiKey, response, user, artistName, trackName);
+                    _ = await FillArtistDataAsync(apiKey, response, user, artistName, trackName);
                     if (!string.IsNullOrEmpty(response.Message))
                     {
                         return response;

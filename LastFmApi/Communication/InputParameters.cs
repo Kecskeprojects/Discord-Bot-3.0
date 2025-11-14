@@ -1,4 +1,5 @@
 ﻿namespace LastFmApi.Communication;
+
 public class InputParameters
 {
     public int Limit { get; set; }
