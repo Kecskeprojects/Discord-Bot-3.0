@@ -19,5 +19,5 @@
     CONSTRAINT [FK_WeeklyPoll_ChannelId] FOREIGN KEY ([ChannelId]) REFERENCES [Channel]([ChannelId]),
     CONSTRAINT [FK_WeeklyPoll_RoleId] FOREIGN KEY ([RoleId]) REFERENCES [Role]([RoleId]),
     CONSTRAINT [FK_WeeklyPoll_WeeklyPollOptionPresetId] FOREIGN KEY ([OptionPresetId]) REFERENCES [WeeklyPollOptionPreset]([WeeklyPollOptionPresetId]),
-    CONSTRAINT [CK_WeeklyPoll_RepeatOnDayOfWeek] CHECK ([RepeatOnDayOfWeek] IN ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')), 
+    CONSTRAINT [CK_WeeklyPoll_RepeatOnDayOfWeek] CHECK ([RepeatOnDayOfWeek]='Sunday' OR [RepeatOnDayOfWeek]='Saturday' OR [RepeatOnDayOfWeek]='Friday' OR [RepeatOnDayOfWeek]='Thursday' OR [RepeatOnDayOfWeek]='Wednesday' OR [RepeatOnDayOfWeek]='Tuesday' OR [RepeatOnDayOfWeek]='Monday'),
 )
