@@ -86,7 +86,7 @@ public class SpotifyAPI(BotLogger logger, Config config, IYoutubeAPI youtubeAPI,
 
                 if (type == "playlist")
                 {
-                    Paging<PlaylistTrack<IPlayableItem>> playlist = await spotify.Playlists.GetItems(id, new PlaylistGetItemsRequest { Limit = 25 });
+                    Paging<PlaylistTrack<IPlayableItem>> playlist = await spotify.Playlists.GetPlaylistItems(id, new PlaylistGetItemsRequest { Limit = 25 });
 
                     list = playlist.Items.Select(n => $"{(n.Track as FullTrack).Name.Trim()} {(n.Track as FullTrack).Artists[0].Name.Trim()}").ToArray();
                 }
