@@ -26,7 +26,7 @@ public class YoutubeStreamService(Config config, BotLogger logger) : IYoutubeDow
             //Audio streaming
             using (AudioOutStream stream = audioResource.AudioVariables.AudioClient.CreatePCMStream(AudioApplication.Mixed, config.Bitrate, 3000))
             {
-                logger.Log("Audio stream starting!");
+                logger.Audio("Audio stream starting!");
                 await ffmpeg.StandardOutput.BaseStream.CopyToAsync(stream, audioResource.AudioVariables.CancellationTokenSource.Token);
                 await stream.FlushAsync();
             }
@@ -34,7 +34,7 @@ public class YoutubeStreamService(Config config, BotLogger logger) : IYoutubeDow
         //Exception thrown with current version of skipping song or bot disconnecting from channel
         catch (OperationCanceledException ex)
         {
-            logger.Log("Exception thrown when audio stream is cancelled!");
+            logger.Audio("Exception thrown when audio stream is cancelled!");
             logger.Warning("YoutubeStreamService.cs StreamAsync", ex, LogOnly: true);
 
             ffmpeg?.Kill();
@@ -53,7 +53,7 @@ public class YoutubeStreamService(Config config, BotLogger logger) : IYoutubeDow
             ffmpeg?.Dispose();
             audioResource.AudioVariables.Stopwatch?.Stop();
 
-            logger.Log("Audio stream finished!");
+            logger.Audio("Audio stream finished!");
         }
     }
 
@@ -63,7 +63,7 @@ public class YoutubeStreamService(Config config, BotLogger logger) : IYoutubeDow
         ProcessStartInfo ffmpeg = new()
         {
             FileName = "cmd.exe",
-            Arguments = $@"/C yt-dlp.exe --no-check-certificate -f bestaudio -o - {url} | ffmpeg.exe -i pipe:0 -f s16le -ar 48000 -ac 2 pipe:1",
+            Arguments = $@"/C yt-dlp.exe --no-check-certificate -f bestaudio -o - {url} | ffmpeg.exe -hide_banner -loglevel panic -i pipe:0 -ac 2 -f s16le -ar 48000 pipe:1",
             UseShellExecute = false,
             RedirectStandardOutput = true,
             CreateNoWindow = true,

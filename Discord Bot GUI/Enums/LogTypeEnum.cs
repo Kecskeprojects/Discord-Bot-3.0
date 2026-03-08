@@ -8,7 +8,8 @@ public enum LogTypeEnum
     MesUser = 4,
     MesOther = 5,
     Error = 6,
-    Warning = 7
+    Warning = 7,
+    Audio = 8
 }
 
 public static class LogTypeEnumExtension
@@ -20,6 +21,7 @@ public static class LogTypeEnumExtension
             LogTypeEnum.Log => "LOG",
             LogTypeEnum.Query => "QUERY",
             LogTypeEnum.Client => "CLIENT",
+            LogTypeEnum.Audio => "AUDIO",
             LogTypeEnum.MesUser => "MES_USER",
             LogTypeEnum.MesOther => "MES_OTHER",
             LogTypeEnum.Error => "ERROR",

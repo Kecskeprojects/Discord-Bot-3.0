@@ -28,7 +28,7 @@ public class AudioPlayFeature(
             while (audioResource.MusicRequests.Count > 0)
             {
                 VoiceConnectionResultEnum connectResult = await CheckAndReconnectBotIfNeededAsync(Context, audioResource);
-                logger.Log($"Voice connection result: {connectResult}");
+                logger.Audio($"Voice connection result: {connectResult}");
                 switch (connectResult)
                 {
                     case VoiceConnectionResultEnum.UserNotInVoiceChannel:
@@ -58,7 +58,7 @@ public class AudioPlayFeature(
                 //If the playlist is empty and there is no song playing, start counting down for 300 seconds
                 if (audioResource.MusicRequests.Count == 0)
                 {
-                    logger.Log("Playlist empty!");
+                    logger.Audio("Playlist empty!");
 
                     if (await WaitAsync(audioResource))
                     {
@@ -72,7 +72,7 @@ public class AudioPlayFeature(
             SocketGuildUser clientUser = await Context.Channel.GetUserAsync(Context.Client.CurrentUser.Id) as SocketGuildUser;
             if (clientUser.VoiceChannel != null)
             {
-                logger.Log("Disconnected due to Error.");
+                logger.Audio("Disconnected due to Error.");
                 await clientUser.VoiceChannel.DisconnectAsync();
             }
 
@@ -140,7 +140,7 @@ public class AudioPlayFeature(
             }
             else
             {
-                logger.Log("Intentional waiting when a video is too short to play");
+                logger.Audio("Intentional waiting when a video is too short to play");
                 await Task.Delay((int) length + 2000);
             }
         }
@@ -160,7 +160,7 @@ public class AudioPlayFeature(
             //if the bot disconnected for some other reason, leave the loop and clear the request list
             if (clientUser.VoiceChannel == null)
             {
-                logger.Log("Bot not in voice channel anymore!");
+                logger.Audio("Bot not in voice channel anymore!");
                 return true;
             }
 

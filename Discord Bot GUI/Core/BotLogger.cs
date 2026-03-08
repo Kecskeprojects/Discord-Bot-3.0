@@ -98,6 +98,24 @@ public class BotLogger
             Logs.Add(log);
         }
     }
+
+    public void Audio(string message, bool ConsoleOnly = false, bool LogOnly = false)
+    {
+        Log log = BotLoggerTools.BaseLog(LogTypeEnum.Client);
+
+        log.Content += message;
+        log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
+
+        if (!LogOnly)
+        {
+            BotWindow.LogToWindow(log, Brushes.DarkOrange);
+        }
+
+        if (!ConsoleOnly)
+        {
+            Logs.Add(log);
+        }
+    }
     #endregion
 
     #region Message Logging

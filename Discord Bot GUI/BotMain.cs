@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.LibDave.Binding;
 using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
@@ -32,6 +33,8 @@ public class BotMain(
             return;
         }
 
+        Discord.LibDave.Dave.SetLogSink(LibDaveLogSink);
+
         client.Log += ClientLog;
         client.Ready += OnWebSocketReady;
         client.Disconnected += OnWebsocketDisconnect;
@@ -53,6 +56,19 @@ public class BotMain(
             await client.StartAsync();
 
             logger.Log("Bot started!");
+        }
+    }
+
+    private void LibDaveLogSink(
+        LoggingSeverity severity,
+        string filePath,
+        int lineNumber,
+        string message
+    )
+    {
+        if( severity > LoggingSeverity.Info)
+        {
+            logger.Audio(message);
         }
     }
 
