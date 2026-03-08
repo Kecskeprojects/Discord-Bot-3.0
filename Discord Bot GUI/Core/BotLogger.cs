@@ -101,7 +101,7 @@ public class BotLogger
 
     public void Audio(string message, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BotLoggerTools.BaseLog(LogTypeEnum.Client);
+        Log log = BotLoggerTools.BaseLog(LogTypeEnum.Audio);
 
         log.Content += message;
         log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
