@@ -119,7 +119,7 @@ public class ServerService(
                 return DbProcessResultEnum.NotFound;
             }
 
-            server.NotificationRole = null;
+            server.NotificationRoleId = null;
 
             _ = await serverRepository.SaveChangesAsync();
 
