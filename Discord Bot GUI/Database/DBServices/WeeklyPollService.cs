@@ -123,6 +123,25 @@ public class WeeklyPollService(
         return result;
     }
 
+    public async Task<WeeklyPollResource> GetPollForForceResendAsync(ulong serverId, string pollName)
+    {
+        WeeklyPollResource result = null;
+        try
+        {
+            pollName = pollName.ToLower();
+            WeeklyPoll poll = await weeklyPollRepository.FirstOrDefaultAsync(
+                wp => wp.Server.DiscordId == serverId.ToString() && wp.Name.ToLower() == pollName,
+                wp => wp.WeeklyPollOptions);
+
+            result = mapper.Map<WeeklyPoll, WeeklyPollResource>(poll);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("WeeklyPollService.cs GetPollForForceResendAsync", ex);
+        }
+        return result;
+    }
+
     public async Task<List<WeeklyPollResource>> GetPollsByDayOfWeekAsync(DayOfWeek dayOfWeek)
     {
         List<WeeklyPollResource> result = null;

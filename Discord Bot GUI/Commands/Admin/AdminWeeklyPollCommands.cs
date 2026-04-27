@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
+using Discord_Bot.Features;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Processors.EmbedProcessors.Polls;
 using Discord_Bot.Resources;
@@ -16,6 +17,7 @@ namespace Discord_Bot.Commands.Admin;
 [Remarks("Admin")]
 [Summary("Manage Weekly Polls on your server")]
 public class AdminWeeklyPollCommands(
+    WeeklyPollFeature weeklyPollFeature,
     IWeeklyPollService weeklyPollService,
     IWeeklyPollOptionPresetService weeklyPollOptionPresetService,
     IServerService serverService,
@@ -112,6 +114,24 @@ public class AdminWeeklyPollCommands(
         catch (Exception ex)
         {
             logger.Error("AdminWeeklyPollCommands.cs ListWeeklyPoll", ex);
+        }
+    }
+
+    [Command("weekly poll resend")]
+    [Alias(["wp re", "weekly poll re", "wp resend", "weeklypoll re", "weeklypoll resend"])]
+    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireContext(ContextType.Guild)]
+    [Summary("Resending an existing Weekly Poll on the server")]
+    public async Task ResendWeeklyPoll([Remainder][Name("name")] string pollName)
+    {
+        try
+        {
+            WeeklyPollResource resource = await weeklyPollService.GetPollForForceResendAsync(Context.Guild.Id, pollName);
+            bool _ = await weeklyPollFeature.ProcessWeeklyPollAsync(resource);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("AdminWeeklyPollCommands.cs EditWeeklyPoll", ex);
         }
     }
 }

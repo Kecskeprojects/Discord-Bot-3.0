@@ -34,26 +34,7 @@ public class WeeklyPollFeature(
             {
                 foreach (WeeklyPollResource poll in result)
                 {
-                    if (poll.Options.Count == 0)
-                    {
-                        continue;
-                    }
-
-                    PollProperties pollProp = mapper.Map<PollProperties>(poll);
-
-                    SocketGuild server = client.GetGuild(poll.ServerDiscordId);
-
-                    if (poll.ChannelDiscordId.HasValue && server?.GetChannel(poll.ChannelDiscordId.Value) is ISocketMessageChannel channel)
-                    {
-                        SocketRole role = poll.RoleDiscordId.HasValue ? server.GetRole(poll.RoleDiscordId.Value) : null;
-                        string notifRole = role != null ? $"<@&{role.Id}>" : "";
-
-                        RestUserMessage message = await channel.SendMessageAsync(notifRole, poll: pollProp);
-                        if (poll.IsPinned)
-                        {
-                            await message.PinAsync();
-                        }
-                    }
+                    bool _ = await ProcessWeeklyPollAsync(poll);
                 }
             }
         }
@@ -62,6 +43,32 @@ public class WeeklyPollFeature(
             logger.Error("ReminderFeature.cs ExecuteCoreLogicAsync", ex);
             return false;
         }
+        return true;
+    }
+
+    public async Task<bool> ProcessWeeklyPollAsync(WeeklyPollResource poll)
+    {
+        if (poll.Options.Count == 0)
+        {
+            return false;
+        }
+
+        PollProperties pollProp = mapper.Map<PollProperties>(poll);
+
+        SocketGuild server = client.GetGuild(poll.ServerDiscordId);
+
+        if (poll.ChannelDiscordId.HasValue && server?.GetChannel(poll.ChannelDiscordId.Value) is ISocketMessageChannel channel)
+        {
+            SocketRole role = poll.RoleDiscordId.HasValue ? server.GetRole(poll.RoleDiscordId.Value) : null;
+            string notifRole = role != null ? $"<@&{role.Id}>" : "";
+
+            RestUserMessage message = await channel.SendMessageAsync(notifRole, poll: pollProp);
+            if (poll.IsPinned)
+            {
+                await message.PinAsync();
+            }
+        }
+
         return true;
     }
 }
