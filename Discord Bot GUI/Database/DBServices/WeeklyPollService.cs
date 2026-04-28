@@ -131,7 +131,14 @@ public class WeeklyPollService(
             pollName = pollName.ToLower();
             WeeklyPoll poll = await weeklyPollRepository.FirstOrDefaultAsync(
                 wp => wp.Server.DiscordId == serverId.ToString() && wp.Name.ToLower() == pollName,
-                wp => wp.WeeklyPollOptions);
+                includes: [
+                    wp => wp.Server,
+                    wp => wp.Role,
+                    wp => wp.Channel,
+                    wp => wp.WeeklyPollOptions,
+                    wp => wp.OptionPreset,
+                    wp => wp.OptionPreset.WeeklyPollOptions
+                ]);
 
             result = mapper.Map<WeeklyPoll, WeeklyPollResource>(poll);
         }
