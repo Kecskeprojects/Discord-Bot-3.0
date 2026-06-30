@@ -151,11 +151,11 @@ public class CommandHandler(
             _ = await easterEggFeature.Run(context);
 
             //Make embed for instagram links
-            if (config.Enable_Instagram_Embed)
-            {
-                InstagramEmbedFeature instagramEmbedFeature = scope.ServiceProvider.GetService<InstagramEmbedFeature>();
-                _ = await instagramEmbedFeature.Run(context);
-            }
+            //if (config.Enable_Instagram_Embed)
+            //{
+            //    InstagramEmbedFeature instagramEmbedFeature = scope.ServiceProvider.GetService<InstagramEmbedFeature>();
+            //    _ = await instagramEmbedFeature.Run(context);
+            //}
         }
     }
     #endregion
