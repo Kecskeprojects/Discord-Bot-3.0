@@ -76,7 +76,7 @@ public static class Startup
         _ = collection.AddTransient<BonkGifProcessor>();
         _ = collection.AddTransient<BiasGameImageProcessor>();
         _ = collection.AddTransient<BiasGameWinnerBracketImageProcessor>();
-        _ = collection.AddTransient<BiasScrapingProcessor>();
+        //_ = collection.AddTransient<BiasScrapingProcessor>();
         _ = collection.AddTransient<LastFmWhoKnowsEmbedProcessor>();
 
         //Features
@@ -106,7 +106,7 @@ public static class Startup
         _ = collection.AddTransient<ILastFmAPI, LastFmAPI>();
         _ = collection.AddTransient<IMusicBrainzAPI, MusicBrainzAPI>();
         _ = collection.AddTransient<ITwitterScraper, TwitterScraper>();
-        _ = collection.AddTransient<IKpopDbScraper, KpopDbScraper>();
+        //_ = collection.AddTransient<IKpopDbScraper, KpopDbScraper>();
 
         //Database Services
         _ = collection.AddTransient<IServerService, ServerService>();

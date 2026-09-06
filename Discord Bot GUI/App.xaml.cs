@@ -141,10 +141,10 @@ public partial class App : Application
                     logger.Log("Youtube keys reset!");
 
                     //Only on a monday
-                    if (DateTime.UtcNow.DayOfWeek == DayOfWeek.Monday)
-                    {
-                        _ = StartBiasScraping();
-                    }
+                    //if (DateTime.UtcNow.DayOfWeek == DayOfWeek.Monday)
+                    //{
+                    //    _ = StartBiasScraping();
+                    //}
                 }
 
                 ReminderFeature reminderFeature = scope.ServiceProvider.GetService<ReminderFeature>();
@@ -162,14 +162,14 @@ public partial class App : Application
         }
     }
 
-    private async Task StartBiasScraping()
-    {
-        using (IServiceScope scope = services.CreateScope())
-        {
-            BiasScrapingProcessor biasScrapingProcessor = scope.ServiceProvider.GetService<BiasScrapingProcessor>();
-            await biasScrapingProcessor.RunUpdateBiasDataAsync();
-        }
-    }
+    //private async Task StartBiasScraping()
+    //{
+    //    using (IServiceScope scope = services.CreateScope())
+    //    {
+    //        BiasScrapingProcessor biasScrapingProcessor = scope.ServiceProvider.GetService<BiasScrapingProcessor>();
+    //        await biasScrapingProcessor.RunUpdateBiasDataAsync();
+    //    }
+    //}
 
     private async void StartTwitchMonitor()
     {
