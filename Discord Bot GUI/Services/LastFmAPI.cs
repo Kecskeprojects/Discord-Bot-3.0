@@ -13,6 +13,7 @@ using LastFmApi.Models.Recent;
 using LastFmApi.Models.TopAlbum;
 using LastFmApi.Models.TopArtist;
 using LastFmApi.Models.TopTrack;
+using LastFmApi.Models.TrackInfo;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -52,6 +53,13 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
 
         result.TotalPlays = playsResponse.Response;
 
+        //if there are no results found, they have not listened to anything recently
+        if (albums.Count == 0)
+        {
+            result.Message = "You haven't listened to anything recently!";
+            return result;
+        }
+
         SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(albums[0].Artist.Mbid, albums[0].Artist.Name, albums[0].Name);
         result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (albums[0].Image?[^1].Text);
 
@@ -86,6 +94,13 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
 
         result.TotalPlays = playsResponse.Response;
 
+        //if there are no results found, they have not listened to anything recently
+        if (artists.Count == 0)
+        {
+            result.Message = "You haven't listened to anything recently!";
+            return result;
+        }
+
         SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(artists[0].Mbid, artists[0].Name);
         result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (artists[0].Image?[^1].Text);
 
@@ -119,6 +134,13 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
         }
 
         result.TotalPlays = playsResponse.Response;
+
+        //if there are no results found, they have not listened to anything recently
+        if (tracks.Count == 0)
+        {
+            result.Message = "You haven't listened to anything recently!";
+            return result;
+        }
 
         SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(tracks[0].Artist.Mbid, tracks[0].Artist.Name, tracks[0].Name);
         result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (tracks[0].Image?[^1].Text);
@@ -195,6 +217,13 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
         }
 
         result.TotalPlays = playsResponse.Response;
+
+        //if there are no results found, they have not listened to anything recently
+        if (tracks.Count == 0)
+        {
+            result.Message = "You haven't listened to anything recently!";
+            return result;
+        }
 
         SpotifyImageSearchResult spotifySearch = await spotifyAPI.SearchItemAsync(tracks[0].Artist.Mbid, tracks[0].Artist.Text, tracks[0].Name);
         result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (tracks[0].Image?[^1].Text);

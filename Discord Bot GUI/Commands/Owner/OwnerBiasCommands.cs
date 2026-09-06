@@ -17,12 +17,12 @@ namespace Discord_Bot.Commands.Owner;
 public class OwnerBiasCommands(
     IIdolService idolService,
     IServerService serverService,
-    BiasScrapingProcessor biasScrapingProcessor,
+    //BiasScrapingProcessor biasScrapingProcessor,
     BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IIdolService idolService = idolService;
-    private readonly BiasScrapingProcessor biasScrapingProcessor = biasScrapingProcessor;
+    //private readonly BiasScrapingProcessor biasScrapingProcessor = biasScrapingProcessor;
 
     [Command("biaslist add")]
     [RequireOwner]
