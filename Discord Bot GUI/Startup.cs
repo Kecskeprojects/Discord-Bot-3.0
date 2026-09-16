@@ -76,7 +76,7 @@ public static class Startup
         _ = collection.AddTransient<BonkGifProcessor>();
         _ = collection.AddTransient<BiasGameImageProcessor>();
         _ = collection.AddTransient<BiasGameWinnerBracketImageProcessor>();
-        //_ = collection.AddTransient<BiasScrapingProcessor>();
+        _ = collection.AddTransient<BiasScrapingProcessor>();
         _ = collection.AddTransient<LastFmWhoKnowsEmbedProcessor>();
 
         //Features
