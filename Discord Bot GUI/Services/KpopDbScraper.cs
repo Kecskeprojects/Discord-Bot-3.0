@@ -1,207 +1,207 @@
-﻿//using AngleSharp;
-//using AngleSharp.Dom;
-//using Discord_Bot.Communication.Bias;
-//using Discord_Bot.Core;
-//using Discord_Bot.Interfaces.Services;
-//using Discord_Bot.Tools;
-//using PuppeteerSharp;
-//using PuppeteerSharp.Input;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Threading.Tasks;
+﻿using AngleSharp;
+using AngleSharp.Dom;
+using Discord_Bot.Communication.Bias;
+using Discord_Bot.Core;
+using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Tools;
+using PuppeteerSharp;
+using PuppeteerSharp.Input;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-//namespace Discord_Bot.Services;
+namespace Discord_Bot.Services;
 
-//public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IKpopDbScraper
-//{
-//    private readonly BotLogger logger = logger;
-//    private readonly BrowserService browserService = browserService;
+public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IKpopDbScraper
+{
+    private readonly BotLogger logger = logger;
+    private readonly BrowserService browserService = browserService;
 
-//    public async Task<List<ExtendedBiasData>> ExtractFromDatabaseTableAsync()
-//    {
-//        List<ExtendedBiasData> biasDataList = [];
-//        try
-//        {
-//            using (IBrowsingContext context = BrowsingContext.New(Configuration.Default))
-//            using (IPage mainPage = await browserService.NewPage())
-//            using (IDocument document = await GetPageAndSetSettingsAsync(context, mainPage))
-//            {
-//                IElement table = document.QuerySelector("#table_1>tbody");
+    public async Task<List<ExtendedBiasData>> ExtractFromDatabaseTableAsync()
+    {
+        List<ExtendedBiasData> biasDataList = [];
+        try
+        {
+            using (IBrowsingContext context = BrowsingContext.New(Configuration.Default))
+            using (IPage mainPage = await browserService.NewPage())
+            using (IDocument document = await GetPageAndSetSettingsAsync(context, mainPage))
+            {
+                IElement table = document.QuerySelector("#table_1>tbody");
 
-//                IHtmlCollection<IElement> rows = table.GetElementsByTagName("tr");
+                IHtmlCollection<IElement> rows = table.GetElementsByTagName("tr");
 
-//                foreach (IElement row in rows)
-//                {
-//                    biasDataList.Add(new ExtendedBiasData(row));
-//                }
+                foreach (IElement row in rows)
+                {
+                    biasDataList.Add(new ExtendedBiasData(row));
+                }
 
-//                await mainPage.CloseAsync();
-//            }
-//        }
-//        catch (NavigationException ex)
-//        {
-//            logger.Warning("KpopDbScraper.cs ExtractFromDatabaseTableAsync", ex);
-//        }
-//        catch (Exception ex)
-//        {
-//            logger.Error("KpopDbScraper.cs ExtractFromDatabaseTableAsync", ex);
-//        }
+                await mainPage.CloseAsync();
+            }
+        }
+        catch (NavigationException ex)
+        {
+            logger.Warning("KpopDbScraper.cs ExtractFromDatabaseTableAsync", ex);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("KpopDbScraper.cs ExtractFromDatabaseTableAsync", ex);
+        }
 
-//        return biasDataList;
-//    }
+        return biasDataList;
+    }
 
-//    private static async Task<IDocument> GetPageAndSetSettingsAsync(IBrowsingContext context, IPage page)
-//    {
-//        await page.DeleteCookieAsync();
-//        try
-//        {
-//            _ = await page.GoToAsync(Constant.DbKpopScrapeBaseUri.OriginalString, 600000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded]);
-//        }
-//        catch (Exception) { }
+    private static async Task<IDocument> GetPageAndSetSettingsAsync(IBrowsingContext context, IPage page)
+    {
+        await page.DeleteCookieAsync();
+        try
+        {
+            _ = await page.GoToAsync(Constant.DbKpopScrapeBaseUri.OriginalString, 600000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded]);
+        }
+        catch (Exception) { }
 
-//        await RemovePopUps(page);
+        await RemovePopUps(page);
 
-//        //Input "Profile" into profile search
-//        await page.TypeAsync(".column-profile>span>input", "Profile");
+        //Input "Profile" into profile search
+        await page.TypeAsync(".column-profile>span>input", "Profile");
 
-//        //Show all entries
-//        await page.ClickAsync("#table_1_length .dropdown-toggle");
-//        _ = await page.WaitForSelectorAsync("#table_1_length .dropdown-menu", new WaitForSelectorOptions() { Visible = true, Timeout = 0 });
+        //Show all entries
+        await page.ClickAsync("#table_1_length .dropdown-toggle");
+        _ = await page.WaitForSelectorAsync("#table_1_length .dropdown-menu", new WaitForSelectorOptions() { Visible = true, Timeout = 0 });
 
-//        await page.ClickAsync("#table_1_length .dropdown-menu>ul>li[data-original-index=\"6\"]>a");
-//        _ = await page.WaitForSelectorAsync("#table_1_length .dropdown-menu", new WaitForSelectorOptions() { Hidden = true, Timeout = 0 });
+        await page.ClickAsync("#table_1_length .dropdown-menu>ul>li[data-original-index=\"6\"]>a");
+        _ = await page.WaitForSelectorAsync("#table_1_length .dropdown-menu", new WaitForSelectorOptions() { Hidden = true, Timeout = 0 });
 
-//        string content = await page.GetContentAsync();
+        string content = await page.GetContentAsync();
 
-//        IDocument document = await context.OpenAsync(req => req.Content(content));
-//        return document;
-//    }
+        IDocument document = await context.OpenAsync(req => req.Content(content));
+        return document;
+    }
 
-//    public async Task<AdditionalIdolData> GetProfileDataAsync(string url, bool getGroupData)
-//    {
-//        AdditionalIdolData idolData = null;
-//        try
-//        {
-//            using (IBrowsingContext context = BrowsingContext.New(Configuration.Default))
-//            using (IPage mainPage = await browserService.NewPage())
-//            using (IDocument document = await GetPageByUrl(context, mainPage, new Uri(url), url.StartsWith(Constant.KProfilesBaseUrl)))
-//            {
-//                //A profile link could lead to dbkpop or kprofiles
-//                idolData = new();
-//                if (!url.StartsWith(Constant.KProfilesBaseUrl))
-//                {
-//                    idolData.ImageUrl = document.QuerySelector(".attachment-post-thumbnail")?.GetAttribute("src");
-//                    await ScrapeGroupData(context, mainPage, document, idolData, getGroupData);
-//                }
-//                else
-//                {
-//                    idolData.ImageUrl = document.QuerySelector(".entry-content img")?.GetAttribute("src");
-//                }
+    public async Task<AdditionalIdolData> GetProfileDataAsync(string url, bool getGroupData)
+    {
+        AdditionalIdolData idolData = null;
+        try
+        {
+            using (IBrowsingContext context = BrowsingContext.New(Configuration.Default))
+            using (IPage mainPage = await browserService.NewPage())
+            using (IDocument document = await GetPageByUrl(context, mainPage, new Uri(url), url.StartsWith(Constant.KProfilesBaseUrl)))
+            {
+                //A profile link could lead to dbkpop or kprofiles
+                idolData = new();
+                if (!url.StartsWith(Constant.KProfilesBaseUrl))
+                {
+                    idolData.ImageUrl = document.QuerySelector(".attachment-post-thumbnail")?.GetAttribute("src");
+                    await ScrapeGroupData(context, mainPage, document, idolData, getGroupData);
+                }
+                else
+                {
+                    idolData.ImageUrl = document.QuerySelector(".entry-content img")?.GetAttribute("src");
+                }
 
-//                await mainPage.CloseAsync();
-//            }
-//        }
-//        catch (NavigationException ex)
-//        {
-//            logger.Warning("BiasDatabaseService.cs GetAdditionalBiasDataAsync", ex);
-//        }
-//        catch (Exception ex)
-//        {
-//            logger.Error("BiasDatabaseService.cs GetAdditionalBiasDataAsync", ex);
-//        }
-//        return idolData;
-//    }
-//    private static async Task ScrapeGroupData(IBrowsingContext context, IPage page, IDocument document, AdditionalIdolData data, bool getGroupData)
-//    {
-//        IHtmlCollection<IElement> groups = document.QuerySelectorAll($"li>a[href*=\"{Constant.DbKpopBaseUrl.UrlCombine("group")}\"]");
-//        string groupUrl = "";
-//        if (groups != null && groups.Length > 0)
-//        {
-//            //The first one should be the most likely accurate group the idol was a member of
-//            groupUrl = groups.First().GetAttribute("href");
-//        }
+                await mainPage.CloseAsync();
+            }
+        }
+        catch (NavigationException ex)
+        {
+            logger.Warning("BiasDatabaseService.cs GetAdditionalBiasDataAsync", ex);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("BiasDatabaseService.cs GetAdditionalBiasDataAsync", ex);
+        }
+        return idolData;
+    }
+    private static async Task ScrapeGroupData(IBrowsingContext context, IPage page, IDocument document, AdditionalIdolData data, bool getGroupData)
+    {
+        IHtmlCollection<IElement> groups = document.QuerySelectorAll($"li>a[href*=\"{Constant.DbKpopBaseUrl.UrlCombine("group")}\"]");
+        string groupUrl = "";
+        if (groups != null && groups.Length > 0)
+        {
+            //The first one should be the most likely accurate group the idol was a member of
+            groupUrl = groups[0].GetAttribute("href");
+        }
 
-//        if (getGroupData && !string.IsNullOrEmpty(groupUrl))
-//        {
-//            document = await GetPageByUrl(context, page, new Uri(groupUrl), false);
-//            IHtmlCollection<IElement> details = document.QuerySelectorAll(".wpb-content-wrapper .vc_sw-align-left");
-//            if (details.Length >= 3)
-//            {
-//                data.GroupFullName = Uri.UnescapeDataString(details[0].InnerHtml);
-//                data.GroupFullKoreanName = Uri.UnescapeDataString(details[1].InnerHtml);
-//                data.DebutDate = DateOnly.TryParse(Uri.UnescapeDataString(details[2].InnerHtml), out DateOnly date) ? date : null;
-//            }
-//        }
-//    }
+        if (getGroupData && !string.IsNullOrEmpty(groupUrl))
+        {
+            document = await GetPageByUrl(context, page, new Uri(groupUrl), false);
+            IHtmlCollection<IElement> details = document.QuerySelectorAll(".wpb-content-wrapper .vc_sw-align-left");
+            if (details.Length >= 3)
+            {
+                data.GroupFullName = Uri.UnescapeDataString(details[0].InnerHtml);
+                data.GroupFullKoreanName = Uri.UnescapeDataString(details[1].InnerHtml);
+                data.DebutDate = DateOnly.TryParse(Uri.UnescapeDataString(details[2].InnerHtml), out DateOnly date) ? date : null;
+            }
+        }
+    }
 
-//    #region Helper Methods
-//    private static async Task<IDocument> GetPageByUrl(IBrowsingContext context, IPage page, Uri uri, bool isKprofiles)
-//    {
-//        await page.DeleteCookieAsync();
-//        try
-//        {
-//            _ = await page.GoToAsync(uri.OriginalString, 60000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded]);
-//        }
-//        catch (Exception) { }
+    #region Helper Methods
+    private static async Task<IDocument> GetPageByUrl(IBrowsingContext context, IPage page, Uri uri, bool isKprofiles)
+    {
+        await page.DeleteCookieAsync();
+        try
+        {
+            _ = await page.GoToAsync(uri.OriginalString, 60000, [WaitUntilNavigation.Load, WaitUntilNavigation.DOMContentLoaded]);
+        }
+        catch (Exception) { }
 
-//        await RemovePopUps(page, isKprofiles);
+        await RemovePopUps(page, isKprofiles);
 
-//        string content = await page.GetContentAsync();
+        string content = await page.GetContentAsync();
 
-//        IDocument document = await context.OpenAsync(req => req.Content(content));
-//        return document;
-//    }
+        IDocument document = await context.OpenAsync(req => req.Content(content));
+        return document;
+    }
 
-//    private static async Task RemovePopUps(IPage page, bool isKprofiles = false)
-//    {
-//        if (isKprofiles)
-//        {
-//            try
-//            {
-//                await page.ClickAsync(".last-focusable-el");
-//            }
-//            catch (Exception) { }
-//        }
-//        else
-//        {
-//            try
-//            {
-//                await page.ClickAsync("#ez-accept-all");
-//            }
-//            catch (Exception) { }
+    private static async Task RemovePopUps(IPage page, bool isKprofiles = false)
+    {
+        if (isKprofiles)
+        {
+            try
+            {
+                await page.ClickAsync(".last-focusable-el");
+            }
+            catch (Exception) { }
+        }
+        else
+        {
+            try
+            {
+                await page.ClickAsync("#ez-accept-all");
+            }
+            catch (Exception) { }
 
-//            try
-//            {
-//                _ = await page.WaitForSelectorAsync("ins.ezfound");
-//                await page.ClickAsync("ins.ezfound", new ClickOptions() { Button = MouseButton.Right, OffSet = new Offset(10, 10) });
-//            }
-//            catch (Exception) { }
+            try
+            {
+                _ = await page.WaitForSelectorAsync("ins.ezfound");
+                await page.ClickAsync("ins.ezfound", new ClickOptions() { Button = MouseButton.Right, OffSet = new Offset(10, 10) });
+            }
+            catch (Exception) { }
 
-//            try
-//            {
-//                await page.ClickAsync("#onesignal-slidedown-cancel-button");
-//            }
-//            catch (Exception) { }
+            try
+            {
+                await page.ClickAsync("#onesignal-slidedown-cancel-button");
+            }
+            catch (Exception) { }
 
-//            try
-//            {
-//                await page.ClickAsync(".ezmob-footer-close");
-//            }
-//            catch (Exception) { }
+            try
+            {
+                await page.ClickAsync(".ezmob-footer-close");
+            }
+            catch (Exception) { }
 
-//            try
-//            {
-//                await page.ClickAsync(".fc-cta-consent");
-//            }
-//            catch (Exception) { }
+            try
+            {
+                await page.ClickAsync(".fc-cta-consent");
+            }
+            catch (Exception) { }
 
-//            try
-//            {
-//                await page.ClickAsync("#cn-accept-cookie");
-//            }
-//            catch (Exception) { }
-//        }
-//    }
-//    #endregion
-//}
+            try
+            {
+                await page.ClickAsync("#cn-accept-cookie");
+            }
+            catch (Exception) { }
+        }
+    }
+    #endregion
+}

@@ -106,7 +106,7 @@ public static class Startup
         _ = collection.AddTransient<ILastFmAPI, LastFmAPI>();
         _ = collection.AddTransient<IMusicBrainzAPI, MusicBrainzAPI>();
         _ = collection.AddTransient<ITwitterScraper, TwitterScraper>();
-        //_ = collection.AddTransient<IKpopDbScraper, KpopDbScraper>();
+        _ = collection.AddTransient<IKpopDbScraper, KpopDbScraper>();
 
         //Database Services
         _ = collection.AddTransient<IServerService, ServerService>();
