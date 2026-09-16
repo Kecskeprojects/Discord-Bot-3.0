@@ -17,7 +17,7 @@ namespace Discord_Bot.Commands.Owner;
 public class OwnerBiasCommands(
     IIdolService idolService,
     IServerService serverService,
-    //BiasScrapingProcessor biasScrapingProcessor,
+    BiasScrapingProcessor biasScrapingProcessor,
     BotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
@@ -120,19 +120,19 @@ public class OwnerBiasCommands(
         }
     }
 
-    //[Command("manual update bias")]
-    //[Alias(["manual update idol", "mass update bias", "mass update idol"])]
-    //[RequireOwner]
-    //[Summary("Start update process of extended information for idols")]
-    //public async Task ManualUpdateBias()
-    //{
-    //    try
-    //    {
-    //        await biasScrapingProcessor.RunUpdateBiasDataAsync();
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        logger.Error("OwnerBiasCommands.cs ManualUpdateBias", ex);
-    //    }
-    //}
+    [Command("manual update bias")]
+    [Alias(["manual update idol", "mass update bias", "mass update idol"])]
+    [RequireOwner]
+    [Summary("Start update process of extended information for idols")]
+    public async Task ManualUpdateBias()
+    {
+        try
+        {
+            await biasScrapingProcessor.RunUpdateBiasDataAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.Error("OwnerBiasCommands.cs ManualUpdateBias", ex);
+        }
+    }
 }

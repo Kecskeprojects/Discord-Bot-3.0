@@ -124,9 +124,6 @@ public partial class App : Application
                     BotWindow.ClearWindowLog();
                 }
 
-                //WeeklyPollFeature weeklyPollFeature = scope.ServiceProvider.GetService<WeeklyPollFeature>();
-                //await weeklyPollFeature.Run();
-
                 //Do at GMT+0 6 am every day
                 if (DateTime.UtcNow.Hour == 6 && DateTime.UtcNow.Minute == 0)
                 {
@@ -141,10 +138,10 @@ public partial class App : Application
                     logger.Log("Youtube keys reset!");
 
                     //Only on a monday
-                    //if (DateTime.UtcNow.DayOfWeek == DayOfWeek.Monday)
-                    //{
-                    //    _ = StartBiasScraping();
-                    //}
+                    if (DateTime.UtcNow.DayOfWeek == DayOfWeek.Monday)
+                    {
+                        _ = StartBiasScraping();
+                    }
                 }
 
                 ReminderFeature reminderFeature = scope.ServiceProvider.GetService<ReminderFeature>();
@@ -162,14 +159,14 @@ public partial class App : Application
         }
     }
 
-    //private async Task StartBiasScraping()
-    //{
-    //    using (IServiceScope scope = services.CreateScope())
-    //    {
-    //        BiasScrapingProcessor biasScrapingProcessor = scope.ServiceProvider.GetService<BiasScrapingProcessor>();
-    //        await biasScrapingProcessor.RunUpdateBiasDataAsync();
-    //    }
-    //}
+    private async Task StartBiasScraping()
+    {
+        using (IServiceScope scope = services.CreateScope())
+        {
+            BiasScrapingProcessor biasScrapingProcessor = scope.ServiceProvider.GetService<BiasScrapingProcessor>();
+            await biasScrapingProcessor.RunUpdateBiasDataAsync();
+        }
+    }
 
     private async void StartTwitchMonitor()
     {
