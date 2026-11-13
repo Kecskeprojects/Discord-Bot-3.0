@@ -1,4 +1,5 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
@@ -108,7 +109,7 @@ public class UserRandomizeCommands(
     [Command("r6 randomizer")]
     [Alias(["r6 rand", "r6 r", "rainbow randomizer", "rainbow rand", "rainbow r"])]
     [Summary("Randomized operators (defender and attacker) for all users in the user's voice chat")]
-    public async Task RainbowRandomizer([Name("attacker (a) or defender (d)")] string optionString)
+    public async Task RainbowRandomizer([Name("attacker (a) or defender (d)")] string optionString, [Remainder][Name("channel name")] IChannel channel = null)
     {
         try
         {
@@ -135,24 +136,30 @@ public class UserRandomizeCommands(
             List<SocketVoiceChannel>? voiceChannels = Context.Guild?.Channels?.Where(x => x is SocketVoiceChannel).Select(x => (SocketVoiceChannel) x).ToList();
             SocketVoiceChannel? currentVoiceChannel = voiceChannels?.FirstOrDefault(x => x.ConnectedUsers.Any(y => y.Id == Context.User.Id));
 
+            List<string> responseParts = [];
             if (DiscordTools.IsDM(Context) || currentVoiceChannel == null)
             {
                 Random r_personal = new();
 
                 string chosen_personal = operatorList[r_personal.Next(0, operatorList.Length)];
 
-                _ = await ReplyAsync($"{Context.User.GlobalName ?? Context.User.Username}: {chosen_personal}");
+                responseParts.Add($"{Context.User.GlobalName ?? Context.User.Username}: {chosen_personal}");
+            }
+            else
+            {
+                Random r = new();
+                foreach (SocketGuildUser user in currentVoiceChannel.ConnectedUsers)
+                {
+                    string chosen = operatorList[r.Next(0, operatorList.Length)];
+                    responseParts.Add($"{user.GlobalName ?? user.Username}: {chosen}");
+                }
+            }
+
+            if(channel is not null and SocketTextChannel textChannel)
+            {
+                _ = await textChannel.SendMessageAsync(string.Join("\n", responseParts));
                 return;
             }
-
-            Random r = new();
-            List<string> responseParts = [];
-            foreach (SocketGuildUser user in currentVoiceChannel.ConnectedUsers)
-            {
-                string chosen = operatorList[r.Next(0, operatorList.Length)];
-                responseParts.Add($"{user.GlobalName ?? user.Username}: {chosen}");
-            }
-
             _ = await ReplyAsync(string.Join("\n", responseParts));
         }
         catch (Exception ex)
