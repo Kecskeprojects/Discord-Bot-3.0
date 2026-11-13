@@ -106,6 +106,7 @@ public class UserRandomizeCommands(
     }
 
     [Command("r6 randomizer")]
+    [Alias(["r6 rand", "r6 r", "rainbow randomizer", "rainbow rand", "rainbow r"])]
     [Summary("Randomized operators (defender and attacker) for all users in the user's voice chat")]
     public async Task RainbowRandomizer([Name("attacker (a) or defender (d)")] string optionString)
     {
