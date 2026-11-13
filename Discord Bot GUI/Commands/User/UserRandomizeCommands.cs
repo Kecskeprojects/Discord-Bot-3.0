@@ -1,9 +1,14 @@
 ﻿using Discord.Commands;
+using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
+using Discord_Bot.Tools;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
@@ -65,14 +70,9 @@ public class UserRandomizeCommands(
                 choices = paramArray;
             }
 
-            if (chance < 50)
-            {
-                _ = await ReplyAsync("The coin landed on: " + choices[0].Trim());
-            }
-            else
-            {
-                _ = chance > 51 ? await ReplyAsync("The coin landed on: " + choices[1].Trim()) : await ReplyAsync("The coin landed on it's edge");
-            }
+            _ = chance < 50
+                ? await ReplyAsync("The coin landed on: " + choices[0].Trim())
+                : chance > 51 ? await ReplyAsync("The coin landed on: " + choices[1].Trim()) : await ReplyAsync("The coin landed on it's edge");
         }
         catch (Exception ex)
         {
@@ -102,6 +102,61 @@ public class UserRandomizeCommands(
         catch (Exception ex)
         {
             logger.Error("UserRandomizeCommands.cs Decide", ex);
+        }
+    }
+
+    [Command("r6 randomizer")]
+    [Summary("Randomized operators (defender and attacker) for all users in the user's voice chat")]
+    public async Task RainbowRandomizer([Name("attacker (a) or defender (d)")] string optionString)
+    {
+        try
+        {
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
+            {
+                return;
+            }
+
+            string[] operatorList;
+            if (optionString is "a" or "attacker")
+            {
+                operatorList = File.ReadAllLines("R6_Attackers.txt");
+            }
+            else if (optionString is "d" or "defender")
+            {
+                operatorList = File.ReadAllLines("R6_Defenders.txt");
+            }
+            else
+            {
+                _ = await ReplyAsync("Please specify either `attacker` or `defender`");
+                return;
+            }
+
+            List<SocketVoiceChannel> voiceChannels = Context.Guild.Channels.Where(x => x is SocketVoiceChannel).Select(x => (SocketVoiceChannel) x).ToList();
+            SocketVoiceChannel? currentVoiceChannel = voiceChannels.FirstOrDefault(x => x.ConnectedUsers.Any(y => y.Id == Context.User.Id));
+
+            if (DiscordTools.IsDM(Context) || currentVoiceChannel == null)
+            {
+                Random r_personal = new();
+
+                string chosen_personal = operatorList[r_personal.Next(0, operatorList.Length)];
+
+                _ = await ReplyAsync($"{Context.User.Username}: {chosen_personal}");
+                return;
+            }
+
+            Random r = new();
+            List<string> responseParts = [];
+            foreach (SocketGuildUser user in currentVoiceChannel.Users)
+            {
+                string chosen = operatorList[r.Next(0, operatorList.Length)];
+                responseParts.Add($"{user.Username}: {chosen}");
+            }
+
+            _ = await ReplyAsync(string.Join("\n", responseParts));
+        }
+        catch (Exception ex)
+        {
+            logger.Error("UserRandomizeCommands.cs RainbowRandomizer", ex);
         }
     }
 }
