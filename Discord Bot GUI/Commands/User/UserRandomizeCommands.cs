@@ -132,8 +132,8 @@ public class UserRandomizeCommands(
                 return;
             }
 
-            List<SocketVoiceChannel> voiceChannels = Context.Guild.Channels.Where(x => x is SocketVoiceChannel).Select(x => (SocketVoiceChannel) x).ToList();
-            SocketVoiceChannel? currentVoiceChannel = voiceChannels.FirstOrDefault(x => x.ConnectedUsers.Any(y => y.Id == Context.User.Id));
+            List<SocketVoiceChannel>? voiceChannels = Context.Guild?.Channels?.Where(x => x is SocketVoiceChannel).Select(x => (SocketVoiceChannel) x).ToList();
+            SocketVoiceChannel? currentVoiceChannel = voiceChannels?.FirstOrDefault(x => x.ConnectedUsers.Any(y => y.Id == Context.User.Id));
 
             if (DiscordTools.IsDM(Context) || currentVoiceChannel == null)
             {
@@ -141,16 +141,16 @@ public class UserRandomizeCommands(
 
                 string chosen_personal = operatorList[r_personal.Next(0, operatorList.Length)];
 
-                _ = await ReplyAsync($"{Context.User.Username}: {chosen_personal}");
+                _ = await ReplyAsync($"{Context.User.GlobalName ?? Context.User.Username}: {chosen_personal}");
                 return;
             }
 
             Random r = new();
             List<string> responseParts = [];
-            foreach (SocketGuildUser user in currentVoiceChannel.Users)
+            foreach (SocketGuildUser user in currentVoiceChannel.ConnectedUsers)
             {
                 string chosen = operatorList[r.Next(0, operatorList.Length)];
-                responseParts.Add($"{user.Username}: {chosen}");
+                responseParts.Add($"{user.GlobalName ?? user.Username}: {chosen}");
             }
 
             _ = await ReplyAsync(string.Join("\n", responseParts));
