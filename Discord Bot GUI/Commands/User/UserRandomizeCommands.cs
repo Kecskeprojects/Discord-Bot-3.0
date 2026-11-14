@@ -118,14 +118,14 @@ public class UserRandomizeCommands(
                 return;
             }
 
-            string[] operatorList;
+            List<string> operatorList;
             if (optionString is "a" or "attacker")
             {
-                operatorList = File.ReadAllLines("R6_Attackers.txt");
+                operatorList = File.ReadAllLines("R6_Attackers.txt").ToList();
             }
             else if (optionString is "d" or "defender")
             {
-                operatorList = File.ReadAllLines("R6_Defenders.txt");
+                operatorList = File.ReadAllLines("R6_Defenders.txt").ToList();
             }
             else
             {
@@ -133,15 +133,15 @@ public class UserRandomizeCommands(
                 return;
             }
 
-            List<SocketVoiceChannel>? voiceChannels = Context.Guild?.Channels?.Where(x => x is SocketVoiceChannel).Select(x => (SocketVoiceChannel) x).ToList();
-            SocketVoiceChannel? currentVoiceChannel = voiceChannels?.FirstOrDefault(x => x.ConnectedUsers.Any(y => y.Id == Context.User.Id));
+            List<SocketVoiceChannel> voiceChannels = Context.Guild?.Channels?.Where(x => x is SocketVoiceChannel).Select(x => (SocketVoiceChannel) x).ToList();
+            SocketVoiceChannel currentVoiceChannel = voiceChannels?.FirstOrDefault(x => x.ConnectedUsers.Any(y => y.Id == Context.User.Id));
 
             List<string> responseParts = [];
             if (DiscordTools.IsDM(Context) || currentVoiceChannel == null)
             {
                 Random r_personal = new();
 
-                string chosen_personal = operatorList[r_personal.Next(0, operatorList.Length)];
+                string chosen_personal = operatorList[r_personal.Next(0, operatorList.Count)];
 
                 responseParts.Add($"{Context.User.GlobalName ?? Context.User.Username}: {chosen_personal}");
             }
@@ -150,8 +150,11 @@ public class UserRandomizeCommands(
                 Random r = new();
                 foreach (SocketGuildUser user in currentVoiceChannel.ConnectedUsers)
                 {
-                    string chosen = operatorList[r.Next(0, operatorList.Length)];
+                    int index = r.Next(0, operatorList.Count);
+                    string chosen = operatorList[index];
                     responseParts.Add($"{user.GlobalName ?? user.Username}: {chosen}");
+
+                    operatorList .RemoveAt(index);
                 }
             }
 
