@@ -118,47 +118,18 @@ public class UserRandomizeCommands(
                 return;
             }
 
-            List<string> operatorList;
-            if (optionString is "a" or "attacker")
-            {
-                operatorList = File.ReadAllLines("R6_Attackers.txt").ToList();
-            }
-            else if (optionString is "d" or "defender")
-            {
-                operatorList = File.ReadAllLines("R6_Defenders.txt").ToList();
-            }
-            else
+            if (optionString is not "a" and not "attacker" and not "d" and not "defender")
             {
                 _ = await ReplyAsync("Please specify either `attacker` or `defender`");
                 return;
             }
 
-            List<SocketVoiceChannel> voiceChannels = Context.Guild?.Channels?.Where(x => x is SocketVoiceChannel).Select(x => (SocketVoiceChannel) x).ToList();
-            SocketVoiceChannel currentVoiceChannel = voiceChannels?.FirstOrDefault(x => x.ConnectedUsers.Any(y => y.Id == Context.User.Id));
+            List<string> operatorList = RainbowRandomizerTools.GetOperatorList(optionString);
+            List<SocketUser> userList = RainbowRandomizerTools.GetUserList(Context);
 
-            List<string> responseParts = [];
-            if (DiscordTools.IsDM(Context) || currentVoiceChannel == null)
-            {
-                Random r_personal = new();
+            List<string> responseParts = RainbowRandomizerTools.GetResponseForRound(operatorList, userList);
 
-                string chosen_personal = operatorList[r_personal.Next(0, operatorList.Count)];
-
-                responseParts.Add($"{Context.User.GlobalName ?? Context.User.Username}: {chosen_personal}");
-            }
-            else
-            {
-                Random r = new();
-                foreach (SocketGuildUser user in currentVoiceChannel.ConnectedUsers)
-                {
-                    int index = r.Next(0, operatorList.Count);
-                    string chosen = operatorList[index];
-                    responseParts.Add($"{user.GlobalName ?? user.Username}: {chosen}");
-
-                    operatorList .RemoveAt(index);
-                }
-            }
-
-            if(channel is not null and SocketTextChannel textChannel)
+            if (channel is not null and SocketTextChannel textChannel)
             {
                 _ = await textChannel.SendMessageAsync(string.Join("\n", responseParts));
                 return;
@@ -168,6 +139,91 @@ public class UserRandomizeCommands(
         catch (Exception ex)
         {
             logger.Error("UserRandomizeCommands.cs RainbowRandomizer", ex);
+        }
+    }
+
+    [Command("r6 full randomizer")]
+    [Alias(["r6 full rand", "r6 f r", "rainbow full randomizer", "rainbow full rand", "rainbow f r"])]
+    [Summary("Randomized operators (defender and attacker) for all users in the user's voice chat")]
+    public async Task RainbowFullRandomizer([Name("attacker (a) or defender (d)")] string optionString, [Remainder][Name("channel name")] IChannel channel = null)
+    {
+        try
+        {
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
+            {
+                return;
+            }
+
+            if (optionString is not "a" and not "attacker" and not "d" and not "defender")
+            {
+                _ = await ReplyAsync("Please specify either `attacker` or `defender`");
+                return;
+            }
+
+            List<string> operatorList = RainbowRandomizerTools.GetOperatorList(optionString);
+            List<string> otherOperatorList = RainbowRandomizerTools.GetOperatorList(optionString == "a" || optionString == "attacker" ? "defender" : "attacker");
+            List<SocketUser> userList = RainbowRandomizerTools.GetUserList(Context);
+
+            List<string> finalResponseParts = [];
+            for (int i = 0; i < 6; i++)
+            {
+                finalResponseParts.Add($"\nRound {i + 1}:");
+                List<string> responseParts = RainbowRandomizerTools.GetResponseForRound(i / 3 < 1 ? operatorList : otherOperatorList, userList);
+                finalResponseParts.AddRange(responseParts);
+            }
+
+            if (channel is not null and SocketTextChannel textChannel)
+            {
+                _ = await textChannel.SendMessageAsync(string.Join("\n", finalResponseParts));
+                return;
+            }
+            _ = await ReplyAsync(string.Join("\n", finalResponseParts));
+        }
+        catch (Exception ex)
+        {
+            logger.Error("UserRandomizeCommands.cs RainbowFullRandomizer", ex);
+        }
+    }
+
+    [Command("r6 overtime randomizer")]
+    [Alias(["r6 over rand", "r6 o r", "rainbow overtime randomizer", "rainbow over rand", "rainbow o r"])]
+    [Summary("Randomized operators (defender and attacker) for all users in the user's voice chat")]
+    public async Task RainbowOvertimeRandomizer([Name("attacker (a) or defender (d)")] string optionString, [Remainder][Name("channel name")] IChannel channel = null)
+    {
+        try
+        {
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
+            {
+                return;
+            }
+
+            if (optionString is not "a" and not "attacker" and not "d" and not "defender")
+            {
+                _ = await ReplyAsync("Please specify either `attacker` or `defender`");
+                return;
+            }
+            List<string> operatorList = RainbowRandomizerTools.GetOperatorList(optionString);
+            List<string> otherOperatorList = RainbowRandomizerTools.GetOperatorList(optionString == "a" || optionString == "attacker" ? "defender" : "attacker");
+            List<SocketUser> userList = RainbowRandomizerTools.GetUserList(Context);
+
+            List<string> finalResponseParts = [];
+            for (int i = 0; i < 3; i++)
+            {
+                finalResponseParts.Add($"\nRound {i + 1}:");
+                List<string> responseParts = RainbowRandomizerTools.GetResponseForRound(i % 2 == 1 ? operatorList : otherOperatorList, userList);
+                finalResponseParts.AddRange(responseParts);
+            }
+
+            if (channel is not null and SocketTextChannel textChannel)
+            {
+                _ = await textChannel.SendMessageAsync(string.Join("\n", finalResponseParts));
+                return;
+            }
+            _ = await ReplyAsync(string.Join("\n", finalResponseParts));
+        }
+        catch (Exception ex)
+        {
+            logger.Error("UserRandomizeCommands.cs RainbowOvertimeRandomizer", ex);
         }
     }
 }
