@@ -214,7 +214,6 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
     }
 
     //Searching by playlist ID
-    //Todo: Be able to choose where to start the 25 songs from a given song/index
     private async Task<SearchResultEnum> PlaylistSearch(YouTubeService youtubeService, string query, string username, ulong serverId)
     {
         string currentKey = config.Youtube_API_Keys[youtubeApiKeyIndex];
@@ -249,7 +248,6 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
         return SearchResultEnum.YoutubePlaylistFound;
     }
 
-    //Todo: Investigate the possibility of a similarity search, some kind of point based system, first came up with Withcha by Apink
     private IList<SearchResult> FilteredResults(IList<SearchResult> items, string query)
     {
         //Filter youtube channels
@@ -276,7 +274,6 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
         {
             bool result = await youtubeAddPlaylistFeature.Run(channelId);
 
-            //Todo: Check if the given song is part of the first 25 songs that will be imported, and do not import it twice
             if (result)
             {
                 _ = await PlaylistSearch(youtubeService, queryPart["list"], username, serverId);
