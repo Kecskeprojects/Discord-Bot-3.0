@@ -1,12 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
-Keep this file under 300 lines. When you add to it, tighten or remove outdated parts so it stays under that limit.
-
-## Workflow
-
-The owner is the only contributor and rarely works on two things at once. Work directly in the main checkout on the current branch, and create a new branch or git worktree only when explicitly asked.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository. General workflow rules (no implicit branches or worktrees, the 300-line limit for this file) are in the owner's personal `~/.claude/CLAUDE.md`.
 
 ## Overview
 
@@ -111,4 +105,5 @@ Lookup data such as `ChannelType` rows is seeded from `MainDB/Post-deployment/`.
 
 ## Gotchas
 
-- Image work uses **Magick.NET** (Q16, so channels are 0–65535) through `Tools/ImageTools.cs`, `Tools/MagickTools.cs`, `Tools/Extensions/MagickImageExtension.cs` and `Communication/TextFont.cs`. SixLabors ImageSharp was removed because its fixed versions need a paid license, so don't add it back. `DrawText` treats (x, y) as the top left of the text, and `TextFont` finds per-user installed fonts such as "Bot Font" through the registry.- The Chrome build used by PuppeteerSharp matters for scraping. Per a comment in `BrowserService`, video responses changed after Chrome 117.
+- Image work uses **Magick.NET** (Q16, so channels are 0–65535) through `Tools/ImageTools.cs`, `Tools/MagickTools.cs`, `Tools/Extensions/MagickImageExtension.cs` and `Communication/TextFont.cs`. SixLabors ImageSharp was removed because its fixed versions need a paid license, so don't add it back. `DrawText` treats (x, y) as the top left of the text, and `TextFont` finds per-user installed fonts such as "Bot Font" through the registry.
+- The Chrome build used by PuppeteerSharp matters for scraping. Per a comment in `BrowserService`, video responses changed after Chrome 117.
