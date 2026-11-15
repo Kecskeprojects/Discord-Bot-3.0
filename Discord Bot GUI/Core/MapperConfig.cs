@@ -1,88 +1,102 @@
-﻿using AutoMapper;
-using Discord;
+﻿using Discord;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
+using Mapster;
 using System;
 using System.Linq;
 
 namespace Discord_Bot.Core;
 
-public class MapperConfig : Profile
+/// <summary>
+/// Mapster mapping registrations (same library as KecskeProjectsSite).
+/// Unlike AutoMapper, Mapster does not null-guard member chains or convert string ids implicitly,
+/// so navigation-based and string → ulong mappings are written out explicitly.
+/// </summary>
+public class MapperConfig : IRegister
 {
-    public MapperConfig()
+    public void Register(TypeAdapterConfig config)
     {
+        // Same-type members (e.g. List<Idol> on IdolGroupResource) are copied by reference, like AutoMapper did,
+        // instead of being deep-cloned (which would recurse through EF navigation properties)
+        _ = config.Default.ShallowCopyForSameType(true);
+
         //Model to Resource
-        _ = CreateMap<Server, ServerResource>()
-            .ForMember(dest => dest.DiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.DiscordId)))
-            .ForMember(dest => dest.RoleMessageDiscordId, opt => opt.MapFrom(scv => scv.RoleMessageDiscordId))
-            .ForMember(dest => dest.NotificationRoleDiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.NotificationRole.DiscordId)))
-            .ForMember(dest => dest.NotificationRoleName, opt => opt.MapFrom(scv => scv.NotificationRole.RoleName))
-            .ForMember(dest => dest.MuteRoleDiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.MuteRole.DiscordId)))
-            .ForMember(dest => dest.MuteRoleName, opt => opt.MapFrom(scv => scv.MuteRole.RoleName));
-        _ = CreateMap<TwitchChannel, TwitchChannelResource>();
-        _ = CreateMap<Greeting, GreetingResource>();
-        _ = CreateMap<TwitchChannel, TwitchChannelResource>()
-            .ForMember(dest => dest.ServerDiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.Server.DiscordId)))
-            .ForMember(dest => dest.NotificationRoleDiscordId, opt => opt.MapFrom(scv => ulong.Parse(scv.Server.NotificationRole.DiscordId)))
-            .ForMember(dest => dest.NotificationRoleName, opt => opt.MapFrom(scv => scv.Server.NotificationRole.RoleName));
-        _ = CreateMap<CustomCommand, CustomCommandResource>();
-        _ = CreateMap<Role, RoleResource>()
-            .ForMember(dest => dest.DiscordId, opt => opt.MapFrom(r => ulong.Parse(r.DiscordId)));
-        _ = CreateMap<Reminder, ReminderResource>()
-            .ForMember(dest => dest.UserDiscordId, opt => opt.MapFrom(r => ulong.Parse(r.User.DiscordId)));
-        _ = CreateMap<Birthday, BirthdayResource>()
-            .ForMember(dest => dest.UserDiscordId, opt => opt.MapFrom(r => ulong.Parse(r.User.DiscordId)))
-            .ForMember(dest => dest.ServerDiscordId, opt => opt.MapFrom(r => ulong.Parse(r.Server.DiscordId)));
-        _ = CreateMap<Idol, IdolResource>()
-            .ForMember(dest => dest.IdolId, opt => opt.MapFrom(i => i.IdolId))
-            .ForMember(dest => dest.Name, opt => opt.MapFrom(i => i.Name))
-            .ForMember(dest => dest.CurrentImageUrl, opt => opt.MapFrom(i => i.IdolImages.Count > 0 ? i.IdolImages.OrderByDescending(img => img.CreatedOn).FirstOrDefault().ImageUrl : null));
-        _ = CreateMap<IdolGroup, IdolGroupResource>()
-            .ForMember(dest => dest.GroupId, opt => opt.MapFrom(ig => ig.GroupId))
-            .ForMember(dest => dest.Name, opt => opt.MapFrom(ig => ig.Name));
-        _ = CreateMap<IdolAlias, IdolAliasResource>()
-            .ForMember(dest => dest.IdolAliasId, opt => opt.MapFrom(ia => ia.IdolAliasId))
-            .ForMember(dest => dest.Alias, opt => opt.MapFrom(ia => ia.Alias));
-        _ = CreateMap<User, UserResource>()
-            .ForMember(dest => dest.UserId, opt => opt.MapFrom(u => u.UserId))
-            .ForMember(dest => dest.DiscordId, opt => opt.MapFrom(u => ulong.Parse(u.DiscordId)))
-            .ForMember(dest => dest.LastFmUsername, opt => opt.MapFrom(u => u.LastFmusername));
-        _ = CreateMap<Idol, IdolExtendedResource>();
-        _ = CreateMap<IdolGroup, IdolGroupExtendedResource>();
-        _ = CreateMap<Idol, IdolGameResource>()
-            .ForMember(dest => dest.GroupFullName, opt => opt.MapFrom(i => i.Group.FullName ?? "Soloist"))
-            .ForMember(dest => dest.LatestImageUrl, opt => opt.MapFrom(i => i.IdolImages.OrderByDescending(x => x.CreatedOn).First().ImageUrl));
-        _ = CreateMap<User, UserBiasGameStatResource>()
-            .ForMember(dest => dest.Stats, opt => opt.Ignore());
-        _ = CreateMap<ServerMutedUser, ServerMutedUserResource>();
-        _ = CreateMap<WeeklyPoll, WeeklyPollResource>()
-            .ForMember(dest => dest.Options, opt => opt.MapFrom(x => PollTools.GetAnswerOptions(x)));
-        _ = CreateMap<WeeklyPollOptionPreset, WeeklyPollOptionPresetResource>()
-            .ForMember(dest => dest.Options, opt => opt.MapFrom(x => x.WeeklyPollOptions));
-        _ = CreateMap<WeeklyPollOption, WeeklyPollOptionResource>();
-        _ = CreateMap<WeeklyPoll, WeeklyPollEditResource>()
-            .ForMember(dest => dest.Options, opt => opt.MapFrom(x => x.WeeklyPollOptions));
+        _ = config.NewConfig<Server, ServerResource>()
+            .Map(dest => dest.DiscordId, src => ulong.Parse(src.DiscordId))
+            .Map(dest => dest.RoleMessageDiscordId, src => string.IsNullOrEmpty(src.RoleMessageDiscordId) ? null : (ulong?) ulong.Parse(src.RoleMessageDiscordId))
+            .Map(dest => dest.NotificationRoleDiscordId, src => src.NotificationRole != null ? (ulong?) ulong.Parse(src.NotificationRole.DiscordId) : null)
+            .Map(dest => dest.NotificationRoleName, src => src.NotificationRole != null ? src.NotificationRole.RoleName : null)
+            .Map(dest => dest.MuteRoleDiscordId, src => src.MuteRole != null ? (ulong?) ulong.Parse(src.MuteRole.DiscordId) : null)
+            .Map(dest => dest.MuteRoleName, src => src.MuteRole != null ? src.MuteRole.RoleName : null);
+        _ = config.NewConfig<Greeting, GreetingResource>();
+        _ = config.NewConfig<TwitchChannel, TwitchChannelResource>()
+            .Map(dest => dest.ServerDiscordId, src => src.Server != null ? ulong.Parse(src.Server.DiscordId) : 0)
+            .Map(dest => dest.NotificationRoleDiscordId, src => src.Server != null && src.Server.NotificationRole != null ? (ulong?) ulong.Parse(src.Server.NotificationRole.DiscordId) : null)
+            .Map(dest => dest.NotificationRoleName, src => src.Server != null && src.Server.NotificationRole != null ? src.Server.NotificationRole.RoleName : null);
+        _ = config.NewConfig<CustomCommand, CustomCommandResource>();
+        _ = config.NewConfig<Role, RoleResource>()
+            .Map(dest => dest.DiscordId, src => ulong.Parse(src.DiscordId));
+        _ = config.NewConfig<Reminder, ReminderResource>()
+            .Map(dest => dest.UserDiscordId, src => src.User != null ? ulong.Parse(src.User.DiscordId) : 0);
+        _ = config.NewConfig<Birthday, BirthdayResource>()
+            .Map(dest => dest.UserDiscordId, src => src.User != null ? ulong.Parse(src.User.DiscordId) : 0)
+            .Map(dest => dest.ServerDiscordId, src => src.Server != null ? ulong.Parse(src.Server.DiscordId) : 0);
+        _ = config.NewConfig<Idol, IdolResource>()
+            .Map(dest => dest.GroupName, src => src.Group != null ? src.Group.Name : null)
+            .Map(dest => dest.GroupDebutDate, src => src.Group != null ? src.Group.DebutDate : null)
+            .Map(dest => dest.CurrentImageUrl, src => src.IdolImages.OrderByDescending(img => img.CreatedOn).Select(img => img.ImageUrl).FirstOrDefault());
+        _ = config.NewConfig<IdolGroup, IdolGroupResource>();
+        _ = config.NewConfig<IdolAlias, IdolAliasResource>();
+        _ = config.NewConfig<User, UserResource>()
+            .Map(dest => dest.DiscordId, src => ulong.Parse(src.DiscordId))
+            .Map(dest => dest.LastFmUsername, src => src.LastFmusername);
+        _ = config.NewConfig<Idol, IdolExtendedResource>()
+            .Map(dest => dest.GroupName, src => src.Group != null ? src.Group.Name : null);
+        _ = config.NewConfig<IdolGroup, IdolGroupExtendedResource>();
+        _ = config.NewConfig<Idol, IdolGameResource>()
+            .Map(dest => dest.GroupFullName, src => src.Group != null && src.Group.FullName != null ? src.Group.FullName : "Soloist")
+            .Map(dest => dest.GroupFullKoreanName, src => src.Group != null ? src.Group.FullKoreanName : null)
+            .Map(dest => dest.LatestImageUrl, src => src.IdolImages.OrderByDescending(img => img.CreatedOn).Select(img => img.ImageUrl).FirstOrDefault());
+        _ = config.NewConfig<User, UserBiasGameStatResource>()
+            .Map(dest => dest.DiscordId, src => ulong.Parse(src.DiscordId))
+            .Ignore(dest => dest.Stats);
+        _ = config.NewConfig<ServerMutedUser, ServerMutedUserResource>()
+            .Map(dest => dest.ServerDiscordId, src => src.Server != null ? src.Server.DiscordId : null)
+            .Map(dest => dest.UserDiscordId, src => src.User != null ? src.User.DiscordId : null);
+        _ = config.NewConfig<WeeklyPoll, WeeklyPollResource>()
+            .Map(dest => dest.ServerDiscordId, src => src.Server != null ? ulong.Parse(src.Server.DiscordId) : 0)
+            .Map(dest => dest.ChannelDiscordId, src => src.Channel != null ? (ulong?) ulong.Parse(src.Channel.DiscordId) : null)
+            .Map(dest => dest.RoleDiscordId, src => src.Role != null ? (ulong?) ulong.Parse(src.Role.DiscordId) : null)
+            .Map(dest => dest.Options, src => PollTools.GetAnswerOptions(src));
+        _ = config.NewConfig<WeeklyPollOptionPreset, WeeklyPollOptionPresetResource>()
+            .Map(dest => dest.Options, src => src.WeeklyPollOptions);
+        _ = config.NewConfig<WeeklyPollOption, WeeklyPollOptionResource>()
+            .Map(dest => dest.WeeklyPollId, src => src.WeeklyPollId ?? 0);
+        _ = config.NewConfig<WeeklyPoll, WeeklyPollEditResource>()
+            .Map(dest => dest.Options, src => src.WeeklyPollOptions);
 
         //Communication to Model
-        _ = CreateMap<ExtendedBiasData, Idol>()
-            .ForMember(dest => dest.Gender, opt => opt.MapFrom(e => e.Gender))
-            .ForMember(dest => dest.ModifiedOn, opt => opt.MapFrom(x => DateTime.UtcNow));
-        _ = CreateMap<ExtendedBiasData, IdolGroup>()
-            .ForMember(dest => dest.Name, opt => opt.Ignore());
-        _ = CreateMap<AdditionalIdolData, IdolGroup>()
-            .ForMember(dest => dest.FullName, opt => opt.MapFrom(e => e.GroupFullName))
-            .ForMember(dest => dest.FullKoreanName, opt => opt.MapFrom(e => e.GroupFullKoreanName))
-            .ForMember(dest => dest.DebutDate, opt => opt.MapFrom(e => e.DebutDate))
-            .ForMember(dest => dest.ModifiedOn, opt => opt.MapFrom(x => DateTime.UtcNow));
+        _ = config.NewConfig<ExtendedBiasData, Idol>()
+            .Map(dest => dest.Gender, src => src.Gender.HasValue ? src.Gender.Value.ToString() : null)
+            .Map(dest => dest.ModifiedOn, src => DateTime.UtcNow);
+        _ = config.NewConfig<ExtendedBiasData, IdolGroup>()
+            .Ignore(dest => dest.Name);
+        _ = config.NewConfig<AdditionalIdolData, IdolGroup>()
+            .Map(dest => dest.FullName, src => src.GroupFullName)
+            .Map(dest => dest.FullKoreanName, src => src.GroupFullKoreanName)
+            .Map(dest => dest.ModifiedOn, src => DateTime.UtcNow);
 
         //Other
-        _ = CreateMap<WeeklyPollResource, PollProperties>()
-            .ForMember(dest => dest.Answers, opt => opt.MapFrom(x => x.Options.Select(PollTools.CreateTitle)))
-            .ForMember(dest => dest.AllowMultiselect, opt => opt.MapFrom(x => x.IsMultipleAnswer))
-            .ForMember(dest => dest.Duration, opt => opt.MapFrom(x => PollTools.GetDuration(x.CloseInTimeSpanTicks)))
-            .ForMember(dest => dest.LayoutType, opt => opt.MapFrom(x => PollLayout.Default))
-            .ForMember(dest => dest.Question, opt => opt.MapFrom(x => PollTools.CreateTitle(x.Title)));
+        _ = config.NewConfig<WeeklyPollResource, PollProperties>()
+            .MapWith(src => new PollProperties
+            {
+                Question = PollTools.CreateTitle(src.Title),
+                Answers = src.Options.Select(option => PollTools.CreateTitle(option)).ToList(),
+                AllowMultiselect = src.IsMultipleAnswer,
+                Duration = PollTools.GetDuration(src.CloseInTimeSpanTicks),
+                LayoutType = PollLayout.Default
+            });
     }
 }

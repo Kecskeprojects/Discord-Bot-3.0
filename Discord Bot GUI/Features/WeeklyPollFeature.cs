@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using MapsterMapper;
 using Discord;
 using Discord.Rest;
 using Discord.WebSocket;

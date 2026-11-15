@@ -17,6 +17,8 @@ using Discord_Bot.Processors.EmbedProcessors.LastFm;
 using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Services;
 using Discord_Bot.Windows;
+using Mapster;
+using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -64,7 +66,11 @@ public static class Startup
         Config config = new();
         _ = collection.AddDbContext<MainDbContext>(options => options.UseSqlServer(config.SqlConnectionString));
 
-        _ = collection.AddAutoMapper(x => x.AddProfile<MapperConfig>());
+        TypeAdapterConfig mapsterConfig = new();
+        new MapperConfig().Register(mapsterConfig);
+        mapsterConfig.Compile(); //Fail fast on startup if a mapping is invalid
+        _ = collection.AddSingleton(mapsterConfig);
+        _ = collection.AddSingleton<IMapper, Mapper>();
 
         _ = collection.AddSingleton<BotMain>();
         _ = collection.AddSingleton<InteractionHandler>();

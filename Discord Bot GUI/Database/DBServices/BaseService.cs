@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using MapsterMapper;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 
