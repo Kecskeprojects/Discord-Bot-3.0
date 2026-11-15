@@ -81,7 +81,7 @@ Each command or interaction runs in its own DI scope (`services.CreateScope()`) 
 **Layers (inside `Discord Bot GUI/`):**
 - `Commands/` and `Interactions/` → Discord entry points; they call DB services, features, and processors.
 - `Features/`: reusable units of behavior derived from `BaseFeature`; call them with `Run(...)` and implement `ExecuteCoreLogicAsync()`, which returns `bool`. Registered transient.
-- `Processors/`: build output (Discord embeds, ImageSharp/Magick.NET images and GIFs, message text). `EmbedProcessors` are mostly static.
+- `Processors/`: build output (Discord embeds, Magick.NET images and GIFs, message text). `EmbedProcessors` are mostly static.
 - `Services/`: wrappers for external APIs, scrapers and CLI tools behind `Interfaces/Services/`.
 - `Database/DBServices/` (transient; `BaseService` gives `IMapper`, `BotLogger`, `ServerCache`) → `Database/DBRepositories/` (scoped; `GenericRepository<T>` plus entity-specific queries) → `MainDbContext`. DB services catch exceptions, log them, and return `DbProcessResultEnum` or `null` instead of throwing.
 - `Database/Models/` are EF entities, and `Resources/` are the DTOs that services return. **Commands should work with `*Resource` types, not EF models.**
@@ -109,5 +109,4 @@ Lookup data such as `ChannelType` rows is seeded from `MainDB/Post-deployment/`.
 
 ## Gotchas
 
-- `SixLabors.ImageSharp` must stay below 4.0.0 and `ImageSharp.Drawing` below 3.0.0, because newer versions require a paid license. The comments in the csproj say so. Don't fix ImageSharp vulnerability warnings by upgrading past these limits.
-- The Chrome build used by PuppeteerSharp matters for scraping. Per a comment in `BrowserService`, video responses changed after Chrome 117.
+- Image work uses **Magick.NET** (Q16, so channels are 0–65535) through `Tools/ImageTools.cs`, `Tools/MagickTools.cs`, `Tools/Extensions/MagickImageExtension.cs` and `Communication/TextFont.cs`. SixLabors ImageSharp was removed because its fixed versions need a paid license, so don't add it back. `DrawText` treats (x, y) as the top left of the text, and `TextFont` finds per-user installed fonts such as "Bot Font" through the registry.- The Chrome build used by PuppeteerSharp matters for scraping. Per a comment in `BrowserService`, video responses changed after Chrome 117.

@@ -33,10 +33,6 @@
 		<PackageReference Include="Magick.NET-Q16-AnyCPU" Version="15.1.0" />
 		<PackageReference Include="PuppeteerSharp" Version="25.17.1" />
 		<PackageReference Include="RestSharp" Version="114.1.0" />
-		<!--Becomes paid beyond 4.0.0-->
-		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
-		<!--Becomes paid beyond 3.0.0-->
-		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.7" />
 		<PackageReference Include="SpotifyAPI.Web" Version="7.4.2" />
 		<PackageReference Include="TwitchLib.Api" Version="3.11.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="11.0.0">
