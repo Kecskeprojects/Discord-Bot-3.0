@@ -1,13 +1,10 @@
-﻿using Discord_Bot.Communication.Bias;
+﻿using Discord_Bot.Communication;
+using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.Extensions;
-using SixLabors.Fonts;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+using ImageMagick;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -58,63 +55,61 @@ public class BiasGameWinnerBracketImageProcessor(BotLogger logger)
     private static MemoryStream EditImage(BiasGameData biasGameData, List<MemoryStream> files, IdolGameResource winner = null)
     {
         StaticRoundData roundData = Constant.BiasGameStaticRoundData[biasGameData.CurrentRound - 1];
-        using Image winnerBracket = Image.Load<Rgba32>(biasGameData.WinnerBracket.ToArray());
+        using MagickImage winnerBracket = new(biasGameData.WinnerBracket.ToArray());
 
-        using Image idolImage_1 = CreateImageForRanking(files[0], roundData);
+        using MagickImage idolImage_1 = CreateImageForRanking(files[0], roundData);
         int position_1 = biasGameData.CurrentPair * 2;
-        winnerBracket.Mutate(x => x.DrawImage(idolImage_1, backgroundLocation: new Point(roundData.CalculateX(position_1), roundData.CalculateY(position_1)), 1));
+        winnerBracket.Composite(idolImage_1, roundData.CalculateX(position_1), roundData.CalculateY(position_1), CompositeOperator.Over);
 
         if (files.Count != 1)
         {
-            using Image idolImage_2 = CreateImageForRanking(files[1], roundData);
+            using MagickImage idolImage_2 = CreateImageForRanking(files[1], roundData);
             int position_2 = (biasGameData.CurrentPair * 2) + 1;
-            winnerBracket.Mutate(x => x.DrawImage(idolImage_2, backgroundLocation: new Point(roundData.CalculateX(position_2), roundData.CalculateY(position_2)), 1));
+            winnerBracket.Composite(idolImage_2, roundData.CalculateX(position_2), roundData.CalculateY(position_2), CompositeOperator.Over);
         }
         else
         {
             int posCenterX = roundData.BaseLeftX + (roundData.BaseDiagonal / 2);
 
             int posY_1 = roundData.BaseY + roundData.BaseDiagonal + 10;
-            WriteText(winnerBracket, "WINNER", 40, posCenterX, posY_1, new Color(new Rgba32(30, 140, 255)));
+            WriteText(winnerBracket, "WINNER", 40, posCenterX, posY_1, MagickColor.FromRgb(30, 140, 255));
 
             int posY_2 = roundData.BaseY + roundData.BaseDiagonal + 10 + 40 + 10;
-            WriteText(winnerBracket, winner.StageName, 30, posCenterX, posY_2, Color.White);
+            WriteText(winnerBracket, winner.StageName, 30, posCenterX, posY_2, MagickColors.White);
 
             int posY_3 = roundData.BaseY + roundData.BaseDiagonal + 10 + 40 + 10 + 30 + 10;
-            WriteText(winnerBracket, winner.GroupFullName, 30, posCenterX, posY_3, Color.White);
+            WriteText(winnerBracket, winner.GroupFullName, 30, posCenterX, posY_3, MagickColors.White);
         }
 
         MemoryStream result = new();
-        winnerBracket.Save(result, new SixLabors.ImageSharp.Formats.Png.PngEncoder());
+        winnerBracket.Write(result, MagickFormat.Png);
 
         return result;
     }
 
-    private static Image<Rgba32> CreateImageForRanking(MemoryStream file, StaticRoundData roundData)
+    private static MagickImage CreateImageForRanking(MemoryStream file, StaticRoundData roundData)
     {
-        Image<Rgba32> idolImage = Image.Load<Rgba32>(file.ToArray());
+        MagickImage idolImage = new(file.ToArray());
 
         //The polaroids were resized, so 20 became 16 (the added numbers are the "paddings", the inner image became 247 instead of 309 in width
-        idolImage.Mutate(x => x.Crop(new Rectangle(new Point(16, 16), new Size(247, 247))));
-        idolImage.Mutate(x => x.Resize(roundData.BaseDiagonal, roundData.BaseDiagonal));
+        idolImage.CropTo(16, 16, 247, 247);
+        idolImage.ResizeExact((uint) roundData.BaseDiagonal, (uint) roundData.BaseDiagonal);
 
-        idolImage.Mutate(x => x.ApplyRoundedCorners(roundData.BaseDiagonal / 2));
+        idolImage.ApplyRoundedCorners(roundData.BaseDiagonal / 2);
 
         return idolImage;
     }
 
-    private static void WriteText(Image bracket, string text, int fontSize, int posCenterX, int posY, Color color)
+    private static void WriteText(MagickImage bracket, string text, int fontSize, int posCenterX, int posY, IMagickColor<ushort> color)
     {
-        Font font = SystemFonts.CreateFont("Comic Sans MS", fontSize, FontStyle.Bold);
+        TextFont font = new("Comic Sans MS", fontSize, Bold: true);
 
-        FontRectangle textsize = TextMeasurer.MeasureBounds(text, new TextOptions(font));
+        double textWidth = MagickTools.MeasureText(text, font).TextWidth;
 
-        string shortenedText = ImageTools.ShortenText(font, text, textsize, 400);
+        string shortenedText = ImageTools.ShortenText(font, text, textWidth, 400);
 
-        textsize = TextMeasurer.MeasureBounds(shortenedText, new TextOptions(font));
+        textWidth = MagickTools.MeasureText(shortenedText, font).TextWidth;
 
-        bracket.Mutate(x =>
-            x.DrawText(text, font, color, new Point(posCenterX - ((int) textsize.Width / 2), posY))
-        );
+        bracket.DrawText(shortenedText, font, color, posCenterX - ((int) textWidth / 2), posY);
     }
 }
