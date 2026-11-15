@@ -75,8 +75,10 @@ public class BiasGameImageProcessor(BotLogger logger)
 
         double textWidth = MagickTools.MeasureText(text, font).TextWidth;
 
-        string shortenedText = ImageTools.ShortenText(font, text, textWidth, 372);
+        //Text may run up to the polaroid's 20px right border
+        int maxWidth = (int) polaroidBase.Width - posX - 20;
+        string shortenedText = ImageTools.ShortenText(font, text, textWidth, maxWidth);
 
-        polaroidBase.DrawText(text, font, MagickColors.Black, posX, posY);
+        polaroidBase.DrawText(shortenedText, font, MagickColors.Black, posX, posY);
     }
 }

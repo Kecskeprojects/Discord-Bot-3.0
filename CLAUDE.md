@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+Keep this file under 300 lines. When you add to it, tighten or remove outdated parts so it stays under that limit.
+
+## Workflow
+
+The owner is the only contributor and rarely works on two things at once. Work directly in the main checkout on the current branch, and create a new branch or git worktree only when explicitly asked.
+
 ## Overview
 
 A self-hosted Discord bot that runs as a **Windows WPF desktop app** (the window shows the live log). It is single-instance, Windows-only (`net11.0-windows`, x64), and talks to SQL Server through EF Core. Most features are aimed at K-pop communities: bias lists and the bias game, Last.fm, music playback, Twitch notifications, birthdays, reminders, weekly polls, self-roles and custom commands.

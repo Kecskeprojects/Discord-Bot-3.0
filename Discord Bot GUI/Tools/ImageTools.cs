@@ -148,7 +148,7 @@ public static class ImageTools
                 double tempwidth = MagickTools.MeasureText(string.Format("{0, 12}", text[..ch]), font).TextWidth;
 
                 //When it is short enough, we shorten the original text to this version and move on
-                if (tempwidth < 210)
+                if (tempwidth < maxWidth)
                 {
                     text = text[..ch];
                     break;
