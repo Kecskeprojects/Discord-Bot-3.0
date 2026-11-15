@@ -1,4 +1,7 @@
-﻿using ImageMagick;
+﻿using Discord_Bot.Communication;
+using ImageMagick;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Net.Http;
 
@@ -28,5 +31,23 @@ public static class MagickTools
                 }
             }
         }
+    }
+
+    //The embedded images are System.Drawing bitmaps, they go through a PNG stream to become MagickImages
+    public static MagickImage LoadResource(Bitmap resource)
+    {
+        using MemoryStream stream = new();
+        resource.Save(stream, ImageFormat.Png);
+        stream.Position = 0;
+
+        return new MagickImage(stream);
+    }
+
+    public static ITypeMetric MeasureText(string text, TextFont font)
+    {
+        using MagickImage canvas = new(MagickColors.Transparent, 1, 1);
+        font.ApplyTo(canvas.Settings);
+
+        return canvas.FontTypeMetrics(text);
     }
 }

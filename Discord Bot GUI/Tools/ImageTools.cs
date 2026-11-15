@@ -1,4 +1,7 @@
-﻿using SixLabors.Fonts;
+﻿using Discord_Bot.Communication;
+using Discord_Bot.Tools.Extensions;
+using ImageMagick;
+using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -25,6 +28,30 @@ public static class ImageTools
                 int Y = (int) (difference * cutoffTopRatio);
                 int plusHeight = (int) ((mainImage.Height - difference) * extraHeight);
                 mainImage.Mutate(x => x.Crop(new Rectangle(0, Y, mainImage.Width, mainImage.Height - difference + plusHeight)));
+            }
+        }
+    }
+
+    public static void CorrectImageRatio(IMagickImage<ushort> mainImage, double acceptableMargin = 0.2, double cutoffTopRatio = 0.5, double cutoffLeftRatio = 0.5, double extraHeight = 0.0, double extraWidth = 0.0)
+    {
+        int width = (int) mainImage.Width;
+        int height = (int) mainImage.Height;
+
+        //If the Cover image is too wide or high, we crop it depending on which of the two it is
+        if (height / (double) width > (1 + acceptableMargin) || height / (double) width < (1 - acceptableMargin))
+        {
+            int difference = Math.Abs(height - width);
+            if (width > height)
+            {
+                int X = (int) (difference * cutoffLeftRatio);
+                int plusWidth = (int) ((width - difference) * extraWidth);
+                mainImage.CropTo(X, 0, (uint) (width - difference + plusWidth), (uint) height);
+            }
+            else
+            {
+                int Y = (int) (difference * cutoffTopRatio);
+                int plusHeight = (int) ((height - difference) * extraHeight);
+                mainImage.CropTo(0, Y, (uint) width, (uint) (height - difference + plusHeight));
             }
         }
     }
@@ -96,6 +123,29 @@ public static class ImageTools
             {
                 //We check the currently shortened string's length
                 float tempwidth = TextMeasurer.MeasureBounds(string.Format("{0, 12}", text[..ch]), new TextOptions(font)).Width;
+
+                //When it is short enough, we shorten the original text to this version and move on
+                if (tempwidth < 210)
+                {
+                    text = text[..ch];
+                    break;
+                }
+            }
+        }
+
+        return text;
+    }
+
+    public static string ShortenText(TextFont font, string text, double textWidth, int maxWidth)
+    {
+        //If it is longer than 210 it will collide with the plays
+        if (textWidth > maxWidth)
+        {
+            //We check character by character when it is shorter than that limit
+            for (int ch = text.Length; ch > 0; ch--)
+            {
+                //We check the currently shortened string's length
+                double tempwidth = MagickTools.MeasureText(string.Format("{0, 12}", text[..ch]), font).TextWidth;
 
                 //When it is short enough, we shorten the original text to this version and move on
                 if (tempwidth < 210)

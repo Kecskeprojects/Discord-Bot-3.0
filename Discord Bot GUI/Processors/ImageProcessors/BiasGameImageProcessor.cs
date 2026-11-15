@@ -1,12 +1,10 @@
-﻿using Discord_Bot.Core;
+﻿using Discord_Bot.Communication;
+using Discord_Bot.Core;
 using Discord_Bot.Properties;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
-using SixLabors.Fonts;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+using Discord_Bot.Tools.Extensions;
+using ImageMagick;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -18,33 +16,33 @@ public class BiasGameImageProcessor(BotLogger logger)
 
     public static Stream CombineImages(MemoryStream left, MemoryStream right)
     {
-        using Image leftImage = Image.Load<Rgba32>(left.ToArray());
-        using Image rightImage = Image.Load<Rgba32>(right.ToArray());
+        using MagickImage leftImage = new(left.ToArray());
+        using MagickImage rightImage = new(right.ToArray());
 
-        leftImage.Mutate(x => x.Resize(new ResizeOptions()
-        {
-            Mode = ResizeMode.BoxPad,
-            Position = AnchorPositionMode.Left,
-            Size = new Size(280 + 50 + 280, 338) //2 image width plus 50px separator
-        }));
-        leftImage.Mutate(x => x.DrawImage(rightImage, backgroundLocation: new Point(330, 0), 1));
+        //Widen the canvas to 2 image width plus 50px separator, keeping the left image on the left
+        leftImage.Extent(280 + 50 + 280, 338, Gravity.West, MagickColors.Transparent);
+        leftImage.Composite(rightImage, 330, 0, CompositeOperator.Over);
 
         MemoryStream result = new();
-        leftImage.Save(result, new SixLabors.ImageSharp.Formats.Png.PngEncoder());
+        leftImage.Write(result, MagickFormat.Png);
 
         return result;
     }
 
     public async Task<Stream> CreatePolaroid(IdolGameResource idol)
     {
-        using MemoryStream polaroidStream = new();
-        Resource.polaroid_base.Save(polaroidStream, System.Drawing.Imaging.ImageFormat.Png);
-        using Image polaroidBase = Image.Load<Rgba32>(polaroidStream.ToArray());
-
         logger.Query($"Getting latest idol image:\n{idol.LatestImageUrl}");
         using MemoryStream stream = await WebTools.GetStream(idol.LatestImageUrl);
-        using Image idolImage = Image.Load<Rgba32>(stream);
-        logger.Log("Format: " + idolImage.Metadata.DecodedImageFormat.Name);
+
+        return CreatePolaroid(idol, stream);
+    }
+
+    public Stream CreatePolaroid(IdolGameResource idol, Stream idolImageStream)
+    {
+        using MagickImage polaroidBase = MagickTools.LoadResource(Resource.polaroid_base);
+
+        using MagickImage idolImage = new(idolImageStream);
+        logger.Log("Format: " + idolImage.Format);
 
         if (!idol.LatestImageUrl.StartsWith(Constant.DbKpopBaseUrl))
         {
@@ -55,32 +53,30 @@ public class BiasGameImageProcessor(BotLogger logger)
             ImageTools.CorrectImageRatio(idolImage, acceptableMargin: 0);
         }
 
-        idolImage.Mutate(x => x.Resize(new Size(309, 322))); //The Size is the empty part of the polaroid_base
+        idolImage.ResizeExact(309, 322); //The Size is the empty part of the polaroid_base
 
-        polaroidBase.Mutate(x => x.DrawImage(idolImage, backgroundLocation: new Point(20, 20), 1)); //The polaroid borders are 20px wide
+        polaroidBase.Composite(idolImage, 20, 20, CompositeOperator.Over); //The polaroid borders are 20px wide
 
         WriteText(polaroidBase, idol.StageName, fontSize: 30, posX: 25, posY: 357);
 
         WriteText(polaroidBase, idol.GroupFullName, fontSize: 20, posX: 25, posY: 392);
 
-        polaroidBase.Mutate(x => x.Resize(280, 338));
+        polaroidBase.ResizeExact(280, 338);
 
         MemoryStream result = new();
-        polaroidBase.Save(result, new SixLabors.ImageSharp.Formats.Png.PngEncoder());
+        polaroidBase.Write(result, MagickFormat.Png);
 
         return result;
     }
 
-    private static void WriteText(Image polaroidBase, string text, int fontSize, int posX, int posY)
+    private static void WriteText(MagickImage polaroidBase, string text, int fontSize, int posX, int posY)
     {
-        Font font = SystemFonts.CreateFont("Comic Sans MS", fontSize, FontStyle.BoldItalic);
+        TextFont font = new("Comic Sans MS", fontSize, Bold: true, Italic: true);
 
-        FontRectangle textsize = TextMeasurer.MeasureBounds(text, new TextOptions(font));
+        double textWidth = MagickTools.MeasureText(text, font).TextWidth;
 
-        string shortenedText = ImageTools.ShortenText(font, text, textsize, 372);
+        string shortenedText = ImageTools.ShortenText(font, text, textWidth, 372);
 
-        polaroidBase.Mutate(x =>
-            x.DrawText(text, font, Color.Black, new Point(posX, posY))
-        );
+        polaroidBase.DrawText(text, font, MagickColors.Black, posX, posY);
     }
 }
