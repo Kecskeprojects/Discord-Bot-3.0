@@ -37,8 +37,10 @@ public class BiasGameInteraction(
                 return;
             }
 
+            //A click must always be acknowledged within 3 seconds, otherwise Discord shows "This interaction failed"
             if (data.IsProcessing)
             {
+                await DeferAsync();
                 return;
             }
 
@@ -56,9 +58,9 @@ public class BiasGameInteraction(
         }
         catch (Exception ex)
         {
-            logger.Error("BiasGameInteraction.cs GenderChoosen", ex);
+            logger.Error("BiasGameInteraction.cs GenderChosen", ex);
             _ = Global.BiasGames.TryRemove(Context.User.Id, out _);
-            _ = await FollowupAsync("Failure during setup!");
+            await RespondOrFollowupAsync("Failure during setup!");
         }
     }
 
@@ -73,8 +75,10 @@ public class BiasGameInteraction(
                 return;
             }
 
+            //A click must always be acknowledged within 3 seconds, otherwise Discord shows "This interaction failed"
             if (data.IsProcessing)
             {
+                await DeferAsync();
                 return;
             }
 
@@ -91,7 +95,10 @@ public class BiasGameInteraction(
 
             await component.UpdateAsync(x => x.Components = waitButton.Build());
 
-            await CreatePolaroids(data);
+            if (!await CreatePolaroids(data))
+            {
+                return;
+            }
 
             int[] idolIds = data.Pairs[data.CurrentPair];
 
@@ -120,19 +127,12 @@ public class BiasGameInteraction(
         {
             logger.Error("BiasGameInteraction.cs DebutChosen", ex);
             _ = Global.BiasGames.TryRemove(Context.User.Id, out _);
-
-            if (Context.Interaction.HasResponded)
-            {
-                _ = await FollowupAsync("Failure during setup!");
-            }
-            else
-            {
-                await RespondAsync("Failure during setup!");
-            }
+            await RespondOrFollowupAsync("Failure during setup!");
         }
     }
 
-    private async Task CreatePolaroids(BiasGameData data)
+    //Returns false if the game cannot start, in that case the user is already notified
+    private async Task<bool> CreatePolaroids(BiasGameData data)
     {
         List<IdolGameResource> idols = await idolService.GetListForGameAsync(data.Gender, data.DebutYearStart, data.DebutYearEnd);
 
@@ -142,7 +142,7 @@ public class BiasGameInteraction(
 
             _ = await FollowupAsync("Not enough idols with your selected parameters!");
             _ = Global.BiasGames.TryRemove(Context.User.Id, out _);
-            return;
+            return false;
         }
 
         foreach (IdolGameResource idol in idols)
@@ -155,5 +155,6 @@ public class BiasGameInteraction(
         }
 
         data.CreatePairs();
+        return true;
     }
 }

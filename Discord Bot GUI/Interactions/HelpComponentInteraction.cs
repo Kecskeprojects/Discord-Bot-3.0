@@ -49,7 +49,7 @@ public class HelpComponentInteraction(
         catch (Exception ex)
         {
             logger.Error("HelpComponentInteraction.cs HelpMenuHandler", ex);
-            await RespondAsync("Something went wrong while creating help detail embed.");
+            await RespondOrFollowupAsync("Something went wrong while creating help detail embed.");
         }
     }
 }

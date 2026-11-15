@@ -51,4 +51,10 @@ public class BaseInteraction(IServerService serverService, BotLogger logger, Con
     {
         return await serverService.GetByDiscordIdAsync(Context.Guild.Id);
     }
+
+    //Usable whether or not the interaction was already acknowledged (e.g. in a catch block after DeferAsync)
+    protected Task RespondOrFollowupAsync(string text, bool ephemeral = false)
+    {
+        return DiscordTools.RespondOrFollowupAsync(Context.Interaction, text, ephemeral);
+    }
 }

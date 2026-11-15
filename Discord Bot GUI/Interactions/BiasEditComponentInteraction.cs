@@ -63,7 +63,7 @@ public class BiasEditComponentInteraction : BaseInteraction
             logger.Error("BiasEditComponentInteraction.cs EditIdolMenuHandler", ex);
         }
 
-        await RespondAsync("Something went wrong during the process.");
+        await RespondOrFollowupAsync("Something went wrong during the process.");
     }
 
     private async Task SendEditIdolModalAsync(string idol, string group)

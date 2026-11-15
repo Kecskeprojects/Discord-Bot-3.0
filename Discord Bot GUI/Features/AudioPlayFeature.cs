@@ -69,14 +69,16 @@ public class AudioPlayFeature(
         }
         catch (Exception ex)
         {
-            SocketGuildUser clientUser = await Context.Channel.GetUserAsync(Context.Client.CurrentUser.Id) as SocketGuildUser;
+            //Logged first, so the original error is not lost if disconnecting fails too
+            logger.Error("AudioPlayFeature.cs ExecuteCoreLogicAsync", ex);
+
+            SocketGuildUser clientUser = Context.Guild.CurrentUser;
             if (clientUser.VoiceChannel != null)
             {
                 logger.Audio("Disconnected due to Error.");
                 await clientUser.VoiceChannel.DisconnectAsync();
             }
 
-            logger.Error("AudioPlayFeature.cs ExecuteCoreLogicAsync", ex);
             return false;
         }
         finally
@@ -91,7 +93,7 @@ public class AudioPlayFeature(
 
     public async Task<VoiceConnectionResultEnum> CheckAndReconnectBotIfNeededAsync(SocketCommandContext context, ServerAudioResource audioResource)
     {
-        SocketGuildUser clientUser = await Context.Channel.GetUserAsync(Context.Client.CurrentUser.Id) as SocketGuildUser;
+        SocketGuildUser clientUser = Context.Guild.CurrentUser;
         VoiceConnectionResultEnum result = VoiceConnectionResultEnum.AlreadyConnected;
         //First connection
         if (audioResource.AudioVariables.FallbackVoiceChannelId == 0)
@@ -124,7 +126,7 @@ public class AudioPlayFeature(
 
         return audioResource.AudioVariables.AudioClient != null
             ? result
-            : throw new Exception("Bot could not reconnect after an unexpected disconnect");
+            : throw new InvalidOperationException("Bot could not reconnect after an unexpected disconnect");
     }
 
     private async Task StreamAudioAsync(ServerAudioResource audioResource, MusicRequest current)
@@ -156,7 +158,7 @@ public class AudioPlayFeature(
         SocketGuildUser clientUser;
         do
         {
-            clientUser = await Context.Channel.GetUserAsync(Context.Client.CurrentUser.Id) as SocketGuildUser;
+            clientUser = Context.Guild.CurrentUser;
             //if the bot disconnected for some other reason, leave the loop and clear the request list
             if (clientUser.VoiceChannel == null)
             {

@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Features;
@@ -32,6 +33,7 @@ public partial class App : Application
     private Thread twitchThread;
     private System.Timers.Timer mainTimer;
     private BotMain BotService;
+    private int closed;
     #endregion
 
     #region OnClose logic
@@ -52,16 +54,50 @@ public partial class App : Application
         Closing();
     }
 
-    private async void Closing()
+    private void Closing()
     {
-        //3 second time limit to event before app closes
+        //OnExit, OnSessionEnding and ProcessExit can all fire, the cleanup only has to run once
+        if (Interlocked.Exchange(ref closed, 1) == 1)
+        {
+            return;
+        }
+
+        //The process exits right after these events, so the cleanup is waited for, with a time limit
+        //It runs on the thread pool, waiting on the UI thread for work that continues on the UI thread would deadlock
         try
         {
-            await browserService.CloseBrowser();
-            logger.Log("Application closing...");
-            logger.LogToFile();
+            _ = Task.Run(CloseAsync).Wait(TimeSpan.FromSeconds(3));
         }
         catch (Exception) { }
+    }
+
+    private async Task CloseAsync()
+    {
+        try
+        {
+            logger.Log("Application closing...");
+
+            foreach (ServerAudioResource audioResource in Global.ServerAudioResources.Values)
+            {
+                audioResource.AudioVariables.CancellationTokenSource?.Cancel(false);
+            }
+
+            //Without this the bot stays visible as online until Discord times the session out
+            if (BotService != null)
+            {
+                await BotService.StopBotAsync();
+            }
+
+            await browserService.CloseBrowser();
+        }
+        catch (Exception ex)
+        {
+            logger.Error("App.xaml.cs CloseAsync", ex);
+        }
+        finally
+        {
+            logger.LogToFile();
+        }
     }
     #endregion
 

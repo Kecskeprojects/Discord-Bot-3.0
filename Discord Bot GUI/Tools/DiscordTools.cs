@@ -111,4 +111,17 @@ public static class DiscordTools
     {
         return user.GetDisplayAvatarUrl(format, size);
     }
+
+    //An interaction can only be responded to once, after that (including after DeferAsync) only followups are accepted
+    public static async Task RespondOrFollowupAsync(IDiscordInteraction interaction, string text, bool ephemeral = false)
+    {
+        if (interaction.HasResponded)
+        {
+            _ = await interaction.FollowupAsync(text, ephemeral: ephemeral);
+        }
+        else
+        {
+            await interaction.RespondAsync(text, ephemeral: ephemeral);
+        }
+    }
 }

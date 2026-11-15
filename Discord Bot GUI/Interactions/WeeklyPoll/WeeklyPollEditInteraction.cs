@@ -56,7 +56,7 @@ public class WeeklyPollEditInteraction(
             logger.Error("WeeklyPollEditInteraction.cs EditWeeklyPollHandler", ex);
         }
 
-        await RespondAsync("Something went wrong during the process.");
+        await RespondOrFollowupAsync("Something went wrong during the process.");
     }
 
     [ModalInteraction("EditPollModal_*")]
@@ -94,7 +94,7 @@ public class WeeklyPollEditInteraction(
         {
             logger.Error("WeeklyPollEditInteraction.cs EditWeeklyPollModalSubmit", ex);
         }
-        _ = await FollowupAsync("Something went wrong during the process.", ephemeral: true);
+        await RespondOrFollowupAsync("Something went wrong during the process.", ephemeral: true);
     }
 
     [ComponentInteraction("Poll_Change_*_*_*")]
@@ -122,7 +122,7 @@ public class WeeklyPollEditInteraction(
         {
             logger.Error("WeeklyPollEditInteraction.cs DynamicChangeWeeklyPollButtonHandler", ex);
         }
-        _ = await FollowupAsync("Something went wrong during the process.", ephemeral: true);
+        await RespondOrFollowupAsync("Something went wrong during the process.", ephemeral: true);
     }
 
     [ComponentInteraction("Poll_SelectChange_*_*")]
@@ -150,6 +150,6 @@ public class WeeklyPollEditInteraction(
         {
             logger.Error("WeeklyPollEditInteraction.cs DynamicChangeWeeklyPollSelectHandler", ex);
         }
-        _ = await FollowupAsync("Something went wrong during the process.", ephemeral: true);
+        await RespondOrFollowupAsync("Something went wrong during the process.", ephemeral: true);
     }
 }

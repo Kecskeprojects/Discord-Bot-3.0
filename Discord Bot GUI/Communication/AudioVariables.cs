@@ -23,7 +23,8 @@ public partial class AudioVariables : IDisposable
     {
         if (!_isDisposed)
         {
-            AudioClient.Dispose();
+            //Null when no connection was made, this also runs from the finalizer, where an exception would crash the whole process
+            AudioClient?.Dispose();
             _isDisposed = true;
         }
     }

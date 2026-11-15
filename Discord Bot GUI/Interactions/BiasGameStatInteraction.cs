@@ -63,7 +63,7 @@ public class BiasGameStatInteraction(
         {
             logger.Error("BiasGameInteraction.cs GenderChoosen", ex);
             _ = Global.BiasGames.TryRemove(Context.User.Id, out _);
-            _ = await FollowupAsync("Failure during stat collection!");
+            await RespondOrFollowupAsync("Failure during stat collection!");
         }
     }
 }

@@ -36,7 +36,7 @@ public class BiasListComponentInteraction(
         catch (Exception ex)
         {
             logger.Error("BiasListComponentInteraction.cs IdolMenuHandler", ex);
-            await RespondAsync("Something went wrong while getting idols.");
+            await RespondOrFollowupAsync("Something went wrong while getting idols.");
         }
     }
 

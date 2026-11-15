@@ -40,7 +40,7 @@ public class EditIdolModalInteraction(
         {
             logger.Error("EditIdolModalInteraction.cs EditIdolModalSubmit", ex);
         }
-        await RespondAsync("Bias could not be edited!");
+        await RespondOrFollowupAsync("Bias could not be edited!");
     }
 
     [ModalInteraction("EditIdolExtendedModal_*")]
@@ -61,7 +61,7 @@ public class EditIdolModalInteraction(
         {
             logger.Error("EditIdolModalInteraction.cs EditIdolExtendedModalSubmit", ex);
         }
-        await RespondAsync("Bias could not be edited!");
+        await RespondOrFollowupAsync("Bias could not be edited!");
     }
 
     [ModalInteraction("EditGroupModal_*")]
@@ -83,7 +83,7 @@ public class EditIdolModalInteraction(
         {
             logger.Error("EditIdolModalInteraction.cs EditGroupModalSubmit", ex);
         }
-        await RespondAsync("Group could not be edited!");
+        await RespondOrFollowupAsync("Group could not be edited!");
     }
 
     [ModalInteraction("ChangeIdolProfileLinkModal_*")]
@@ -105,7 +105,7 @@ public class EditIdolModalInteraction(
         {
             logger.Error("EditIdolModalInteraction.cs ChangeIdolProfileLinkModalSubmit", ex);
         }
-        await RespondAsync("Bias could not be edited!");
+        await RespondOrFollowupAsync("Bias could not be edited!");
     }
 
     [ModalInteraction("ChangeIdolGroupModal_*")]
@@ -127,7 +127,7 @@ public class EditIdolModalInteraction(
         {
             logger.Error("EditIdolModalInteraction.cs ChangeIdolGroupModalSubmit", ex);
         }
-        await RespondAsync("Bias could not be edited!");
+        await RespondOrFollowupAsync("Bias could not be edited!");
     }
 
     [ModalInteraction("OverrideImageModal_*")]
@@ -149,6 +149,6 @@ public class EditIdolModalInteraction(
         {
             logger.Error("EditIdolModalInteraction.cs OverrideImageModalSubmit", ex);
         }
-        await RespondAsync("Bias could not be edited!");
+        await RespondOrFollowupAsync("Bias could not be edited!");
     }
 }

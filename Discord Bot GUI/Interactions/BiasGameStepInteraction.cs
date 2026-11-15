@@ -38,8 +38,10 @@ public class BiasGameStepInteraction(
                 return;
             }
 
+            //A click must always be acknowledged within 3 seconds, otherwise Discord shows "This interaction failed"
             if (data.IsProcessing)
             {
+                await DeferAsync();
                 return;
             }
 
@@ -90,9 +92,9 @@ public class BiasGameStepInteraction(
         }
         catch (Exception ex)
         {
-            logger.Error("BiasGameInteraction.cs DebutChosen", ex);
+            logger.Error("BiasGameStepInteraction.cs BiasGameNext", ex);
             _ = Global.BiasGames.TryRemove(Context.User.Id, out _);
-            _ = await FollowupAsync("Failure during preparing next step!");
+            await RespondOrFollowupAsync("Failure during preparing next step!");
         }
     }
 

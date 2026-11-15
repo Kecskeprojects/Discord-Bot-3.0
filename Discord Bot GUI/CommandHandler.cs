@@ -10,7 +10,6 @@ using Discord_Bot.Resources;
 using Discord_Bot.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Discord_Bot;
@@ -32,11 +31,20 @@ public class CommandHandler(
     {
         client.MessageReceived += HandleCommandAsync;
         commands.CommandExecuted += HandleCommandExecutionAsync;
-        _ = await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
+        commands.Log += HandleServiceLogAsync;
+        _ = await commands.AddModulesAsync(typeof(CommandHandler).Assembly, services);
     }
 
     #region Handle Command
-    private async Task HandleCommandAsync(SocketMessage arg)
+    private Task HandleCommandAsync(SocketMessage arg)
+    {
+        //Everything, including the database lookup, runs on the thread pool so the gateway task is never blocked
+        //Commands still use RunMode.Sync inside, so their scope lives until they finish and their result reaches CommandExecuted
+        _ = Task.Run(() => ProcessMessageAsync(arg));
+        return Task.CompletedTask;
+    }
+
+    private async Task ProcessMessageAsync(SocketMessage arg)
     {
         try
         {
@@ -60,7 +68,12 @@ public class CommandHandler(
                 return;
             }
 
-            SocketCommandContext context = new(client, arg as SocketUserMessage);
+            if (arg is not SocketUserMessage message)
+            {
+                return;
+            }
+
+            SocketCommandContext context = new(client, message);
             int argPos = 0;
 
             //Check if the message is an embed or not
@@ -79,22 +92,22 @@ public class CommandHandler(
             if (context.Message.HasCharPrefix('!', ref argPos) || context.Message.HasCharPrefix('.', ref argPos))
             {
                 //Command execution
-                _ = ExecuteCommandAsync(context, argPos);
+                await ExecuteCommandAsync(context, argPos);
             }
             else if (!DiscordTools.IsDM(context) && DiscordTools.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id, false))
             {
                 //Role handling
-                _ = HandleRoleAssignmentAsync(context, argPos);
+                await HandleRoleAssignmentAsync(context, argPos);
             }
             else
             {
                 //Feature handling
-                _ = HandleFeatureCheckAsync(context);
+                await HandleFeatureCheckAsync(context);
             }
         }
         catch (Exception ex)
         {
-            logger.Error("CommandHandler.cs HandleCommandAsync", ex);
+            logger.Error("CommandHandler.cs ProcessMessageAsync", ex);
         }
     }
 
@@ -112,7 +125,7 @@ public class CommandHandler(
                     DbProcessResultEnum result = await serverService.AddServerAsync(context.Guild.Id);
                     server = result == DbProcessResultEnum.Success
                         ? await serverService.GetByDiscordIdAsync(context.Guild.Id)
-                        : throw new Exception($"{context.Guild.Name} could not be added to list!");
+                        : throw new InvalidOperationException($"{context.Guild.Name} could not be added to list!");
                 }
             }
             return server;
@@ -177,7 +190,12 @@ public class CommandHandler(
                 }
                 case CommandError.UnknownCommand:
                 {
-                    _ = CheckCustomCommandAsync(context);
+                    await CheckCustomCommandAsync(context);
+                    break;
+                }
+                case CommandError.Exception when result is ExecuteResult { Exception: not null } executeResult:
+                {
+                    logger.Error("CommandHandler.cs HandleCommandExecutionAsync", executeResult.Exception);
                     break;
                 }
                 default:
@@ -203,6 +221,33 @@ public class CommandHandler(
                 _ = await customCommandFeature.Run(context as SocketCommandContext);
             }
         }
+    }
+
+    private Task HandleServiceLogAsync(LogMessage arg)
+    {
+        try
+        {
+            //Exceptions thrown inside commands arrive here wrapped in a CommandException,
+            //they are already logged by HandleCommandExecutionAsync
+            if (arg.Exception is CommandException)
+            {
+                return Task.CompletedTask;
+            }
+
+            if (arg.Exception != null)
+            {
+                logger.Error("CommandHandler.cs HandleServiceLogAsync", arg.Exception);
+            }
+            else
+            {
+                logger.Client(arg.ToString());
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("CommandHandler.cs HandleServiceLogAsync", ex);
+        }
+        return Task.CompletedTask;
     }
     #endregion
 }

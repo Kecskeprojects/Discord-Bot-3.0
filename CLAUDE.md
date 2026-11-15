@@ -44,7 +44,7 @@ Build the projects rather than the `.sln`, because the solution includes `MainDB
 
 | Service | Where | Notes |
 |---|---|---|
-| Discord | Discord.Net (`Startup.cs`, `BotMain.cs`) | Gateway intents include MessageContent; presences/invites are commented out |
+| Discord | Discord.Net (`Startup.cs`, `BotMain.cs`) | Only the gateway intents in use (each is commented in `Startup.cs`); add one only when handling its events |
 | SQL Server | EF Core, `sql_connection_string` | Schema from `MainDB/` |
 | Last.fm | `LastFmApi` project + `Services/LastFmAPI.cs` | `lastfm_artist_input_replacement` in the config rewrites artist names |
 | Spotify | SpotifyAPI.Web | Client credentials from the config |
@@ -64,14 +64,16 @@ Base URLs live in `Core/Constant.cs`.
 **Scheduler:** a 1-minute `System.Timers.Timer` in `App.xaml.cs` reconnects the client if it is logged out, runs `ReminderFeature` and `UnmuteFeature` every tick, runs `BirthdayFeature`, `WeeklyPollFeature` and the YouTube key reset at 06:00 UTC, scrapes bias data on Mondays, and clears the window log at midnight UTC. Times are **UTC**.
 
 **Two command systems coexist:**
-1. **Text prefix commands** (`Commands/`, Discord.Commands `ModuleBase` via `BaseCommand`) are triggered by `!` or `.`. This is where nearly all commands are. `CommandHandler.HandleCommandAsync` also:
+1. **Text prefix commands** (`Commands/`, Discord.Commands `ModuleBase` via `BaseCommand`) are triggered by `!` or `.`. This is where nearly all commands are. `CommandHandler.ProcessMessageAsync` also:
    - auto-inserts any guild it sees into the DB,
    - treats messages in a `RoleText` channel as `+role`/`-role` self-role requests and **deletes the message**,
    - otherwise runs `EasterEggFeature`,
    - on `UnknownCommand`, falls back to DB-defined custom commands (`CustomCommandFeature`).
 2. **Interactions** (`Interactions/`, `BaseInteraction`) are **only** `[ComponentInteraction]` and `[ModalInteraction]` handlers for buttons, selects and modals sent by text commands (bias editing, bias game, help paging, weekly-poll editing). There are no slash commands, and nothing registers any.
 
-Each command or interaction runs in its own DI scope (`services.CreateScope()`) with `RunMode.Sync`.
+Each command or interaction runs in its own DI scope (`services.CreateScope()`) with `RunMode.Sync`. The handlers dispatch it in the background (`Task.Run` / fire-and-forget), so the gateway isn't blocked. `RunMode.Async` was tried and rejected, so keep this setup. `BotMain` registers handlers once; the reconnect timer only logs in again.
+
+Every interaction must be acknowledged within 3 seconds, including early returns (use `DeferAsync()`). In error paths use `RespondOrFollowupAsync`, because a plain `RespondAsync` throws after a defer. Open findings and ideas are tracked in `docs/improvement-notes.md`.
 
 **Command conventions:**
 - Module-level `[Remarks("User" | "Admin" | "Owner")]` must match `CommandLevelEnum`. `HelpCommands` filters by it, so a module with the wrong value disappears from help. `[Summary]` is the help text.

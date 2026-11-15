@@ -76,10 +76,14 @@ public class UserVoiceCommands(
 
             audioResource.MusicRequests.Clear();
 
-            IUser clientUser = await Context.Channel.GetUserAsync(Context.Client.CurrentUser.Id);
-            await (clientUser as SocketGuildUser).VoiceChannel.DisconnectAsync();
+            //The bot may not be in a voice channel (e.g. leave sent twice)
+            SocketVoiceChannel voiceChannel = Context.Guild.CurrentUser.VoiceChannel;
+            if (voiceChannel != null)
+            {
+                await voiceChannel.DisconnectAsync();
+            }
 
-            audioResource.AudioVariables.CancellationTokenSource.Cancel(false);
+            audioResource.AudioVariables.CancellationTokenSource?.Cancel(false);
         }
         catch (Exception ex)
         {

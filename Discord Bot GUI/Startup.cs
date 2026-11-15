@@ -32,12 +32,15 @@ public static class Startup
         DiscordSocketClient client = new(new DiscordSocketConfig()
         {
             EnableVoiceDaveEncryption = true,
-            GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMembers | GatewayIntents.GuildBans | GatewayIntents.GuildEmojis
-                            | GatewayIntents.GuildIntegrations | GatewayIntents.GuildWebhooks /*| GatewayIntents.GuildInvites*/ | GatewayIntents.GuildVoiceStates
-                            /*| GatewayIntents.GuildPresences*/ | GatewayIntents.GuildMessages | GatewayIntents.GuildMessageReactions | GatewayIntents.GuildMessageTyping
-                            | GatewayIntents.DirectMessages | GatewayIntents.DirectMessageReactions | GatewayIntents.DirectMessageTyping | GatewayIntents.MessageContent
-                            /*| GatewayIntents.GuildScheduledEvents/* /*| GatewayIntents.AutoModerationConfiguration*/ /*| GatewayIntents.AutoModerationActionExecution*/
-                            | GatewayIntents.GuildMessagePolls | GatewayIntents.DirectMessagePolls,
+            //Only the intents the bot uses, each one adds gateway events that have to be received and cached
+            //Not needed: reaction, typing, ban, emoji, webhook, integration and poll events, none are handled
+            //(adding reactions and sending polls go through the REST API and do not need intents)
+            GatewayIntents = GatewayIntents.Guilds
+                            | GatewayIntents.GuildMembers       //Member cache for DownloadUsersAsync, nicknames, server member filtering (privileged)
+                            | GatewayIntents.GuildVoiceStates   //Music playback
+                            | GatewayIntents.GuildMessages
+                            | GatewayIntents.DirectMessages
+                            | GatewayIntents.MessageContent,    //Text commands (privileged)
             LogLevel = LogSeverity.Info
         });
 
