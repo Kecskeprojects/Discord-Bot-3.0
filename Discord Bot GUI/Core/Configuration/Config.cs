@@ -36,7 +36,7 @@ public class Config
 
         if (!Directory.Exists(assetDir))
         {
-            _ = Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "Logs"));
+            _ = Directory.CreateDirectory(assetDir);
         }
 
         if (!File.Exists(Path.Combine(assetDir, "config.json")))
@@ -63,14 +63,12 @@ public class Config
                 show_diagnostics = true,
             };
 
-            using StreamWriter sw = File.AppendText(Path.Combine(assetDir, "config.json"));
-            sw.WriteLine(JsonConvert.SerializeObject(conf));
-
-            return;
+            //Written and closed before loading below, so an empty config is read instead of leaving Configuration null
+            File.WriteAllText(Path.Combine(assetDir, "config.json"), JsonConvert.SerializeObject(conf, Formatting.Indented));
         }
 
         Configuration = new ConfigurationBuilder()
-         .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "Assets"))
+         .SetBasePath(assetDir)
          .AddJsonFile("config.json", optional: false, reloadOnChange: true)
          .Build();
     }
