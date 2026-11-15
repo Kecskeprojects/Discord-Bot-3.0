@@ -53,7 +53,7 @@ public static class RainbowRandomizerTools
         {
             int index = r.Next(0, tempOperatorList.Count);
             string chosen = tempOperatorList[index];
-            responseParts.Add($"{user.Username}: {chosen}");
+            responseParts.Add($"{user.GlobalName ?? user.Username}: {chosen}");
             tempOperatorList.RemoveAt(index);
         }
         return responseParts;

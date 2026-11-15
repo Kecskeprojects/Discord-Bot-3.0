@@ -161,14 +161,19 @@ public class UserRandomizeCommands(
             }
 
             List<string> operatorList = RainbowRandomizerTools.GetOperatorList(optionString);
-            List<string> otherOperatorList = RainbowRandomizerTools.GetOperatorList(optionString == "a" || optionString == "attacker" ? "defender" : "attacker");
+            List<string> otherOperatorList = RainbowRandomizerTools.GetOperatorList(optionString is "a" or "attacker" ? "defender" : "attacker");
             List<SocketUser> userList = RainbowRandomizerTools.GetUserList(Context);
 
             List<string> finalResponseParts = [];
+            string label = optionString is "a" or "attacker" ? "Attacker" : "Defender";
+            string otherLabel = optionString is "a" or "attacker" ? "Defender" : "Attacker";
             for (int i = 0; i < 6; i++)
             {
-                finalResponseParts.Add($"\nRound {i + 1}:");
-                List<string> responseParts = RainbowRandomizerTools.GetResponseForRound(i / 3 < 1 ? operatorList : otherOperatorList, userList);
+                string currentLabel = i / 3 < 1 ? label : otherLabel;
+                List<string> currentOperatorList = i / 3 < 1 ? operatorList : otherOperatorList;
+
+                List<string> responseParts = RainbowRandomizerTools.GetResponseForRound(currentOperatorList, userList);
+                finalResponseParts.Add($"\n{currentLabel} Round {i + 1}:");
                 finalResponseParts.AddRange(responseParts);
             }
 
@@ -203,14 +208,19 @@ public class UserRandomizeCommands(
                 return;
             }
             List<string> operatorList = RainbowRandomizerTools.GetOperatorList(optionString);
-            List<string> otherOperatorList = RainbowRandomizerTools.GetOperatorList(optionString == "a" || optionString == "attacker" ? "defender" : "attacker");
+            List<string> otherOperatorList = RainbowRandomizerTools.GetOperatorList(optionString is "a" or "attacker" ? "defender" : "attacker");
             List<SocketUser> userList = RainbowRandomizerTools.GetUserList(Context);
 
             List<string> finalResponseParts = [];
+            string label = optionString is "a" or "attacker" ? "Attacker" : "Defender";
+            string otherLabel = optionString is "a" or "attacker" ? "Defender" : "Attacker";
             for (int i = 0; i < 3; i++)
             {
-                finalResponseParts.Add($"\nRound {i + 1}:");
-                List<string> responseParts = RainbowRandomizerTools.GetResponseForRound(i % 2 == 1 ? operatorList : otherOperatorList, userList);
+                string currentLabel = i % 2 != 1 ? label : otherLabel;
+                List<string> currentOperatorList = i % 2 != 1 ? operatorList : otherOperatorList;
+
+                List<string> responseParts = RainbowRandomizerTools.GetResponseForRound(currentOperatorList, userList);
+                finalResponseParts.Add($"\n{currentLabel} Round {i + 1}:");
                 finalResponseParts.AddRange(responseParts);
             }
 
