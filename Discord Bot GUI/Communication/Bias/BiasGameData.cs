@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord_Bot.Enums;
 using Discord_Bot.Properties;
 using System;
@@ -26,13 +28,13 @@ public sealed partial class BiasGameData : IDisposable
     public int DebutYearEnd { get; private set; }
 
     public Dictionary<int, FileAttachment> IdolWithImage { get; private set; } = [];
-    public List<int[]> Pairs { get; private set; }
+    public List<int[]> Pairs { get; private set; } = [];
     public int CurrentPair { get; private set; }
     public int CurrentRound { get; private set; }
     public bool IsProcessing { get; set; }
 
     public Stack<int> Ranking { get; private set; } = [];
-    public MemoryStream WinnerBracket { get; set; } = new MemoryStream();
+    public MemoryStream WinnerBracket { get; private set; } = new MemoryStream();
 
     public ulong MessageId { get; set; }//This is only stored so if the game is stopped, the embed can be deleted
 
@@ -72,6 +74,16 @@ public sealed partial class BiasGameData : IDisposable
         CurrentPair = 0;
         CurrentRound++;
         Pairs.Clear();
+    }
+
+    //The new bracket is null when it could not be drawn (the processor logs why), then the current one is kept so the game can go on
+    public void ReplaceWinnerBracket(MemoryStream? winnerBracket)
+    {
+        if (winnerBracket != null)
+        {
+            WinnerBracket.Dispose();
+            WinnerBracket = winnerBracket;
+        }
     }
 
     public void Dispose()

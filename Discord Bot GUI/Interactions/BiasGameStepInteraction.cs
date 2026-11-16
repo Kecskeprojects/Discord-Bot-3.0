@@ -52,7 +52,7 @@ public class BiasGameStepInteraction(
             await DeferAsync();
             logger.Log($"BiasGame Next Step: IdolId: {idolId}", LogOnly: true);
 
-            data.WinnerBracket = biasGameWinnerBracketImageProcessor.UpdateWinnerBracket(data);
+            data.ReplaceWinnerBracket(biasGameWinnerBracketImageProcessor.UpdateWinnerBracket(data));
             data.RemoveItem(idolId);
 
             if (data.IdolWithImage.Count == 1)
@@ -105,7 +105,7 @@ public class BiasGameStepInteraction(
         data.FinalizeData();
 
         IdolGameResource idolResource = await idolService.GetIdolByIdAsync(data.IdolWithImage.Keys.First());
-        data.WinnerBracket = biasGameWinnerBracketImageProcessor.AddFinal(data, idolResource);
+        data.ReplaceWinnerBracket(biasGameWinnerBracketImageProcessor.AddFinal(data, idolResource));
         using (FileAttachment file = new(data.WinnerBracket, "winner-bracket.png"))
         {
             Embed[] embed = BiasGameEmbedProcessor.CreateFinalEmbed(

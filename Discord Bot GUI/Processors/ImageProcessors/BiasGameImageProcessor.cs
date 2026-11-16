@@ -35,7 +35,9 @@ public class BiasGameImageProcessor(BotLogger logger)
     public async Task<Stream> CreatePolaroid(IdolGameResource idol)
     {
         logger.Query($"Getting latest idol image:\n{idol.LatestImageUrl}");
-        using MemoryStream stream = await WebTools.GetStream(idol.LatestImageUrl);
+        //The game only picks idols that have an image (IdolRepository.GetListForGameAsync)
+        string imageUrl = idol.LatestImageUrl ?? throw new InvalidOperationException($"Idol {idol.IdolId} has no image");
+        using MemoryStream stream = await WebTools.GetStream(imageUrl);
 
         return CreatePolaroid(idol, stream);
     }
@@ -47,7 +49,7 @@ public class BiasGameImageProcessor(BotLogger logger)
         using MagickImage idolImage = new(idolImageStream);
         logger.Log("Format: " + idolImage.Format);
 
-        if (!idol.LatestImageUrl.StartsWith(Constant.DbKpopBaseUrl, StringComparison.Ordinal))
+        if (idol.LatestImageUrl?.StartsWith(Constant.DbKpopBaseUrl, StringComparison.Ordinal) != true)
         {
             ImageTools.CorrectImageRatio(idolImage, acceptableMargin: 0, cutoffTopRatio: 0.1, extraHeight: 0.05);
         }
@@ -60,7 +62,7 @@ public class BiasGameImageProcessor(BotLogger logger)
 
         polaroidBase.Composite(idolImage, 20, 20, CompositeOperator.Over); //The polaroid borders are 20px wide
 
-        WriteText(polaroidBase, idol.StageName, fontSize: 30, posX: 25, posY: 357);
+        WriteText(polaroidBase, idol.StageName ?? "", fontSize: 30, posX: 25, posY: 357);
 
         WriteText(polaroidBase, idol.GroupFullName, fontSize: 20, posX: 25, posY: 392);
 

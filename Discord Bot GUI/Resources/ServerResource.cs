@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Enums;
+﻿#nullable enable
+
+using Discord_Bot.Enums;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Resources;
@@ -13,13 +15,13 @@ public class ServerResource
 
     public ulong? NotificationRoleDiscordId { get; set; }
 
-    public string NotificationRoleName { get; set; }
+    public string? NotificationRoleName { get; set; }
 
     public ulong? MuteRoleDiscordId { get; set; }
 
-    public string MuteRoleName { get; set; }
+    public string? MuteRoleName { get; set; }
 
-    public List<TwitchChannelResource> TwitchChannels { get; set; }
+    public List<TwitchChannelResource> TwitchChannels { get; set; } = [];
 
-    public Dictionary<ChannelTypeEnum, List<ulong>> SettingsChannels { get; set; }
+    public Dictionary<ChannelTypeEnum, List<ulong>> SettingsChannels { get; set; } = [];
 }

@@ -165,7 +165,7 @@ public class UserVoiceCommands(
 
             _ = await Context.Channel.SendMessageAsync("The queue has been cleared!");
 
-            audioResource.AudioVariables.CancellationTokenSource.Cancel(false);
+            audioResource.AudioVariables.CancellationTokenSource?.Cancel(false);
         }
         catch (Exception ex)
         {
@@ -188,7 +188,7 @@ public class UserVoiceCommands(
 
             _ = await Context.Channel.SendMessageAsync("Song skipped!");
 
-            audioResource.AudioVariables.CancellationTokenSource.Cancel(false);
+            audioResource.AudioVariables.CancellationTokenSource?.Cancel(false);
         }
         catch (Exception ex)
         {

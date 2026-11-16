@@ -14,7 +14,7 @@ public static class AudioNowPlayingEmbedProcessor
     {
         MusicRequest nowPlaying = audioResource.MusicRequests[0];
 
-        int elapsed = Convert.ToInt32(audioResource.AudioVariables.Stopwatch.Elapsed.TotalSeconds);
+        int elapsed = Convert.ToInt32(audioResource.AudioVariables.Stopwatch?.Elapsed.TotalSeconds ?? 0);
         int hour = elapsed / 3600;
         int minute = (elapsed / 60) - (hour * 60);
         int second = elapsed - (minute * 60) - (hour * 3600);

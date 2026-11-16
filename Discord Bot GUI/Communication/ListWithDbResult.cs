@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Enums;
+﻿#nullable enable
+
+using Discord_Bot.Enums;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Communication;

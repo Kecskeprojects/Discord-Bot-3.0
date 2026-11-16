@@ -1,4 +1,6 @@
-﻿using AngleSharp.Dom;
+﻿#nullable enable
+
+using AngleSharp.Dom;
 using Discord_Bot.Enums;
 using System;
 
@@ -8,15 +10,17 @@ public class ExtendedBiasData
 {
     public ExtendedBiasData(IElement row)
     {
-        ProfileUrl = Uri.UnescapeDataString(row.QuerySelector(".column-profile>a").GetAttribute("href").Trim());
-        StageName = Uri.UnescapeDataString(row.QuerySelector(".column-stage_name").InnerHtml.Trim());
-        FullName = Uri.UnescapeDataString(row.QuerySelector(".column-full_name").InnerHtml.Trim());
-        KoreanFullName = Uri.UnescapeDataString(row.QuerySelector(".column-korean_name").InnerHtml.Trim());
-        KoreanStageName = Uri.UnescapeDataString(row.QuerySelector(".column-korean_stage_name").InnerHtml.Trim());
-        string dateString = Uri.UnescapeDataString(row.QuerySelector(".column-dob").InnerHtml.Trim());
+        string profileHref = Cell(row, ".column-profile>a").GetAttribute("href")
+            ?? throw new InvalidOperationException("A dbkpop profile link has no href, the page layout may have changed");
+        ProfileUrl = Uri.UnescapeDataString(profileHref.Trim());
+        StageName = CellText(row, ".column-stage_name");
+        FullName = CellText(row, ".column-full_name");
+        KoreanFullName = CellText(row, ".column-korean_name");
+        KoreanStageName = CellText(row, ".column-korean_stage_name");
+        string dateString = CellText(row, ".column-dob");
         DateOfBirth = DateOnly.TryParseExact(dateString, "yyyy-MM-dd", out DateOnly date) ? date : null;
-        GroupName = Uri.UnescapeDataString(row.QuerySelector(".column-grp").InnerHtml.Trim());
-        string gender = Uri.UnescapeDataString(row.QuerySelector(".column-gender").InnerHtml.Trim());
+        GroupName = CellText(row, ".column-grp");
+        string gender = CellText(row, ".column-gender");
         Gender = gender == GenderEnum.Male.ToDatabaseFriendlyString()
                  ? GenderEnum.Male
                  : gender == GenderEnum.Female.ToDatabaseFriendlyString()
@@ -32,4 +36,16 @@ public class ExtendedBiasData
     public DateOnly? DateOfBirth { get; private set; }
     public string GroupName { get; private set; }
     public GenderEnum? Gender { get; private set; }
+
+    //Every row of the dbkpop table has these cells, a missing one means the page layout changed
+    private static IElement Cell(IElement row, string selector)
+    {
+        return row.QuerySelector(selector)
+            ?? throw new InvalidOperationException($"A dbkpop row has no '{selector}' cell, the page layout may have changed");
+    }
+
+    private static string CellText(IElement row, string selector)
+    {
+        return Uri.UnescapeDataString(Cell(row, selector).InnerHtml.Trim());
+    }
 }

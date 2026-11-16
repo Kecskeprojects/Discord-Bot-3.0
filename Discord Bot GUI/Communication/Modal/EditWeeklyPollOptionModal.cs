@@ -1,4 +1,6 @@
-﻿using Discord.Interactions;
+﻿#nullable enable
+
+using Discord.Interactions;
 
 namespace Discord_Bot.Communication.Modal;
 
@@ -9,5 +11,5 @@ public class EditWeeklyPollOptionModal : IModal
     [RequiredInput(true)]
     [InputLabel("Option Title")]
     [ModalTextInput("optiontitle", placeholder: "Title of option shown in poll", maxLength: 55)]
-    public string OptionTitle { get; set; }
+    public string OptionTitle { get; set; } = "";
 }

@@ -1,8 +1,10 @@
-﻿namespace Discord_Bot.Resources;
+﻿#nullable enable
+
+namespace Discord_Bot.Resources;
 
 public class IdolAliasResource
 {
     public int IdolAliasId { get; set; }
 
-    public string Alias { get; set; }
+    public string Alias { get; set; } = "";
 }

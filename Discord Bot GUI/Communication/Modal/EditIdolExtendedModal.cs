@@ -1,4 +1,6 @@
-﻿using Discord.Interactions;
+﻿#nullable enable
+
+using Discord.Interactions;
 
 namespace Discord_Bot.Communication.Modal;
 
@@ -9,25 +11,25 @@ public class EditIdolExtendedModal : IModal
     [RequiredInput(false)]
     [InputLabel("Stage Name")]
     [ModalTextInput("stagename", maxLength: 200)]
-    public string StageName { get; set; }
+    public string StageName { get; set; } = "";
 
     [RequiredInput(false)]
     [InputLabel("Full Name")]
     [ModalTextInput("fullname", maxLength: 100)]
-    public string FullName { get; set; }
+    public string FullName { get; set; } = "";
 
     [RequiredInput(false)]
     [InputLabel("Korean Stage Name")]
     [ModalTextInput("koreanstagename", maxLength: 100)]
-    public string KoreanStageName { get; set; }
+    public string KoreanStageName { get; set; } = "";
 
     [RequiredInput(false)]
     [InputLabel("Korean Full Name")]
     [ModalTextInput("koreanfullname", maxLength: 100)]
-    public string KoreanFullName { get; set; }
+    public string KoreanFullName { get; set; } = "";
 
     [RequiredInput(false)]
     [InputLabel("Debut Date")]
     [ModalTextInput("debutdate", placeholder: "YYYY. MM. DD. format, latest debut")]
-    public string DebutDate { get; set; }
+    public string DebutDate { get; set; } = "";
 }

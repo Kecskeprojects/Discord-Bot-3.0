@@ -1,4 +1,6 @@
-﻿using Discord.Interactions;
+﻿#nullable enable
+
+using Discord.Interactions;
 
 namespace Discord_Bot.Communication.Modal;
 
@@ -9,5 +11,5 @@ public class ChangeIdolProfileLinkModal : IModal
     [RequiredInput(true)]
     [InputLabel("Profile URL")]
     [ModalTextInput("profileurl", placeholder: "kpopdb or kprofiles link", maxLength: 200)]
-    public string ProfileURL { get; set; }
+    public string ProfileURL { get; set; } = "";
 }

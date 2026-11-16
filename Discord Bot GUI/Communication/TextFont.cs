@@ -1,3 +1,5 @@
+#nullable enable
+
 using ImageMagick;
 using ImageMagick.Drawing;
 using Microsoft.Win32;
@@ -13,7 +15,7 @@ public sealed record TextFont(string Family, double Size, bool Bold = false, boo
     private static readonly Lazy<HashSet<string>> installedFamilies = new(() => [.. MagickNET.FontFamilies]);
 
     //ImageMagick only finds fonts installed for all users, a font installed for the current user has to be used by its file path
-    private readonly string userFontFile = installedFamilies.Value.Contains(Family) ? null : FindUserFontFile(Family);
+    private readonly string? userFontFile = installedFamilies.Value.Contains(Family) ? null : FindUserFontFile(Family);
 
     private FontWeight Weight => Bold ? FontWeight.Bold : FontWeight.Normal;
     private FontStyleType Style => Italic ? FontStyleType.Italic : FontStyleType.Normal;
@@ -42,11 +44,16 @@ public sealed record TextFont(string Family, double Size, bool Bold = false, boo
         settings.FontPointsize = Size;
     }
 
-    private static string FindUserFontFile(string family)
+    private static string? FindUserFontFile(string family)
     {
         //Registry values are named like "Bot Font (TrueType)" and hold the font file's full path
-        using RegistryKey fonts = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts");
-        string valueName = fonts?.GetValueNames().FirstOrDefault(name => name.StartsWith($"{family} (", StringComparison.OrdinalIgnoreCase));
+        using RegistryKey? fonts = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts");
+        if (fonts == null)
+        {
+            return null;
+        }
+
+        string? valueName = fonts.GetValueNames().FirstOrDefault(name => name.StartsWith($"{family} (", StringComparison.OrdinalIgnoreCase));
 
         return valueName != null ? fonts.GetValue(valueName) as string : null;
     }

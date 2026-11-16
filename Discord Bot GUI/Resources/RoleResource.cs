@@ -1,8 +1,10 @@
-﻿namespace Discord_Bot.Resources;
+﻿#nullable enable
+
+namespace Discord_Bot.Resources;
 
 public class RoleResource
 {
     public ulong DiscordId { get; set; }
 
-    public string RoleName { get; set; }
+    public string RoleName { get; set; } = "";
 }

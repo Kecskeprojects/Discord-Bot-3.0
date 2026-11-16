@@ -1,4 +1,6 @@
-﻿namespace Discord_Bot.Resources;
+﻿#nullable enable
+
+namespace Discord_Bot.Resources;
 
 public class WeeklyPollOptionResource
 {
@@ -6,5 +8,5 @@ public class WeeklyPollOptionResource
     public int? WeeklyPollOptionId { get; set; }
     public int? WeeklyPollOptionPresetId { get; set; }
     public byte OrderNumber { get; set; }
-    public string Title { get; set; }
+    public string Title { get; set; } = "";
 }

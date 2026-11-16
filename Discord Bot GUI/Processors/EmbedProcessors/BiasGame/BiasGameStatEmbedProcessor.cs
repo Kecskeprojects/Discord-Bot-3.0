@@ -28,7 +28,7 @@ public static class BiasGameStatEmbedProcessor
         for (int i = 0; i < stats.Stats.Count; i++)
         {
             string heart = stats.Stats[i].IsUserBias ? $" {heartEmoji}" : "";
-            list += $"#{i + 1} {stats.Stats[i].IdolStageName} - {stats.Stats[i].IdolGroupFullName.Replace("*", "\\*")}{heart}\n";
+            list += $"#{i + 1} {stats.Stats[i].IdolStageName} - {(stats.Stats[i].IdolGroupFullName ?? "Soloist").Replace("*", "\\*")}{heart}\n";
         }
 
         _ = builder.AddField($"Your Favorites from *{stats.BiasGameCount} games*", list);

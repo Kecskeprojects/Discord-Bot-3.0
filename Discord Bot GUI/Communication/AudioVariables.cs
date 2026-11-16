@@ -1,4 +1,6 @@
-﻿using Discord.Audio;
+﻿#nullable enable
+
+using Discord.Audio;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -14,11 +16,11 @@ public sealed partial class AudioVariables : IDisposable
 
     public ulong FallbackVoiceChannelId { get; set; }
 
-    public IAudioClient AudioClient { get; set; }
+    public IAudioClient? AudioClient { get; set; }
 
-    public Stopwatch Stopwatch { get; set; }
+    public Stopwatch? Stopwatch { get; set; }
 
-    public CancellationTokenSource CancellationTokenSource { get; set; }
+    public CancellationTokenSource? CancellationTokenSource { get; set; }
 
     public void Dispose()
     {

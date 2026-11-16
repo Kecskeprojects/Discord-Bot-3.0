@@ -1,8 +1,10 @@
-﻿namespace Discord_Bot.Resources;
+﻿#nullable enable
+
+namespace Discord_Bot.Resources;
 
 public class GreetingResource
 {
     public int GreetingId { get; set; }
 
-    public string Url { get; set; }
+    public string Url { get; set; } = "";
 }

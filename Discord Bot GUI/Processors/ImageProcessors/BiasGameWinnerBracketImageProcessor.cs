@@ -80,7 +80,7 @@ public class BiasGameWinnerBracketImageProcessor(BotLogger logger)
             WriteText(winnerBracket, "WINNER", 40, posCenterX, posY_1, MagickColor.FromRgb(30, 140, 255));
 
             int posY_2 = roundData.BaseY + roundData.BaseDiagonal + 10 + 40 + 10;
-            WriteText(winnerBracket, winner.StageName, 30, posCenterX, posY_2, MagickColors.White);
+            WriteText(winnerBracket, winner.StageName ?? "", 30, posCenterX, posY_2, MagickColors.White);
 
             int posY_3 = roundData.BaseY + roundData.BaseDiagonal + 10 + 40 + 10 + 30 + 10;
             WriteText(winnerBracket, winner.GroupFullName, 30, posCenterX, posY_3, MagickColors.White);

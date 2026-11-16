@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+
+using System.Collections.Generic;
 
 namespace Discord_Bot.Resources;
 
@@ -10,8 +12,8 @@ public class WeeklyPollEditResource
     public bool IsMultipleAnswer { get; set; }
     public int? OptionPresetId { get; set; }
     public long CloseInTimeSpanTicks { get; set; }
-    public string RepeatOnDayOfWeek { get; set; }
-    public string Name { get; set; }
+    public string RepeatOnDayOfWeek { get; set; } = "";
+    public string Name { get; set; } = "";
 
-    public List<WeeklyPollOptionResource> Options { get; set; }
+    public List<WeeklyPollOptionResource> Options { get; set; } = [];
 }

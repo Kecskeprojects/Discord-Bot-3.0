@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+
+using System.Collections.Generic;
 
 namespace Discord_Bot.Resources;
 
@@ -10,5 +12,5 @@ public class UserBiasGameStatResource
 
     public int BiasGameCount { get; set; }
 
-    public List<UserIdolStatisticResource> Stats { get; set; }
+    public List<UserIdolStatisticResource> Stats { get; set; } = [];
 }

@@ -1,4 +1,6 @@
-﻿namespace Discord_Bot.Communication;
+﻿#nullable enable
+
+namespace Discord_Bot.Communication;
 
 public class MusicRequest(string uRL, string title, string thumbnail, string duration, string user)
 {

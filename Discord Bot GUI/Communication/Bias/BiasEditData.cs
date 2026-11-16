@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Enums;
+﻿#nullable enable
+
+using Discord_Bot.Enums;
 
 namespace Discord_Bot.Communication.Bias;
 

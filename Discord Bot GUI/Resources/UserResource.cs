@@ -1,4 +1,6 @@
-﻿namespace Discord_Bot.Resources;
+﻿#nullable enable
+
+namespace Discord_Bot.Resources;
 
 public class UserResource
 {
@@ -6,7 +8,7 @@ public class UserResource
 
     public ulong DiscordId { get; set; }
 
-    public string LastFmUsername { get; set; }
+    public string? LastFmUsername { get; set; }
 
-    public string Username { get; set; }
+    public string? Username { get; set; }
 }
