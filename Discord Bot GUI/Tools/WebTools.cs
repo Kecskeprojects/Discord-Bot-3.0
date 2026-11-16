@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.NetworkInformation;
@@ -18,7 +20,7 @@ public static class WebTools
         })
         {
             HttpResponseMessage response = await wc.GetAsync(new Uri(url), HttpCompletionOption.ResponseHeadersRead);
-            string contentType = response.Content.Headers.ContentType.MediaType;
+            string? contentType = response.Content.Headers.ContentType?.MediaType;
             MagickTools.ConvertIfUnsupported(response.Content, contentType, imageData);
         }
 

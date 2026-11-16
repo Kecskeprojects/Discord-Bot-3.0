@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Tools.NativeTools;

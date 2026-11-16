@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -27,7 +29,7 @@ public static class ProcessExtension
                         catch (Exception) { }
                         return null;
                     })
-                    .Where(x => x != null)
+                    .OfType<Process>()
                     .ToList();
             }
         }

@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using System;

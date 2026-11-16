@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication;
+﻿#nullable enable
+
+using Discord_Bot.Communication;
 using Discord_Bot.Tools.Extensions;
 using ImageMagick;
 using System;
@@ -39,7 +41,7 @@ public static class ImageTools
         sample.Sample(new MagickGeometry(100, 0));
 
         using IPixelCollection<ushort> pixels = sample.GetPixels();
-        byte[] rgb = pixels.ToByteArray(PixelMapping.RGB);
+        byte[] rgb = pixels.ToByteArray(PixelMapping.RGB) ?? throw new InvalidOperationException("Magick.NET could not read the pixels of the image");
 
         //Add up every channel, then put the numbers into the 255 range by dividing it with the total pixels checked
         long r = 0, g = 0, b = 0;

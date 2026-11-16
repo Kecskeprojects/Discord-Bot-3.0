@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Services.Models.LastFm;
+﻿#nullable enable
+
+using Discord_Bot.Services.Models.LastFm;
 using Discord_Bot.Services.Models.SpotifyAPI;
 using LastFmApi.Communication;
 using LastFmApi.Models.Recent;

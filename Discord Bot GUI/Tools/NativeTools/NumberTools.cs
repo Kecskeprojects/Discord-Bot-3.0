@@ -1,4 +1,6 @@
-﻿namespace Discord_Bot.Tools.NativeTools;
+﻿#nullable enable
+
+namespace Discord_Bot.Tools.NativeTools;
 
 public static class NumberTools
 {

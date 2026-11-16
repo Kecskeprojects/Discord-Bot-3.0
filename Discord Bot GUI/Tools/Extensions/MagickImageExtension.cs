@@ -1,3 +1,5 @@
+#nullable enable
+
 using Discord_Bot.Communication;
 using ImageMagick;
 using ImageMagick.Drawing;

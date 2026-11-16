@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Database.Models;
+﻿#nullable enable
+
+using Discord_Bot.Database.Models;
 
 namespace Discord_Bot.Tools.ModelTools;
 

@@ -1,5 +1,8 @@
-﻿using Discord_Bot.Communication;
+﻿#nullable enable
+
+using Discord_Bot.Communication;
 using ImageMagick;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -9,7 +12,8 @@ namespace Discord_Bot.Tools;
 
 public static class MagickTools
 {
-    public static void ConvertIfUnsupported(HttpContent content, string contentType, MemoryStream imageData)
+    //contentType is null when the response had no Content-Type header, then the data is copied as it is
+    public static void ConvertIfUnsupported(HttpContent content, string? contentType, MemoryStream imageData)
     {
         using (Stream tempImageData = content.ReadAsStream())
         {
@@ -48,6 +52,6 @@ public static class MagickTools
         using MagickImage canvas = new(MagickColors.Transparent, 1, 1);
         font.ApplyTo(canvas.Settings);
 
-        return canvas.FontTypeMetrics(text);
+        return canvas.FontTypeMetrics(text) ?? throw new InvalidOperationException("Magick.NET could not measure the text");
     }
 }

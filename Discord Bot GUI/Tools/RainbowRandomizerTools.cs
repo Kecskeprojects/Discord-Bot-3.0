@@ -1,4 +1,6 @@
-﻿using Discord.Commands;
+﻿#nullable enable
+
+using Discord.Commands;
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
@@ -26,8 +28,8 @@ public static class RainbowRandomizerTools
 
     public static List<SocketUser> GetUserList(SocketCommandContext context)
     {
-        List<SocketVoiceChannel> voiceChannels = context.Guild?.Channels?.Where(x => x is SocketVoiceChannel).Select(x => (SocketVoiceChannel) x).ToList();
-        SocketVoiceChannel currentVoiceChannel = voiceChannels?.FirstOrDefault(x => x.ConnectedUsers.Any(y => y.Id == context.User.Id));
+        List<SocketVoiceChannel>? voiceChannels = context.Guild?.Channels?.Where(x => x is SocketVoiceChannel).Select(x => (SocketVoiceChannel) x).ToList();
+        SocketVoiceChannel? currentVoiceChannel = voiceChannels?.FirstOrDefault(x => x.ConnectedUsers.Any(y => y.Id == context.User.Id));
 
         List<SocketUser> userList = [];
         if (currentVoiceChannel is not null)

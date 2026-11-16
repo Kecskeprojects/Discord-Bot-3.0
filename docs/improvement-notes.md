@@ -13,7 +13,7 @@ C# has no separate linter. Linting is done by **Roslyn analyzers** that run duri
 | `.editorconfig` | Rule severities, formatting, naming | Root file with formatting options matching the owner's VS settings, code style preferences and severities. `Database/.editorconfig` only marks generated code |
 | `dotnet format` | Formatter and fixer; `--verify-no-changes` is the check mode | Available (part of the SDK), not run yet |
 | Third-party analyzers | Roslynator, Meziantou.Analyzer, StyleCop.Analyzers (strict style), SonarAnalyzer.CSharp, Microsoft.VisualStudio.Threading.Analyzers (async misuse) | None |
-| Nullable reference types | Compiler flags possible null dereferences | `<Nullable>disable</Nullable>` in both projects |
+| Nullable reference types | Compiler flags possible null dereferences | `<Nullable>disable</Nullable>` in both projects, turned on per file with `#nullable enable`: `Tools/` since 2026-11-16 |
 | `TreatWarningsAsErrors` | Enforces the zero-warning goal | On since 2026-11-16, in every configuration (`Directory.Build.props`). NuGet audit warnings NU1901–NU1904 stay warnings |
 
 ### Trial run (2026-11-15)
@@ -37,7 +37,7 @@ A trial build with `-p:AnalysisLevel=latest-recommended -p:EnforceCodeStyleInBui
 2. **Done 2026-11-16.** A root `.editorconfig` that silences the unwanted rules and keeps the rest as warnings (details below).
 3. Optionally `Microsoft.VisualStudio.Threading.Analyzers` for `async void`, `.Result` / `.Wait()` and unawaited tasks, which are common in Discord.Net handlers. Not added yet.
 4. **Done 2026-11-16.** `dotnet format` for formatting. Turn on `TreatWarningsAsErrors` only once at zero warnings.
-5. Enable nullable reference types gradually, folder by folder with `#nullable enable`.
+5. Enable nullable reference types gradually, folder by folder with `#nullable enable`. **In progress:** `Tools/` done 2026-11-16 (details under "Nullable reference types" below).
 
 ### Setup decisions (2026-11-16)
 
@@ -144,6 +144,9 @@ Nullable reference types for the whole project (992 warnings):
 - About 620 are CS8618, uninitialized non-nullable properties, in the JSON / API / DTO models: `Services/Models` (354), LastFmApi (204, mostly models), `Resources` (55), `Communication` (40).
 - The logic folders are small: `Tools` 19 (10 files), `Commands` 19, `Processors` 21, `Features` 16, `Interactions` 14, `Core` 16, `Windows` 8, root files 46 (`App`, `BotMain`, the handlers), service code 74, `Database` 92.
 - Suggested order: `#nullable enable` in `Tools` first, then `Features`, `Processors`, `Commands` and `Interactions`. Leave the model folders for last, or keep nullable off there.
+- **`Tools/` done 2026-11-16:** `#nullable enable` at the top of all 23 files, 18 warnings fixed. With `TreatWarningsAsErrors` on, a folder can only be switched on once all its warnings are fixed. Files outside converted folders stay oblivious, so callers there are not affected.
+  - Annotated as nullable because they return or accept null on purpose: `UrlTools.LinkSearch` / `SanitizeText`, `StringTools.AddNumberPositionIdentifier`, the `server` parameter of `DiscordTools.IsTypeOfChannel`, the optional `user` of `GetNickName`, and the `contentType` of `MagickTools.ConvertIfUnsupported`. `StringExtension.UrlCombine` returns null only when both parts are null, which `[NotNullIfNotNull]` expresses, so URLs built from constants stay non-null for callers.
+  - Behavior changes: `WebTools.GetStream` threw a NullReferenceException for a response without a Content-Type header, and now copies the data as it is. `DiscordTools.GetNickNameBase` threw when the user in a server channel wasn't a `SocketGuildUser`, and now falls back to the username. `MagickTools.MeasureText` and `ImageTools.GetDominantColor` throw an `InvalidOperationException` with a message where Magick.NET returns null (only when its native call fails), instead of a NullReferenceException in the caller. `ProcessExtension.GetChildProcesses` filters with `OfType<Process>()`.
 
 **Found on the way**
 - **Done 2026-11-16:** `App.StartTwitchMonitor` was `async void` without a try/catch on its own thread. `TwitchAPI.Start()` catches its own exceptions, but creating the scope or constructing `TwitchAPI` and its dependencies (e.g. `Config` with a broken config file) could still throw and end the process. It now logs instead.

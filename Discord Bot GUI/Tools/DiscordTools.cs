@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.Commands;
 using Discord.Interactions;
 using Discord.Rest;
@@ -12,9 +14,9 @@ namespace Discord_Bot.Tools;
 
 public static class DiscordTools
 {
-    public static bool IsTypeOfChannel(ServerResource server, ChannelTypeEnum type, ulong channelId, bool allowLackOfType = true)
+    public static bool IsTypeOfChannel(ServerResource? server, ChannelTypeEnum type, ulong channelId, bool allowLackOfType = true)
     {
-        return server == null || (!server.SettingsChannels.TryGetValue(type, out List<ulong> value)
+        return server == null || (!server.SettingsChannels.TryGetValue(type, out List<ulong>? value)
             ? allowLackOfType
             : value.Contains(channelId));
     }
@@ -70,13 +72,13 @@ public static class DiscordTools
         return channel.GetChannelType() == ChannelType.DM;
     }
 
-    public static string GetNickName(SocketInteractionContext context, IUser user = null)
+    public static string GetNickName(SocketInteractionContext context, IUser? user = null)
     {
         user ??= context.User;
         return GetNickNameBase(user, context.Channel);
     }
 
-    public static string GetNickName(SocketCommandContext context, IUser user = null)
+    public static string GetNickName(SocketCommandContext context, IUser? user = null)
     {
         user ??= context.User;
         return GetNickNameBase(user, context.Channel);
@@ -85,7 +87,7 @@ public static class DiscordTools
     public static string GetNickNameBase(IUser user, ISocketMessageChannel channel)
     {
         return !IsDMBase(channel) ?
-            (user as SocketGuildUser).Nickname ?? user.Username :
+            (user as SocketGuildUser)?.Nickname ?? user.Username :
             user.Username;
     }
 
