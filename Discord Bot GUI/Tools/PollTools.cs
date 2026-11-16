@@ -51,7 +51,7 @@ public static class PollTools
         {
             "Days Of Week" => GetNext7Days("en-US"),
             "Days Of Week (HUN)" => GetNext7Days("hu-HU"),
-            _ => throw new Exception("Special answer values do not exist!")
+            _ => throw new ArgumentOutOfRangeException(nameof(name), name, "Special answer values do not exist!")
         };
     }
 

@@ -1,4 +1,5 @@
 ﻿using Discord_Bot.Tools.NativeTools;
+using System;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Core.Caching;
@@ -11,10 +12,7 @@ public sealed class SizedDictionary<TKey, TValue>(int size) : Dictionary<TKey, T
 
     public new bool TryAdd(TKey key, TValue value)
     {
-        if (key == null)
-        {
-            throw new();
-        }
+        ArgumentNullException.ThrowIfNull(key);
 
         if (base.TryAdd(key, value))
         {
@@ -34,10 +32,7 @@ public sealed class SizedDictionary<TKey, TValue>(int size) : Dictionary<TKey, T
 
     public new void Add(TKey key, TValue value)
     {
-        if (key == null)
-        {
-            throw new();
-        }
+        ArgumentNullException.ThrowIfNull(key);
 
         base.Add(key, value);
         keys.Enqueue(key);
@@ -49,10 +44,7 @@ public sealed class SizedDictionary<TKey, TValue>(int size) : Dictionary<TKey, T
 
     public new bool Remove(TKey key)
     {
-        if (key == null)
-        {
-            throw new();
-        }
+        ArgumentNullException.ThrowIfNull(key);
 
         if (!keys.Contains(key))
         {

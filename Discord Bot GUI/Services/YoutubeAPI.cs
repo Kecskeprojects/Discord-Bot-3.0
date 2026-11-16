@@ -56,7 +56,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
 
                 if (!Global.YoutubeApiKeys.TryRemove(currentKey, out _))
                 {
-                    throw new Exception("Youtube API Key could not be removed!");
+                    throw new InvalidOperationException("Youtube API Key could not be removed!");
                 }
 
                 Random r = new();
@@ -161,7 +161,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
 
         if (!Global.ServerAudioResources.TryGetValue(serverId, out ServerAudioResource audioResource))
         {
-            throw new Exception("Server Audio Resource does not exist");
+            throw new InvalidOperationException("Server Audio Resource does not exist");
         }
 
         audioResource.MusicRequests.Add(new MusicRequest(temp[0], temp[1], temp[2], temp[3], username));
@@ -293,7 +293,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
         {
             if (!Global.YoutubeApiKeys.TryAdd(item, 0))
             {
-                throw new Exception("Youtube API Key could not be added!");
+                throw new InvalidOperationException("Youtube API Key could not be added!");
             }
         }
 

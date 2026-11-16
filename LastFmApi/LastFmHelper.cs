@@ -26,7 +26,7 @@ public class LastFmHelper
                 }
                 else
                 {
-                    throw new Exception("Wrong input format!");
+                    throw new ArgumentException("Wrong input format!", nameof(parameters));
                 }
                 break;
             }
@@ -44,7 +44,7 @@ public class LastFmHelper
                 }
                 else
                 {
-                    throw new Exception("Wrong input format!");
+                    throw new ArgumentException("Wrong input format!", nameof(parameters));
                 }
                 break;
             }
@@ -55,7 +55,7 @@ public class LastFmHelper
                 break;
             }
             default:
-                throw new Exception("Too many or too few parameters!");
+                throw new ArgumentException("Too many or too few parameters!", nameof(parameters));
         }
 
         if (defaultLimitTo10 && input.Limit > 30)
