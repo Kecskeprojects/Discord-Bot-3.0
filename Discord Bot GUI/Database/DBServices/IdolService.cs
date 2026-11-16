@@ -1,10 +1,10 @@
 ﻿using Discord_Bot.Communication;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Communication.Modal;
-using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
@@ -23,7 +23,7 @@ public class IdolService(
     IIdolGroupService idolGroupService,
     IIdolImageRepository idolImageRepository,
     IMapper mapper,
-    BotLogger logger,
+    IBotLogger logger,
     ServerCache cache) : BaseService(mapper, logger, cache), IIdolService
 {
     private readonly IIdolRepository idolRepository = idolRepository;
@@ -161,7 +161,7 @@ public class IdolService(
 
             if (additional != null)
             {
-                if (!idol.IdolImages.Any(x => x.OverriddenUrl == additional.ImageUrl))
+                if (additional.ImageUrl != null && !idol.IdolImages.Any(x => x.OverriddenUrl == additional.ImageUrl))
                 {
                     idol.IdolImages.Add(new IdolImage() { ImageUrl = additional.ImageUrl });
                 }

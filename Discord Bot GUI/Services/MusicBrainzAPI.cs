@@ -1,4 +1,5 @@
 ﻿using Discord_Bot.Core;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.MusicBrainz.ArtistLookup;
 using Discord_Bot.Tools;
@@ -10,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
 
-public class MusicBrainzAPI(BotLogger logger) : IMusicBrainzAPI
+public class MusicBrainzAPI(IBotLogger logger) : IMusicBrainzAPI
 {
-    private readonly BotLogger logger = logger;
+    private readonly IBotLogger logger = logger;
 
     private static readonly RestClient client = new(Constant.MusicBrainzBaseUri);
 

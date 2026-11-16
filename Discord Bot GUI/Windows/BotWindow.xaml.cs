@@ -1,6 +1,7 @@
 ﻿using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
+using Discord_Bot.Enums;
 using Discord_Bot.Tools.NativeTools;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace Discord_Bot.Windows;
@@ -26,6 +28,7 @@ public sealed partial class BotWindow : Window, IDisposable
     {
         InitializeComponent();
         this.logger = logger;
+        logger.LogAdded += OnLogAdded;
 
         if (config.ShowDiagnostics)
         {
@@ -174,26 +177,38 @@ public sealed partial class BotWindow : Window, IDisposable
         }));
     }
 
-    public static void LogToWindow(Log log, System.Windows.Media.Brush color)
+    //Raised on whichever thread logged, so the line is added through the window's dispatcher
+    private void OnLogAdded(object? sender, Log log)
     {
         string mess = log.Content.Replace(":\t", ":    \t");
-        _ = (Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
+        SolidColorBrush color = GetLogColor(log.Type);
+        _ = Dispatcher.BeginInvoke(DispatcherPriority.DataBind, () =>
         {
-            if (Application.Current.Windows.OfType<BotWindow>().FirstOrDefault() != null)
+            Run run = new(mess + "\n")
             {
-                BotWindow main = Application.Current.Windows.OfType<BotWindow>().First();
-                Run run = new(mess + "\n")
-                {
-                    Foreground = color
-                };
-                main.MainLogText.Inlines.Add(run);
-            }
-        }));
+                Foreground = color
+            };
+            MainLogText.Inlines.Add(run);
+        });
+    }
+
+    private static SolidColorBrush GetLogColor(LogTypeEnum type)
+    {
+        return type switch
+        {
+            LogTypeEnum.Query => Brushes.DarkCyan,
+            LogTypeEnum.Client => Brushes.DarkGray,
+            LogTypeEnum.Audio => Brushes.DarkOrange,
+            LogTypeEnum.Error => Brushes.Red,
+            LogTypeEnum.Warning => Brushes.Yellow,
+            _ => Brushes.White
+        };
     }
 
     //WPF never disposes a window, so the timer is disposed when the window closes
     protected override void OnClosed(EventArgs e)
     {
+        logger.LogAdded -= OnLogAdded;
         Dispose();
         base.OnClosed(e);
     }

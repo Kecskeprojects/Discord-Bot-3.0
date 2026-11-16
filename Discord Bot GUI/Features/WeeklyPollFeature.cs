@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
-using Discord_Bot.Core;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools.NativeTools;
@@ -17,7 +17,7 @@ public class WeeklyPollFeature(
     DiscordSocketClient client,
     IServerService serverService,
     IMapper mapper,
-    BotLogger logger) : BaseFeature(serverService, logger)
+    IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IWeeklyPollService weeklyPollService = weeklyPollService;
     private readonly DiscordSocketClient client = client;

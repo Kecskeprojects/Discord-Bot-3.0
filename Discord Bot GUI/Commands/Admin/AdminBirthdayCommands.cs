@@ -1,9 +1,9 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.Rest;
-using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using System;
 using System.Collections.Generic;
@@ -18,7 +18,7 @@ namespace Discord_Bot.Commands.Admin;
 public class AdminBirthdayCommands(
     IBirthdayService birthdayService,
     IServerService serverService,
-    BotLogger logger,
+    IBotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IBirthdayService birthdayService = birthdayService;

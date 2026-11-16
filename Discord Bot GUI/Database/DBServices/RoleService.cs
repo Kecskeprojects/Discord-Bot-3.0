@@ -1,7 +1,7 @@
-﻿using Discord_Bot.Core;
-using Discord_Bot.Core.Caching;
+﻿using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
@@ -16,7 +16,7 @@ public class RoleService(
     IRoleRepository roleRepository,
     IServerRepository serverRepository,
     IMapper mapper,
-    BotLogger logger,
+    IBotLogger logger,
     ServerCache cache) : BaseService(mapper, logger, cache), IRoleService
 {
     private readonly IRoleRepository roleRepository = roleRepository;
@@ -35,6 +35,10 @@ public class RoleService(
             }
 
             Server? server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
+            if (server == null)
+            {
+                return DbProcessResultEnum.NotFound;
+            }
 
             Role role = new()
             {

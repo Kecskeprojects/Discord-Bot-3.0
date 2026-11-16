@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Processors.EmbedProcessors.BiasGame;
 using Discord_Bot.Resources;
@@ -15,7 +16,7 @@ namespace Discord_Bot.Interactions;
 public class BiasGameStatInteraction(
     IUserService userService,
     IServerService serverService,
-    BotLogger logger,
+    IBotLogger logger,
     Config config) : BaseInteraction(serverService, logger, config)
 {
     private readonly IUserService userService = userService;

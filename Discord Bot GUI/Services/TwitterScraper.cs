@@ -1,6 +1,7 @@
 ﻿using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.Twitter;
 using Discord_Bot.Tools;
@@ -13,9 +14,9 @@ using System.Web;
 
 namespace Discord_Bot.Services;
 
-public class TwitterScraper(BotLogger logger, BrowserService browserService) : ITwitterScraper
+public class TwitterScraper(IBotLogger logger, BrowserService browserService) : ITwitterScraper
 {
-    private readonly BotLogger logger = logger;
+    private readonly IBotLogger logger = logger;
     private readonly BrowserService browserService = browserService;
 
     private Root? Body { get; set; }

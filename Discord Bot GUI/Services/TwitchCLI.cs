@@ -1,4 +1,4 @@
-﻿using Discord_Bot.Core;
+﻿using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.Twitch;
 using Discord_Bot.Tools.NativeTools;
@@ -9,9 +9,9 @@ using System.IO;
 
 namespace Discord_Bot.Services;
 
-public class TwitchCLI(BotLogger logger) : ITwitchCLI
+public class TwitchCLI(IBotLogger logger) : ITwitchCLI
 {
-    private readonly BotLogger logger = logger;
+    private readonly IBotLogger logger = logger;
 
     //Responsible for generating the access tokens to Twitch's api requests
     public string GenerateToken()

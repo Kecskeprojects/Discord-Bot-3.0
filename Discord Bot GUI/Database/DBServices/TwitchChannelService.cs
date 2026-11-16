@@ -2,6 +2,7 @@
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
@@ -14,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Database.DBServices;
 
-public class TwitchChannelService(IMapper mapper, BotLogger logger, ServerCache cache, ITwitchChannelRepository twitchChannelRepository, IServerRepository serverRepository) : BaseService(mapper, logger, cache), ITwitchChannelService
+public class TwitchChannelService(IMapper mapper, IBotLogger logger, ServerCache cache, ITwitchChannelRepository twitchChannelRepository, IServerRepository serverRepository) : BaseService(mapper, logger, cache), ITwitchChannelService
 {
     private readonly ITwitchChannelRepository twitchChannelRepository = twitchChannelRepository;
     private readonly IServerRepository serverRepository = serverRepository;

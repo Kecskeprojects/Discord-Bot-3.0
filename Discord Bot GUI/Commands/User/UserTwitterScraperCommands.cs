@@ -4,6 +4,7 @@
 //using Discord_Bot.Communication;
 //using Discord_Bot.Core;
 //using Discord_Bot.Core.Configuration;
+//using Discord_Bot.Interfaces.Core;
 //using Discord_Bot.Interfaces.DBServices;
 //using Discord_Bot.Interfaces.Services;
 //using Discord_Bot.Processors.MessageProcessor;
@@ -22,7 +23,7 @@
 //public class UserTwitterScraperCommands(
 //    ITwitterScraper twitterScraper,
 //    IServerService serverService,
-//    BotLogger logger,
+//    IBotLogger logger,
 //    Config config) : BaseCommand(logger, config, serverService)
 //{
 //    private readonly ITwitterScraper twitterScraper = twitterScraper;

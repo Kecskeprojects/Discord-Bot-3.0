@@ -1,7 +1,7 @@
 ﻿using Discord.Commands;
-using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using System;
 using System.Threading.Tasks;
@@ -14,7 +14,7 @@ namespace Discord_Bot.Commands.Owner;
 public class OwnerBiasAliasCommands(
     IIdolAliasService idolAliasService,
     IServerService serverService,
-    BotLogger logger,
+    IBotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IIdolAliasService idolAliasService = idolAliasService;

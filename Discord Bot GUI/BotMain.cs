@@ -3,6 +3,7 @@ using Discord.LibDave.Binding;
 using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -17,14 +18,14 @@ public sealed class BotMain(
     InteractionHandler interactionHandler,
     CommandHandler commandHandler,
     DiscordSocketClient client,
-    BotLogger logger) : IDisposable
+    IBotLogger logger) : IDisposable
 {
     #region Variables
     private readonly IServiceProvider services = services;
     private readonly InteractionHandler interactionHandler = interactionHandler;
     private readonly CommandHandler commandHandler = commandHandler;
     private readonly DiscordSocketClient client = client;
-    private readonly BotLogger logger = logger;
+    private readonly IBotLogger logger = logger;
 
     //Stops the startup call and the reconnect timer from logging in at the same time
     private readonly SemaphoreSlim startLock = new(1, 1);

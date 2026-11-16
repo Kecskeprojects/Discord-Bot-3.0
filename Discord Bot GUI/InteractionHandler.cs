@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Discord_Bot.Core;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -13,13 +13,13 @@ public class InteractionHandler(
     IServiceProvider services,
     DiscordSocketClient client,
     InteractionService interactions,
-    BotLogger logger)
+    IBotLogger logger)
 {
     #region Variables
     private readonly IServiceProvider services = services;
     private readonly DiscordSocketClient client = client;
     private readonly InteractionService interactions = interactions;
-    private readonly BotLogger logger = logger;
+    private readonly IBotLogger logger = logger;
     #endregion
 
     public async Task RegisterInteractionsAsync()

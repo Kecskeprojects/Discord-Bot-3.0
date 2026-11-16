@@ -1,5 +1,5 @@
 ﻿using Discord_Bot.Communication;
-using Discord_Bot.Core;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.Extensions;
 using ImageMagick;
@@ -11,9 +11,9 @@ using System.Linq;
 
 namespace Discord_Bot.Processors.ImageProcessors;
 
-public class WhoKnowsImageProcessor(BotLogger logger)
+public class WhoKnowsImageProcessor(IBotLogger logger)
 {
-    private readonly BotLogger logger = logger;
+    private readonly IBotLogger logger = logger;
 
     //Our image size will be 800*500 in the end
     //Null when the image could not be made, the error is logged

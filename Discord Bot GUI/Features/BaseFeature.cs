@@ -2,6 +2,7 @@
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
@@ -10,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 
-public abstract class BaseFeature(IServerService serverService, BotLogger logger)
+public abstract class BaseFeature(IServerService serverService, IBotLogger logger)
 {
     protected readonly IServerService serverService = serverService;
-    protected readonly BotLogger logger = logger;
+    protected readonly IBotLogger logger = logger;
 
     //Set by Run before ExecuteCoreLogicAsync; features started without a context or parameters never read them
     protected SocketCommandContext Context { get; private set; } = null!;

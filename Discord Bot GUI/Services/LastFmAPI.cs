@@ -1,5 +1,5 @@
-﻿using Discord_Bot.Core;
-using Discord_Bot.Core.Configuration;
+﻿using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.LastFm;
@@ -18,10 +18,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
 
-public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) : ILastFmAPI
+public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, Config config) : ILastFmAPI
 {
     private readonly ISpotifyAPI spotifyAPI = spotifyAPI;
-    private readonly BotLogger logger = logger;
+    private readonly IBotLogger logger = logger;
     private readonly Config config = config;
 
     #region Last.fm top calls

@@ -4,6 +4,7 @@ using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Processors.EmbedProcessors.BiasGame;
 using Discord_Bot.Resources;
@@ -18,7 +19,7 @@ namespace Discord_Bot.Commands.User;
 public class UserBiasGameCommands(
     IUserService userService,
     IServerService serverService,
-    BotLogger logger,
+    IBotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IUserService userService = userService;

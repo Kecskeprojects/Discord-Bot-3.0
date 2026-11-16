@@ -1,6 +1,6 @@
 ﻿using Discord_Bot.Communication;
-using Discord_Bot.Core;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.Instagram;
 using Discord_Bot.Tools;
@@ -14,9 +14,9 @@ using System.Web;
 
 namespace Discord_Bot.Services;
 
-public class InstaScraper(BotLogger logger) : IInstaScraper
+public class InstaScraper(IBotLogger logger) : IInstaScraper
 {
-    private readonly BotLogger logger = logger;
+    private readonly IBotLogger logger = logger;
 
     #region Main Methods
     public async Task<SocialScrapingResult> GetDataFromUrl(Uri uri)

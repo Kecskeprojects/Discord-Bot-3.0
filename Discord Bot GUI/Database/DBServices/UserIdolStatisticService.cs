@@ -1,6 +1,6 @@
-﻿using Discord_Bot.Core;
-using Discord_Bot.Core.Caching;
+﻿using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Tools.ModelTools;
@@ -15,7 +15,7 @@ public class UserIdolStatisticService(
     IUserIdolStatisticRepository userIdolStatisticRepository,
     IUserRepository userRepository,
     IMapper mapper,
-    BotLogger logger,
+    IBotLogger logger,
     ServerCache cache) : BaseService(mapper, logger, cache), IUserIdolStatisticService
 {
     private readonly IUserIdolStatisticRepository userIdolStatisticRepository = userIdolStatisticRepository;

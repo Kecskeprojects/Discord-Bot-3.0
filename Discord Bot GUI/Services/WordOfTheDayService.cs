@@ -1,4 +1,5 @@
 ﻿using Discord_Bot.Core;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.Wotd;
 using RestSharp;
@@ -11,9 +12,9 @@ using System.Xml.Serialization;
 
 namespace Discord_Bot.Services;
 
-public class WordOfTheDayService(BotLogger logger) : IWordOfTheDayService
+public class WordOfTheDayService(IBotLogger logger) : IWordOfTheDayService
 {
-    private readonly BotLogger logger = logger;
+    private readonly IBotLogger logger = logger;
 
     private static readonly RestClient client = new(Constant.WordOfTheDayBaseUri);
 

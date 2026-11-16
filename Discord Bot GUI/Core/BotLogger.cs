@@ -1,214 +1,133 @@
 ﻿using Discord_Bot.Communication;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
-using Discord_Bot.Windows;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Windows.Media;
+using System.Threading;
 
 namespace Discord_Bot.Core;
 
-public class BotLogger
+//Only Startup, App and BotWindow use this type directly, for LogAdded and LogToFile; everything else logs through IBotLogger
+public class BotLogger : IBotLogger
 {
-    //List of logs, before they are cleared
-    public readonly List<Log> Logs = [];
+    //Logs waiting for the file. Any thread can add to it, LogToFile empties it
+    private readonly ConcurrentQueue<Log> logs = new();
+    //Taken from the queue but not written yet: kept for the next try when writing the file fails
+    private readonly List<Log> unwritten = [];
+    //The timer, the window's button and the shutdown can all write the file at the same time
+    private readonly Lock fileLock = new();
+
+    //Raised for every log meant for the window, on the thread that logged it
+    public event EventHandler<Log>? LogAdded;
 
     public void LogToFile()
     {
         try
         {
-            if (Logs.Count != 0)
+            lock (fileLock)
             {
-                string file_location = $"Logs\\logs[{DateTimeTools.CurrentDate()}].txt";
-
-                using (StreamWriter logFileWriter = File.AppendText(file_location))
+                while (logs.TryDequeue(out Log? queued))
                 {
-                    string[] contents = Logs.Select(n => n.Content).ToArray();
-                    foreach (string log in contents)
-                    {
-                        logFileWriter.WriteLine(log);
-                    }
+                    unwritten.Add(queued);
                 }
 
-                Logs.Clear();
+                if (unwritten.Count != 0)
+                {
+                    string file_location = $"Logs\\logs[{DateTimeTools.CurrentDate()}].txt";
+
+                    using (StreamWriter logFileWriter = File.AppendText(file_location))
+                    {
+                        foreach (Log log in unwritten)
+                        {
+                            logFileWriter.WriteLine(log.Content);
+                        }
+                    }
+
+                    unwritten.Clear();
+                }
             }
         }
         catch (Exception ex)
         {
-            Error("BotLogger.cs LogtoFile", ex);
+            Error("BotLogger.cs LogToFile", ex);
         }
     }
 
     #region Internal Logging
     public void Log(string message, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BotLoggerTools.BaseLog(LogTypeEnum.Log);
-
-        log.Content += message;
-        log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
-
-        if (!LogOnly)
-        {
-            BotWindow.LogToWindow(log, Brushes.White);
-        }
-
-        if (!ConsoleOnly)
-        {
-            Logs.Add(log);
-        }
+        Add(LogTypeEnum.Log, message, ConsoleOnly, LogOnly);
     }
 
     public void Query(string message, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BotLoggerTools.BaseLog(LogTypeEnum.Query);
-
-        log.Content += message;
-        log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
-
-        if (!LogOnly)
-        {
-            BotWindow.LogToWindow(log, Brushes.DarkCyan);
-        }
-
-        if (!ConsoleOnly)
-        {
-            Logs.Add(log);
-        }
+        Add(LogTypeEnum.Query, message, ConsoleOnly, LogOnly);
     }
 
     public void Client(string message, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BotLoggerTools.BaseLog(LogTypeEnum.Client);
-
-        log.Content += message;
-        log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
-
-        if (!LogOnly)
-        {
-            BotWindow.LogToWindow(log, Brushes.DarkGray);
-        }
-
-        if (!ConsoleOnly)
-        {
-            Logs.Add(log);
-        }
+        Add(LogTypeEnum.Client, message, ConsoleOnly, LogOnly);
     }
 
     public void Audio(string message, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BotLoggerTools.BaseLog(LogTypeEnum.Audio);
-
-        log.Content += message;
-        log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
-
-        if (!LogOnly)
-        {
-            BotWindow.LogToWindow(log, Brushes.DarkOrange);
-        }
-
-        if (!ConsoleOnly)
-        {
-            Logs.Add(log);
-        }
+        Add(LogTypeEnum.Audio, message, ConsoleOnly, LogOnly);
     }
     #endregion
 
     #region Message Logging
     public void MesUser(string message, string server = "DM")
     {
-        Log log = BotLoggerTools.BaseLog(LogTypeEnum.MesUser);
-
-        log.Content += $"Server: {server}, Content: {message}";
-        log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
-
-        Logs.Add(log);
+        Add(LogTypeEnum.MesUser, $"Server: {server}, Content: {message}", ConsoleOnly: false, LogOnly: true);
     }
 
     public void MesOther(string message, string server = "DM")
     {
-        Log log = BotLoggerTools.BaseLog(LogTypeEnum.MesOther);
-
-        log.Content += $"Server: {server}, Content: {message}";
-        log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
-
-        Logs.Add(log);
+        Add(LogTypeEnum.MesOther, $"Server: {server}, Content: {message}", ConsoleOnly: false, LogOnly: true);
     }
     #endregion
 
     #region Error Logging
     public void Error(string location, string message, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BotLoggerTools.BaseLog(LogTypeEnum.Error);
-
-        log.Content += $"Location: {location}\n{message}";
-        log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
-
-        if (!LogOnly)
-        {
-            BotWindow.LogToWindow(log, Brushes.Red);
-        }
-
-        if (!ConsoleOnly)
-        {
-            Logs.Add(log);
-        }
+        Add(LogTypeEnum.Error, $"Location: {location}\n{message}", ConsoleOnly, LogOnly);
     }
 
     public void Error(string location, Exception ex, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BotLoggerTools.BaseLog(LogTypeEnum.Error);
-
-        log.Content += $"Location: {location}\n{ex}";
-        log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
-
-        if (!LogOnly)
-        {
-            BotWindow.LogToWindow(log, Brushes.Red);
-        }
-
-        if (!ConsoleOnly)
-        {
-            Logs.Add(log);
-        }
+        Add(LogTypeEnum.Error, $"Location: {location}\n{ex}", ConsoleOnly, LogOnly);
     }
 
     public void Warning(string location, string message, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BotLoggerTools.BaseLog(LogTypeEnum.Warning);
-
-        log.Content += $"Location: {location}, Content: {message}";
-        log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
-
-        if (!LogOnly)
-        {
-            BotWindow.LogToWindow(log, Brushes.Yellow);
-        }
-
-        if (!ConsoleOnly)
-        {
-            Logs.Add(log);
-        }
+        Add(LogTypeEnum.Warning, $"Location: {location}, Content: {message}", ConsoleOnly, LogOnly);
     }
 
     public void Warning(string location, Exception ex, bool ConsoleOnly = false, bool LogOnly = false)
     {
-        Log log = BotLoggerTools.BaseLog(LogTypeEnum.Warning);
+        Add(LogTypeEnum.Warning, $"Location: {location}, Content: {ex}", ConsoleOnly, LogOnly);
+    }
+    #endregion
 
-        log.Content += $"Location: {location}, Content: {ex}";
+    private void Add(LogTypeEnum type, string content, bool ConsoleOnly, bool LogOnly)
+    {
+        Log log = BotLoggerTools.BaseLog(type);
+
+        log.Content += content;
         log.Content = BotLoggerTools.PutTabsOnNewLines(log.Content);
 
         if (!LogOnly)
         {
-            BotWindow.LogToWindow(log, Brushes.Yellow);
+            LogAdded?.Invoke(this, log);
         }
 
         if (!ConsoleOnly)
         {
-            Logs.Add(log);
+            logs.Enqueue(log);
         }
     }
-    #endregion
 }

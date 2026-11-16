@@ -1,6 +1,6 @@
 ﻿using Discord.Rest;
 using Discord.WebSocket;
-using Discord_Bot.Core;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using System;
@@ -11,7 +11,7 @@ namespace Discord_Bot.Features;
 public class SelfRoleFeature(
     IRoleService roleService,
     IServerService serverService,
-    BotLogger logger) : BaseFeature(serverService, logger)
+    IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IRoleService roleService = roleService;
 

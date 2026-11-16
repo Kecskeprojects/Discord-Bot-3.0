@@ -1,4 +1,4 @@
-﻿using Discord_Bot.Core;
+﻿using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using System;
@@ -9,7 +9,7 @@ namespace Discord_Bot.Features;
 public class CustomCommandFeature(
     ICustomCommandService customCommandService,
     IServerService serverService,
-    BotLogger logger) : BaseFeature(serverService, logger)
+    IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly ICustomCommandService customCommandService = customCommandService;
 

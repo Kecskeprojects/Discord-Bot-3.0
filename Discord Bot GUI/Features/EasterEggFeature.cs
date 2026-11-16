@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Discord_Bot.Core;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
@@ -15,7 +16,7 @@ public class EasterEggFeature(
     IGreetingService greetingService,
     DiscordSocketClient client,
     IServerService serverService,
-    BotLogger logger) : BaseFeature(serverService, logger)
+    IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IGreetingService greetingService = greetingService;
     private readonly DiscordSocketClient client = client;

@@ -1,4 +1,4 @@
-﻿using Discord_Bot.Core;
+﻿using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.Services;
 using System;
 using System.Diagnostics;
@@ -6,9 +6,9 @@ using System.IO;
 
 namespace Discord_Bot.Services;
 
-public class InstaLoader(BotLogger logger) : IInstaLoader
+public class InstaLoader(IBotLogger logger) : IInstaLoader
 {
-    private readonly BotLogger logger = logger;
+    private readonly IBotLogger logger = logger;
 
     //https://instaloader.github.io/basic-usage.html
     //https://github.com/instaloader/instaloader

@@ -35,11 +35,11 @@ public class GenericRepository<TEntity>(MainDbContext context) : IGenericReposit
         return context.Set<TEntity>().Where(predicate).AnyAsync();
     }
 
-    public Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
+    public Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object?>>[] includes)
     {
         IQueryable<TEntity> dbSet = context.Set<TEntity>().Where(predicate);
 
-        foreach (Expression<Func<TEntity, object>> include in includes)
+        foreach (Expression<Func<TEntity, object?>> include in includes)
         {
             dbSet = dbSet.Include(include);
         }
@@ -61,11 +61,11 @@ public class GenericRepository<TEntity>(MainDbContext context) : IGenericReposit
         return context.Set<TEntity>().FirstOrDefaultAsync(predicate);
     }
 
-    public Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
+    public Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object?>>[] includes)
     {
         IQueryable<TEntity> dbSet = context.Set<TEntity>();
 
-        foreach (Expression<Func<TEntity, object>> include in includes)
+        foreach (Expression<Func<TEntity, object?>> include in includes)
         {
             dbSet = dbSet.Include(include);
         }
@@ -80,11 +80,11 @@ public class GenericRepository<TEntity>(MainDbContext context) : IGenericReposit
         return context.Set<TEntity>().ToListAsync();
     }
 
-    public Task<List<TEntity>> GetAllAsync(params Expression<Func<TEntity, object>>[] includes)
+    public Task<List<TEntity>> GetAllAsync(params Expression<Func<TEntity, object?>>[] includes)
     {
         IQueryable<TEntity> dbSet = context.Set<TEntity>();
 
-        foreach (Expression<Func<TEntity, object>> include in includes)
+        foreach (Expression<Func<TEntity, object?>> include in includes)
         {
             dbSet = dbSet.Include(include);
         }
@@ -92,7 +92,7 @@ public class GenericRepository<TEntity>(MainDbContext context) : IGenericReposit
         return dbSet.ToListAsync();
     }
 
-    public Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, object>> orderBy, bool ascending = true)
+    public Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, object?>> orderBy, bool ascending = true)
     {
         IQueryable<TEntity> dbSet = context.Set<TEntity>();
 
@@ -101,13 +101,13 @@ public class GenericRepository<TEntity>(MainDbContext context) : IGenericReposit
         return dbSet.ToListAsync();
     }
 
-    public Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, object>> orderBy, bool ascending = true, params Expression<Func<TEntity, object>>[] includes)
+    public Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, object?>> orderBy, bool ascending = true, params Expression<Func<TEntity, object?>>[] includes)
     {
         IQueryable<TEntity> dbSet = context.Set<TEntity>();
 
         dbSet = dbSet.OrderByDynamic(orderBy, ascending);
 
-        foreach (Expression<Func<TEntity, object>> include in includes)
+        foreach (Expression<Func<TEntity, object?>> include in includes)
         {
             dbSet = dbSet.Include(include);
         }
@@ -122,11 +122,11 @@ public class GenericRepository<TEntity>(MainDbContext context) : IGenericReposit
         return context.Set<TEntity>().Where(predicate).ToListAsync();
     }
 
-    public Task<List<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
+    public Task<List<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object?>>[] includes)
     {
         IQueryable<TEntity> dbSet = context.Set<TEntity>().Where(predicate);
 
-        foreach (Expression<Func<TEntity, object>> include in includes)
+        foreach (Expression<Func<TEntity, object?>> include in includes)
         {
             dbSet = dbSet.Include(include);
         }
@@ -134,7 +134,7 @@ public class GenericRepository<TEntity>(MainDbContext context) : IGenericReposit
         return dbSet.ToListAsync();
     }
 
-    public Task<List<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> orderBy, bool ascending = true)
+    public Task<List<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object?>> orderBy, bool ascending = true)
     {
         IQueryable<TEntity> dbSet = context.Set<TEntity>().Where(predicate);
 
@@ -143,13 +143,13 @@ public class GenericRepository<TEntity>(MainDbContext context) : IGenericReposit
         return dbSet.ToListAsync();
     }
 
-    public Task<List<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> orderBy, bool ascending = true, params Expression<Func<TEntity, object>>[] includes)
+    public Task<List<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object?>> orderBy, bool ascending = true, params Expression<Func<TEntity, object?>>[] includes)
     {
         IQueryable<TEntity> dbSet = context.Set<TEntity>().Where(predicate);
 
         dbSet = dbSet.OrderByDynamic(orderBy, ascending);
 
-        foreach (Expression<Func<TEntity, object>> include in includes)
+        foreach (Expression<Func<TEntity, object?>> include in includes)
         {
             dbSet = dbSet.Include(include);
         }

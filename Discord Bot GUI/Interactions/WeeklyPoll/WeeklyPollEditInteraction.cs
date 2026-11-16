@@ -3,9 +3,9 @@ using Discord.Interactions;
 using Discord.Rest;
 using Discord.WebSocket;
 using Discord_Bot.Communication.Modal;
-using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Processors.EmbedProcessors.Polls;
 using Discord_Bot.Resources;
@@ -20,7 +20,7 @@ public class WeeklyPollEditInteraction(
     IWeeklyPollOptionPresetService weeklyPollOptionPresetService,
     IWeeklyPollService weeklyPollService,
     IServerService serverService,
-    BotLogger logger,
+    IBotLogger logger,
     Config config) : BaseInteraction(serverService, logger, config)
 {
     private readonly IWeeklyPollOptionPresetService weeklyPollOptionPresetService = weeklyPollOptionPresetService;
@@ -82,7 +82,9 @@ public class WeeklyPollEditInteraction(
             }
             SocketRole? role = Context.Guild.Roles.FirstOrDefault(x => x.Name.Equals(modal.Role.Trim(), StringComparison.OrdinalIgnoreCase));
 
-            DbProcessResultEnum result = await weeklyPollService.UpdateAsync(pollId, modal, channel.Id, role?.Id, role?.Name);
+            RoleResource? pollRole = role == null ? null : new RoleResource() { DiscordId = role.Id, RoleName = role.Name };
+
+            DbProcessResultEnum result = await weeklyPollService.UpdateAsync(pollId, modal, channel.Id, pollRole);
             if (result == DbProcessResultEnum.Success)
             {
                 WeeklyPollResource? resource = await weeklyPollService.GetPollByIdAsync(pollId);

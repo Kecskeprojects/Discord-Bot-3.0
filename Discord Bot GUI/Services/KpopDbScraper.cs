@@ -2,6 +2,7 @@
 using AngleSharp.Dom;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Tools;
 using PuppeteerSharp;
@@ -12,9 +13,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
 
-public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IKpopDbScraper
+public class KpopDbScraper(IBotLogger logger, BrowserService browserService) : IKpopDbScraper
 {
-    private readonly BotLogger logger = logger;
+    private readonly IBotLogger logger = logger;
     private readonly BrowserService browserService = browserService;
 
     public async Task<List<ExtendedBiasData>> ExtractFromDatabaseTableAsync()

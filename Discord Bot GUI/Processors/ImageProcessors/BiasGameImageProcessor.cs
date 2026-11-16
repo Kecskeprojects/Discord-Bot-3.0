@@ -1,5 +1,6 @@
 ﻿using Discord_Bot.Communication;
 using Discord_Bot.Core;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Properties;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
@@ -11,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Processors.ImageProcessors;
 
-public class BiasGameImageProcessor(BotLogger logger)
+public class BiasGameImageProcessor(IBotLogger logger)
 {
-    private readonly BotLogger logger = logger;
+    private readonly IBotLogger logger = logger;
 
     public static Stream CombineImages(MemoryStream left, MemoryStream right)
     {

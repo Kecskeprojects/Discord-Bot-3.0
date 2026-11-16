@@ -4,6 +4,7 @@ using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
@@ -12,9 +13,9 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands;
 
-public class BaseCommand(BotLogger logger, Config config, IServerService serverService) : ModuleBase<SocketCommandContext>
+public class BaseCommand(IBotLogger logger, Config config, IServerService serverService) : ModuleBase<SocketCommandContext>
 {
-    protected readonly BotLogger logger = logger;
+    protected readonly IBotLogger logger = logger;
     protected readonly Config config = config;
     protected readonly IServerService serverService = serverService;
 

@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Discord_Bot.Core;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools.NativeTools;
@@ -16,7 +16,7 @@ public class ReminderFeature(
     IReminderService reminderService,
     DiscordSocketClient client,
     IServerService serverService,
-    BotLogger logger) : BaseFeature(serverService, logger)
+    IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IReminderService reminderService = reminderService;
     private readonly DiscordSocketClient client = client;

@@ -5,6 +5,7 @@ using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Processors.MessageProcessor;
 using Discord_Bot.Resources;
@@ -25,7 +26,7 @@ public class UserBiasCommands(
     IIdolService idolService,
     IIdolGroupService idolGroupService,
     IServerService serverService,
-    BotLogger logger,
+    IBotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IUserIdolService userIdolService = userIdolService;

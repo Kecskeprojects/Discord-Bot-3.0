@@ -1,14 +1,14 @@
-﻿using Discord_Bot.Core;
-using Discord_Bot.Core.Configuration;
+﻿using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces.Core;
 using PuppeteerSharp;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
 
-public class BrowserService(BotLogger logger, Config config)
+public class BrowserService(IBotLogger logger, Config config)
 {
-    private readonly BotLogger logger = logger;
+    private readonly IBotLogger logger = logger;
     private readonly Config config = config;
     private IBrowser? Browser { get; set; }
 

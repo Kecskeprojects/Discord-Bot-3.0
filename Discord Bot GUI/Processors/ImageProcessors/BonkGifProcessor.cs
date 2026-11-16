@@ -1,4 +1,4 @@
-﻿using Discord_Bot.Core;
+﻿using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Properties;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.Extensions;
@@ -9,9 +9,9 @@ using System.IO;
 
 namespace Discord_Bot.Processors.ImageProcessors;
 
-public class BonkGifProcessor(BotLogger logger)
+public class BonkGifProcessor(IBotLogger logger)
 {
-    private readonly BotLogger logger = logger;
+    private readonly IBotLogger logger = logger;
 
     //Null when the gif could not be made, the error is logged
     public MemoryStream? CreateBonkImage(Stream stream, int delay)

@@ -1,10 +1,10 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Features;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
@@ -18,13 +18,13 @@ public class CommandHandler(
     IServiceProvider services,
     DiscordSocketClient client,
     CommandService commands,
-    BotLogger logger)
+    IBotLogger logger)
 {
     #region Variables
     private readonly IServiceProvider services = services;
     private readonly DiscordSocketClient client = client;
     private readonly CommandService commands = commands;
-    private readonly BotLogger logger = logger;
+    private readonly IBotLogger logger = logger;
     #endregion
 
     public async Task RegisterCommandsAsync()

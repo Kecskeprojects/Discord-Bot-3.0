@@ -1,8 +1,8 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.EmbedProcessors;
@@ -22,7 +22,7 @@ public class AdminServerSettingCommands(
     ITwitchChannelService twitchChannelService,
     ITwitchCLI twitchCLI,
     IServerService serverService,
-    BotLogger logger,
+    IBotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     private readonly IChannelService channelService = channelService;

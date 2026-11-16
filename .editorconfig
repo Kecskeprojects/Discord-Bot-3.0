@@ -79,12 +79,9 @@ dotnet_diagnostic.CA1711.severity = none
 # CA1716 (names that are keywords in other .NET languages, e.g. Global, Date): only matters for VB consumers of a library.
 dotnet_diagnostic.CA1716.severity = none
 
-# The JSON models are generated from API responses and stay nullable-oblivious, like the scaffolded Database/Models
-# (see Discord Bot GUI/Database/.editorconfig). Generated code is also skipped by the analyzers.
+# Generated code: nullable-oblivious and skipped by the analyzers. The JSON models are generated from API responses, and
+# MainDbContext is scaffolded.
 [Discord Bot GUI/Services/Models/**.cs]
-generated_code = true
-
-[Discord Bot GUI/Database/Models/**.cs]
 generated_code = true
 
 [Discord Bot GUI/Database/MainDbContext.cs]
@@ -92,3 +89,10 @@ generated_code = true
 
 [LastFmApi/Models/**.cs]
 generated_code = true
+
+# The scaffolded EF models are not marked as generated code: with nullable on, the scaffold writes `?` for nullable columns
+# and optional navigations instead of .IsRequired(), so EF and the compiler need those annotations to count (in generated
+# code they are off, and a `?` there is error CS8669). Only the style rules a new scaffold would undo are turned off.
+[Discord Bot GUI/Database/Models/**.cs]
+dotnet_diagnostic.IDE0005.severity = none
+dotnet_diagnostic.IDE0028.severity = none

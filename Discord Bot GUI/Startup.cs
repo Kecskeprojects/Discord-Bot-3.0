@@ -9,6 +9,7 @@ using Discord_Bot.Database;
 using Discord_Bot.Database.DBRepositories;
 using Discord_Bot.Database.DBServices;
 using Discord_Bot.Features;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
@@ -63,7 +64,10 @@ public static class Startup
         _ = collection.AddSingleton(interactions);
         _ = collection.AddSingleton(commands);
         _ = collection.AddTransient<Config>(); //Configuration can be edited without stopping the program
-        _ = collection.AddSingleton(new BotLogger());
+        //One logger: the bot's code gets IBotLogger, App and BotWindow the concrete type (LogToFile, LogAdded)
+        BotLogger logger = new();
+        _ = collection.AddSingleton(logger);
+        _ = collection.AddSingleton<IBotLogger>(logger);
         _ = collection.AddSingleton(new ServerCache());
 
         Config config = new();

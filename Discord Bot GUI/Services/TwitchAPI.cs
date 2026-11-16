@@ -1,7 +1,7 @@
 ﻿using Discord_Bot.Communication;
-using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Features;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
@@ -24,13 +24,13 @@ namespace Discord_Bot.Services;
 public class TwitchAPI(
     IServiceProvider services,
     ITwitchCLI twitchCLI,
-    BotLogger logger,
+    IBotLogger logger,
     Config config) : ITwitchAPI
 {
     #region Variables
     private readonly IServiceProvider services = services;
     private readonly ITwitchCLI twitchCLI = twitchCLI;
-    private readonly BotLogger logger = logger;
+    private readonly IBotLogger logger = logger;
     private readonly Config config = config;
 
     //Both are set by Check before the monitor raises any event, and only the event handlers use them after that

@@ -1,7 +1,7 @@
-﻿using Discord_Bot.Core;
-using Discord_Bot.Core.Caching;
+﻿using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
@@ -16,7 +16,7 @@ public class CustomCommandService(
     ICustomCommandRepository customCommandRepository,
     IServerRepository serverRepository,
     IMapper mapper,
-    BotLogger logger,
+    IBotLogger logger,
     ServerCache cache) : BaseService(mapper, logger, cache), ICustomCommandService
 {
     private readonly ICustomCommandRepository customCommandRepository = customCommandRepository;
@@ -36,6 +36,10 @@ public class CustomCommandService(
             }
 
             Server? server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
+            if (server == null)
+            {
+                return DbProcessResultEnum.NotFound;
+            }
 
             CustomCommand command = new()
             {

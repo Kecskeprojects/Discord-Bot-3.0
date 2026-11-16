@@ -1,9 +1,9 @@
 ﻿using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Bot.Communication;
-using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using System;
@@ -16,7 +16,7 @@ public class AudioPlayFeature(
     IYoutubeDownloadService youtubeDownloadService,
     Config config,
     IServerService serverService,
-    BotLogger logger) : BaseFeature(serverService, logger)
+    IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IYoutubeDownloadService youtubeStreamService = youtubeDownloadService;
 

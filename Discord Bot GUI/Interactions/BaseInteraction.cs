@@ -1,8 +1,8 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions;
 
-public class BaseInteraction(IServerService serverService, BotLogger logger, Config config) : InteractionModuleBase<SocketInteractionContext>
+public class BaseInteraction(IServerService serverService, IBotLogger logger, Config config) : InteractionModuleBase<SocketInteractionContext>
 {
     private readonly IServerService serverService = serverService;
-    protected readonly BotLogger logger = logger;
+    protected readonly IBotLogger logger = logger;
     protected readonly Config config = config;
 
     protected Task<bool> IsOwner()

@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using System;
 using System.Threading.Tasks;
@@ -13,7 +13,7 @@ namespace Discord_Bot.Commands.Owner;
 [Summary("Send messages as the bot, the channel must be in the same server as the command")]
 public class OwnerSayCommands(
     IServerService serverService,
-    BotLogger logger,
+    IBotLogger logger,
     Config config) : BaseCommand(logger, config, serverService)
 {
     [Command("say")]

@@ -2,6 +2,7 @@
 using Discord.Net;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.MessageProcessor;
@@ -17,7 +18,7 @@ public class InstagramEmbedFeature(
     //IInstaLoader instaLoader,
     IInstaScraper instaScraper,
     IServerService serverService,
-    BotLogger logger) : BaseFeature(serverService, logger)
+    IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IInstaScraper instaScraper = instaScraper;
 

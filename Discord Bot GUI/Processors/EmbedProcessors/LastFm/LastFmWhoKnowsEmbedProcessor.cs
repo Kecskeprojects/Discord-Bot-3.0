@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord_Bot.Communication;
-using Discord_Bot.Core;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Services.Models.LastFm;
 using Discord_Bot.Tools;
@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot.Processors.EmbedProcessors.LastFm;
 
-public class LastFmWhoKnowsEmbedProcessor(WhoKnowsImageProcessor whoKnowsImageProcessor, BotLogger logger) : LastFmBaseEmbedProcessor
+public class LastFmWhoKnowsEmbedProcessor(WhoKnowsImageProcessor whoKnowsImageProcessor, IBotLogger logger) : LastFmBaseEmbedProcessor
 {
     private readonly WhoKnowsImageProcessor whoKnowsImageProcessor = whoKnowsImageProcessor;
-    private readonly BotLogger logger = logger;
+    private readonly IBotLogger logger = logger;
 
     public async Task<WhoKnowsEmbedResult> CreateEmbed(WhoKnows wk)
     {

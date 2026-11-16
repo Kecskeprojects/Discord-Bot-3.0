@@ -1,6 +1,6 @@
 ﻿using Discord.WebSocket;
-using Discord_Bot.Core;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Processors.MessageProcessor;
 using Discord_Bot.Resources;
@@ -15,7 +15,7 @@ public class BirthdayFeature(
     IBirthdayService birthdayService,
     DiscordSocketClient client,
     IServerService serverService,
-    BotLogger logger) : BaseFeature(serverService, logger)
+    IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IBirthdayService birthdayService = birthdayService;
     private readonly DiscordSocketClient client = client;

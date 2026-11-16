@@ -10,6 +10,9 @@ Changes from 2026-11-16 that built cleanly but have not been tried live:
 - **Twitch token refresh:** after the bot has run for more than a day (the refresh runs about every 24 hours), stream notifications should keep arriving.
 - **Last.fm who-knows:** `!lf wk` with no song (uses what you are playing now), with `artist>track` and with an artist only.
 - **Weekly poll buttons:** the toggle buttons in the poll and preset edit messages (active, pinned, multiple answers, special preset), and the preset select's "Custom Options".
+- **Weekly poll edit modal** with and without a role: the service now takes the role as an optional `RoleResource`.
+- **After the nullable scaffold** (`247e656`): EF now reads required columns from the models' annotations instead of `.IsRequired()`. Adding a custom command, a self role and a bias, and the Monday bias scrape (new idol images), are the writes most worth a look.
+- **Log window and file** (`IBotLogger`): the window still shows each log type in its color (log white, query dark cyan, client dark gray, audio dark orange, error red, warning yellow) and keeps autoscrolling, the "open active log file" button shows the current entries, and `Logs/` keeps getting written every minute and at shutdown.
 
 ## 1. Linting follow-ups (investigated 2026-11-15 and 2026-11-16)
 
@@ -43,16 +46,15 @@ The analyzer setup is done and described in CLAUDE.md ("Linting"). Left:
 - Every DB service, repository and external API service is behind an interface (`Interfaces/`) and registered through DI in `Startup.cs`, so DB services can be unit-tested now by mocking their repositories.
 - `IMapper` can be built for real in tests from `MapperConfig`, the same way `Startup` does.
 - A large share of logic sits in static, mostly pure helpers that need no changes to test: `Tools/` (`StringTools`, `CollectionTools`, `NumberTools`, `UrlTools`, `ChannelTypeEnumTools`, `LastFmTools`, `DiscordTools.IsTypeOfChannel`), `SizedDictionary` / `ServerCache`, and the static embed and message processors (assert on the returned `Embed`'s fields).
-- `BotLogger` writing to the window is harmless in tests: `Application.Current?` is null, so nothing happens.
+- Everything logs through `IBotLogger`, so tests can pass a mock (and assert that an error was logged). The concrete `BotLogger` has no WPF dependency either; the window subscribes to its `LogAdded` event.
 
 ### Blockers, in order of value
 
 1. **The clock.** 45 `DateTime.UtcNow` / `DateTime.Now` calls in 23 files (DB services, features, processors, `DateTimeTools`, `PollTools`). Reminder, birthday, poll and unmute logic can't be tested deterministically. Fix: inject `TimeProvider` (built into .NET; `FakeTimeProvider` from `Microsoft.Extensions.TimeProvider.Testing` in tests), or pass `DateTime now` into the static helpers.
 2. **`Global` static state** (`ServerAudioResources`, `BiasGames`, `YoutubeApiKeys`). It is shared between tests and can't be reset cleanly. Fix: move it into DI singletons (e.g. `BiasGameStore`, `AudioStateStore`, `YoutubeKeyStore`).
 3. **`Config`** is a concrete class whose constructor reads and writes `Assets/config.json` in the current directory, and about 47 classes inject it. Fix: extract an `IConfig` interface (smallest change), or move to `IOptionsMonitor<BotOptions>`, which keeps reload-on-change.
-4. **`BotLogger`** is concrete and calls `BotWindow.LogToWindow` directly, so the core depends on the WPF window. Fix: an `IBotLogger` interface (lets tests assert an error was logged), and have the window subscribe to a logger event instead of the logger knowing the window. Section 4 needs the same change; the design is written down there.
-5. **Concrete Discord.Net socket types.** `BaseFeature`, `BaseCommand` and `DiscordTools` use `SocketCommandContext` / `SocketInteractionContext`, and several features inject `DiscordSocketClient`. Socket entities have internal constructors and can't be mocked. Fix: use Discord.Net's own interfaces: `ICommandContext`, `IUser`, `IGuild`, `IMessageChannel`, and `IDiscordClient` (or a narrow wrapper like `IDiscordMessenger.SendDmAsync`) instead of `DiscordSocketClient`. `BaseCommand` could derive from `ModuleBase<ICommandContext>`.
-6. **Logic inside command bodies.** Commands parse, validate and branch (e.g. `UserReminderCommands.RemindIn`). Commands are the hardest thing to unit-test, so move that logic into features, processors or tools and keep commands as thin adapters.
+4. **Concrete Discord.Net socket types.** `BaseFeature`, `BaseCommand` and `DiscordTools` use `SocketCommandContext` / `SocketInteractionContext`, and several features inject `DiscordSocketClient`. Socket entities have internal constructors and can't be mocked. Fix: use Discord.Net's own interfaces: `ICommandContext`, `IUser`, `IGuild`, `IMessageChannel`, and `IDiscordClient` (or a narrow wrapper like `IDiscordMessenger.SendDmAsync`) instead of `DiscordSocketClient`. `BaseCommand` could derive from `ModuleBase<ICommandContext>`.
+5. **Logic inside command bodies.** Commands parse, validate and branch (e.g. `UserReminderCommands.RemindIn`). Commands are the hardest thing to unit-test, so move that logic into features, processors or tools and keep commands as thin adapters.
 
 ### Not worth unit-testing
 
@@ -91,8 +93,9 @@ Decided against:
 
 | From the bot | Notes |
 |---|---|
-| `Database/` (DbContext, 19 models, 20 repositories, 20 services, `.editorconfig`) | As is. The `.editorconfig` keeps the models and `MainDbContext` marked as generated code |
+| `Database/` (DbContext, 19 models, 20 repositories, 20 services) | As is. The root `.editorconfig` sections for `Database/Models` (IDE0005 / IDE0028 off) and `MainDbContext.cs` (generated code) need their new paths |
 | `Interfaces/DBServices/`, `Interfaces/DBRepositories/` | As is |
+| `Interfaces/Core/IBotLogger.cs` | The services log through it; `BotLogger` stays in the bot and implements it |
 | `Resources/` (22 DTOs) | As is, after the `IdolGroupResource` fix below |
 | `Core/Caching/` (`ServerCache`, `SizedDictionary`) | Only the DB services and `Startup` use it |
 | Enums the DB layer uses (`DbProcessResultEnum`, `ChannelTypeEnum`, `GenderEnum`) | See the `Constant` coupling below |
@@ -104,23 +107,20 @@ Keeping the existing `Discord_Bot.Database.*` / `Discord_Bot.Resources` namespac
 
 ### Couplings to untangle first
 
-1. **`BotLogger` (the real blocker).** All 20 services take `BotLogger` through `BaseService`, and `BotLogger` calls `BotWindow` (WPF). The library can't reference the bot. Fix: an `IBotLogger` interface in the library (the DB layer only uses `Log` and `Error`) implemented by the existing `BotLogger`. This is the same change as test-project blocker 4. The alternative is the standard `ILogger<T>` (`AddLogging()` is already registered) with a small provider forwarding to `BotLogger`, but that changes the 156 logger calls in `Database/`.
-   - Design worked out 2026-11-16: `Log` already carries its `Type`, so `BotLogger` can raise a `LogAdded` event, and `BotWindow` subscribes in its constructor (unsubscribes in `OnClosed`) and maps the type to the color it uses today (Log white, Query dark cyan, Client dark gray, Audio dark orange, Error red, Warning yellow). `BotLogger` then loses its `System.Windows` dependency. `BotLogger` appears in 94 files. Other places to change: `Startup.cs` registers `new BotLogger()`, and `App.xaml.cs` resolves it with `GetRequiredService<BotLogger>()`. Put the interface in `Interfaces/Core/`, following the existing `Interfaces/<folder>/` layout.
-   - Do this together with: `BotLogger.Logs` is a plain public `List<Log>`, written from many threads and read and cleared by `LogToFile` on the timer thread. A concurrent `Add` can lose entries, and `LogToFile` can hit "Collection was modified". A private `ConcurrentQueue<Log>` that `LogToFile` drains fixes it. Nothing outside `BotLogger` reads `Logs`.
-2. **Modals in service signatures.** The idol, idol group and weekly poll service interfaces take 8 Discord `IModal` types (`EditIdolModal`, `EditIdolExtendedModal`, `ChangeIdolGroupModal`, `ChangeIdolProfileLinkModal`, `OverrideImageModal`, `EditGroupModal`, `EditWeeklyPollModal`, `EditWeeklyPollOptionPresetModal`), which carry `Discord.Interactions` attributes. Fix: plain DTOs (e.g. `IdolEditData`) in the library, and have the interaction classes map the modal into them (by hand or with a Mapster map). Referencing Discord.Net from the library for these would work, but defeats much of the point.
-3. **EF models leaking out.**
+1. **Modals in service signatures.** The idol, idol group and weekly poll service interfaces take 8 Discord `IModal` types (`EditIdolModal`, `EditIdolExtendedModal`, `ChangeIdolGroupModal`, `ChangeIdolProfileLinkModal`, `OverrideImageModal`, `EditGroupModal`, `EditWeeklyPollModal`, `EditWeeklyPollOptionPresetModal`), which carry `Discord.Interactions` attributes. Fix: plain DTOs (e.g. `IdolEditData`) in the library, and have the interaction classes map the modal into them (by hand or with a Mapster map). Referencing Discord.Net from the library for these would work, but defeats much of the point.
+2. **EF models leaking out.**
    - `IdolGroupResource.Idols` is a `List<Idol>` (an EF entity). Change it to `List<IdolResource>`; this also fixes a "commands use Resources" violation.
    - `IIdolGroupService.UpdateOrCreateGroupAsync` takes and returns `IdolGroup`. It's only called from `IdolService`, so make it internal or move it into a repository.
-4. **`MapperConfig` mixes layers.** Model ↔ resource and DTO → model mappings go to the library. The `WeeklyPollResource → PollProperties` (Discord) mapping stays in the bot. Register both `IRegister`s at startup.
-5. **Helpers in `Tools/`.**
+3. **`MapperConfig` mixes layers.** Model ↔ resource and DTO → model mappings go to the library. The `WeeklyPollResource → PollProperties` (Discord) mapping stays in the bot. Register both `IRegister`s at startup.
+4. **Helpers in `Tools/`.**
    - `PollTools.GetAnswerOptions(WeeklyPoll)` (used by a model mapping) and `UserIdolStatisticTools.AddRanking` move to the library.
    - `PollTools.CreateTitle` / `GetDuration` (Discord types) stay.
    - `CollectionTools.IsNullOrEmpty` is needed on both sides; split `CollectionTools` or duplicate the one-liner (with its `[NotNullWhen(false)]`).
-6. **`Constant`.**
+5. **`Constant`.**
    - `TwitchChannelService` uses `Constant.TwitchBaseUrl` (+ `UrlCombine`).
    - `ChannelTypeEnum`'s extension uses `Constant.RestrictedChannelTypes`.
    - Move these constants into the library, or keep the extension method in the bot.
-7. **`GlobalSuppressions.cs`.** The Database entries have to move to the new project: CA1309, CA1310 and CA1862 for the `Discord_Bot.Database` namespace, IDE0028 for `Database.Models`, and IDE0290 for `MainDbContext`.
+6. **`GlobalSuppressions.cs`.** The Database entries have to move to the new project: CA1309, CA1310 and CA1862 for the `Discord_Bot.Database` namespace, and IDE0290 for `MainDbContext`.
 
 ### Shape of the result
 
@@ -138,15 +138,14 @@ Keeping the existing `Discord_Bot.Database.*` / `Discord_Bot.Resources` namespac
 
 ### Suggested order
 
-1. `IBotLogger`.
-2. Fix the `IdolGroupResource` / `UpdateOrCreateGroupAsync` leaks.
-3. Modal → DTO for the 8 modals.
-4. Split `MapperConfig` and the `Tools` helpers.
-5. Create the project and move the files (keeping namespaces).
-6. Add the `AddDatabase` extension.
-7. Build, then a quick run against the dev database.
+1. Fix the `IdolGroupResource` / `UpdateOrCreateGroupAsync` leaks.
+2. Modal → DTO for the 8 modals.
+3. Split `MapperConfig` and the `Tools` helpers.
+4. Create the project and move the files (keeping namespaces).
+5. Add the `AddDatabase` extension.
+6. Build, then a quick run against the dev database.
 
-Steps 1–4 are worth doing even inside the current project, and they make the move itself mechanical.
+Steps 1–3 are worth doing even inside the current project, and they make the move itself mechanical.
 
 Doing this before the test project (section 2) is a good order: DB-service tests can then live in a plain `net11.0` test project.
 

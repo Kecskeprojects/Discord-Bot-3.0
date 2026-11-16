@@ -1,8 +1,8 @@
 ﻿using Discord_Bot.Communication.Modal;
-using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
@@ -21,7 +21,7 @@ public class WeeklyPollService(
     IChannelRepository channelRepository,
     IRoleRepository roleRepository,
     IMapper mapper,
-    BotLogger logger,
+    IBotLogger logger,
     ServerCache cache) : BaseService(mapper, logger, cache), IWeeklyPollService
 {
     private readonly IWeeklyPollRepository weeklyPollRepository = weeklyPollRepository;
@@ -47,7 +47,7 @@ public class WeeklyPollService(
                     CloseInTimeSpanTicks = long.MinValue,
                     IsActive = false,
                     IsMultipleAnswer = false,
-                    RepeatOnDayOfWeek = Enum.GetName(DayOfWeek.Monday),
+                    RepeatOnDayOfWeek = nameof(DayOfWeek.Monday),
                     ChannelId = null,
                     OptionPresetId = null,
                     RoleId = null,
@@ -138,7 +138,7 @@ public class WeeklyPollService(
                     wp => wp.Channel,
                     wp => wp.WeeklyPollOptions,
                     wp => wp.OptionPreset,
-                    wp => wp.OptionPreset.WeeklyPollOptions
+                    wp => wp.OptionPreset!.WeeklyPollOptions
                 ]);
 
             result = poll == null ? null : mapper.Map<WeeklyPoll, WeeklyPollResource>(poll);
@@ -163,7 +163,7 @@ public class WeeklyPollService(
                     wp => wp.Channel,
                     wp => wp.WeeklyPollOptions,
                     wp => wp.OptionPreset,
-                    wp => wp.OptionPreset.WeeklyPollOptions
+                    wp => wp.OptionPreset!.WeeklyPollOptions
                 ]);
 
             result = mapper.Map<List<WeeklyPoll>, List<WeeklyPollResource>>(polls);
@@ -188,7 +188,7 @@ public class WeeklyPollService(
                     wp => wp.Channel,
                     wp => wp.WeeklyPollOptions,
                     wp => wp.OptionPreset,
-                    wp => wp.OptionPreset.WeeklyPollOptions
+                    wp => wp.OptionPreset!.WeeklyPollOptions
                 ]);
 
             result = mapper.Map<List<WeeklyPoll>, List<WeeklyPollResource>>(polls);
@@ -226,7 +226,7 @@ public class WeeklyPollService(
         return DbProcessResultEnum.Failure;
     }
 
-    public async Task<DbProcessResultEnum> UpdateAsync(int pollId, EditWeeklyPollModal modal, ulong channelId, ulong? roleId, string? roleName)
+    public async Task<DbProcessResultEnum> UpdateAsync(int pollId, EditWeeklyPollModal modal, ulong channelId, RoleResource? role)
     {
         try
         {
@@ -240,15 +240,15 @@ public class WeeklyPollService(
                     ServerId = poll.ServerId
                 };
 
-                Role? role = null;
-                if (roleId.HasValue)
+                Role? pollRole = null;
+                if (role != null)
                 {
-                    string roleDiscordId = roleId.Value.ToString();
-                    role = await roleRepository.FirstOrDefaultAsync(r => r.DiscordId == roleDiscordId);
-                    role ??= new Role()
+                    string roleDiscordId = role.DiscordId.ToString();
+                    pollRole = await roleRepository.FirstOrDefaultAsync(r => r.DiscordId == roleDiscordId);
+                    pollRole ??= new Role()
                     {
                         DiscordId = roleDiscordId,
-                        RoleName = roleName,
+                        RoleName = role.RoleName,
                         ServerId = poll.ServerId
                     };
                 }
@@ -260,7 +260,7 @@ public class WeeklyPollService(
                 poll.Name = modal.Name;
                 poll.Title = modal.PollTitle;
                 poll.Channel = channel;
-                poll.Role = role;
+                poll.Role = pollRole;
                 poll.ModifiedOn = DateTime.UtcNow;
 
                 _ = await weeklyPollRepository.SaveChangesAsync();

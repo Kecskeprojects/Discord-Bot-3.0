@@ -1,6 +1,7 @@
 ﻿using Discord_Bot.Communication;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.Extensions;
@@ -12,9 +13,9 @@ using System.Linq;
 
 namespace Discord_Bot.Processors.ImageProcessors;
 
-public class BiasGameWinnerBracketImageProcessor(BotLogger logger)
+public class BiasGameWinnerBracketImageProcessor(IBotLogger logger)
 {
-    private readonly BotLogger logger = logger;
+    private readonly IBotLogger logger = logger;
 
     //Null when the image could not be made, the error is logged
     public MemoryStream? UpdateWinnerBracket(BiasGameData biasGameData)

@@ -1,5 +1,5 @@
 ﻿using Discord_Bot.Communication.Bias;
-using Discord_Bot.Core;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
@@ -16,11 +16,11 @@ public class BiasScrapingProcessor(
     IIdolService idolService,
     IKpopDbScraper kpopDbScraper,
     BrowserService browserService,
-    BotLogger logger)
+    IBotLogger logger)
 {
     private readonly IIdolService idolService = idolService;
     private readonly IKpopDbScraper kpopDbScraper = kpopDbScraper;
-    private readonly BotLogger logger = logger;
+    private readonly IBotLogger logger = logger;
 
     public async Task RunUpdateBiasDataAsync()
     {

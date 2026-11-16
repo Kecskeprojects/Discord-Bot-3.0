@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Discord_Bot.Core;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ namespace Discord_Bot.Features;
 public class YoutubeAddPlaylistFeature(
     DiscordSocketClient client,
     IServerService serverService,
-    BotLogger logger) : BaseFeature(serverService, logger)
+    IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly DiscordSocketClient client = client;
 

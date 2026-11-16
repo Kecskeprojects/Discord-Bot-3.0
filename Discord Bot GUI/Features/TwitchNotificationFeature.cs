@@ -1,8 +1,8 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Discord_Bot.Communication;
-using Discord_Bot.Core;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Processors.EmbedProcessors;
 using Discord_Bot.Resources;
@@ -16,7 +16,7 @@ namespace Discord_Bot.Features;
 public class TwitchNotificationFeature(
     DiscordSocketClient client,
     IServerService serverService,
-    BotLogger logger) : BaseFeature(serverService, logger)
+    IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly DiscordSocketClient client = client;
 
