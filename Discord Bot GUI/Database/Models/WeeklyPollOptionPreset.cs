@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Database.Models;
@@ -7,9 +7,9 @@ public partial class WeeklyPollOptionPreset
 {
     public int WeeklyPollOptionPresetId { get; set; }
 
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
-    public string Description { get; set; }
+    public string Description { get; set; } = null!;
 
     public bool IsSpecialPreset { get; set; }
 

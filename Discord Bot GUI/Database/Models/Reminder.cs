@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Database.Models;
@@ -11,9 +11,9 @@ public partial class Reminder
 
     public DateTime Date { get; set; }
 
-    public string Message { get; set; }
+    public string Message { get; set; } = null!;
 
     public DateTime CreatedOn { get; set; }
 
-    public virtual User User { get; set; }
+    public virtual User User { get; set; } = null!;
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Database.Models;
@@ -23,7 +23,7 @@ public partial class UserIdolStatistic
 
     public DateTime ModifiedOn { get; set; }
 
-    public virtual Idol Idol { get; set; }
+    public virtual Idol Idol { get; set; } = null!;
 
-    public virtual User User { get; set; }
+    public virtual User User { get; set; } = null!;
 }

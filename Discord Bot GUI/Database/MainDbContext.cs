@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Discord_Bot.Database.Models;
 using Microsoft.EntityFrameworkCore;
@@ -87,7 +87,6 @@ public partial class MainDbContext : DbContext
                 .HasDefaultValueSql("(getutcdate())", "DF_Channel_CreatedOn")
                 .HasColumnType("datetime");
             entity.Property(e => e.DiscordId)
-                .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
 
@@ -111,6 +110,8 @@ public partial class MainDbContext : DbContext
                     {
                         j.HasKey("ChannelId", "ChannelTypeId").HasName("PK_ChannelId_ChannelTypeId");
                         j.ToTable("ServerSettingChannel");
+                        j.IndexerProperty<int>("ChannelId");
+                        j.IndexerProperty<int>("ChannelTypeId");
                     });
         });
 
@@ -125,7 +126,6 @@ public partial class MainDbContext : DbContext
                 .HasDefaultValueSql("(getutcdate())", "DF_ChannelType_CreatedOn")
                 .HasColumnType("datetime");
             entity.Property(e => e.Name)
-                .IsRequired()
                 .HasMaxLength(100)
                 .IsUnicode(false);
         });
@@ -137,14 +137,12 @@ public partial class MainDbContext : DbContext
             entity.ToTable("CustomCommand");
 
             entity.Property(e => e.Command)
-                .IsRequired()
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.CreatedOn)
                 .HasDefaultValueSql("(getutcdate())", "DF_CustomCommand_CreatedOn")
                 .HasColumnType("datetime");
             entity.Property(e => e.Url)
-                .IsRequired()
                 .HasMaxLength(500)
                 .IsUnicode(false);
 
@@ -164,7 +162,6 @@ public partial class MainDbContext : DbContext
                 .HasDefaultValueSql("(getutcdate())", "DF_Greeting_CreatedOn")
                 .HasColumnType("datetime");
             entity.Property(e => e.Url)
-                .IsRequired()
                 .HasMaxLength(500)
                 .IsUnicode(false);
         });
@@ -188,7 +185,6 @@ public partial class MainDbContext : DbContext
                 .HasDefaultValueSql("(getutcdate())", "DF_Idol_ModifiedOn")
                 .HasColumnType("datetime");
             entity.Property(e => e.Name)
-                .IsRequired()
                 .HasMaxLength(100)
                 .IsUnicode(false);
             entity.Property(e => e.ProfileUrl).HasMaxLength(200);
@@ -206,7 +202,6 @@ public partial class MainDbContext : DbContext
             entity.ToTable("IdolAlias");
 
             entity.Property(e => e.Alias)
-                .IsRequired()
                 .HasMaxLength(100)
                 .IsUnicode(false);
             entity.Property(e => e.CreatedOn)
@@ -233,7 +228,6 @@ public partial class MainDbContext : DbContext
                 .HasDefaultValueSql("(getutcdate())", "DF_IdolGroup_ModifiedOn")
                 .HasColumnType("datetime");
             entity.Property(e => e.Name)
-                .IsRequired()
                 .HasMaxLength(100)
                 .IsUnicode(false);
         });
@@ -248,7 +242,6 @@ public partial class MainDbContext : DbContext
                 .HasDefaultValueSql("(getutcdate())", "DF_IdolImage_CreatedOn")
                 .HasColumnType("datetime");
             entity.Property(e => e.ImageUrl)
-                .IsRequired()
                 .HasMaxLength(200)
                 .HasColumnName("ImageURL");
             entity.Property(e => e.OverriddenUrl)
@@ -270,7 +263,6 @@ public partial class MainDbContext : DbContext
                 .HasDefaultValueSql("(getutcdate())", "DF_Reminder_CreatedOn")
                 .HasColumnType("datetime");
             entity.Property(e => e.Message)
-                .IsRequired()
                 .HasMaxLength(500)
                 .IsUnicode(false);
 
@@ -292,11 +284,9 @@ public partial class MainDbContext : DbContext
                 .HasDefaultValueSql("(getutcdate())", "DF_Role_CreatedOn")
                 .HasColumnType("datetime");
             entity.Property(e => e.DiscordId)
-                .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.RoleName)
-                .IsRequired()
                 .HasMaxLength(50)
                 .IsUnicode(false);
 
@@ -318,7 +308,6 @@ public partial class MainDbContext : DbContext
                 .HasDefaultValueSql("(getutcdate())", "DF_Server_CreatedOn")
                 .HasColumnType("datetime");
             entity.Property(e => e.DiscordId)
-                .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.ModifiedOn)
@@ -342,7 +331,6 @@ public partial class MainDbContext : DbContext
             entity.HasKey(e => new { e.UserId, e.ServerId }).HasName("PK_Muted_ServerId_UserId");
 
             entity.Property(e => e.MutedUntil).HasColumnType("datetime");
-            entity.Property(e => e.RemovedRoleDiscordIds).IsRequired();
 
             entity.HasOne(d => d.Server).WithMany(p => p.ServerMutedUsers)
                 .HasForeignKey(d => d.ServerId)
@@ -365,15 +353,12 @@ public partial class MainDbContext : DbContext
                 .HasDefaultValueSql("(getutcdate())", "DF_TwitchChannel_CreatedOn")
                 .HasColumnType("datetime");
             entity.Property(e => e.TwitchId)
-                .IsRequired()
                 .HasMaxLength(12)
                 .IsUnicode(false);
             entity.Property(e => e.TwitchLink)
-                .IsRequired()
                 .HasMaxLength(100)
                 .IsUnicode(false);
             entity.Property(e => e.TwitchName)
-                .IsRequired()
                 .HasMaxLength(75)
                 .IsUnicode(false);
 
@@ -395,7 +380,6 @@ public partial class MainDbContext : DbContext
                 .HasDefaultValueSql("(getutcdate())", "DF_User_CreatedOn")
                 .HasColumnType("datetime");
             entity.Property(e => e.DiscordId)
-                .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.LastFmusername)
@@ -420,6 +404,8 @@ public partial class MainDbContext : DbContext
                     {
                         j.HasKey("UserId", "IdolId").HasName("PK_UserId_IdolId");
                         j.ToTable("UserBias");
+                        j.IndexerProperty<int>("UserId");
+                        j.IndexerProperty<int>("IdolId");
                     });
         });
 
@@ -458,16 +444,11 @@ public partial class MainDbContext : DbContext
             entity.Property(e => e.ModifiedOn)
                 .HasDefaultValueSql("(getutcdate())", "DF_WeeklyPoll_ModifiedOn")
                 .HasColumnType("datetime");
-            entity.Property(e => e.Name)
-                .IsRequired()
-                .HasMaxLength(50);
+            entity.Property(e => e.Name).HasMaxLength(50);
             entity.Property(e => e.RepeatOnDayOfWeek)
-                .IsRequired()
                 .HasMaxLength(10)
                 .IsUnicode(false);
-            entity.Property(e => e.Title)
-                .IsRequired()
-                .HasMaxLength(300);
+            entity.Property(e => e.Title).HasMaxLength(300);
 
             entity.HasOne(d => d.Channel).WithMany(p => p.WeeklyPolls)
                 .HasForeignKey(d => d.ChannelId)
@@ -499,9 +480,7 @@ public partial class MainDbContext : DbContext
             entity.Property(e => e.ModifiedOn)
                 .HasDefaultValueSql("(getutcdate())", "DF_WeeklyPollOption_ModifiedOn")
                 .HasColumnType("datetime");
-            entity.Property(e => e.Title)
-                .IsRequired()
-                .HasMaxLength(55);
+            entity.Property(e => e.Title).HasMaxLength(55);
 
             entity.HasOne(d => d.WeeklyPoll).WithMany(p => p.WeeklyPollOptions)
                 .HasForeignKey(d => d.WeeklyPollId)
@@ -521,16 +500,12 @@ public partial class MainDbContext : DbContext
             entity.Property(e => e.CreatedOn)
                 .HasDefaultValueSql("(getutcdate())", "DF_WeeklyPollOptionPreset_CreatedOn")
                 .HasColumnType("datetime");
-            entity.Property(e => e.Description)
-                .IsRequired()
-                .HasMaxLength(100);
+            entity.Property(e => e.Description).HasMaxLength(100);
             entity.Property(e => e.IsActive).HasDefaultValue(true, "DF_WeeklyPollOptionPreset_IsActive");
             entity.Property(e => e.ModifiedOn)
                 .HasDefaultValueSql("(getutcdate())", "DF_WeeklyPollOptionPreset_ModifiedOn")
                 .HasColumnType("datetime");
-            entity.Property(e => e.Name)
-                .IsRequired()
-                .HasMaxLength(100);
+            entity.Property(e => e.Name).HasMaxLength(100);
         });
 
         OnModelCreatingPartial(modelBuilder);

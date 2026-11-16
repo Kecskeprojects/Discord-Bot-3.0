@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Database.Models;
@@ -13,13 +13,13 @@ public partial class WeeklyPollOption
 
     public byte OrderNumber { get; set; }
 
-    public string Title { get; set; }
+    public string Title { get; set; } = null!;
 
     public DateTime CreatedOn { get; set; }
 
     public DateTime ModifiedOn { get; set; }
 
-    public virtual WeeklyPoll WeeklyPoll { get; set; }
+    public virtual WeeklyPoll? WeeklyPoll { get; set; }
 
-    public virtual WeeklyPollOptionPreset WeeklyPollOptionPreset { get; set; }
+    public virtual WeeklyPollOptionPreset? WeeklyPollOptionPreset { get; set; }
 }

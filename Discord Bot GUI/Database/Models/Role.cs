@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Database.Models;
@@ -9,13 +9,13 @@ public partial class Role
 
     public int ServerId { get; set; }
 
-    public string DiscordId { get; set; }
+    public string DiscordId { get; set; } = null!;
 
-    public string RoleName { get; set; }
+    public string RoleName { get; set; } = null!;
 
     public DateTime CreatedOn { get; set; }
 
-    public virtual Server Server { get; set; }
+    public virtual Server Server { get; set; } = null!;
 
     public virtual ICollection<Server> ServerMuteRoles { get; set; } = new List<Server>();
 

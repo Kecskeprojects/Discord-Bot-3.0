@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Database.Models;
@@ -15,7 +15,7 @@ public partial class Birthday
 
     public DateTime CreatedOn { get; set; }
 
-    public virtual Server Server { get; set; }
+    public virtual Server Server { get; set; } = null!;
 
-    public virtual User User { get; set; }
+    public virtual User User { get; set; } = null!;
 }

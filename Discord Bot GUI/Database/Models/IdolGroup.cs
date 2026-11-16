@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Database.Models;
@@ -7,13 +7,13 @@ public partial class IdolGroup
 {
     public int GroupId { get; set; }
 
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     public DateOnly? DebutDate { get; set; }
 
-    public string FullName { get; set; }
+    public string? FullName { get; set; }
 
-    public string FullKoreanName { get; set; }
+    public string? FullKoreanName { get; set; }
 
     public DateTime CreatedOn { get; set; }
 

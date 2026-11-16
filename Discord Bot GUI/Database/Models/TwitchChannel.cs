@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Database.Models;
@@ -7,15 +7,15 @@ public partial class TwitchChannel
 {
     public int TwitchChannelId { get; set; }
 
-    public string TwitchId { get; set; }
+    public string TwitchId { get; set; } = null!;
 
-    public string TwitchLink { get; set; }
+    public string TwitchLink { get; set; } = null!;
 
-    public string TwitchName { get; set; }
+    public string TwitchName { get; set; } = null!;
 
     public int ServerId { get; set; }
 
     public DateTime CreatedOn { get; set; }
 
-    public virtual Server Server { get; set; }
+    public virtual Server Server { get; set; } = null!;
 }
