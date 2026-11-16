@@ -1,0 +1,7 @@
+// Symbols the build reports as RS0030 (Microsoft.CodeAnalysis.BannedApiAnalyzers, added in Directory.Build.props).
+// Format: documentation ID (T: type, M: method, F: field, N: namespace), then ';' and the reason shown in the warning.
+T:System.Console;Log through BotLogger: only what goes through it reaches the window and the log files
+F:Discord.Commands.RunMode.Async;RunMode.Async was tried and rejected: commands run Sync, and CommandHandler dispatches them in the background
+F:Discord.Interactions.RunMode.Async;RunMode.Async was tried and rejected: interactions run Sync, and InteractionHandler dispatches them in the background
+M:System.Reflection.Assembly.GetEntryAssembly;Use typeof(SomeType).Assembly: the entry assembly is not the bot under tools such as EF or test runners
+N:SixLabors.ImageSharp;ImageSharp was removed because its newer versions need a paid license: use Magick.NET (Tools/ImageTools.cs, Tools/MagickTools.cs)

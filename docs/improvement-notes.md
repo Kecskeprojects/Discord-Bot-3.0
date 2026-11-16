@@ -86,6 +86,45 @@ Kept as a record of what changed and why. File and line references are from `bdc
 **Security, CA5369 (1): done 2026-11-16**
 - `WordOfTheDayService` deserialized the external RSS with `XmlSerializer.Deserialize(TextReader)`, which processes DTDs. It now reads through `XmlReader.Create(..., new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore })` (`Ignore` rather than `Prohibit`, so a DOCTYPE in the feed doesn't throw). Checked against 6 live feeds (zh, fr, ru, hindi, esp, pl): identical results to the old path, and none has a DOCTYPE.
 
+### Further rule candidates (investigated 2026-11-16, recommended and optional ones applied 2026-11-16)
+
+Trial builds on top of the zero-warning setup. Counts are new warnings.
+
+**Outcome (2026-11-16):** all recommended and optional rules below are on, and the build is back at 0 warnings in Debug and Release.
+- CA2000: all 14 fixed. `Startup.Run` is suppressed in GlobalSuppressions (DI singletons). `YoutubeAPI` needed more than a `using`: the playlist import runs in the background after `Run` returns and used `Run`'s service. It now creates and disposes its own service once the user confirms. `GetChildProcessCount` also disposes the child `Process` objects it creates every second.
+- CA1063: the 5 finalizers are removed and the 8 types sealed. Two bugs went with them:
+  - `WhoKnowsEmbedResult.Dispose()` threw on a null `ImageData` (who-knows embeds without an image). `Dispose` stopped before marking itself disposed, so the finalizer ran it again on the finalizer thread, which ends the process.
+  - `LastFmWhoKnowsEmbedProcessor` hands an `EditPictureResult`'s stream to the who-knows result without disposing the `EditPictureResult`, so its finalizer could close the stream while the embed was still being sent.
+- Naming: 16 fields renamed; private constants keep PascalCase through a more specific rule.
+- Banned API list: `BannedSymbols.txt` at the repo root, with `Microsoft.CodeAnalysis.BannedApiAnalyzers` 5.6.0 added in `Directory.Build.props`. Checked with a temporary file that every entry reports RS0030.
+- **CA1508, kept on trial: 4 of 5 findings were right.**
+  - Real bug: `ChannelTypeEnumTools.TryGetEnumFromCommandText` ran `FirstOrDefault` over a non-nullable enum, so it always returned `true`, with `None` for unknown text. `!channel add/remove <typo>` answered "ChannelType or Server not found." instead of listing the valid types, and "unspecified" was accepted as `None`.
+  - Dead code: `BotLogger.LogToFile` (the writer null check) and `TwitterScraper` (`Body?.` after the null check).
+  - False positive, suppressed: `AudioPlayFeature.WaitAsync` reads `VoiceChannel` again after a `Task.Delay`, during which the bot can be disconnected.
+
+**Recommended**
+1. **IDE code-quality rules** (`dotnet_analyzer_diagnostic.category-CodeQuality.severity = warning`): unused or unread private members, unnecessary suppressions and similar. **0 warnings today**, so it only guards future code.
+2. **CA2000, dispose objects before losing scope** (14). Real leaks:
+   - `ProcessTools.cs:17-21` creates 5 `PerformanceCounter`s on every diagnostics tick (once a second when `ShowDiagnostics` is on) and never disposes them.
+   - `ProcessExtension.cs:14,32` (`ManagementObjectSearcher`), `WebTools.cs:45` (`Ping`, on every login attempt), `YoutubeAPI.cs:85` (`YouTubeService` per search), `TwitchCLI.cs:45`, `UserBiasGameCommands.cs:79` (`BiasGameData` from `TryRemove`).
+   - False positives: `Startup.cs:32,47,54`, DI singletons the container owns. Suppress those with a justification.
+3. **CA1063, implement IDisposable correctly** (21, in 8 types). `AudioVariables`, `BiasGameData`, `EditPictureResult`, `ServerAudioResource` and `WhoKnowsEmbedResult` have finalizers that call `Dispose()` on managed objects. That is unsafe, because those objects may already be finalized; the `AudioVariables` finalizer crash in section 3 was this pattern. They hold no native resources, so the fix is to remove the finalizers and seal the classes. `App`, `BotMain` and `BotWindow` only need `sealed`.
+
+**Optional**
+4. **Private field naming**, camelCase without a prefix, as most of the code already does (16). The exceptions: `_` prefix in `AudioVariables`, `BiasGameData`, `EditPictureResult`, `ServerAudioResource`, `WhoKnowsEmbedResult`, `MusicBrainzAPI`, `WordOfTheDayService`, `LastFmApi/BaseRequests`; PascalCase in `App.BotService`, `TextFont.InstalledFamilies`, `Config.Configuration`, `TwitchAPI` (`Monitor`, `API`, `Token`, `TokenTick`), `BotWindow.AutoScroll`.
+5. **Banned API list** (`Microsoft.CodeAnalysis.BannedApiAnalyzers` package + `BannedSymbols.txt`) to turn CLAUDE.md rules into build errors: `Console.*` (use `BotLogger`), `RunMode.Async` (rejected), `Assembly.GetEntryAssembly`, `SixLabors.*` (license). No current violations, so it's a guard only. `DateTime.Now` is better left off the list, because the 3 uses (`BotLoggerTools`, `DateTimeTools`) are deliberate local log times.
+6. **CA1508, dead conditional code** (5): `BotLogger.cs:24`, `AudioPlayFeature.cs:178`, `TwitterScraper.cs:96-97`, `ChannelTypeEnumTools.cs:26`. Useful, but this rule is known for false positives.
+
+**Not recommended**
+- The rest of `AnalysisLevel=latest-all` (2,184 warnings in total): CA2007 ConfigureAwait (880), CA1515 make types internal (387), CA1031 catch `Exception` (278, the project's convention), CA1062 validate arguments (183, nullable is the better tool), CA1002 / CA2227 / CA1056 library-design rules, and CA5394 insecure `Random` (games, not security). CA1849 (12) mostly flags `GetChannel` / `GetRole`, which are cache lookups in Discord.Net.
+- `Microsoft.VisualStudio.Threading.Analyzers`: a poor fit. 7 of the 8 `async void` methods are event handlers or overrides whose signatures require it, the 4 `.Result` hits are JSON properties named `Result`, and the only blocking wait is the deliberate 3-second shutdown wait. It would mostly add `Async`-suffix naming and VS-extension threading rules.
+- Nullable reference types for the whole project: 991 warnings (637 are CS8618, uninitialized non-nullable properties, mostly DTOs and models). Stay with the folder-by-folder plan above.
+
+**Found on the way**
+- **Done 2026-11-16:** `App.StartTwitchMonitor` was `async void` without a try/catch on its own thread. `TwitchAPI.Start()` catches its own exceptions, but creating the scope or constructing `TwitchAPI` and its dependencies (e.g. `Config` with a broken config file) could still throw and end the process. It now logs instead.
+- Open: `App.OnStartup` is also `async void` without a try/catch around `await BotService.RunBotAsync()`. `RunBotAsync` has only a `finally`, so a login failure at startup (e.g. an invalid token, which `LoginAsync` rejects) goes unhandled on the UI thread and closes the app without a log entry, instead of leaving the reconnect timer to retry. The other `async void` handlers already catch their exceptions.
+- Open: the Twitch monitor keeps one DI scope for its whole life (`Check` ends with `await Task.Delay(-1)`), so every Twitch event handler shares that scope's `DbContext`. The handlers are `async void` and can overlap (e.g. a service tick during a stream-online announcement), and `DbContext` doesn't allow concurrent use ("A second operation was started on this context"). Creating a scope per event would avoid it.
+
 ## 2. Test project (investigated 2026-11-15)
 
 ### Already in good shape

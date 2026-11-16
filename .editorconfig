@@ -19,12 +19,38 @@ csharp_style_expression_bodied_local_functions = when_on_single_line
 
 #### Code style (IDE) rules: everything Visual Studio suggests is a build warning ####
 dotnet_analyzer_diagnostic.category-Style.severity = warning
+# Code quality IDE rules too: unused or unread private members, unnecessary suppressions, ...
+dotnet_analyzer_diagnostic.category-CodeQuality.severity = warning
 
 # Populate switch: a switch doesn't need a case for every enum value when the default branch covers the rest.
 dotnet_diagnostic.IDE0010.severity = suggestion
 dotnet_diagnostic.IDE0072.severity = suggestion
 
-#### Code quality (CA) rules: AnalysisLevel latest-recommended, with these exceptions ####
+#### Naming (IDE1006) ####
+# Private fields are camelCase without a prefix, static and readonly ones included.
+dotnet_naming_rule.private_fields_camel_case.symbols = private_fields
+dotnet_naming_rule.private_fields_camel_case.style = camel_case
+dotnet_naming_rule.private_fields_camel_case.severity = warning
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_style.camel_case.capitalization = camel_case
+
+# Private constants stay PascalCase, like the public ones in Constant.cs (the more specific rule wins).
+dotnet_naming_rule.private_constants_pascal_case.symbols = private_constants
+dotnet_naming_rule.private_constants_pascal_case.style = pascal_case
+dotnet_naming_rule.private_constants_pascal_case.severity = warning
+dotnet_naming_symbols.private_constants.applicable_kinds = field
+dotnet_naming_symbols.private_constants.applicable_accessibilities = private
+dotnet_naming_symbols.private_constants.required_modifiers = const
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+#### Code quality (CA) rules: AnalysisLevel latest-recommended, with these additions and exceptions ####
+
+# Added on top of latest-recommended: CA2000 (dispose objects before losing scope), CA1063 (implement IDisposable
+# correctly) and CA1508 (dead conditional code, on trial: it is known for false positives).
+dotnet_diagnostic.CA2000.severity = warning
+dotnet_diagnostic.CA1063.severity = warning
+dotnet_diagnostic.CA1508.severity = warning
 
 # CA1304 / CA1311 (ToLower/ToUpper without a culture): lowercasing only differs from the invariant culture under Turkish,
 # Azerbaijani and Lithuanian cultures, which the bot's machines don't use (dev PC: hu-HU). Most calls are inside EF
