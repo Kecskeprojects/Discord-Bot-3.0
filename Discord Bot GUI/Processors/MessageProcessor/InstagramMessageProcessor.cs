@@ -31,7 +31,7 @@ public static class InstagramMessageProcessor
             {
                 text = text[..indexOfTag];
             }
-            text = UrlTools.SanitizeText(text) ?? "";
+            text = UrlTools.SanitizeText(text);
 
             message += $"{text}\n";
         }

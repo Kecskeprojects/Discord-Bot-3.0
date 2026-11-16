@@ -280,14 +280,12 @@ public class WeeklyPollService(
         return DbProcessResultEnum.Failure;
     }
 
-    public async Task<DbProcessResultEnum> UpdateFieldAsync(int pollId, string fieldName, string? newValue)
+    public async Task<DbProcessResultEnum> UpdateFieldAsync(int pollId, string fieldName, string newValue)
     {
         try
         {
-            if (newValue == "custom")
-            {
-                newValue = null;
-            }
+            //"custom" in the preset select means no preset (custom answers), stored as a null OptionPresetId
+            string? value = newValue == "custom" ? null : newValue;
 
             WeeklyPoll? poll = await weeklyPollRepository.FirstOrDefaultAsync(p => p.WeeklyPollId == pollId);
             if (poll == null)
@@ -302,13 +300,13 @@ public class WeeklyPollService(
             object? convertedValue;
             if (property.PropertyType == typeof(int?))
             {
-                convertedValue = int.TryParse(newValue, out int tempValue) ? tempValue : null;
+                convertedValue = int.TryParse(value, out int tempValue) ? tempValue : null;
             }
             else
             {
                 _ = Enum.TryParse(property.PropertyType.Name, true, out TypeCode enumValue); //Get the type based on typecode
 
-                convertedValue = Convert.ChangeType(newValue, enumValue, CultureInfo.InvariantCulture); //Convert the value to that of the typecode
+                convertedValue = Convert.ChangeType(value, enumValue, CultureInfo.InvariantCulture); //Convert the value to that of the typecode
             }
 
             property.SetValue(poll, convertedValue); // Set the converted value

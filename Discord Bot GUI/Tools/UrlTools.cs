@@ -7,7 +7,7 @@ namespace Discord_Bot.Tools;
 
 public static class UrlTools
 {
-    public static List<Uri>? LinkSearch(string? message, bool ignoreEmbedSuppress, params string[] baseURLs)
+    public static List<Uri>? LinkSearch(string message, bool ignoreEmbedSuppress, params string[] baseURLs)
     {
         if (string.IsNullOrWhiteSpace(message))
         {
@@ -59,11 +59,11 @@ public static class UrlTools
         return null;
     }
 
-    public static string? SanitizeText(string? message)
+    public static string SanitizeText(string message)
     {
         if (string.IsNullOrWhiteSpace(message))
         {
-            return null;
+            return "";
         }
 
         int startIndex = 0;

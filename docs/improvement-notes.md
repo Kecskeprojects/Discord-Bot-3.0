@@ -201,6 +201,37 @@ Nullable reference types for the whole project (992 warnings):
   `TwitchAPI` now takes `IServiceProvider` and creates a scope for each channel lookup and each notification (the channel resources are DTOs, so they outlive the scope). The stream states are a `ConcurrentDictionary`.
 - **Done 2026-11-16:** the token refresh in `TwitchAPI.MonitorOnServiceTick` (every 1440 ticks, about 24 hours) stored the new token only in the `token` field, never in `api.Settings.AccessToken`, so the monitor kept using the token from startup. Twitch app access tokens expire after about 60 days, so a long-running bot would have stopped getting stream updates until a restart. It now sets `api.Settings.AccessToken` too; the monitor shares that client. Not checked live: that needs a bot running for over a day.
 
+### Null-check placement (investigated and fixed 2026-11-16)
+
+The goal: check a value for null where it comes from, and hand callees a non-nullable value. Where the caller has checked a value but the compiler loses track of it (a property of a property, a combined condition), the caller passes it on with `!` instead of the callee taking `T?`. The review covered every nullable parameter (63 declarations), every `!` and every `?.` / `??` outside the models.
+
+- There is no `!` at any call site; the only ones are `= null!` fields set before use (`App`, `BaseFeature`, `TwitchAPI`). Where a checked value was lost, the code used a nullable parameter or a `?? ""` fallback instead. Those are the items below.
+
+**Done 2026-11-16:**
+1. **`DiscordTools.IsTypeOfChannel` returned `true` for a null server.** Four of its five callers pass a server from `GetCurrentServerAsync`, which throws instead of returning null. `CommandHandler` passed `GetServerAsync`'s result. That was null in DMs (guarded by `!IsDM`), but also in a guild when the server was just added and could not be read back. The message then counted as a self-role request and was deleted. Now the parameter is `ServerResource`. `GetServerAsync` throws in a guild when the server can't be loaded, so null means a DM, and `CommandHandler` checks `server != null` instead of `!IsDM`.
+2. **Who-knows current user.** `UserLastfmCommands.LfWhoKnows` checks the current user and their Last.fm username when no artist or track is given. `LastFmAPI.GetWhoKnowsDataAsync` still took `UserResource? currentUser` and used `currentUser?.LastFmUsername ?? ""`, a fallback that couldn't trigger. Now the now-playing case is `GetWhoKnowsByNowPlayingAsync(string lastFmUsername, List<UserResource> users)`, and the command passes `currentUser!.LastFmUsername!` after its check. Both public methods end in the private `CreateWhoKnowsResultAsync` (request logging, image, sorted plays).
+3. **Helpers that turned a non-null input into null, which the callers turned back:**
+   - `UrlTools.SanitizeText` takes and returns `string`, returning `""` for blank text, so the three callers (Instagram, Twitter) lost their `?? ""`.
+   - `StringTools.AddNumberPositionIdentifier` takes and returns `string`. `GetNowPlayingAsync` calls it only when the play count request succeeded and parsed, instead of turning a missing count into `""`. `GetSongMonthlyRankingAsync` returns null after a failed request instead of passing a null response on. Its warning was also logged as `GetNowPlayingAsync`.
+   - `StringExtension.UrlCombine(this string str, string addition)`: all four callers pass non-null strings, so the null branches and both `[NotNullIfNotNull]` attributes are gone.
+   - `UrlTools.LinkSearch` takes `string message`; its one caller (Instagram embed, disabled) passes `Context.Message.Content`.
+4. **Nullable value types that always get a value:**
+   - The Last.fm top lists (`ILastFmAPI.GetTopAlbumsAsync` / `GetTopArtistsAsync` / `GetTopTracksAsync`, `LastFmListResultTools.Create*List`) take `int limit`. It is always `InputParameters.Limit`, and a null limit would have quietly given an empty list. `page` stays `int?`: it is always `null` at the bot level, but it maps to Last.fm's optional paging.
+   - The weekly poll and preset toggle buttons take `bool value`; their IDs always carry a `bool`.
+   - `WeeklyPollService.UpdateFieldAsync` / `WeeklyPollOptionPresetService.UpdateFieldAsync` take `string newValue`. In the poll service, `"custom"` (the preset select's "Custom Options") becomes null in a local for a null `OptionPresetId`.
+5. **A check repeated after it was done:** the second `BiasGameImageProcessor.CreatePolaroid` overload (now private) takes the `imageUrl` that the public overload resolved with `?? throw`, instead of checking `idol.LatestImageUrl?.StartsWith(…)` again.
+
+Checked and left as they are:
+- Parameters that carry an optional value: optional command arguments (`IChannel? channel = null`, `IUser? user = null`), event-handler senders, Last.fm's optional request parameters in `LastFmApi`, and optional data passed on for display or merging. That data includes the Spotify result, ranking and play count in `MapNowPlayingData`, `data` / `additional` in `IdolService.UpdateIdolDetailsAsync`, the MBID in `SearchItemAsync`, the optional role in `WeeklyPollService.UpdateAsync`, the bracket `winner` and an HTTP `contentType`. Also the check helpers themselves (`IsNullOrEmpty`, `IsNullOrZero`, `LastFmHelper.GetResultMessage`).
+- `BiasGameData.ReplaceWinnerBracket(MemoryStream?)`: keeping the current bracket when the new one is null is the method's purpose, so the two callers don't repeat it.
+- `?.` on JSON and scraped data (Twitter, Instagram, AngleSharp lookups), on things that may not exist yet (timers, the audio client, the stopwatch, `ffmpeg` in a `finally`), and on `context.Guild` in `RainbowRandomizerTools`, whose commands allow DMs.
+- Properties checked in the caller and read from the whole object in the callee, e.g. `additional.ImageUrl` in `UpdateIdolDetailsAsync`, checked in `BiasScrapingProcessor.UpdateBiasAsync`. The object is passed as a whole because the callee needs several of its properties.
+
+Found on the way:
+- **Done 2026-11-16:** `ISpotifyAPI.SearchItemAsync`'s `songName` defaulted to `""` while who-knows passes `null` for "no song"; the default is `null` now.
+- **Done 2026-11-16:** `PollPresetEditEmbedProcessor` built `PollPreset_Change_IsSpecialPreset_ {id}` with a stray space. Discord.Net's wildcard stops only at the delimiter `_`, and `int` parsing allows leading spaces, so the button most likely worked anyway.
+- Not a finding after all: the review said no caller passes `userId` to `IdolRepository.GetListByNamesAsync`, but `UserIdolService` does (the "already connected?" check when adding a bias). The caller search's output had been cut off before that call; the build caught it. The parameter is a real optional filter and stays.
+
 ## 2. Test project (investigated 2026-11-15)
 
 ### Already in good shape

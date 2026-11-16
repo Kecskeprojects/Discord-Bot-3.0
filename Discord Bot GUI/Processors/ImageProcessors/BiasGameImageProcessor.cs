@@ -37,17 +37,17 @@ public class BiasGameImageProcessor(BotLogger logger)
         string imageUrl = idol.LatestImageUrl ?? throw new InvalidOperationException($"Idol {idol.IdolId} has no image");
         using MemoryStream stream = await WebTools.GetStream(imageUrl);
 
-        return CreatePolaroid(idol, stream);
+        return CreatePolaroid(idol, imageUrl, stream);
     }
 
-    public Stream CreatePolaroid(IdolGameResource idol, Stream idolImageStream)
+    private MemoryStream CreatePolaroid(IdolGameResource idol, string imageUrl, Stream idolImageStream)
     {
         using MagickImage polaroidBase = MagickTools.LoadResource(Resource.polaroid_base);
 
         using MagickImage idolImage = new(idolImageStream);
         logger.Log("Format: " + idolImage.Format);
 
-        if (idol.LatestImageUrl?.StartsWith(Constant.DbKpopBaseUrl, StringComparison.Ordinal) != true)
+        if (!imageUrl.StartsWith(Constant.DbKpopBaseUrl, StringComparison.Ordinal))
         {
             ImageTools.CorrectImageRatio(idolImage, acceptableMargin: 0, cutoffTopRatio: 0.1, extraHeight: 0.05);
         }

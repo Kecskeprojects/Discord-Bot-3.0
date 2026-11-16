@@ -29,7 +29,7 @@ public static class PollPresetEditEmbedProcessor
                             , customId: $"EditPollPreset_{preset.WeeklyPollOptionPresetId}"
                             , style: ButtonStyle.Primary)
             .WithButton(label: preset.IsSpecialPreset ? "Special Options" : "Normal Options"
-                            , customId: $"PollPreset_Change_IsSpecialPreset_ {preset.WeeklyPollOptionPresetId}_{preset.IsSpecialPreset}"
+                            , customId: $"PollPreset_Change_IsSpecialPreset_{preset.WeeklyPollOptionPresetId}_{preset.IsSpecialPreset}"
                             , style: ButtonStyle.Primary)
             .WithButton(label: preset.IsActive ? "Active" : "Inactive"
                             , customId: $"PollPreset_Change_IsActive_{preset.WeeklyPollOptionPresetId}_{preset.IsActive}"

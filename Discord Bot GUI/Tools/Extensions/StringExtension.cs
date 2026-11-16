@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace Discord_Bot.Tools;
@@ -38,26 +37,8 @@ public static partial class StringExtension
         return newString;
     }
 
-    //Null only when both parts are null
-    [return: NotNullIfNotNull(nameof(str))]
-    [return: NotNullIfNotNull(nameof(addition))]
-    public static string? UrlCombine(this string? str, string? addition)
+    public static string UrlCombine(this string str, string addition)
     {
-        if (str == null && addition == null)
-        {
-            return null;
-        }
-
-        if (str == null)
-        {
-            return addition;
-        }
-
-        if (addition == null)
-        {
-            return str;
-        }
-
         string newString = str;
 
         if (!newString.EndsWith('/'))

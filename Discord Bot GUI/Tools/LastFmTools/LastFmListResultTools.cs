@@ -8,7 +8,7 @@ namespace Discord_Bot.Tools.LastFmTools;
 
 public static class LastFmListResultTools
 {
-    public static void CreateTopAlbumList(int? limit, LastFmListResult result, List<LastFmApi.Models.TopAlbum.Album> albums)
+    public static void CreateTopAlbumList(int limit, LastFmListResult result, List<LastFmApi.Models.TopAlbum.Album> albums)
     {
         int index = 0;
         for (int i = 0; i < albums.Count && i < limit; i++)
@@ -27,7 +27,7 @@ public static class LastFmListResultTools
         }
     }
 
-    public static void CreateTopArtistList(int? limit, LastFmListResult result, List<LastFmApi.Models.TopArtist.Artist> artists)
+    public static void CreateTopArtistList(int limit, LastFmListResult result, List<LastFmApi.Models.TopArtist.Artist> artists)
     {
 
         int index = 0;
@@ -47,7 +47,7 @@ public static class LastFmListResultTools
         }
     }
 
-    public static void CreateTopTrackList(int? limit, LastFmListResult result, List<LastFmApi.Models.TopTrack.Track> tracks)
+    public static void CreateTopTrackList(int limit, LastFmListResult result, List<LastFmApi.Models.TopTrack.Track> tracks)
     {
         int index = 0;
         for (int i = 0; i < tracks.Count && i < limit; i++)

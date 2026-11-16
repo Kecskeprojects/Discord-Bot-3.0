@@ -87,7 +87,7 @@ Config config) : BaseInteraction(serverService, logger, config)
     [ComponentInteraction("PollPreset_Change_*_*_*")]
     [RequireUserPermission(ChannelPermission.SendPolls)]
     [RequireContext(ContextType.Guild)]
-    public async Task DynamicChangeWeeklyPollPresetButtonHandler(string fieldName, int presetId, bool? value)
+    public async Task DynamicChangeWeeklyPollPresetButtonHandler(string fieldName, int presetId, bool value)
     {
         try
         {

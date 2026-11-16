@@ -110,7 +110,7 @@ public class WeeklyPollEditInteraction(
     [ComponentInteraction("Poll_Change_*_*_*")]
     [RequireUserPermission(ChannelPermission.SendPolls)]
     [RequireContext(ContextType.Guild)]
-    public async Task DynamicChangeWeeklyPollButtonHandler(string fieldName, int pollId, bool? value)
+    public async Task DynamicChangeWeeklyPollButtonHandler(string fieldName, int pollId, bool value)
     {
         try
         {

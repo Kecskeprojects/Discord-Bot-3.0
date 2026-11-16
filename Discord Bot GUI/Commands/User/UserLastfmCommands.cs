@@ -349,7 +349,10 @@ public class UserLastfmCommands(
 
             users = DiscordTools.FilterToOnlyServerMembers(Context, users);
 
-            WhoKnows wk = await lastFmAPI.GetWhoKnowsDataAsync(parameters, users, currentUser);
+            //Without parameters the check above made sure the current user has a Last.fm username
+            WhoKnows wk = string.IsNullOrEmpty(parameters)
+                ? await lastFmAPI.GetWhoKnowsByNowPlayingAsync(currentUser!.LastFmUsername!, users)
+                : await lastFmAPI.GetWhoKnowsDataAsync(parameters, users);
 
             if (string.IsNullOrEmpty(wk.Message))
             {

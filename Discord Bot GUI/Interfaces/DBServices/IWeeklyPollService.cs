@@ -17,6 +17,6 @@ public interface IWeeklyPollService
     Task<List<WeeklyPollResource>> GetPollsByServerIdAsync(ulong serverId);
     Task<DbProcessResultEnum> RemovePollByNameAsync(ulong serverId, string pollName);
     Task<DbProcessResultEnum> UpdateAsync(int pollId, EditWeeklyPollModal modal, ulong channelId, ulong? roleId, string? roleName);
-    Task<DbProcessResultEnum> UpdateFieldAsync(int pollId, string fieldName, string? newValue);
+    Task<DbProcessResultEnum> UpdateFieldAsync(int pollId, string fieldName, string newValue);
     Task<WeeklyPollResource?> GetPollForForceResendAsync(ulong id, string pollName);
 }

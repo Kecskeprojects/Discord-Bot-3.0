@@ -190,7 +190,7 @@ public class WeeklyPollOptionPresetService(
         return DbProcessResultEnum.Failure;
     }
 
-    public async Task<DbProcessResultEnum> UpdateFieldAsync(int presetId, string fieldName, string? newValue)
+    public async Task<DbProcessResultEnum> UpdateFieldAsync(int presetId, string fieldName, string newValue)
     {
         try
         {

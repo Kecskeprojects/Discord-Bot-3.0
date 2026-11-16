@@ -115,7 +115,7 @@ public class SpotifyAPI(BotLogger logger, Config config, IYoutubeAPI youtubeAPI,
 
     #region Image search
     //Lastfm complimentary function
-    public async Task<SpotifyImageSearchResult?> SearchItemAsync(string? mbid, string artistName, string? songName = "")
+    public async Task<SpotifyImageSearchResult?> SearchItemAsync(string? mbid, string artistName, string? songName = null)
     {
         try
         {

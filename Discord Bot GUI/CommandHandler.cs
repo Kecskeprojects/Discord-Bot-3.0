@@ -94,7 +94,7 @@ public class CommandHandler(
                 //Command execution
                 await ExecuteCommandAsync(context, argPos);
             }
-            else if (!DiscordTools.IsDM(context) && DiscordTools.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id, false))
+            else if (server != null && DiscordTools.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id, false))
             {
                 //Role handling
                 await HandleRoleAssignmentAsync(context, argPos);
@@ -111,25 +111,28 @@ public class CommandHandler(
         }
     }
 
-    //Null in DMs
+    //Null only in DMs; in a server it throws when the server can't be loaded or added
     private async Task<ServerResource?> GetServerAsync(SocketCommandContext context)
     {
+        if (DiscordTools.IsDM(context))
+        {
+            return null;
+        }
+
         using (IServiceScope scope = services.CreateScope())
         {
-            ServerResource? server = null;
-            if (!DiscordTools.IsDM(context))
+            IServerService serverService = scope.ServiceProvider.GetRequiredService<IServerService>();
+            ServerResource? server = await serverService.GetByDiscordIdAsync(context.Guild.Id);
+            if (server != null)
             {
-                IServerService serverService = scope.ServiceProvider.GetRequiredService<IServerService>();
-                server = await serverService.GetByDiscordIdAsync(context.Guild.Id);
-                if (server == null)
-                {
-                    DbProcessResultEnum result = await serverService.AddServerAsync(context.Guild.Id);
-                    server = result == DbProcessResultEnum.Success
-                        ? await serverService.GetByDiscordIdAsync(context.Guild.Id)
-                        : throw new InvalidOperationException($"{context.Guild.Name} could not be added to list!");
-                }
+                return server;
             }
-            return server;
+
+            DbProcessResultEnum result = await serverService.AddServerAsync(context.Guild.Id);
+            return result == DbProcessResultEnum.Success
+                ? await serverService.GetByDiscordIdAsync(context.Guild.Id)
+                    ?? throw new InvalidOperationException($"{context.Guild.Name} was added to list, but could not be loaded!")
+                : throw new InvalidOperationException($"{context.Guild.Name} could not be added to list!");
         }
     }
 

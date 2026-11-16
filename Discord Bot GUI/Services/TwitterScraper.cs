@@ -147,7 +147,7 @@ public class TwitterScraper(BotLogger logger, BrowserService browserService) : I
             }
 
             result.TextContent = HttpUtility.HtmlDecode(result.TextContent);
-            result.TextContent = UrlTools.SanitizeText(result.TextContent) ?? "";
+            result.TextContent = UrlTools.SanitizeText(result.TextContent);
         }
     }
     #endregion

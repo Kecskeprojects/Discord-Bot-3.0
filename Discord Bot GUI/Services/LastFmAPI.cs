@@ -25,7 +25,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
     private readonly Config config = config;
 
     #region Last.fm top calls
-    public async Task<LastFmListResult> GetTopAlbumsAsync(string lastFmUsername, int? limit, int? page, string period)
+    public async Task<LastFmListResult> GetTopAlbumsAsync(string lastFmUsername, int limit, int? page, string period)
     {
         GenericResponseItem<Topalbums> restResult = await UserBasedRequests.TopAlbums(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
         logger.Query("Last.fm request URL:\n" + restResult.RequestDetails?.ToString());
@@ -66,7 +66,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
         return result;
     }
 
-    public async Task<LastFmListResult> GetTopArtistsAsync(string lastFmUsername, int? limit, int? page, string period)
+    public async Task<LastFmListResult> GetTopArtistsAsync(string lastFmUsername, int limit, int? page, string period)
     {
         GenericResponseItem<Topartists> restResult = await UserBasedRequests.TopArtists(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
         logger.Query("Last.fm request URL:\n" + restResult.RequestDetails?.ToString());
@@ -107,7 +107,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
         return result;
     }
 
-    public async Task<LastFmListResult> GetTopTracksAsync(string lastFmUsername, int? limit, int? page, string period)
+    public async Task<LastFmListResult> GetTopTracksAsync(string lastFmUsername, int limit, int? page, string period)
     {
         GenericResponseItem<Toptracks> restResult = await UserBasedRequests.TopTracks(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
         logger.Query("Last.fm request URL:\n" + restResult.RequestDetails?.ToString());
@@ -180,8 +180,9 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
                 logger.Error("LastFmAPI.cs GetNowPlayingAsync", trackInfo.Exception);
             }
         }
-        int? userplaycount = int.TryParse(trackInfo.Response?.Userplaycount, out int playCount) ? playCount + 1 : null;
-        string? playCountString = StringTools.AddNumberPositionIdentifier(userplaycount?.ToString() ?? "");
+        string? playCountString = trackInfo.IsSuccess && int.TryParse(trackInfo.Response.Userplaycount, out int playCount)
+            ? StringTools.AddNumberPositionIdentifier((playCount + 1).ToString())
+            : null;
 
         string? ranking = await GetSongMonthlyRankingAsync(lastFmUsername, track.Artist.Text, track.Name);
 
@@ -295,19 +296,21 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
         return result;
     }
 
-    public async Task<WhoKnows> GetWhoKnowsDataAsync(string input, List<UserResource> users, UserResource? currentUser)
+    //For when the user doesn't give a song or artist: their currently playing song is checked
+    public async Task<WhoKnows> GetWhoKnowsByNowPlayingAsync(string lastFmUsername, List<UserResource> users)
     {
-        //Variable declarations
-        WhoKnows result = new(users);
+        List<string> usernameList = users.Select(x => x.LastFmUsername).OfType<string>().ToList();
+        GenericResponseItem<WhoKnowsResponseItem> restResult =
+            await WhoKnowsRequests.WhoKnowsByCurrentlyPlayingAsync(config.Lastfm_API_Key, lastFmUsername, usernameList);
 
-        //In case user doesn't give a song, we check if they are playing something
+        return await CreateWhoKnowsResultAsync(restResult, users);
+    }
+
+    public async Task<WhoKnows> GetWhoKnowsDataAsync(string input, List<UserResource> users)
+    {
         GenericResponseItem<WhoKnowsResponseItem> restResult;
         List<string> usernameList = users.Select(x => x.LastFmUsername).OfType<string>().ToList();
-        if (input == "")
-        {
-            restResult = await WhoKnowsRequests.WhoKnowsByCurrentlyPlayingAsync(config.Lastfm_API_Key, currentUser?.LastFmUsername ?? "", usernameList);
-        }
-        else if (input.Contains('>'))
+        if (input.Contains('>'))
         {
             //Get artist's name and the track for search
             string artistName = input.Split('>')[0].Trim().ToLower();
@@ -329,6 +332,14 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
             restResult = await WhoKnowsRequests.WhoKnowsByArtistAsync(config.Lastfm_API_Key, artistName, usernameList);
         }
 
+        return await CreateWhoKnowsResultAsync(restResult, users);
+    }
+
+    //The part both who-knows calls share: logging the requests, then the image and the sorted plays
+    private async Task<WhoKnows> CreateWhoKnowsResultAsync(GenericResponseItem<WhoKnowsResponseItem> restResult, List<UserResource> users)
+    {
+        WhoKnows result = new(users);
+
         foreach (LastFmRequestDetails item in restResult.RequestDetailList)
         {
             logger.Query("Last.fm request URL:\n" + item.ToString());
@@ -339,7 +350,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
             result.Message = LastFmHelper.GetResultMessage(restResult.ResultCode, restResult.Message);
             if (restResult.Exception != null)
             {
-                logger.Error("LastFmAPI.cs GetWhoKnowsDataAsync", restResult.Exception);
+                logger.Error("LastFmAPI.cs CreateWhoKnowsResultAsync", restResult.Exception);
             }
             return result;
         }
@@ -397,15 +408,15 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
         if (!ranking.IsSuccess)
         {
             string? resultMessage = LastFmHelper.GetResultMessage(ranking.ResultCode, ranking.Message);
-            logger.Warning("LastFmAPI.cs GetNowPlayingAsync", $"Last.fm request response message: {resultMessage}");
+            logger.Warning("LastFmAPI.cs GetSongMonthlyRankingAsync", $"Last.fm request response message: {resultMessage}");
             if (ranking.Exception != null)
             {
                 logger.Error("LastFmAPI.cs GetSongMonthlyRankingAsync", ranking.Exception);
             }
+            return null;
         }
-        ranking.Response = StringTools.AddNumberPositionIdentifier(ranking.Response);
 
-        return ranking.Response;
+        return StringTools.AddNumberPositionIdentifier(ranking.Response);
     }
 
     private async Task<GenericResponseItem<List<LastFmApi.Models.TopAlbum.Album>>> GetEveryAlbumUserListenedToFromArtistAsync(string username, string artistName)

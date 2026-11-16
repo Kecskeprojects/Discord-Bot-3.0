@@ -15,5 +15,5 @@ public interface IWeeklyPollOptionPresetService
     Task<List<WeeklyPollOptionPresetResource>> GetPresetsAsync();
     Task<DbProcessResultEnum> RemovePresetByNameAsync(string presetName);
     Task<DbProcessResultEnum> UpdateAsync(int presetId, EditWeeklyPollOptionPresetModal modal);
-    Task<DbProcessResultEnum> UpdateFieldAsync(int presetId, string fieldName, string? newValue);
+    Task<DbProcessResultEnum> UpdateFieldAsync(int presetId, string fieldName, string newValue);
 }

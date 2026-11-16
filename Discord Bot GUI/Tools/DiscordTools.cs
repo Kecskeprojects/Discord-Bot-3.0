@@ -12,11 +12,11 @@ namespace Discord_Bot.Tools;
 
 public static class DiscordTools
 {
-    public static bool IsTypeOfChannel(ServerResource? server, ChannelTypeEnum type, ulong channelId, bool allowLackOfType = true)
+    public static bool IsTypeOfChannel(ServerResource server, ChannelTypeEnum type, ulong channelId, bool allowLackOfType = true)
     {
-        return server == null || (!server.SettingsChannels.TryGetValue(type, out List<ulong>? value)
+        return !server.SettingsChannels.TryGetValue(type, out List<ulong>? value)
             ? allowLackOfType
-            : value.Contains(channelId));
+            : value.Contains(channelId);
     }
 
     public static Task<bool> IsOwner(SocketInteractionContext context)

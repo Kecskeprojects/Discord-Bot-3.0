@@ -107,7 +107,7 @@ public class InstaScraper(BotLogger logger) : IInstaScraper
             caption = caption[..indexOfTag];
         }
         caption = HttpUtility.HtmlDecode(caption);
-        caption = UrlTools.SanitizeText(caption) ?? "";
+        caption = UrlTools.SanitizeText(caption);
 
         result.TextContent += caption;
 

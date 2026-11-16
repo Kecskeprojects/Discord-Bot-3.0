@@ -4,10 +4,10 @@ namespace Discord_Bot.Tools.NativeTools;
 
 public static class StringTools
 {
-    public static string? AddNumberPositionIdentifier(string? position)
+    public static string AddNumberPositionIdentifier(string position)
     {
-        return string.IsNullOrEmpty(position)
-            ? null
+        return position.Length == 0
+            ? position
             : position.Length >= 2 && position[^2..] is "11" or "12" or "13"
             ? $"{position}th"
             : position[^1] switch
