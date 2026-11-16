@@ -15,7 +15,7 @@ public class WordOfTheDayService(BotLogger logger) : IWordOfTheDayService
 {
     private readonly BotLogger logger = logger;
 
-    private static readonly RestClient _client = new(Constant.WordOfTheDayBaseUri);
+    private static readonly RestClient client = new(Constant.WordOfTheDayBaseUri);
 
     public async Task<WotdBase> GetDataAsync(string language)
     {
@@ -25,7 +25,7 @@ public class WordOfTheDayService(BotLogger logger) : IWordOfTheDayService
             if (Constant.WotdLanguages.ContainsKey(language.ToLower()))
             {
                 RestRequest request = new(Constant.WotdLanguages[language.ToLower()]);
-                RestResponse response = await _client.GetAsync(request);
+                RestResponse response = await client.GetAsync(request);
 
                 XmlSerializer serializer = new(typeof(WotdBase));
                 using StringReader stringReader = new(response.Content);

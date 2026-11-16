@@ -93,8 +93,8 @@ public class TwitterScraper(BotLogger logger, BrowserService browserService) : I
                 return "Timeout while getting content.";
             }
 
-            string reason = Body?.Data?.TweetResult?.Result?.Reason;
-            string quoteReason = Body?.Data?.TweetResult?.Result?.QuotedStatusResult?.Result?.Reason;
+            string reason = Body.Data?.TweetResult?.Result?.Reason;
+            string quoteReason = Body.Data?.TweetResult?.Result?.QuotedStatusResult?.Result?.Reason;
             if (!string.IsNullOrEmpty(reason) || !string.IsNullOrEmpty(quoteReason))
             {
                 if (reason == "NsfwLoggedOut" || quoteReason == "NsfwLoggedOut")

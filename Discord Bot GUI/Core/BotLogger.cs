@@ -20,12 +20,11 @@ public class BotLogger
     {
         try
         {
-            StreamWriter logFileWriter = null;
-            if (Logs.Count != 0 && logFileWriter == null)
+            if (Logs.Count != 0)
             {
                 string file_location = $"Logs\\logs[{DateTimeTools.CurrentDate()}].txt";
 
-                using (logFileWriter = File.AppendText(file_location))
+                using (StreamWriter logFileWriter = File.AppendText(file_location))
                 {
                     string[] contents = Logs.Select(n => n.Content).ToArray();
                     foreach (string log in contents)
@@ -34,7 +33,6 @@ public class BotLogger
                     }
                 }
 
-                logFileWriter = null;
                 Logs.Clear();
             }
         }

@@ -5,9 +5,10 @@ using System.Threading;
 
 namespace Discord_Bot.Communication;
 
-public partial class AudioVariables : IDisposable
+//No finalizer: it holds only managed objects, which clean up after themselves
+public sealed partial class AudioVariables : IDisposable
 {
-    private bool _isDisposed;
+    private bool isDisposed;
 
     public bool Playing { get; set; }
 
@@ -21,16 +22,11 @@ public partial class AudioVariables : IDisposable
 
     public void Dispose()
     {
-        if (!_isDisposed)
+        if (!isDisposed)
         {
-            //Null when no connection was made, this also runs from the finalizer, where an exception would crash the whole process
+            //Null when no connection was made
             AudioClient?.Dispose();
-            _isDisposed = true;
+            isDisposed = true;
         }
-    }
-
-    ~AudioVariables()
-    {
-        Dispose();
     }
 }

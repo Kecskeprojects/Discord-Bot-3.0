@@ -82,11 +82,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
     {
         string currentKey = config.Youtube_API_Keys[youtubeApiKeyIndex];
 
-        YouTubeService youtubeService = new(new BaseClientService.Initializer()
-        {
-            ApiKey = currentKey,
-            ApplicationName = GetType().ToString()
-        });
+        using YouTubeService youtubeService = CreateYoutubeService(currentKey);
 
         logger.Query($"API key used: {currentKey}");
 
@@ -105,7 +101,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
 
                     if (queryPart.AllKeys.Contains("list"))
                     {
-                        _ = AddPlaylistAsync(youtubeService, queryPart, username, serverId, channelId);
+                        _ = AddPlaylistAsync(queryPart, username, serverId, channelId);
                     }
 
                     return await VideoSearch(youtubeService, queryPart["v"], username, serverId);
@@ -129,6 +125,16 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
     #endregion
 
     #region Helper Methods
+    //The caller owns the service and has to dispose it
+    private YouTubeService CreateYoutubeService(string apiKey)
+    {
+        return new(new BaseClientService.Initializer()
+        {
+            ApiKey = apiKey,
+            ApplicationName = GetType().ToString()
+        });
+    }
+
     //Searching by video ID
     private async Task<SearchResultEnum> VideoSearch(YouTubeService youtubeService, string query, string username, ulong serverId)
     {
@@ -268,7 +274,8 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
     }
 
     //Checking if user wants to add playlist
-    private async Task AddPlaylistAsync(YouTubeService youtubeService, NameValueCollection queryPart, string username, ulong serverId, ulong channelId)
+    //It keeps running after Run returned and disposed its service, so it creates its own once the user said yes
+    private async Task AddPlaylistAsync(NameValueCollection queryPart, string username, ulong serverId, ulong channelId)
     {
         try
         {
@@ -276,7 +283,10 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
 
             if (result)
             {
-                _ = await PlaylistSearch(youtubeService, queryPart["list"], username, serverId);
+                using (YouTubeService youtubeService = CreateYoutubeService(config.Youtube_API_Keys[youtubeApiKeyIndex]))
+                {
+                    _ = await PlaylistSearch(youtubeService, queryPart["list"], username, serverId);
+                }
             }
         }
         catch (Exception ex)

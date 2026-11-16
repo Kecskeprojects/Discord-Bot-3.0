@@ -42,9 +42,12 @@ public static class WebTools
     {
         try
         {
-            if (new Ping().Send("google.com", 1000, new byte[32], new PingOptions()).Status == IPStatus.Success)
+            using (Ping ping = new())
             {
-                return true;
+                if (ping.Send("google.com", 1000, new byte[32], new PingOptions()).Status == IPStatus.Success)
+                {
+                    return true;
+                }
             }
         }
         catch (Exception) { }

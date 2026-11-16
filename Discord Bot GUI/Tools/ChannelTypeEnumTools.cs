@@ -19,10 +19,19 @@ public static class ChannelTypeEnumTools
         return values.Where(x => x != ChannelTypeEnum.None).ToDictionary(x => x, x => x.ToChannelString());
     }
 
+    //None is not a real channel type (it has no database row), so its command text is not accepted
     public static bool TryGetEnumFromCommandText(string value, out ChannelTypeEnum? enumItem)
     {
-        ChannelTypeEnum[] values = Enum.GetValues<ChannelTypeEnum>();
-        enumItem = values.FirstOrDefault(x => x.EqualsCommandString(value));
-        return enumItem != null;
+        foreach (ChannelTypeEnum item in Enum.GetValues<ChannelTypeEnum>())
+        {
+            if (item != ChannelTypeEnum.None && item.EqualsCommandString(value))
+            {
+                enumItem = item;
+                return true;
+            }
+        }
+
+        enumItem = null;
+        return false;
     }
 }

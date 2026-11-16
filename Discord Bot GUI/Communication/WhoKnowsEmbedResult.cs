@@ -4,9 +4,10 @@ using System.IO;
 
 namespace Discord_Bot.Communication;
 
-public partial class WhoKnowsEmbedResult : IDisposable
+//No finalizer: it holds only a managed stream, which cleans up after itself
+public sealed partial class WhoKnowsEmbedResult : IDisposable
 {
-    private bool _isDisposed;
+    private bool isDisposed;
 
     public Embed[] Embed { get; set; }
     public bool HasImage { get; set; }
@@ -15,15 +16,11 @@ public partial class WhoKnowsEmbedResult : IDisposable
 
     public void Dispose()
     {
-        if (!_isDisposed)
+        if (!isDisposed)
         {
-            ImageData.Dispose();
-            _isDisposed = true;
+            //Null when the embed has no image
+            ImageData?.Dispose();
+            isDisposed = true;
         }
-    }
-
-    ~WhoKnowsEmbedResult()
-    {
-        Dispose();
     }
 }

@@ -5,7 +5,7 @@ namespace LastFmApi;
 
 public class BaseRequests
 {
-    private static readonly RestClient _client = new(Constant.LastFmApiBaseUri);
+    private static readonly RestClient client = new(Constant.LastFmApiBaseUri);
     protected static async Task<RestResponse> UserBasedRequestHandler(UserBasedRequestItem item)
     {
         string query = $"?method={item.Type}&user={Uri.EscapeDataString(item.Username)}&api_key={item.ApiKey}";
@@ -28,7 +28,7 @@ public class BaseRequests
         query += "&format=json";
 
         RestRequest request = new(query);
-        return await _client.GetAsync(request);
+        return await client.GetAsync(request);
     }
 
     protected static async Task<RestResponse> InfoBasedRequestHandler(InfoBasedRequestItem item)
@@ -48,6 +48,6 @@ public class BaseRequests
         query += "&format=json";
 
         RestRequest request = new(query);
-        return await _client.GetAsync(request);
+        return await client.GetAsync(request);
     }
 }

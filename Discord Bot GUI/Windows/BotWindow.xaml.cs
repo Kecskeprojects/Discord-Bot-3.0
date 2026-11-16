@@ -15,10 +15,10 @@ using System.Windows.Threading;
 
 namespace Discord_Bot.Windows;
 
-public partial class BotWindow : Window, IDisposable
+public sealed partial class BotWindow : Window, IDisposable
 {
     private readonly Timer diagnosticsTimer;
-    private bool AutoScroll = true;
+    private bool autoScroll = true;
 
     private readonly BotLogger logger;
 
@@ -49,11 +49,11 @@ public partial class BotWindow : Window, IDisposable
             // User scroll event : set or unset autoscroll mode
             if (e.ExtentHeightChange == 0)
             {   // Content unchanged : user scroll event
-                AutoScroll = (e.Source as ScrollViewer).VerticalOffset == (e.Source as ScrollViewer).ScrollableHeight;
+                autoScroll = (e.Source as ScrollViewer).VerticalOffset == (e.Source as ScrollViewer).ScrollableHeight;
             }
 
             // Content scroll event : autoscroll eventually
-            if (AutoScroll && e.ExtentHeightChange != 0)
+            if (autoScroll && e.ExtentHeightChange != 0)
             {   // Content changed and autoscroll mode set
                 (e.Source as ScrollViewer).ScrollToVerticalOffset((e.Source as ScrollViewer).ExtentHeight);
             }

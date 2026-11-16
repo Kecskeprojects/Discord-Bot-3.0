@@ -30,11 +30,11 @@ public class TwitchAPI(
     private readonly BotLogger logger = logger;
     private readonly Config config = config;
 
-    private LiveStreamMonitorService Monitor;
-    private TwitchLib.Api.TwitchAPI API;
+    private LiveStreamMonitorService monitor;
+    private TwitchLib.Api.TwitchAPI api;
     private readonly Dictionary<string, bool> channelStatuses = [];
-    private string Token;
-    private int TokenTick;
+    private string token;
+    private int tokenTick;
     #endregion
 
     #region Base Methods
@@ -45,7 +45,7 @@ public class TwitchAPI(
         {
             logger.Log("Twitch monitoring starting!");
 
-            Token = twitchCLI.GenerateToken();
+            token = twitchCLI.GenerateToken();
 
             await Check();
         }
@@ -64,12 +64,12 @@ public class TwitchAPI(
             return;
         }
 
-        API = new TwitchLib.Api.TwitchAPI();
+        api = new TwitchLib.Api.TwitchAPI();
 
-        API.Settings.ClientId = config.Twitch_Client_Id;
-        API.Settings.AccessToken = Token;
+        api.Settings.ClientId = config.Twitch_Client_Id;
+        api.Settings.AccessToken = token;
 
-        Monitor = new LiveStreamMonitorService(API);
+        monitor = new LiveStreamMonitorService(api);
 
         List<string> lst = await GetChannelsAsync();
 
@@ -79,16 +79,16 @@ public class TwitchAPI(
             return;
         }
 
-        Monitor.OnStreamOnline += MonitorOnStreamOnline;
-        Monitor.OnStreamOffline += MonitorOnStreamOffline;
-        Monitor.OnServiceTick += MonitorOnServiceTick;
+        monitor.OnStreamOnline += MonitorOnStreamOnline;
+        monitor.OnStreamOffline += MonitorOnStreamOffline;
+        monitor.OnServiceTick += MonitorOnServiceTick;
 
-        Monitor.OnServiceStarted += MonitorOnServiceStarted;
-        Monitor.OnChannelsSet += MonitorOnChannelsSet;
+        monitor.OnServiceStarted += MonitorOnServiceStarted;
+        monitor.OnChannelsSet += MonitorOnChannelsSet;
 
-        Monitor.SetChannelsById(lst);
+        monitor.SetChannelsById(lst);
 
-        Monitor.Start(); //Keep at the end!
+        monitor.Start(); //Keep at the end!
 
         await Task.Delay(-1);
     }
@@ -164,14 +164,14 @@ public class TwitchAPI(
     {
         try
         {
-            TokenTick++;
-            if (TokenTick > 1440)
+            tokenTick++;
+            if (tokenTick > 1440)
             {
-                Token = twitchCLI.GenerateToken();
-                TokenTick = 0;
+                token = twitchCLI.GenerateToken();
+                tokenTick = 0;
             }
 
-            if (TokenTick % 120 == 0)
+            if (tokenTick % 120 == 0)
             {
                 logger.Log("120 queries have been completed!");
             }
@@ -179,10 +179,10 @@ public class TwitchAPI(
             List<string> lst = await GetChannelsAsync();
 
             if (!CollectionTools.IsNullOrEmpty(lst)
-                && (Monitor.ChannelsToMonitor.Except(lst).Any()
-                    || lst.Except(Monitor.ChannelsToMonitor).Any()))
+                && (monitor.ChannelsToMonitor.Except(lst).Any()
+                    || lst.Except(monitor.ChannelsToMonitor).Any()))
             {
-                Monitor.SetChannelsById(lst);
+                monitor.SetChannelsById(lst);
             }
         }
         catch (Exception ex)

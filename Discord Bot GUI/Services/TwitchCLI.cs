@@ -42,22 +42,23 @@ public class TwitchCLI(BotLogger logger) : ITwitchCLI
     //Get user data by username
     public UserData GetChannel(string username)
     {
-        Process process = new()
+        ProcessStartInfo startInfo = new()
         {
-            StartInfo = new ProcessStartInfo()
-            {
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                FileName = "cmd.exe",
-                Arguments = $"/C twitch.exe api get users?login={username.ToLower()}",
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-                WorkingDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Dependencies")
-            }
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            FileName = "cmd.exe",
+            Arguments = $"/C twitch.exe api get users?login={username.ToLower()}",
+            RedirectStandardError = true,
+            RedirectStandardOutput = true,
+            WorkingDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Dependencies")
         };
-        _ = process.Start();
-        string response = process.StandardOutput.ReadToEnd();
-        process.WaitForExit();
+
+        string response;
+        using (Process process = Process.Start(startInfo))
+        {
+            response = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+        }
 
         User twitchUser = JsonConvert.DeserializeObject<User>(response);
 

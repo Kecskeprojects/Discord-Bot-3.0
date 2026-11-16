@@ -3,9 +3,10 @@ using System.Collections.Generic;
 
 namespace Discord_Bot.Communication;
 
-public partial class ServerAudioResource(ulong serverDiscordId) : IDisposable
+//No finalizer: it holds only managed objects, which clean up after themselves
+public sealed partial class ServerAudioResource(ulong serverDiscordId) : IDisposable
 {
-    private bool _isDisposed;
+    private bool isDisposed;
 
     public ulong ServerDiscordId { get; set; } = serverDiscordId;
     public AudioVariables AudioVariables { get; set; } = new();
@@ -13,15 +14,10 @@ public partial class ServerAudioResource(ulong serverDiscordId) : IDisposable
 
     public void Dispose()
     {
-        if (!_isDisposed)
+        if (!isDisposed)
         {
-            AudioVariables.Dispose();
-            _isDisposed = true;
+            AudioVariables?.Dispose();
+            isDisposed = true;
         }
-    }
-
-    ~ServerAudioResource()
-    {
-        Dispose();
     }
 }

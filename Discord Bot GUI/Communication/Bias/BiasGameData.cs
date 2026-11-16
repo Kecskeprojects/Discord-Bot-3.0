@@ -8,7 +8,8 @@ using System.Linq;
 
 namespace Discord_Bot.Communication.Bias;
 
-public partial class BiasGameData : IDisposable
+//No finalizer: it holds only managed streams, which clean up after themselves
+public sealed partial class BiasGameData : IDisposable
 {
     public BiasGameData(ulong userId)
     {
@@ -16,7 +17,7 @@ public partial class BiasGameData : IDisposable
         Resource.winner_bracket.Save(WinnerBracket, System.Drawing.Imaging.ImageFormat.Png);
     }
 
-    private bool _isDisposed;
+    private bool isDisposed;
 
     public ulong UserId { get; private set; }
     public DateTime StartedAt { get; private set; } = DateTime.UtcNow;
@@ -75,19 +76,14 @@ public partial class BiasGameData : IDisposable
 
     public void Dispose()
     {
-        if (!_isDisposed)
+        if (!isDisposed)
         {
             WinnerBracket.Dispose();
             foreach (KeyValuePair<int, FileAttachment> item in IdolWithImage)
             {
                 item.Value.Dispose();
             }
-            _isDisposed = true;
+            isDisposed = true;
         }
-    }
-
-    ~BiasGameData()
-    {
-        Dispose();
     }
 }

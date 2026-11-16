@@ -78,8 +78,11 @@ public class UserBiasGameCommands(
 
             if (Global.BiasGames.TryRemove(Context.User.Id, out BiasGameData data))
             {
-                _ = await ReplyAsync("Game stopped!");
-                await Context.Channel.DeleteMessageAsync(data.MessageId);
+                using (data)
+                {
+                    _ = await ReplyAsync("Game stopped!");
+                    await Context.Channel.DeleteMessageAsync(data.MessageId);
+                }
             }
         }
         catch (Exception ex)

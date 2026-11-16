@@ -7,7 +7,7 @@ namespace Discord_Bot.Core.Configuration;
 
 public class Config
 {
-    private readonly IConfiguration Configuration;
+    private readonly IConfiguration configuration;
     public struct ConfigModel
     {
         public string token;
@@ -63,52 +63,52 @@ public class Config
                 show_diagnostics = true,
             };
 
-            //Written and closed before loading below, so an empty config is read instead of leaving Configuration null
+            //Written and closed before loading below, so an empty config is read instead of leaving configuration null
             File.WriteAllText(Path.Combine(assetDir, "config.json"), JsonConvert.SerializeObject(conf, Formatting.Indented));
         }
 
-        Configuration = new ConfigurationBuilder()
+        configuration = new ConfigurationBuilder()
          .SetBasePath(assetDir)
          .AddJsonFile("config.json", optional: false, reloadOnChange: true)
          .Build();
     }
 
     #region Config Values
-    public string Token => Configuration.GetSection("token").Get<string>();
+    public string Token => configuration.GetSection("token").Get<string>();
 
-    public string Environment => Configuration.GetSection("environment").Get<string>();
+    public string Environment => configuration.GetSection("environment").Get<string>();
 
-    public string Img => Configuration.GetSection("img").Get<string>();
+    public string Img => configuration.GetSection("img").Get<string>();
 
-    public int Bitrate => Configuration.GetSection("bitrate").Get<int>();
+    public int Bitrate => configuration.GetSection("bitrate").Get<int>();
 
-    public int VoiceWaitSeconds => Configuration.GetSection("voice_wait_seconds").Get<int>();
+    public int VoiceWaitSeconds => configuration.GetSection("voice_wait_seconds").Get<int>();
 
-    public string Twitch_Client_Id => Configuration.GetSection("twitch_client_id").Get<string>();
+    public string Twitch_Client_Id => configuration.GetSection("twitch_client_id").Get<string>();
 
-    public string Spotify_Client_Id => Configuration.GetSection("spotify_client_id").Get<string>();
+    public string Spotify_Client_Id => configuration.GetSection("spotify_client_id").Get<string>();
 
-    public string Spotify_Client_Secret => Configuration.GetSection("spotify_client_secret").Get<string>();
+    public string Spotify_Client_Secret => configuration.GetSection("spotify_client_secret").Get<string>();
 
-    public string Lastfm_API_Key => Configuration.GetSection("lastfm_api_key").Get<string>();
+    public string Lastfm_API_Key => configuration.GetSection("lastfm_api_key").Get<string>();
 
-    public string Lastfm_API_Secret => Configuration.GetSection("lastfm_api_secret").Get<string>();
+    public string Lastfm_API_Secret => configuration.GetSection("lastfm_api_secret").Get<string>();
 
-    public Dictionary<string, string> Lastfm_Artist_Input_Replacement => Configuration.GetSection("lastfm_artist_input_replacement").Get<Dictionary<string, string>>();
+    public Dictionary<string, string> Lastfm_Artist_Input_Replacement => configuration.GetSection("lastfm_artist_input_replacement").Get<Dictionary<string, string>>();
 
-    public string[] Youtube_API_Keys => Configuration.GetSection("youtube_api_keys").Get<string[]>();
+    public string[] Youtube_API_Keys => configuration.GetSection("youtube_api_keys").Get<string[]>();
 
-    public string[] Youtube_Filter_Words => Configuration.GetSection("youtube_filter_words").Get<string[]>();
+    public string[] Youtube_Filter_Words => configuration.GetSection("youtube_filter_words").Get<string[]>();
 
-    public bool Enable_Instagram_Embed => Configuration.GetSection("enable_instagram_embed").Get<bool>();
+    public bool Enable_Instagram_Embed => configuration.GetSection("enable_instagram_embed").Get<bool>();
 
-    public bool Enable_Twitter_Embed => Configuration.GetSection("enable_twitter_embed").Get<bool>();
+    public bool Enable_Twitter_Embed => configuration.GetSection("enable_twitter_embed").Get<bool>();
 
-    public string SqlConnectionString => Configuration.GetSection("sql_connection_string").Get<string>();
+    public string SqlConnectionString => configuration.GetSection("sql_connection_string").Get<string>();
 
-    public bool HeadlessBrowser => Configuration.GetSection("headless_browser").Get<bool>();
+    public bool HeadlessBrowser => configuration.GetSection("headless_browser").Get<bool>();
 
-    public bool ShowDiagnostics => Configuration.GetSection("show_diagnostics").Get<bool>();
+    public bool ShowDiagnostics => configuration.GetSection("show_diagnostics").Get<bool>();
     #endregion
 
 }

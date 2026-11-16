@@ -18,7 +18,7 @@ using System.Windows;
 
 namespace Discord_Bot;
 
-public partial class App : Application, IDisposable
+public sealed partial class App : Application, IDisposable
 {
     #region Variables
     private IServiceProvider services;
@@ -26,7 +26,7 @@ public partial class App : Application, IDisposable
     private BrowserService browserService;
     private Thread twitchThread;
     private System.Timers.Timer mainTimer;
-    private BotMain BotService;
+    private BotMain botService;
     private int closed;
     #endregion
 
@@ -80,9 +80,9 @@ public partial class App : Application, IDisposable
             }
 
             //Without this the bot stays visible as online until Discord times the session out
-            if (BotService != null)
+            if (botService != null)
             {
-                await BotService.StopBotAsync();
+                await botService.StopBotAsync();
             }
 
             await browserService.CloseBrowser();
@@ -137,8 +137,8 @@ public partial class App : Application, IDisposable
         twitchThread = new Thread(new ThreadStart(StartTwitchMonitor));
         twitchThread.Start();
 
-        BotService = services.GetRequiredService<BotMain>();
-        await BotService.RunBotAsync();
+        botService = services.GetRequiredService<BotMain>();
+        await botService.RunBotAsync();
     }
 
     private async void OnTimedEvent(object source, ElapsedEventArgs e)
@@ -151,7 +151,7 @@ public partial class App : Application, IDisposable
                 if (client.LoginState == LoginState.LoggedOut)
                 {
                     logger.Log("Attempting to re-connect bot after disconnect.");
-                    await BotService.RunBotAsync();
+                    await botService.RunBotAsync();
                 }
 
                 //Do at GMT+0 midnight every day
@@ -204,19 +204,27 @@ public partial class App : Application, IDisposable
         }
     }
 
+    //Runs on its own thread as async void, so an exception escaping from here would end the whole process
     private async void StartTwitchMonitor()
     {
-        using (IServiceScope scope = services.CreateScope())
+        try
         {
-            ITwitchAPI twitchAPI = scope.ServiceProvider.GetService<ITwitchAPI>();
-            await twitchAPI.Start();
+            using (IServiceScope scope = services.CreateScope())
+            {
+                ITwitchAPI twitchAPI = scope.ServiceProvider.GetService<ITwitchAPI>();
+                await twitchAPI.Start();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("App.xaml.cs StartTwitchMonitor", ex);
         }
     }
 
-    //Called at the end of CloseAsync. BotService is null if startup failed before the bot was created
+    //Called at the end of CloseAsync. botService is null if startup failed before the bot was created
     public void Dispose()
     {
         mainTimer?.Dispose();
-        BotService?.Dispose();
+        botService?.Dispose();
     }
 }

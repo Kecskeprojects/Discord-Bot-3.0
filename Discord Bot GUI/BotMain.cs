@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Discord_Bot;
 
-public class BotMain(
+public sealed class BotMain(
     IServiceProvider services,
     InteractionHandler interactionHandler,
     CommandHandler commandHandler,
