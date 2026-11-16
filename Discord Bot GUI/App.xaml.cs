@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.WebSocket;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
@@ -21,12 +23,14 @@ namespace Discord_Bot;
 public sealed partial class App : Application, IDisposable
 {
     #region Variables
-    private IServiceProvider services;
-    private BotLogger logger;
-    private BrowserService browserService;
-    private Thread twitchThread;
-    private System.Timers.Timer mainTimer;
-    private BotMain botService;
+    //Set in OnStartup, which WPF runs before anything else in this class
+    private IServiceProvider services = null!;
+    private BotLogger logger = null!;
+    private BrowserService browserService = null!;
+    private Thread twitchThread = null!;
+    //Null until OnStartup creates them, and stays null when startup fails before that
+    private System.Timers.Timer? mainTimer;
+    private BotMain? botService;
     private int closed;
     #endregion
 
@@ -43,7 +47,7 @@ public sealed partial class App : Application, IDisposable
         base.OnSessionEnding(e);
     }
 
-    private void Closing(object sender, EventArgs e)
+    private void Closing(object? sender, EventArgs e)
     {
         Closing();
     }
@@ -113,8 +117,8 @@ public sealed partial class App : Application, IDisposable
         AppDomain.CurrentDomain.ProcessExit += new EventHandler(Closing);
 
         services = Discord_Bot.Startup.Run();
-        logger = services.GetService<BotLogger>();
-        browserService = services.GetService<BrowserService>();
+        logger = services.GetRequiredService<BotLogger>();
+        browserService = services.GetRequiredService<BrowserService>();
 
         using (IServiceScope scope = services.CreateScope())
         {
@@ -130,7 +134,7 @@ public sealed partial class App : Application, IDisposable
 
             logger.Log("App started!");
 
-            Config config = scope.ServiceProvider.GetService<Config>();
+            Config config = scope.ServiceProvider.GetRequiredService<Config>();
             YoutubeAPI.KeyReset(config.Youtube_API_Keys);
         }
 
@@ -150,14 +154,14 @@ public sealed partial class App : Application, IDisposable
         }
     }
 
-    private async void OnTimedEvent(object source, ElapsedEventArgs e)
+    private async void OnTimedEvent(object? source, ElapsedEventArgs e)
     {
         try
         {
             using (IServiceScope scope = services.CreateScope())
             {
-                DiscordSocketClient client = scope.ServiceProvider.GetService<DiscordSocketClient>();
-                if (client.LoginState == LoginState.LoggedOut)
+                DiscordSocketClient client = scope.ServiceProvider.GetRequiredService<DiscordSocketClient>();
+                if (client.LoginState == LoginState.LoggedOut && botService != null)
                 {
                     logger.Log("Attempting to re-connect bot after disconnect.");
                     await botService.RunBotAsync();
@@ -172,13 +176,13 @@ public sealed partial class App : Application, IDisposable
                 //Do at GMT+0 6 am every day
                 if (DateTime.UtcNow.Hour == 6 && DateTime.UtcNow.Minute == 0)
                 {
-                    BirthdayFeature birthdayFeature = scope.ServiceProvider.GetService<BirthdayFeature>();
+                    BirthdayFeature birthdayFeature = scope.ServiceProvider.GetRequiredService<BirthdayFeature>();
                     _ = await birthdayFeature.Run();
 
-                    WeeklyPollFeature weeklyPollFeature = scope.ServiceProvider.GetService<WeeklyPollFeature>();
+                    WeeklyPollFeature weeklyPollFeature = scope.ServiceProvider.GetRequiredService<WeeklyPollFeature>();
                     _ = await weeklyPollFeature.Run();
 
-                    Config config = scope.ServiceProvider.GetService<Config>();
+                    Config config = scope.ServiceProvider.GetRequiredService<Config>();
                     YoutubeAPI.KeyReset(config.Youtube_API_Keys);
                     logger.Log("Youtube keys reset!");
 
@@ -189,10 +193,10 @@ public sealed partial class App : Application, IDisposable
                     }
                 }
 
-                ReminderFeature reminderFeature = scope.ServiceProvider.GetService<ReminderFeature>();
+                ReminderFeature reminderFeature = scope.ServiceProvider.GetRequiredService<ReminderFeature>();
                 _ = await reminderFeature.Run();
 
-                UnmuteFeature unmuteFeature = scope.ServiceProvider.GetService<UnmuteFeature>();
+                UnmuteFeature unmuteFeature = scope.ServiceProvider.GetRequiredService<UnmuteFeature>();
                 _ = await unmuteFeature.Run();
 
                 logger.LogToFile();
@@ -208,7 +212,7 @@ public sealed partial class App : Application, IDisposable
     {
         using (IServiceScope scope = services.CreateScope())
         {
-            BiasScrapingProcessor biasScrapingProcessor = scope.ServiceProvider.GetService<BiasScrapingProcessor>();
+            BiasScrapingProcessor biasScrapingProcessor = scope.ServiceProvider.GetRequiredService<BiasScrapingProcessor>();
             await biasScrapingProcessor.RunUpdateBiasDataAsync();
         }
     }
@@ -220,7 +224,7 @@ public sealed partial class App : Application, IDisposable
         {
             using (IServiceScope scope = services.CreateScope())
             {
-                ITwitchAPI twitchAPI = scope.ServiceProvider.GetService<ITwitchAPI>();
+                ITwitchAPI twitchAPI = scope.ServiceProvider.GetRequiredService<ITwitchAPI>();
                 await twitchAPI.Start();
             }
         }

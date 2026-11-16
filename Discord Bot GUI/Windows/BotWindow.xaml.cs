@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication;
+﻿#nullable enable
+
+using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Tools.NativeTools;
@@ -17,7 +19,7 @@ namespace Discord_Bot.Windows;
 
 public sealed partial class BotWindow : Window, IDisposable
 {
-    private readonly Timer diagnosticsTimer;
+    private readonly Timer? diagnosticsTimer;
     private bool autoScroll = true;
 
     private readonly BotLogger logger;
@@ -46,16 +48,21 @@ public sealed partial class BotWindow : Window, IDisposable
     {
         try
         {
+            if (e.Source is not ScrollViewer scrollViewer)
+            {
+                return;
+            }
+
             // User scroll event : set or unset autoscroll mode
             if (e.ExtentHeightChange == 0)
             {   // Content unchanged : user scroll event
-                autoScroll = (e.Source as ScrollViewer).VerticalOffset == (e.Source as ScrollViewer).ScrollableHeight;
+                autoScroll = scrollViewer.VerticalOffset == scrollViewer.ScrollableHeight;
             }
 
             // Content scroll event : autoscroll eventually
             if (autoScroll && e.ExtentHeightChange != 0)
             {   // Content changed and autoscroll mode set
-                (e.Source as ScrollViewer).ScrollToVerticalOffset((e.Source as ScrollViewer).ExtentHeight);
+                scrollViewer.ScrollToVerticalOffset(scrollViewer.ExtentHeight);
             }
         }
         catch (Exception ex)
@@ -68,7 +75,11 @@ public sealed partial class BotWindow : Window, IDisposable
     {
         try
         {
-            ToolBar toolBar = sender as ToolBar;
+            if (sender is not ToolBar toolBar)
+            {
+                return;
+            }
+
             if (toolBar.Template.FindName("OverflowGrid", toolBar) is FrameworkElement overflowGrid)
             {
                 overflowGrid.Visibility = Visibility.Collapsed;
@@ -125,7 +136,7 @@ public sealed partial class BotWindow : Window, IDisposable
         }
     }
 
-    public async void OnTimedEvent(object source, ElapsedEventArgs e)
+    public async void OnTimedEvent(object? source, ElapsedEventArgs e)
     {
         try
         {

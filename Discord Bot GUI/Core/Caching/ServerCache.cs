@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Resources;
+﻿#nullable enable
+
+using Discord_Bot.Resources;
 
 namespace Discord_Bot.Core.Caching;
 
@@ -16,9 +18,10 @@ public class ServerCache
         Cache.Clear();
     }
 
-    public ServerResource TryGetValue(ulong key)
+    //Null when the server is not cached
+    public ServerResource? TryGetValue(ulong key)
     {
-        return Cache.TryGetValue(key, out ServerResource server) ? server : null;
+        return Cache.TryGetValue(key, out ServerResource? server) ? server : null;
     }
 
     public void TryAddValue(ulong discordId, ServerResource result)

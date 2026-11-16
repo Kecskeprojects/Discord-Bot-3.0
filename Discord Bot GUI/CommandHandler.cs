@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Bot.Core;
@@ -59,7 +61,7 @@ public class CommandHandler(
             {
                 if (!DiscordTools.IsDM(arg))
                 {
-                    logger.MesOther(arg.Content, (arg.Channel as SocketGuildChannel).Guild.Name);
+                    logger.MesOther(arg.Content, ((SocketGuildChannel) arg.Channel).Guild.Name);
                 }
                 else
                 {
@@ -87,7 +89,7 @@ public class CommandHandler(
             }
 
             //If message is not private message, and the server is not in our database, add it
-            ServerResource server = await GetServerAsync(context);
+            ServerResource? server = await GetServerAsync(context);
 
             if (context.Message.HasCharPrefix('!', ref argPos) || context.Message.HasCharPrefix('.', ref argPos))
             {
@@ -111,14 +113,15 @@ public class CommandHandler(
         }
     }
 
-    private async Task<ServerResource> GetServerAsync(SocketCommandContext context)
+    //Null in DMs
+    private async Task<ServerResource?> GetServerAsync(SocketCommandContext context)
     {
         using (IServiceScope scope = services.CreateScope())
         {
-            ServerResource server = null;
+            ServerResource? server = null;
             if (!DiscordTools.IsDM(context))
             {
-                IServerService serverService = scope.ServiceProvider.GetService<IServerService>();
+                IServerService serverService = scope.ServiceProvider.GetRequiredService<IServerService>();
                 server = await serverService.GetByDiscordIdAsync(context.Guild.Id);
                 if (server == null)
                 {
@@ -147,7 +150,7 @@ public class CommandHandler(
             if (context.Message.HasCharPrefix('+', ref argPos) || context.Message.HasCharPrefix('-', ref argPos))
             {
                 //self roles
-                SelfRoleFeature selfRoleFeature = scope.ServiceProvider.GetService<SelfRoleFeature>();
+                SelfRoleFeature selfRoleFeature = scope.ServiceProvider.GetRequiredService<SelfRoleFeature>();
                 _ = await selfRoleFeature.Run(context);
             }
 
@@ -159,14 +162,14 @@ public class CommandHandler(
     {
         using (IServiceScope scope = services.CreateScope())
         {
-            EasterEggFeature easterEggFeature = scope.ServiceProvider.GetService<EasterEggFeature>();
-            Config config = scope.ServiceProvider.GetService<Config>();
+            EasterEggFeature easterEggFeature = scope.ServiceProvider.GetRequiredService<EasterEggFeature>();
+            Config config = scope.ServiceProvider.GetRequiredService<Config>();
             _ = await easterEggFeature.Run(context);
 
             //Make embed for instagram links
             //if (config.Enable_Instagram_Embed)
             //{
-            //    InstagramEmbedFeature instagramEmbedFeature = scope.ServiceProvider.GetService<InstagramEmbedFeature>();
+            //    InstagramEmbedFeature instagramEmbedFeature = scope.ServiceProvider.GetRequiredService<InstagramEmbedFeature>();
             //    _ = await instagramEmbedFeature.Run(context);
             //}
         }
@@ -215,10 +218,10 @@ public class CommandHandler(
     {
         using (IServiceScope scope = services.CreateScope())
         {
-            if (!DiscordTools.IsDM(context as SocketCommandContext))
+            if (context is SocketCommandContext socketContext && !DiscordTools.IsDM(socketContext))
             {
-                CustomCommandFeature customCommandFeature = scope.ServiceProvider.GetService<CustomCommandFeature>();
-                _ = await customCommandFeature.Run(context as SocketCommandContext);
+                CustomCommandFeature customCommandFeature = scope.ServiceProvider.GetRequiredService<CustomCommandFeature>();
+                _ = await customCommandFeature.Run(socketContext);
             }
         }
     }

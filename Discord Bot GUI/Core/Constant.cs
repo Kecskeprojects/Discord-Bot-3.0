@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication.Bias;
+﻿#nullable enable
+
+using Discord_Bot.Communication.Bias;
 using Discord_Bot.Enums;
 using System;
 using System.Collections.Generic;

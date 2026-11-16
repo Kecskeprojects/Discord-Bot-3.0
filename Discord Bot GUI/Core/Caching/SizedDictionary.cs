@@ -1,10 +1,12 @@
-﻿using Discord_Bot.Tools.NativeTools;
+﻿#nullable enable
+
+using Discord_Bot.Tools.NativeTools;
 using System;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Core.Caching;
 
-public sealed class SizedDictionary<TKey, TValue>(int size) : Dictionary<TKey, TValue>
+public sealed class SizedDictionary<TKey, TValue>(int size) : Dictionary<TKey, TValue> where TKey : notnull
 {
 
     private readonly int maxSize = size;

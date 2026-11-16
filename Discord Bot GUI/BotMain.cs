@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.LibDave.Binding;
 using Discord.WebSocket;
 using Discord_Bot.Core;
@@ -63,7 +65,7 @@ public sealed class BotMain(
 
             using (IServiceScope scope = services.CreateScope())
             {
-                Config config = scope.ServiceProvider.GetService<Config>();
+                Config config = scope.ServiceProvider.GetRequiredService<Config>();
                 if (string.IsNullOrEmpty(config.Token))
                 {
                     logger.Error("BotMain.cs RunBotAsync", "Bot cannot start without a valid token, fill out the proper fields in the config file!");

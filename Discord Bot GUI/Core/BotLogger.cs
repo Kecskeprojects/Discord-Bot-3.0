@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication;
+﻿#nullable enable
+
+using Discord_Bot.Communication;
 using Discord_Bot.Enums;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
