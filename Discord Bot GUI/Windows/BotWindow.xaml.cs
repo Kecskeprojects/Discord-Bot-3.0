@@ -182,8 +182,16 @@ public partial class BotWindow : Window, IDisposable
         }));
     }
 
+    //WPF never disposes a window, so the timer is disposed when the window closes
+    protected override void OnClosed(EventArgs e)
+    {
+        Dispose();
+        base.OnClosed(e);
+    }
+
+    //The timer only exists when diagnostics are shown
     public void Dispose()
     {
-        diagnosticsTimer.Dispose();
+        diagnosticsTimer?.Dispose();
     }
 }

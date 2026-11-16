@@ -196,6 +196,7 @@ public class BotMain(
     }
     #endregion
 
+    //Called by App.xaml.cs at shutdown, after StopBotAsync. The client is disposed here because the root service provider never is
     public void Dispose()
     {
         startLock.Dispose();

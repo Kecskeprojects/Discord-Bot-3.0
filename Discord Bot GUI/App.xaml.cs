@@ -56,6 +56,9 @@ public partial class App : Application, IDisposable
             return;
         }
 
+        //Otherwise the reconnect timer could log the bot back in while it is shutting down
+        mainTimer?.Stop();
+
         //The process exits right after these events, so the cleanup is waited for, with a time limit
         //It runs on the thread pool, waiting on the UI thread for work that continues on the UI thread would deadlock
         try
@@ -91,6 +94,9 @@ public partial class App : Application, IDisposable
         finally
         {
             logger.LogToFile();
+
+            //Last, because StopBotAsync above still needs the client that BotMain disposes
+            Dispose();
         }
     }
     #endregion
@@ -207,9 +213,10 @@ public partial class App : Application, IDisposable
         }
     }
 
+    //Called at the end of CloseAsync. BotService is null if startup failed before the bot was created
     public void Dispose()
     {
-        BotService.Dispose();
-        mainTimer.Dispose();
+        mainTimer?.Dispose();
+        BotService?.Dispose();
     }
 }
