@@ -122,8 +122,13 @@ Trial builds on top of the zero-warning setup. Counts are new warnings.
 
 **Found on the way**
 - **Done 2026-11-16:** `App.StartTwitchMonitor` was `async void` without a try/catch on its own thread. `TwitchAPI.Start()` catches its own exceptions, but creating the scope or constructing `TwitchAPI` and its dependencies (e.g. `Config` with a broken config file) could still throw and end the process. It now logs instead.
-- Open: `App.OnStartup` is also `async void` without a try/catch around `await BotService.RunBotAsync()`. `RunBotAsync` has only a `finally`, so a login failure at startup (e.g. an invalid token, which `LoginAsync` rejects) goes unhandled on the UI thread and closes the app without a log entry, instead of leaving the reconnect timer to retry. The other `async void` handlers already catch their exceptions.
-- Open: the Twitch monitor keeps one DI scope for its whole life (`Check` ends with `await Task.Delay(-1)`), so every Twitch event handler shares that scope's `DbContext`. The handlers are `async void` and can overlap (e.g. a service tick during a stream-online announcement), and `DbContext` doesn't allow concurrent use ("A second operation was started on this context"). Creating a scope per event would avoid it.
+- **Done 2026-11-16:** `App.OnStartup` is also `async void`, and nothing caught errors from `await botService.RunBotAsync()` (`RunBotAsync` has only a `finally`). A login failure at startup (e.g. an invalid token, which `LoginAsync` rejects) closed the app without a log entry. It is now logged. A failed login leaves the client `LoggedOut`, so the reconnect timer retries every minute, and a corrected token in `config.json` is picked up without a restart. The other `async void` handlers already caught their exceptions.
+- **Done 2026-11-16:** the Twitch monitor keeps one DI scope for its whole life (`Check` ends with `await Task.Delay(-1)`), and its `async void` event handlers, which can overlap, all shared it. Three things were unsafe to share:
+  - the scope's `DbContext`, which allows one operation at a time ("A second operation was started on this context");
+  - one `TwitchNotificationFeature` instance, whose `Parameters` hold the current run's data, so overlapping announcements could swap their data;
+  - a plain `Dictionary` of stream states.
+  `TwitchAPI` now takes `IServiceProvider` and creates a scope for each channel lookup and each notification (the channel resources are DTOs, so they outlive the scope). The stream states are a `ConcurrentDictionary`.
+- **Done 2026-11-16:** the token refresh in `TwitchAPI.MonitorOnServiceTick` (every 1440 ticks, about 24 hours) stored the new token only in the `token` field, never in `api.Settings.AccessToken`, so the monitor kept using the token from startup. Twitch app access tokens expire after about 60 days, so a long-running bot would have stopped getting stream updates until a restart. It now sets `api.Settings.AccessToken` too; the monitor shares that client. Not checked live: that needs a bot running for over a day.
 
 ## 2. Test project (investigated 2026-11-15)
 

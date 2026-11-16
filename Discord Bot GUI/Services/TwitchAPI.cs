@@ -6,7 +6,9 @@ using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools.NativeTools;
+using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,23 +18,24 @@ using TwitchLib.Api.Services.Events.LiveStreamMonitor;
 
 namespace Discord_Bot.Services;
 
+//The monitor's event handlers are async void and can overlap, so they share nothing that is unsafe to use twice at once:
+//database work and features get a new DI scope per use (a DbContext allows one operation at a time, and a feature
+//keeps the parameters of its current run), and the stream states are kept in a ConcurrentDictionary
 public class TwitchAPI(
+    IServiceProvider services,
     ITwitchCLI twitchCLI,
-    ITwitchChannelService twitchChannelService,
-    TwitchNotificationFeature twitchNotificationFeature,
     BotLogger logger,
     Config config) : ITwitchAPI
 {
     #region Variables
+    private readonly IServiceProvider services = services;
     private readonly ITwitchCLI twitchCLI = twitchCLI;
-    private readonly ITwitchChannelService twitchChannelService = twitchChannelService;
-    private readonly TwitchNotificationFeature twitchNotificationFeature = twitchNotificationFeature;
     private readonly BotLogger logger = logger;
     private readonly Config config = config;
 
     private LiveStreamMonitorService monitor;
     private TwitchLib.Api.TwitchAPI api;
-    private readonly Dictionary<string, bool> channelStatuses = [];
+    private readonly ConcurrentDictionary<string, bool> channelStatuses = new();
     private string token;
     private int tokenTick;
     #endregion
@@ -101,7 +104,7 @@ public class TwitchAPI(
         try
         {
             logger.Query($"Streamer turned online: {e.Stream.UserName} with id: {e.Stream.Id}");
-            List<TwitchChannelResource> channels = await twitchChannelService.GetChannelsAsync();
+            List<TwitchChannelResource> channels = await GetTwitchChannelsAsync();
             if (channels == null)
             {
                 return;
@@ -119,7 +122,11 @@ public class TwitchAPI(
                         ThumbnailUrl = e.Stream.ThumbnailUrl,
                         Title = e.Stream.Title
                     };
-                    _ = await twitchNotificationFeature.Run(data);
+                    using (IServiceScope scope = services.CreateScope())
+                    {
+                        TwitchNotificationFeature twitchNotificationFeature = scope.ServiceProvider.GetRequiredService<TwitchNotificationFeature>();
+                        _ = await twitchNotificationFeature.Run(data);
+                    }
                     channelStatuses[channel.TwitchId] = true;
                 }
             }
@@ -137,7 +144,7 @@ public class TwitchAPI(
         {
             logger.Query($"Streamer turned offline: {e.Stream.UserName} with id: {e.Stream.Id}");
 
-            List<TwitchChannelResource> channels = await twitchChannelService.GetChannelsAsync();
+            List<TwitchChannelResource> channels = await GetTwitchChannelsAsync();
             if (channels == null)
             {
                 return;
@@ -168,6 +175,8 @@ public class TwitchAPI(
             if (tokenTick > 1440)
             {
                 token = twitchCLI.GenerateToken();
+                //The monitor shares this client, and its requests read the token from the settings, not from the field
+                api.Settings.AccessToken = token;
                 tokenTick = 0;
             }
 
@@ -218,10 +227,19 @@ public class TwitchAPI(
     #endregion
 
     #region Helper Methods
+    //The resources are plain DTOs, so they stay usable after the scope and its DbContext are disposed
+    private async Task<List<TwitchChannelResource>> GetTwitchChannelsAsync()
+    {
+        using (IServiceScope scope = services.CreateScope())
+        {
+            ITwitchChannelService twitchChannelService = scope.ServiceProvider.GetRequiredService<ITwitchChannelService>();
+            return await twitchChannelService.GetChannelsAsync();
+        }
+    }
 
     private async Task<List<string>> GetChannelsAsync()
     {
-        List<TwitchChannelResource> channels = await twitchChannelService.GetChannelsAsync();
+        List<TwitchChannelResource> channels = await GetTwitchChannelsAsync();
         List<string> lst = [];
         if (!CollectionTools.IsNullOrEmpty(channels))
         {

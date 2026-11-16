@@ -138,7 +138,16 @@ public sealed partial class App : Application, IDisposable
         twitchThread.Start();
 
         botService = services.GetRequiredService<BotMain>();
-        await botService.RunBotAsync();
+        try
+        {
+            await botService.RunBotAsync();
+        }
+        catch (Exception ex)
+        {
+            //OnStartup is async void, so an exception escaping here would close the app without a log entry
+            //A failed login leaves the client logged out, and the reconnect timer in OnTimedEvent tries again every minute
+            logger.Error("App.xaml.cs OnStartup", ex);
+        }
     }
 
     private async void OnTimedEvent(object source, ElapsedEventArgs e)
