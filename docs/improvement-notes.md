@@ -1,236 +1,40 @@
 # Improvement notes
 
-Findings from code-quality investigations, kept so the work can be picked up later. Nothing here has been applied yet unless marked done.
+Open work from code-quality investigations, kept so it can be picked up later. Items are removed once they are applied; the git history has the details of earlier work. Last brought up to date 2026-11-16.
 
-## 1. Linting (investigated 2026-11-15, set up 2026-11-16)
+## To check in the running bot
 
-C# has no separate linter. Linting is done by **Roslyn analyzers** that run during `dotnet build` and in Visual Studio, configured through `.editorconfig` and MSBuild properties.
+Changes from 2026-11-16 that built cleanly but have not been tried live:
 
-| Piece | What it does | Current state |
-|---|---|---|
-| .NET SDK analyzers (CA rules) | Correctness, performance, security, design. Strictness via `<AnalysisLevel>` / `<AnalysisMode>` | `latest-recommended` in both projects (`Directory.Build.props`), exceptions in the root `.editorconfig` |
-| Code-style rules (IDE rules) | Style and formatting | Enforced by `dotnet build` (`EnforceCodeStyleInBuild`). The whole Style category is a warning, except IDE0010 / IDE0072 (populate switch) |
-| `.editorconfig` | Rule severities, formatting, naming | Root file with formatting options matching the owner's VS settings, code style preferences and severities. `Database/.editorconfig` only marks generated code |
-| `dotnet format` | Formatter and fixer; `--verify-no-changes` is the check mode | Available (part of the SDK), not run yet |
-| Third-party analyzers | Roslynator, Meziantou.Analyzer, StyleCop.Analyzers (strict style), SonarAnalyzer.CSharp, Microsoft.VisualStudio.Threading.Analyzers (async misuse) | None |
-| Nullable reference types | Compiler flags possible null dereferences | `<Nullable>enable</Nullable>` in both projects since 2026-11-16, after a folder-by-folder rollout. The scaffolded and JSON models are marked `generated_code` and stay unchecked |
-| `TreatWarningsAsErrors` | Enforces the zero-warning goal | On since 2026-11-16, in every configuration (`Directory.Build.props`). NuGet audit warnings NU1901–NU1904 stay warnings |
+- **Shutdown:** close the window. The log should end with "Application closing..." and no error, and the bot should show offline in Discord right away.
+- **Twitch token refresh:** after the bot has run for more than a day (the refresh runs about every 24 hours), stream notifications should keep arriving.
+- **Last.fm who-knows:** `!lf wk` with no song (uses what you are playing now), with `artist>track` and with an artist only.
+- **Weekly poll buttons:** the toggle buttons in the poll and preset edit messages (active, pinned, multiple answers, special preset), and the preset select's "Custom Options".
 
-### Trial run (2026-11-15)
+## 1. Linting follow-ups (investigated 2026-11-15 and 2026-11-16)
 
-A trial build with `-p:AnalysisLevel=latest-recommended -p:EnforceCodeStyleInBuild=true` reported 418 distinct warnings:
+The analyzer setup is done and described in CLAUDE.md ("Linting"). Left:
 
-- About 320 culture warnings (CA1305, CA1304, CA1311, CA1310): `ToString()`, `ToLower()`, `string.Format`, `StartsWith` without a culture or `StringComparison`. Mostly harmless for a bot; can be lowered in `.editorconfig`.
-- Naming and design: CA1051 public fields (30), CA1707 underscores in names (15), CA1711 / CA1716 name suffixes and reserved words, CA1725 parameter names differ from the interface, CA1309, CA1805.
-- Worth fixing:
-  - CA2201, `throw new Exception(...)` (10 left): `SizedDictionary`, `YoutubeAPI`, `LastFmHelper`, `PollTools`. (`CommandHandler` and `AudioPlayFeature` were fixed during the Discord.Net work.)
-  - CA1001: `App` (`mainTimer`) and `BotWindow` (`diagnosticsTimer`) own timers but are not disposable.
-  - CA5369: `WordOfTheDayService.cs:31` uses an `XmlSerializer.Deserialize` overload that may allow DTD processing on external RSS. Deserialize through an `XmlReader` with safe settings instead.
+- **CA1508 (dead conditional code) is on trial.** Of its first 5 findings, 4 were right and 1 was a false positive (`AudioPlayFeature.WaitAsync`, suppressed in GlobalSuppressions). Decide whether to keep it once it has run on new code for a while.
+- **CA1849 cases worth fixing by hand.** The rule isn't turned on, because half of its 12 findings are false positives (`GetChannel` / `GetRole` are cache lookups in Discord.Net's socket client). The real ones:
+  - `CancellationTokenSource.Cancel(false)` runs the cancellation callbacks on the calling thread: `App.xaml.cs`, `BotMain.cs`, `UserVoiceCommands.cs` (3). `CancelAsync` avoids that.
+  - `YoutubeStreamService.cs:51` blocks a thread for up to a minute in `Process.WaitForExit(TimeSpan)`. `WaitForExitAsync` with a timeout token avoids that.
+- **Optional, explicitness only (no behavior change):**
+  - CA1307 (38): spell out `StringComparison` on `Contains` / `Replace` / `EndsWith(char)`, which are already ordinal. None are in the Database namespace.
+  - CA1820 (15): `== ""` → `string.IsNullOrEmpty`. Not a pure rename, because `IsNullOrEmpty` also accepts null.
 
-### Gotcha (done 2026-11-16)
-
-`Discord Bot GUI/Database/.editorconfig` had `root = true`, so the repo-root `.editorconfig` would **not** have applied anywhere under `Database/`. Removed; `root = true` is now only in the root file.
-
-### Recommended setup
-
-1. **Done 2026-11-16.** `Directory.Build.props` at the repo root so both projects share `<AnalysisLevel>latest-recommended</AnalysisLevel>` and `<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>`.
-2. **Done 2026-11-16.** A root `.editorconfig` that silences the unwanted rules and keeps the rest as warnings (details below).
-3. Optionally `Microsoft.VisualStudio.Threading.Analyzers` for `async void`, `.Result` / `.Wait()` and unawaited tasks, which are common in Discord.Net handlers. Not added yet.
-4. **Done 2026-11-16.** `dotnet format` for formatting. Turn on `TreatWarningsAsErrors` only once at zero warnings.
-5. **Done 2026-11-16.** Enable nullable reference types gradually, folder by folder with `#nullable enable`, then project-wide (details under "Nullable reference types" below).
-
-### Setup decisions (2026-11-16)
-
-- **Formatting** options mirror the owner's Visual Studio settings (read from `CurrentSettings.vssettings`): space after casts, braces of `case` blocks not indented, file-scoped namespaces, no simple `using` statements, expression-bodied lambdas and local functions only on a single line. With the .NET defaults instead, `dotnet format` wanted to reformat 25 files.
-- **Silenced, with the reason written in `.editorconfig`:** CA1304 / CA1311 (lowercasing without a culture), CA1051 (visible fields), CA1707 (underscores), CA1711 (`Enum` suffix), CA1716 (keywords in other languages).
-- **CA1305 stays on** except for integer `ToString` / `Parse` (`dotnet_code_quality.CA1305.excluded_symbol_names`). Nullable integers (`int?.ToString()`) are not covered by the exclusion.
-- **`GenerateDocumentationFile`** is on only so the build reports IDE0005 (unnecessary usings). Side effect: `Discord Bot.xml` / `LastFmApi.xml` next to the binaries. CS1591 (missing XML comments) is off.
-- **The Database namespace is exempt from CA1309 and CA1310** (`Properties/GlobalSuppressions.cs`, next to CA1862). DB services and repositories pass lambdas that EF translates to SQL, and EF can't translate the `StringComparison` overloads. Visual Studio's code fix for these rules adds one anyway: Code Cleanup did it to 7 queries (reverted 2026-11-16).
-- The build went from 0 to 87 warnings (the trial with `latest-recommended` alone had 417). After the partial Code Cleanup (`35fb3ba`) and the Database exemption, 55 were left; after the CA2201 fixes, 45; after CA1310 and CA5369, 27 (all CA1305); after CA1305, **0 warnings in Debug and Release**. `dotnet format --verify-no-changes` passes on both projects.
-
-### Warnings from the setup (all cleared 2026-11-16)
-
-Kept as a record of what changed and why. File and line references are from `bdc988d`, before the fixes.
-
-**Formatting and style (9): done 2026-11-16** in `35fb3ba` and `bdc988d`. The extra IDE0001 that only `dotnet format` reported is gone too.
-
-**String comparison: done 2026-11-16**
-- CA1310 (17): **done 2026-11-16** with `StringComparison.Ordinal`. `StartsWith` / `EndsWith` / `IndexOf` / `LastIndexOf` with a string argument were culture-sensitive. Every call looks for a fixed ASCII marker (URL prefix, file extension, "tags:", "Token: ", "getInfo", "i am"), so the results are the same. None of these are in EF queries. `EasterEggFeature.cs:48,54,56`, `BiasGameImageProcessor.cs:47`, `InstagramMessageProcessor.cs:24,64,69,73`, `InstaScraper.cs:103`, `KpopDbScraper.cs:87,91`, `TwitchCLI.cs:36`, `UrlTools.cs:29,72`, `LastFmApi/Communication/LastFmRequestDetails.cs:16`.
-- CA1309 (7): **no longer reported** because of the Database exemption, not a code change. These were `.ToLower().Equals(x)` inside EF queries in `CustomCommandService`, `RoleService` and `ServerService`; they stay as they are.
-
-**Format provider, CA1305 (27): done 2026-11-16.** None of these could be reproduced as a bug: under both hu-HU and en-US on .NET 11, `DateTime.Parse` accepts Last.fm's English dates ("16 Nov 2026, 14:05"), and the bias modal dates parse back correctly. The risk was that output and parsing depend on the server's culture. Fixed with `CultureInfo.InvariantCulture` unless noted:
-- `string.Format`: `UserBiasCommands`, `BirthdayMessageProcessor`, `WhoKnowsImageProcessor` (2), `ImageTools`.
-- Parsing: `LastFmListResultTools` (`double.Parse` of play counts ×3, `DateTime.Parse` of Last.fm dates), `ProcessExtension` (`Convert.ToInt32` ×2), `Convert.ChangeType` in `WeeklyPollService` and `WeeklyPollOptionPresetService` (the edited fields are `string`, `bool`, `long` and `int?`, so invariant is safe).
-- `ReminderFeature` and `UnmuteFeature` sent `DateTime.UtcNow` through a string and back to drop the seconds. Now `new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, now.Kind)`, as `DateTimeTools.TryAddValuesToDate` already does. The value is only compared in EF queries, so its `Kind` (now `Utc` instead of `Unspecified`) doesn't matter.
-- `InstagramMessageProcessor`, `InstaScraper`: `ToString("yyyy\\.MM\\.dd")`.
-- `BiasEditComponentInteraction` (3): the edit modals are prefilled with `?.ToString("yyyy. MM. dd.", CultureInfo.InvariantCulture) ?? ""`. This differs from the earlier ISO proposal, because the modals' placeholders say "YYYY. MM. DD. format". The output is exactly what hu-HU produced before ("2001. 05. 12."), and `DateOnly.TryParse` reads it back under hu-HU, en-US, en-GB and invariant (tested on .NET 11). Before, an en-US server would have prefilled "5/12/2001".
-- Nullable integers: `WeeklyPollService.UpdateAsync` now looks the role up only inside `if (roleId.HasValue)`, with `roleId.Value.ToString()` in a local (before, a null `roleId` queried `DiscordId == ""`). `LastFmAPI.GetNowPlayingAsync`: `userplaycount?.ToString() ?? ""`. `LastFmRequestDetails`: `Limit` / `Page` use `?.ToString()`; empty and null are both skipped when the URL is built.
-- Not covered by CA1305: interpolated strings. For example `LastFmListResultTools` writes `{percentage}%`, which shows "12,5%" under hu-HU and "12.5%" under en-US. Leave it as is if the server's culture is the intended display format.
-
-**Exceptions, CA2201 (10): done 2026-11-16**
-- `SizedDictionary`: `throw new()` on a null key → `ArgumentNullException.ThrowIfNull(key)`.
-- `YoutubeAPI` (3) → `InvalidOperationException`.
-- `PollTools.GetSpecialAnswers` → `ArgumentOutOfRangeException(nameof(name), name, ...)`.
-- `LastFmApi/LastFmHelper` (3) → `ArgumentException(..., nameof(parameters))`. This adds " (Parameter 'parameters')" to the message, which only appears in the log.
-- Nothing catches these types or checks their messages; every caller catches `Exception` and logs it, so behavior is unchanged.
-
-**Design (16): done 2026-11-16, with follow-ups for CA1001**
-- CA1725 (8): **done 2026-11-16** in `35fb3ba` and `bdc988d`. Code Cleanup renamed the implementations to the interface names, the opposite of the proposal here (which was renaming the interfaces to the clearer implementation names, e.g. `reminderOrderId`, `foreignId`, `artistMbid`).
-- CA1805 (5): **done 2026-11-16** in `35fb3ba`.
-- CA1001 (3): **done 2026-11-16** in `bdc988d`. `App.Dispose` disposes `BotService` and `mainTimer`, `BotMain.Dispose` disposes `startLock` and the client, and `BotWindow.Dispose` disposes `diagnosticsTimer`. Follow-ups found on review (2026-11-16):
-  - **Done 2026-11-16.** Nothing called these methods. Now `Closing()` stops `mainTimer` first, so the reconnect timer can't log the bot back in during shutdown. `CloseAsync` calls `App.Dispose` last in its `finally`, after `StopBotAsync` and the log flush, on the thread pool like the rest of the shutdown (the client's `Dispose` waits on its own `StopAsync`, which risks the UI-thread deadlock that `Closing()` already avoids). `BotWindow` disposes its timer in `OnClosed`.
-  - **Done 2026-11-16.** Null cases: `BotWindow.diagnosticsTimer` is null when `ShowDiagnostics` is off, and `App.BotService` is null if startup failed before it was assigned. Both use `?.Dispose()`.
-  - `BotMain` keeps disposing the `DiscordSocketClient`, although the DI container created it, because the root service provider is never disposed. This is the only place it gets disposed (a second dispose would be harmless).
-  - Not checked by running the bot. To check by hand: start the bot, close the window, and confirm the log ends with "Application closing..." and no error, and that the bot shows offline in Discord right away.
-
-**Security, CA5369 (1): done 2026-11-16**
-- `WordOfTheDayService` deserialized the external RSS with `XmlSerializer.Deserialize(TextReader)`, which processes DTDs. It now reads through `XmlReader.Create(..., new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore })` (`Ignore` rather than `Prohibit`, so a DOCTYPE in the feed doesn't throw). Checked against 6 live feeds (zh, fr, ru, hindi, esp, pl): identical results to the old path, and none has a DOCTYPE.
-
-### Further rule candidates (investigated 2026-11-16, recommended and optional ones applied 2026-11-16)
-
-Trial builds on top of the zero-warning setup. Counts are new warnings.
-
-**Outcome (2026-11-16):** all recommended and optional rules below are on, and the build is back at 0 warnings in Debug and Release.
-- CA2000: all 14 fixed. `Startup.Run` is suppressed in GlobalSuppressions (DI singletons). `YoutubeAPI` needed more than a `using`: the playlist import runs in the background after `Run` returns and used `Run`'s service. It now creates and disposes its own service once the user confirms. `GetChildProcessCount` also disposes the child `Process` objects it creates every second.
-- CA1063: the 5 finalizers are removed and the 8 types sealed. Two bugs went with them:
-  - `WhoKnowsEmbedResult.Dispose()` threw on a null `ImageData` (who-knows embeds without an image). `Dispose` stopped before marking itself disposed, so the finalizer ran it again on the finalizer thread, which ends the process.
-  - `LastFmWhoKnowsEmbedProcessor` hands an `EditPictureResult`'s stream to the who-knows result without disposing the `EditPictureResult`, so its finalizer could close the stream while the embed was still being sent.
-- Naming: 16 fields renamed; private constants keep PascalCase through a more specific rule.
-- Banned API list: `BannedSymbols.txt` at the repo root, with `Microsoft.CodeAnalysis.BannedApiAnalyzers` 5.6.0 added in `Directory.Build.props`. Checked with a temporary file that every entry reports RS0030.
-- **CA1508, kept on trial: 4 of 5 findings were right.**
-  - Real bug: `ChannelTypeEnumTools.TryGetEnumFromCommandText` ran `FirstOrDefault` over a non-nullable enum, so it always returned `true`, with `None` for unknown text. `!channel add/remove <typo>` answered "ChannelType or Server not found." instead of listing the valid types, and "unspecified" was accepted as `None`.
-  - Dead code: `BotLogger.LogToFile` (the writer null check) and `TwitterScraper` (`Body?.` after the null check).
-  - False positive, suppressed: `AudioPlayFeature.WaitAsync` reads `VoiceChannel` again after a `Task.Delay`, during which the bot can be disconnected.
-
-**Recommended**
-1. **IDE code-quality rules** (`dotnet_analyzer_diagnostic.category-CodeQuality.severity = warning`): unused or unread private members, unnecessary suppressions and similar. **0 warnings today**, so it only guards future code.
-2. **CA2000, dispose objects before losing scope** (14). Real leaks:
-   - `ProcessTools.cs:17-21` creates 5 `PerformanceCounter`s on every diagnostics tick (once a second when `ShowDiagnostics` is on) and never disposes them.
-   - `ProcessExtension.cs:14,32` (`ManagementObjectSearcher`), `WebTools.cs:45` (`Ping`, on every login attempt), `YoutubeAPI.cs:85` (`YouTubeService` per search), `TwitchCLI.cs:45`, `UserBiasGameCommands.cs:79` (`BiasGameData` from `TryRemove`).
-   - False positives: `Startup.cs:32,47,54`, DI singletons the container owns. Suppress those with a justification.
-3. **CA1063, implement IDisposable correctly** (21, in 8 types). `AudioVariables`, `BiasGameData`, `EditPictureResult`, `ServerAudioResource` and `WhoKnowsEmbedResult` have finalizers that call `Dispose()` on managed objects. That is unsafe, because those objects may already be finalized; the `AudioVariables` finalizer crash in section 3 was this pattern. They hold no native resources, so the fix is to remove the finalizers and seal the classes. `App`, `BotMain` and `BotWindow` only need `sealed`.
-
-**Optional**
-4. **Private field naming**, camelCase without a prefix, as most of the code already does (16). The exceptions: `_` prefix in `AudioVariables`, `BiasGameData`, `EditPictureResult`, `ServerAudioResource`, `WhoKnowsEmbedResult`, `MusicBrainzAPI`, `WordOfTheDayService`, `LastFmApi/BaseRequests`; PascalCase in `App.BotService`, `TextFont.InstalledFamilies`, `Config.Configuration`, `TwitchAPI` (`Monitor`, `API`, `Token`, `TokenTick`), `BotWindow.AutoScroll`.
-5. **Banned API list** (`Microsoft.CodeAnalysis.BannedApiAnalyzers` package + `BannedSymbols.txt`) to turn CLAUDE.md rules into build errors: `Console.*` (use `BotLogger`), `RunMode.Async` (rejected), `Assembly.GetEntryAssembly`, `SixLabors.*` (license). No current violations, so it's a guard only. `DateTime.Now` is better left off the list, because the 3 uses (`BotLoggerTools`, `DateTimeTools`) are deliberate local log times.
-6. **CA1508, dead conditional code** (5): `BotLogger.cs:24`, `AudioPlayFeature.cs:178`, `TwitterScraper.cs:96-97`, `ChannelTypeEnumTools.cs:26`. Useful, but this rule is known for false positives.
-
-**Not recommended at first: second look (investigated 2026-11-16, after the rules above were applied)**
-
-`AnalysisLevel=latest-all` now adds 2,145 warnings. Rule by rule:
-- Worth adding after all (cheap, no noise). **Added and fixed 2026-11-16, together with CA2234 below:**
-  - CA1052 (9): classes with only static members that aren't `static`. The 6 embed processors in `Processors/EmbedProcessors/Help` and `Polls`, plus `LastFmHelper`, `UtilityRequests` and `WhoKnowsRequests` in LastFmApi. All are now `static`.
-  - CA1851 (2): `InstagramMessageProcessor.ReadFiles` ended with an empty leftover loop, `for (int i = 0; i < orderedFiles.Count(); i++) { }`, which sorted the whole file list again on every iteration. Removed. (The Instagram embed is disabled.)
-- Worth fixing by hand, but not as a rule:
-  - CA1849 (12): half are real and half are false positives. Real: `CancellationTokenSource.Cancel` runs the cancellation callbacks on the calling thread (App, BotMain, UserVoiceCommands ×3), and `YoutubeStreamService.cs:51` blocks a thread in `Process.WaitForExit(TimeSpan)`. False positives: `GetChannel` ×4 and `GetRole` ×2 are cache lookups in Discord.Net's socket client.
-- Optional, explicitness only (no behavior change):
-  - CA1307 (38): spell out `StringComparison` on `Contains` / `Replace` / `EndsWith(char)`, which are already ordinal. None of them are in the Database namespace.
-  - CA1820 (15): `== ""` → `string.IsNullOrEmpty`. Not a pure rename: `IsNullOrEmpty` also accepts null.
-  - CA2234 (2): `WebTools` passes URLs to `HttpClient` as strings. **Added and fixed 2026-11-16** (`new Uri(url)`).
-- Not worth it, for reasons specific to this code:
-  - CA2007 ConfigureAwait (881): the Discord.Net handlers already run on the thread pool, where it changes nothing. Only the WPF UI code (`App`, `BotWindow`) has a synchronization context, and there `ConfigureAwait(false)` would be wrong before UI access.
-  - CA1515 make types internal (387): Discord.Net only discovers public command and interaction modules, so applying the code fix would make commands disappear.
-  - CA1031 catch `Exception` (279): the project's convention; handlers log and carry on.
-  - CA1062 validate arguments (182): nullable reference types are the better tool.
-  - CA1002 (123), CA2227 (80), CA1819 (4), CA1034 + CA1815 (3, `Config.ConfigModel`): library API design. The settable collections and arrays are what Mapster, JSON and Discord.Net (`Embed[]`) work with.
-  - CA1056 / CA1054 / CA1055 (76): URLs come from the database, JSON and the config as strings.
-  - CA1724 (24): type names such as `Log`, `User`, `Owner` and `Data` that also exist as namespaces. Renaming churn with no effect on behavior.
-  - CA5394 (20): `Random` for games and easter eggs, not security.
-  - CA1008 (5): these enums start at 1 on purpose (database IDs, command levels), so a `None = 0` would mean nothing.
-
-`Microsoft.VisualStudio.Threading.Analyzers` 18.12.1, trial build (180 warnings): VSTHRD200 `Async` suffix (153, mostly command methods, whose names Discord.Net doesn't care about), VSTHRD202 return the task directly (9), VSTHRD100 `async void` (8, all event handlers or overrides, all guarded now), VSTHRD103 (6, the same `GetChannel` / `GetRole` false positives), VSTHRD001 (3, Visual Studio extension threading rules), VSTHRD002 (1, the deliberate 3-second shutdown wait). Nothing new; not worth adding.
-
-Nullable reference types for the whole project (992 warnings):
-- About 620 are CS8618, uninitialized non-nullable properties, in the JSON / API / DTO models: `Services/Models` (354), LastFmApi (204, mostly models), `Resources` (55), `Communication` (40).
-- The logic folders are small: `Tools` 19 (10 files), `Commands` 19, `Processors` 21, `Features` 16, `Interactions` 14, `Core` 16, `Windows` 8, root files 46 (`App`, `BotMain`, the handlers), service code 74, `Database` 92.
-- Suggested order: `#nullable enable` in `Tools` first, then `Features`, `Processors`, `Commands` and `Interactions`. Leave the model folders for last, or keep nullable off there.
-- **`Tools/` done 2026-11-16:** `#nullable enable` at the top of all 23 files, 18 warnings fixed. With `TreatWarningsAsErrors` on, a folder can only be switched on once all its warnings are fixed. Files outside converted folders stay oblivious, so callers there are not affected.
-  - Annotated as nullable because they return or accept null on purpose: `UrlTools.LinkSearch` / `SanitizeText`, `StringTools.AddNumberPositionIdentifier`, the `server` parameter of `DiscordTools.IsTypeOfChannel`, the optional `user` of `GetNickName`, and the `contentType` of `MagickTools.ConvertIfUnsupported`. `StringExtension.UrlCombine` returns null only when both parts are null, which `[NotNullIfNotNull]` expresses, so URLs built from constants stay non-null for callers.
-  - Behavior changes: `WebTools.GetStream` threw a NullReferenceException for a response without a Content-Type header, and now copies the data as it is. `DiscordTools.GetNickNameBase` threw when the user in a server channel wasn't a `SocketGuildUser`, and now falls back to the username. `MagickTools.MeasureText` and `ImageTools.GetDominantColor` throw an `InvalidOperationException` with a message where Magick.NET returns null (only when its native call fails), instead of a NullReferenceException in the caller. `ProcessExtension.GetChildProcesses` filters with `OfType<Process>()`.
-- **`Features/`, `Processors/`, `Commands/`, `Interactions/` done 2026-11-16:** `#nullable enable` in all 85 files, 68 warnings fixed.
-  - Mostly annotations: `out` variables of `TryGetValue` / `TryRemove`, optional `IChannel` / `IUser` command parameters, and `FirstOrDefault` results that are already null-checked. Two helpers in `Tools` got attributes so callers know the result after the check: `CollectionTools.IsNullOrEmpty` (`[NotNullWhen(false)]`) and `ChannelTypeEnumTools.TryGetEnumFromCommandText` (`[NotNullWhen(true)]`).
-  - `BaseFeature.Context` / `Parameters` are `= null!`: `Run(...)` sets them before `ExecuteCoreLogicAsync`, and features started without them never read them. A nullable type would have meant a null check in every feature.
-  - `as` casts that can't fail became casts that state the assumption: `(SocketGuildUser) Context.User` in guild-only features and `(SocketMessageComponent) Context.Interaction` in component handlers. `AudioRequestFeature` uses `Context.User is not SocketGuildUser { VoiceChannel: not null }`.
-  - Bugs fixed:
-    - `UnmuteFeature` checked `user != null` only for the DM. When a muted user (or the bot) had left the server, `user.RemoveRoleAsync` / `user.Id` threw every minute, the exception ended the loop for everyone after them, and their row was never removed. Now the roles are only touched when both server and user are found, and the entry is removed either way.
-    - `BirthdayFeature`: a deleted birthday channel or a server the bot left threw inside the loop and stopped the day's birthdays for the other servers. Now it is logged and skipped.
-    - `!update role message` and the YouTube playlist offer threw on a deleted channel. They now reply / log instead.
-  - The image processors that log and return null on failure now say so in their types (`MemoryStream?`, `EditPictureResult?`). `UserBonkCommands` skips sending when the gif failed, instead of throwing in `SendFileAsync`. `BiasGameWinnerBracketImageProcessor.EditImage` branches on `winner == null` instead of the file count. `InstagramMessageProcessor` (disabled embed) throws a clear exception when Instaloader saved no metadata file.
-  - **Done 2026-11-16** (with `Communication/`): `BiasGameStepInteraction` assigned the result of `UpdateWinnerBracket` / `AddFinal` straight to `BiasGameData.WinnerBracket`. When drawing failed it became null and the next step of the game threw. The replaced stream was also never disposed. Now `BiasGameData.ReplaceWinnerBracket` keeps the current bracket when the new one is null and disposes the replaced one; the setter is private.
-- **`Core/`, `Windows/` and the root files done 2026-11-16:** `#nullable enable` in all 13 files (`App`, `BotMain`, `CommandHandler`, `InteractionHandler`, `Startup`), 70 warnings fixed.
-  - `GetService<T>()` → `GetRequiredService<T>()` in `App`, `BotMain` and `CommandHandler` (18 calls). Everything they resolve is registered, so the only difference is a clear "No service registered" error instead of a NullReferenceException.
-  - `App`: `services`, `logger`, `browserService` and `twitchThread` are `= null!`, because `OnStartup` sets them before anything uses them. `mainTimer` and `botService` are nullable, as `Closing` / `Dispose` already treated them, and the reconnect timer only logs in again once `botService` exists. Event handlers take `object? sender`.
-  - `Config`: a missing value now comes back as `""`, `[]` or an empty dictionary instead of null. Bug found while checking this (tested with Microsoft.Extensions.Configuration 11.0.0): the binder reads an empty JSON object as null, and the generated `config.json` has `"lastfm_artist_input_replacement": {}`. With no replacements configured, `Lastfm_Artist_Input_Replacement` was null, and the three `TryGetValue` calls in `LastFmAPI` (artist lookups) threw. Empty arrays (`[]`) were not affected.
-  - `CommandHandler.GetServerAsync` returns `ServerResource?` (null in DMs); `ServerCache.TryGetValue` returns `ServerResource?`; `SizedDictionary` has `where TKey : notnull`, which `Dictionary` requires. `BotWindow`'s scroll and toolbar handlers use `is not` patterns instead of repeated `as` casts.
-- **`Communication/` and `Resources/` done 2026-11-16:** `#nullable enable` in all 50 files, 110 warnings fixed (all but 7 were uninitialized properties).
-  - `Resources`: a property is nullable when its database column is (`MainDB/Tables`: most of `Idol`'s strings, `IdolGroup.FullName` / `FullKoreanName`, `User.LastFMUsername`) or when `MapperConfig` maps it to null (the optional role names, `Gender`, the latest image URLs, which are null for an idol without images). `UserResource.Username` is nullable too: only `DiscordTools.FilterToOnlyServerMembers` fills it. Everything else gets `= ""` / `= []`, which Mapster overwrites; the defaults only matter for code that creates a resource itself.
-  - `Communication`: modal inputs default to `""`. `AudioVariables.AudioClient` / `Stopwatch` / `CancellationTokenSource` are nullable (null until something plays). `WhoKnowsEmbedResult.ImageData` / `ImageName` and `AdditionalIdolData`'s scraped fields are nullable. `TwitchNotificationData` and `BiasMessageResult.Message` are `required`, because they are always built with an object initializer. `TextFont` handles a missing registry key.
-  - Bugs fixed: `BiasGameStatEmbedProcessor` called `.Replace` on `IdolGroupFullName`, which is null when the idol's group has no full name, so the stats embed threw. It now shows "Soloist", as the `Idol` → `IdolGameResource` mapping in `MapperConfig` already does. `UserVoiceCommands` cancelled playback with `CancellationTokenSource.Cancel` in two places without the `?.` the third place had, which threw before anything had played. `AudioNowPlayingEmbedProcessor` handles a missing stopwatch. The bias game polaroid and winner texts fall back to `""` when an idol has no stage name (the column is nullable).
-  - `ExtendedBiasData` (dbkpop scraping) dereferenced AngleSharp's nullable `QuerySelector` results.
-- **Plan for the rest (decided 2026-11-16, "plan A"):** the JSON models in `Services/Models` (97 files) and `LastFmApi/Models` (46 files) are not annotated. Marking those two folders `generated_code = true` in `.editorconfig` makes the compiler treat them as generated, which turns nullable off for them (tested: 506 warnings → 0, no model file edited). Steps: (1) `Database/` with its interfaces, (2) `Services/` code and LastFmApi code, (3) the switch-over: `<Nullable>enable</Nullable>` in both projects, the `generated_code` sections, and removing the then redundant `#nullable enable` lines (IDE0240) in one mechanical commit. The models stay unchecked; a null deserialization result is still caught, nested JSON fields are not.
-- **`Database/` with `Interfaces/DBServices` / `DBRepositories` done 2026-11-16** (step 1): `#nullable enable` in all 79 files.
-  - Contract: the 39 service methods that return null on failure or when nothing matches now declare it. Of those, the 16 list methods return an empty list instead (the failure is still logged; callers already treated null and empty alike through `IsNullOrEmpty`). `GetCurrentServerAsync()` in `BaseCommand` / `BaseFeature` / `BaseInteraction` throws when the server can't be loaded: `CommandHandler` adds every guild it sees, so that only happens when the database fails, and every command's `catch` logs it. `GenericRepository.FirstOrDefaultAsync` / `FindByIdAsync` return `TEntity?`.
-  - Inside the services: 79 lookup results are declared nullable, 13 `mapper.Map(entity)` calls map only a found entity, and the lookups used without a check now return `NotFound` / `false` / `null`.
-  - Callers: 36 results declared nullable. The 26 places that used one without a check now reply or skip: text commands answer "Poll not found!" / "Preset not found!" / "… could not be created."; the modal-opening interactions answer that the idol / group / poll / preset could not be found (before, the click went unanswered); the interactions that reload an item after saving it say the change was saved but the message could not be refreshed; the birthday, Twitch notification and unmute features log and skip a server that can't be loaded; the bias game final bracket is drawn without the winner's name when the winner can't be loaded.
-  - Bugs fixed:
-    - `UserService.RemoveLastfmUsernameAsync` had `if (user != null || …)`: for an existing user it returned `NotFound` without removing anything, and for a missing user it threw. Removing a Last.fm username never worked. Now `user == null || …`; its success log said "added".
-    - `IdolAliasService.RemoveIdolAliasAsync` checked the alias string parameter instead of the lookup result, so removing a missing alias failed with an exception instead of `NotFound`.
-    - `ServerMutedUserService.AddMutedUserAsync` is written to create the user and server rows when missing, but its "already muted?" query read `user.UserId` first, which threw for a user without a row: muting anyone who had never used a bias or Last.fm command failed. The check is now skipped when the user or server has no row yet. `GetMutedUserByUsernameAsync` / `RemoveMutedUserAsync` threw the same way and now return null / `NotFound`.
-    - `UserService.GetTopIdolsAsync` threw (and logged an error) for a user without a row instead of returning null.
-  - `AdminWeeklyPollCommands.ResendWeeklyPoll` declared a local named `_` (`bool _ = …`); it is a real discard now. A missing cell or link now throws an `InvalidOperationException` that names the selector, instead of a NullReferenceException; the scrape fails the same way as before.
-- **`Services/` with `Interfaces/Services` and the LastFmApi code done 2026-11-16** (step 2): `#nullable enable` in 41 files (everything but the two `Models` folders). About 200 warnings fixed, most of them follow-ups to the LastFmApi change.
-  - LastFmApi: `GenericResponseItem.Response` is `T?`. The new `IsSuccess` property (`[MemberNotNullWhen(true, nameof(Response))]`) replaces the 22 `ResultCode != LastFmRequestResultEnum.Success` checks, so the compiler knows `Response` is set after the check. `AddRequestDetailsOf` adds a request's details only when the request was sent; `RequestDetails` is null when a required parameter was empty. A null or empty response body is handled as `EmptyResponse` instead of throwing a NullReferenceException. `BaseResponse.Message`, the optional request details and the `WhoKnowsResponseItem` fields Last.fm may leave out (image, MBID, track) are nullable. `WhoKnowsRequests` reads `Response` only after the success check.
-  - Services: methods that return null for "not found" now declare it: `ITwitchCLI.GetChannel`, `IKpopDbScraper.GetProfileDataAsync`, `IMusicBrainzAPI.GetArtistSpotifyUrlAsync`, `ISpotifyAPI.SearchItemAsync` and `IWordOfTheDayService.GetDataAsync`. Their callers already checked for null. `Process.Start` (Twitch CLI, Instaloader, yt-dlp/ffmpeg) and a missing voice `AudioClient` throw an `InvalidOperationException` with a message instead of a NullReferenceException; both are caught and logged as before. `TwitchAPI.monitor` / `api` are `= null!`, because `Check` sets them before the monitor raises any event. `BrowserService.OpenBrowser` returns the browser it launched.
-  - Bugs fixed:
-    - `LastFmAPI.GetArtistDataAsync` checked the track request's result a second time after the artist info request (copy-paste). A failed artist request therefore went on with a null artist: `LastFmArtistTools.MapArtistData` threw on `artistInfo.Stats`, and the user got no reply. It now checks the artist request and replies with Last.fm's message.
-    - Spotify playlists: `n.Track as FullTrack` gave null for a podcast episode, so a playlist with an episode in it threw and the whole request failed as "not found". Episodes are now skipped.
-    - YouTube watch links: an empty `list=` still offered to add a playlist and then searched for an empty ID, and a link without `v` (or a playlist link without `list`) called the API with a null ID. A playlist is now offered only for a non-empty ID, and a missing ID returns "not found" without spending quota.
-    - `InstaScraper` (disabled embed) returned null when an exception was caught inside `ExtractFromUrl`. It now returns the same error result as the outer catch.
-  - Switch-over dry run: I built with `-p:Nullable=enable` and the two `generated_code` sections added temporarily, then restored `.editorconfig`. The result was 291 warnings, all IDE0240 (the now redundant directives), so step 3 needs no other code changes.
-- **Switch-over done 2026-11-16** (step 3): `<Nullable>enable</Nullable>` in both csproj files, `generated_code = true` for `Discord Bot GUI/Services/Models/**.cs` and `LastFmApi/Models/**.cs` in the root `.editorconfig`, and the 291 `#nullable enable` lines removed (each with the blank line after it). `Enums/` and `Properties/` came in with no warnings.
-  - Generated code is also skipped by the analyzers, so the two JSON model folders no longer get style or quality warnings (`Database/Models` already didn't).
-  - Tested with a probe file in `Database/Models`: `string?` there is error CS8669 (annotations in generated code need a `#nullable` directive), while an uninitialized `string` gives nothing. A scaffolder run against the project now writes `?` annotations, so scaffolded output either loses them or gets `#nullable enable` (which puts the file under checking). Noted in CLAUDE.md under "Database changes".
-
-**Found on the way**
-- **Done 2026-11-16:** `App.StartTwitchMonitor` was `async void` without a try/catch on its own thread. `TwitchAPI.Start()` catches its own exceptions, but creating the scope or constructing `TwitchAPI` and its dependencies (e.g. `Config` with a broken config file) could still throw and end the process. It now logs instead.
-- **Done 2026-11-16:** `App.OnStartup` is also `async void`, and nothing caught errors from `await botService.RunBotAsync()` (`RunBotAsync` has only a `finally`). A login failure at startup (e.g. an invalid token, which `LoginAsync` rejects) closed the app without a log entry. It is now logged. A failed login leaves the client `LoggedOut`, so the reconnect timer retries every minute, and a corrected token in `config.json` is picked up without a restart. The other `async void` handlers already caught their exceptions.
-- **Done 2026-11-16:** the Twitch monitor keeps one DI scope for its whole life (`Check` ends with `await Task.Delay(-1)`), and its `async void` event handlers, which can overlap, all shared it. Three things were unsafe to share:
-  - the scope's `DbContext`, which allows one operation at a time ("A second operation was started on this context");
-  - one `TwitchNotificationFeature` instance, whose `Parameters` hold the current run's data, so overlapping announcements could swap their data;
-  - a plain `Dictionary` of stream states.
-  `TwitchAPI` now takes `IServiceProvider` and creates a scope for each channel lookup and each notification (the channel resources are DTOs, so they outlive the scope). The stream states are a `ConcurrentDictionary`.
-- **Done 2026-11-16:** the token refresh in `TwitchAPI.MonitorOnServiceTick` (every 1440 ticks, about 24 hours) stored the new token only in the `token` field, never in `api.Settings.AccessToken`, so the monitor kept using the token from startup. Twitch app access tokens expire after about 60 days, so a long-running bot would have stopped getting stream updates until a restart. It now sets `api.Settings.AccessToken` too; the monitor shares that client. Not checked live: that needs a bot running for over a day.
-
-### Null-check placement (investigated and fixed 2026-11-16)
-
-The goal: check a value for null where it comes from, and hand callees a non-nullable value. Where the caller has checked a value but the compiler loses track of it (a property of a property, a combined condition), the caller passes it on with `!` instead of the callee taking `T?`. The review covered every nullable parameter (63 declarations), every `!` and every `?.` / `??` outside the models.
-
-- There is no `!` at any call site; the only ones are `= null!` fields set before use (`App`, `BaseFeature`, `TwitchAPI`). Where a checked value was lost, the code used a nullable parameter or a `?? ""` fallback instead. Those are the items below.
-
-**Done 2026-11-16:**
-1. **`DiscordTools.IsTypeOfChannel` returned `true` for a null server.** Four of its five callers pass a server from `GetCurrentServerAsync`, which throws instead of returning null. `CommandHandler` passed `GetServerAsync`'s result. That was null in DMs (guarded by `!IsDM`), but also in a guild when the server was just added and could not be read back. The message then counted as a self-role request and was deleted. Now the parameter is `ServerResource`. `GetServerAsync` throws in a guild when the server can't be loaded, so null means a DM, and `CommandHandler` checks `server != null` instead of `!IsDM`.
-2. **Who-knows current user.** `UserLastfmCommands.LfWhoKnows` checks the current user and their Last.fm username when no artist or track is given. `LastFmAPI.GetWhoKnowsDataAsync` still took `UserResource? currentUser` and used `currentUser?.LastFmUsername ?? ""`, a fallback that couldn't trigger. Now the now-playing case is `GetWhoKnowsByNowPlayingAsync(string lastFmUsername, List<UserResource> users)`, and the command passes `currentUser!.LastFmUsername!` after its check. Both public methods end in the private `CreateWhoKnowsResultAsync` (request logging, image, sorted plays).
-3. **Helpers that turned a non-null input into null, which the callers turned back:**
-   - `UrlTools.SanitizeText` takes and returns `string`, returning `""` for blank text, so the three callers (Instagram, Twitter) lost their `?? ""`.
-   - `StringTools.AddNumberPositionIdentifier` takes and returns `string`. `GetNowPlayingAsync` calls it only when the play count request succeeded and parsed, instead of turning a missing count into `""`. `GetSongMonthlyRankingAsync` returns null after a failed request instead of passing a null response on. Its warning was also logged as `GetNowPlayingAsync`.
-   - `StringExtension.UrlCombine(this string str, string addition)`: all four callers pass non-null strings, so the null branches and both `[NotNullIfNotNull]` attributes are gone.
-   - `UrlTools.LinkSearch` takes `string message`; its one caller (Instagram embed, disabled) passes `Context.Message.Content`.
-4. **Nullable value types that always get a value:**
-   - The Last.fm top lists (`ILastFmAPI.GetTopAlbumsAsync` / `GetTopArtistsAsync` / `GetTopTracksAsync`, `LastFmListResultTools.Create*List`) take `int limit`. It is always `InputParameters.Limit`, and a null limit would have quietly given an empty list. `page` stays `int?`: it is always `null` at the bot level, but it maps to Last.fm's optional paging.
-   - The weekly poll and preset toggle buttons take `bool value`; their IDs always carry a `bool`.
-   - `WeeklyPollService.UpdateFieldAsync` / `WeeklyPollOptionPresetService.UpdateFieldAsync` take `string newValue`. In the poll service, `"custom"` (the preset select's "Custom Options") becomes null in a local for a null `OptionPresetId`.
-5. **A check repeated after it was done:** the second `BiasGameImageProcessor.CreatePolaroid` overload (now private) takes the `imageUrl` that the public overload resolved with `?? throw`, instead of checking `idol.LatestImageUrl?.StartsWith(…)` again.
-
-Checked and left as they are:
-- Parameters that carry an optional value: optional command arguments (`IChannel? channel = null`, `IUser? user = null`), event-handler senders, Last.fm's optional request parameters in `LastFmApi`, and optional data passed on for display or merging. That data includes the Spotify result, ranking and play count in `MapNowPlayingData`, `data` / `additional` in `IdolService.UpdateIdolDetailsAsync`, the MBID in `SearchItemAsync`, the optional role in `WeeklyPollService.UpdateAsync`, the bracket `winner` and an HTTP `contentType`. Also the check helpers themselves (`IsNullOrEmpty`, `IsNullOrZero`, `LastFmHelper.GetResultMessage`).
-- `BiasGameData.ReplaceWinnerBracket(MemoryStream?)`: keeping the current bracket when the new one is null is the method's purpose, so the two callers don't repeat it.
-- `?.` on JSON and scraped data (Twitter, Instagram, AngleSharp lookups), on things that may not exist yet (timers, the audio client, the stopwatch, `ffmpeg` in a `finally`), and on `context.Guild` in `RainbowRandomizerTools`, whose commands allow DMs.
-- Properties checked in the caller and read from the whole object in the callee, e.g. `additional.ImageUrl` in `UpdateIdolDetailsAsync`, checked in `BiasScrapingProcessor.UpdateBiasAsync`. The object is passed as a whole because the callee needs several of its properties.
-
-Found on the way:
-- **Done 2026-11-16:** `ISpotifyAPI.SearchItemAsync`'s `songName` defaulted to `""` while who-knows passes `null` for "no song"; the default is `null` now.
-- **Done 2026-11-16:** `PollPresetEditEmbedProcessor` built `PollPreset_Change_IsSpecialPreset_ {id}` with a stray space. Discord.Net's wildcard stops only at the delimiter `_`, and `int` parsing allows leading spaces, so the button most likely worked anyway.
-- Not a finding after all: the review said no caller passes `userId` to `IdolRepository.GetListByNamesAsync`, but `UserIdolService` does (the "already connected?" check when adding a bias). The caller search's output had been cut off before that call; the build caught it. The parameter is a real optional filter and stays.
+**Decided against (2026-11-16)**, so these don't need another look:
+- `Microsoft.VisualStudio.Threading.Analyzers`: 180 warnings in a trial build, mostly VSTHRD200 (`Async` suffix on command methods, which Discord.Net doesn't care about); nothing the current rules miss.
+- From `AnalysisLevel=latest-all`:
+  - CA2007 `ConfigureAwait`: the handlers run on the thread pool, and in the WPF UI code `ConfigureAwait(false)` would be wrong.
+  - CA1515 internal types: Discord.Net only discovers public modules.
+  - CA1031 catching `Exception`: the project's convention (handlers log and carry on).
+  - CA1062: nullable reference types cover it.
+  - CA1002 / CA2227 / CA1819 / CA1034 / CA1815: library API design; Mapster, JSON and Discord.Net (`Embed[]`) work with settable collections and arrays.
+  - CA1056 / CA1054 / CA1055: URLs come from the database, JSON and the config as strings.
+  - CA1724: type names that are also namespace names (`Log`, `User`, `Owner`, `Data`); renaming churn only.
+  - CA5394: `Random` is for games and easter eggs.
+  - CA1008: the enums start at 1 on purpose (database IDs, command levels).
 
 ## 2. Test project (investigated 2026-11-15)
 
@@ -243,10 +47,10 @@ Found on the way:
 
 ### Blockers, in order of value
 
-1. **The clock.** About 40 `DateTime.UtcNow` / `DateTime.Now` calls in 23 files (DB services, features, processors, `DateTimeTools`, `PollTools`). Reminder, birthday, poll and unmute logic can't be tested deterministically. Fix: inject `TimeProvider` (built into .NET; `FakeTimeProvider` from `Microsoft.Extensions.TimeProvider.Testing` in tests), or pass `DateTime now` into the static helpers.
+1. **The clock.** 45 `DateTime.UtcNow` / `DateTime.Now` calls in 23 files (DB services, features, processors, `DateTimeTools`, `PollTools`). Reminder, birthday, poll and unmute logic can't be tested deterministically. Fix: inject `TimeProvider` (built into .NET; `FakeTimeProvider` from `Microsoft.Extensions.TimeProvider.Testing` in tests), or pass `DateTime now` into the static helpers.
 2. **`Global` static state** (`ServerAudioResources`, `BiasGames`, `YoutubeApiKeys`). It is shared between tests and can't be reset cleanly. Fix: move it into DI singletons (e.g. `BiasGameStore`, `AudioStateStore`, `YoutubeKeyStore`).
-3. **`Config`** is a concrete class whose constructor reads and writes `Assets/config.json` in the current directory, and it's injected into ~45 classes. Fix: extract an `IConfig` interface (smallest change), or move to `IOptionsMonitor<BotOptions>`, which keeps reload-on-change.
-4. **`BotLogger`** is concrete and calls `BotWindow.LogToWindow` directly, so the core depends on the WPF window. Fix: an `IBotLogger` interface (lets tests assert an error was logged), and have the window subscribe to a logger event instead of the logger knowing the window. This also matters for step 4 (moving the DB layer into its own library).
+3. **`Config`** is a concrete class whose constructor reads and writes `Assets/config.json` in the current directory, and about 47 classes inject it. Fix: extract an `IConfig` interface (smallest change), or move to `IOptionsMonitor<BotOptions>`, which keeps reload-on-change.
+4. **`BotLogger`** is concrete and calls `BotWindow.LogToWindow` directly, so the core depends on the WPF window. Fix: an `IBotLogger` interface (lets tests assert an error was logged), and have the window subscribe to a logger event instead of the logger knowing the window. Section 4 needs the same change; the design is written down there.
 5. **Concrete Discord.Net socket types.** `BaseFeature`, `BaseCommand` and `DiscordTools` use `SocketCommandContext` / `SocketInteractionContext`, and several features inject `DiscordSocketClient`. Socket entities have internal constructors and can't be mocked. Fix: use Discord.Net's own interfaces: `ICommandContext`, `IUser`, `IGuild`, `IMessageChannel`, and `IDiscordClient` (or a narrow wrapper like `IDiscordMessenger.SendDmAsync`) instead of `DiscordSocketClient`. `BaseCommand` could derive from `ModuleBase<ICommandContext>`.
 6. **Logic inside command bodies.** Commands parse, validate and branch (e.g. `UserReminderCommands.RemindIn`). Commands are the hardest thing to unit-test, so move that logic into features, processors or tools and keep commands as thin adapters.
 
@@ -262,36 +66,22 @@ Don't use EF InMemory or SQLite: the schema uses the `SQL_Latin1_General_CP1_CI_
 ### Project setup
 
 - New project `Discord Bot GUI.Tests` targeting `net11.0-windows10.0.19041.0`, x64, `win-x64`, with a `ProjectReference` to the bot. Referencing a WinExe/WPF project from a test project works; the test project may need `<UseWPF>true</UseWPF>`.
+- `Directory.Build.props` applies to it automatically (analyzers, warnings as errors, banned APIs). It needs its own `<Nullable>enable</Nullable>`, like the other two projects.
 - Packages: xUnit v3 (or MSTest / NUnit), NSubstitute (or Moq), `Microsoft.Extensions.TimeProvider.Testing`.
 - Suggested order: (1) static tools + Mapster mapping tests, no code changes; (2) DB services with mocked repositories; (3) `TimeProvider` + `Global` → DI, then features; (4) Discord interfaces; (5) optional LocalDB repository tests.
 
-## 3. Discord.Net review (investigated and fixed 2026-11-15)
+## 3. Discord.Net: optional modernization (investigated 2026-11-15)
 
-Discord.Net 3.20.2 is the latest release, all NuGet packages are current, and no `[Obsolete]` Discord.Net APIs are in use. Discord.Commands is not deprecated, but the docs note that text commands need the privileged MessageContent intent and recommend slash commands.
-
-### Fixed
-
-- **Reconnect timer stacking event handlers.** `BotMain.RunBotAsync` registers handlers and modules only once, and a semaphore stops the startup call and the timer from logging in at the same time.
-- **Bias game clicks without acknowledgement.** The `IsProcessing` early return now calls `DeferAsync()`. Failure replies across all interactions use `RespondOrFollowupAsync` (`DiscordTools` / `BaseInteraction`), which picks `RespondAsync` or `FollowupAsync` depending on `HasResponded`. Also fixed: the debut step continued after "Not enough idols" and then failed.
-- **Lost stack traces.** `CommandExecuted` / `InteractionExecuted` log `ExecuteResult.Exception`. `commands.Log` and `interactions.Log` are now hooked into `BotLogger`. They skip `CommandException` / `InteractionException`, which Discord.Net also sends there, to avoid logging the same error twice.
-- **Interaction failures not reported to the user.** `InteractionExecuted` replies ephemerally on any error result.
-- **Unobserved fire-and-forget tasks.** `MessageReceived` runs the whole message handling in one `Task.Run` with a try/catch. That also moves the server DB lookup off the gateway task and adds the `is not SocketUserMessage` check. Commands still run with `RunMode.Sync` inside it.
-- **Intents** reduced to `Guilds`, `GuildMembers`, `GuildVoiceStates`, `GuildMessages`, `DirectMessages`, `MessageContent`.
-- **Shutdown** stops audio playback, calls `StopAsync` / `LogoutAsync`, then closes the browser, waiting up to 3 seconds and running only once.
-- **Voice:** the cached `Guild.CurrentUser` replaces `GetUserAsync` polling. `leave` no longer throws when the bot isn't in a channel. Errors are logged before disconnecting. `AudioVariables.Dispose` is null-safe (it ran from the finalizer with a null `AudioClient`, which can crash the process). `throw new Exception` became `InvalidOperationException` in `AudioPlayFeature` and `CommandHandler`.
-- **Module discovery** uses `typeof(...).Assembly` instead of `Assembly.GetEntryAssembly()`.
-
-### Accepted as is
-
-- **`DownloadUsersAsync` per command:** fine as it is.
-- **Adding guilds on `JoinedGuild` instead of on every message:** rejected. The bot can be added while it isn't running, so the per-message check stays.
-- **`RunMode.Async`:** tried in the past and dropped because of its own problems. Sync mode plus background dispatch from the handlers stays.
-
-### Remaining: optional modernization
+When checked, Discord.Net 3.20.2 was the latest release, no `[Obsolete]` Discord.Net APIs were in use, and Discord.Commands was not deprecated. The docs note that text commands need the privileged MessageContent intent and recommend slash commands. The fixes from that review are done.
 
 - **Slash commands.** MessageContent only needs Discord approval once the bot is in 100+ servers, so text commands are fine for a self-hosted bot. Slash commands would bring built-in argument parsing, autocomplete and permissions, but would be a large migration.
 - **Components V2** (stable since 3.18) could replace the embed + button layouts for help paging, bias lists and poll editing. Cosmetic, not required.
 - **Modal improvements** (3.19–3.20): select menus, checkboxes and radio groups in modals could simplify the weekly poll and idol edit modals.
+
+Decided against:
+- Adding guilds on `JoinedGuild` instead of on every message: the bot can be added while it isn't running, so the per-message check stays.
+- `DownloadUsersAsync` per command: fine as it is.
+- `RunMode.Async`: tried in the past and dropped (see CLAUDE.md).
 
 ## 4. Moving the database layer into its own class library (investigated 2026-11-15)
 
@@ -301,7 +91,7 @@ Discord.Net 3.20.2 is the latest release, all NuGet packages are current, and no
 
 | From the bot | Notes |
 |---|---|
-| `Database/` (DbContext, 19 models, 20 repositories, 20 services, `.editorconfig`) | As is |
+| `Database/` (DbContext, 19 models, 20 repositories, 20 services, `.editorconfig`) | As is. The `.editorconfig` keeps the models and `MainDbContext` marked as generated code |
 | `Interfaces/DBServices/`, `Interfaces/DBRepositories/` | As is |
 | `Resources/` (22 DTOs) | As is, after the `IdolGroupResource` fix below |
 | `Core/Caching/` (`ServerCache`, `SizedDictionary`) | Only the DB services and `Startup` use it |
@@ -314,10 +104,10 @@ Keeping the existing `Discord_Bot.Database.*` / `Discord_Bot.Resources` namespac
 
 ### Couplings to untangle first
 
-1. **`BotLogger` (the real blocker).** All 20 services take `BotLogger` through `BaseService`, and `BotLogger` calls `BotWindow` (WPF). The library can't reference the bot. Fix: an `IBotLogger` interface in the library (the DB layer only uses `Log` and `Error`) implemented by the existing `BotLogger`. This is the same change as test-project blocker 4. The alternative is the standard `ILogger<T>` (`AddLogging()` is already registered) with a small provider forwarding to `BotLogger`, but that changes ~156 call sites.
-   - Design worked out 2026-11-16 (not applied): `Log` already carries its `Type`, so `BotLogger` can raise a `LogAdded` event, and `BotWindow` subscribes in its constructor (unsubscribes in `OnClosed`) and maps the type to the color it uses today (Log white, Query dark cyan, Client dark gray, Audio dark orange, Error red, Warning yellow). `BotLogger` then loses its `System.Windows` dependency. `BotLogger` appears in 94 files. Other places to change: `Startup.cs` registers `new BotLogger()`, and `App.xaml.cs` resolves it with `GetService<BotLogger>()`. Put the interface in `Interfaces/Core/`, following the existing `Interfaces/<folder>/` layout.
-   - Found at the same time: `BotLogger.Logs` is a plain `List<Log>` written from many threads and read and cleared by `LogToFile` on the timer thread. A concurrent `Add` can lose entries, and `LogToFile` can hit "Collection was modified". A private `ConcurrentQueue<Log>` that `LogToFile` drains fixes it; do it together with `IBotLogger`. Nothing outside `BotLogger` reads `Logs`.
-2. **Modals in service signatures.** `IIdolService` / `IIdolGroupService` / weekly poll services take 8 Discord `IModal` types (`EditIdolModal`, `EditGroupModal`, `EditWeeklyPollModal`, …), which carry `Discord.Interactions` attributes. Fix: plain DTOs (e.g. `IdolEditData`) in the library, and have the 4 interaction classes map the modal into them (by hand or with a Mapster map). The other option, referencing Discord.Net from the library for these, works but defeats much of the point.
+1. **`BotLogger` (the real blocker).** All 20 services take `BotLogger` through `BaseService`, and `BotLogger` calls `BotWindow` (WPF). The library can't reference the bot. Fix: an `IBotLogger` interface in the library (the DB layer only uses `Log` and `Error`) implemented by the existing `BotLogger`. This is the same change as test-project blocker 4. The alternative is the standard `ILogger<T>` (`AddLogging()` is already registered) with a small provider forwarding to `BotLogger`, but that changes the 156 logger calls in `Database/`.
+   - Design worked out 2026-11-16: `Log` already carries its `Type`, so `BotLogger` can raise a `LogAdded` event, and `BotWindow` subscribes in its constructor (unsubscribes in `OnClosed`) and maps the type to the color it uses today (Log white, Query dark cyan, Client dark gray, Audio dark orange, Error red, Warning yellow). `BotLogger` then loses its `System.Windows` dependency. `BotLogger` appears in 94 files. Other places to change: `Startup.cs` registers `new BotLogger()`, and `App.xaml.cs` resolves it with `GetRequiredService<BotLogger>()`. Put the interface in `Interfaces/Core/`, following the existing `Interfaces/<folder>/` layout.
+   - Do this together with: `BotLogger.Logs` is a plain public `List<Log>`, written from many threads and read and cleared by `LogToFile` on the timer thread. A concurrent `Add` can lose entries, and `LogToFile` can hit "Collection was modified". A private `ConcurrentQueue<Log>` that `LogToFile` drains fixes it. Nothing outside `BotLogger` reads `Logs`.
+2. **Modals in service signatures.** The idol, idol group and weekly poll service interfaces take 8 Discord `IModal` types (`EditIdolModal`, `EditIdolExtendedModal`, `ChangeIdolGroupModal`, `ChangeIdolProfileLinkModal`, `OverrideImageModal`, `EditGroupModal`, `EditWeeklyPollModal`, `EditWeeklyPollOptionPresetModal`), which carry `Discord.Interactions` attributes. Fix: plain DTOs (e.g. `IdolEditData`) in the library, and have the interaction classes map the modal into them (by hand or with a Mapster map). Referencing Discord.Net from the library for these would work, but defeats much of the point.
 3. **EF models leaking out.**
    - `IdolGroupResource.Idols` is a `List<Idol>` (an EF entity). Change it to `List<IdolResource>`; this also fixes a "commands use Resources" violation.
    - `IIdolGroupService.UpdateOrCreateGroupAsync` takes and returns `IdolGroup`. It's only called from `IdolService`, so make it internal or move it into a repository.
@@ -325,17 +115,18 @@ Keeping the existing `Discord_Bot.Database.*` / `Discord_Bot.Resources` namespac
 5. **Helpers in `Tools/`.**
    - `PollTools.GetAnswerOptions(WeeklyPoll)` (used by a model mapping) and `UserIdolStatisticTools.AddRanking` move to the library.
    - `PollTools.CreateTitle` / `GetDuration` (Discord types) stay.
-   - `CollectionTools.IsNullOrEmpty` is needed on both sides; split `CollectionTools` or duplicate the one-liner.
+   - `CollectionTools.IsNullOrEmpty` is needed on both sides; split `CollectionTools` or duplicate the one-liner (with its `[NotNullWhen(false)]`).
 6. **`Constant`.**
    - `TwitchChannelService` uses `Constant.TwitchBaseUrl` (+ `UrlCombine`).
    - `ChannelTypeEnum`'s extension uses `Constant.RestrictedChannelTypes`.
    - Move these constants into the library, or keep the extension method in the bot.
-7. **`GlobalSuppressions.cs`.** The `Discord_Bot.Database` entries (CA1862, IDE0290 on `MainDbContext`) have to be copied to the new project.
+7. **`GlobalSuppressions.cs`.** The Database entries have to move to the new project: CA1309, CA1310 and CA1862 for the `Discord_Bot.Database` namespace, IDE0028 for `Database.Models`, and IDE0290 for `MainDbContext`.
 
 ### Shape of the result
 
 - New `DiscordBot.Data` (name open) class library targeting plain **`net11.0`**, with no Windows, WPF or Discord.Net dependency. The bot references it.
-- An `AddDatabase(this IServiceCollection, string connectionString)` extension in the library registers the DbContext, repositories, services and cache, which removes ~45 lines from `Startup.cs`.
+- It gets the analyzer setup from `Directory.Build.props` automatically, and needs `<Nullable>enable</Nullable>` in its csproj.
+- An `AddDatabase(this IServiceCollection, string connectionString)` extension in the library registers the DbContext, repositories, services and cache, which takes about 45 lines out of `Startup.cs`.
 - Repository interfaces could become `internal`, with `InternalsVisibleTo` for tests, so the bot physically can't bypass the services.
 - `MainDB/` (SSDT) is unaffected. Scaffolding commands point at the new project (use the bot as `--startup-project` if EF tooling asks for one).
 
@@ -374,11 +165,12 @@ The `Services/` folder (API wrappers, scrapers and CLI tools behind `Interfaces/
 
 - **Generic `BaseService`:** turn it into a generic class so simple DB calls need less boilerplate. Each service would still declare its own methods. `GenericRepository<T>` already exists on the repository side.
 - **Last.fm top tags:** a new command for `user.getTopTags`. That endpoint has no period or pagination.
-- **YouTube playlist start point:** let the user choose which song or index a playlist import starts from (`YoutubeAPI.PlaylistSearch`). It currently always takes the first page; `MaxResults` is 50, although the old comment said 25.
+- **Last.fm artist stats image (found 2026-11-16):** `LastFmAPI.GetArtistDataAsync` picks the MBID from the albums when there are any, but always passes `tracks[0]`'s artist and track name to the Spotify search. An artist with album plays but no track plays would throw there (rare, since album plays come from track plays). Passing a track name also makes the search return that track's album cover instead of the artist's image, as `GetTopArtistsAsync` does. Decide which image the stats should show, and take both values from the same list.
+- **Hand-written results in `Services/Models` (found 2026-11-16):** `Services/Models/LastFm` (`ArtistStats`, `LastFmListResult`, `NowPlayingResult`, `WhoKnows`) and `Services/Models/SpotifyAPI/SpotifyImageSearchResult` are the bot's own result DTOs, not JSON models. Because the folder is marked as generated code, they get no nullable checking and no analyzer warnings. Moving them to `Communication/` (where data types belong by convention) would bring both back. Their nullable fields are `Message`, the image URLs and the optional now-playing data.
+- **Culture in interpolated strings (found 2026-11-16):** CA1305 doesn't cover them. For example `LastFmListResultTools` writes `{percentage}%`, which shows "12,5%" under hu-HU and "12.5%" under en-US. Leave it as is if the server's culture is the intended display format.
+- **YouTube playlist start point:** let the user choose which song or index a playlist import starts from (`YoutubeAPI.PlaylistSearch`). It currently always takes the first page of 50 (`MaxResults`).
 - **YouTube duplicate on playlist import:** when a video link that also carries a playlist (`&list=`) is imported as a playlist (`YoutubeAPI.AddPlaylistAsync`), the video itself can be queued twice if it is in the imported part of the playlist. Skip it.
 - **YouTube search matching:** look into a similarity or points-based ranking of search results, beyond the current channel and filter-word filtering in `YoutubeAPI.FilteredResults`. It first came up searching for "Withcha" by Apink.
-- **Last.fm artist stats image (found 2026-11-16):** `LastFmAPI.GetArtistDataAsync` picks the MBID from the albums when there are any, but always passes `tracks[0]`'s artist and track name to the Spotify search. An artist with album plays but no track plays would throw there (rare, since album plays come from track plays). Passing a track name also makes the search return that track's album cover instead of the artist's image, as `GetTopArtistsAsync` does. Decide which image the stats should show, and take both values from the same list.
-- **Hand-written results in `Services/Models` (found 2026-11-16):** `Services/Models/LastFm` (`ArtistStats`, `LastFmListResult`, `NowPlayingResult`, `WhoKnows`) and `Services/Models/SpotifyAPI/SpotifyImageSearchResult` are the bot's own result DTOs, not JSON models. Since the switch-over they are unchecked (and skipped by the analyzers) with the JSON models around them. Moving them to `Communication/` (where data types belong by convention) would put them under nullable checking. Their nullable fields are `Message`, the image URLs and the optional now-playing data.
 
 ## Feature ideas
 
