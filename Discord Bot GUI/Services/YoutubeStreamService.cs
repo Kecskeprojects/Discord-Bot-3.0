@@ -1,4 +1,6 @@
-﻿using Discord.Audio;
+﻿#nullable enable
+
+using Discord.Audio;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
@@ -24,7 +26,7 @@ public class YoutubeStreamService(Config config, BotLogger logger) : IYoutubeDow
             audioResource.AudioVariables.CancellationTokenSource = new();
 
             //Audio streaming
-            using (AudioOutStream stream = audioResource.AudioVariables.AudioClient.CreatePCMStream(AudioApplication.Mixed, config.Bitrate, 3000))
+            using (AudioOutStream stream = (audioResource.AudioVariables.AudioClient ?? throw new InvalidOperationException("The bot is not connected to a voice channel")).CreatePCMStream(AudioApplication.Mixed, config.Bitrate, 3000))
             {
                 logger.Audio("Audio stream starting!");
                 await ffmpeg.StandardOutput.BaseStream.CopyToAsync(stream, audioResource.AudioVariables.CancellationTokenSource.Token);
@@ -71,6 +73,6 @@ public class YoutubeStreamService(Config config, BotLogger logger) : IYoutubeDow
         };
 
         logger.Audio($"Yt-dlp audio stream created for '{url}'!");
-        return Process.Start(ffmpeg);
+        return Process.Start(ffmpeg) ?? throw new InvalidOperationException("The audio stream could not be started");
     }
 }

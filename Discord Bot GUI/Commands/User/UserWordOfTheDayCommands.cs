@@ -38,7 +38,7 @@ public class UserWordOfTheDayCommands(
                 return;
             }
 
-            WotdBase result = await wordOfTheDayService.GetDataAsync(language);
+            WotdBase? result = await wordOfTheDayService.GetDataAsync(language);
 
             if (result != null)
             {

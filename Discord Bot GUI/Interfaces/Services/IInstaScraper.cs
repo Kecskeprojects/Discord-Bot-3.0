@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication;
+﻿#nullable enable
+
+using Discord_Bot.Communication;
 using System;
 using System.Threading.Tasks;
 

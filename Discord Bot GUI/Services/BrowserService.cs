@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using PuppeteerSharp;
 using System.Collections.Generic;
@@ -10,12 +12,13 @@ public class BrowserService(BotLogger logger, Config config)
 {
     private readonly BotLogger logger = logger;
     private readonly Config config = config;
-    private IBrowser Browser { get; set; }
-    public async Task OpenBrowser()
+    private IBrowser? Browser { get; set; }
+
+    public async Task<IBrowser> OpenBrowser()
     {
         BrowserFetcher browserFetcher = new(SupportedBrowser.Chrome);
         _ = await browserFetcher.DownloadAsync(PuppeteerSharp.BrowserData.Chrome.DefaultBuildId); //117.0.5938.62 is the last version where videos were sent as media http responses
-        Browser = await Puppeteer.LaunchAsync(new LaunchOptions
+        IBrowser browser = await Puppeteer.LaunchAsync(new LaunchOptions
         {
             Headless = config.HeadlessBrowser,
             Args =
@@ -31,6 +34,8 @@ public class BrowserService(BotLogger logger, Config config)
             //HeadlessMode = HeadlessMode.Shell
             //ExecutablePath = "Chrome\\Win64-117.0.5938.62\\chrome-win64\\chrome.exe"
         });
+        Browser = browser;
+        return browser;
     }
 
     public async Task CloseBrowser()
@@ -45,14 +50,11 @@ public class BrowserService(BotLogger logger, Config config)
 
     public async Task<IPage> NewPage(params KeyValuePair<string, string>[] additionalHeaders)
     {
-        if (Browser == null || Browser.IsClosed)
-        {
-            await OpenBrowser();
-        }
+        IBrowser browser = Browser is { IsClosed: false } ? Browser : await OpenBrowser();
 
-        IPage[] pages = await Browser.PagesAsync();
+        IPage[] pages = await browser.PagesAsync();
 
-        IPage mainPage = await Browser.NewPageAsync();
+        IPage mainPage = await browser.NewPageAsync();
         logger.Log($"New Browser Page opened. (Total pages: {pages.Length + 1})", LogOnly: true);
 
         Dictionary<string, string> headers = new()

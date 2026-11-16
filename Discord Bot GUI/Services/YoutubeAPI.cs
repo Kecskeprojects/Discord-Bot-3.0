@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication;
+﻿#nullable enable
+
+using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
@@ -99,18 +101,25 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
                 {
                     NameValueCollection queryPart = HttpUtility.ParseQueryString(uri.Query);
 
-                    if (queryPart.AllKeys.Contains("list"))
+                    string? playlistId = queryPart["list"];
+                    if (!string.IsNullOrEmpty(playlistId))
                     {
-                        _ = AddPlaylistAsync(queryPart, username, serverId, channelId);
+                        _ = AddPlaylistAsync(playlistId, username, serverId, channelId);
                     }
 
-                    return await VideoSearch(youtubeService, queryPart["v"], username, serverId);
+                    string? videoId = queryPart["v"];
+                    return string.IsNullOrEmpty(videoId)
+                        ? SearchResultEnum.YoutubeNotFound
+                        : await VideoSearch(youtubeService, videoId, username, serverId);
                 }
                 else if (uri.Segments[1] == "playlist")
                 {
                     NameValueCollection queryPart = HttpUtility.ParseQueryString(uri.Query);
 
-                    return await PlaylistSearch(youtubeService, queryPart["list"], username, serverId);
+                    string? playlistId = queryPart["list"];
+                    return string.IsNullOrEmpty(playlistId)
+                        ? SearchResultEnum.YoutubeNotFound
+                        : await PlaylistSearch(youtubeService, playlistId, username, serverId);
                 }
                 else
                 {
@@ -165,7 +174,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
 
         string[] temp = [Constant.YoutubeBaseUrl.UrlCombine($"watch?v={video.Id}"), video.Snippet.Title.Replace("&#39;", "'"), video.Snippet.Thumbnails.Default__.Url, video.ContentDetails.Duration];
 
-        if (!Global.ServerAudioResources.TryGetValue(serverId, out ServerAudioResource audioResource))
+        if (!Global.ServerAudioResources.TryGetValue(serverId, out ServerAudioResource? audioResource))
         {
             throw new InvalidOperationException("Server Audio Resource does not exist");
         }
@@ -275,7 +284,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
 
     //Checking if user wants to add playlist
     //It keeps running after Run returned and disposed its service, so it creates its own once the user said yes
-    private async Task AddPlaylistAsync(NameValueCollection queryPart, string username, ulong serverId, ulong channelId)
+    private async Task AddPlaylistAsync(string playlistId, string username, ulong serverId, ulong channelId)
     {
         try
         {
@@ -285,7 +294,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
             {
                 using (YouTubeService youtubeService = CreateYoutubeService(config.Youtube_API_Keys[youtubeApiKeyIndex]))
                 {
-                    _ = await PlaylistSearch(youtubeService, queryPart["list"], username, serverId);
+                    _ = await PlaylistSearch(youtubeService, playlistId, username, serverId);
                 }
             }
         }

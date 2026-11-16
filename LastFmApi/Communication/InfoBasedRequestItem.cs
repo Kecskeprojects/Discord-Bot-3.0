@@ -1,4 +1,6 @@
-﻿namespace LastFmApi.Communication;
+﻿#nullable enable
+
+namespace LastFmApi.Communication;
 
 public class InfoBasedRequestItem(string type, string username, string apiKey, string artist)
 {
@@ -6,6 +8,6 @@ public class InfoBasedRequestItem(string type, string username, string apiKey, s
     public string Username { get; set; } = username;
     public string ApiKey { get; set; } = apiKey;
     public string Artist { get; set; } = artist;
-    public string Track { get; set; }
-    public string Album { get; set; }
+    public string? Track { get; set; }
+    public string? Album { get; set; }
 }

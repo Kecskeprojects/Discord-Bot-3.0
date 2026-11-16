@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.MusicBrainz.ArtistLookup;
 using Discord_Bot.Tools;
@@ -17,7 +19,7 @@ public class MusicBrainzAPI(BotLogger logger) : IMusicBrainzAPI
     private static readonly RestClient client = new(Constant.MusicBrainzBaseUri);
 
     //https://musicbrainz.org/ws/2/artist/[artistMBID]?inc=url-rels&fmt=json
-    public async Task<string> GetArtistSpotifyUrlAsync(string mbid)
+    public async Task<string?> GetArtistSpotifyUrlAsync(string mbid)
     {
         try
         {
@@ -26,9 +28,9 @@ public class MusicBrainzAPI(BotLogger logger) : IMusicBrainzAPI
 
             RestRequest request = new(query);
             RestResponse resultJSON = await client.GetAsync(request);
-            ArtistLookup deserialized = JsonConvert.DeserializeObject<ArtistLookup>(resultJSON.Content);
+            ArtistLookup? deserialized = JsonConvert.DeserializeObject<ArtistLookup>(resultJSON.Content ?? "");
 
-            Url spotifyUrl = deserialized.Relations.FirstOrDefault(x => x.Url != null && x.Url.Resource.Contains("spotify"))?.Url;
+            Url? spotifyUrl = deserialized?.Relations?.FirstOrDefault(x => x.Url != null && x.Url.Resource.Contains("spotify"))?.Url;
             return spotifyUrl?.Resource;
         }
         catch (Exception ex)

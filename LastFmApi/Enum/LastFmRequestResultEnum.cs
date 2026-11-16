@@ -1,4 +1,6 @@
-﻿namespace LastFmApi.Enum;
+﻿#nullable enable
+
+namespace LastFmApi.Enum;
 
 public enum LastFmRequestResultEnum
 {

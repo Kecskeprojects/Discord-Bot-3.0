@@ -1,4 +1,6 @@
-﻿using LastFmApi.Communication;
+﻿#nullable enable
+
+using LastFmApi.Communication;
 using RestSharp;
 
 namespace LastFmApi;

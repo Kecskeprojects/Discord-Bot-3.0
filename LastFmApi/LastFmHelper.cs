@@ -1,4 +1,6 @@
-﻿using LastFmApi.Communication;
+﻿#nullable enable
+
+using LastFmApi.Communication;
 using LastFmApi.Enum;
 
 namespace LastFmApi;
@@ -82,7 +84,7 @@ public static class LastFmHelper
         return period != "";
     }
 
-    public static string GetResultMessage(LastFmRequestResultEnum resultCode, string message)
+    public static string? GetResultMessage(LastFmRequestResultEnum resultCode, string? message)
     {
         return resultCode switch
         {

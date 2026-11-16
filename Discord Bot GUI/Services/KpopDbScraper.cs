@@ -1,4 +1,6 @@
-﻿using AngleSharp;
+﻿#nullable enable
+
+using AngleSharp;
 using AngleSharp.Dom;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
@@ -26,7 +28,7 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
             using (IPage mainPage = await browserService.NewPage())
             using (IDocument document = await GetPageAndSetSettingsAsync(context, mainPage))
             {
-                IElement table = document.QuerySelector("#table_1>tbody");
+                IElement table = document.QuerySelector("#table_1>tbody") ?? throw new InvalidOperationException("The idol table was not found on the page");
 
                 IHtmlCollection<IElement> rows = table.GetElementsByTagName("tr");
 
@@ -77,9 +79,9 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
         return document;
     }
 
-    public async Task<AdditionalIdolData> GetProfileDataAsync(string url, bool getGroupData)
+    public async Task<AdditionalIdolData?> GetProfileDataAsync(string url, bool getGroupData)
     {
-        AdditionalIdolData idolData = null;
+        AdditionalIdolData? idolData = null;
         try
         {
             using (IBrowsingContext context = BrowsingContext.New(Configuration.Default))
@@ -118,7 +120,7 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
         if (groups != null && groups.Length > 0)
         {
             //The first one should be the most likely accurate group the idol was a member of
-            groupUrl = groups[0].GetAttribute("href");
+            groupUrl = groups[0].GetAttribute("href") ?? "";
         }
 
         if (getGroupData && !string.IsNullOrEmpty(groupUrl))

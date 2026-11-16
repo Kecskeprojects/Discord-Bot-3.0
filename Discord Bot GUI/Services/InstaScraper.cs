@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication;
+﻿#nullable enable
+
+using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Services;
@@ -46,7 +48,7 @@ public class InstaScraper(BotLogger logger) : IInstaScraper
             string response =
                 await WebTools.GetBody($"https://www.instagram.com/graphql/query/?doc_id=8845758582119845&variables={{\"shortcode\":\"{shortcode}\"}}");
 
-            Root body = JsonConvert.DeserializeObject<Root>(response);
+            Root? body = JsonConvert.DeserializeObject<Root>(response);
 
             if (body?.Data?.XdtShortcodeMedia == null)
             {
@@ -65,13 +67,13 @@ public class InstaScraper(BotLogger logger) : IInstaScraper
             logger.Error("InstaScraper.cs ExtractFromUrl", ex);
         }
 
-        return null;
+        return new SocialScrapingResult("Unexpected error occured");
     }
 
     private static SocialScrapingResult GetData(Root body, Uri uri)
     {
         SocialScrapingResult result = new();
-        List<Edge> content = body.Data.XdtShortcodeMedia.EdgeSidecarToChildren?.Edges;
+        List<Edge>? content = body.Data.XdtShortcodeMedia.EdgeSidecarToChildren?.Edges;
 
         if (body.Data.XdtShortcodeMedia.EdgeMediaToCaption?.Edges?.Count > 0)
         {
@@ -107,7 +109,7 @@ public class InstaScraper(BotLogger logger) : IInstaScraper
             caption = caption[..indexOfTag];
         }
         caption = HttpUtility.HtmlDecode(caption);
-        caption = UrlTools.SanitizeText(caption);
+        caption = UrlTools.SanitizeText(caption) ?? "";
 
         result.TextContent += caption;
 

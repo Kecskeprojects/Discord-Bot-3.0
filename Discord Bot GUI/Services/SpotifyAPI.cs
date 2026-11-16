@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Services;
@@ -6,6 +8,7 @@ using Discord_Bot.Services.Models.SpotifyAPI;
 using Discord_Bot.Tools.NativeTools;
 using SpotifyAPI.Web;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -82,18 +85,18 @@ public class SpotifyAPI(BotLogger logger, Config config, IYoutubeAPI youtubeAPI,
             }
             else if (type is "playlist" or "album")
             {
-                string[] list = null;
+                string[] list;
 
                 if (type == "playlist")
                 {
                     Paging<PlaylistTrack<IPlayableItem>> playlist = await spotify.Playlists.GetPlaylistItems(id, new PlaylistGetItemsRequest { Limit = 25 });
 
-                    list = playlist.Items.Select(n => $"{(n.Track as FullTrack).Name.Trim()} {(n.Track as FullTrack).Artists[0].Name.Trim()}").ToArray();
+                    list = playlist.Items?.Select(n => n.Track).OfType<FullTrack>().Select(t => $"{t.Name.Trim()} {t.Artists[0].Name.Trim()}").ToArray() ?? [];
                 }
                 else
                 {
                     Paging<SimpleTrack> album = await spotify.Albums.GetTracks(id);
-                    list = album.Items.Select(n => $"{n.Name.Trim()} {n.Artists[0].Name.Trim()}").ToArray();
+                    list = album.Items?.Select(n => $"{n.Name.Trim()} {n.Artists[0].Name.Trim()}").ToArray() ?? [];
                 }
 
                 if (!CollectionTools.IsNullOrEmpty(list))
@@ -114,7 +117,7 @@ public class SpotifyAPI(BotLogger logger, Config config, IYoutubeAPI youtubeAPI,
 
     #region Image search
     //Lastfm complimentary function
-    public async Task<SpotifyImageSearchResult> SearchItemAsync(string mbid, string artistName, string songName = "")
+    public async Task<SpotifyImageSearchResult?> SearchItemAsync(string? mbid, string artistName, string? songName = "")
     {
         try
         {
@@ -123,7 +126,7 @@ public class SpotifyAPI(BotLogger logger, Config config, IYoutubeAPI youtubeAPI,
                 logger.Log("Artist MBID is empty, defaulting to last.fm image URL.");
                 return null;
             }
-            string url = await musicBrainzAPI.GetArtistSpotifyUrlAsync(mbid);
+            string? url = await musicBrainzAPI.GetArtistSpotifyUrlAsync(mbid);
             if (string.IsNullOrEmpty(url))
             {
                 logger.Log("Musicbrainz entry not found for artist, defaulting to last.fm image URL.");
@@ -161,14 +164,15 @@ public class SpotifyAPI(BotLogger logger, Config config, IYoutubeAPI youtubeAPI,
                 SearchRequest request = new(SearchRequest.Types.Track, $"{songName} {artistName}");
                 SearchResponse searchResult = await spotify.Search.Item(request);
 
-                if (searchResult.Tracks.Items.Count == 0)
+                List<FullTrack>? tracks = searchResult.Tracks?.Items;
+                if (CollectionTools.IsNullOrEmpty(tracks))
                 {
                     logger.Query("No results for track!");
                     logger.Query("============================================================================");
                     return null;
                 }
 
-                FullTrack track = searchResult.Tracks.Items.FirstOrDefault(x => x.Artists.Any(y => y.Id == artistId));
+                FullTrack? track = tracks.FirstOrDefault(x => x.Artists.Any(y => y.Id == artistId));
 
                 if (track == null)
                 {

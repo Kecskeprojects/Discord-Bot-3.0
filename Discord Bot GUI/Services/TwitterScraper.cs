@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication;
+﻿#nullable enable
+
+using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Services;
@@ -18,7 +20,7 @@ public class TwitterScraper(BotLogger logger, BrowserService browserService) : I
     private readonly BotLogger logger = logger;
     private readonly BrowserService browserService = browserService;
 
-    private Root Body { get; set; }
+    private Root? Body { get; set; }
 
     #region Main Methods
     public async Task<SocialScrapingResult> GetDataFromUrls(List<Uri> uris)
@@ -59,7 +61,7 @@ public class TwitterScraper(BotLogger logger, BrowserService browserService) : I
         }
     }
 
-    private async void TwitterScraperResponse(object sender, ResponseCreatedEventArgs e)
+    private async void TwitterScraperResponse(object? sender, ResponseCreatedEventArgs e)
     {
         try
         {
@@ -93,8 +95,8 @@ public class TwitterScraper(BotLogger logger, BrowserService browserService) : I
                 return "Timeout while getting content.";
             }
 
-            string reason = Body.Data?.TweetResult?.Result?.Reason;
-            string quoteReason = Body.Data?.TweetResult?.Result?.QuotedStatusResult?.Result?.Reason;
+            string? reason = Body.Data?.TweetResult?.Result?.Reason;
+            string? quoteReason = Body.Data?.TweetResult?.Result?.QuotedStatusResult?.Result?.Reason;
             if (!string.IsNullOrEmpty(reason) || !string.IsNullOrEmpty(quoteReason))
             {
                 if (reason == "NsfwLoggedOut" || quoteReason == "NsfwLoggedOut")
@@ -116,17 +118,17 @@ public class TwitterScraper(BotLogger logger, BrowserService browserService) : I
     private void GetData(bool singleLink, SocialScrapingResult result)
     {
         List<Uri> links = [];
-        Legacy tweet = Body?.Data?.TweetResult?.Result?.Legacy;
-        Legacy quote = Body?.Data?.TweetResult?.Result?.QuotedStatusResult?.Result?.Legacy;
+        Legacy? tweet = Body?.Data?.TweetResult?.Result?.Legacy;
+        Legacy? quote = Body?.Data?.TweetResult?.Result?.QuotedStatusResult?.Result?.Legacy;
 
         if (tweet?.Entities?.Media?.Count > 0)
         {
-            links.AddRange(GetMediaUris(result, tweet.Entities?.Media));
+            links.AddRange(GetMediaUris(result, tweet.Entities.Media));
         }
 
         if (quote?.Entities?.Media?.Count > 0)
         {
-            links.AddRange(GetMediaUris(result, quote.Entities?.Media));
+            links.AddRange(GetMediaUris(result, quote.Entities.Media));
         }
 
         if (singleLink)
@@ -147,7 +149,7 @@ public class TwitterScraper(BotLogger logger, BrowserService browserService) : I
             }
 
             result.TextContent = HttpUtility.HtmlDecode(result.TextContent);
-            result.TextContent = UrlTools.SanitizeText(result.TextContent);
+            result.TextContent = UrlTools.SanitizeText(result.TextContent) ?? "";
         }
     }
     #endregion

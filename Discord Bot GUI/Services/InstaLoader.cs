@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Interfaces.Services;
 using System;
 using System.Diagnostics;
@@ -31,7 +33,7 @@ public class InstaLoader(BotLogger logger) : IInstaLoader
                 WorkingDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Dependencies\\Instagram")
             };
             logger.Log("Downloading images");
-            using (Process process = Process.Start(instaloader))
+            using (Process process = Process.Start(instaloader) ?? throw new InvalidOperationException("Instaloader could not be started"))
             {
                 errorDuringDownload = process.StandardError.ReadToEnd();
                 process.WaitForExit();

@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.Twitch;
 using Discord_Bot.Tools.NativeTools;
@@ -28,7 +30,7 @@ public class TwitchCLI(BotLogger logger) : ITwitchCLI
         };
 
         string response = "";
-        using (Process process = Process.Start(twitchcli))
+        using (Process process = Process.Start(twitchcli) ?? throw new InvalidOperationException("Twitch CLI could not be started"))
         {
             response = process.StandardError.ReadToEnd();
             process.WaitForExit();
@@ -40,7 +42,7 @@ public class TwitchCLI(BotLogger logger) : ITwitchCLI
     }
 
     //Get user data by username
-    public UserData GetChannel(string username)
+    public UserData? GetChannel(string username)
     {
         ProcessStartInfo startInfo = new()
         {
@@ -54,13 +56,13 @@ public class TwitchCLI(BotLogger logger) : ITwitchCLI
         };
 
         string response;
-        using (Process process = Process.Start(startInfo))
+        using (Process process = Process.Start(startInfo) ?? throw new InvalidOperationException("Twitch CLI could not be started"))
         {
             response = process.StandardOutput.ReadToEnd();
             process.WaitForExit();
         }
 
-        User twitchUser = JsonConvert.DeserializeObject<User>(response);
+        User? twitchUser = JsonConvert.DeserializeObject<User>(response);
 
         if (twitchUser == null || CollectionTools.IsNullOrEmpty(twitchUser.Response))
         {

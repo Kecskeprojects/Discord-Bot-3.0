@@ -1,4 +1,6 @@
-﻿using LastFmApi.Communication;
+﻿#nullable enable
+
+using LastFmApi.Communication;
 using LastFmApi.Enum;
 using LastFmApi.Models.ArtistInfo;
 using LastFmApi.Models.TrackInfo;
@@ -30,16 +32,16 @@ public class InfoBasedRequests : BaseRequests
             response.RequestDetails = new LastFmRequestDetails(request);
 
             RestResponse restResultJSON = await InfoBasedRequestHandler(request);
-            ArtistInfo deserialized = JsonConvert.DeserializeObject<ArtistInfo>(restResultJSON.Content);
+            ArtistInfo? deserialized = JsonConvert.DeserializeObject<ArtistInfo>(restResultJSON.Content ?? "");
 
-            response.Response = deserialized.Artist;
-            response.ResultCode = deserialized.Artist != null
+            response.Response = deserialized?.Artist;
+            response.ResultCode = deserialized?.Artist != null
                                     ? LastFmRequestResultEnum.Success
-                                    : !string.IsNullOrEmpty(deserialized.Message)
+                                    : !string.IsNullOrEmpty(deserialized?.Message)
                                         ? LastFmRequestResultEnum.Failure
                                         : LastFmRequestResultEnum.EmptyResponse;
-            response.Message = deserialized.Message;
-            response.ErrorCode = deserialized.Error;
+            response.Message = deserialized?.Message;
+            response.ErrorCode = deserialized?.Error;
         }
         catch (Exception ex)
         {
@@ -72,16 +74,16 @@ public class InfoBasedRequests : BaseRequests
             response.RequestDetails = new LastFmRequestDetails(request);
 
             RestResponse restResultJSON = await InfoBasedRequestHandler(request);
-            TrackInfo deserialized = JsonConvert.DeserializeObject<TrackInfo>(restResultJSON.Content);
+            TrackInfo? deserialized = JsonConvert.DeserializeObject<TrackInfo>(restResultJSON.Content ?? "");
 
-            response.Response = deserialized.Track;
-            response.ResultCode = deserialized.Track != null
+            response.Response = deserialized?.Track;
+            response.ResultCode = deserialized?.Track != null
                                     ? LastFmRequestResultEnum.Success
-                                    : !string.IsNullOrEmpty(deserialized.Message)
+                                    : !string.IsNullOrEmpty(deserialized?.Message)
                                         ? LastFmRequestResultEnum.Failure
                                         : LastFmRequestResultEnum.EmptyResponse;
-            response.Message = deserialized.Message;
-            response.ErrorCode = deserialized.Error;
+            response.Message = deserialized?.Message;
+            response.ErrorCode = deserialized?.Error;
         }
         catch (Exception ex)
         {

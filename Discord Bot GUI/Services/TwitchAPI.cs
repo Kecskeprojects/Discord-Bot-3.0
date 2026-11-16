@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication;
+﻿#nullable enable
+
+using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Features;
@@ -33,10 +35,11 @@ public class TwitchAPI(
     private readonly BotLogger logger = logger;
     private readonly Config config = config;
 
-    private LiveStreamMonitorService monitor;
-    private TwitchLib.Api.TwitchAPI api;
+    //Both are set by Check before the monitor raises any event, and only the event handlers use them after that
+    private LiveStreamMonitorService monitor = null!;
+    private TwitchLib.Api.TwitchAPI api = null!;
     private readonly ConcurrentDictionary<string, bool> channelStatuses = new();
-    private string token;
+    private string token = "";
     private int tokenTick;
     #endregion
 
@@ -99,7 +102,7 @@ public class TwitchAPI(
 
     #region Event Handlers
     //Make announcement when stream comes online
-    private async void MonitorOnStreamOnline(object sender, OnStreamOnlineArgs e)
+    private async void MonitorOnStreamOnline(object? sender, OnStreamOnlineArgs e)
     {
         try
         {
@@ -138,7 +141,7 @@ public class TwitchAPI(
     }
 
     //Make console message when stream goes offline
-    private async void MonitorOnStreamOffline(object sender, OnStreamOfflineArgs e)
+    private async void MonitorOnStreamOffline(object? sender, OnStreamOfflineArgs e)
     {
         try
         {
@@ -167,7 +170,7 @@ public class TwitchAPI(
     }
 
     //Every 2 hours, send message on console, every 24 hours, refresh token and reset counter
-    private async void MonitorOnServiceTick(object sender, OnServiceTickArgs e)
+    private async void MonitorOnServiceTick(object? sender, OnServiceTickArgs e)
     {
         try
         {
@@ -200,7 +203,7 @@ public class TwitchAPI(
         }
     }
 
-    private void MonitorOnChannelsSet(object sender, OnChannelsSetArgs e)
+    private void MonitorOnChannelsSet(object? sender, OnChannelsSetArgs e)
     {
         try
         {
@@ -213,7 +216,7 @@ public class TwitchAPI(
         }
     }
 
-    private void MonitorOnServiceStarted(object sender, OnServiceStartedArgs e)
+    private void MonitorOnServiceStarted(object? sender, OnServiceStartedArgs e)
     {
         try
         {

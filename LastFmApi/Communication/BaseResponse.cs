@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿#nullable enable
+
+using Newtonsoft.Json;
 using System.Text.Json.Serialization;
 
 namespace LastFmApi.Communication;
@@ -7,7 +9,7 @@ public class BaseResponse
 {
     [JsonProperty("message")]
     [JsonPropertyName("message")]
-    public string Message { get; set; }
+    public string? Message { get; set; }
 
     [JsonProperty("error")]
     [JsonPropertyName("error")]

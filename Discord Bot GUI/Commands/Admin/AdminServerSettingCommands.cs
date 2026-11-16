@@ -207,7 +207,7 @@ public class AdminServerSettingCommands(
                 }
                 twitchchannel = uri.Segments[1].Replace("/", "");
             }
-            UserData response = twitchCLI.GetChannel(twitchchannel);
+            UserData? response = twitchCLI.GetChannel(twitchchannel);
 
             if (response == null)
             {

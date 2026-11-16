@@ -1,4 +1,6 @@
-﻿namespace Discord_Bot.Interfaces.Services;
+﻿#nullable enable
+
+namespace Discord_Bot.Interfaces.Services;
 
 public interface IInstaLoader
 {

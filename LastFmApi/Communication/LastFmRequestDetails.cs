@@ -1,4 +1,6 @@
-﻿namespace LastFmApi.Communication;
+﻿#nullable enable
+
+namespace LastFmApi.Communication;
 
 public class LastFmRequestDetails
 {
@@ -76,12 +78,12 @@ public class LastFmRequestDetails
     }
 
     public string Type { get; private set; }
-    public string ApiKey { get; private set; }
-    public string UserName { get; private set; }
-    public string Limit { get; private set; }
-    public string Page { get; private set; }
-    public string Period { get; private set; }
-    public string ArtistName { get; private set; }
-    public string TrackName { get; private set; }
-    public string AlbumName { get; private set; }
+    public string? ApiKey { get; private set; }
+    public string? UserName { get; private set; }
+    public string? Limit { get; private set; }
+    public string? Page { get; private set; }
+    public string? Period { get; private set; }
+    public string? ArtistName { get; private set; }
+    public string? TrackName { get; private set; }
+    public string? AlbumName { get; private set; }
 }

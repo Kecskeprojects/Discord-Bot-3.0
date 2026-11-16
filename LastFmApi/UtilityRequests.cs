@@ -1,11 +1,13 @@
-﻿using LastFmApi.Communication;
+﻿#nullable enable
+
+using LastFmApi.Communication;
 using LastFmApi.Enum;
 
 namespace LastFmApi;
 
 public static class UtilityRequests
 {
-    public static async Task<GenericResponseItem<int>> TotalPlays(string apiKey, string username, string period)
+    public static async Task<GenericResponseItem<int>> TotalPlays(string apiKey, string username, string? period)
     {
         GenericResponseItem<int> response = new()
         {
@@ -17,9 +19,9 @@ public static class UtilityRequests
             do
             {
                 GenericResponseItem<Models.TopArtist.Topartists> restResult = await UserBasedRequests.TopArtists(apiKey, username, 1000, page, period);
-                response.RequestDetailList.Add(restResult.RequestDetails);
+                response.AddRequestDetailsOf(restResult);
 
-                if (restResult.ResultCode != LastFmRequestResultEnum.Success)
+                if (!restResult.IsSuccess)
                 {
                     response.Exception = restResult.Exception;
                     response.Message = restResult.Message;
@@ -61,9 +63,9 @@ public static class UtilityRequests
             do
             {
                 GenericResponseItem<Models.TopTrack.Toptracks> restResult = await UserBasedRequests.TopTracks(apiKey, username, 1000, page, "1month");
-                response.RequestDetailList.Add(restResult.RequestDetails);
+                response.AddRequestDetailsOf(restResult);
 
-                if (restResult.ResultCode != LastFmRequestResultEnum.Success)
+                if (!restResult.IsSuccess)
                 {
                     response.Exception = restResult.Exception;
                     response.Message = restResult.Message;
@@ -88,7 +90,7 @@ public static class UtilityRequests
                 .OrderByDescending(x => x.Key)
                 .ToList();
 
-            string position = null;
+            string? position = null;
             for (int i = 0; i < totalGroups.Count; i++)
             {
                 IGrouping<int, Models.TopTrack.Track> playcountGroup = totalGroups[i];
@@ -123,9 +125,9 @@ public static class UtilityRequests
             do
             {
                 GenericResponseItem<Models.TopAlbum.Topalbums> restResult = await UserBasedRequests.TopAlbums(apiKey, username, 1000, page, null);
-                response.RequestDetailList.Add(restResult.RequestDetails);
+                response.AddRequestDetailsOf(restResult);
 
-                if (restResult.ResultCode != LastFmRequestResultEnum.Success)
+                if (!restResult.IsSuccess)
                 {
                     response.Exception = restResult.Exception;
                     response.Message = restResult.Message;
@@ -175,9 +177,9 @@ public static class UtilityRequests
             do
             {
                 GenericResponseItem<Models.TopTrack.Toptracks> restResult = await UserBasedRequests.TopTracks(apiKey, username, 1000, page, null);
-                response.RequestDetailList.Add(restResult.RequestDetails);
+                response.AddRequestDetailsOf(restResult);
 
-                if (restResult.ResultCode != LastFmRequestResultEnum.Success)
+                if (!restResult.IsSuccess)
                 {
                     response.Exception = restResult.Exception;
                     response.Message = restResult.Message;
