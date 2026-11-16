@@ -27,7 +27,7 @@ public partial class BiasGameData : IDisposable
     public Dictionary<int, FileAttachment> IdolWithImage { get; private set; } = [];
     public List<int[]> Pairs { get; private set; }
     public int CurrentPair { get; private set; }
-    public int CurrentRound { get; private set; } = 0;
+    public int CurrentRound { get; private set; }
     public bool IsProcessing { get; set; }
 
     public Stack<int> Ranking { get; private set; } = [];

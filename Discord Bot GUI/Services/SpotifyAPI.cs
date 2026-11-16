@@ -114,16 +114,16 @@ public class SpotifyAPI(BotLogger logger, Config config, IYoutubeAPI youtubeAPI,
 
     #region Image search
     //Lastfm complimentary function
-    public async Task<SpotifyImageSearchResult> SearchItemAsync(string artistMbid, string artistName, string songName = "")
+    public async Task<SpotifyImageSearchResult> SearchItemAsync(string mbid, string artistName, string songName = "")
     {
         try
         {
-            if (string.IsNullOrEmpty(artistMbid))
+            if (string.IsNullOrEmpty(mbid))
             {
                 logger.Log("Artist MBID is empty, defaulting to last.fm image URL.");
                 return null;
             }
-            string url = await musicBrainzAPI.GetArtistSpotifyUrlAsync(artistMbid);
+            string url = await musicBrainzAPI.GetArtistSpotifyUrlAsync(mbid);
             if (string.IsNullOrEmpty(url))
             {
                 logger.Log("Musicbrainz entry not found for artist, defaulting to last.fm image URL.");

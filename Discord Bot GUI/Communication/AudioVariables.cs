@@ -9,7 +9,7 @@ public partial class AudioVariables : IDisposable
 {
     private bool _isDisposed;
 
-    public bool Playing { get; set; } = false;
+    public bool Playing { get; set; }
 
     public ulong FallbackVoiceChannelId { get; set; }
 

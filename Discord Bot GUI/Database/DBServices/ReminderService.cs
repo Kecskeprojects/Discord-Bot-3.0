@@ -1,5 +1,4 @@
-﻿using MapsterMapper;
-using Discord_Bot.Core;
+﻿using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
@@ -7,6 +6,7 @@ using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools.NativeTools;
+using MapsterMapper;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -119,22 +119,22 @@ public class ReminderService(
         return DbProcessResultEnum.Failure;
     }
 
-    public async Task<DbProcessResultEnum> RemoveUserReminderAsync(ulong userId, int reminderOrderId)
+    public async Task<DbProcessResultEnum> RemoveUserReminderAsync(ulong userId, int reminderId)
     {
         try
         {
-            Reminder reminder = await reminderRepository.GetByIndexAsync(userId.ToString(), reminderOrderId);
+            Reminder reminder = await reminderRepository.GetByIndexAsync(userId.ToString(), reminderId);
 
             if (reminder != null)
             {
                 _ = await reminderRepository.RemoveAsync(reminder);
 
-                logger.Log($"Reminders removed by the following user: {userId}\nwith the following ID: {reminderOrderId}");
+                logger.Log($"Reminders removed by the following user: {userId}\nwith the following ID: {reminderId}");
                 return DbProcessResultEnum.Success;
             }
             else
             {
-                logger.Log($"Reminder was not found with the following user: {userId}\nand reminder ID: {reminderOrderId}");
+                logger.Log($"Reminder was not found with the following user: {userId}\nand reminder ID: {reminderId}");
                 return DbProcessResultEnum.NotFound;
             }
         }

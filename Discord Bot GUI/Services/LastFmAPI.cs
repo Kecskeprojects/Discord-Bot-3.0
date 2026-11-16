@@ -13,7 +13,6 @@ using LastFmApi.Models.Recent;
 using LastFmApi.Models.TopAlbum;
 using LastFmApi.Models.TopArtist;
 using LastFmApi.Models.TopTrack;
-using LastFmApi.Models.TrackInfo;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -235,15 +234,15 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
     #endregion
 
     #region Last.fm advanced calls
-    public async Task<ArtistStats> GetArtistDataAsync(string username, string artistName)
+    public async Task<ArtistStats> GetArtistDataAsync(string name, string artist_name)
     {
-        artistName = config.Lastfm_Artist_Input_Replacement.TryGetValue(artistName, out string value)
+        artist_name = config.Lastfm_Artist_Input_Replacement.TryGetValue(artist_name, out string value)
             ? value
-            : artistName;
+            : artist_name;
 
         ArtistStats result = new();
 
-        GenericResponseItem<List<LastFmApi.Models.TopAlbum.Album>> restAlbum = await GetEveryAlbumUserListenedToFromArtistAsync(username, artistName);
+        GenericResponseItem<List<LastFmApi.Models.TopAlbum.Album>> restAlbum = await GetEveryAlbumUserListenedToFromArtistAsync(name, artist_name);
 
         if (restAlbum.ResultCode != LastFmRequestResultEnum.Success)
         {
@@ -256,7 +255,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
         }
         List<LastFmApi.Models.TopAlbum.Album> albums = restAlbum.Response;
 
-        GenericResponseItem<List<LastFmApi.Models.TopTrack.Track>> restTrack = await GetEveryTrackUserListenedToFromArtistAsync(username, artistName);
+        GenericResponseItem<List<LastFmApi.Models.TopTrack.Track>> restTrack = await GetEveryTrackUserListenedToFromArtistAsync(name, artist_name);
 
         if (restTrack.ResultCode != LastFmRequestResultEnum.Success)
         {
@@ -281,7 +280,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
         result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (albums.Count == 0 ? tracks[0].Image?[^1].Text : albums[0].Image?[^1].Text);
 
         GenericResponseItem<LastFmApi.Models.ArtistInfo.Artist> artistInfo =
-            await InfoBasedRequests.ArtistPlays(config.Lastfm_API_Key, username, artistName);
+            await InfoBasedRequests.ArtistPlays(config.Lastfm_API_Key, name, artist_name);
         if (restTrack.ResultCode != LastFmRequestResultEnum.Success)
         {
             result.Message = LastFmHelper.GetResultMessage(restTrack.ResultCode, restTrack.Message);

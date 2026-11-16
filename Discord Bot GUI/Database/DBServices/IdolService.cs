@@ -1,5 +1,4 @@
-﻿using MapsterMapper;
-using Discord_Bot.Communication;
+﻿using Discord_Bot.Communication;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;
@@ -10,6 +9,7 @@ using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools.NativeTools;
+using MapsterMapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;

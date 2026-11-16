@@ -142,7 +142,7 @@ public class InstagramEmbedFeature(
             }
         }
         //Ignore videos is a second try at sending so that is when we can know if the post is too large to send
-        else if (ignoreVideos == true)
+        else if (ignoreVideos)
         {
             _ = await Context.Channel.SendMessageAsync("Post content too large to send!");
         }

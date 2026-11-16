@@ -62,8 +62,8 @@ public static class PollTools
         {
             days.Add(DateTime.UtcNow.AddDays(i).ToString("MMMM dd. (dddd)", CultureInfo.GetCultureInfo(cultureCode)));
         }
-        
-        if(cultureCode == "hu-HU")
+
+        if (cultureCode == "hu-HU")
         {
             days.Add("Egyik sem");
         }

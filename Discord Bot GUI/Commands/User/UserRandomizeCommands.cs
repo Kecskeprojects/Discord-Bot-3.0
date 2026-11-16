@@ -8,8 +8,6 @@ using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;

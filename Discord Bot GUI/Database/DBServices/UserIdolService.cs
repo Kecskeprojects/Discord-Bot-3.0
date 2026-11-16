@@ -1,11 +1,11 @@
-﻿using MapsterMapper;
-using Discord_Bot.Core;
+﻿using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
+using MapsterMapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -153,7 +153,7 @@ public class UserIdolService(
         return DbProcessResultEnum.Failure;
     }
 
-    public async Task<DbProcessResultEnum> RemoveUserIdolAsync(ulong userId, string idolName, string idolGroup)
+    public async Task<DbProcessResultEnum> RemoveUserIdolAsync(ulong userId, string biasName, string idolGroup)
     {
         try
         {
@@ -161,15 +161,15 @@ public class UserIdolService(
 
             User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString(), u => u.Idols);
             user ??= new User() { DiscordId = userId.ToString() };
-            List<Idol> idols = user.Idols.Where(i => i.Name == idolName && (string.IsNullOrEmpty(idolGroup) || idolGroup == i.Group.Name)).ToList();
+            List<Idol> idols = user.Idols.Where(i => i.Name == biasName && (string.IsNullOrEmpty(idolGroup) || idolGroup == i.Group.Name)).ToList();
             if (idols.Count == 0)
             {
-                logger.Log($"{userId} user's with idol [{idolName}]-[{(noGroup ? "No group specified" : idolGroup)}] are not connected currently!");
+                logger.Log($"{userId} user's with idol [{biasName}]-[{(noGroup ? "No group specified" : idolGroup)}] are not connected currently!");
                 return DbProcessResultEnum.PartialNotFound;
             }
             else if (idols.Count > 1)
             {
-                logger.Log($"Idol [{idolName}]-[{(noGroup ? "No group specified" : idolGroup)}] returned multiple results for {userId} user's idols!");
+                logger.Log($"Idol [{biasName}]-[{(noGroup ? "No group specified" : idolGroup)}] returned multiple results for {userId} user's idols!");
                 return DbProcessResultEnum.MultipleResults;
             }
             Idol idol = idols[0];
@@ -177,7 +177,7 @@ public class UserIdolService(
 
             _ = await userRepository.UpdateAsync(user);
 
-            logger.Log($"{userId} user's idol [{idolName}]-[{(noGroup ? "No group specified" : idolGroup)}] removed successfully!");
+            logger.Log($"{userId} user's idol [{biasName}]-[{(noGroup ? "No group specified" : idolGroup)}] removed successfully!");
             return DbProcessResultEnum.Success;
         }
         catch (Exception ex)

@@ -34,7 +34,7 @@ public class TwitchAPI(
     private TwitchLib.Api.TwitchAPI API;
     private readonly Dictionary<string, bool> channelStatuses = [];
     private string Token;
-    private int TokenTick = 0;
+    private int TokenTick;
     #endregion
 
     #region Base Methods

@@ -1,11 +1,11 @@
-﻿using MapsterMapper;
-using Discord;
+﻿using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools.NativeTools;
+using MapsterMapper;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

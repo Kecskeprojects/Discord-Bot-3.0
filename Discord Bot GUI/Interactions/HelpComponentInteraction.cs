@@ -38,8 +38,7 @@ public class HelpComponentInteraction(
             }
 
             IReadOnlyList<CommandInfo> commands = commandService.Modules
-                .Where(x => x.Remarks == commandLevel.ToString() && x.Name == category)
-                .First()
+                .First(x => x.Remarks == commandLevel.ToString() && x.Name == category)
                 .Commands;
 
             Embed[] embed = HelpDetailEmbedProcessor.CreateEmbed(commandLevel, category, [.. commands], config.Img);

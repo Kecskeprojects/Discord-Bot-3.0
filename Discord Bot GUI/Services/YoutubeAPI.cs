@@ -24,7 +24,7 @@ public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, Bot
     private readonly YoutubeAddPlaylistFeature youtubeAddPlaylistFeature = youtubeAddPlaylistFeature;
     private readonly BotLogger logger = logger;
     private readonly Config config = config;
-    private static int youtubeApiKeyIndex = 0;
+    private static int youtubeApiKeyIndex;
     #endregion
 
     #region Base Methods

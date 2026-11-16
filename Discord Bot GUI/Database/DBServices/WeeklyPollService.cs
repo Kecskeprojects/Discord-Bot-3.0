@@ -1,5 +1,4 @@
-﻿using MapsterMapper;
-using Discord_Bot.Communication.Modal;
+﻿using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
@@ -7,6 +6,7 @@ using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
+using MapsterMapper;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -123,14 +123,14 @@ public class WeeklyPollService(
         return result;
     }
 
-    public async Task<WeeklyPollResource> GetPollForForceResendAsync(ulong serverId, string pollName)
+    public async Task<WeeklyPollResource> GetPollForForceResendAsync(ulong id, string pollName)
     {
         WeeklyPollResource result = null;
         try
         {
             pollName = pollName.ToLower();
             WeeklyPoll poll = await weeklyPollRepository.FirstOrDefaultAsync(
-                wp => wp.Server.DiscordId == serverId.ToString() && wp.Name.ToLower() == pollName,
+                wp => wp.Server.DiscordId == id.ToString() && wp.Name.ToLower() == pollName,
                 includes: [
                     wp => wp.Server,
                     wp => wp.Role,
@@ -292,7 +292,7 @@ public class WeeklyPollService(
 
             //Get the type we need to cast to.
             object convertedValue;
-            if (property.PropertyType == typeof(Nullable<Int32>))
+            if (property.PropertyType == typeof(int?))
             {
                 convertedValue = int.TryParse(newValue, out int tempValue) ? tempValue : null;
             }

@@ -1,11 +1,11 @@
-﻿using MapsterMapper;
-using Discord_Bot.Core;
+﻿using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
+using MapsterMapper;
 using System;
 using System.Threading.Tasks;
 
@@ -19,7 +19,7 @@ public class WeeklyPollOptionService(
 {
     private readonly IWeeklyPollOptionRepository weeklyPollOptionRepository = weeklyPollOptionRepository;
 
-    public async Task<WeeklyPollOptionResource> GetOrCreateOptionAsync(bool isPresetOption, int foreignId, int optionId, byte orderNumber)
+    public async Task<WeeklyPollOptionResource> GetOrCreateOptionAsync(bool isPresetOption, int Id, int optionId, byte orderNumber)
     {
         WeeklyPollOptionResource result = null;
         try
@@ -30,8 +30,8 @@ public class WeeklyPollOptionService(
                 pollOption = new()
                 {
                     OrderNumber = orderNumber,
-                    WeeklyPollId = isPresetOption ? null : foreignId,
-                    WeeklyPollOptionPresetId = isPresetOption ? foreignId : null,
+                    WeeklyPollId = isPresetOption ? null : Id,
+                    WeeklyPollOptionPresetId = isPresetOption ? Id : null,
                     Title = string.Empty,
                     CreatedOn = DateTime.UtcNow,
                     ModifiedOn = DateTime.UtcNow,
