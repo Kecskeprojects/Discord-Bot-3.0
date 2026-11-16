@@ -9,6 +9,7 @@ using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions;
@@ -74,7 +75,7 @@ public class BiasEditComponentInteraction : BaseInteraction
             .UpdateTextInput("profileurl", resource.ProfileUrl)
             .UpdateTextInput("name", resource.Name)
             .UpdateTextInput("group", resource.GroupName)
-            .UpdateTextInput("dateofbirth", resource.DateOfBirth.ToString())
+            .UpdateTextInput("dateofbirth", resource.DateOfBirth?.ToString("yyyy. MM. dd.", CultureInfo.InvariantCulture) ?? "")
             .UpdateTextInput("gender", resource.Gender);
 
         await RespondWithModalAsync<EditIdolModal>($"EditIdolModal_{resource.IdolId}", modifyModal: Modify);
@@ -89,7 +90,7 @@ public class BiasEditComponentInteraction : BaseInteraction
             .UpdateTextInput("fullname", resource.FullName)
             .UpdateTextInput("koreanstagename", resource.KoreanStageName)
             .UpdateTextInput("koreanfullname", resource.KoreanFullName)
-            .UpdateTextInput("debutdate", resource.DebutDate.ToString());
+            .UpdateTextInput("debutdate", resource.DebutDate?.ToString("yyyy. MM. dd.", CultureInfo.InvariantCulture) ?? "");
 
         await RespondWithModalAsync<EditIdolExtendedModal>($"EditIdolExtendedModal_{resource.IdolId}", modifyModal: Modify);
     }
@@ -102,7 +103,7 @@ public class BiasEditComponentInteraction : BaseInteraction
             .UpdateTextInput("name", resource.Name)
             .UpdateTextInput("fullname", resource.FullName)
             .UpdateTextInput("fullkoreanname", resource.FullKoreanName)
-            .UpdateTextInput("debutdate", resource.DebutDate.ToString());
+            .UpdateTextInput("debutdate", resource.DebutDate?.ToString("yyyy. MM. dd.", CultureInfo.InvariantCulture) ?? "");
 
         await RespondWithModalAsync<EditGroupModal>($"EditGroupModal_{resource.GroupId}", modifyModal: Modify);
     }

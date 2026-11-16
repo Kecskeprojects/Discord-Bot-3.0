@@ -9,6 +9,7 @@ using Discord_Bot.Resources;
 using MapsterMapper;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -199,7 +200,7 @@ public class WeeklyPollOptionPresetService(
 
             _ = Enum.TryParse(property.PropertyType.Name, true, out TypeCode enumValue); //Get the type based on typecode
 
-            object convertedValue = Convert.ChangeType(newValue, enumValue); //Convert the value to that of the typecode
+            object convertedValue = Convert.ChangeType(newValue, enumValue, CultureInfo.InvariantCulture); //Convert the value to that of the typecode
 
             property.SetValue(poll, convertedValue); // Set the converted value
 

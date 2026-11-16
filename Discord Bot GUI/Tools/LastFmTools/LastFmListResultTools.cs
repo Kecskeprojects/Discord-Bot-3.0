@@ -2,6 +2,7 @@
 using Discord_Bot.Services.Models.LastFm;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Discord_Bot.Tools.LastFmTools;
 
@@ -13,7 +14,7 @@ public static class LastFmListResultTools
         for (int i = 0; i < albums.Count && i < limit; i++)
         {
             LastFmApi.Models.TopAlbum.Album album = albums[i];
-            double percentage = Math.Round(double.Parse(album.PlayCount) / result.TotalPlays * 100, 2);
+            double percentage = Math.Round(double.Parse(album.PlayCount, CultureInfo.InvariantCulture) / result.TotalPlays * 100, 2);
 
             //One line in the embed
             result.EmbedFields[index] += $"`#{i + 1}`**{album.Name}** by **{album.Artist.Name}** - *{percentage}%* (*{album.PlayCount} plays*)\n";
@@ -33,7 +34,7 @@ public static class LastFmListResultTools
         for (int i = 0; i < artists.Count && i < limit; i++)
         {
             LastFmApi.Models.TopArtist.Artist artist = artists[i];
-            double percentage = Math.Round(double.Parse(artist.PlayCount) / result.TotalPlays * 100, 2);
+            double percentage = Math.Round(double.Parse(artist.PlayCount, CultureInfo.InvariantCulture) / result.TotalPlays * 100, 2);
 
             //One line in the embed
             result.EmbedFields[index] += $"`#{i + 1}`**{artist.Name}** - *{percentage}%* (*{artist.PlayCount} plays*)\n";
@@ -52,7 +53,7 @@ public static class LastFmListResultTools
         for (int i = 0; i < tracks.Count && i < limit; i++)
         {
             LastFmApi.Models.TopTrack.Track track = tracks[i];
-            double percentage = Math.Round(double.Parse(track.PlayCount) / result.TotalPlays * 100, 2);
+            double percentage = Math.Round(double.Parse(track.PlayCount, CultureInfo.InvariantCulture) / result.TotalPlays * 100, 2);
 
             //One line in the embed
             result.EmbedFields[index] += $"`#{i + 1}`**{track.Name}** by **{track.Artist.Name}** - *{percentage}%* (*{track.PlayCount} plays*)\n";
@@ -76,7 +77,7 @@ public static class LastFmListResultTools
             result.EmbedFields[index] += $"`#{i + 1}` **{track.Name}** by **{track.Artist.Text}** - *";
             result.EmbedFields[index] += track.Attr != null
                 ? "Now playing*"
-                : TimestampTag.FromDateTime(DateTime.Parse(track.Date.Text, styles: System.Globalization.DateTimeStyles.AssumeUniversal), TimestampTagStyles.Relative) + "*";
+                : TimestampTag.FromDateTime(DateTime.Parse(track.Date.Text, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal), TimestampTagStyles.Relative) + "*";
             result.EmbedFields[index] += "\n";
 
             //If we went through 10 results, start filling a new list page

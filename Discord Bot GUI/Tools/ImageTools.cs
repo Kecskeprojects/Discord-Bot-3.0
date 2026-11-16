@@ -2,6 +2,7 @@
 using Discord_Bot.Tools.Extensions;
 using ImageMagick;
 using System;
+using System.Globalization;
 
 namespace Discord_Bot.Tools;
 
@@ -76,7 +77,7 @@ public static class ImageTools
             for (int ch = text.Length; ch > 0; ch--)
             {
                 //We check the currently shortened string's length
-                double tempwidth = MagickTools.MeasureText(string.Format("{0, 12}", text[..ch]), font).TextWidth;
+                double tempwidth = MagickTools.MeasureText(string.Format(CultureInfo.InvariantCulture, "{0, 12}", text[..ch]), font).TextWidth;
 
                 //When it is short enough, we shorten the original text to this version and move on
                 if (tempwidth < maxWidth)

@@ -26,7 +26,8 @@ public class UnmuteFeature(
         try
         {
             //Get the list of reminders that are before or exactly set to this minute
-            DateTime dateTime = DateTime.Parse(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm"));
+            DateTime now = DateTime.UtcNow;
+            DateTime dateTime = new(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, now.Kind);
             List<ServerMutedUserResource> result = await serverMutedUserService.GetExpiredMutedUsersAsync(dateTime);
             if (!CollectionTools.IsNullOrEmpty(result))
             {

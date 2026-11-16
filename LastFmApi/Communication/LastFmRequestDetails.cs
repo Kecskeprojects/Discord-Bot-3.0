@@ -70,8 +70,8 @@ public class LastFmRequestDetails
         Type = userBasedRequest.Type ?? "";
         ApiKey = userBasedRequest.ApiKey;
         UserName = userBasedRequest.Username;
-        Limit = userBasedRequest.Limit.ToString();
-        Page = userBasedRequest.Page.ToString();
+        Limit = userBasedRequest.Limit?.ToString();
+        Page = userBasedRequest.Page?.ToString();
         Period = userBasedRequest.Period;
     }
 

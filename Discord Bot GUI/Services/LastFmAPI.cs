@@ -182,7 +182,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, BotLogger logger, Config config) 
             }
         }
         int? userplaycount = int.TryParse(trackInfo.Response?.Userplaycount, out int playCount) ? playCount + 1 : null;
-        string playCountString = StringTools.AddNumberPositionIdentifier(userplaycount.ToString());
+        string playCountString = StringTools.AddNumberPositionIdentifier(userplaycount?.ToString() ?? "");
 
         string ranking = await GetSongMonthlyRankingAsync(lastFmUsername, track.Artist.Text, track.Name);
 

@@ -5,6 +5,7 @@ using Discord_Bot.Tools.Extensions;
 using ImageMagick;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -118,14 +119,14 @@ public class WhoKnowsImageProcessor(BotLogger logger)
             FillRectangle(mainImage, rowColor, 425, 132 + (i * 28), 300, 25);
 
             //Check the length of the user string
-            double textWidth = MagickTools.MeasureText(string.Format("{0, 12}", user), font).TextWidth;
+            double textWidth = MagickTools.MeasureText(string.Format(CultureInfo.InvariantCulture, "{0, 12}", user), font).TextWidth;
             user = ImageTools.ShortenText(font, user, textWidth, 210);
 
             //Place tranking and name of user
             mainImage.DrawText(user, font, textColor, 427, 137 + (i * 28));
 
             //Placeholder text, formatting is permanent though
-            string points = string.Format("{0,12}", $"{rows[i].Value} plays");
+            string points = string.Format(CultureInfo.InvariantCulture, "{0,12}", $"{rows[i].Value} plays");
             textWidth = MagickTools.MeasureText(points, font).TextWidth;
 
             //Amount of plays the user has, right aligned to the rectangle

@@ -4,6 +4,7 @@ using Discord_Bot.Tools;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -30,7 +31,7 @@ public static class InstagramMessageProcessor
 
             message += $"{text}\n";
         }
-        string currDate = DateTimeOffset.FromUnixTimeSeconds(metadata.TakenAtTimestamp).ToString("yyyy\\.MM\\.dd");
+        string currDate = DateTimeOffset.FromUnixTimeSeconds(metadata.TakenAtTimestamp).ToString("yyyy\\.MM\\.dd", CultureInfo.InvariantCulture);
         message = message.Insert(0, currDate);
 
         if (message.Length > 2000)

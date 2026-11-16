@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Management;
 
@@ -17,7 +18,7 @@ public static class ProcessExtension
                     {
                         try
                         {
-                            return Process.GetProcessById(Convert.ToInt32(mo["ProcessID"]));
+                            return Process.GetProcessById(Convert.ToInt32(mo["ProcessID"], CultureInfo.InvariantCulture));
                         }
                         catch (Exception) { }
                         return null;
@@ -35,7 +36,7 @@ public static class ProcessExtension
                         {
                             try
                             {
-                                return Process.GetProcessById(Convert.ToInt32(mo["ProcessID"]));
+                                return Process.GetProcessById(Convert.ToInt32(mo["ProcessID"], CultureInfo.InvariantCulture));
                             }
                             catch (Exception) { }
                             return null;

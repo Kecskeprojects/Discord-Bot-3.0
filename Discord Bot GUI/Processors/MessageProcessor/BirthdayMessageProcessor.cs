@@ -2,6 +2,7 @@
 using Discord_Bot.Core;
 using Discord_Bot.Resources;
 using System;
+using System.Globalization;
 
 namespace Discord_Bot.Processors.MessageProcessor;
 
@@ -14,7 +15,7 @@ public static class BirthdayMessageProcessor
         Random r = new();
         string baseMessage = Constant.BirthdayMessage[r.Next(0, Constant.BirthdayMessage.Length)];
 
-        string message = string.Format(baseMessage, user.Mention, (DateTime.UtcNow.Year - birthday.Date.Year).ToString());
+        string message = string.Format(CultureInfo.InvariantCulture, baseMessage, user.Mention, (DateTime.UtcNow.Year - birthday.Date.Year).ToString());
         return message;
     }
 }

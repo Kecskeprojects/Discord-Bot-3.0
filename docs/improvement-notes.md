@@ -14,7 +14,7 @@ C# has no separate linter. Linting is done by **Roslyn analyzers** that run duri
 | `dotnet format` | Formatter and fixer; `--verify-no-changes` is the check mode | Available (part of the SDK), not run yet |
 | Third-party analyzers | Roslynator, Meziantou.Analyzer, StyleCop.Analyzers (strict style), SonarAnalyzer.CSharp, Microsoft.VisualStudio.Threading.Analyzers (async misuse) | None |
 | Nullable reference types | Compiler flags possible null dereferences | `<Nullable>disable</Nullable>` in both projects |
-| `TreatWarningsAsErrors` | Enforces the zero-warning goal | Off until the warnings below are cleared |
+| `TreatWarningsAsErrors` | Enforces the zero-warning goal | Off. The build reached zero warnings on 2026-11-16, so it can be turned on |
 
 ### Trial run (2026-11-15)
 
@@ -46,25 +46,26 @@ A trial build with `-p:AnalysisLevel=latest-recommended -p:EnforceCodeStyleInBui
 - **CA1305 stays on** except for integer `ToString` / `Parse` (`dotnet_code_quality.CA1305.excluded_symbol_names`). Nullable integers (`int?.ToString()`) are not covered by the exclusion.
 - **`GenerateDocumentationFile`** is on only so the build reports IDE0005 (unnecessary usings). Side effect: `Discord Bot.xml` / `LastFmApi.xml` next to the binaries. CS1591 (missing XML comments) is off.
 - **The Database namespace is exempt from CA1309 and CA1310** (`Properties/GlobalSuppressions.cs`, next to CA1862). DB services and repositories pass lambdas that EF translates to SQL, and EF can't translate the `StringComparison` overloads. Visual Studio's code fix for these rules adds one anyway: Code Cleanup did it to 7 queries (reverted 2026-11-16).
-- The build went from 0 to 87 warnings (the trial with `latest-recommended` alone had 417). After the partial Code Cleanup (`35fb3ba`) and the Database exemption, 55 were left; after the CA2201 fixes, 45; after CA1310 and CA5369, 27 (all CA1305). `dotnet format --verify-no-changes` now passes on both projects.
+- The build went from 0 to 87 warnings (the trial with `latest-recommended` alone had 417). After the partial Code Cleanup (`35fb3ba`) and the Database exemption, 55 were left; after the CA2201 fixes, 45; after CA1310 and CA5369, 27 (all CA1305); after CA1305, **0 warnings in Debug and Release**. `dotnet format --verify-no-changes` passes on both projects.
 
-### Warnings left for review (27 left, updated 2026-11-16)
+### Warnings from the setup (all cleared 2026-11-16)
 
-Line numbers are from `bdc988d`. "Proposed" is the fix worked out during the setup, not applied.
+Kept as a record of what changed and why. File and line references are from `bdc988d`, before the fixes.
 
-**Formatting and style (9): done 2026-11-16** in `35fb3ba` and `bdc988d`. `dotnet format --verify-no-changes` now reports only CA1310 for both projects (the extra IDE0001 it used to report is gone too).
+**Formatting and style (9): done 2026-11-16** in `35fb3ba` and `bdc988d`. The extra IDE0001 that only `dotnet format` reported is gone too.
 
 **String comparison: done 2026-11-16**
 - CA1310 (17): **done 2026-11-16** with `StringComparison.Ordinal`. `StartsWith` / `EndsWith` / `IndexOf` / `LastIndexOf` with a string argument were culture-sensitive. Every call looks for a fixed ASCII marker (URL prefix, file extension, "tags:", "Token: ", "getInfo", "i am"), so the results are the same. None of these are in EF queries. `EasterEggFeature.cs:48,54,56`, `BiasGameImageProcessor.cs:47`, `InstagramMessageProcessor.cs:24,64,69,73`, `InstaScraper.cs:103`, `KpopDbScraper.cs:87,91`, `TwitchCLI.cs:36`, `UrlTools.cs:29,72`, `LastFmApi/Communication/LastFmRequestDetails.cs:16`.
 - CA1309 (7): **no longer reported** because of the Database exemption, not a code change. These were `.ToLower().Equals(x)` inside EF queries in `CustomCommandService`, `RoleService` and `ServerService`; they stay as they are.
 
-**Format provider, CA1305 (27).** None of these could be reproduced as a bug: under both hu-HU and en-US on .NET 11, `DateTime.Parse` accepts Last.fm's English dates ("16 Nov 2026, 14:05"), and the bias modal dates parse back correctly. The risk is that output and parsing depend on the server's culture. Proposed: `CultureInfo.InvariantCulture`, with these specifics:
-- `string.Format`: `UserBiasCommands.cs:207`, `BirthdayMessageProcessor.cs:17`, `WhoKnowsImageProcessor.cs:121,128`, `ImageTools.cs:79`.
-- Parsing: `LastFmListResultTools.cs:16,36,55` (`double.Parse` of play counts) and `:79` (`DateTime.Parse` of Last.fm dates), `ProcessExtension.cs:20,38` (`Convert.ToInt32`), `Convert.ChangeType` in `WeeklyPollService.cs:303` and `WeeklyPollOptionPresetService.cs:202` (the edited fields are `string`, `bool`, `long` and `int?`, so invariant is safe).
-- `ReminderFeature.cs:29` and `UnmuteFeature.cs:29` send `DateTime.UtcNow` through a string and back to drop the seconds. `new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0)` does it without strings, as `DateTimeTools.TryAddValuesToDate` already does.
-- `InstagramMessageProcessor.cs:33`, `InstaScraper.cs:98`: `ToString("yyyy\\.MM\\.dd")`, culture-neutral in practice.
-- `BiasEditComponentInteraction.cs:77,92,105`: the modal is prefilled with `DateOnly?.ToString()`, which shows "2001. 05. 12." under hu-HU and "5/12/2001" under en-US. Proposed: `?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? ""`, the same format the scraper uses; `DateOnly.TryParse` reads ISO dates under any culture.
-- Nullable integers: `WeeklyPollService.cs:242,247` (`ulong? roleId` inside an EF query; proposed: look the role up only inside `if (roleId.HasValue)`, with `roleId.Value.ToString()` stored in a local before the query), `LastFmAPI.cs:185` (`userplaycount?.ToString() ?? ""`), `LastFmRequestDetails.cs:73,74` (`?.ToString()`; empty and null are both skipped when the URL is built).
+**Format provider, CA1305 (27): done 2026-11-16.** None of these could be reproduced as a bug: under both hu-HU and en-US on .NET 11, `DateTime.Parse` accepts Last.fm's English dates ("16 Nov 2026, 14:05"), and the bias modal dates parse back correctly. The risk was that output and parsing depend on the server's culture. Fixed with `CultureInfo.InvariantCulture` unless noted:
+- `string.Format`: `UserBiasCommands`, `BirthdayMessageProcessor`, `WhoKnowsImageProcessor` (2), `ImageTools`.
+- Parsing: `LastFmListResultTools` (`double.Parse` of play counts ×3, `DateTime.Parse` of Last.fm dates), `ProcessExtension` (`Convert.ToInt32` ×2), `Convert.ChangeType` in `WeeklyPollService` and `WeeklyPollOptionPresetService` (the edited fields are `string`, `bool`, `long` and `int?`, so invariant is safe).
+- `ReminderFeature` and `UnmuteFeature` sent `DateTime.UtcNow` through a string and back to drop the seconds. Now `new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, now.Kind)`, as `DateTimeTools.TryAddValuesToDate` already does. The value is only compared in EF queries, so its `Kind` (now `Utc` instead of `Unspecified`) doesn't matter.
+- `InstagramMessageProcessor`, `InstaScraper`: `ToString("yyyy\\.MM\\.dd")`.
+- `BiasEditComponentInteraction` (3): the edit modals are prefilled with `?.ToString("yyyy. MM. dd.", CultureInfo.InvariantCulture) ?? ""`. This differs from the earlier ISO proposal, because the modals' placeholders say "YYYY. MM. DD. format". The output is exactly what hu-HU produced before ("2001. 05. 12."), and `DateOnly.TryParse` reads it back under hu-HU, en-US, en-GB and invariant (tested on .NET 11). Before, an en-US server would have prefilled "5/12/2001".
+- Nullable integers: `WeeklyPollService.UpdateAsync` now looks the role up only inside `if (roleId.HasValue)`, with `roleId.Value.ToString()` in a local (before, a null `roleId` queried `DiscordId == ""`). `LastFmAPI.GetNowPlayingAsync`: `userplaycount?.ToString() ?? ""`. `LastFmRequestDetails`: `Limit` / `Page` use `?.ToString()`; empty and null are both skipped when the URL is built.
+- Not covered by CA1305: interpolated strings. For example `LastFmListResultTools` writes `{percentage}%`, which shows "12,5%" under hu-HU and "12.5%" under en-US. Leave it as is if the server's culture is the intended display format.
 
 **Exceptions, CA2201 (10): done 2026-11-16**
 - `SizedDictionary`: `throw new()` on a null key → `ArgumentNullException.ThrowIfNull(key)`.

@@ -9,6 +9,7 @@ using Discord_Bot.Resources;
 using MapsterMapper;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -239,12 +240,14 @@ public class WeeklyPollService(
                     ServerId = poll.ServerId
                 };
 
-                Role role = await roleRepository.FirstOrDefaultAsync(r => r.DiscordId == roleId.ToString());
+                Role role = null;
                 if (roleId.HasValue)
                 {
+                    string roleDiscordId = roleId.Value.ToString();
+                    role = await roleRepository.FirstOrDefaultAsync(r => r.DiscordId == roleDiscordId);
                     role ??= new Role()
                     {
-                        DiscordId = roleId.ToString(),
+                        DiscordId = roleDiscordId,
                         RoleName = roleName,
                         ServerId = poll.ServerId
                     };
@@ -300,7 +303,7 @@ public class WeeklyPollService(
             {
                 _ = Enum.TryParse(property.PropertyType.Name, true, out TypeCode enumValue); //Get the type based on typecode
 
-                convertedValue = Convert.ChangeType(newValue, enumValue); //Convert the value to that of the typecode
+                convertedValue = Convert.ChangeType(newValue, enumValue, CultureInfo.InvariantCulture); //Convert the value to that of the typecode
             }
 
             property.SetValue(poll, convertedValue); // Set the converted value

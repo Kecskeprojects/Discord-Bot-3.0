@@ -7,6 +7,7 @@ using Discord_Bot.Tools;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -95,7 +96,7 @@ public class InstaScraper(BotLogger logger) : IInstaScraper
 
     private static void GetTextContent(Root body, SocialScrapingResult result, Uri uri)
     {
-        result.TextContent = DateTimeOffset.FromUnixTimeSeconds(body.Data.XdtShortcodeMedia.TakenAtTimestamp).ToString("yyyy\\.MM\\.dd");
+        result.TextContent = DateTimeOffset.FromUnixTimeSeconds(body.Data.XdtShortcodeMedia.TakenAtTimestamp).ToString("yyyy\\.MM\\.dd", CultureInfo.InvariantCulture);
         result.TextContent += $" **{body.Data.XdtShortcodeMedia.Owner.Username}**'s [post](<{uri.OriginalString}>)\n\n";
 
         string caption = string.Join("\n\n", body.Data.XdtShortcodeMedia.EdgeMediaToCaption.Edges.Select(x => x.Node.Text));

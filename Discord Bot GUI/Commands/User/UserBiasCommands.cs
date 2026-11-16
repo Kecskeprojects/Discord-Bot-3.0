@@ -11,6 +11,7 @@ using Discord_Bot.Resources;
 using Discord_Bot.Tools.NativeTools;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -204,7 +205,7 @@ public class UserBiasCommands(
                 bias = bias.ToUpper();
 
                 string baseMessage = Constant.BiasExtraMessage[r.Next(0, Constant.BiasExtraMessage.Length)];
-                string message = string.Format(baseMessage, bias);
+                string message = string.Format(CultureInfo.InvariantCulture, baseMessage, bias);
 
                 _ = await ReplyAsync(message);
             }
