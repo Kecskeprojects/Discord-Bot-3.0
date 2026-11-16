@@ -18,7 +18,7 @@ using System.Windows;
 
 namespace Discord_Bot;
 
-public partial class App : Application
+public partial class App : Application, IDisposable
 {
     #region Variables
     private IServiceProvider services;
@@ -205,5 +205,11 @@ public partial class App : Application
             ITwitchAPI twitchAPI = scope.ServiceProvider.GetService<ITwitchAPI>();
             await twitchAPI.Start();
         }
+    }
+
+    public void Dispose()
+    {
+        BotService.Dispose();
+        mainTimer.Dispose();
     }
 }

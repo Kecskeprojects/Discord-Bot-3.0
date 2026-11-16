@@ -17,7 +17,7 @@ public class BotMain(
     InteractionHandler interactionHandler,
     CommandHandler commandHandler,
     DiscordSocketClient client,
-    BotLogger logger)
+    BotLogger logger) : IDisposable
 {
     #region Variables
     private readonly IServiceProvider services = services;
@@ -97,7 +97,7 @@ public class BotMain(
         string message
     )
     {
-        if( severity > LoggingSeverity.Info)
+        if (severity > LoggingSeverity.Info)
         {
             logger.Audio(message);
         }
@@ -195,4 +195,10 @@ public class BotMain(
         return Task.CompletedTask;
     }
     #endregion
+
+    public void Dispose()
+    {
+        startLock.Dispose();
+        client.Dispose();
+    }
 }

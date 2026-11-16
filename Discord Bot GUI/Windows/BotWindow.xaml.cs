@@ -15,7 +15,7 @@ using System.Windows.Threading;
 
 namespace Discord_Bot.Windows;
 
-public partial class BotWindow : Window
+public partial class BotWindow : Window, IDisposable
 {
     private readonly Timer diagnosticsTimer;
     private bool AutoScroll = true;
@@ -180,5 +180,10 @@ public partial class BotWindow : Window
                 main.MainLogText.Inlines.Add(run);
             }
         }));
+    }
+
+    public void Dispose()
+    {
+        diagnosticsTimer.Dispose();
     }
 }

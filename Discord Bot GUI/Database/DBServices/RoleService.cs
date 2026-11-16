@@ -1,11 +1,11 @@
-﻿using MapsterMapper;
-using Discord_Bot.Core;
+﻿using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
+using MapsterMapper;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -80,13 +80,13 @@ public class RoleService(
         return result;
     }
 
-    public async Task<List<RoleResource>> GetServerRolesAsync(ulong serverId)
+    public async Task<List<RoleResource>> GetServerRolesAsync(ulong id)
     {
         List<RoleResource> result = null;
         try
         {
             List<Role> role = await roleRepository.GetListAsync(r =>
-            r.Server.DiscordId == serverId.ToString(),
+            r.Server.DiscordId == id.ToString(),
             r => r.Server);
             result = mapper.Map<List<Role>, List<RoleResource>>(role);
         }
