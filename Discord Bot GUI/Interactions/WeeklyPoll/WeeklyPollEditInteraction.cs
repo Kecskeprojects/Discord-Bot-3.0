@@ -77,7 +77,7 @@ public class WeeklyPollEditInteraction(
             SocketGuildChannel? channel = Context.Guild.Channels.FirstOrDefault(x => x.Name.Equals(modal.Channel.Trim(), StringComparison.OrdinalIgnoreCase));
             if (channel == null)
             {
-                await RespondAsync("Channel not found!");
+                await RespondOrFollowupAsync("Channel not found!", ephemeral: true);
                 return;
             }
             SocketRole? role = Context.Guild.Roles.FirstOrDefault(x => x.Name.Equals(modal.Role.Trim(), StringComparison.OrdinalIgnoreCase));

@@ -10,7 +10,7 @@ Changes from 2026-11-16 that built cleanly but have not been tried live:
 - **Twitch token refresh:** after the bot has run for more than a day (the refresh runs about every 24 hours), stream notifications should keep arriving.
 - **Last.fm who-knows:** `!lf wk` with no song (uses what you are playing now), with `artist>track` and with an artist only.
 - **Weekly poll buttons:** the toggle buttons in the poll and preset edit messages (active, pinned, multiple answers, special preset), and the preset select's "Custom Options".
-- **Weekly poll edit modal** with and without a role: the service now takes the role as an optional `RoleResource`.
+- **Weekly poll edit modal** with and without a role (the service now takes the role as an optional `RoleResource`), and with a channel name that doesn't exist, which should answer "Channel not found!" (it used to throw after the defer).
 - **After the nullable scaffold** (`247e656`): EF now reads required columns from the models' annotations instead of `.IsRequired()`. Adding a custom command, a self role and a bias, and the Monday bias scrape (new idol images), are the writes most worth a look.
 - **Log window and file** (`IBotLogger`): the window still shows each log type in its color (log white, query dark cyan, client dark gray, audio dark orange, error red, warning yellow) and keeps autoscrolling, the "open active log file" button shows the current entries, and `Logs/` keeps getting written every minute and at shutdown.
 
