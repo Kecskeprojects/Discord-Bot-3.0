@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace Discord_Bot.Communication;
+﻿namespace Discord_Bot.Communication;
 
 public class InstagramMessageResult
 {

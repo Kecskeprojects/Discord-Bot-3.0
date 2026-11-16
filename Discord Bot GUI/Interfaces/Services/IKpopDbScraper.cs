@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord_Bot.Communication.Bias;
+﻿using Discord_Bot.Communication.Bias;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord;
+﻿using Discord;
 using Discord_Bot.Services.Models.InstaLoader;
 using Discord_Bot.Tools;
 using Newtonsoft.Json;

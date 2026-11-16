@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord_Bot.Communication.Modal;
+﻿using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;

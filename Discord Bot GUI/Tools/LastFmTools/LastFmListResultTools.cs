@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord;
+﻿using Discord;
 using Discord_Bot.Services.Models.LastFm;
 using System;
 using System.Collections.Generic;

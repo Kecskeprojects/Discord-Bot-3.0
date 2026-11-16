@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord;
+﻿using Discord;
 using Discord.LibDave.Binding;
 using Discord.WebSocket;
 using Discord_Bot.Core;

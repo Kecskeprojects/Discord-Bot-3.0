@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord_Bot.Communication;
+﻿using Discord_Bot.Communication;
 using ImageMagick;
 using System;
 using System.Drawing;

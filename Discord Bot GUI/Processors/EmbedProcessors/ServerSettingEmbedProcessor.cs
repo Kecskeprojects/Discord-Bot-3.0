@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;

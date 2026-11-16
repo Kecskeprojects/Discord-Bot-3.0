@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord;
+﻿using Discord;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Resources;

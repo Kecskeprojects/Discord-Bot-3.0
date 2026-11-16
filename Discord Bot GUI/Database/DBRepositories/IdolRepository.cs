@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord_Bot.Database.Models;
+﻿using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBRepositories;
 using Microsoft.EntityFrameworkCore;

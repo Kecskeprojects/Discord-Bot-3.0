@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord_Bot.Communication;
+﻿using Discord_Bot.Communication;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;

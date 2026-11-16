@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using LastFmApi.Communication;
+﻿using LastFmApi.Communication;
 using LastFmApi.Enum;
 using LastFmApi.Models.ArtistInfo;
 using LastFmApi.Models.TrackInfo;

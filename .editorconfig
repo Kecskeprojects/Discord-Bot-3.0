@@ -78,3 +78,17 @@ dotnet_diagnostic.CA1711.severity = none
 
 # CA1716 (names that are keywords in other .NET languages, e.g. Global, Date): only matters for VB consumers of a library.
 dotnet_diagnostic.CA1716.severity = none
+
+# The JSON models are generated from API responses and stay nullable-oblivious, like the scaffolded Database/Models
+# (see Discord Bot GUI/Database/.editorconfig). Generated code is also skipped by the analyzers.
+[Discord Bot GUI/Services/Models/**.cs]
+generated_code = true
+
+[Discord Bot GUI/Database/Models/**.cs]
+generated_code = true
+
+[Discord Bot GUI/Database/MainDbContext.cs]
+generated_code = true
+
+[LastFmApi/Models/**.cs]
+generated_code = true

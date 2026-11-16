@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord;
+﻿using Discord;
 
 namespace Discord_Bot.Communication.Bias;
 

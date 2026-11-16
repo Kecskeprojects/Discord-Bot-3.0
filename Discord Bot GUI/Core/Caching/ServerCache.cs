@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord_Bot.Resources;
+﻿using Discord_Bot.Resources;
 
 namespace Discord_Bot.Core.Caching;
 

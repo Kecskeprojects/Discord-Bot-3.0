@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord_Bot.Enums;
+﻿using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using System.Collections.Generic;
 using System.Threading.Tasks;

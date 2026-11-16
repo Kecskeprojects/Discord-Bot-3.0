@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord_Bot.Resources;
+﻿using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.LastFm;
 using System.Collections.Generic;
 using System.Threading.Tasks;

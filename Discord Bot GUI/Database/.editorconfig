@@ -1,5 +1,0 @@
-[/Models/**]
-generated_code = true
-
-[MainDbContext.cs]
-generated_code = true

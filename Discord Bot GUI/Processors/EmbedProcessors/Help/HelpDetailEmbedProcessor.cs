@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord_Bot.Core;
 using Discord_Bot.Enums;

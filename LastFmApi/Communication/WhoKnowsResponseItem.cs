@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace LastFmApi.Communication;
+﻿namespace LastFmApi.Communication;
 
 public class WhoKnowsResponseItem
 {

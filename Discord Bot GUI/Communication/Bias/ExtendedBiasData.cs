@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using AngleSharp.Dom;
+﻿using AngleSharp.Dom;
 using Discord_Bot.Enums;
 using System;
 

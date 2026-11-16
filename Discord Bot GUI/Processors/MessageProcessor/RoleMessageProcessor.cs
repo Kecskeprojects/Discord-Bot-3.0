@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord_Bot.Resources;
+﻿using Discord_Bot.Resources;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;

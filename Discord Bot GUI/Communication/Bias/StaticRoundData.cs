@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace Discord_Bot.Communication.Bias;
+﻿namespace Discord_Bot.Communication.Bias;
 
 public class StaticRoundData(int baseLeftX, int baseRightX, int baseDiagonal, int baseY, int spacing, int totalPositions)
 {

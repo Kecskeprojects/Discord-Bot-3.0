@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Text.Json.Serialization;
 
 namespace LastFmApi.Communication;

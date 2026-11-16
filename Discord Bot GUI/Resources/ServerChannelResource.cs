@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace Discord_Bot.Resources;
+﻿namespace Discord_Bot.Resources;
 
 public class ServerChannelResource
 {

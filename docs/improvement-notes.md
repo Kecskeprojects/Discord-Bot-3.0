@@ -13,7 +13,7 @@ C# has no separate linter. Linting is done by **Roslyn analyzers** that run duri
 | `.editorconfig` | Rule severities, formatting, naming | Root file with formatting options matching the owner's VS settings, code style preferences and severities. `Database/.editorconfig` only marks generated code |
 | `dotnet format` | Formatter and fixer; `--verify-no-changes` is the check mode | Available (part of the SDK), not run yet |
 | Third-party analyzers | Roslynator, Meziantou.Analyzer, StyleCop.Analyzers (strict style), SonarAnalyzer.CSharp, Microsoft.VisualStudio.Threading.Analyzers (async misuse) | None |
-| Nullable reference types | Compiler flags possible null dereferences | `<Nullable>disable</Nullable>` in both projects, turned on per file with `#nullable enable`: `Tools/`, `Features/`, `Processors/`, `Commands/`, `Interactions/`, `Core/`, `Windows/`, the root files, `Communication/`, `Resources/` and `Database/` with its interfaces since 2026-11-16 |
+| Nullable reference types | Compiler flags possible null dereferences | `<Nullable>enable</Nullable>` in both projects since 2026-11-16, after a folder-by-folder rollout. The scaffolded and JSON models are marked `generated_code` and stay unchecked |
 | `TreatWarningsAsErrors` | Enforces the zero-warning goal | On since 2026-11-16, in every configuration (`Directory.Build.props`). NuGet audit warnings NU1901–NU1904 stay warnings |
 
 ### Trial run (2026-11-15)
@@ -37,7 +37,7 @@ A trial build with `-p:AnalysisLevel=latest-recommended -p:EnforceCodeStyleInBui
 2. **Done 2026-11-16.** A root `.editorconfig` that silences the unwanted rules and keeps the rest as warnings (details below).
 3. Optionally `Microsoft.VisualStudio.Threading.Analyzers` for `async void`, `.Result` / `.Wait()` and unawaited tasks, which are common in Discord.Net handlers. Not added yet.
 4. **Done 2026-11-16.** `dotnet format` for formatting. Turn on `TreatWarningsAsErrors` only once at zero warnings.
-5. Enable nullable reference types gradually, folder by folder with `#nullable enable`. **In progress:** `Tools/`, `Features/`, `Processors/`, `Commands/`, `Interactions/`, `Core/`, `Windows/`, the root files, `Communication/`, `Resources/` and `Database/` with `Interfaces/DBServices` / `DBRepositories`, and `Services/` with `Interfaces/Services` plus the LastFmApi code, done 2026-11-16 (details under "Nullable reference types" below). Left: the switch-over (plan A, step 3, below).
+5. **Done 2026-11-16.** Enable nullable reference types gradually, folder by folder with `#nullable enable`, then project-wide (details under "Nullable reference types" below).
 
 ### Setup decisions (2026-11-16)
 
@@ -187,6 +187,9 @@ Nullable reference types for the whole project (992 warnings):
     - YouTube watch links: an empty `list=` still offered to add a playlist and then searched for an empty ID, and a link without `v` (or a playlist link without `list`) called the API with a null ID. A playlist is now offered only for a non-empty ID, and a missing ID returns "not found" without spending quota.
     - `InstaScraper` (disabled embed) returned null when an exception was caught inside `ExtractFromUrl`. It now returns the same error result as the outer catch.
   - Switch-over dry run: I built with `-p:Nullable=enable` and the two `generated_code` sections added temporarily, then restored `.editorconfig`. The result was 291 warnings, all IDE0240 (the now redundant directives), so step 3 needs no other code changes.
+- **Switch-over done 2026-11-16** (step 3): `<Nullable>enable</Nullable>` in both csproj files, `generated_code = true` for `Discord Bot GUI/Services/Models/**.cs` and `LastFmApi/Models/**.cs` in the root `.editorconfig`, and the 291 `#nullable enable` lines removed (each with the blank line after it). `Enums/` and `Properties/` came in with no warnings.
+  - Generated code is also skipped by the analyzers, so the two JSON model folders no longer get style or quality warnings (`Database/Models` already didn't).
+  - Tested with a probe file in `Database/Models`: `string?` there is error CS8669 (annotations in generated code need a `#nullable` directive), while an uninitialized `string` gives nothing. A scaffolder run against the project now writes `?` annotations, so scaffolded output either loses them or gets `#nullable enable` (which puts the file under checking). Noted in CLAUDE.md under "Database changes".
 
 **Found on the way**
 - **Done 2026-11-16:** `App.StartTwitchMonitor` was `async void` without a try/catch on its own thread. `TwitchAPI.Start()` catches its own exceptions, but creating the scope or constructing `TwitchAPI` and its dependencies (e.g. `Config` with a broken config file) could still throw and end the process. It now logs instead.
@@ -344,7 +347,7 @@ The `Services/` folder (API wrappers, scrapers and CLI tools behind `Interfaces/
 - **YouTube duplicate on playlist import:** when a video link that also carries a playlist (`&list=`) is imported as a playlist (`YoutubeAPI.AddPlaylistAsync`), the video itself can be queued twice if it is in the imported part of the playlist. Skip it.
 - **YouTube search matching:** look into a similarity or points-based ranking of search results, beyond the current channel and filter-word filtering in `YoutubeAPI.FilteredResults`. It first came up searching for "Withcha" by Apink.
 - **Last.fm artist stats image (found 2026-11-16):** `LastFmAPI.GetArtistDataAsync` picks the MBID from the albums when there are any, but always passes `tracks[0]`'s artist and track name to the Spotify search. An artist with album plays but no track plays would throw there (rare, since album plays come from track plays). Passing a track name also makes the search return that track's album cover instead of the artist's image, as `GetTopArtistsAsync` does. Decide which image the stats should show, and take both values from the same list.
-- **Hand-written results in `Services/Models` (found 2026-11-16):** `Services/Models/LastFm` (`ArtistStats`, `LastFmListResult`, `NowPlayingResult`, `WhoKnows`) and `Services/Models/SpotifyAPI/SpotifyImageSearchResult` are the bot's own result DTOs, not JSON models. Under plan A they become unchecked with the JSON models around them. Moving them to `Communication/` (where data types belong by convention) would put them under nullable checking. Their nullable fields are `Message`, the image URLs and the optional now-playing data.
+- **Hand-written results in `Services/Models` (found 2026-11-16):** `Services/Models/LastFm` (`ArtistStats`, `LastFmListResult`, `NowPlayingResult`, `WhoKnows`) and `Services/Models/SpotifyAPI/SpotifyImageSearchResult` are the bot's own result DTOs, not JSON models. Since the switch-over they are unchecked (and skipped by the analyzers) with the JSON models around them. Moving them to `Communication/` (where data types belong by convention) would put them under nullable checking. Their nullable fields are `Message`, the image URLs and the optional now-playing data.
 
 ## Feature ideas
 

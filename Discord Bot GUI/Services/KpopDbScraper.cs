@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using AngleSharp;
+﻿using AngleSharp;
 using AngleSharp.Dom;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;

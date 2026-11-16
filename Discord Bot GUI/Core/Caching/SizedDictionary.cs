@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord_Bot.Tools.NativeTools;
+﻿using Discord_Bot.Tools.NativeTools;
 using System;
 using System.Collections.Generic;
 

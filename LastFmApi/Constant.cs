@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace LastFmApi;
+﻿namespace LastFmApi;
 
 public static class Constant
 {

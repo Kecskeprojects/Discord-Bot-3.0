@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord_Bot.Core;
+﻿using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using PuppeteerSharp;
 using System.Collections.Generic;

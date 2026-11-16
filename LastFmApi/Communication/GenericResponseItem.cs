@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using LastFmApi.Enum;
+﻿using LastFmApi.Enum;
 using System.Diagnostics.CodeAnalysis;
 
 namespace LastFmApi.Communication;

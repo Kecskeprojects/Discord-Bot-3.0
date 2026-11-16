@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord.Audio;
+﻿using Discord.Audio;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;

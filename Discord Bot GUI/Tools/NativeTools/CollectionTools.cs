@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Discord_Bot.Communication;
+﻿using Discord_Bot.Communication;
 using System;
 using System.Collections;
 using System.Collections.Generic;

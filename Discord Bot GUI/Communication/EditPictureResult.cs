@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.IO;
 
 namespace Discord_Bot.Communication;
