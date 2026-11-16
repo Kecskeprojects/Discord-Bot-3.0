@@ -2,18 +2,6 @@
 
 Open work from code-quality investigations, kept so it can be picked up later. Items are removed once they are applied; the git history has the details of earlier work. Last brought up to date 2026-11-16.
 
-## To check in the running bot
-
-Changes from 2026-11-16 that built cleanly but have not been tried live:
-
-- **Shutdown:** close the window. The log should end with "Application closing..." and no error, and the bot should show offline in Discord right away.
-- **Twitch token refresh:** after the bot has run for more than a day (the refresh runs about every 24 hours), stream notifications should keep arriving.
-- **Last.fm who-knows:** `!lf wk` with no song (uses what you are playing now), with `artist>track` and with an artist only.
-- **Weekly poll buttons:** the toggle buttons in the poll and preset edit messages (active, pinned, multiple answers, special preset), and the preset select's "Custom Options".
-- **Weekly poll edit modal** with and without a role (the service now takes the role as an optional `RoleResource`), and with a channel name that doesn't exist, which should answer "Channel not found!" (it used to throw after the defer).
-- **After the nullable scaffold** (`247e656`): EF now reads required columns from the models' annotations instead of `.IsRequired()`. Adding a custom command, a self role and a bias, and the Monday bias scrape (new idol images), are the writes most worth a look.
-- **Log window and file** (`IBotLogger`): the window still shows each log type in its color (log white, query dark cyan, client dark gray, audio dark orange, error red, warning yellow) and keeps autoscrolling, the "open active log file" button shows the current entries, and `Logs/` keeps getting written every minute and at shutdown.
-
 ## 1. Linting follow-ups (investigated 2026-11-15 and 2026-11-16)
 
 The analyzer setup is done and described in CLAUDE.md ("Linting"). Left:
@@ -43,7 +31,7 @@ The analyzer setup is done and described in CLAUDE.md ("Linting"). Left:
 
 ### Already in good shape
 
-- Every DB service, repository and external API service is behind an interface (`Interfaces/`) and registered through DI in `Startup.cs`, so DB services can be unit-tested now by mocking their repositories.
+- Every DB service, repository and external service class is behind an interface (`Interfaces/`) and registered through DI in `Startup.cs`, so DB services can be unit-tested now by mocking their repositories, and code that uses an external service can mock it. What is still missing for the services' own logic is listed under "Interfaces for mocking" below.
 - `IMapper` can be built for real in tests from `MapperConfig`, the same way `Startup` does.
 - A large share of logic sits in static, mostly pure helpers that need no changes to test: `Tools/` (`StringTools`, `CollectionTools`, `NumberTools`, `UrlTools`, `ChannelTypeEnumTools`, `LastFmTools`, `DiscordTools.IsTypeOfChannel`), `SizedDictionary` / `ServerCache`, and the static embed and message processors (assert on the returned `Embed`'s fields).
 - Everything logs through `IBotLogger`, so tests can pass a mock (and assert that an error was logged). The concrete `BotLogger` has no WPF dependency either; the window subscribes to its `LogAdded` event.
@@ -55,6 +43,32 @@ The analyzer setup is done and described in CLAUDE.md ("Linting"). Left:
 3. **`Config`** is a concrete class whose constructor reads and writes `Assets/config.json` in the current directory, and about 47 classes inject it. Fix: extract an `IConfig` interface (smallest change), or move to `IOptionsMonitor<BotOptions>`, which keeps reload-on-change.
 4. **Concrete Discord.Net socket types.** `BaseFeature`, `BaseCommand` and `DiscordTools` use `SocketCommandContext` / `SocketInteractionContext`, and several features inject `DiscordSocketClient`. Socket entities have internal constructors and can't be mocked. Fix: use Discord.Net's own interfaces: `ICommandContext`, `IUser`, `IGuild`, `IMessageChannel`, and `IDiscordClient` (or a narrow wrapper like `IDiscordMessenger.SendDmAsync`) instead of `DiscordSocketClient`. `BaseCommand` could derive from `ModuleBase<ICommandContext>`.
 5. **Logic inside command bodies.** Commands parse, validate and branch (e.g. `UserReminderCommands.RemindIn`). Commands are the hardest thing to unit-test, so move that logic into features, processors or tools and keep commands as thin adapters.
+
+### Interfaces for mocking (investigated 2026-11-16)
+
+What has to be mockable so tests can leave out the database, the external APIs and the scraping. These classes have no interface yet, in order of how much code each one makes testable:
+
+1. **The Last.fm requests (`LastFmApi`).** `UserBasedRequests`, `InfoBasedRequests`, `UtilityRequests` and `WhoKnowsRequests` are static methods over one static `RestClient` in `BaseRequests`. `LastFmAPI` calls them directly (465 lines: the list results, now playing, artist stats, who-knows), and so do `UtilityRequests` (215 lines: total plays, the monthly ranking, every album or track of an artist) and `WhoKnowsRequests` (195 lines). Fix: instance classes behind `IUserBasedRequests`, `IInfoBasedRequests`, `IUtilityRequests` and `IWhoKnowsRequests`, registered in DI; the last two take the first two. For the library's own JSON handling, `BaseRequests` can take the `RestClient` from outside: RestSharp builds one on an `HttpClient`, so a test passes a fake `HttpMessageHandler` that returns saved responses. Optional at the same time: give the API key to the constructor instead of every call.
+2. **`BrowserService`** (Puppeteer, a concrete singleton) → `IBrowserService` (`OpenBrowser`, `CloseBrowser`, `NewPage`). `BiasScrapingProcessor` (136 lines: matching scraped idols to the database, the group check, image changes) only uses it to close the browser at the end, so with the interface it can be tested with mocked `IKpopDbScraper` and `IIdolService`. Optional: to test the scrapers' HTML parsing (`KpopDbScraper`, `ExtendedBiasData`), split loading a page from parsing it, so the parsing takes the page content and tests can feed it saved pages.
+3. **`WebTools`** (static `HttpClient`: `GetStream`, `GetBody`, `TestConnection`) → an instance service behind an interface (e.g. `IWebTools`). `LastFmWhoKnowsEmbedProcessor`, `BiasGameImageProcessor`, `SocialMessageProcessor`, `InstaScraper`, `UserBonkCommands` and `BotMain` use it; with the interface, the image processors get a local test image instead of a download. `WhoKnowsImageProcessor` needs an interface too, so `LastFmWhoKnowsEmbedProcessor` (88 lines: download, draw, fall back to a plain embed) can be tested without Magick.NET.
+4. **YouTube.** `YoutubeAPI` (320 lines: watch, playlist and youtu.be links, keyword search with filtering, the playlist import, key rotation and quota counting) creates a `YouTubeService` for every search. Fix: a small `IYoutubeDataClient` wrapping the three calls it makes (videos by ID, search, playlist items), and an interface for `YoutubeAddPlaylistFeature`, which waits for the user's answer in Discord. The key quotas and the music queue are in `Global` (blocker 2).
+5. **Spotify.** `SpotifyAPI` (201 lines: link handling, playlist or album → search terms, the image search fallback) builds a `SpotifyClient` on every call. SpotifyAPI.Web already has `ISpotifyClient`, so no interface of our own is needed: inject that, through a small factory if credential edits in `config.json` should still apply without a restart.
+6. **`DiscordSocketClient`**, injected into `BotMain`, `CommandHandler`, `InteractionHandler`, `DiscordTools` and the features `BirthdayFeature`, `ReminderFeature`, `UnmuteFeature`, `WeeklyPollFeature`, `TwitchNotificationFeature`, `EasterEggFeature` and `YoutubeAddPlaylistFeature`: blocker 4. The birthday, reminder, unmute and poll logic sits in those features, so this matters most for feature tests.
+
+No interface needed:
+- `Config` (42 classes): blocker 3 already covers it (`IConfig`).
+- `ServerCache` (every DB service): it lives in memory, so tests use a real one.
+- `MainDbContext`: only the repositories use it. Mock the repository interfaces, or test the repositories against LocalDB (below).
+- `IMapper` is already an interface; tests build the real one from `MapperConfig`.
+- Features and processors that only commands and interactions inject (`AudioPlayFeature`, `AudioRequestFeature`, `WeeklyPollFeature`, `BiasScrapingProcessor`, the image processors): commands aren't test targets (blocker 5), so nothing has to mock them.
+- `MusicBrainzAPI` and `WordOfTheDayService`: thin wrappers, already behind interfaces, so their consumers can mock them. Their own parsing could be tested by passing in the `RestClient`, as for `BaseRequests` (optional).
+- `TwitchCLI`, `YoutubeStreamService`, `InstaLoader` (CLI processes) and `ProcessTools` / `ProcessExtension` (performance counters and WMI for the window's diagnostics): not worth testing.
+- `TwitchAPI`: TwitchLib's monitor raises the events. To test the live / offline decisions, move them into a plain class that the event handlers call, rather than wrapping the monitor.
+- `CommandService` / `InteractionService` (Discord.Net): only the handlers and the help command use them.
+
+Randomness and files (no interface, but tests have to account for them):
+- `new Random()` in `CollectionTools`, `StringExtension.ToMockText`, `RainbowRandomizerTools`, `BirthdayMessageProcessor`, `EasterEggFeature`, `WhoKnowsImageProcessor` (file names), `YoutubeAPI` (key choice) and several commands. Tests can check properties (a shuffle keeps every item), or the helpers take a `Random` so a test passes a seeded one.
+- `RainbowRandomizerTools.GetOperatorList` reads `R6_Attackers.txt` / `R6_Defenders.txt` from the working directory: copy them to the test output, or pass the list in.
 
 ### Not worth unit-testing
 
@@ -70,7 +84,7 @@ Don't use EF InMemory or SQLite: the schema uses the `SQL_Latin1_General_CP1_CI_
 - New project `Discord Bot GUI.Tests` targeting `net11.0-windows10.0.19041.0`, x64, `win-x64`, with a `ProjectReference` to the bot. Referencing a WinExe/WPF project from a test project works; the test project may need `<UseWPF>true</UseWPF>`.
 - `Directory.Build.props` applies to it automatically (analyzers, warnings as errors, banned APIs). It needs its own `<Nullable>enable</Nullable>`, like the other two projects.
 - Packages: xUnit v3 (or MSTest / NUnit), NSubstitute (or Moq), `Microsoft.Extensions.TimeProvider.Testing`.
-- Suggested order: (1) static tools + Mapster mapping tests, no code changes; (2) DB services with mocked repositories; (3) `TimeProvider` + `Global` → DI, then features; (4) Discord interfaces; (5) optional LocalDB repository tests.
+- Suggested order: (1) static tools + Mapster mapping tests, no code changes; (2) DB services with mocked repositories; (3) the Last.fm request interfaces, `IBrowserService` and `IWebTools`, then `LastFmAPI`, `BiasScrapingProcessor` and the who-knows embed; (4) `TimeProvider` + `Global` → DI, then features; (5) Discord interfaces; (6) YouTube and Spotify; (7) optional LocalDB repository tests.
 
 ## 3. Discord.Net: optional modernization (investigated 2026-11-15)
 
