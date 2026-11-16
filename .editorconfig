@@ -1,0 +1,50 @@
+# Root EditorConfig for the whole repository. Analyzer level and build enforcement are set in Directory.Build.props.
+# Visual Studio and `dotnet build` both read this file, so a warning here shows up in both.
+# Severity changes that silence a rule must say why (same rule as Properties/GlobalSuppressions.cs).
+root = true
+
+[*.cs]
+indent_style = space
+indent_size = 4
+
+#### Formatting: only the options that differ from the .NET defaults, matching the owner's Visual Studio settings ####
+csharp_space_after_cast = true
+csharp_indent_case_contents_when_block = false
+
+#### Code style preferences that differ from the .NET defaults ####
+csharp_style_namespace_declarations = file_scoped
+csharp_prefer_simple_using_statement = false
+csharp_style_expression_bodied_lambdas = when_on_single_line
+csharp_style_expression_bodied_local_functions = when_on_single_line
+
+#### Code style (IDE) rules: everything Visual Studio suggests is a build warning ####
+dotnet_analyzer_diagnostic.category-Style.severity = warning
+
+# Populate switch: a switch doesn't need a case for every enum value when the default branch covers the rest.
+dotnet_diagnostic.IDE0010.severity = suggestion
+dotnet_diagnostic.IDE0072.severity = suggestion
+
+#### Code quality (CA) rules: AnalysisLevel latest-recommended, with these exceptions ####
+
+# CA1304 / CA1311 (ToLower/ToUpper without a culture): lowercasing only differs from the invariant culture under Turkish,
+# Azerbaijani and Lithuanian cultures, which the bot's machines don't use (dev PC: hu-HU). Most calls are inside EF
+# queries, which SQL Server translates to LOWER() anyway.
+dotnet_diagnostic.CA1304.severity = none
+dotnet_diagnostic.CA1311.severity = none
+
+# CA1305 (IFormatProvider): integer ToString/Parse is the same in every culture for the values used here (Discord IDs,
+# counts). The rule stays on for double, DateTime and string.Format, where hu-HU really differs ("3,5", "2026. 11. 16.").
+dotnet_code_quality.CA1305.excluded_symbol_names = M:System.UInt64.ToString|M:System.UInt64.Parse(System.String)|M:System.Int64.ToString|M:System.Int32.ToString|M:System.Int32.Parse(System.String)|M:System.Byte.Parse(System.String)
+
+# CA1051 (visible instance fields): single-assembly app with no outside consumers. The protected fields on the base
+# classes (BaseCommand, BaseFeature, BaseService, ...) and Config's public fields are not a library API.
+dotnet_diagnostic.CA1051.severity = none
+
+# CA1707 (underscores in names): the root namespace is Discord_Bot, and Config's property names mirror config.json keys.
+dotnet_diagnostic.CA1707.severity = none
+
+# CA1711 (type name ends in "Enum"): project convention for every enum (ChannelTypeEnum, DbProcessResultEnum, ...).
+dotnet_diagnostic.CA1711.severity = none
+
+# CA1716 (names that are keywords in other .NET languages, e.g. Global, Date): only matters for VB consumers of a library.
+dotnet_diagnostic.CA1716.severity = none

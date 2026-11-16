@@ -14,7 +14,7 @@ A self-hosted Discord bot that runs as a **Windows WPF desktop app** (the window
 - `Latest_Release.sql`: the generated full deployment script for the current schema.
 - `diagram.drawio` / `diagram.png`: the DB diagram.
 
-There is no test project and no linter configured.
+There is no test project. Linting is done by analyzers during the build (see Linting).
 
 ## Commands
 
@@ -26,7 +26,19 @@ dotnet build "Discord Bot GUI/Discord Bot GUI.csproj"
 dotnet run --project "Discord Bot GUI/Discord Bot GUI.csproj"
 ```
 
-Build the projects rather than the `.sln`, because the solution includes `MainDB.sqlproj`, which needs Visual Studio/SSDT. The goal is a build with no warnings, so fix new warnings rather than ignoring them.
+```bash
+dotnet format "Discord Bot GUI/Discord Bot GUI.csproj" --verify-no-changes
+```
+
+Build the projects rather than the `.sln`, because the solution includes `MainDB.sqlproj`, which needs Visual Studio/SSDT. The goal is a build with no warnings, so fix new warnings rather than ignoring them. `dotnet format` without `--verify-no-changes` applies every fix it has (whitespace, style and analyzer code fixes such as CA1310), so review its diff. It covers one project at a time (run it for `LastFmApi/LastFmApi.csproj` too) and also reports IDE0001, which the build doesn't.
+
+## Linting
+
+- `Directory.Build.props` (repo root) gives both projects `AnalysisLevel=latest-recommended` and `EnforceCodeStyleInBuild`, so Visual Studio and `dotnet build` report the same warnings. `GenerateDocumentationFile` is on only so the build reports IDE0005 (unnecessary usings); CS1591 is off.
+- The root `.editorconfig` holds the formatting options (matching the owner's VS settings: a space after casts, `case` block braces not indented), the code style preferences (file-scoped namespaces, no simple `using` statements) and every severity change. All IDE style rules are warnings.
+- Silencing a rule needs a written reason, either as a comment in `.editorconfig` or in `Properties/GlobalSuppressions.cs`. CA1305 excludes integer `ToString`/`Parse` only; use `CultureInfo.InvariantCulture` for doubles, dates and `string.Format`.
+- The `Discord_Bot.Database` namespace is exempt from CA1309, CA1310 and CA1862 (GlobalSuppressions), because EF translates the lambdas passed to repositories into SQL and can't translate `StringComparison` overloads. Never apply those code fixes there (Code Cleanup will offer them if the suppressions go).
+- `Discord Bot GUI/Database/.editorconfig` only marks the scaffolded files as generated code. It must not get `root = true`, or the root file stops applying under `Database/`.
 
 ## Runtime requirements
 

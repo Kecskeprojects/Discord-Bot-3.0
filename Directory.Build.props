@@ -1,0 +1,11 @@
+<Project>
+	<!-- Shared by every project under the repo root. Rule severities and their justifications live in the root .editorconfig. -->
+	<PropertyGroup>
+		<AnalysisLevel>latest-recommended</AnalysisLevel>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<!-- Needed for IDE0005 (unnecessary using directives) to be reported by the build, not only in Visual Studio.
+		     CS1591 (missing XML comment on public members) is off: the doc file is a side effect, not documentation. -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>$(NoWarn);CS1591</NoWarn>
+	</PropertyGroup>
+</Project>
