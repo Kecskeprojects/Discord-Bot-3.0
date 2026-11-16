@@ -3,6 +3,7 @@ using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.Twitch;
 using Discord_Bot.Tools.NativeTools;
 using Newtonsoft.Json;
+using System;
 using System.Diagnostics;
 using System.IO;
 
@@ -33,7 +34,7 @@ public class TwitchCLI(BotLogger logger) : ITwitchCLI
             process.WaitForExit();
         }
 
-        response = response.Substring(response.IndexOf("Token: ") + 7, 30);
+        response = response.Substring(response.IndexOf("Token: ", StringComparison.Ordinal) + 7, 30);
         logger.Query($"Twitch API token: {response}");
         return response;
     }

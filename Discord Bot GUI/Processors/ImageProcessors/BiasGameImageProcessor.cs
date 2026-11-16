@@ -5,6 +5,7 @@ using Discord_Bot.Resources;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.Extensions;
 using ImageMagick;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -44,7 +45,7 @@ public class BiasGameImageProcessor(BotLogger logger)
         using MagickImage idolImage = new(idolImageStream);
         logger.Log("Format: " + idolImage.Format);
 
-        if (!idol.LatestImageUrl.StartsWith(Constant.DbKpopBaseUrl))
+        if (!idol.LatestImageUrl.StartsWith(Constant.DbKpopBaseUrl, StringComparison.Ordinal))
         {
             ImageTools.CorrectImageRatio(idolImage, acceptableMargin: 0, cutoffTopRatio: 0.1, extraHeight: 0.05);
         }

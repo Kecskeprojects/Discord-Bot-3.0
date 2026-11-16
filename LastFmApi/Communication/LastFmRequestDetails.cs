@@ -13,7 +13,7 @@ public class LastFmRequestDetails
 
         if (!string.IsNullOrWhiteSpace(UserName))
         {
-            if (Type.EndsWith("getInfo"))
+            if (Type.EndsWith("getInfo", StringComparison.Ordinal))
             {
                 FinalUrl += $"&username={UserName}";
             }

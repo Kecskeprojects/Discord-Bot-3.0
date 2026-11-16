@@ -100,7 +100,7 @@ public class InstaScraper(BotLogger logger) : IInstaScraper
 
         string caption = string.Join("\n\n", body.Data.XdtShortcodeMedia.EdgeMediaToCaption.Edges.Select(x => x.Node.Text));
         caption = caption.Split("\n\n#")[0];
-        int indexOfTag = caption.ToLower().LastIndexOf("tags:");
+        int indexOfTag = caption.ToLower().LastIndexOf("tags:", StringComparison.Ordinal);
         if (indexOfTag != -1)
         {
             caption = caption[..indexOfTag];

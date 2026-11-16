@@ -45,15 +45,15 @@ public class EasterEggFeature(
             {
                 MessageReference refer = new(Context.Message.Id, Context.Channel.Id, Context.Guild.Id, false);
                 string mess = Context.Message.Content.ToLower();
-                if (mess.StartsWith("i think"))
+                if (mess.StartsWith("i think", StringComparison.Ordinal))
                 {
                     _ = r.Next(0, 2) == 0
                         ? await Context.Channel.SendMessageAsync("I agree wholeheartedly!", messageReference: refer)
                         : await Context.Channel.SendMessageAsync(Context.Message.Content.ToMockText(), messageReference: refer);
                 }
-                else if ((mess.StartsWith("i am") && mess != "i am") || (mess.StartsWith("i'm") && mess != "i'm"))
+                else if ((mess.StartsWith("i am", StringComparison.Ordinal) && mess != "i am") || (mess.StartsWith("i'm", StringComparison.Ordinal) && mess != "i'm"))
                 {
-                    string message = string.Concat("Hey ", Context.Message.Content.AsSpan(mess.StartsWith("i am") ? 5 : 4), ", I'm Kim Synthji!");
+                    string message = string.Concat("Hey ", Context.Message.Content.AsSpan(mess.StartsWith("i am", StringComparison.Ordinal) ? 5 : 4), ", I'm Kim Synthji!");
                     _ = await Context.Channel.SendMessageAsync(message, messageReference: refer);
                 }
             }

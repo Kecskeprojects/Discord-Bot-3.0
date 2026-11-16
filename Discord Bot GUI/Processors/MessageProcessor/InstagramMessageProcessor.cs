@@ -21,7 +21,7 @@ public static class InstagramMessageProcessor
         if (!string.IsNullOrEmpty(caption))
         {
             string text = caption.Split("\n\n#")[0];
-            int indexOfTag = text.ToLower().LastIndexOf("tags:");
+            int indexOfTag = text.ToLower().LastIndexOf("tags:", StringComparison.Ordinal);
             if (indexOfTag != -1)
             {
                 text = text[..indexOfTag];
@@ -61,16 +61,16 @@ public static class InstagramMessageProcessor
 
         foreach (string file in orderedFiles)
         {
-            if (file.EndsWith(".txt"))
+            if (file.EndsWith(".txt", StringComparison.Ordinal))
             {
                 caption = File.ReadAllText(file);
                 continue;
             }
-            else if (file.EndsWith(".json"))
+            else if (file.EndsWith(".json", StringComparison.Ordinal))
             {
                 metadata = JsonConvert.DeserializeObject<InstaLoaderBase>(File.ReadAllText(file)).Node;
             }
-            else if (!ignoreVideos || file.EndsWith(".jpg") || file.EndsWith(".png"))
+            else if (!ignoreVideos || file.EndsWith(".jpg", StringComparison.Ordinal) || file.EndsWith(".png", StringComparison.Ordinal))
             {
                 attachments.Add(new FileAttachment(file));
             }

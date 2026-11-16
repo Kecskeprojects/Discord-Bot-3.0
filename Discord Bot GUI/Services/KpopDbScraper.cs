@@ -84,11 +84,11 @@ public class KpopDbScraper(BotLogger logger, BrowserService browserService) : IK
         {
             using (IBrowsingContext context = BrowsingContext.New(Configuration.Default))
             using (IPage mainPage = await browserService.NewPage())
-            using (IDocument document = await GetPageByUrl(context, mainPage, new Uri(url), url.StartsWith(Constant.KProfilesBaseUrl)))
+            using (IDocument document = await GetPageByUrl(context, mainPage, new Uri(url), url.StartsWith(Constant.KProfilesBaseUrl, StringComparison.Ordinal)))
             {
                 //A profile link could lead to dbkpop or kprofiles
                 idolData = new();
-                if (!url.StartsWith(Constant.KProfilesBaseUrl))
+                if (!url.StartsWith(Constant.KProfilesBaseUrl, StringComparison.Ordinal))
                 {
                     idolData.ImageUrl = document.QuerySelector(".attachment-post-thumbnail")?.GetAttribute("src");
                     await ScrapeGroupData(context, mainPage, document, idolData, getGroupData);

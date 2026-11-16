@@ -26,7 +26,7 @@ public static class UrlTools
                 int startIndex = 0;
                 while (startIndex != -1 && message.Length - 1 > startIndex)
                 {
-                    startIndex = message.IndexOf(baseURL, startIndex);
+                    startIndex = message.IndexOf(baseURL, startIndex, StringComparison.Ordinal);
 
                     if (startIndex == -1)
                     {
@@ -69,7 +69,7 @@ public static class UrlTools
         int startIndex = 0;
         while (startIndex != -1 && message.Length - 1 > startIndex)
         {
-            startIndex = message.IndexOf("https://", startIndex);
+            startIndex = message.IndexOf("https://", startIndex, StringComparison.Ordinal);
 
             if (startIndex == -1)
             {
