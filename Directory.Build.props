@@ -7,6 +7,11 @@
 		     CS1591 (missing XML comment on public members) is off: the doc file is a side effect, not documentation. -->
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);CS1591</NoWarn>
+		<!-- Every warning fails the build, in every configuration (the build reached zero warnings on 2026-11-16).
+		     Exception: NuGet audit warnings (NU1901-NU1904, a vulnerability published for a package in use) stay warnings,
+		     so a new advisory does not block unrelated work; they still show in every build. -->
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<WarningsNotAsErrors>$(WarningsNotAsErrors);NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
 	</PropertyGroup>
 	<ItemGroup>
 		<!-- Project rules enforced by the build: using anything listed in BannedSymbols.txt is warning RS0030 -->

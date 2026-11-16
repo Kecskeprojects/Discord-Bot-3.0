@@ -3,7 +3,7 @@ using LastFmApi.Enum;
 
 namespace LastFmApi;
 
-public class UtilityRequests
+public static class UtilityRequests
 {
     public static async Task<GenericResponseItem<int>> TotalPlays(string apiKey, string username, string period)
     {

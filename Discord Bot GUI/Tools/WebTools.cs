@@ -17,7 +17,7 @@ public static class WebTools
             Timeout = new TimeSpan(0, 3, 0)
         })
         {
-            HttpResponseMessage response = await wc.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+            HttpResponseMessage response = await wc.GetAsync(new Uri(url), HttpCompletionOption.ResponseHeadersRead);
             string contentType = response.Content.Headers.ContentType.MediaType;
             MagickTools.ConvertIfUnsupported(response.Content, contentType, imageData);
         }
@@ -33,7 +33,7 @@ public static class WebTools
             Timeout = new TimeSpan(0, 3, 0)
         })
         {
-            HttpResponseMessage response = await wc.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+            HttpResponseMessage response = await wc.GetAsync(new Uri(url), HttpCompletionOption.ResponseHeadersRead);
             return await response.Content.ReadAsStringAsync();
         }
     }

@@ -76,8 +76,5 @@ public static class InstagramMessageProcessor
                 attachments.Add(new FileAttachment(file));
             }
         }
-        for (int i = 0; i < orderedFiles.Count(); i++)
-        {
-        }
     }
 }

@@ -3,7 +3,7 @@ using LastFmApi.Enum;
 
 namespace LastFmApi;
 
-public class WhoKnowsRequests
+public static class WhoKnowsRequests
 {
     public static async Task<GenericResponseItem<WhoKnowsResponseItem>> WhoKnowsByCurrentlyPlayingAsync(string apiKey, string username, List<string> usernameList)
     {

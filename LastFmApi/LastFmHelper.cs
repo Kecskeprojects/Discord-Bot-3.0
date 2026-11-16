@@ -3,7 +3,7 @@ using LastFmApi.Enum;
 
 namespace LastFmApi;
 
-public class LastFmHelper
+public static class LastFmHelper
 {
     public static InputParameters LastfmParameterCheck(string[] parameters, bool defaultLimitTo10 = true)
     {

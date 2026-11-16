@@ -14,7 +14,7 @@ C# has no separate linter. Linting is done by **Roslyn analyzers** that run duri
 | `dotnet format` | Formatter and fixer; `--verify-no-changes` is the check mode | Available (part of the SDK), not run yet |
 | Third-party analyzers | Roslynator, Meziantou.Analyzer, StyleCop.Analyzers (strict style), SonarAnalyzer.CSharp, Microsoft.VisualStudio.Threading.Analyzers (async misuse) | None |
 | Nullable reference types | Compiler flags possible null dereferences | `<Nullable>disable</Nullable>` in both projects |
-| `TreatWarningsAsErrors` | Enforces the zero-warning goal | Off. The build reached zero warnings on 2026-11-16, so it can be turned on |
+| `TreatWarningsAsErrors` | Enforces the zero-warning goal | On since 2026-11-16, in every configuration (`Directory.Build.props`). NuGet audit warnings NU1901–NU1904 stay warnings |
 
 ### Trial run (2026-11-15)
 
@@ -36,7 +36,7 @@ A trial build with `-p:AnalysisLevel=latest-recommended -p:EnforceCodeStyleInBui
 1. **Done 2026-11-16.** `Directory.Build.props` at the repo root so both projects share `<AnalysisLevel>latest-recommended</AnalysisLevel>` and `<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>`.
 2. **Done 2026-11-16.** A root `.editorconfig` that silences the unwanted rules and keeps the rest as warnings (details below).
 3. Optionally `Microsoft.VisualStudio.Threading.Analyzers` for `async void`, `.Result` / `.Wait()` and unawaited tasks, which are common in Discord.Net handlers. Not added yet.
-4. `dotnet format` for formatting. Turn on `TreatWarningsAsErrors` only once at zero warnings.
+4. **Done 2026-11-16.** `dotnet format` for formatting. Turn on `TreatWarningsAsErrors` only once at zero warnings.
 5. Enable nullable reference types gradually, folder by folder with `#nullable enable`.
 
 ### Setup decisions (2026-11-16)
@@ -115,10 +115,35 @@ Trial builds on top of the zero-warning setup. Counts are new warnings.
 5. **Banned API list** (`Microsoft.CodeAnalysis.BannedApiAnalyzers` package + `BannedSymbols.txt`) to turn CLAUDE.md rules into build errors: `Console.*` (use `BotLogger`), `RunMode.Async` (rejected), `Assembly.GetEntryAssembly`, `SixLabors.*` (license). No current violations, so it's a guard only. `DateTime.Now` is better left off the list, because the 3 uses (`BotLoggerTools`, `DateTimeTools`) are deliberate local log times.
 6. **CA1508, dead conditional code** (5): `BotLogger.cs:24`, `AudioPlayFeature.cs:178`, `TwitterScraper.cs:96-97`, `ChannelTypeEnumTools.cs:26`. Useful, but this rule is known for false positives.
 
-**Not recommended**
-- The rest of `AnalysisLevel=latest-all` (2,184 warnings in total): CA2007 ConfigureAwait (880), CA1515 make types internal (387), CA1031 catch `Exception` (278, the project's convention), CA1062 validate arguments (183, nullable is the better tool), CA1002 / CA2227 / CA1056 library-design rules, and CA5394 insecure `Random` (games, not security). CA1849 (12) mostly flags `GetChannel` / `GetRole`, which are cache lookups in Discord.Net.
-- `Microsoft.VisualStudio.Threading.Analyzers`: a poor fit. 7 of the 8 `async void` methods are event handlers or overrides whose signatures require it, the 4 `.Result` hits are JSON properties named `Result`, and the only blocking wait is the deliberate 3-second shutdown wait. It would mostly add `Async`-suffix naming and VS-extension threading rules.
-- Nullable reference types for the whole project: 991 warnings (637 are CS8618, uninitialized non-nullable properties, mostly DTOs and models). Stay with the folder-by-folder plan above.
+**Not recommended at first: second look (investigated 2026-11-16, after the rules above were applied)**
+
+`AnalysisLevel=latest-all` now adds 2,145 warnings. Rule by rule:
+- Worth adding after all (cheap, no noise). **Added and fixed 2026-11-16, together with CA2234 below:**
+  - CA1052 (9): classes with only static members that aren't `static`. The 6 embed processors in `Processors/EmbedProcessors/Help` and `Polls`, plus `LastFmHelper`, `UtilityRequests` and `WhoKnowsRequests` in LastFmApi. All are now `static`.
+  - CA1851 (2): `InstagramMessageProcessor.ReadFiles` ended with an empty leftover loop, `for (int i = 0; i < orderedFiles.Count(); i++) { }`, which sorted the whole file list again on every iteration. Removed. (The Instagram embed is disabled.)
+- Worth fixing by hand, but not as a rule:
+  - CA1849 (12): half are real and half are false positives. Real: `CancellationTokenSource.Cancel` runs the cancellation callbacks on the calling thread (App, BotMain, UserVoiceCommands ×3), and `YoutubeStreamService.cs:51` blocks a thread in `Process.WaitForExit(TimeSpan)`. False positives: `GetChannel` ×4 and `GetRole` ×2 are cache lookups in Discord.Net's socket client.
+- Optional, explicitness only (no behavior change):
+  - CA1307 (38): spell out `StringComparison` on `Contains` / `Replace` / `EndsWith(char)`, which are already ordinal. None of them are in the Database namespace.
+  - CA1820 (15): `== ""` → `string.IsNullOrEmpty`. Not a pure rename: `IsNullOrEmpty` also accepts null.
+  - CA2234 (2): `WebTools` passes URLs to `HttpClient` as strings. **Added and fixed 2026-11-16** (`new Uri(url)`).
+- Not worth it, for reasons specific to this code:
+  - CA2007 ConfigureAwait (881): the Discord.Net handlers already run on the thread pool, where it changes nothing. Only the WPF UI code (`App`, `BotWindow`) has a synchronization context, and there `ConfigureAwait(false)` would be wrong before UI access.
+  - CA1515 make types internal (387): Discord.Net only discovers public command and interaction modules, so applying the code fix would make commands disappear.
+  - CA1031 catch `Exception` (279): the project's convention; handlers log and carry on.
+  - CA1062 validate arguments (182): nullable reference types are the better tool.
+  - CA1002 (123), CA2227 (80), CA1819 (4), CA1034 + CA1815 (3, `Config.ConfigModel`): library API design. The settable collections and arrays are what Mapster, JSON and Discord.Net (`Embed[]`) work with.
+  - CA1056 / CA1054 / CA1055 (76): URLs come from the database, JSON and the config as strings.
+  - CA1724 (24): type names such as `Log`, `User`, `Owner` and `Data` that also exist as namespaces. Renaming churn with no effect on behavior.
+  - CA5394 (20): `Random` for games and easter eggs, not security.
+  - CA1008 (5): these enums start at 1 on purpose (database IDs, command levels), so a `None = 0` would mean nothing.
+
+`Microsoft.VisualStudio.Threading.Analyzers` 18.12.1, trial build (180 warnings): VSTHRD200 `Async` suffix (153, mostly command methods, whose names Discord.Net doesn't care about), VSTHRD202 return the task directly (9), VSTHRD100 `async void` (8, all event handlers or overrides, all guarded now), VSTHRD103 (6, the same `GetChannel` / `GetRole` false positives), VSTHRD001 (3, Visual Studio extension threading rules), VSTHRD002 (1, the deliberate 3-second shutdown wait). Nothing new; not worth adding.
+
+Nullable reference types for the whole project (992 warnings):
+- About 620 are CS8618, uninitialized non-nullable properties, in the JSON / API / DTO models: `Services/Models` (354), LastFmApi (204, mostly models), `Resources` (55), `Communication` (40).
+- The logic folders are small: `Tools` 19 (10 files), `Commands` 19, `Processors` 21, `Features` 16, `Interactions` 14, `Core` 16, `Windows` 8, root files 46 (`App`, `BotMain`, the handlers), service code 74, `Database` 92.
+- Suggested order: `#nullable enable` in `Tools` first, then `Features`, `Processors`, `Commands` and `Interactions`. Leave the model folders for last, or keep nullable off there.
 
 **Found on the way**
 - **Done 2026-11-16:** `App.StartTwitchMonitor` was `async void` without a try/catch on its own thread. `TwitchAPI.Start()` catches its own exceptions, but creating the scope or constructing `TwitchAPI` and its dependencies (e.g. `Config` with a broken config file) could still throw and end the process. It now logs instead.

@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Discord_Bot.Processors.EmbedProcessors.Polls;
 
-public class PollEditEmbedProcessor
+public static class PollEditEmbedProcessor
 {
     public static Embed[] CreateEmbed(WeeklyPollEditResource poll, bool isEdit)
     {

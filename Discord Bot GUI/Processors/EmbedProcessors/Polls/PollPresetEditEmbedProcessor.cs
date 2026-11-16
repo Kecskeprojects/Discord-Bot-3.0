@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Discord_Bot.Processors.EmbedProcessors.Polls;
 
-public class PollPresetEditEmbedProcessor
+public static class PollPresetEditEmbedProcessor
 {
     public static Embed[] CreateEmbed(WeeklyPollOptionPresetResource preset, bool isEdit)
     {

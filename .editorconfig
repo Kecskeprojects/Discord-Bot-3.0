@@ -47,10 +47,14 @@ dotnet_naming_style.pascal_case.capitalization = pascal_case
 #### Code quality (CA) rules: AnalysisLevel latest-recommended, with these additions and exceptions ####
 
 # Added on top of latest-recommended: CA2000 (dispose objects before losing scope), CA1063 (implement IDisposable
-# correctly) and CA1508 (dead conditional code, on trial: it is known for false positives).
+# correctly), CA1508 (dead conditional code, on trial: it is known for false positives), CA1052 (classes with only
+# static members are static), CA1851 (an IEnumerable enumerated more than once) and CA2234 (pass Uri, not string).
 dotnet_diagnostic.CA2000.severity = warning
 dotnet_diagnostic.CA1063.severity = warning
 dotnet_diagnostic.CA1508.severity = warning
+dotnet_diagnostic.CA1052.severity = warning
+dotnet_diagnostic.CA1851.severity = warning
+dotnet_diagnostic.CA2234.severity = warning
 
 # CA1304 / CA1311 (ToLower/ToUpper without a culture): lowercasing only differs from the invariant culture under Turkish,
 # Azerbaijani and Lithuanian cultures, which the bot's machines don't use (dev PC: hu-HU). Most calls are inside EF

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Discord_Bot.Processors.EmbedProcessors.Polls;
 
-public class PollPresetListEmbedProcessor
+public static class PollPresetListEmbedProcessor
 {
     public static Embed[] CreateEmbed(List<WeeklyPollOptionPresetResource> list)
     {
