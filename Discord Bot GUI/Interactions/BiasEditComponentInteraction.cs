@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.Interactions;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Communication.Modal;
@@ -52,7 +54,7 @@ public class BiasEditComponentInteraction : BaseInteraction
 
             BiasEditData data = new(selectedAction[0]);
 
-            if (Actions.TryGetValue(data.Action, out Func<string, string, Task> value))
+            if (Actions.TryGetValue(data.Action, out Func<string, string, Task>? value))
             {
                 //To streamline the process we use a dictionary instead of a switch
                 await value.Invoke(data.BiasName, data.BiasGroupName);

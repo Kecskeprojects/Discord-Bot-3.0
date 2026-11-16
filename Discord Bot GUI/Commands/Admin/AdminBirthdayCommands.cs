@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.Commands;
 using Discord.Rest;
 using Discord_Bot.Core;
@@ -35,7 +37,7 @@ public class AdminBirthdayCommands(
             string userIdOrName = parameters.Split('>')[0].Trim().ToLower();
             string dateString = parameters.Split('>')[1].Trim().ToLower();
 
-            IUser user = null;
+            IUser? user = null;
             if (ulong.TryParse(userIdOrName, out ulong id))
             {
                 user = await Context.Client.GetUserAsync(id);

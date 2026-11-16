@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication;
+﻿#nullable enable
+
+using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.Extensions;
@@ -16,7 +18,8 @@ public class WhoKnowsImageProcessor(BotLogger logger)
     private readonly BotLogger logger = logger;
 
     //Our image size will be 800*500 in the end
-    public EditPictureResult EditPicture(Stream originalImg, Dictionary<string, int> plays, string HeadText)
+    //Null when the image could not be made, the error is logged
+    public EditPictureResult? EditPicture(Stream originalImg, Dictionary<string, int> plays, string HeadText)
     {
         try
         {

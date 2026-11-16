@@ -1,4 +1,6 @@
-﻿using Discord.WebSocket;
+﻿#nullable enable
+
+using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Resources;
 using System;

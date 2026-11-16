@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 
 namespace Discord_Bot.Processors.EmbedProcessors.BiasGame;
 

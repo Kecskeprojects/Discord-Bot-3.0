@@ -1,4 +1,6 @@
-﻿using Discord.Rest;
+﻿#nullable enable
+
+using Discord.Rest;
 using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces.DBServices;
@@ -21,7 +23,7 @@ public class SelfRoleFeature(
         {
             RoleResource role = await roleService.GetRoleAsync(Context.Guild.Id, Context.Message.Content[1..].ToLower());
 
-            RestUserMessage reply = null;
+            RestUserMessage? reply = null;
             if (role != null)
             {
                 SocketRole discordRole = Context.Guild.GetRole(role.DiscordId);
@@ -30,13 +32,13 @@ public class SelfRoleFeature(
                 {
                     case '+':
                     {
-                        await (Context.User as SocketGuildUser).AddRoleAsync(discordRole);
+                        await ((SocketGuildUser) Context.User).AddRoleAsync(discordRole);
                         reply = await Context.Channel.SendMessageAsync($"You now have the `{discordRole.Name}` role!");
                         break;
                     }
                     case '-':
                     {
-                        await (Context.User as SocketGuildUser).RemoveRoleAsync(discordRole);
+                        await ((SocketGuildUser) Context.User).RemoveRoleAsync(discordRole);
                         reply = await Context.Channel.SendMessageAsync($"`{discordRole.Name}` role has been removed!");
                         break;
                     }

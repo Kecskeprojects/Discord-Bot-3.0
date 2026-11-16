@@ -4,12 +4,13 @@ using Discord_Bot.Communication;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Discord_Bot.Tools.NativeTools;
 
 public static class CollectionTools
 {
-    public static bool IsNullOrEmpty<T>(T collection) where T : ICollection
+    public static bool IsNullOrEmpty<T>([NotNullWhen(false)] T? collection) where T : ICollection
     {
         return collection == null || collection.Count == 0;
     }

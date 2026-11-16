@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Enums;
@@ -33,37 +35,49 @@ public class UnmuteFeature(
             {
                 foreach (ServerMutedUserResource mutedUser in result)
                 {
-                    SocketGuild server = client.GetGuild(ulong.Parse(mutedUser.ServerDiscordId));
+                    ulong serverId = ulong.Parse(mutedUser.ServerDiscordId);
+                    ulong userId = ulong.Parse(mutedUser.UserDiscordId);
 
-                    await server.DownloadUsersAsync();
-                    SocketGuildUser user = server.GetUser(ulong.Parse(mutedUser.UserDiscordId));
-
-                    ServerResource serverData = await serverService.GetByDiscordIdAsync(server.Id);
-
-                    if (serverData.MuteRoleDiscordId == null)
+                    //The bot may have left the server, or the user may have left it (which also drops their roles)
+                    SocketGuild? server = client.GetGuild(serverId);
+                    SocketGuildUser? user = null;
+                    if (server != null)
                     {
-                        logger.Log($"Server {serverData.DiscordId} does not have a mute role.");
-                    }
-                    else
-                    {
-                        await user.RemoveRoleAsync(serverData.MuteRoleDiscordId.Value);
+                        await server.DownloadUsersAsync();
+                        user = server.GetUser(userId);
                     }
 
-                    if (string.IsNullOrEmpty(mutedUser.RemovedRoleDiscordIds))
+                    if (server != null && user != null)
                     {
-                        logger.Log($"User {mutedUser.UserDiscordId} does not have roles that need to be reassigned.");
-                    }
-                    else
-                    {
-                        await user.AddRolesAsync(mutedUser.RemovedRoleDiscordIds.Split(";").Select(ulong.Parse));
-                    }
+                        ServerResource serverData = await serverService.GetByDiscordIdAsync(server.Id);
 
-                    //If user exists send a direct message to the user
-                    if (user != null)
-                    {
+                        if (serverData.MuteRoleDiscordId == null)
+                        {
+                            logger.Log($"Server {serverData.DiscordId} does not have a mute role.");
+                        }
+                        else
+                        {
+                            await user.RemoveRoleAsync(serverData.MuteRoleDiscordId.Value);
+                        }
+
+                        if (string.IsNullOrEmpty(mutedUser.RemovedRoleDiscordIds))
+                        {
+                            logger.Log($"User {mutedUser.UserDiscordId} does not have roles that need to be reassigned.");
+                        }
+                        else
+                        {
+                            await user.AddRolesAsync(mutedUser.RemovedRoleDiscordIds.Split(";").Select(ulong.Parse));
+                        }
+
                         _ = await user.SendMessageAsync($"You have now been unmuted in '**{server.Name}**'.");
                     }
-                    DbProcessResultEnum reminderResult = await serverMutedUserService.RemoveMutedUserAsync(server.Id, user.Id);
+                    else
+                    {
+                        //Removing the entry anyway, otherwise this user would fail every minute and stop the users after them from being unmuted
+                        logger.Log($"Server {serverId} or user {userId} is not available anymore, only the mute entry is removed.");
+                    }
+
+                    DbProcessResultEnum reminderResult = await serverMutedUserService.RemoveMutedUserAsync(serverId, userId);
                     if (reminderResult == DbProcessResultEnum.Failure)
                     {
                         logger.Error("UnmuteFeature.cs ExecuteCoreLogicAsync", "Failure during automatic unmuting process!");

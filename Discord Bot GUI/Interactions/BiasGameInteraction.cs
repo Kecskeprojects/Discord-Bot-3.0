@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Discord_Bot.Communication.Bias;
@@ -31,7 +33,7 @@ public class BiasGameInteraction(
     {
         try
         {
-            if (Context.User.Id != userId || !Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData data))
+            if (Context.User.Id != userId || !Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData? data))
             {
                 await RespondAsync("You are not the owner of this interaction.", ephemeral: true);
                 return;
@@ -69,7 +71,7 @@ public class BiasGameInteraction(
     {
         try
         {
-            if (Context.User.Id != userId || !Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData data))
+            if (Context.User.Id != userId || !Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData? data))
             {
                 await RespondAsync("You are not the owner of this interaction.", ephemeral: true);
                 return;
@@ -88,7 +90,7 @@ public class BiasGameInteraction(
 
             logger.Log($"BiasGame Setup Debut Chosen: {string.Join(", ", chosenYears)}", LogOnly: true);
 
-            SocketMessageComponent component = Context.Interaction as SocketMessageComponent;
+            SocketMessageComponent component = (SocketMessageComponent) Context.Interaction;
 
             ComponentBuilder waitButton = new ComponentBuilder()
                 .WithButton("Your game is being set up...", "BiasGame_Setup_Debut_Disabled", disabled: true, style: ButtonStyle.Secondary);

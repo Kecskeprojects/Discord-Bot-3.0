@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.Commands;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
@@ -337,7 +339,7 @@ public class UserLastfmCommands(
             }
 
             List<UserResource> users = await userService.GetAllLastFmUsersAsync();
-            UserResource currentUser = users.FirstOrDefault(user => user.DiscordId == Context.User.Id);
+            UserResource? currentUser = users.FirstOrDefault(user => user.DiscordId == Context.User.Id);
             if ((currentUser == null || string.IsNullOrEmpty(currentUser.LastFmUsername)) && string.IsNullOrEmpty(parameters))
             {
                 _ = await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");

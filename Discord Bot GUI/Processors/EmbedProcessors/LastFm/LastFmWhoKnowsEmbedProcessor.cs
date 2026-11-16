@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Processors.ImageProcessors;
@@ -28,7 +30,7 @@ public class LastFmWhoKnowsEmbedProcessor(WhoKnowsImageProcessor whoKnowsImagePr
             using (MemoryStream originalImage = await WebTools.GetStream(wk.ImageUrl))
             {
                 //Edit the picture to the list format
-                EditPictureResult modifiedImage = whoKnowsImageProcessor.EditPicture(originalImage, wk.Plays, wk.EmbedTitle);
+                EditPictureResult? modifiedImage = whoKnowsImageProcessor.EditPicture(originalImage, wk.Plays, wk.EmbedTitle);
 
                 if (modifiedImage != null)
                 {

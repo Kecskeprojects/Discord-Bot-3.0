@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.Commands;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
@@ -61,7 +63,7 @@ public class BaseCommand(BotLogger logger, Config config, IServerService serverS
 
     protected ServerAudioResource GetCurrentAudioResource()
     {
-        if (!Global.ServerAudioResources.TryGetValue(Context.Guild.Id, out ServerAudioResource audioResource))
+        if (!Global.ServerAudioResources.TryGetValue(Context.Guild.Id, out ServerAudioResource? audioResource))
         {
             audioResource = new(Context.Guild.Id);
             _ = Global.ServerAudioResources.TryAdd(Context.Guild.Id, audioResource);

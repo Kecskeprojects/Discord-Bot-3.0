@@ -1,4 +1,6 @@
-﻿using Discord.WebSocket;
+﻿#nullable enable
+
+using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
@@ -47,10 +49,17 @@ public class BirthdayFeature(
     {
         ServerResource server = await serverService.GetByDiscordIdAsync(birthday.ServerDiscordId);
 
-        if (server.SettingsChannels.TryGetValue(ChannelTypeEnum.BirthdayText, out List<ulong> channels))
+        if (server.SettingsChannels.TryGetValue(ChannelTypeEnum.BirthdayText, out List<ulong>? channels))
         {
-            ISocketMessageChannel channel = client.GetChannel(channels[0]) as ISocketMessageChannel;
-            SocketGuild guild = client.GetGuild(birthday.ServerDiscordId);
+            SocketGuild? guild = client.GetGuild(birthday.ServerDiscordId);
+
+            //A deleted channel or a server the bot left is skipped, so the birthdays of the other servers are still sent
+            if (client.GetChannel(channels[0]) is not ISocketMessageChannel channel || guild == null)
+            {
+                logger.Warning("BirthdayFeature.cs SendBirthdayMessageAsync", $"Birthday channel {channels[0]} or server {birthday.ServerDiscordId} is not available.");
+                return;
+            }
+
             await guild.DownloadUsersAsync();
 
             string message = BirthdayMessageProcessor.CreateMessage(birthday, guild);

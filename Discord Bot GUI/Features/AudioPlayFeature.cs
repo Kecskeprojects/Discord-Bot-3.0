@@ -1,4 +1,6 @@
-﻿using Discord.Commands;
+﻿#nullable enable
+
+using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
@@ -98,7 +100,7 @@ public class AudioPlayFeature(
         //First connection
         if (audioResource.AudioVariables.FallbackVoiceChannelId == 0)
         {
-            SocketVoiceChannel channel = (context.User as SocketGuildUser).VoiceChannel;
+            SocketVoiceChannel channel = ((SocketGuildUser) context.User).VoiceChannel;
 
             if (channel == null)
             {

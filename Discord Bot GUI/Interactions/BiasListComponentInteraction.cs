@@ -1,4 +1,6 @@
-﻿using Discord.Interactions;
+﻿#nullable enable
+
+using Discord.Interactions;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Interfaces.DBServices;

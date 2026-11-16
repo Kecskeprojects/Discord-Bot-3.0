@@ -1,4 +1,6 @@
-﻿//using Discord;
+﻿#nullable enable
+
+//using Discord;
 //using Discord.Commands;
 //using Discord.Net;
 //using Discord_Bot.Communication;

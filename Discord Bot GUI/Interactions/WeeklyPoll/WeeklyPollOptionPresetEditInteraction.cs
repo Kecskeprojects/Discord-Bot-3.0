@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.Interactions;
 using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;

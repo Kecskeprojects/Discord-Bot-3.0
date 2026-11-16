@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.WebSocket;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
@@ -29,7 +31,7 @@ public class TwitchNotificationFeature(
             ServerResource server = await serverService.GetByDiscordIdAsync(data.TwitchChannel.ServerDiscordId);
 
             //Do not send a message if a channel was not set
-            if (server.SettingsChannels.TryGetValue(ChannelTypeEnum.TwitchNotificationText, out List<ulong> notificationChannels))
+            if (server.SettingsChannels.TryGetValue(ChannelTypeEnum.TwitchNotificationText, out List<ulong>? notificationChannels))
             {
                 foreach (ulong channelId in notificationChannels)
                 {

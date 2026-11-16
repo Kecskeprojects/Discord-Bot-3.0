@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication;
+﻿#nullable enable
+
+using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Properties;
 using Discord_Bot.Resources;

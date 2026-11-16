@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.Interactions;
 using Discord.Rest;
 using Discord.WebSocket;
@@ -35,10 +37,10 @@ public class WeeklyPollEditInteraction(
         {
             WeeklyPollResource resource = await weeklyPollService.GetPollByIdAsync(pollId);
 
-            RestRole role = resource.RoleDiscordId.HasValue
+            RestRole? role = resource.RoleDiscordId.HasValue
                 ? await Context.Guild.GetRoleAsync(resource.RoleDiscordId.Value)
                 : null;
-            SocketGuildChannel channel = resource.ChannelDiscordId.HasValue
+            SocketGuildChannel? channel = resource.ChannelDiscordId.HasValue
                 ? Context.Guild.GetChannel(resource.ChannelDiscordId.Value)
                 : null;
 
@@ -69,13 +71,13 @@ public class WeeklyPollEditInteraction(
             await DeferAsync();
             logger.Log($"Edit Poll Modal Submitted for poll with ID {pollId}", LogOnly: true);
 
-            SocketGuildChannel channel = Context.Guild.Channels.FirstOrDefault(x => x.Name.Equals(modal.Channel.Trim(), StringComparison.OrdinalIgnoreCase));
+            SocketGuildChannel? channel = Context.Guild.Channels.FirstOrDefault(x => x.Name.Equals(modal.Channel.Trim(), StringComparison.OrdinalIgnoreCase));
             if (channel == null)
             {
                 await RespondAsync("Channel not found!");
                 return;
             }
-            SocketRole role = Context.Guild.Roles.FirstOrDefault(x => x.Name.Equals(modal.Role.Trim(), StringComparison.OrdinalIgnoreCase));
+            SocketRole? role = Context.Guild.Roles.FirstOrDefault(x => x.Name.Equals(modal.Role.Trim(), StringComparison.OrdinalIgnoreCase));
 
             DbProcessResultEnum result = await weeklyPollService.UpdateAsync(pollId, modal, channel.Id, role?.Id, role?.Name);
             if (result == DbProcessResultEnum.Success)

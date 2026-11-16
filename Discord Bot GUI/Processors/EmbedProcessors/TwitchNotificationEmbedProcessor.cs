@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord_Bot.Resources;
 
 namespace Discord_Bot.Processors.EmbedProcessors;

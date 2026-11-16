@@ -1,4 +1,6 @@
-﻿using Discord.Commands;
+﻿#nullable enable
+
+using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Bot.Communication;
 using Discord_Bot.Communication.Bias;

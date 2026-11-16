@@ -3,6 +3,7 @@
 using Discord_Bot.Enums;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Discord_Bot.Tools;
@@ -22,7 +23,7 @@ public static class ChannelTypeEnumTools
     }
 
     //None is not a real channel type (it has no database row), so its command text is not accepted
-    public static bool TryGetEnumFromCommandText(string value, out ChannelTypeEnum? enumItem)
+    public static bool TryGetEnumFromCommandText(string value, [NotNullWhen(true)] out ChannelTypeEnum? enumItem)
     {
         foreach (ChannelTypeEnum item in Enum.GetValues<ChannelTypeEnum>())
         {

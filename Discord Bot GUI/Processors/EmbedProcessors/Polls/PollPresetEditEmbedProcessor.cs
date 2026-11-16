@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord_Bot.Resources;
 using System.Linq;
 
@@ -61,7 +63,7 @@ public static class PollPresetEditEmbedProcessor
         //Values can be separated by the _ character so that we have both an order number and an ID as values
         for (int i = 0; i < 10; i++)
         {
-            WeeklyPollOptionResource option = preset.Options.FirstOrDefault(x => x.OrderNumber == i);
+            WeeklyPollOptionResource? option = preset.Options.FirstOrDefault(x => x.OrderNumber == i);
             _ = option != null
                 ? optionPresetSelect.AddOption($"{i + 1}# {option.Title}", $"{i}_{option.WeeklyPollOptionPresetId}")
                 : optionPresetSelect.AddOption($"{i + 1}#", $"{i}_0");

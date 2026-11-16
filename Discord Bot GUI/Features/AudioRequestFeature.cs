@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.WebSocket;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
@@ -26,7 +28,7 @@ public class AudioRequestFeature(
         try
         {
             string input = (string) Parameters;
-            if (string.IsNullOrEmpty(input) || (Context.User as SocketGuildUser).VoiceChannel == null)
+            if (string.IsNullOrEmpty(input) || Context.User is not SocketGuildUser { VoiceChannel: not null })
             {
                 return false;
             }

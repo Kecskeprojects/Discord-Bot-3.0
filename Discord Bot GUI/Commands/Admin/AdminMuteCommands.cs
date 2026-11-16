@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.Commands;
 using Discord.Rest;
 using Discord.WebSocket;
@@ -64,7 +66,7 @@ public class AdminMuteCommands(
                                 ? parameters.Split('>')[1].Trim().ToLower()
                                 : "5000y";
 
-            IUser user = null;
+            IUser? user = null;
             if (ulong.TryParse(userIdOrName, out ulong id))
             {
                 user = await Context.Client.GetUserAsync(id);

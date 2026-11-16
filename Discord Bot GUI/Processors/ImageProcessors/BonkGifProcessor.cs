@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Properties;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.Extensions;
@@ -13,7 +15,8 @@ public class BonkGifProcessor(BotLogger logger)
 {
     private readonly BotLogger logger = logger;
 
-    public MemoryStream CreateBonkImage(Stream stream, int delay)
+    //Null when the gif could not be made, the error is logged
+    public MemoryStream? CreateBonkImage(Stream stream, int delay)
     {
         try
         {

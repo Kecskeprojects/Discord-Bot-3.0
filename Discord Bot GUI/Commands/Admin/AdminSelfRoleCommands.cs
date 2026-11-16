@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.Commands;
 using Discord.Rest;
 using Discord.WebSocket;
@@ -81,12 +83,17 @@ public class AdminSelfRoleCommands(
         {
             ServerResource server = await GetCurrentServerAsync();
 
-            if (!server.SettingsChannels.TryGetValue(ChannelTypeEnum.RoleText, out List<ulong> roleChannels))
+            if (!server.SettingsChannels.TryGetValue(ChannelTypeEnum.RoleText, out List<ulong>? roleChannels))
             {
                 return;
             }
 
-            ISocketMessageChannel channel = Context.Client.GetChannel(roleChannels[0]) as ISocketMessageChannel;
+            if (Context.Client.GetChannel(roleChannels[0]) is not ISocketMessageChannel channel)
+            {
+                _ = await ReplyAsync("The role channel could not be found, it may have been deleted.");
+                return;
+            }
+
             if (server.RoleMessageDiscordId.HasValue)
             {
                 IMessage previousMessage = await channel.GetMessageAsync(server.RoleMessageDiscordId.Value);

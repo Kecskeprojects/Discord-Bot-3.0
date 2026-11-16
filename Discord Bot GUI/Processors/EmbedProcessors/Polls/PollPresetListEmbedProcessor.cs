@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord_Bot.Resources;
 using System.Collections.Generic;
 

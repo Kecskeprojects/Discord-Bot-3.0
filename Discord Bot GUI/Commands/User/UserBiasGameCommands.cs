@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.Commands;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
@@ -35,7 +37,7 @@ public class UserBiasGameCommands(
                 return;
             }
 
-            if (Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData data))
+            if (Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData? data))
             {
                 if (data.StartedAt > DateTime.UtcNow.AddMinutes(-30))
                 {
@@ -76,7 +78,7 @@ public class UserBiasGameCommands(
                 return;
             }
 
-            if (Global.BiasGames.TryRemove(Context.User.Id, out BiasGameData data))
+            if (Global.BiasGames.TryRemove(Context.User.Id, out BiasGameData? data))
             {
                 using (data)
                 {

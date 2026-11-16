@@ -1,4 +1,6 @@
-﻿using Discord.Commands;
+﻿#nullable enable
+
+using Discord.Commands;
 using Discord.Rest;
 using Discord.WebSocket;
 using Discord_Bot.Core;
@@ -92,9 +94,13 @@ public class UserBonkCommands(
             {
                 logger.Query($"Getting profile image:\n{url}");
                 using (MemoryStream stream = await WebTools.GetStream(url))
-                using (MemoryStream gifStream = bonkGifProcessor.CreateBonkImage(stream, frameDelay))
+                using (MemoryStream? gifStream = bonkGifProcessor.CreateBonkImage(stream, frameDelay))
                 {
-                    _ = await Context.Channel.SendFileAsync(gifStream, $"bonk_{userName}.gif");
+                    //Null when the gif could not be made, the processor already logged why
+                    if (gifStream != null)
+                    {
+                        _ = await Context.Channel.SendFileAsync(gifStream, $"bonk_{userName}.gif");
+                    }
                 }
             }
         }

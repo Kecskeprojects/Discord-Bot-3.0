@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Discord_Bot.Core;
@@ -52,7 +54,7 @@ public class BiasGameStatInteraction(
 
             MessageComponent component = BiasGameStatEmbedProcessor.CreateComponent(chosenGender, Context.User.Id);
 
-            SocketMessageComponent message = Context.Interaction as SocketMessageComponent;
+            SocketMessageComponent message = (SocketMessageComponent) Context.Interaction;
             _ = await ModifyOriginalResponseAsync(x =>
             {
                 x.Embeds = embed;

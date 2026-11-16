@@ -13,7 +13,7 @@ C# has no separate linter. Linting is done by **Roslyn analyzers** that run duri
 | `.editorconfig` | Rule severities, formatting, naming | Root file with formatting options matching the owner's VS settings, code style preferences and severities. `Database/.editorconfig` only marks generated code |
 | `dotnet format` | Formatter and fixer; `--verify-no-changes` is the check mode | Available (part of the SDK), not run yet |
 | Third-party analyzers | Roslynator, Meziantou.Analyzer, StyleCop.Analyzers (strict style), SonarAnalyzer.CSharp, Microsoft.VisualStudio.Threading.Analyzers (async misuse) | None |
-| Nullable reference types | Compiler flags possible null dereferences | `<Nullable>disable</Nullable>` in both projects, turned on per file with `#nullable enable`: `Tools/` since 2026-11-16 |
+| Nullable reference types | Compiler flags possible null dereferences | `<Nullable>disable</Nullable>` in both projects, turned on per file with `#nullable enable`: `Tools/`, `Features/`, `Processors/`, `Commands/` and `Interactions/` since 2026-11-16 |
 | `TreatWarningsAsErrors` | Enforces the zero-warning goal | On since 2026-11-16, in every configuration (`Directory.Build.props`). NuGet audit warnings NU1901–NU1904 stay warnings |
 
 ### Trial run (2026-11-15)
@@ -37,7 +37,7 @@ A trial build with `-p:AnalysisLevel=latest-recommended -p:EnforceCodeStyleInBui
 2. **Done 2026-11-16.** A root `.editorconfig` that silences the unwanted rules and keeps the rest as warnings (details below).
 3. Optionally `Microsoft.VisualStudio.Threading.Analyzers` for `async void`, `.Result` / `.Wait()` and unawaited tasks, which are common in Discord.Net handlers. Not added yet.
 4. **Done 2026-11-16.** `dotnet format` for formatting. Turn on `TreatWarningsAsErrors` only once at zero warnings.
-5. Enable nullable reference types gradually, folder by folder with `#nullable enable`. **In progress:** `Tools/` done 2026-11-16 (details under "Nullable reference types" below).
+5. Enable nullable reference types gradually, folder by folder with `#nullable enable`. **In progress:** `Tools/`, `Features/`, `Processors/`, `Commands/` and `Interactions/` done 2026-11-16 (details under "Nullable reference types" below). Left: `Services/`, `Database/`, `Core/`, `Communication/`, `Resources/`, `Windows/`, the root files and LastFmApi.
 
 ### Setup decisions (2026-11-16)
 
@@ -147,6 +147,16 @@ Nullable reference types for the whole project (992 warnings):
 - **`Tools/` done 2026-11-16:** `#nullable enable` at the top of all 23 files, 18 warnings fixed. With `TreatWarningsAsErrors` on, a folder can only be switched on once all its warnings are fixed. Files outside converted folders stay oblivious, so callers there are not affected.
   - Annotated as nullable because they return or accept null on purpose: `UrlTools.LinkSearch` / `SanitizeText`, `StringTools.AddNumberPositionIdentifier`, the `server` parameter of `DiscordTools.IsTypeOfChannel`, the optional `user` of `GetNickName`, and the `contentType` of `MagickTools.ConvertIfUnsupported`. `StringExtension.UrlCombine` returns null only when both parts are null, which `[NotNullIfNotNull]` expresses, so URLs built from constants stay non-null for callers.
   - Behavior changes: `WebTools.GetStream` threw a NullReferenceException for a response without a Content-Type header, and now copies the data as it is. `DiscordTools.GetNickNameBase` threw when the user in a server channel wasn't a `SocketGuildUser`, and now falls back to the username. `MagickTools.MeasureText` and `ImageTools.GetDominantColor` throw an `InvalidOperationException` with a message where Magick.NET returns null (only when its native call fails), instead of a NullReferenceException in the caller. `ProcessExtension.GetChildProcesses` filters with `OfType<Process>()`.
+- **`Features/`, `Processors/`, `Commands/`, `Interactions/` done 2026-11-16:** `#nullable enable` in all 85 files, 68 warnings fixed.
+  - Mostly annotations: `out` variables of `TryGetValue` / `TryRemove`, optional `IChannel` / `IUser` command parameters, and `FirstOrDefault` results that are already null-checked. Two helpers in `Tools` got attributes so callers know the result after the check: `CollectionTools.IsNullOrEmpty` (`[NotNullWhen(false)]`) and `ChannelTypeEnumTools.TryGetEnumFromCommandText` (`[NotNullWhen(true)]`).
+  - `BaseFeature.Context` / `Parameters` are `= null!`: `Run(...)` sets them before `ExecuteCoreLogicAsync`, and features started without them never read them. A nullable type would have meant a null check in every feature.
+  - `as` casts that can't fail became casts that state the assumption: `(SocketGuildUser) Context.User` in guild-only features and `(SocketMessageComponent) Context.Interaction` in component handlers. `AudioRequestFeature` uses `Context.User is not SocketGuildUser { VoiceChannel: not null }`.
+  - Bugs fixed:
+    - `UnmuteFeature` checked `user != null` only for the DM. When a muted user (or the bot) had left the server, `user.RemoveRoleAsync` / `user.Id` threw every minute, the exception ended the loop for everyone after them, and their row was never removed. Now the roles are only touched when both server and user are found, and the entry is removed either way.
+    - `BirthdayFeature`: a deleted birthday channel or a server the bot left threw inside the loop and stopped the day's birthdays for the other servers. Now it is logged and skipped.
+    - `!update role message` and the YouTube playlist offer threw on a deleted channel. They now reply / log instead.
+  - The image processors that log and return null on failure now say so in their types (`MemoryStream?`, `EditPictureResult?`). `UserBonkCommands` skips sending when the gif failed, instead of throwing in `SendFileAsync`. `BiasGameWinnerBracketImageProcessor.EditImage` branches on `winner == null` instead of the file count. `InstagramMessageProcessor` (disabled embed) throws a clear exception when Instaloader saved no metadata file.
+  - Open: `BiasGameStepInteraction` assigns the result of `UpdateWinnerBracket` / `AddFinal` straight to `BiasGameData.WinnerBracket`. When drawing fails it becomes null and the next step of the game throws. The replaced stream is also never disposed. Not flagged yet because `Communication/` is still oblivious; keep the previous bracket and dispose the replaced one when that folder is converted.
 
 **Found on the way**
 - **Done 2026-11-16:** `App.StartTwitchMonitor` was `async void` without a try/catch on its own thread. `TwitchAPI.Start()` catches its own exceptions, but creating the scope or constructing `TwitchAPI` and its dependencies (e.g. `Config` with a broken config file) could still throw and end the process. It now logs instead.

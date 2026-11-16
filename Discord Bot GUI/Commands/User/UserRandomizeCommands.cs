@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Bot.Core;
@@ -107,7 +109,7 @@ public class UserRandomizeCommands(
     [Command("r6 randomizer")]
     [Alias(["r6 rand", "r6 r", "rainbow randomizer", "rainbow rand", "rainbow r"])]
     [Summary("Randomized operators (defender and attacker) for all users in the user's voice chat")]
-    public async Task RainbowRandomizer([Name("attacker (a) or defender (d)")] string optionString, [Remainder][Name("channel name")] IChannel channel = null)
+    public async Task RainbowRandomizer([Name("attacker (a) or defender (d)")] string optionString, [Remainder][Name("channel name")] IChannel? channel = null)
     {
         try
         {
@@ -143,7 +145,7 @@ public class UserRandomizeCommands(
     [Command("r6 full randomizer")]
     [Alias(["r6 full rand", "r6 f r", "rainbow full randomizer", "rainbow full rand", "rainbow f r"])]
     [Summary("Randomized operators (defender and attacker) for all users in the user's voice chat")]
-    public async Task RainbowFullRandomizer([Name("attacker (a) or defender (d)")] string optionString, [Remainder][Name("channel name")] IChannel channel = null)
+    public async Task RainbowFullRandomizer([Name("attacker (a) or defender (d)")] string optionString, [Remainder][Name("channel name")] IChannel? channel = null)
     {
         try
         {
@@ -191,7 +193,7 @@ public class UserRandomizeCommands(
     [Command("r6 overtime randomizer")]
     [Alias(["r6 over rand", "r6 o r", "rainbow overtime randomizer", "rainbow over rand", "rainbow o r"])]
     [Summary("Randomized operators (defender and attacker) for all users in the user's voice chat")]
-    public async Task RainbowOvertimeRandomizer([Name("attacker (a) or defender (d)")] string optionString, [Remainder][Name("channel name")] IChannel channel = null)
+    public async Task RainbowOvertimeRandomizer([Name("attacker (a) or defender (d)")] string optionString, [Remainder][Name("channel name")] IChannel? channel = null)
     {
         try
         {

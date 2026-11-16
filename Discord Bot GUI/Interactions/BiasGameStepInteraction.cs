@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.Interactions;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
@@ -32,7 +34,7 @@ public class BiasGameStepInteraction(
     {
         try
         {
-            if (Context.User.Id != userId || !Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData data))
+            if (Context.User.Id != userId || !Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData? data))
             {
                 await RespondAsync("You are not the owner of this interaction.", ephemeral: true);
                 return;

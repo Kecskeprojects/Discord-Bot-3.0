@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord_Bot.Services.Models.InstaLoader;
 using Discord_Bot.Tools;
 using Newtonsoft.Json;
@@ -15,8 +17,12 @@ public static class InstagramMessageProcessor
     public static string GetEmbedContent(List<FileAttachment> attachments, string[] files, string url, bool ignoreVideos)
     {
         string caption = "";
-        Node metadata = null;
+        Node? metadata = null;
         ReadFiles(attachments, files, ref caption, ref metadata, ignoreVideos);
+        if (metadata == null)
+        {
+            throw new InvalidOperationException("Instaloader did not save the metadata (.json) of the post");
+        }
 
         string message = $" **{metadata.Owner.Username}**'s [post](<{url}>)\n\n";
         if (!string.IsNullOrEmpty(caption))
@@ -27,7 +33,7 @@ public static class InstagramMessageProcessor
             {
                 text = text[..indexOfTag];
             }
-            text = UrlTools.SanitizeText(text);
+            text = UrlTools.SanitizeText(text) ?? "";
 
             message += $"{text}\n";
         }
@@ -42,7 +48,7 @@ public static class InstagramMessageProcessor
         return message;
     }
 
-    private static void ReadFiles(List<FileAttachment> attachments, string[] files, ref string caption, ref Node metadata, bool ignoreVideos)
+    private static void ReadFiles(List<FileAttachment> attachments, string[] files, ref string caption, ref Node? metadata, bool ignoreVideos)
     {
         if (attachments.Count > 0)
         {
@@ -69,7 +75,7 @@ public static class InstagramMessageProcessor
             }
             else if (file.EndsWith(".json", StringComparison.Ordinal))
             {
-                metadata = JsonConvert.DeserializeObject<InstaLoaderBase>(File.ReadAllText(file)).Node;
+                metadata = JsonConvert.DeserializeObject<InstaLoaderBase>(File.ReadAllText(file))?.Node;
             }
             else if (!ignoreVideos || file.EndsWith(".jpg", StringComparison.Ordinal) || file.EndsWith(".png", StringComparison.Ordinal))
             {

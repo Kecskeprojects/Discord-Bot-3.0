@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Resources;
 using System;
@@ -16,7 +18,7 @@ public static class BiasListMessageProcessor
             if (bias.GroupName != null)
             {
                 //Check if key exists for group, if not, make it
-                if (!groups.TryGetValue(bias.GroupName, out List<string> memberList))
+                if (!groups.TryGetValue(bias.GroupName, out List<string>? memberList))
                 {
                     groups.Add(bias.GroupName, [bias.Name.ToUpper()]);
                     continue;
@@ -27,7 +29,7 @@ public static class BiasListMessageProcessor
             else
             {
                 //Check if key exists for group, if not, make it
-                if (!groups.TryGetValue("unsorted", out List<string> memberList))
+                if (!groups.TryGetValue("unsorted", out List<string>? memberList))
                 {
                     groups.Add("unsorted", [bias.Name.ToUpper()]);
                     continue;

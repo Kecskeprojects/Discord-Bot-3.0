@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.Net;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
@@ -27,7 +29,7 @@ public class InstagramEmbedFeature(
     {
         try
         {
-            List<Uri> urls = UrlTools.LinkSearch(Context.Message.Content, false, Constant.InstagramBaseUrl);
+            List<Uri>? urls = UrlTools.LinkSearch(Context.Message.Content, false, Constant.InstagramBaseUrl);
 
             //Check if message is an instagram link
             if (!CollectionTools.IsNullOrEmpty(urls))

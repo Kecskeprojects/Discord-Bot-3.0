@@ -1,4 +1,6 @@
-﻿using Discord.Commands;
+﻿#nullable enable
+
+using Discord.Commands;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Enums;
@@ -14,8 +16,9 @@ public abstract class BaseFeature(IServerService serverService, BotLogger logger
     protected readonly IServerService serverService = serverService;
     protected readonly BotLogger logger = logger;
 
-    protected SocketCommandContext Context { get; private set; }
-    protected object Parameters { get; private set; }
+    //Set by Run before ExecuteCoreLogicAsync; features started without a context or parameters never read them
+    protected SocketCommandContext Context { get; private set; } = null!;
+    protected object Parameters { get; private set; } = null!;
 
     public async Task<bool> Run()
     {
@@ -48,7 +51,7 @@ public abstract class BaseFeature(IServerService serverService, BotLogger logger
 
     protected ServerAudioResource GetCurrentAudioResource()
     {
-        if (!Global.ServerAudioResources.TryGetValue(Context.Guild.Id, out ServerAudioResource audioResource))
+        if (!Global.ServerAudioResources.TryGetValue(Context.Guild.Id, out ServerAudioResource? audioResource))
         {
             audioResource = new(Context.Guild.Id);
             _ = Global.ServerAudioResources.TryAdd(Context.Guild.Id, audioResource);

@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication.Bias;
+﻿#nullable enable
+
+using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
@@ -69,7 +71,7 @@ public class BiasScrapingProcessor(
 
     private async Task<bool> UpdateBiasAsync(List<IdolResource> localIdols, List<ExtendedBiasData> completeList, int i)
     {
-        string profileUrl = GetProfileUrl(localIdols[i], completeList, out ExtendedBiasData data);
+        string? profileUrl = GetProfileUrl(localIdols[i], completeList, out ExtendedBiasData? data);
 
         if (string.IsNullOrEmpty(profileUrl))
         {
@@ -77,7 +79,7 @@ public class BiasScrapingProcessor(
             return false;
         }
 
-        AdditionalIdolData additional = await kpopDbScraper.GetProfileDataAsync(profileUrl, getGroupData: localIdols[i].GroupDebutDate == null);
+        AdditionalIdolData? additional = await kpopDbScraper.GetProfileDataAsync(profileUrl, getGroupData: localIdols[i].GroupDebutDate == null);
 
         if (additional?.ImageUrl == null)
         {
@@ -109,9 +111,9 @@ public class BiasScrapingProcessor(
         return await idolService.UpdateIdolDetailsAsync(localIdols[i], data, additional);
     }
 
-    private static string GetProfileUrl(IdolResource resource, List<ExtendedBiasData> completeList, out ExtendedBiasData data)
+    private static string? GetProfileUrl(IdolResource resource, List<ExtendedBiasData> completeList, out ExtendedBiasData? data)
     {
-        string profileUrl = "";
+        string? profileUrl = "";
         data = null;
         if (!string.IsNullOrEmpty(resource.ProfileUrl))
         {

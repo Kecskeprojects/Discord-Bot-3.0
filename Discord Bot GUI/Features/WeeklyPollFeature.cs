@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
 using Discord_Bot.Core;
@@ -59,7 +61,7 @@ public class WeeklyPollFeature(
 
         if (poll.ChannelDiscordId.HasValue && server?.GetChannel(poll.ChannelDiscordId.Value) is ISocketMessageChannel channel)
         {
-            SocketRole role = poll.RoleDiscordId.HasValue ? server.GetRole(poll.RoleDiscordId.Value) : null;
+            SocketRole? role = poll.RoleDiscordId.HasValue ? server.GetRole(poll.RoleDiscordId.Value) : null;
             string notifRole = role != null ? $"<@&{role.Id}>" : "";
 
             RestUserMessage message = await channel.SendMessageAsync(notifRole, poll: pollProp);

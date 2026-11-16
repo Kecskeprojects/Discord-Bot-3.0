@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using System;
@@ -165,7 +167,7 @@ public static class PollEditEmbedProcessor
         //Values can be separated by the _ character so that we have both an order number and an ID as values
         for (int i = 0; i < 10; i++)
         {
-            WeeklyPollOptionResource option = poll.Options.FirstOrDefault(x => x.OrderNumber == i);
+            WeeklyPollOptionResource? option = poll.Options.FirstOrDefault(x => x.OrderNumber == i);
             _ = option != null
                 ? optionPresetSelect.AddOption($"{i + 1}# {option.Title}", $"{i}_{option.WeeklyPollOptionId}")
                 : optionPresetSelect.AddOption($"{i + 1}#", $"{i}_0");

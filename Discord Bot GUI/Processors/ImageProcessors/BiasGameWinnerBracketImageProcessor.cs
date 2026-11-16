@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication;
+﻿#nullable enable
+
+using Discord_Bot.Communication;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
 using Discord_Bot.Resources;
@@ -16,7 +18,8 @@ public class BiasGameWinnerBracketImageProcessor(BotLogger logger)
 {
     private readonly BotLogger logger = logger;
 
-    public MemoryStream UpdateWinnerBracket(BiasGameData biasGameData)
+    //Null when the image could not be made, the error is logged
+    public MemoryStream? UpdateWinnerBracket(BiasGameData biasGameData)
     {
         try
         {
@@ -35,7 +38,8 @@ public class BiasGameWinnerBracketImageProcessor(BotLogger logger)
         return null;
     }
 
-    public MemoryStream AddFinal(BiasGameData data, IdolGameResource winner)
+    //Null when the image could not be made, the error is logged
+    public MemoryStream? AddFinal(BiasGameData data, IdolGameResource winner)
     {
         try
         {
@@ -52,7 +56,7 @@ public class BiasGameWinnerBracketImageProcessor(BotLogger logger)
         return null;
     }
 
-    private static MemoryStream EditImage(BiasGameData biasGameData, List<MemoryStream> files, IdolGameResource winner = null)
+    private static MemoryStream EditImage(BiasGameData biasGameData, List<MemoryStream> files, IdolGameResource? winner = null)
     {
         StaticRoundData roundData = Constant.BiasGameStaticRoundData[biasGameData.CurrentRound - 1];
         using MagickImage winnerBracket = new(biasGameData.WinnerBracket.ToArray());
@@ -61,7 +65,8 @@ public class BiasGameWinnerBracketImageProcessor(BotLogger logger)
         int position_1 = biasGameData.CurrentPair * 2;
         winnerBracket.Composite(idolImage_1, roundData.CalculateX(position_1), roundData.CalculateY(position_1), CompositeOperator.Over);
 
-        if (files.Count != 1)
+        //UpdateWinnerBracket passes the two images of the current pair, AddFinal passes the winner's image and data
+        if (winner == null)
         {
             using MagickImage idolImage_2 = CreateImageForRanking(files[1], roundData);
             int position_2 = (biasGameData.CurrentPair * 2) + 1;

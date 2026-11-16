@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces.DBServices;
@@ -21,7 +23,12 @@ public class YoutubeAddPlaylistFeature(
         try
         {
             ulong channelId = (ulong) Parameters;
-            IMessageChannel channel = client.GetChannel(channelId) as IMessageChannel;
+            if (client.GetChannel(channelId) is not IMessageChannel channel)
+            {
+                logger.Warning("YoutubeAddPlaylistFeature.cs ExecuteCoreLogicAsync", $"Channel {channelId} is not available, the playlist is not offered.");
+                return false;
+            }
+
             IUserMessage message = await channel.SendMessageAsync("You requested a song from a playlist!\n Do you want to me to add the playlist to the queue?");
             await message.AddReactionAsync(new Emoji("\U00002705"));
 

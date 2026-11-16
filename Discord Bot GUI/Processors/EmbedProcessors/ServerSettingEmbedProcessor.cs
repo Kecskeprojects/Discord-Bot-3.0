@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿#nullable enable
+
+using Discord;
 using Discord.WebSocket;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
@@ -18,10 +20,10 @@ public static class ServerSettingEmbedProcessor
         _ = embed.WithTitle("The server's settings are the following:");
         foreach (KeyValuePair<ChannelTypeEnum, string> item in ChannelTypeEnumTools.GetNameDictionary())
         {
-            if (server.SettingsChannels.TryGetValue(item.Key, out List<ulong> settingsChannels))
+            if (server.SettingsChannels.TryGetValue(item.Key, out List<ulong>? settingsChannels))
             {
                 IEnumerable<string> channels = settingsChannels.Select(x => textChannels.FirstOrDefault(n => n.Id == x))
-                                                .Where(x => x != null)
+                                                .OfType<SocketTextChannel>()
                                                 .Select(x => $"`{x.Name}`");
 
                 _ = embed.AddField($"{item.Value}:", $"`{string.Join(", ", channels).Replace("`, `", ", ")}`");
