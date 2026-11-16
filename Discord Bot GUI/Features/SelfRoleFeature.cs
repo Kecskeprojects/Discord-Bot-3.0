@@ -21,7 +21,7 @@ public class SelfRoleFeature(
     {
         try
         {
-            RoleResource role = await roleService.GetRoleAsync(Context.Guild.Id, Context.Message.Content[1..].ToLower());
+            RoleResource? role = await roleService.GetRoleAsync(Context.Guild.Id, Context.Message.Content[1..].ToLower());
 
             RestUserMessage? reply = null;
             if (role != null)

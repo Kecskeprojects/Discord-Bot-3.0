@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
@@ -24,7 +26,7 @@ public class TwitchChannelService(IMapper mapper, BotLogger logger, ServerCache 
         try
         {
             string url = Constant.TwitchBaseUrl.UrlCombine(twitchUserName);
-            Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
+            Server? server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
             if (server == null)
             {
                 return DbProcessResultEnum.NotFound;
@@ -62,13 +64,13 @@ public class TwitchChannelService(IMapper mapper, BotLogger logger, ServerCache 
 
     public async Task<List<TwitchChannelResource>> GetChannelsAsync()
     {
-        List<TwitchChannelResource> result = null;
+        List<TwitchChannelResource> result = [];
         try
         {
             List<TwitchChannel> channels = await twitchChannelRepository.GetAllAsync(tc => tc.Server, tc => tc.Server.NotificationRole);
             if (channels == null)
             {
-                return null;
+                return [];
             }
 
             result = mapper.Map<List<TwitchChannel>, List<TwitchChannelResource>>(channels);

@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
@@ -25,7 +27,7 @@ public class UserService(
     {
         try
         {
-            User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
+            User? user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
 
             user ??= new User()
             {
@@ -51,7 +53,7 @@ public class UserService(
 
     public async Task<List<UserResource>> GetAllLastFmUsersAsync()
     {
-        List<UserResource> result = null;
+        List<UserResource> result = [];
         try
         {
             List<User> users = await userRepository.GetListAsync(u => !string.IsNullOrEmpty(u.LastFmusername));
@@ -64,12 +66,16 @@ public class UserService(
         return result;
     }
 
-    public async Task<UserBiasGameStatResource> GetTopIdolsAsync(ulong userId, GenderEnum gender)
+    public async Task<UserBiasGameStatResource?> GetTopIdolsAsync(ulong userId, GenderEnum gender)
     {
-        UserBiasGameStatResource result = null;
+        UserBiasGameStatResource? result = null;
         try
         {
-            User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
+            User? user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
+            if (user == null)
+            {
+                return null;
+            }
             result = mapper.Map<User, UserBiasGameStatResource>(user);
 
             result.Stats = await userIdolStatisticRepository.GetTop10ForUserAsync(user.UserId, gender);
@@ -81,13 +87,13 @@ public class UserService(
         return result;
     }
 
-    public async Task<UserResource> GetUserAsync(ulong userId)
+    public async Task<UserResource?> GetUserAsync(ulong userId)
     {
-        UserResource result = null;
+        UserResource? result = null;
         try
         {
-            User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
-            result = mapper.Map<User, UserResource>(user);
+            User? user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
+            result = user == null ? null : mapper.Map<User, UserResource>(user);
         }
         catch (Exception ex)
         {
@@ -100,16 +106,16 @@ public class UserService(
     {
         try
         {
-            User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
+            User? user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
 
-            if (user != null || string.IsNullOrEmpty(user.LastFmusername))
+            if (user == null || string.IsNullOrEmpty(user.LastFmusername))
             {
                 return DbProcessResultEnum.NotFound;
             }
             user.LastFmusername = null;
             _ = await userRepository.SaveChangesAsync();
 
-            logger.Log("Lastfm username added successfully!");
+            logger.Log("Lastfm username removed successfully!");
             return DbProcessResultEnum.Success;
         }
         catch (Exception ex)

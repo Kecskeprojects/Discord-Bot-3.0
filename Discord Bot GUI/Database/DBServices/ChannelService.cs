@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
@@ -30,18 +32,18 @@ public class ChannelService(
     {
         try
         {
-            Channel channel = await channelRepository.FirstOrDefaultAsync(
+            Channel? channel = await channelRepository.FirstOrDefaultAsync(
                 c => c.Server.DiscordId == serverId.ToString()
                 && c.DiscordId == channelId.ToString(),
                 c => c.Server);
 
-            ChannelType channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int) channelTypeId);
+            ChannelType? channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int) channelTypeId);
             if (channelType == null)
             {
                 return DbProcessResultEnum.NotFound;
             }
 
-            Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
+            Server? server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
             if (server == null)
             {
                 return DbProcessResultEnum.NotFound;
@@ -95,11 +97,11 @@ public class ChannelService(
     {
         try
         {
-            Channel channel = await channelRepository.FirstOrDefaultAsync(
+            Channel? channel = await channelRepository.FirstOrDefaultAsync(
                 c => c.Server.DiscordId == serverId.ToString()
                 && c.DiscordId == channelId.ToString(),
                 c => c.Server);
-            ChannelType channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int) channelTypeId);
+            ChannelType? channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int) channelTypeId);
             if (channelType == null)
             {
                 return DbProcessResultEnum.NotFound;
@@ -140,7 +142,7 @@ public class ChannelService(
                     && c.ChannelTypes.FirstOrDefault(ct => ct.ChannelTypeId == (int) channelTypeId) != null,
                     c => c.ChannelTypes,
                     c => c.Server);
-            ChannelType channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int) channelTypeId);
+            ChannelType? channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int) channelTypeId);
             if (channelType == null)
             {
                 return DbProcessResultEnum.NotFound;

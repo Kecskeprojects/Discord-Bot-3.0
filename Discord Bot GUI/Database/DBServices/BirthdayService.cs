@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
@@ -28,7 +30,7 @@ public class BirthdayService(
     {
         try
         {
-            Birthday birthday = await birthdayRepository.FirstOrDefaultAsync(
+            Birthday? birthday = await birthdayRepository.FirstOrDefaultAsync(
                 b => b.Server.DiscordId == serverId.ToString()
                 && b.User.DiscordId == userId.ToString(),
                 b => b.Server);
@@ -48,8 +50,8 @@ public class BirthdayService(
                     return DbProcessResultEnum.AlreadyExists;
                 }
             }
-            Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
-            User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
+            Server? server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
+            User? user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
 
             birthday = new()
             {
@@ -106,7 +108,7 @@ public class BirthdayService(
     {
         try
         {
-            Birthday birthday = await birthdayRepository.FirstOrDefaultAsync(
+            Birthday? birthday = await birthdayRepository.FirstOrDefaultAsync(
                 b => b.Server.DiscordId == serverId.ToString()
                 && b.User.DiscordId == userId.ToString(),
                 b => b.Server);

@@ -42,7 +42,7 @@ public class BiasGameStatInteraction(
 
             logger.Log($"Bias Stat Gender Chosen: {chosenGender.ToDatabaseFriendlyString()}", LogOnly: true);
 
-            UserBiasGameStatResource stats = await userService.GetTopIdolsAsync(Context.User.Id, chosenGender);
+            UserBiasGameStatResource? stats = await userService.GetTopIdolsAsync(Context.User.Id, chosenGender);
 
             if (stats == null || stats.BiasGameCount == 0 || stats.Stats.Count == 0)
             {

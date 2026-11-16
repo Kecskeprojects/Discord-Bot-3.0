@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
@@ -25,7 +27,7 @@ public class UserIdolService(
 
     public async Task<List<IdolResource>> GetUserIdolsListAsync(ulong userId, string groupName)
     {
-        List<IdolResource> result = null;
+        List<IdolResource> result = [];
         try
         {
             List<Idol> idols = await idolRepository.GetListAsync(
@@ -67,7 +69,7 @@ public class UserIdolService(
 
             Idol idol = idols[0];
 
-            User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString(), u => u.Idols);
+            User? user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString(), u => u.Idols);
             user ??= new User() { DiscordId = userId.ToString(), Idols = [] };
             List<Idol> userIdols = await idolRepository.GetListByNamesAsync(idolName, idolGroup, userId.ToString());
             if (userIdols.Count > 0)
@@ -96,7 +98,7 @@ public class UserIdolService(
         {
             List<Idol> idols = await idolRepository.GetListAsync(i => i.Group.Name == biasGroup, i => i.Group);
 
-            User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString(), u => u.Idols);
+            User? user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString(), u => u.Idols);
             user ??= new User() { DiscordId = userId.ToString(), Idols = [] };
 
             List<Idol> userIdols = await idolRepository
@@ -137,7 +139,7 @@ public class UserIdolService(
     {
         try
         {
-            User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString(), u => u.Idols);
+            User? user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString(), u => u.Idols);
             user ??= new User() { DiscordId = userId.ToString() };
             user.Idols = [];
 
@@ -159,7 +161,7 @@ public class UserIdolService(
         {
             bool noGroup = string.IsNullOrEmpty(idolGroup);
 
-            User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString(), u => u.Idols);
+            User? user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString(), u => u.Idols);
             user ??= new User() { DiscordId = userId.ToString() };
             List<Idol> idols = user.Idols.Where(i => i.Name == biasName && (string.IsNullOrEmpty(idolGroup) || idolGroup == i.Group.Name)).ToList();
             if (idols.Count == 0)
@@ -191,7 +193,7 @@ public class UserIdolService(
     {
         try
         {
-            User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString(), u => u.Idols);
+            User? user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString(), u => u.Idols);
             user ??= new User() { DiscordId = userId.ToString() };
 
             List<Idol> userIdols = await idolRepository

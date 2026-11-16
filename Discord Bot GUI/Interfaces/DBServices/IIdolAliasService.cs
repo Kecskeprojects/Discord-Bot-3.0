@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Enums;
+﻿#nullable enable
+
+using Discord_Bot.Enums;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interfaces.DBServices;

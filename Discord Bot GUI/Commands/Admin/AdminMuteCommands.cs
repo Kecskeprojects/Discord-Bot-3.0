@@ -159,9 +159,9 @@ public class AdminMuteCommands(
                 return;
             }
 
-            ServerMutedUserResource mutedUser = await serverMutedUserService.GetMutedUserByUsernameAsync(Context.Guild.Id, guildUser.Id);
+            ServerMutedUserResource? mutedUser = await serverMutedUserService.GetMutedUserByUsernameAsync(Context.Guild.Id, guildUser.Id);
 
-            if (string.IsNullOrEmpty(mutedUser.RemovedRoleDiscordIds))
+            if (mutedUser == null || string.IsNullOrEmpty(mutedUser.RemovedRoleDiscordIds))
             {
                 _ = await ReplyAsync("User is not currently muted.");
                 return;

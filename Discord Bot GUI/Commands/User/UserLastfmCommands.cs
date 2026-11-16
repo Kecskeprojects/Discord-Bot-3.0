@@ -105,7 +105,7 @@ public class UserLastfmCommands(
                 return;
             }
 
-            UserResource user = await userService.GetUserAsync(Context.User.Id);
+            UserResource? user = await userService.GetUserAsync(Context.User.Id);
             if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
                 _ = await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
@@ -142,7 +142,7 @@ public class UserLastfmCommands(
                 return;
             }
 
-            UserResource user = await userService.GetUserAsync(Context.User.Id);
+            UserResource? user = await userService.GetUserAsync(Context.User.Id);
             if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
                 _ = await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
@@ -179,7 +179,7 @@ public class UserLastfmCommands(
                 return;
             }
 
-            UserResource user = await userService.GetUserAsync(Context.User.Id);
+            UserResource? user = await userService.GetUserAsync(Context.User.Id);
             if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
                 _ = await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
@@ -218,7 +218,7 @@ public class UserLastfmCommands(
                 return;
             }
 
-            UserResource user = await userService.GetUserAsync(Context.User.Id);
+            UserResource? user = await userService.GetUserAsync(Context.User.Id);
             if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
                 _ = await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
@@ -257,7 +257,7 @@ public class UserLastfmCommands(
                 return;
             }
 
-            UserResource user = await userService.GetUserAsync(Context.User.Id);
+            UserResource? user = await userService.GetUserAsync(Context.User.Id);
             if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
                 _ = await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");
@@ -295,7 +295,7 @@ public class UserLastfmCommands(
                 return;
             }
 
-            UserResource user = await userService.GetUserAsync(Context.User.Id);
+            UserResource? user = await userService.GetUserAsync(Context.User.Id);
             if (user == null || string.IsNullOrEmpty(user.LastFmUsername))
             {
                 _ = await ReplyAsync("You have yet to connect a username to your discord account. Use the !lf conn [username] command to do so!");

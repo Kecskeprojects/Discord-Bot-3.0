@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication.Modal;
+﻿#nullable enable
+
+using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
@@ -25,7 +27,7 @@ public class IdolImageService(
     {
         try
         {
-            IdolImage currentImage = await idolImageRepository.GetLatestByIdolIdAsync(idolId);
+            IdolImage? currentImage = await idolImageRepository.GetLatestByIdolIdAsync(idolId);
 
             IdolImage newImage = new()
             {
@@ -48,7 +50,7 @@ public class IdolImageService(
     {
         try
         {
-            Idol idolForImage = await idolRepository.FirstOrDefaultAsync(
+            Idol? idolForImage = await idolRepository.FirstOrDefaultAsync(
                 i => i.Name == idol
                 && i.Group.Name == group,
                 i => i.Group,

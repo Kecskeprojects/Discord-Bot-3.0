@@ -19,7 +19,7 @@ public class CustomCommandFeature(
     {
         try
         {
-            CustomCommandResource command = await customCommandService.GetCustomCommandAsync(Context.Guild.Id, Context.Message.Content[1..].ToLower());
+            CustomCommandResource? command = await customCommandService.GetCustomCommandAsync(Context.Guild.Id, Context.Message.Content[1..].ToLower());
             if (command != null)
             {
                 _ = await Context.Channel.SendMessageAsync(command.Url);

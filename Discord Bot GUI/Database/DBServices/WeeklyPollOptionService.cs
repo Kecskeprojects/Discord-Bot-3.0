@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
@@ -19,12 +21,12 @@ public class WeeklyPollOptionService(
 {
     private readonly IWeeklyPollOptionRepository weeklyPollOptionRepository = weeklyPollOptionRepository;
 
-    public async Task<WeeklyPollOptionResource> GetOrCreateOptionAsync(bool isPresetOption, int Id, int optionId, byte orderNumber)
+    public async Task<WeeklyPollOptionResource?> GetOrCreateOptionAsync(bool isPresetOption, int Id, int optionId, byte orderNumber)
     {
-        WeeklyPollOptionResource result = null;
+        WeeklyPollOptionResource? result = null;
         try
         {
-            WeeklyPollOption pollOption;
+            WeeklyPollOption? pollOption;
             if (optionId == 0)
             {
                 pollOption = new()
@@ -43,7 +45,7 @@ public class WeeklyPollOptionService(
                 pollOption = await weeklyPollOptionRepository.FirstOrDefaultAsync(wp => wp.WeeklyPollOptionId == optionId);
             }
 
-            result = mapper.Map<WeeklyPollOption, WeeklyPollOptionResource>(pollOption);
+            result = pollOption == null ? null : mapper.Map<WeeklyPollOption, WeeklyPollOptionResource>(pollOption);
         }
         catch (Exception ex)
         {
@@ -56,7 +58,7 @@ public class WeeklyPollOptionService(
     {
         try
         {
-            WeeklyPollOption pollOption = await weeklyPollOptionRepository.FirstOrDefaultAsync(p => p.WeeklyPollOptionId == pollOptionId);
+            WeeklyPollOption? pollOption = await weeklyPollOptionRepository.FirstOrDefaultAsync(p => p.WeeklyPollOptionId == pollOptionId);
             if (pollOption != null)
             {
                 pollOption.Title = optionTitle;

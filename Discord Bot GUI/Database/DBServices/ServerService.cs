@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
@@ -47,7 +49,11 @@ public class ServerService(
     {
         try
         {
-            Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
+            Server? server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
+            if (server == null)
+            {
+                return DbProcessResultEnum.NotFound;
+            }
 
             server.RoleMessageDiscordId = messageId.ToString();
 
@@ -69,14 +75,14 @@ public class ServerService(
     {
         try
         {
-            Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
+            Server? server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
             if (server == null)
             {
                 return DbProcessResultEnum.NotFound;
             }
 
             roleName = roleName.Trim().ToLower();
-            Role role = await roleRepository.FirstOrDefaultAsync(r =>
+            Role? role = await roleRepository.FirstOrDefaultAsync(r =>
                 r.Server.DiscordId == serverId.ToString()
                 && r.RoleName.Trim().ToLower().Equals(roleName),
                 r => r.Server);
@@ -113,7 +119,7 @@ public class ServerService(
     {
         try
         {
-            Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
+            Server? server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
             if (server == null || server.NotificationRoleId == null)
             {
                 return DbProcessResultEnum.NotFound;
@@ -134,18 +140,18 @@ public class ServerService(
         return DbProcessResultEnum.Failure;
     }
 
-    public async Task<ServerResource> GetByDiscordIdAsync(ulong serverId)
+    public async Task<ServerResource?> GetByDiscordIdAsync(ulong serverId)
     {
-        ServerResource result = null;
+        ServerResource? result = null;
         try
         {
-            ServerResource cachedServer = cache.TryGetValue(serverId);
+            ServerResource? cachedServer = cache.TryGetValue(serverId);
             if (cachedServer != null)
             {
                 return cachedServer;
             }
 
-            Server server = await serverRepository.FirstOrDefaultAsync(s =>
+            Server? server = await serverRepository.FirstOrDefaultAsync(s =>
                 s.DiscordId == serverId.ToString(),
                 s => s.TwitchChannels,
                 s => s.NotificationRole,
@@ -172,14 +178,14 @@ public class ServerService(
     {
         try
         {
-            Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
+            Server? server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
             if (server == null)
             {
                 return DbProcessResultEnum.NotFound;
             }
 
             roleName = roleName.Trim().ToLower();
-            Role role = await roleRepository.FirstOrDefaultAsync(r =>
+            Role? role = await roleRepository.FirstOrDefaultAsync(r =>
                 r.Server.DiscordId == serverId.ToString()
                 && r.RoleName.Trim().ToLower().Equals(roleName),
                 r => r.Server);

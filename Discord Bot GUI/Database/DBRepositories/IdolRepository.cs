@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Database.Models;
+﻿#nullable enable
+
+using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBRepositories;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +13,7 @@ namespace Discord_Bot.Database.DBRepositories;
 
 public class IdolRepository(MainDbContext context) : GenericRepository<Idol>(context), IIdolRepository
 {
-    public Task<List<Idol>> GetListByNamesAsync(string idolOrGroupName, string idolGroup, string userId = null)
+    public Task<List<Idol>> GetListByNamesAsync(string idolOrGroupName, string idolGroup, string? userId = null)
     {
         IQueryable<Idol> dbSet = context.Idols
             .Include(i => i.Users)

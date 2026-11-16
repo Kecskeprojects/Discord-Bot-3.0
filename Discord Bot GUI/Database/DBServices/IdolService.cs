@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication;
+﻿#nullable enable
+
+using Discord_Bot.Communication;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;
@@ -44,7 +46,7 @@ public class IdolService(
                 return DbProcessResultEnum.AlreadyExists;
             }
 
-            IdolGroup group = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.Name == idolGroup);
+            IdolGroup? group = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.Name == idolGroup);
 
             group ??= new()
             {
@@ -72,7 +74,7 @@ public class IdolService(
 
     public async Task<List<IdolResource>> GetIdolsByGroupAsync(string groupName)
     {
-        List<IdolResource> result = null;
+        List<IdolResource> result = [];
         try
         {
             List<Idol> idols = await idolRepository.GetListAsync(
@@ -95,7 +97,7 @@ public class IdolService(
     {
         try
         {
-            Idol idol = await idolRepository.FirstOrDefaultAsync(
+            Idol? idol = await idolRepository.FirstOrDefaultAsync(
                 i => i.Name == idolName
                 && i.Group.Name == idolGroup,
                 i => i.Group);
@@ -121,7 +123,7 @@ public class IdolService(
 
     public async Task<List<IdolResource>> GetAllIdolsAsync()
     {
-        List<IdolResource> result = null;
+        List<IdolResource> result = [];
         try
         {
             List<Idol> idols = await idolRepository.GetAllAsync(i => i.Group, i => i.IdolImages);
@@ -135,15 +137,19 @@ public class IdolService(
         return result;
     }
 
-    public async Task<bool> UpdateIdolDetailsAsync(IdolResource idolResource, ExtendedBiasData data, AdditionalIdolData additional)
+    public async Task<bool> UpdateIdolDetailsAsync(IdolResource idolResource, ExtendedBiasData? data, AdditionalIdolData? additional)
     {
         try
         {
-            Idol idol = await idolRepository
+            Idol? idol = await idolRepository
                 .FirstOrDefaultAsync(i =>
                     i.IdolId == idolResource.IdolId,
                     i => i.Group,
                     i => i.IdolImages);
+            if (idol == null)
+            {
+                return false;
+            }
 
             if (idol.IdolImages.Count > 3)
             {
@@ -208,12 +214,12 @@ public class IdolService(
         return count;
     }
 
-    public async Task<IdolExtendedResource> GetIdolDetailsAsync(string idolName, string idolGroup)
+    public async Task<IdolExtendedResource?> GetIdolDetailsAsync(string idolName, string idolGroup)
     {
-        IdolExtendedResource resource = null;
+        IdolExtendedResource? resource = null;
         try
         {
-            Idol idol = await idolRepository.FirstOrDefaultAsync(
+            Idol? idol = await idolRepository.FirstOrDefaultAsync(
                 i => i.Name == idolName
                 && i.Group.Name == idolGroup,
                 i => i.Group,
@@ -226,7 +232,7 @@ public class IdolService(
 
             resource = mapper.Map<Idol, IdolExtendedResource>(idol);
 
-            IdolImage image = await idolImageRepository.GetLatestByIdolIdAsync(idol.IdolId);
+            IdolImage? image = await idolImageRepository.GetLatestByIdolIdAsync(idol.IdolId);
             resource.LatestImageUrl = image?.ImageUrl;
         }
         catch (Exception ex)
@@ -241,10 +247,14 @@ public class IdolService(
     {
         try
         {
-            Idol idol = await idolRepository
+            Idol? idol = await idolRepository
                 .FirstOrDefaultAsync(i =>
                 i.IdolId == idolId,
                 i => i.Group);
+            if (idol == null)
+            {
+                return DbProcessResultEnum.NotFound;
+            }
 
             idol.ProfileUrl = modal.ProfileURL.Trim();
             idol.DateOfBirth = DateOnly.TryParse(modal.DateOfBirth, out DateOnly dateOfBirth) ? dateOfBirth : idol.DateOfBirth;
@@ -271,8 +281,12 @@ public class IdolService(
     {
         try
         {
-            Idol idol = await idolRepository
+            Idol? idol = await idolRepository
                 .FirstOrDefaultAsync(i => i.IdolId == idolId);
+            if (idol == null)
+            {
+                return DbProcessResultEnum.NotFound;
+            }
 
             idol.StageName = modal.StageName.Trim();
             idol.KoreanStageName = modal.KoreanStageName.Trim();
@@ -295,8 +309,12 @@ public class IdolService(
     {
         try
         {
-            Idol idol = await idolRepository
+            Idol? idol = await idolRepository
                 .FirstOrDefaultAsync(i => i.IdolId == idolId);
+            if (idol == null)
+            {
+                return DbProcessResultEnum.NotFound;
+            }
 
             idol.ProfileUrl = modal.ProfileURL.Trim();
             _ = await idolRepository.SaveChangesAsync();
@@ -315,8 +333,12 @@ public class IdolService(
     {
         try
         {
-            Idol idol = await idolRepository
+            Idol? idol = await idolRepository
                 .FirstOrDefaultAsync(i => i.IdolId == idolId);
+            if (idol == null)
+            {
+                return DbProcessResultEnum.NotFound;
+            }
 
             idol.Group = await idolGroupService.UpdateOrCreateGroupAsync(idol.Group, modal.Group.ToLower().Trim());
             _ = await idolRepository.SaveChangesAsync();
@@ -333,7 +355,7 @@ public class IdolService(
 
     public async Task<ListWithDbResult<UserResource>> GetUsersByIdolsAsync(string[] nameList)
     {
-        ListWithDbResult<UserResource> result = new(null, DbProcessResultEnum.Failure);
+        ListWithDbResult<UserResource> result = new([], DbProcessResultEnum.Failure);
         try
         {
             List<Idol> idols = [];
@@ -366,7 +388,7 @@ public class IdolService(
 
     public async Task<List<IdolGameResource>> GetListForGameAsync(GenderEnum gender, int debutAfter, int debutBefore)
     {
-        List<IdolGameResource> result = null;
+        List<IdolGameResource> result = [];
         try
         {
             List<Idol> idols = await idolRepository.GetListForGameAsync(gender, debutAfter, debutBefore);
@@ -380,18 +402,18 @@ public class IdolService(
         return result;
     }
 
-    public async Task<IdolGameResource> GetIdolByIdAsync(int idolId)
+    public async Task<IdolGameResource?> GetIdolByIdAsync(int idolId)
     {
-        IdolGameResource result = null;
+        IdolGameResource? result = null;
         try
         {
-            Idol idol = await idolRepository
+            Idol? idol = await idolRepository
                 .FirstOrDefaultAsync(i =>
                     i.IdolId == idolId,
                     i => i.Group,
                     i => i.IdolImages);
 
-            result = mapper.Map<Idol, IdolGameResource>(idol);
+            result = idol == null ? null : mapper.Map<Idol, IdolGameResource>(idol);
         }
         catch (Exception ex)
         {

@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication;
+﻿#nullable enable
+
+using Discord_Bot.Communication;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Communication.Modal;
 using Discord_Bot.Enums;
@@ -14,8 +16,8 @@ public interface IIdolService
     Task<List<IdolResource>> GetIdolsByGroupAsync(string groupName);
     Task<DbProcessResultEnum> RemoveIdolAsync(string idolName, string idolGroup);
     Task<List<IdolResource>> GetAllIdolsAsync();
-    Task<bool> UpdateIdolDetailsAsync(IdolResource idolResource, ExtendedBiasData data, AdditionalIdolData additional);
-    Task<IdolExtendedResource> GetIdolDetailsAsync(string idolName, string idolGroup);
+    Task<bool> UpdateIdolDetailsAsync(IdolResource idolResource, ExtendedBiasData? data, AdditionalIdolData? additional);
+    Task<IdolExtendedResource?> GetIdolDetailsAsync(string idolName, string idolGroup);
     Task<DbProcessResultEnum> UpdateAsync(int idolId, EditIdolModal modal);
     Task<DbProcessResultEnum> UpdateAsync(int idolId, EditIdolExtendedModal modal);
     Task<DbProcessResultEnum> UpdateAsync(int idolId, ChangeIdolProfileLinkModal modal);
@@ -23,5 +25,5 @@ public interface IIdolService
     Task<ListWithDbResult<UserResource>> GetUsersByIdolsAsync(string[] nameList);
     Task<List<IdolGameResource>> GetListForGameAsync(GenderEnum gender, int debutAfter, int debutBefore);
     Task<int> CorrectUpdateErrorsAsync();
-    Task<IdolGameResource> GetIdolByIdAsync(int idolId);
+    Task<IdolGameResource?> GetIdolByIdAsync(int idolId);
 }

@@ -71,7 +71,12 @@ public class BiasEditComponentInteraction : BaseInteraction
 
     private async Task SendEditIdolModalAsync(string idol, string group)
     {
-        IdolExtendedResource resource = await idolService.GetIdolDetailsAsync(idol, group);
+        IdolExtendedResource? resource = await idolService.GetIdolDetailsAsync(idol, group);
+        if (resource == null)
+        {
+            await RespondOrFollowupAsync("Idol could not be found.");
+            return;
+        }
 
         void Modify(ModalBuilder builder) => builder
             .UpdateTextInput("profileurl", resource.ProfileUrl)
@@ -85,7 +90,12 @@ public class BiasEditComponentInteraction : BaseInteraction
 
     private async Task CreateEditIdolExtendedModalAsync(string idol, string group)
     {
-        IdolExtendedResource resource = await idolService.GetIdolDetailsAsync(idol, group);
+        IdolExtendedResource? resource = await idolService.GetIdolDetailsAsync(idol, group);
+        if (resource == null)
+        {
+            await RespondOrFollowupAsync("Idol could not be found.");
+            return;
+        }
 
         void Modify(ModalBuilder builder) => builder
             .UpdateTextInput("stagename", resource.StageName)
@@ -99,7 +109,12 @@ public class BiasEditComponentInteraction : BaseInteraction
 
     private async Task CreateEditGroupModalAsync(string idol, string group)
     {
-        IdolGroupExtendedResource resource = await idolGroupService.GetIdolGroupDetailsAsync(group);
+        IdolGroupExtendedResource? resource = await idolGroupService.GetIdolGroupDetailsAsync(group);
+        if (resource == null)
+        {
+            await RespondOrFollowupAsync("Group could not be found.");
+            return;
+        }
 
         void Modify(ModalBuilder builder) => builder
             .UpdateTextInput("name", resource.Name)
@@ -112,7 +127,12 @@ public class BiasEditComponentInteraction : BaseInteraction
 
     private async Task CreateChangeProfileLinkModalAsync(string idol, string group)
     {
-        IdolExtendedResource resource = await idolService.GetIdolDetailsAsync(idol, group);
+        IdolExtendedResource? resource = await idolService.GetIdolDetailsAsync(idol, group);
+        if (resource == null)
+        {
+            await RespondOrFollowupAsync("Idol could not be found.");
+            return;
+        }
 
         void Modify(ModalBuilder builder) => builder
             .UpdateTextInput("profileurl", resource.ProfileUrl);
@@ -122,7 +142,12 @@ public class BiasEditComponentInteraction : BaseInteraction
 
     private async Task CreateChangeGroupModalAsync(string idol, string group)
     {
-        IdolExtendedResource resource = await idolService.GetIdolDetailsAsync(idol, group);
+        IdolExtendedResource? resource = await idolService.GetIdolDetailsAsync(idol, group);
+        if (resource == null)
+        {
+            await RespondOrFollowupAsync("Idol could not be found.");
+            return;
+        }
 
         void Modify(ModalBuilder builder) => builder
             .UpdateTextInput("group", resource.GroupName);
@@ -150,7 +175,12 @@ public class BiasEditComponentInteraction : BaseInteraction
 
     private async Task OverrideImageAsync(string idol, string group)
     {
-        IdolExtendedResource resource = await idolService.GetIdolDetailsAsync(idol, group);
+        IdolExtendedResource? resource = await idolService.GetIdolDetailsAsync(idol, group);
+        if (resource == null)
+        {
+            await RespondOrFollowupAsync("Idol could not be found.");
+            return;
+        }
 
         void Modify(ModalBuilder builder) => builder
             .UpdateTextInput("currentimageurl", resource.LatestImageUrl);

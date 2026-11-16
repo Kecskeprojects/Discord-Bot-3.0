@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
@@ -27,7 +29,7 @@ public class ReminderService(
     {
         try
         {
-            User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
+            User? user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
             Reminder reminder = new()
             {
                 ReminderId = 0,
@@ -49,13 +51,13 @@ public class ReminderService(
 
     public async Task<List<ReminderResource>> GetCurrentRemindersAsync(DateTime dateTime)
     {
-        List<ReminderResource> result = null;
+        List<ReminderResource> result = [];
         try
         {
             List<Reminder> reminders = await reminderRepository.GetListAsync(r => r.Date <= dateTime, r => r.User);
             if (reminders == null)
             {
-                return null;
+                return [];
             }
 
             result = mapper.Map<List<Reminder>, List<ReminderResource>>(reminders);
@@ -70,7 +72,7 @@ public class ReminderService(
 
     public async Task<List<ReminderResource>> GetUserReminderListAsync(ulong userId)
     {
-        List<ReminderResource> result = null;
+        List<ReminderResource> result = [];
         try
         {
             List<Reminder> server = await reminderRepository.GetListAsync(r =>
@@ -81,7 +83,7 @@ public class ReminderService(
 
             if (server == null)
             {
-                return null;
+                return [];
             }
 
             result = mapper.Map<List<Reminder>, List<ReminderResource>>(server);

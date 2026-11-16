@@ -8,6 +8,7 @@ using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
+using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions;
@@ -51,7 +52,9 @@ public class BaseInteraction(IServerService serverService, BotLogger logger, Con
 
     protected async Task<ServerResource> GetCurrentServerAsync()
     {
-        return await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+        //CommandHandler adds every guild it sees, so a missing server means the database could not be reached (the service logged why)
+        return await serverService.GetByDiscordIdAsync(Context.Guild.Id)
+            ?? throw new InvalidOperationException($"Server {Context.Guild.Id} could not be loaded from the database");
     }
 
     //Usable whether or not the interaction was already acknowledged (e.g. in a catch block after DeferAsync)

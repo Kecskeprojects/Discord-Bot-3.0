@@ -47,7 +47,12 @@ public class BirthdayFeature(
 
     private async Task SendBirthdayMessageAsync(BirthdayResource birthday)
     {
-        ServerResource server = await serverService.GetByDiscordIdAsync(birthday.ServerDiscordId);
+        ServerResource? server = await serverService.GetByDiscordIdAsync(birthday.ServerDiscordId);
+        if (server == null)
+        {
+            logger.Warning("BirthdayFeature.cs SendBirthdayMessageAsync", $"Server {birthday.ServerDiscordId} could not be loaded, its birthday message is skipped.");
+            return;
+        }
 
         if (server.SettingsChannels.TryGetValue(ChannelTypeEnum.BirthdayText, out List<ulong>? channels))
         {

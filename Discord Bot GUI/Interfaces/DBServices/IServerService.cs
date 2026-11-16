@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Enums;
+﻿#nullable enable
+
+using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using System.Threading.Tasks;
 
@@ -10,6 +12,6 @@ public interface IServerService
     Task<DbProcessResultEnum> ChangeRoleMessageIdAsync(ulong serverId, ulong messageId);
     Task<DbProcessResultEnum> AddNotificationRoleAsync(ulong serverId, ulong roleId, string roleName);
     Task<DbProcessResultEnum> RemoveNotificationRoleAsync(ulong serverId);
-    Task<ServerResource> GetByDiscordIdAsync(ulong serverId);
+    Task<ServerResource?> GetByDiscordIdAsync(ulong serverId);
     Task<DbProcessResultEnum> ChangeServerMuteRoleAsync(ulong serverId, string roleName, ulong roleId);
 }

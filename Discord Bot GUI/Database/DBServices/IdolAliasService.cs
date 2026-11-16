@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
@@ -35,7 +37,7 @@ public class IdolAliasService(
                 return DbProcessResultEnum.AlreadyExists;
             }
 
-            Idol idol = await idolRepository.FirstOrDefaultAsync(
+            Idol? idol = await idolRepository.FirstOrDefaultAsync(
                 i => idolGroup == i.Group.Name
                 && i.Name == idolName,
                 i => i.IdolAliases,
@@ -69,13 +71,13 @@ public class IdolAliasService(
     {
         try
         {
-            IdolAlias idolAliasItem = await idolAliasRepository.FirstOrDefaultAsync(
+            IdolAlias? idolAliasItem = await idolAliasRepository.FirstOrDefaultAsync(
                 ia => ia.Alias == idolAlias
                 && ia.Idol.Name == idolName
                 && ia.Idol.Group.Name == idolGroup,
                 ia => ia.Idol,
                 ia => ia.Idol.Group);
-            if (idolAlias != null)
+            if (idolAliasItem != null)
             {
                 _ = await idolAliasRepository.RemoveAsync(idolAliasItem);
 

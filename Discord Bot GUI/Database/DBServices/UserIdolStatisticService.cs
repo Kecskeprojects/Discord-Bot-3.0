@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Interfaces.DBRepositories;
@@ -24,7 +26,7 @@ public class UserIdolStatisticService(
     {
         try
         {
-            User user = await userRepository.FirstOrDefaultAsync(x => x.DiscordId == userId.ToString());
+            User? user = await userRepository.FirstOrDefaultAsync(x => x.DiscordId == userId.ToString());
 
             if (user == null)
             {
@@ -39,7 +41,7 @@ public class UserIdolStatisticService(
             while (ranking != null && ranking.Count > 0)
             {
                 int idolId = ranking.Pop();
-                UserIdolStatistic userIdolStatistic = await userIdolStatisticRepository
+                UserIdolStatistic? userIdolStatistic = await userIdolStatisticRepository
                     .FirstOrDefaultAsync(i =>
                         i.User.DiscordId == userId.ToString()
                         && idolId == i.IdolId,

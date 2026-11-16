@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication.Modal;
+﻿#nullable enable
+
+using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
@@ -25,13 +27,13 @@ public class WeeklyPollOptionPresetService(
 
     public async Task<List<WeeklyPollOptionPresetResource>> GetActivePresetsAsync()
     {
-        List<WeeklyPollOptionPresetResource> result = null;
+        List<WeeklyPollOptionPresetResource> result = [];
         try
         {
             List<WeeklyPollOptionPreset> presets = await weeklyPollOptionPresetRepository.GetListAsync(p => p.IsActive);
             if (presets == null)
             {
-                return null;
+                return [];
             }
 
             result = mapper.Map<List<WeeklyPollOptionPreset>, List<WeeklyPollOptionPresetResource>>(presets);
@@ -44,12 +46,12 @@ public class WeeklyPollOptionPresetService(
         return result;
     }
 
-    public async Task<WeeklyPollOptionPresetResource> GetOrCreateDummyPresetAsync()
+    public async Task<WeeklyPollOptionPresetResource?> GetOrCreateDummyPresetAsync()
     {
-        WeeklyPollOptionPresetResource result = null;
+        WeeklyPollOptionPresetResource? result = null;
         try
         {
-            WeeklyPollOptionPreset preset = await weeklyPollOptionPresetRepository.FirstOrDefaultAsync(
+            WeeklyPollOptionPreset? preset = await weeklyPollOptionPresetRepository.FirstOrDefaultAsync(
                 wp => string.IsNullOrEmpty(wp.Name),
                 wp => wp.WeeklyPollOptions);
 
@@ -76,16 +78,16 @@ public class WeeklyPollOptionPresetService(
         return result;
     }
 
-    public async Task<WeeklyPollOptionPresetResource> GetPresetByIdAsync(int presetId)
+    public async Task<WeeklyPollOptionPresetResource?> GetPresetByIdAsync(int presetId)
     {
-        WeeklyPollOptionPresetResource result = null;
+        WeeklyPollOptionPresetResource? result = null;
         try
         {
-            WeeklyPollOptionPreset preset = await weeklyPollOptionPresetRepository.FirstOrDefaultAsync(
+            WeeklyPollOptionPreset? preset = await weeklyPollOptionPresetRepository.FirstOrDefaultAsync(
                 wp => wp.WeeklyPollOptionPresetId == presetId,
                 wp => wp.WeeklyPollOptions);
 
-            result = mapper.Map<WeeklyPollOptionPreset, WeeklyPollOptionPresetResource>(preset);
+            result = preset == null ? null : mapper.Map<WeeklyPollOptionPreset, WeeklyPollOptionPresetResource>(preset);
         }
         catch (Exception ex)
         {
@@ -94,17 +96,17 @@ public class WeeklyPollOptionPresetService(
         return result;
     }
 
-    public async Task<WeeklyPollOptionPresetResource> GetPresetByNameAsync(string presetName)
+    public async Task<WeeklyPollOptionPresetResource?> GetPresetByNameAsync(string presetName)
     {
-        WeeklyPollOptionPresetResource result = null;
+        WeeklyPollOptionPresetResource? result = null;
         try
         {
             presetName = presetName.ToLower();
-            WeeklyPollOptionPreset poll = await weeklyPollOptionPresetRepository.FirstOrDefaultAsync(
+            WeeklyPollOptionPreset? poll = await weeklyPollOptionPresetRepository.FirstOrDefaultAsync(
                 wp => wp.Name.ToLower() == presetName,
                 wp => wp.WeeklyPollOptions);
 
-            result = mapper.Map<WeeklyPollOptionPreset, WeeklyPollOptionPresetResource>(poll);
+            result = poll == null ? null : mapper.Map<WeeklyPollOptionPreset, WeeklyPollOptionPresetResource>(poll);
         }
         catch (Exception ex)
         {
@@ -115,13 +117,13 @@ public class WeeklyPollOptionPresetService(
 
     public async Task<List<WeeklyPollOptionPresetResource>> GetPresetsAsync()
     {
-        List<WeeklyPollOptionPresetResource> result = null;
+        List<WeeklyPollOptionPresetResource> result = [];
         try
         {
             List<WeeklyPollOptionPreset> presets = await weeklyPollOptionPresetRepository.GetAllAsync();
             if (presets == null)
             {
-                return null;
+                return [];
             }
 
             result = mapper.Map<List<WeeklyPollOptionPreset>, List<WeeklyPollOptionPresetResource>>(presets);
@@ -139,7 +141,7 @@ public class WeeklyPollOptionPresetService(
         try
         {
             presetName = presetName.ToLower();
-            WeeklyPollOptionPreset poll = await weeklyPollOptionPresetRepository.FirstOrDefaultAsync(
+            WeeklyPollOptionPreset? poll = await weeklyPollOptionPresetRepository.FirstOrDefaultAsync(
                 p => p.Name.ToLower() == presetName,
                 wp => wp.WeeklyPollOptions);
             if (poll != null)
@@ -166,7 +168,7 @@ public class WeeklyPollOptionPresetService(
     {
         try
         {
-            WeeklyPollOptionPreset poll = await weeklyPollOptionPresetRepository.FirstOrDefaultAsync(p => p.WeeklyPollOptionPresetId == presetId);
+            WeeklyPollOptionPreset? poll = await weeklyPollOptionPresetRepository.FirstOrDefaultAsync(p => p.WeeklyPollOptionPresetId == presetId);
             if (poll != null)
             {
                 poll.Name = modal.Name;
@@ -190,17 +192,22 @@ public class WeeklyPollOptionPresetService(
         return DbProcessResultEnum.Failure;
     }
 
-    public async Task<DbProcessResultEnum> UpdateFieldAsync(int presetId, string fieldName, string newValue)
+    public async Task<DbProcessResultEnum> UpdateFieldAsync(int presetId, string fieldName, string? newValue)
     {
         try
         {
-            WeeklyPollOptionPreset poll = await weeklyPollOptionPresetRepository.FirstOrDefaultAsync(p => p.WeeklyPollOptionPresetId == presetId);
+            WeeklyPollOptionPreset? poll = await weeklyPollOptionPresetRepository.FirstOrDefaultAsync(p => p.WeeklyPollOptionPresetId == presetId);
+            if (poll == null)
+            {
+                return DbProcessResultEnum.NotFound;
+            }
 
-            PropertyInfo property = poll.GetType().GetProperty(fieldName);
+            PropertyInfo property = poll.GetType().GetProperty(fieldName)
+                ?? throw new InvalidOperationException($"WeeklyPollOptionPreset has no property {fieldName}");
 
             _ = Enum.TryParse(property.PropertyType.Name, true, out TypeCode enumValue); //Get the type based on typecode
 
-            object convertedValue = Convert.ChangeType(newValue, enumValue, CultureInfo.InvariantCulture); //Convert the value to that of the typecode
+            object? convertedValue = Convert.ChangeType(newValue, enumValue, CultureInfo.InvariantCulture); //Convert the value to that of the typecode
 
             property.SetValue(poll, convertedValue); // Set the converted value
 

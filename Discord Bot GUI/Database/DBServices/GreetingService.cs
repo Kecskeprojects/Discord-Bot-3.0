@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
@@ -22,7 +24,7 @@ public class GreetingService(
 
     public async Task<List<GreetingResource>> GetAllGreetingAsync()
     {
-        List<GreetingResource> result = null;
+        List<GreetingResource> result = [];
         try
         {
             List<Greeting> greetings = await greetingRepository.GetAllAsync();
@@ -60,7 +62,7 @@ public class GreetingService(
     {
         try
         {
-            Greeting greeting = await greetingRepository.FindByIdAsync(id);
+            Greeting? greeting = await greetingRepository.FindByIdAsync(id);
             if (greeting != null)
             {
                 _ = await greetingRepository.RemoveAsync(greeting);

@@ -36,7 +36,12 @@ Config config) : BaseInteraction(serverService, logger, config)
         {
             byte orderNumber = byte.Parse(selectedOption[0].Split("_")[0]);
             int optionId = int.Parse(selectedOption[0].Split("_")[1]);
-            WeeklyPollOptionResource resource = await weeklyPollOptionService.GetOrCreateOptionAsync(isPresetOption, Id, optionId, orderNumber);
+            WeeklyPollOptionResource? resource = await weeklyPollOptionService.GetOrCreateOptionAsync(isPresetOption, Id, optionId, orderNumber);
+            if (resource == null)
+            {
+                await RespondOrFollowupAsync("The poll option could not be found.", ephemeral: true);
+                return;
+            }
 
             void Modify(ModalBuilder builder) => builder
                 .UpdateTextInput("optiontitle", string.IsNullOrEmpty(resource.Title) ? null : resource.Title);
@@ -64,7 +69,12 @@ Config config) : BaseInteraction(serverService, logger, config)
             DbProcessResultEnum result = await weeklyPollOptionService.UpdateAsync(pollOptionId, modal.OptionTitle);
             if (result == DbProcessResultEnum.Success)
             {
-                WeeklyPollEditResource resource = await weeklyPollService.GetPollByIdForEditAsync(pollId);
+                WeeklyPollEditResource? resource = await weeklyPollService.GetPollByIdForEditAsync(pollId);
+                if (resource == null)
+                {
+                    await RespondOrFollowupAsync("The change was saved, but the poll could not be loaded again to refresh this message.", ephemeral: true);
+                    return;
+                }
                 List<WeeklyPollOptionPresetResource> presets = await weeklyPollOptionPresetService.GetActivePresetsAsync();
 
                 MessageComponent embeds = PollEditEmbedProcessor.CreateComponent(resource, presets);
@@ -93,7 +103,12 @@ Config config) : BaseInteraction(serverService, logger, config)
             DbProcessResultEnum result = await weeklyPollOptionService.UpdateAsync(pollOptionId, modal.OptionTitle);
             if (result == DbProcessResultEnum.Success)
             {
-                WeeklyPollOptionPresetResource resource = await weeklyPollOptionPresetService.GetPresetByIdAsync(presetId);
+                WeeklyPollOptionPresetResource? resource = await weeklyPollOptionPresetService.GetPresetByIdAsync(presetId);
+                if (resource == null)
+                {
+                    await RespondOrFollowupAsync("The change was saved, but the preset could not be loaded again to refresh this message.", ephemeral: true);
+                    return;
+                }
 
                 MessageComponent embeds = PollPresetEditEmbedProcessor.CreateComponent(resource);
 

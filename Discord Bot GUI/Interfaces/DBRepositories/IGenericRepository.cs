@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -9,9 +11,9 @@ public interface IGenericRepository<TEntity> where TEntity : class
 {
     Task<int> AddAsync(TEntity item, bool saveChanges = true);
     Task<int> AddAsync(IEnumerable<TEntity> items, bool saveChanges = true);
-    ValueTask<TEntity> FindByIdAsync(int id);
-    Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
-    Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes);
+    ValueTask<TEntity?> FindByIdAsync(int id);
+    Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
+    Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes);
     Task<List<TEntity>> GetAllAsync();
     Task<List<TEntity>> GetAllAsync(params Expression<Func<TEntity, object>>[] includes);
     Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, object>> orderBy, bool ascending);

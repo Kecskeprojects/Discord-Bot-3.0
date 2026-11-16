@@ -7,6 +7,7 @@ using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
 using Discord_Bot.Tools;
+using System;
 using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
@@ -61,7 +62,9 @@ public abstract class BaseFeature(IServerService serverService, BotLogger logger
 
     protected async Task<ServerResource> GetCurrentServerAsync()
     {
-        return await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+        //CommandHandler adds every guild it sees, so a missing server means the database could not be reached (the service logged why)
+        return await serverService.GetByDiscordIdAsync(Context.Guild.Id)
+            ?? throw new InvalidOperationException($"Server {Context.Guild.Id} could not be loaded from the database");
     }
 
     protected async Task<bool> IsCommandAllowedAsync(ChannelTypeEnum type, bool allowLackOfType = true)

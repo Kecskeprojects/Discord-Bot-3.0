@@ -35,7 +35,12 @@ public class WeeklyPollEditInteraction(
     {
         try
         {
-            WeeklyPollResource resource = await weeklyPollService.GetPollByIdAsync(pollId);
+            WeeklyPollResource? resource = await weeklyPollService.GetPollByIdAsync(pollId);
+            if (resource == null)
+            {
+                await RespondOrFollowupAsync("The poll could not be found.", ephemeral: true);
+                return;
+            }
 
             RestRole? role = resource.RoleDiscordId.HasValue
                 ? await Context.Guild.GetRoleAsync(resource.RoleDiscordId.Value)
@@ -82,7 +87,12 @@ public class WeeklyPollEditInteraction(
             DbProcessResultEnum result = await weeklyPollService.UpdateAsync(pollId, modal, channel.Id, role?.Id, role?.Name);
             if (result == DbProcessResultEnum.Success)
             {
-                WeeklyPollResource resource = await weeklyPollService.GetPollByIdAsync(pollId);
+                WeeklyPollResource? resource = await weeklyPollService.GetPollByIdAsync(pollId);
+                if (resource == null)
+                {
+                    await RespondOrFollowupAsync("The change was saved, but the poll could not be loaded again to refresh this message.", ephemeral: true);
+                    return;
+                }
 
                 Embed[] embeds = PollEditEmbedProcessor.CreateEmbed(resource, true);
 
@@ -111,7 +121,12 @@ public class WeeklyPollEditInteraction(
 
             if (result == DbProcessResultEnum.Success)
             {
-                WeeklyPollEditResource resource = await weeklyPollService.GetPollByIdForEditAsync(pollId);
+                WeeklyPollEditResource? resource = await weeklyPollService.GetPollByIdForEditAsync(pollId);
+                if (resource == null)
+                {
+                    await RespondOrFollowupAsync("The change was saved, but the poll could not be loaded again to refresh this message.", ephemeral: true);
+                    return;
+                }
                 List<WeeklyPollOptionPresetResource> presets = await weeklyPollOptionPresetService.GetActivePresetsAsync();
 
                 MessageComponent component = PollEditEmbedProcessor.CreateComponent(resource, presets);
@@ -139,7 +154,12 @@ public class WeeklyPollEditInteraction(
 
             if (result == DbProcessResultEnum.Success)
             {
-                WeeklyPollEditResource resource = await weeklyPollService.GetPollByIdForEditAsync(pollId);
+                WeeklyPollEditResource? resource = await weeklyPollService.GetPollByIdForEditAsync(pollId);
+                if (resource == null)
+                {
+                    await RespondOrFollowupAsync("The change was saved, but the poll could not be loaded again to refresh this message.", ephemeral: true);
+                    return;
+                }
                 List<WeeklyPollOptionPresetResource> presets = await weeklyPollOptionPresetService.GetActivePresetsAsync();
 
                 MessageComponent embeds = PollEditEmbedProcessor.CreateComponent(resource, presets);

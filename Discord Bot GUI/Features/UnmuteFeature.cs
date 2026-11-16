@@ -49,11 +49,11 @@ public class UnmuteFeature(
 
                     if (server != null && user != null)
                     {
-                        ServerResource serverData = await serverService.GetByDiscordIdAsync(server.Id);
+                        ServerResource? serverData = await serverService.GetByDiscordIdAsync(server.Id);
 
-                        if (serverData.MuteRoleDiscordId == null)
+                        if (serverData?.MuteRoleDiscordId == null)
                         {
-                            logger.Log($"Server {serverData.DiscordId} does not have a mute role.");
+                            logger.Log($"Server {server.Id} does not have a mute role, or it could not be loaded.");
                         }
                         else
                         {

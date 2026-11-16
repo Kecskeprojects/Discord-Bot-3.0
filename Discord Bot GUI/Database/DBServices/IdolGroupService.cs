@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication.Modal;
+﻿#nullable enable
+
+using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
@@ -20,12 +22,12 @@ public class IdolGroupService(
 {
     private readonly IIdolGroupRepository idolGroupRepository = idolGroupRepository;
 
-    public async Task<IdolGroupExtendedResource> GetIdolGroupDetailsAsync(string groupName)
+    public async Task<IdolGroupExtendedResource?> GetIdolGroupDetailsAsync(string groupName)
     {
-        IdolGroupExtendedResource resource = null;
+        IdolGroupExtendedResource? resource = null;
         try
         {
-            IdolGroup idol = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.Name == groupName);
+            IdolGroup? idol = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.Name == groupName);
 
             if (idol == null)
             {
@@ -61,7 +63,11 @@ public class IdolGroupService(
     {
         try
         {
-            IdolGroup idolGroup = await idolGroupRepository.FindByIdAsync(groupId);
+            IdolGroup? idolGroup = await idolGroupRepository.FindByIdAsync(groupId);
+            if (idolGroup == null)
+            {
+                return DbProcessResultEnum.NotFound;
+            }
             idolGroup.Name = modal.Name.ToLower().Trim();
             idolGroup.FullName = modal.FullName.Trim();
             idolGroup.FullKoreanName = modal.FullKoreanName.Trim();
@@ -86,7 +92,7 @@ public class IdolGroupService(
             return group;
         }
 
-        IdolGroup newGroup = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.Name == groupName);
+        IdolGroup? newGroup = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.Name == groupName);
         if (newGroup == null)
         {
             newGroup = new IdolGroup()

@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Database.Models;
+﻿#nullable enable
+
+using Discord_Bot.Database.Models;
 using Discord_Bot.Interfaces.DBRepositories;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;

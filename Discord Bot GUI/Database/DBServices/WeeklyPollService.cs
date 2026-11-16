@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication.Modal;
+﻿#nullable enable
+
+using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
@@ -26,18 +28,18 @@ public class WeeklyPollService(
 {
     private readonly IWeeklyPollRepository weeklyPollRepository = weeklyPollRepository;
 
-    public async Task<WeeklyPollEditResource> GetOrCreateDummyPollAsync(ulong serverId)
+    public async Task<WeeklyPollEditResource?> GetOrCreateDummyPollAsync(ulong serverId)
     {
-        WeeklyPollEditResource result = null;
+        WeeklyPollEditResource? result = null;
         try
         {
-            WeeklyPoll poll = await weeklyPollRepository.FirstOrDefaultAsync(
+            WeeklyPoll? poll = await weeklyPollRepository.FirstOrDefaultAsync(
                 wp => wp.Server.DiscordId == serverId.ToString() && string.IsNullOrEmpty(wp.Name),
                 wp => wp.WeeklyPollOptions);
 
             if (poll == null)
             {
-                Server server = await serverRepository.FirstOrDefaultAsync(x => x.DiscordId == serverId.ToString());
+                Server? server = await serverRepository.FirstOrDefaultAsync(x => x.DiscordId == serverId.ToString());
                 server ??= new Server() { DiscordId = serverId.ToString() };
 
                 poll = new WeeklyPoll()
@@ -67,18 +69,18 @@ public class WeeklyPollService(
         return result;
     }
 
-    public async Task<WeeklyPollResource> GetPollByIdAsync(int pollId)
+    public async Task<WeeklyPollResource?> GetPollByIdAsync(int pollId)
     {
-        WeeklyPollResource result = null;
+        WeeklyPollResource? result = null;
         try
         {
-            WeeklyPoll poll = await weeklyPollRepository.FirstOrDefaultAsync(
+            WeeklyPoll? poll = await weeklyPollRepository.FirstOrDefaultAsync(
                 wp => wp.WeeklyPollId == pollId,
                 includes: [wp => wp.Role,
                 wp => wp.Channel,
                 wp => wp.WeeklyPollOptions]);
 
-            result = mapper.Map<WeeklyPoll, WeeklyPollResource>(poll);
+            result = poll == null ? null : mapper.Map<WeeklyPoll, WeeklyPollResource>(poll);
         }
         catch (Exception ex)
         {
@@ -87,16 +89,16 @@ public class WeeklyPollService(
         return result;
     }
 
-    public async Task<WeeklyPollEditResource> GetPollByIdForEditAsync(int pollId)
+    public async Task<WeeklyPollEditResource?> GetPollByIdForEditAsync(int pollId)
     {
-        WeeklyPollEditResource result = null;
+        WeeklyPollEditResource? result = null;
         try
         {
-            WeeklyPoll poll = await weeklyPollRepository.FirstOrDefaultAsync(
+            WeeklyPoll? poll = await weeklyPollRepository.FirstOrDefaultAsync(
                 wp => wp.WeeklyPollId == pollId,
                 wp => wp.WeeklyPollOptions);
 
-            result = mapper.Map<WeeklyPoll, WeeklyPollEditResource>(poll);
+            result = poll == null ? null : mapper.Map<WeeklyPoll, WeeklyPollEditResource>(poll);
         }
         catch (Exception ex)
         {
@@ -105,17 +107,17 @@ public class WeeklyPollService(
         return result;
     }
 
-    public async Task<WeeklyPollEditResource> GetPollByNameForEditAsync(ulong serverId, string pollName)
+    public async Task<WeeklyPollEditResource?> GetPollByNameForEditAsync(ulong serverId, string pollName)
     {
-        WeeklyPollEditResource result = null;
+        WeeklyPollEditResource? result = null;
         try
         {
             pollName = pollName.ToLower();
-            WeeklyPoll poll = await weeklyPollRepository.FirstOrDefaultAsync(
+            WeeklyPoll? poll = await weeklyPollRepository.FirstOrDefaultAsync(
                 wp => wp.Server.DiscordId == serverId.ToString() && wp.Name.ToLower() == pollName,
                 wp => wp.WeeklyPollOptions);
 
-            result = mapper.Map<WeeklyPoll, WeeklyPollEditResource>(poll);
+            result = poll == null ? null : mapper.Map<WeeklyPoll, WeeklyPollEditResource>(poll);
         }
         catch (Exception ex)
         {
@@ -124,13 +126,13 @@ public class WeeklyPollService(
         return result;
     }
 
-    public async Task<WeeklyPollResource> GetPollForForceResendAsync(ulong id, string pollName)
+    public async Task<WeeklyPollResource?> GetPollForForceResendAsync(ulong id, string pollName)
     {
-        WeeklyPollResource result = null;
+        WeeklyPollResource? result = null;
         try
         {
             pollName = pollName.ToLower();
-            WeeklyPoll poll = await weeklyPollRepository.FirstOrDefaultAsync(
+            WeeklyPoll? poll = await weeklyPollRepository.FirstOrDefaultAsync(
                 wp => wp.Server.DiscordId == id.ToString() && wp.Name.ToLower() == pollName,
                 includes: [
                     wp => wp.Server,
@@ -141,7 +143,7 @@ public class WeeklyPollService(
                     wp => wp.OptionPreset.WeeklyPollOptions
                 ]);
 
-            result = mapper.Map<WeeklyPoll, WeeklyPollResource>(poll);
+            result = poll == null ? null : mapper.Map<WeeklyPoll, WeeklyPollResource>(poll);
         }
         catch (Exception ex)
         {
@@ -152,7 +154,7 @@ public class WeeklyPollService(
 
     public async Task<List<WeeklyPollResource>> GetPollsByDayOfWeekAsync(DayOfWeek dayOfWeek)
     {
-        List<WeeklyPollResource> result = null;
+        List<WeeklyPollResource> result = [];
         try
         {
             List<WeeklyPoll> polls = await weeklyPollRepository.GetListAsync(
@@ -177,7 +179,7 @@ public class WeeklyPollService(
 
     public async Task<List<WeeklyPollResource>> GetPollsByServerIdAsync(ulong serverId)
     {
-        List<WeeklyPollResource> result = null;
+        List<WeeklyPollResource> result = [];
         try
         {
             List<WeeklyPoll> polls = await weeklyPollRepository.GetListAsync(
@@ -205,7 +207,7 @@ public class WeeklyPollService(
         try
         {
             pollName = pollName.ToLower();
-            WeeklyPoll poll = await weeklyPollRepository.FirstOrDefaultAsync(p => p.Server.DiscordId == serverId.ToString() && p.Name.ToLower() == pollName);
+            WeeklyPoll? poll = await weeklyPollRepository.FirstOrDefaultAsync(p => p.Server.DiscordId == serverId.ToString() && p.Name.ToLower() == pollName);
             if (poll != null)
             {
                 _ = await weeklyPollRepository.RemoveAsync(poll);
@@ -226,21 +228,21 @@ public class WeeklyPollService(
         return DbProcessResultEnum.Failure;
     }
 
-    public async Task<DbProcessResultEnum> UpdateAsync(int pollId, EditWeeklyPollModal modal, ulong channelId, ulong? roleId, string roleName)
+    public async Task<DbProcessResultEnum> UpdateAsync(int pollId, EditWeeklyPollModal modal, ulong channelId, ulong? roleId, string? roleName)
     {
         try
         {
-            WeeklyPoll poll = await weeklyPollRepository.FirstOrDefaultAsync(p => p.WeeklyPollId == pollId);
+            WeeklyPoll? poll = await weeklyPollRepository.FirstOrDefaultAsync(p => p.WeeklyPollId == pollId);
             if (poll != null)
             {
-                Channel channel = await channelRepository.FirstOrDefaultAsync(c => c.DiscordId == channelId.ToString());
+                Channel? channel = await channelRepository.FirstOrDefaultAsync(c => c.DiscordId == channelId.ToString());
                 channel ??= new Channel()
                 {
                     DiscordId = channelId.ToString(),
                     ServerId = poll.ServerId
                 };
 
-                Role role = null;
+                Role? role = null;
                 if (roleId.HasValue)
                 {
                     string roleDiscordId = roleId.Value.ToString();
@@ -280,7 +282,7 @@ public class WeeklyPollService(
         return DbProcessResultEnum.Failure;
     }
 
-    public async Task<DbProcessResultEnum> UpdateFieldAsync(int pollId, string fieldName, string newValue)
+    public async Task<DbProcessResultEnum> UpdateFieldAsync(int pollId, string fieldName, string? newValue)
     {
         try
         {
@@ -289,12 +291,17 @@ public class WeeklyPollService(
                 newValue = null;
             }
 
-            WeeklyPoll poll = await weeklyPollRepository.FirstOrDefaultAsync(p => p.WeeklyPollId == pollId);
+            WeeklyPoll? poll = await weeklyPollRepository.FirstOrDefaultAsync(p => p.WeeklyPollId == pollId);
+            if (poll == null)
+            {
+                return DbProcessResultEnum.NotFound;
+            }
 
-            PropertyInfo property = poll.GetType().GetProperty(fieldName);
+            PropertyInfo property = poll.GetType().GetProperty(fieldName)
+                ?? throw new InvalidOperationException($"WeeklyPoll has no property {fieldName}");
 
             //Get the type we need to cast to.
-            object convertedValue;
+            object? convertedValue;
             if (property.PropertyType == typeof(int?))
             {
                 convertedValue = int.TryParse(newValue, out int tempValue) ? tempValue : null;

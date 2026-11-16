@@ -22,7 +22,9 @@ public class BaseCommand(BotLogger logger, Config config, IServerService serverS
 
     protected async Task<ServerResource> GetCurrentServerAsync()
     {
-        return await serverService.GetByDiscordIdAsync(Context.Guild.Id);
+        //CommandHandler adds every guild it sees, so a missing server means the database could not be reached (the service logged why)
+        return await serverService.GetByDiscordIdAsync(Context.Guild.Id)
+            ?? throw new InvalidOperationException($"Server {Context.Guild.Id} could not be loaded from the database");
     }
 
     protected string GetCurrentUserAvatar(ImageFormat format = ImageFormat.Png, ushort size = 512)

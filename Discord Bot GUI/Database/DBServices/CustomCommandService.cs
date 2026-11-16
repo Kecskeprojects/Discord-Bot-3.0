@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
@@ -35,7 +37,7 @@ public class CustomCommandService(
                 return DbProcessResultEnum.AlreadyExists;
             }
 
-            Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
+            Server? server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
 
             CustomCommand command = new()
             {
@@ -57,17 +59,17 @@ public class CustomCommandService(
         return DbProcessResultEnum.Failure;
     }
 
-    public async Task<CustomCommandResource> GetCustomCommandAsync(ulong serverId, string commandName)
+    public async Task<CustomCommandResource?> GetCustomCommandAsync(ulong serverId, string commandName)
     {
-        CustomCommandResource result = null;
+        CustomCommandResource? result = null;
         try
         {
             commandName = commandName.Trim().ToLower();
-            CustomCommand command = await customCommandRepository.FirstOrDefaultAsync(
+            CustomCommand? command = await customCommandRepository.FirstOrDefaultAsync(
                 cc => cc.Server.DiscordId == serverId.ToString()
                 && cc.Command.Trim().ToLower().Equals(commandName),
                 cc => cc.Server);
-            result = mapper.Map<CustomCommand, CustomCommandResource>(command);
+            result = command == null ? null : mapper.Map<CustomCommand, CustomCommandResource>(command);
         }
         catch (Exception ex)
         {
@@ -78,7 +80,7 @@ public class CustomCommandService(
 
     public async Task<List<CustomCommandResource>> GetServerCustomCommandListAsync(ulong serverId)
     {
-        List<CustomCommandResource> result = null;
+        List<CustomCommandResource> result = [];
         try
         {
             List<CustomCommand> commands = await customCommandRepository.GetListAsync(
@@ -100,7 +102,7 @@ public class CustomCommandService(
         try
         {
             commandName = commandName.Trim().ToLower();
-            CustomCommand customCommand = await customCommandRepository.FirstOrDefaultAsync(
+            CustomCommand? customCommand = await customCommandRepository.FirstOrDefaultAsync(
                 cc => cc.Server.DiscordId == serverId.ToString()
                 && cc.Command.Trim().ToLower().Equals(commandName),
                 cc => cc.Server);

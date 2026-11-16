@@ -105,7 +105,7 @@ public class UserBiasGameCommands(
                 return;
             }
 
-            UserBiasGameStatResource stats = await userService.GetTopIdolsAsync(Context.User.Id, GenderEnum.NotSpecified);
+            UserBiasGameStatResource? stats = await userService.GetTopIdolsAsync(Context.User.Id, GenderEnum.NotSpecified);
 
             if (stats == null || stats.BiasGameCount == 0 || stats.Stats.Count == 0)
             {

@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
@@ -27,10 +29,11 @@ public class ServerMutedUserService(
     {
         try
         {
-            User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
-            Server server = await serverRepository.FirstOrDefaultAsync(u => u.DiscordId == serverId.ToString());
+            User? user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
+            Server? server = await serverRepository.FirstOrDefaultAsync(u => u.DiscordId == serverId.ToString());
 
-            if (await serverMutedUserRepository.ExistsAsync(smu =>
+            //A user or server without a row yet (both are created below) cannot already be muted
+            if (user != null && server != null && await serverMutedUserRepository.ExistsAsync(smu =>
                 smu.UserId == user.UserId &&
                 smu.ServerId == server.ServerId &&
                 smu.MutedUntil > DateTime.UtcNow))
@@ -60,7 +63,7 @@ public class ServerMutedUserService(
 
     public async Task<List<ServerMutedUserResource>> GetExpiredMutedUsersAsync(DateTime dateTime)
     {
-        List<ServerMutedUserResource> result = null;
+        List<ServerMutedUserResource> result = [];
         try
         {
             List<ServerMutedUser> mutedUser =
@@ -77,21 +80,24 @@ public class ServerMutedUserService(
         return result;
     }
 
-    public async Task<ServerMutedUserResource> GetMutedUserByUsernameAsync(ulong serverId, ulong userId)
+    public async Task<ServerMutedUserResource?> GetMutedUserByUsernameAsync(ulong serverId, ulong userId)
     {
-        ServerMutedUserResource result = null;
+        ServerMutedUserResource? result = null;
         try
         {
-            User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
-            Server server = await serverRepository.FirstOrDefaultAsync(u => u.DiscordId == serverId.ToString());
+            User? user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
+            Server? server = await serverRepository.FirstOrDefaultAsync(u => u.DiscordId == serverId.ToString());
+            if (user == null || server == null)
+            {
+                return null;
+            }
 
-            ServerMutedUser mutedUser =
-                await serverMutedUserRepository.FirstOrDefaultAsync(smu =>
+            ServerMutedUser? mutedUser = await serverMutedUserRepository.FirstOrDefaultAsync(smu =>
                     smu.UserId == user.UserId &&
                     smu.ServerId == server.ServerId,
                     smu => smu.User,
                     smu => smu.Server);
-            result = mapper.Map<ServerMutedUserResource>(mutedUser);
+            result = mutedUser == null ? null : mapper.Map<ServerMutedUserResource>(mutedUser);
         }
         catch (Exception ex)
         {
@@ -104,10 +110,14 @@ public class ServerMutedUserService(
     {
         try
         {
-            User user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
-            Server server = await serverRepository.FirstOrDefaultAsync(u => u.DiscordId == serverId.ToString());
+            User? user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString());
+            Server? server = await serverRepository.FirstOrDefaultAsync(u => u.DiscordId == serverId.ToString());
+            if (user == null || server == null)
+            {
+                return DbProcessResultEnum.NotFound;
+            }
 
-            ServerMutedUser mutedUser = await serverMutedUserRepository.FirstOrDefaultAsync(smu => smu.UserId == user.UserId && smu.ServerId == server.ServerId);
+            ServerMutedUser? mutedUser = await serverMutedUserRepository.FirstOrDefaultAsync(smu => smu.UserId == user.UserId && smu.ServerId == server.ServerId);
             if (mutedUser == null)
             {
                 return DbProcessResultEnum.NotFound;

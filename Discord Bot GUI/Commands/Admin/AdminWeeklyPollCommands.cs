@@ -37,7 +37,12 @@ public class AdminWeeklyPollCommands(
     {
         try
         {
-            WeeklyPollEditResource resource = await weeklyPollService.GetOrCreateDummyPollAsync(Context.Guild.Id);
+            WeeklyPollEditResource? resource = await weeklyPollService.GetOrCreateDummyPollAsync(Context.Guild.Id);
+            if (resource == null)
+            {
+                _ = await ReplyAsync("The poll could not be created.");
+                return;
+            }
             List<WeeklyPollOptionPresetResource> presets = await weeklyPollOptionPresetService.GetActivePresetsAsync();
 
             Embed[] embeds = PollEditEmbedProcessor.CreateEmbed(resource, false);
@@ -60,7 +65,12 @@ public class AdminWeeklyPollCommands(
     {
         try
         {
-            WeeklyPollEditResource resource = await weeklyPollService.GetPollByNameForEditAsync(Context.Guild.Id, pollName);
+            WeeklyPollEditResource? resource = await weeklyPollService.GetPollByNameForEditAsync(Context.Guild.Id, pollName);
+            if (resource == null)
+            {
+                _ = await ReplyAsync("Poll not found!");
+                return;
+            }
             List<WeeklyPollOptionPresetResource> presets = await weeklyPollOptionPresetService.GetActivePresetsAsync();
 
             Embed[] embeds = PollEditEmbedProcessor.CreateEmbed(resource, true);
@@ -128,8 +138,14 @@ public class AdminWeeklyPollCommands(
     {
         try
         {
-            WeeklyPollResource resource = await weeklyPollService.GetPollForForceResendAsync(Context.Guild.Id, pollName);
-            bool _ = await weeklyPollFeature.ProcessWeeklyPollAsync(resource);
+            WeeklyPollResource? resource = await weeklyPollService.GetPollForForceResendAsync(Context.Guild.Id, pollName);
+            if (resource == null)
+            {
+                _ = await ReplyAsync("Poll not found!");
+                return;
+            }
+
+            _ = await weeklyPollFeature.ProcessWeeklyPollAsync(resource);
         }
         catch (Exception ex)
         {

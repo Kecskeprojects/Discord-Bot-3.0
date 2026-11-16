@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Interfaces.DBRepositories;
+﻿#nullable enable
+
+using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Tools.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -49,19 +51,19 @@ public class GenericRepository<TEntity>(MainDbContext context) : IGenericReposit
     #endregion
 
     #region FindById
-    public ValueTask<TEntity> FindByIdAsync(int id)
+    public ValueTask<TEntity?> FindByIdAsync(int id)
     {
         return context.Set<TEntity>().FindAsync(id);
     }
     #endregion
 
     #region FirstOrDefault
-    public Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+    public Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
     {
         return context.Set<TEntity>().FirstOrDefaultAsync(predicate);
     }
 
-    public Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
+    public Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
     {
         IQueryable<TEntity> dbSet = context.Set<TEntity>();
 

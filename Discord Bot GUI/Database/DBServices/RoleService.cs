@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Core;
+﻿#nullable enable
+
+using Discord_Bot.Core;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
@@ -34,7 +36,7 @@ public class RoleService(
                 return DbProcessResultEnum.AlreadyExists;
             }
 
-            Server server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
+            Server? server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
 
             Role role = new()
             {
@@ -61,17 +63,17 @@ public class RoleService(
         throw new NotImplementedException();
     }
 
-    public async Task<RoleResource> GetRoleAsync(ulong serverId, string roleName)
+    public async Task<RoleResource?> GetRoleAsync(ulong serverId, string roleName)
     {
-        RoleResource result = null;
+        RoleResource? result = null;
         try
         {
             roleName = roleName.Trim().ToLower();
-            Role role = await roleRepository.FirstOrDefaultAsync(r =>
+            Role? role = await roleRepository.FirstOrDefaultAsync(r =>
                 r.Server.DiscordId == serverId.ToString()
                 && r.RoleName.Trim().ToLower().Equals(roleName),
                 r => r.Server);
-            result = mapper.Map<Role, RoleResource>(role);
+            result = role == null ? null : mapper.Map<Role, RoleResource>(role);
         }
         catch (Exception ex)
         {
@@ -82,7 +84,7 @@ public class RoleService(
 
     public async Task<List<RoleResource>> GetServerRolesAsync(ulong id)
     {
-        List<RoleResource> result = null;
+        List<RoleResource> result = [];
         try
         {
             List<Role> role = await roleRepository.GetListAsync(r =>
@@ -102,7 +104,7 @@ public class RoleService(
         try
         {
             roleName = roleName.Trim().ToLower();
-            Role role = await roleRepository.FirstOrDefaultAsync(r =>
+            Role? role = await roleRepository.FirstOrDefaultAsync(r =>
                 r.Server.DiscordId == serverId.ToString()
                 && r.RoleName.Trim().ToLower().Equals(roleName));
             if (role != null)

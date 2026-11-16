@@ -34,7 +34,12 @@ public class OwnerWeeklyPollOptionPresetCommands(
     {
         try
         {
-            WeeklyPollOptionPresetResource resource = await weeklyPollOptionPresetService.GetOrCreateDummyPresetAsync();
+            WeeklyPollOptionPresetResource? resource = await weeklyPollOptionPresetService.GetOrCreateDummyPresetAsync();
+            if (resource == null)
+            {
+                _ = await ReplyAsync("The preset could not be created.");
+                return;
+            }
 
             Embed[] embeds = PollPresetEditEmbedProcessor.CreateEmbed(resource, false);
             MessageComponent component = PollPresetEditEmbedProcessor.CreateComponent(resource);
@@ -56,7 +61,12 @@ public class OwnerWeeklyPollOptionPresetCommands(
     {
         try
         {
-            WeeklyPollOptionPresetResource resource = await weeklyPollOptionPresetService.GetPresetByNameAsync(presetName);
+            WeeklyPollOptionPresetResource? resource = await weeklyPollOptionPresetService.GetPresetByNameAsync(presetName);
+            if (resource == null)
+            {
+                _ = await ReplyAsync("Preset not found!");
+                return;
+            }
 
             Embed[] embeds = PollPresetEditEmbedProcessor.CreateEmbed(resource, true);
             MessageComponent component = PollPresetEditEmbedProcessor.CreateComponent(resource);

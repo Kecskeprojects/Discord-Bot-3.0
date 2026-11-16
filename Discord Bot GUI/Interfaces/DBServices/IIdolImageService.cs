@@ -1,4 +1,6 @@
-﻿using Discord_Bot.Communication.Modal;
+﻿#nullable enable
+
+using Discord_Bot.Communication.Modal;
 using Discord_Bot.Enums;
 using System.Threading.Tasks;
 

@@ -28,7 +28,12 @@ public class TwitchNotificationFeature(
         {
             TwitchNotificationData data = (TwitchNotificationData) Parameters;
 
-            ServerResource server = await serverService.GetByDiscordIdAsync(data.TwitchChannel.ServerDiscordId);
+            ServerResource? server = await serverService.GetByDiscordIdAsync(data.TwitchChannel.ServerDiscordId);
+            if (server == null)
+            {
+                logger.Warning("TwitchNotificationFeature.cs ExecuteCoreLogicAsync", $"Server {data.TwitchChannel.ServerDiscordId} could not be loaded, no notification is sent.");
+                return false;
+            }
 
             //Do not send a message if a channel was not set
             if (server.SettingsChannels.TryGetValue(ChannelTypeEnum.TwitchNotificationText, out List<ulong>? notificationChannels))
