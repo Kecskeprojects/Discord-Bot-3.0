@@ -89,6 +89,7 @@ public class LastFmHelper
             LastFmRequestResultEnum.Failure => string.IsNullOrEmpty(message) ? "Unexpected exception during request!" : message,
             LastFmRequestResultEnum.EmptyResponse => "The response was empty!",
             LastFmRequestResultEnum.RequiredParameterEmpty => "Required parameter is not set!",
+            LastFmRequestResultEnum.Success => null,
             _ => "Unexpected response type during request!"
         };
     }
