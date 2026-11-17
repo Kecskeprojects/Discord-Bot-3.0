@@ -80,14 +80,31 @@ The analyzer setup is done and described in CLAUDE.md ("Linting"). Left:
 
 What has to be mockable so tests can leave out the database, the external APIs and the scraping. These classes have no interface yet, in order of how much code each one makes testable:
 
-1. **The Last.fm requests (`LastFmApi`).** `UserBasedRequests`, `InfoBasedRequests`, `UtilityRequests` and `WhoKnowsRequests` are static methods over one static `RestClient` in `BaseRequests`. They are called directly:
-   - by `LastFmAPI` (465 lines: the list results, now playing, artist stats, who-knows)
-   - by `UtilityRequests` (215 lines: total plays, the monthly ranking, every album or track of an artist)
-   - by `WhoKnowsRequests` (195 lines)
-
-   Fix: instance classes behind `IUserBasedRequests`, `IInfoBasedRequests`, `IUtilityRequests` and `IWhoKnowsRequests`, registered in DI; the last two take the first two.
-   - For the library's own JSON handling, `BaseRequests` can take the `RestClient` from outside. RestSharp builds one on an `HttpClient`, so a test passes a fake `HttpMessageHandler` that returns saved responses.
-   - Optional at the same time: give the API key to the constructor instead of every call.
+1. **Last.fm: fake only the HTTP layer (updated 2026-11-17).**
+   - **Why this one place is enough:** all of `LastFmApi` (858 lines) sends through one static `RestClient` in `BaseRequests`, in two methods: `UserBasedRequestHandler` and `InfoBasedRequestHandler`, each a single `GetAsync`.
+     - `UserBasedRequests`, `InfoBasedRequests`, `UtilityRequests` and `WhoKnowsRequests` are static methods on top of it, with no other I/O.
+     - The bot's `LastFmAPI` (456 lines) calls 14 of those methods. It also uses `ISpotifyAPI` (already an interface), `IBotLogger` and `Config`, which it reads only for `Lastfm_API_Key`. It uses no clock, `WebTools`, `Global`, files or randomness.
+     - Faking only the HTTP responses therefore tests the whole chain:
+       - query building (escaping, `limit` / `page` / `period`)
+       - success and error handling
+       - JSON deserialization
+       - the paging and aggregation in `UtilityRequests` and `WhoKnowsRequests`
+       - `LastFmAPI`'s list results, now playing, artist stats and who-knows
+   - **The seam: make `LastFmApi` instance-based, with the client injected (chosen 2026-11-17, so the tests can run in parallel).**
+     - `BaseRequests` takes its `RestClient` in the constructor instead of holding a static one. RestSharp recommends one long-lived client, and it is thread-safe, so the bot registers a single instance.
+     - The four request classes become instance classes. `UserBasedRequests` and `InfoBasedRequests` take the `BaseRequests`; `UtilityRequests` and `WhoKnowsRequests` take the request classes they call.
+     - The bot registers them in `Startup`, and `LastFmAPI` takes them in its constructor.
+     - Size: `BaseRequests`, the four classes, 8 cross-calls inside `LastFmApi`, `LastFmAPI`'s 14 calls (the only caller outside the library) and the registrations. `LastFmHelper` stays static (pure helpers).
+     - Keep the API key as a parameter of each call. `LastFmAPI` reads it from `Config` per call, so an edited key still applies without a restart.
+     - Interfaces aren't needed for these tests: they build the real classes over a fake client. Interfaces would only matter for mocking `LastFmAPI`'s own dependencies.
+     - **In a test:** `new RestClient(new RestClientOptions(Constant.LastFmApiBaseUri) { ConfigureMessageHandler = _ => fakeHandler })` (RestSharp 114). The fake `HttpMessageHandler` returns saved JSON and can assert on the request URL.
+     - **Speed, honestly:** tests against saved responses take milliseconds each, so running them in parallel saves little at first. The bigger gain is isolation: no shared static client to reset between tests. That also lets the integration tests (below) swap only the HTTP edge of a real container.
+   - **Saved responses:** record each Last.fm method once from the real API (`user.gettoptracks`, `user.gettopalbums`, `user.gettopartists`, `user.getrecenttracks`, `artist.getinfo`, `track.getinfo`, plus an error response). Keep them as JSON files in the test project.
+     - The fake handler picks the file by the `method=` parameter (and the page, for the paging helpers).
+     - Use your own account's data, or replace the usernames.
+     - Saved responses can drift from the live API, so re-record them when Last.fm changes a format.
+   - **Config:** until blocker 3 (`IConfig`) is done, a `LastFmAPI` test writes an `Assets/config.json` with a dummy `lastfm_api_key` into its working directory, which is where `Config` reads from.
+   - **Spotify:** only artist stats use it (for the image); mock `ISpotifyAPI` there.
 2. **`BrowserService`** (Puppeteer, a concrete singleton) → `IBrowserService` (`OpenBrowser`, `CloseBrowser`, `NewPage`).
    - `BiasScrapingProcessor` (136 lines: matching scraped idols to the database, the group check, image changes) only uses it to close the browser at the end. With the interface it can be tested with mocked `IKpopDbScraper` and `IIdolService`.
    - Optional: to test the scrapers' HTML parsing (`KpopDbScraper.ParseRow` and the group scraping), split loading a page from parsing it, so the parsing takes the page content and tests can feed it saved pages.
@@ -126,10 +143,45 @@ Randomness and files (no interface, but tests have to account for them):
 
 Don't use EF InMemory or SQLite. The schema uses the `SQL_Latin1_General_CP1_CI_AS` collation (case-insensitive comparisons that queries rely on, see the CA1862 suppression) and `getutcdate()` defaults, so results would differ.
 
-If repository tests are wanted:
-- Run them against **SQL Server LocalDB** (ships with Visual Studio) or Testcontainers.
-- Create the schema from the model or `Latest_Release.sql`.
-- Reset between tests (e.g. Respawn).
+If repository tests are wanted (checked 2026-11-17):
+- **Run them against SQL Server LocalDB.** `MSSQLLocalDB` is installed on the dev PC (SQL Server 2025, `Microsoft SQL Server/170`).
+- **Create the schema with `Database.EnsureCreated()` from the scaffolded model.**
+  - It carries `UseCollation("SQL_Latin1_General_CP1_CI_AS")` and all 26 `getutcdate()` defaults, so the result matches the SSDT schema closely enough.
+  - Then run `MainDB/Post-deployment/ChannelType_Inserts.sql` for the 6 lookup rows.
+- **Why not the other two schema sources:**
+  - `Latest_Release.sql` is git-ignored, and the dev PC's copy is from 2023.
+  - Publishing `MainDB.dacpac` (DacFx or SqlPackage) would be exact, but it needs a Visual Studio build of `MainDB` first.
+- **Isolation:** give each test collection its own database (a unique name, created at the start and dropped at the end), so collections run in parallel. Within one collection, reset between tests (e.g. Respawn).
+
+### Integration tests (investigated 2026-11-17)
+
+Yes, the bot's test project can run integration tests: real services wired together in-process, with only the outside world faked. In order of value for effort:
+
+1. **DI composition.** Build the real container and resolve every registered service.
+   - A throwaway program already did this through `Startup.Run()` on 2026-11-17, with a dummy connection string. No SQL Server or Discord connection is made.
+   - Cheap, and it catches a missing registration or a broken Mapster mapping before the bot starts.
+2. **The DB layer against LocalDB.** Real DB services and repositories on the schema above.
+   - This tests the actual queries, the collation-dependent comparisons, the cache invalidation, and the results the services return.
+3. **Last.fm through the bot.** `LastFmAPI` and `LastFmApi` on the injected fake HTTP client with the saved responses (item 1 above). `ISpotifyAPI` is replaced by a mock.
+4. **Whole text commands, without Discord.**
+   - Discord.Net's `CommandService.ExecuteAsync(ICommandContext, …)` runs a command from its text. Give it a fake context that records what the command replies, and a real container with LocalDB and the fake Last.fm client.
+   - A test can then send `!lf…` or a bias command and check the reply embed.
+   - This needs blocker 4 first. `BaseCommand` derives from `ModuleBase<SocketCommandContext>`, so a non-socket context fails; deriving from `ModuleBase<ICommandContext>` fixes that.
+   - Interactions (buttons, modals) work the same way through `InteractionService`, with the same prerequisite.
+
+**The one enabler they share:** split `Startup.Run()` into a method that registers everything on an `IServiceCollection` and one that builds it. A test then reuses the real registrations and replaces only the edges:
+- the Last.fm `RestClient`
+- `ISpotifyAPI`, and other external services as needed
+- the connection string, through a test `Assets/config.json`, or a `Func<string>` straight into `DatabaseStartup`
+
+**Not worth it:**
+- A real Discord gateway: it would need a second bot account and a test server, and would be slow and flaky.
+- Live external APIs as part of the normal run. An optional, opt-in live Last.fm test (a trait, a real key, network) could warn when a saved response no longer matches the real format.
+
+**Where:**
+- Keep them in `Discord Bot GUI.Tests`, marked `[Trait("Category", "Integration")]`. Then `dotnet test --filter "Category!=Integration"` stays the quick run.
+- Move them to their own project if the LocalDB setup grows.
+- DB-only integration tests can also go in `DatabaseORM.Tests`.
 
 ### Project setup
 
@@ -141,13 +193,14 @@ If repository tests are wanted:
 - **Shared setup:** `Directory.Build.props` and the root `.editorconfig` apply automatically (analyzers, warnings as errors, banned APIs, CRLF, the BOM rule). Each test project needs its own `<Nullable>enable</Nullable>` and `<ImplicitUsings>enable</ImplicitUsings>`, like the other projects.
 - **Packages:** xUnit v3 (or MSTest / NUnit), NSubstitute (or Moq), `Microsoft.Extensions.TimeProvider.Testing`.
 - **Suggested order:**
-  1. Static tools and Mapster mapping tests, with no code changes.
+  1. Static tools and Mapster mapping tests, with no code changes. Then split `Startup.Run()` and add the DI composition test.
   2. DB services with mocked repositories.
-  3. The Last.fm request interfaces, `IBrowserService` and `IWebTools`; then `LastFmAPI`, `BiasScrapingProcessor` and the who-knows embed.
-  4. `TimeProvider`, and `Global` moved into DI; then the features.
-  5. The Discord interfaces.
-  6. YouTube and Spotify.
-  7. Optional: LocalDB repository tests.
+  3. `LastFmApi` made instance-based with the injected client. Then tests for `LastFmApi` and the bot's `LastFmAPI` against saved responses, run in parallel. They go in `Discord Bot GUI.Tests`, which reaches `LastFmApi` through the bot.
+  4. Integration tests: the DB layer on LocalDB, and Last.fm through the real container.
+  5. `IBrowserService` and `IWebTools`; then `BiasScrapingProcessor` and the who-knows embed.
+  6. `TimeProvider`, and `Global` moved into DI; then the features.
+  7. The Discord interfaces, then whole-command integration tests.
+  8. YouTube and Spotify.
 
 ## 3. Discord.Net: optional modernization (investigated 2026-11-15)
 

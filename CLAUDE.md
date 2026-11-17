@@ -12,7 +12,7 @@ A self-hosted Discord bot that runs as a **Windows WPF desktop app** (the window
 - `DatabaseORM/`: the database layer as a plain `net11.0` class library (no WPF or Discord.Net), referenced by the bot and modeled on the project of the same name in KecskeProjectsSite. Its namespaces are `DatabaseORM.*`. Keep its .NET version in step with the bot's.
 - `LastFmApi/`: a small RestSharp/Newtonsoft client for `ws.audioscrobbler.com`, referenced by the bot. Keep its target framework in step with the bot's.
 - `MainDB/`: a legacy (non-SDK) SSDT `.sqlproj`, the **source of truth for the database schema**. It builds and publishes only from Visual Studio, not `dotnet build`.
-- `Latest_Release.sql`: the generated full deployment script for the current schema.
+- `Latest_Release.sql`: a full deployment script, but git-ignored and local only. The dev PC's copy dates from 2023, so the source of truth is `MainDB/`.
 - `diagram.drawio` / `diagram.png`: the DB diagram.
 
 There is no test project. Linting is done by analyzers during the build (see Linting).
@@ -131,7 +131,7 @@ Every interaction must be acknowledged within 3 seconds, including early returns
 
 The schema is **database-first**:
 1. Edit the table definitions in `MainDB/Tables/*.sql`.
-2. Generate the deployment or patch script with SSDT publish (profiles: `Local_Debug`, `Local_Release`, `Main_Release`). Applied patches are archived as `MainDB/DB Patch/Patched/Patch_N.sql`, and `Latest_Release.sql` holds the full script.
+2. Generate the deployment or patch script with SSDT publish (profiles: `Local_Debug`, `Local_Release`, `Main_Release`). Applied patches are archived as `MainDB/DB Patch/Patched/Patch_N.sql`. A full script can be generated too, but `Latest_Release.sql` is git-ignored, so it only exists locally.
 3. Re-scaffold `DatabaseORM/Model/*` and `DatabaseORM/Context/MainDbContext.cs` from the Package Manager Console: `Scaffold-DbContext "<connection string>" -Project "DatabaseORM" -StartupProject "DatabaseORM" Microsoft.EntityFrameworkCore.SqlServer -f -NoOnConfiguring -OutputDir Model -ContextDir Context -Context MainDbContext`. The full local command is in the git-ignored `DatabaseORM/Context/update-scaffold.txt`. Don't hand-edit or hand-style the scaffolded files. With nullable on, the scaffold writes `?` for nullable columns and optional navigations instead of `.IsRequired()`, so EF and the compiler read required columns from those annotations. That is why the models are not marked as generated code (there a `?` would be error CS8669). In an `Include` path through an optional navigation, use `!` (`wp => wp.OptionPreset!.WeeklyPollOptions`): EF only reads the path.
 4. Update the matching `Resource`, Mapster mapping, repository and service.
 
