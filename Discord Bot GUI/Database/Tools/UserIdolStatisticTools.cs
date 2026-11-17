@@ -1,6 +1,6 @@
 ﻿using Discord_Bot.Database.Models;
 
-namespace Discord_Bot.Tools.ModelTools;
+namespace Discord_Bot.Database.Tools;
 
 public static class UserIdolStatisticTools
 {

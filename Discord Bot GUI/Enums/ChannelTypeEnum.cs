@@ -1,5 +1,4 @@
-﻿using Discord_Bot.Core;
-using System;
+﻿using System;
 using System.Linq;
 
 namespace Discord_Bot.Enums;
@@ -17,9 +16,17 @@ public enum ChannelTypeEnum
 
 public static class ChannelTypeEnumExtension
 {
+    //Only one channel per server can have these types, setting one on a channel takes it off the others
+    private static readonly ChannelTypeEnum[] restrictedChannelTypes =
+    [
+        ChannelTypeEnum.RoleText,
+        ChannelTypeEnum.TwitchNotificationText,
+        ChannelTypeEnum.BirthdayText
+    ];
+
     public static bool IsRestrictedChannelType(this ChannelTypeEnum channelType)
     {
-        return Constant.RestrictedChannelTypes.Contains(channelType);
+        return restrictedChannelTypes.Contains(channelType);
     }
 
     public static string ToCommandString(this ChannelTypeEnum channelTypeEnum)

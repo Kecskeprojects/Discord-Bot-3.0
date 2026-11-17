@@ -1,9 +1,9 @@
 ﻿using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
+using Discord_Bot.Database.Tools;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
-using Discord_Bot.Tools.ModelTools;
 using MapsterMapper;
 using System;
 using System.Collections.Generic;

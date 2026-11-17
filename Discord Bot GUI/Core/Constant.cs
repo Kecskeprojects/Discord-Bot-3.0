@@ -1,5 +1,4 @@
 ﻿using Discord_Bot.Communication.Bias;
-using Discord_Bot.Enums;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -165,13 +164,6 @@ public static class Constant
         ThreadState.Wait,
         ThreadState.Transition,
         /*ThreadState.Unknown*/
-    ];
-
-    public static readonly ChannelTypeEnum[] RestrictedChannelTypes =
-    [
-        ChannelTypeEnum.RoleText,
-        ChannelTypeEnum.TwitchNotificationText,
-        ChannelTypeEnum.BirthdayText
     ];
     #endregion
 }

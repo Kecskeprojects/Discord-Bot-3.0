@@ -8,6 +8,7 @@ using Discord_Bot.Core.Configuration;
 using Discord_Bot.Database;
 using Discord_Bot.Database.DBRepositories;
 using Discord_Bot.Database.DBServices;
+using Discord_Bot.Database.Mapping;
 using Discord_Bot.Features;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
@@ -74,6 +75,7 @@ public static class Startup
         _ = collection.AddDbContext<MainDbContext>(options => options.UseSqlServer(config.SqlConnectionString));
 
         TypeAdapterConfig mapsterConfig = new();
+        new DatabaseMapperConfig().Register(mapsterConfig);
         new MapperConfig().Register(mapsterConfig);
         mapsterConfig.Compile(); //Fail fast on startup if a mapping is invalid
         _ = collection.AddSingleton(mapsterConfig);

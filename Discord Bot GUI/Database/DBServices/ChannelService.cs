@@ -5,7 +5,6 @@ using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
-using Discord_Bot.Tools.NativeTools;
 using MapsterMapper;
 using System;
 using System.Collections.Generic;
@@ -145,7 +144,7 @@ public class ChannelService(
             {
                 return DbProcessResultEnum.NotFound;
             }
-            if (!CollectionTools.IsNullOrEmpty(channels))
+            if (channels.Count > 0)
             {
                 channels.ForEach((channel) => { _ = channel.ChannelTypes.Remove(channelType); });
 

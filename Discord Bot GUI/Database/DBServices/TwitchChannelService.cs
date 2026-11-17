@@ -1,13 +1,10 @@
-﻿using Discord_Bot.Core;
-using Discord_Bot.Core.Caching;
+﻿using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
-using Discord_Bot.Tools;
-using Discord_Bot.Tools.NativeTools;
 using MapsterMapper;
 using System;
 using System.Collections.Generic;
@@ -20,11 +17,10 @@ public class TwitchChannelService(IMapper mapper, IBotLogger logger, ServerCache
     private readonly ITwitchChannelRepository twitchChannelRepository = twitchChannelRepository;
     private readonly IServerRepository serverRepository = serverRepository;
 
-    public async Task<DbProcessResultEnum> AddTwitchChannelAsync(ulong serverId, string twitchUserId, string twitchUserName)
+    public async Task<DbProcessResultEnum> AddTwitchChannelAsync(ulong serverId, string twitchUserId, string twitchUserName, string twitchLink)
     {
         try
         {
-            string url = Constant.TwitchBaseUrl.UrlCombine(twitchUserName);
             Server? server = await serverRepository.FirstOrDefaultAsync(s => s.DiscordId == serverId.ToString());
             if (server == null)
             {
@@ -43,7 +39,7 @@ public class TwitchChannelService(IMapper mapper, IBotLogger logger, ServerCache
             {
                 TwitchChannelId = 0,
                 TwitchId = twitchUserId,
-                TwitchLink = url,
+                TwitchLink = twitchLink,
                 TwitchName = twitchUserName,
                 Server = server
             };
@@ -90,7 +86,7 @@ public class TwitchChannelService(IMapper mapper, IBotLogger logger, ServerCache
                 tc => tc.Server.DiscordId == serverId.ToString()
                 && (string.IsNullOrEmpty(name) || tc.TwitchName == name),
                 tc => tc.Server);
-            if (CollectionTools.IsNullOrEmpty(channels))
+            if (channels.Count == 0)
             {
                 return DbProcessResultEnum.NotFound;
             }

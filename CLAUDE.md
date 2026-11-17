@@ -99,7 +99,7 @@ Every interaction must be acknowledged within 3 seconds, including early returns
 - `Database/Models/` are EF entities, and `Resources/` are the DTOs that services return. **Commands should work with `*Resource` types, not EF models.**
 - `Communication/`: in-memory DTOs, including modal definitions.
 
-**Mapping:** Mapster, configured in `Core/MapperConfig.cs` and compiled at startup, so an invalid mapping fails fast. The project moved off AutoMapper. Mapster does **not** null-guard navigation chains or convert `string` → `ulong` on its own, so write these mappings out explicitly. `ShallowCopyForSameType(true)` is on to avoid deep-cloning EF navigation graphs.
+**Mapping:** Mapster, configured in `Database/Mapping/DatabaseMapperConfig.cs` (EF models and scraped data) and `Core/MapperConfig.cs` (resources to Discord types). `Startup` registers both and compiles them, so an invalid mapping fails fast. The project moved off AutoMapper. Mapster does **not** null-guard navigation chains or convert `string` → `ulong` on its own, so write these mappings out explicitly. `ShallowCopyForSameType(true)` is on to avoid deep-cloning EF navigation graphs.
 
 **Discord IDs** are stored as `string` (varchar) in the DB and exposed as `ulong` on resources. Compare against `id.ToString()` in EF queries.
 

@@ -2,6 +2,7 @@
 using AngleSharp.Dom;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
+using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Tools;
@@ -33,7 +34,7 @@ public class KpopDbScraper(IBotLogger logger, BrowserService browserService) : I
 
                 foreach (IElement row in rows)
                 {
-                    biasDataList.Add(new ExtendedBiasData(row));
+                    biasDataList.Add(ParseRow(row));
                 }
 
                 await mainPage.CloseAsync();
@@ -49,6 +50,38 @@ public class KpopDbScraper(IBotLogger logger, BrowserService browserService) : I
         }
 
         return biasDataList;
+    }
+
+    private static ExtendedBiasData ParseRow(IElement row)
+    {
+        string profileHref = Cell(row, ".column-profile>a").GetAttribute("href")
+            ?? throw new InvalidOperationException("A dbkpop profile link has no href, the page layout may have changed");
+        string dateString = CellText(row, ".column-dob");
+        string gender = CellText(row, ".column-gender");
+
+        return new ExtendedBiasData()
+        {
+            ProfileUrl = Uri.UnescapeDataString(profileHref.Trim()),
+            StageName = CellText(row, ".column-stage_name"),
+            FullName = CellText(row, ".column-full_name"),
+            KoreanFullName = CellText(row, ".column-korean_name"),
+            KoreanStageName = CellText(row, ".column-korean_stage_name"),
+            DateOfBirth = DateOnly.TryParseExact(dateString, "yyyy-MM-dd", out DateOnly date) ? date : null,
+            GroupName = CellText(row, ".column-grp"),
+            Gender = GenderChoiceEnumExtension.FromDatabaseString(gender)
+        };
+    }
+
+    //Every row of the dbkpop table has these cells, a missing one means the page layout changed
+    private static IElement Cell(IElement row, string selector)
+    {
+        return row.QuerySelector(selector)
+            ?? throw new InvalidOperationException($"A dbkpop row has no '{selector}' cell, the page layout may have changed");
+    }
+
+    private static string CellText(IElement row, string selector)
+    {
+        return Uri.UnescapeDataString(Cell(row, selector).InnerHtml.Trim());
     }
 
     private static async Task<IDocument> GetPageAndSetSettingsAsync(IBrowsingContext context, IPage page)

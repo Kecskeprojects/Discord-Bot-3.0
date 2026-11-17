@@ -7,7 +7,6 @@ using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
-using Discord_Bot.Tools.NativeTools;
 using MapsterMapper;
 using System;
 using System.Collections.Generic;
@@ -364,7 +363,7 @@ public class IdolService(
                 idols = idols.Union(newIdols).ToList();
             }
 
-            if (CollectionTools.IsNullOrEmpty(idols))
+            if (idols.Count == 0)
             {
                 result.ProcessResultEnum = DbProcessResultEnum.NotFound;
                 return result;

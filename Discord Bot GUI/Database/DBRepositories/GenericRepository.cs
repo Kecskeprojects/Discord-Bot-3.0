@@ -1,5 +1,5 @@
 ﻿using Discord_Bot.Interfaces.DBRepositories;
-using Discord_Bot.Tools.Extensions;
+using Discord_Bot.Database.Tools.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

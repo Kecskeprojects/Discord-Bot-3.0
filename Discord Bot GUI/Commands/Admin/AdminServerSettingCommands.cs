@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Core;
@@ -216,7 +217,7 @@ public class AdminServerSettingCommands(
             string twitchUserId = response.Id;
 
             //Adds the twitch channel to the checked channel's list for the server, removes server from cache
-            DbProcessResultEnum result = await twitchChannelService.AddTwitchChannelAsync(Context.Guild.Id, twitchUserId, response.Login);
+            DbProcessResultEnum result = await twitchChannelService.AddTwitchChannelAsync(Context.Guild.Id, twitchUserId, response.Login, Constant.TwitchBaseUrl.UrlCombine(response.Login));
             string resultMessage = result switch
             {
                 DbProcessResultEnum.Success => "Twitch channel added.",

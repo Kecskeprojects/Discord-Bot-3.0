@@ -1,5 +1,4 @@
-﻿using Discord_Bot.Tools.NativeTools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Core.Caching;
@@ -52,7 +51,7 @@ public sealed class SizedDictionary<TKey, TValue>(int size) : Dictionary<TKey, T
         }
 
         Queue<TKey> newQueue = new();
-        while (!CollectionTools.IsNullOrEmpty(keys))
+        while (keys.Count > 0)
         {
             TKey thisKey = keys.Dequeue();
             if (!thisKey.Equals(key))

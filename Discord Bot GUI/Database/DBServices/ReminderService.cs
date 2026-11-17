@@ -5,7 +5,6 @@ using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.DBRepositories;
 using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Resources;
-using Discord_Bot.Tools.NativeTools;
 using MapsterMapper;
 using System;
 using System.Collections.Generic;
@@ -100,7 +99,7 @@ public class ReminderService(
         {
             List<Reminder> reminders = await reminderRepository.GetListAsync(r => reminderIds.Contains(r.ReminderId));
 
-            if (!CollectionTools.IsNullOrEmpty(reminders))
+            if (reminders.Count > 0)
             {
                 _ = await reminderRepository.RemoveAsync(reminders);
 
