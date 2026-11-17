@@ -248,7 +248,7 @@ Can the disabled embeds be turned back on as they are, with adjustments and with
 
 **Found on the way:** `BrowserService` downloads PuppeteerSharp's default Chrome build on first use after every PuppeteerSharp upgrade and never removes the old ones. The old `net10.0` output folder alone holds 7 Chrome and 6 ChromeHeadlessShell builds (117 to 150). Check the bot's folder on the live server too, and delete all but the current build.
 
-## 9. Line endings (noted 2026-11-17, investigated 2026-11-17, not applied yet)
+## 9. Line endings (noted, investigated and applied 2026-11-17)
 
 Settle on one line ending for every file in the repository and enforce it.
 
@@ -301,13 +301,22 @@ Settle on one line ending for every file in the repository and enforce it.
   - After Write or Git Bash text tools, convert to CRLF with `sed -b -i 's/\r*$/\r/'`, or run `dotnet format whitespace`, and check with `git ls-files --eol`.
   - The same rule could go in the global `~/.claude/CLAUDE.md`, since KecskeProjectsSite has the same tools.
 
-### Applying it
+### Applying it (done 2026-11-17)
 
 On a clean working tree:
 1. Change `.gitattributes` and `.editorconfig`, then commit. The index is already LF, so `git add --renormalize .` should report nothing.
 2. Rewrite every working file in CRLF. git doesn't rewrite files it considers unchanged, so: `git rm -r --cached -q .` then `git reset --hard`.
 3. Check that `git ls-files --eol` shows only `w/crlf` (and `-text` for binaries), that the three projects build, and that `dotnet format --verify-no-changes` passes for each.
 4. Add the CLAUDE.md rule.
+
+**Result:**
+- **Settings:** commit `6176c49` holds `.gitattributes`, `.editorconfig` and this investigation. `git add --renormalize .` found nothing to change.
+- **Working copy:** `git rm -r --cached -q .` and `git reset --hard` rewrote all 526 text files as CRLF. The 16 binaries stay `-text`, and `LICENSE` is no longer mixed.
+- **Checks:** the three projects build without warnings, and `dotnet format --verify-no-changes` passes for each.
+- **Safety net:** a file turned into LF with `sed -i` got all 14 of its lines reported as ENDOFLINE, and `git checkout` restored it as CRLF.
+- **CLAUDE.md:** the line endings rule is in its Linting section.
+- **Still to check by hand:** that VS Code's Prettier now writes CRLF. Save a Markdown file there, then run `git ls-files --eol -- <file>`.
+- **Local only:** the ignored `Context/update-scaffold.txt` was converted with `unix2dos`.
 
 ## 10. Implicit usings in the bot (noted 2026-11-17, not investigated yet)
 
