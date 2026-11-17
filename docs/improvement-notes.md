@@ -318,17 +318,144 @@ On a clean working tree:
 - **Still to check by hand:** that VS Code's Prettier now writes CRLF. Save a Markdown file there, then run `git ls-files --eol -- <file>`.
 - **Local only:** the ignored `Context/update-scaffold.txt` was converted with `unix2dos`.
 
-## 10. Implicit usings in the bot (noted 2026-11-17, not investigated yet)
+## 10. Implicit usings in the bot (noted and investigated 2026-11-17, not applied yet)
 
-`DatabaseORM` and `LastFmApi` already have `<ImplicitUsings>enable</ImplicitUsings>`; only `Discord Bot GUI` doesn't. Investigate whether to turn it on there too.
+`DatabaseORM` and `LastFmApi` already have `<ImplicitUsings>enable</ImplicitUsings>`; only `Discord Bot GUI` doesn't.
 
-**Points to check:**
-- **WinForms usings.** The bot has `UseWindowsForms` as well as `UseWPF`. With implicit usings, the Windows Desktop SDK then also imports `System.Drawing` and `System.Windows.Forms`, which clash with WPF names (`Application`, `Color`, `MessageBox`...).
-  - A quick grep found no `System.Windows.Forms` use in the code, so first check whether `UseWindowsForms` is still needed.
-  - Otherwise, drop those two with `<Using Remove="..." />`.
-- **`System.Threading` becomes global.** A bare `Timer` is then ambiguous in any file that also imports `System.Timers`. `App.xaml.cs` already writes `System.Timers.Timer` in full, and the build will point out any others.
-- **`System.IO` is not implicit in WPF projects.** A WPF test project on 2026-11-17 had no `File` or `Path` without it, so files that use them keep their `using System.IO;`.
-- **The redundant usings.** Remove them with `dotnet format --diagnostics IDE0005`, then review the diff.
+### What the bot would get (SDK 11.0.100)
+
+The base C# set is `System`, `System.Collections.Generic`, `System.IO`, `System.Linq`, `System.Net.Http`, `System.Net.Http.Json` (.NET 11+), `System.Threading` and `System.Threading.Tasks` (`Microsoft.NET.Sdk.CSharp.props`). The Windows Desktop SDK then changes it:
+- **`UseWPF`:** removes `System.IO` and `System.Net.Http` (`Microsoft.NET.Sdk.WindowsDesktop.WPF.props`). `System.Net.Http.Json` stays, because the WPF list predates it.
+- **`UseWindowsForms`:** adds `System.Drawing` and `System.Windows.Forms` (`...WindowsForms.props`).
+
+### Trial build (2026-11-17, `dotnet build -p:ImplicitUsings=enable`, no file changes)
+
+The only errors are ambiguous names (CS0104), three places in all:
+
+| File | Name | Clash | With `UseWindowsForms` | Without |
+|---|---|---|---|---|
+| `App.xaml.cs` | `Application` | `System.Windows.Forms` vs `System.Windows` | yes | no |
+| `Core/Constant.cs` | `ThreadState` | `System.Diagnostics` vs `System.Threading` | yes | yes |
+| `Windows/BotWindow.xaml.cs` | `Timer` | `System.Timers` vs `System.Windows.Forms` / `System.Threading` | yes | yes |
+
+Each needs a one-line fix: an alias, or writing the type out in full, as `App.xaml.cs` already does for `System.Timers.Timer`.
+
+**Redundant usings that IDE0005 would then report:** counted directly, because the CS0104 errors stop the build before the analyzers get there.
+- 296 `using` lines in 128 of the bot's 177 hand-written `.cs` files: `System` 99, `System.Collections.Generic` 77, `System.Threading.Tasks` 77, `System.Linq` 39 and `System.Threading` 4.
+- 12 files would be left with no `using` at all.
+- The generated JSON models in `Services/Models` keep theirs, because IDE0005 doesn't run on generated code.
+- `System.IO` (23 files) and `System.Net.Http` (4 files) stay explicit.
+
+### Is `UseWindowsForms` needed?
+
+Only for one line.
+- It was added in `c5a9e57` (2026-02-23, "changed to nightly package").
+- A trial build with `-p:UseWindowsForms=false` fails only in `Tools/NativeTools/ProcessTools.cs`, on `using Microsoft.VisualBasic.Devices`. Its `new ComputerInfo().TotalPhysicalMemory` feeds the window's total RAM figure, and on .NET that type ships with the WinForms part of the Windows Desktop runtime.
+- `System.Drawing` (the resx bitmaps, `BonkGifProcessor`, `BiasGameData`) compiles without WinForms.
+- **Replacements, checked on this machine:** `ComputerInfo().TotalPhysicalMemory`, WMI `Win32_OperatingSystem.TotalVisibleMemorySize × 1024` and `Win32_ComputerSystem.TotalPhysicalMemory` all return 67,845,451,776 bytes. `ComputerInfo` itself calls the Win32 `GlobalMemoryStatusEx`, so a P/Invoke of that is an exact replacement with no package at all.
+- **Found on the way:** `ProcessExtension` already uses WMI (`System.Management`), but the bot doesn't reference that package. Version 7.0.2 only arrives through `Google.Apis.Auth`. Reference it directly if WMI stays in use.
+- **On the server:** dropping WinForms changes nothing there. WPF needs the same Windows Desktop runtime.
+
+### Recommendation: turn it on, after dropping WinForms
+
+- **Benefits:**
+  - All three projects work the same way, as KecskeProjectsSite's `DatabaseORM` already does.
+  - About 300 boilerplate lines go, and new files need fewer usings.
+  - Dropping `UseWindowsForms` first removes the `System.Windows.Forms`/`System.Drawing` globals and the `Application` clash.
+- **Costs:**
+  - A one-time diff touching only `using` lines in 128 files, plus two ambiguity fixes.
+  - The global set differs a little per project type (the bot lacks `System.IO` and `System.Net.Http`), which CLAUDE.md should state.
+- **Order, each step building clean and passing `dotnet format --verify-no-changes`:**
+  1. Replace `ComputerInfo` (P/Invoke `GlobalMemoryStatusEx`, or WMI plus an explicit `System.Management` reference) and remove `<UseWindowsForms>`. Check the window's RAM figure.
+  2. Fix `ThreadState` in `Constant.cs` and `Timer` in `BotWindow.xaml.cs`.
+  3. Add `<ImplicitUsings>enable</ImplicitUsings>`, run `dotnet format "Discord Bot GUI/Discord Bot GUI.csproj" --diagnostics IDE0005`, and review the diff.
+  4. Update CLAUDE.md: implicit usings in all three projects, and the bot's WPF set without `System.IO` and `System.Net.Http`.
+- **Keep `System.IO` out of the global set.** The WPF SDK removes it without saying why in its props file. A likely reason is `Path`, which clashes with `System.Windows.Shapes.Path`. Leaving it explicit in 23 files matches the SDK default.
+
+## 11. File encoding and the UTF-8 BOM (investigated and applied 2026-11-17)
+
+Every tracked text file is UTF-8 (no UTF-16, no ANSI). The only difference is whether a file starts with the UTF-8 byte order mark (`EF BB BF`).
+
+**How it differs from line endings:**
+- git never adds or removes a BOM.
+- A BOM change is a real content change: the first line shows up in the diff and gets committed.
+- Nothing in `.editorconfig` declares a `charset` yet.
+
+### What is true today
+
+| Files | With BOM | Without BOM |
+|---|---|---|
+| `.cs` | 447 | 26, see below |
+| `.csproj`, `.sln`, `.sqlproj`, `.resx`, `.xaml`, `.refactorlog` | all 9 | none |
+| `.sql` (`MainDB/`) | 29 | 2: the archived `Patch_5.sql` and `Patch_6.sql` |
+| `.md`, `.json`, `.txt`, `.props`, `.drawio`, `.editorconfig`, `.gitignore`, `.gitattributes`, `LICENSE` | none | all 13 |
+
+**The 26 `.cs` files without a BOM:**
+- The 19 scaffolded models and `MainDbContext.cs`.
+- Five files written by Claude Code's Write tool: the three `*EditData.cs` (2026-11-17), `TextFont.cs` and `MagickImageExtension.cs` (2026-11-15).
+- `Properties/AssemblyInfo.cs`, from the 2023 WPF project template.
+
+**In git history only two commits ever changed a file's BOM:**
+- `247e656` "updated scaffold" (2026-11-16) removed it from 20 models. The models had a BOM since 2023, when they were scaffolded with EF Core 7. EF Core 11 writes none.
+- `e5540a9` (2025-02-09) swapped it on two SSDT patch files.
+
+Visual Studio never removed one.
+
+**Non-ASCII text without a BOM:** `CLAUDE.md`, this file, and `External Files/R6_Attackers.txt` and `R6_Defenders.txt` (operator names such as "Jäger"). All are valid UTF-8, so this is fine:
+- The bot reads the R6 lists with `File.ReadAllLines`, which defaults to UTF-8.
+- Visual Studio detects UTF-8 without a BOM ("Auto-detect UTF-8 encoding without signature", `AutoDetectUtf8` is on in its settings).
+
+### Who writes what (checked on this machine 2026-11-17)
+
+| Source | New files | Existing files | Evidence |
+|---|---|---|---|
+| Visual Studio (templates, `.sln`, `.csproj`, resx) | BOM | Keeps the encoding it detected | The repository: every file created in VS has one |
+| `dotnet new` templates | BOM | – | Tested (`Class1.cs`, `.csproj`) |
+| EF Core 11 `Scaffold-DbContext` | No BOM | Overwrites with no BOM | The bot's 2026-11-16 re-scaffold, and KecskeProjectsSite's scaffolded files. Its hand-written `_Extended.cs` files have one |
+| SSDT publish scripts | BOM | – | 29 of 31 scripts |
+| git (all clients) | – | Never changes it | – |
+| VS Code | No BOM (`files.encoding` default `utf8`) | Keeps a BOM | [Microsoft's VS Code encoding notes](https://learn.microsoft.com/powershell/scripting/dev-cross-plat/vscode/understanding-file-encoding). It ignores `.editorconfig` without the EditorConfig extension |
+| Prettier (VS Code format on save) | – | Not verified | – |
+| .NET `File.WriteAllText` (e.g. `Config` creating `config.json`) | No BOM | Overwrites with no BOM | Tested |
+| Claude Code's Edit tool | – | Keeps the BOM, or its absence | Tested |
+| Claude Code's Write tool | BOM only if the content starts with U+FEFF | Keeps an existing BOM (but writes LF) | Tested |
+| Git Bash `sed`, `awk`, redirects | No BOM unless written with `printf '\xEF\xBB\xBF'` | Keep the bytes | Tested. A line-1 pattern anchored with `^` doesn't match after a BOM, which caught several edits during section 4 |
+| PowerShell 5.1 `Set-Content` (no `-Encoding`) | ANSI (windows-1250 here) | Re-encodes as ANSI | Tested: `ä` became the single byte `E4`. **This corrupts non-ASCII text in UTF-8 files** |
+| PowerShell 5.1 `-Encoding UTF8`, `Out-File` (with this environment's preset default) | BOM | Adds a BOM | Tested |
+| PowerShell `[IO.File]::WriteAllText` | No BOM | Removes it | Tested |
+| `dotnet format` | – | With `charset` set: adds or removes BOMs in `.cs` files to match ("CHARSET: Fix file encoding"); without it: leaves them alone | Tested both ways on a scratch project |
+
+### Can it be uniform and enforced?
+
+**Only partly.**
+- For C# files, yes: `charset` in `.editorconfig` plus `dotnet format` enforce it, and `--verify-no-changes` reports any file that doesn't match. That's the same mechanism as ENDOFLINE.
+- For other file types nothing enforces it automatically. `dotnet format` only handles C#, and git has no BOM setting. Visual Studio reads `charset` too, but whether it converts an existing file on save wasn't tested. There, the rule can only be documented, with a check command.
+
+### Recommendation: follow the tool that creates each kind of file
+
+Keeping what the generating tools already write means the least churn and no fights with Visual Studio or the scaffolder:
+- **BOM (`charset = utf-8-bom`)** for C#, project, solution, XAML, resx and SQL files: what Visual Studio, `dotnet new` and SSDT write. Also `Directory.Build.props`, which is project XML too.
+- **No BOM (`charset = utf-8`)** for the scaffolded `Model/**.cs` and `MainDbContext.cs`, which is what EF Core 11 writes. A re-scaffold then matches without any extra step.
+  - The alternative is BOMs there too, plus a `dotnet format` run after every scaffold.
+- **No BOM (`charset = utf-8`)** for everything else: Markdown, JSON, txt, the git and editor config files, `LICENSE` and `.drawio`. That's what VS Code, git tooling and `File.WriteAllText` produce.
+- **Never use PowerShell's `Set-Content` or `Out-File` without `-Encoding`** on repository files.
+  - In Windows PowerShell 5.1 there is no BOM-less UTF-8 option, so use `[IO.File]::WriteAllText` for files without one.
+
+### Applied 2026-11-17
+
+- **`.editorconfig`:**
+  - `charset = utf-8` under `[*]`.
+  - `charset = utf-8-bom` for `*.{cs,csproj,sln,sqlproj,xaml,resx,sql,props,refactorlog}`.
+  - `charset = utf-8` again in the `DatabaseORM/Model/**.cs` and `MainDbContext.cs` sections.
+- **Files changed, each only by its BOM (a one-line diff):**
+  - Six C#: the three `*EditData.cs`, `TextFont.cs`, `MagickImageExtension.cs` and `AssemblyInfo.cs`. Fixed by `dotnet format whitespace`, which flagged exactly these and none of the models.
+  - `Patch_5.sql`, `Patch_6.sql` and `Directory.Build.props`, given a BOM byte for byte.
+- **Checks:**
+  - The three projects build without warnings, and `dotnet format --verify-no-changes` passes for each.
+  - All 526 text files are still CRLF, and the check command reports nothing.
+  - With one BOM stripped, `--verify-no-changes` reported CHARSET. With a BOM added to a Markdown file, the check command named it.
+- **CLAUDE.md:** the rule is in Linting, and the check command (all tracked text files, mirroring the `.editorconfig` patterns) is under Commands.
+- **Not covered:** Visual Studio is expected to follow `charset` when saving non-C# files, but that isn't tested. For those files the check command is the only safeguard.
 
 ## Minor improvements
 

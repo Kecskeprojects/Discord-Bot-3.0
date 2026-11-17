@@ -1,4 +1,4 @@
-namespace DatabaseORM.Communication.Bias;
+﻿namespace DatabaseORM.Communication.Bias;
 
 //The owner's edit of an idol's main details, as typed in (the service parses and trims it)
 public class IdolEditData

@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
 	<!-- Shared by every project under the repo root. Rule severities and their justifications live in the root .editorconfig. -->
 	<PropertyGroup>
 		<AnalysisLevel>latest-recommended</AnalysisLevel>

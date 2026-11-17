@@ -8,6 +8,14 @@ root = true
 # and Prettier in VS Code writes CRLF too. See docs/improvement-notes.md, section 9.
 [*]
 end_of_line = crlf
+# The UTF-8 BOM follows the tool that creates each kind of file (docs/improvement-notes.md, section 11).
+# No BOM by default (Markdown, JSON, txt, the git and editor config files), as VS Code, git tooling and File.WriteAllText write them.
+charset = utf-8
+
+# A BOM for what Visual Studio, dotnet new and SSDT create. dotnet format enforces it for C# (CHARSET).
+# The EF-scaffolded MainDbContext.cs and models go back to no BOM in their own sections below.
+[*.{cs,csproj,sln,sqlproj,xaml,resx,sql,props,refactorlog}]
+charset = utf-8-bom
 
 [*.cs]
 indent_style = space
@@ -96,6 +104,8 @@ generated_code = true
 
 [DatabaseORM/Context/MainDbContext.cs]
 generated_code = true
+# EF Core 11 scaffolds without a BOM, so a re-scaffold matches without an extra step
+charset = utf-8
 
 [LastFmApi/Models/**.cs]
 generated_code = true
@@ -106,3 +116,5 @@ generated_code = true
 [DatabaseORM/Model/**.cs]
 dotnet_diagnostic.IDE0005.severity = none
 dotnet_diagnostic.IDE0028.severity = none
+# EF Core 11 scaffolds without a BOM, so a re-scaffold matches without an extra step
+charset = utf-8

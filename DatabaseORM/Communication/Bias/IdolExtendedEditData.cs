@@ -1,4 +1,4 @@
-namespace DatabaseORM.Communication.Bias;
+﻿namespace DatabaseORM.Communication.Bias;
 
 //An edit of an idol's extra name and debut details, as typed in (the service parses and trims it)
 public class IdolExtendedEditData

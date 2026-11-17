@@ -31,6 +31,12 @@ dotnet run --project "Discord Bot GUI/Discord Bot GUI.csproj"
 dotnet format "Discord Bot GUI/Discord Bot GUI.csproj" --verify-no-changes
 ```
 
+Check every tracked text file against the BOM rule (Git Bash; no output means all match). Keep its patterns in step with the `charset` sections in `.editorconfig`:
+
+```bash
+git ls-files --eol | grep -v 'i/-text' | cut -f2 | while IFS= read -r f; do case "$f" in DatabaseORM/Model/*|DatabaseORM/Context/MainDbContext.cs) want=none;; *.cs|*.csproj|*.sln|*.sqlproj|*.xaml|*.resx|*.sql|*.props|*.refactorlog) want=bom;; *) want=none;; esac; [ "$(head -c3 "$f" | od -An -tx1 | tr -d ' \n')" = efbbbf ] && has=bom || has=none; [ "$want" = "$has" ] || echo "expected $want, has $has: $f"; done
+```
+
 Build the projects rather than the `.sln`, because the solution includes `MainDB.sqlproj`, which needs Visual Studio/SSDT. Warnings fail the build (`TreatWarningsAsErrors`), so fix them rather than suppressing them. `dotnet format` without `--verify-no-changes` applies every fix it has (whitespace, style and analyzer code fixes such as CA1310), so review its diff. It covers one project at a time (run it for `DatabaseORM/DatabaseORM.csproj` and `LastFmApi/LastFmApi.csproj` too) and also reports IDE0001 and IDE0002, which the build doesn't.
 
 ## Linting
@@ -45,6 +51,12 @@ Build the projects rather than the `.sln`, because the solution includes `MainDB
 - The `DatabaseORM.Repository` and `DatabaseORM.Service` namespaces are exempt from CA1309, CA1310 and CA1862 (`DatabaseORM/GlobalSuppressions.cs`), because EF translates the lambdas passed to repositories into SQL and can't translate `StringComparison` overloads. Never apply those code fixes there (Code Cleanup will offer them if the suppressions go).
 - The path-specific sections (generated code, the model folders) are in the root `.editorconfig` too. A nested `.editorconfig` must not get `root = true`, or the root file stops applying below it.
 - **Line endings are CRLF** in the working copy (`.gitattributes` `* text=auto eol=crlf`, `.editorconfig` `end_of_line = crlf`); the repository stores LF. An ending-only change shows as modified with an empty diff, LF next to comments fails IDE0055, and `dotnet format --verify-no-changes` reports any LF line (ENDOFLINE). Claude's Write tool and Git Bash `sed -i`, `awk` and redirects write LF: use Edit for existing files and `sed -b` in Bash, run `unix2dos -q <file>` on anything written another way, and check with `git ls-files --eol` (Git Bash's `grep $'\r'` is unreliable). Details in `docs/improvement-notes.md` section 9.
+- **The UTF-8 BOM follows the tool that creates each kind of file** (`charset` in `.editorconfig`, details in section 11 of the notes):
+  - With a BOM: C#, project, solution, XAML, resx and SQL files, and `Directory.Build.props`, as Visual Studio, `dotnet new` and SSDT write them.
+  - Without one: the EF-scaffolded `DatabaseORM/Model/` files and `MainDbContext.cs` (EF Core 11 writes none), and everything else (Markdown, JSON, txt, config files).
+  - `dotnet format` enforces it for C# (CHARSET); check the other files with the command under Commands.
+  - Claude's Edit and Write tools keep an existing BOM, but a new file from Write gets one only if its content starts with U+FEFF.
+  - Never write repository files with PowerShell `Set-Content` or `Out-File` without `-Encoding`: Windows PowerShell 5.1 writes ANSI (windows-1250 here), which corrupts non-ASCII text.
 
 ## Runtime requirements
 

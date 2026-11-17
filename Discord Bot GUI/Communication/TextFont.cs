@@ -1,4 +1,4 @@
-using ImageMagick;
+﻿using ImageMagick;
 using ImageMagick.Drawing;
 using Microsoft.Win32;
 using System;
