@@ -68,13 +68,14 @@ public static class BiasListMessageProcessor
             ComponentBuilder builder = new();
             while (Math.Ceiling(keys.Count / 25.0) > selectCount)
             {
-                int remaininglistCount = (groups.Keys.Count - (selectCount * 25)) > 25 ? (selectCount + (1 * 25)) : (selectCount * 25) + (groups.Keys.Count - (selectCount * 25));
+                //Each select menu holds up to 25 groups; this one ends at the next multiple of 25, or at the last group
+                int pageEnd = Math.Min((selectCount + 1) * 25, keys.Count);
                 //Make a selector out of all the groups and their members
                 SelectMenuBuilder menuBuilder = new SelectMenuBuilder()
                 .WithPlaceholder("Select a group")
                 .WithCustomId($"BiasMenu_{selectCount + 1}");
 
-                for (int i = 25 * selectCount; i < remaininglistCount; i++)
+                for (int i = 25 * selectCount; i < pageEnd; i++)
                 {
                     _ = menuBuilder.AddOption(keys[i].ToUpper(), keys[i] + (isUser ? $"><{userId}" : ""), $"{groups[keys[i]].Count} biases...");
                 }

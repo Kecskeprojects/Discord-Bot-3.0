@@ -16,6 +16,10 @@ csharp_style_namespace_declarations = file_scoped
 csharp_prefer_simple_using_statement = false
 csharp_style_expression_bodied_lambdas = when_on_single_line
 csharp_style_expression_bodied_local_functions = when_on_single_line
+# An if/else that only assigns or returns may stay an if/else (IDE0045 / IDE0046 off). As warnings they made the build
+# reject it, and Code Cleanup turned complex if/else blocks into ?: chains. Ternaries are for simple value choices.
+dotnet_style_prefer_conditional_expression_over_assignment = false
+dotnet_style_prefer_conditional_expression_over_return = false
 
 #### Code style (IDE) rules: everything Visual Studio suggests is a build warning ####
 dotnet_analyzer_diagnostic.category-Style.severity = warning

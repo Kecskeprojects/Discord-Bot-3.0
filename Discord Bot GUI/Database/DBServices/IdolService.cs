@@ -257,11 +257,12 @@ public class IdolService(
             idol.ProfileUrl = modal.ProfileURL.Trim();
             idol.DateOfBirth = DateOnly.TryParse(modal.DateOfBirth, out DateOnly dateOfBirth) ? dateOfBirth : idol.DateOfBirth;
             idol.Name = modal.Name.ToLower().Trim();
-            idol.Gender = GenderEnum.Female.EqualsString(modal.Gender)
-                            ? "F"
-                            : GenderEnum.Male.EqualsString(modal.Gender)
-                                ? "M"
-                                : idol.Gender;
+            //An unknown gender in the modal keeps the current one
+            GenderEnum? gender = GenderChoiceEnumExtension.FromDatabaseString(modal.Gender);
+            if (gender.HasValue)
+            {
+                idol.Gender = gender.Value.ToDatabaseFriendlyString();
+            }
             idol.Group = await idolGroupService.UpdateOrCreateGroupAsync(idol.Group, modal.Group.ToLower().Trim());
             _ = await idolRepository.SaveChangesAsync();
 

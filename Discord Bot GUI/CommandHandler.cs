@@ -129,10 +129,13 @@ public class CommandHandler(
             }
 
             DbProcessResultEnum result = await serverService.AddServerAsync(context.Guild.Id);
-            return result == DbProcessResultEnum.Success
-                ? await serverService.GetByDiscordIdAsync(context.Guild.Id)
-                    ?? throw new InvalidOperationException($"{context.Guild.Name} was added to list, but could not be loaded!")
-                : throw new InvalidOperationException($"{context.Guild.Name} could not be added to list!");
+            if (result != DbProcessResultEnum.Success)
+            {
+                throw new InvalidOperationException($"{context.Guild.Name} could not be added to list!");
+            }
+
+            return await serverService.GetByDiscordIdAsync(context.Guild.Id)
+                ?? throw new InvalidOperationException($"{context.Guild.Name} was added to list, but could not be loaded!");
         }
     }
 

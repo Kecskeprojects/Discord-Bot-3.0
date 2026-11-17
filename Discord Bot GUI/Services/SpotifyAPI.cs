@@ -76,9 +76,8 @@ public class SpotifyAPI(IBotLogger logger, Config config, IYoutubeAPI youtubeAPI
 
                     logger.Query($"Result: {temp}");
 
-                    return await youtubeAPI.Searching(temp, username, serverId, channelId) == SearchResultEnum.YoutubeFoundVideo
-                        ? SearchResultEnum.SpotifyVideoFound
-                        : SearchResultEnum.SpotifyFoundYoutubeNotFound;
+                    SearchResultEnum youtubeResult = await youtubeAPI.Searching(temp, username, serverId, channelId);
+                    return youtubeResult == SearchResultEnum.YoutubeFoundVideo ? SearchResultEnum.SpotifyVideoFound : SearchResultEnum.SpotifyFoundYoutubeNotFound;
                 }
             }
             else if (type is "playlist" or "album")

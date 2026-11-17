@@ -48,9 +48,8 @@ public class EasterEggFeature(
                 string mess = Context.Message.Content.ToLower();
                 if (mess.StartsWith("i think", StringComparison.Ordinal))
                 {
-                    _ = r.Next(0, 2) == 0
-                        ? await Context.Channel.SendMessageAsync("I agree wholeheartedly!", messageReference: refer)
-                        : await Context.Channel.SendMessageAsync(Context.Message.Content.ToMockText(), messageReference: refer);
+                    string reply = r.Next(0, 2) == 0 ? "I agree wholeheartedly!" : Context.Message.Content.ToMockText();
+                    _ = await Context.Channel.SendMessageAsync(reply, messageReference: refer);
                 }
                 else if ((mess.StartsWith("i am", StringComparison.Ordinal) && mess != "i am") || (mess.StartsWith("i'm", StringComparison.Ordinal) && mess != "i'm"))
                 {

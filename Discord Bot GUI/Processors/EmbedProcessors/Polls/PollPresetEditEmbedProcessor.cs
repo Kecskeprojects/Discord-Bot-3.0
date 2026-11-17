@@ -62,9 +62,14 @@ public static class PollPresetEditEmbedProcessor
         for (int i = 0; i < 10; i++)
         {
             WeeklyPollOptionResource? option = preset.Options.FirstOrDefault(x => x.OrderNumber == i);
-            _ = option != null
-                ? optionPresetSelect.AddOption($"{i + 1}# {option.Title}", $"{i}_{option.WeeklyPollOptionPresetId}")
-                : optionPresetSelect.AddOption($"{i + 1}#", $"{i}_0");
+            if (option != null)
+            {
+                _ = optionPresetSelect.AddOption($"{i + 1}# {option.Title}", $"{i}_{option.WeeklyPollOptionPresetId}");
+            }
+            else
+            {
+                _ = optionPresetSelect.AddOption($"{i + 1}#", $"{i}_0");
+            }
         }
 
         ActionRowBuilder optionPresetRow = new();

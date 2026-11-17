@@ -186,15 +186,13 @@ public class UserBiasCommands(
             //Check if you have any
             if (CollectionTools.IsNullOrEmpty(list))
             {
-                _ = groupName != ""
-                    ? await ReplyAsync("No biases from that group are in your list!")
-                    : await ReplyAsync("You do not have any biases set yet!");
+                _ = await ReplyAsync(groupName != "" ? "No biases from that group are in your list!" : "You do not have any biases set yet!");
 
                 return;
             }
 
             BiasMessageResult result = BiasListMessageProcessor.BuildBiasMessage(list, groupName, $"{GetCurrentUserNickname()}'s biases by group", Context.User.Id, true);
-            _ = result.Component == null ? await ReplyAsync(result.Message) : await ReplyAsync(result.Message, components: result.Component);
+            _ = await ReplyAsync(result.Message, components: result.Component);
 
             //Generate a random number, 10% chance for an additional message to appear
             Random r = new();
@@ -234,14 +232,12 @@ public class UserBiasCommands(
             //Check if we have any items on the list
             if (idols.Count == 0)
             {
-                _ = groupName != ""
-                    ? await ReplyAsync("No biases from that group are in the database!")
-                    : await ReplyAsync("No biases have been added to database yet!");
+                _ = await ReplyAsync(groupName != "" ? "No biases from that group are in the database!" : "No biases have been added to database yet!");
                 return;
             }
 
             BiasMessageResult result = BiasListMessageProcessor.BuildBiasMessage(idols, groupName, "Which group do you want to see?", Context.User.Id, false);
-            _ = result.Component == null ? await ReplyAsync(result.Message) : await ReplyAsync(result.Message, components: result.Component);
+            _ = await ReplyAsync(result.Message, components: result.Component);
         }
         catch (Exception ex)
         {

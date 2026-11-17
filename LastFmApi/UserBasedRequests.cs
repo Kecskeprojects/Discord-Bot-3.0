@@ -32,11 +32,7 @@ public class UserBasedRequests : BaseRequests
             TopTrack? deserialized = JsonConvert.DeserializeObject<TopTrack>(restResultJSON.Content ?? "");
 
             response.Response = deserialized?.TopTracks;
-            response.ResultCode = deserialized?.TopTracks != null
-                                    ? LastFmRequestResultEnum.Success
-                                    : !string.IsNullOrEmpty(deserialized?.Message)
-                                        ? LastFmRequestResultEnum.Failure
-                                        : LastFmRequestResultEnum.EmptyResponse;
+            response.ResultCode = LastFmHelper.GetResultCode(response.Response, deserialized?.Message);
             response.Message = deserialized?.Message;
             response.ErrorCode = deserialized?.Error;
         }
@@ -70,11 +66,7 @@ public class UserBasedRequests : BaseRequests
             TopAlbum? deserialized = JsonConvert.DeserializeObject<TopAlbum>(restResultJSON.Content ?? "");
 
             response.Response = deserialized?.TopAlbums;
-            response.ResultCode = deserialized?.TopAlbums != null
-                                    ? LastFmRequestResultEnum.Success
-                                    : !string.IsNullOrEmpty(deserialized?.Message)
-                                        ? LastFmRequestResultEnum.Failure
-                                        : LastFmRequestResultEnum.EmptyResponse;
+            response.ResultCode = LastFmHelper.GetResultCode(response.Response, deserialized?.Message);
             response.Message = deserialized?.Message;
             response.ErrorCode = deserialized?.Error;
         }
@@ -108,11 +100,7 @@ public class UserBasedRequests : BaseRequests
             TopArtist? deserialized = JsonConvert.DeserializeObject<TopArtist>(restResultJSON.Content ?? "");
 
             response.Response = deserialized?.TopArtists;
-            response.ResultCode = deserialized?.TopArtists != null
-                                    ? LastFmRequestResultEnum.Success
-                                    : !string.IsNullOrEmpty(deserialized?.Message)
-                                        ? LastFmRequestResultEnum.Failure
-                                        : LastFmRequestResultEnum.EmptyResponse;
+            response.ResultCode = LastFmHelper.GetResultCode(response.Response, deserialized?.Message);
             response.Message = deserialized?.Message;
             response.ErrorCode = deserialized?.Error;
         }
@@ -149,11 +137,7 @@ public class UserBasedRequests : BaseRequests
             Recent? deserialized = JsonConvert.DeserializeObject<Recent>(restResultJSON.Content ?? "");
 
             response.Response = deserialized?.RecentTracks;
-            response.ResultCode = deserialized?.RecentTracks != null
-                                    ? LastFmRequestResultEnum.Success
-                                    : !string.IsNullOrEmpty(deserialized?.Message)
-                                        ? LastFmRequestResultEnum.Failure
-                                        : LastFmRequestResultEnum.EmptyResponse;
+            response.ResultCode = LastFmHelper.GetResultCode(response.Response, deserialized?.Message);
             response.Message = deserialized?.Message;
             response.ErrorCode = deserialized?.Error;
         }
@@ -191,11 +175,7 @@ public class UserBasedRequests : BaseRequests
 
             //If the Attr is not empty in the first index, it means the first song is a song that is currently playing
             response.Response = deserialized?.RecentTracks;
-            response.ResultCode = deserialized?.RecentTracks != null
-                                    ? LastFmRequestResultEnum.Success
-                                    : !string.IsNullOrEmpty(deserialized?.Message)
-                                        ? LastFmRequestResultEnum.Failure
-                                        : LastFmRequestResultEnum.EmptyResponse;
+            response.ResultCode = LastFmHelper.GetResultCode(response.Response, deserialized?.Message);
             response.Message = deserialized?.Message;
             response.ErrorCode = deserialized?.Error;
         }

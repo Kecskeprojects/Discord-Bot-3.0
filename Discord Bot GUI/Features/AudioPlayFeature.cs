@@ -124,9 +124,12 @@ public class AudioPlayFeature(
             result = VoiceConnectionResultEnum.Reconnected;
         }
 
-        return audioResource.AudioVariables.AudioClient != null
-            ? result
-            : throw new InvalidOperationException("Bot could not reconnect after an unexpected disconnect");
+        if (audioResource.AudioVariables.AudioClient == null)
+        {
+            throw new InvalidOperationException("Bot could not reconnect after an unexpected disconnect");
+        }
+
+        return result;
     }
 
     private async Task StreamAudioAsync(ServerAudioResource audioResource, MusicRequest current)

@@ -54,11 +54,17 @@ public class InstaScraper(IBotLogger logger) : IInstaScraper
             }
 
             string status = body.Status;
-            return status != "ok"
-                ? new SocialScrapingResult($"Request was returned with status: {status}")
-                : !body.Data.XdtShortcodeMedia.IsVideo && body.Data.XdtShortcodeMedia.EdgeSidecarToChildren?.Edges?.Count == 0
-                ? new SocialScrapingResult("No content was found in post.")
-                : GetData(body, uri);
+            if (status != "ok")
+            {
+                return new SocialScrapingResult($"Request was returned with status: {status}");
+            }
+
+            if (!body.Data.XdtShortcodeMedia.IsVideo && body.Data.XdtShortcodeMedia.EdgeSidecarToChildren?.Edges?.Count == 0)
+            {
+                return new SocialScrapingResult("No content was found in post.");
+            }
+
+            return GetData(body, uri);
         }
         catch (Exception ex)
         {

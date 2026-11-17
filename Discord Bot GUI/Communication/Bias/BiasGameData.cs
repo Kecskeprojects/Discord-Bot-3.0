@@ -40,8 +40,8 @@ public sealed partial class BiasGameData : IDisposable
     {
         int date1 = int.TryParse(chosenYears[0], out int start) ? start : 0;
         int date2 = int.TryParse(chosenYears[1], out int end) ? end : 0;
-        DebutYearStart = date1 > date2 ? date2 : date1;
-        DebutYearEnd = date1 > date2 ? date1 : date2;
+        DebutYearStart = Math.Min(date1, date2);
+        DebutYearEnd = Math.Max(date1, date2);
     }
 
     public void AddImage(int idolId, Stream stream, string fileName)

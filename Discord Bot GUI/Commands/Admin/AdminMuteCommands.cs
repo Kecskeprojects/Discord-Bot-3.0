@@ -58,11 +58,10 @@ public class AdminMuteCommands(
     {
         try
         {
-            //Get artist's name and the track for search
-            string userIdOrName = parameters.Split('>')[0].Trim().ToLower();
-            string timeData = parameters.Split('>').Length == 2
-                                ? parameters.Split('>')[1].Trim().ToLower()
-                                : "5000y";
+            //The user (ID or name) and, after a >, how long the mute lasts; without a duration it is practically permanent
+            string[] parts = parameters.Split('>');
+            string userIdOrName = parts[0].Trim().ToLower();
+            string timeData = parts.Length == 2 ? parts[1].Trim().ToLower() : "5000y";
 
             IUser? user = null;
             if (ulong.TryParse(userIdOrName, out ulong id))

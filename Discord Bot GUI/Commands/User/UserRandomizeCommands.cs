@@ -70,9 +70,14 @@ public class UserRandomizeCommands(
                 choices = paramArray;
             }
 
-            _ = chance < 50
-                ? await ReplyAsync("The coin landed on: " + choices[0].Trim())
-                : chance > 51 ? await ReplyAsync("The coin landed on: " + choices[1].Trim()) : await ReplyAsync("The coin landed on it's edge");
+            //50 and 51, 2 in 100, are the coin landing on its edge
+            string result = chance switch
+            {
+                < 50 => "The coin landed on: " + choices[0].Trim(),
+                > 51 => "The coin landed on: " + choices[1].Trim(),
+                _ => "The coin landed on it's edge"
+            };
+            _ = await ReplyAsync(result);
         }
         catch (Exception ex)
         {

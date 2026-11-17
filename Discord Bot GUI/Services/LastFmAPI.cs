@@ -236,9 +236,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, Config config)
     #region Last.fm advanced calls
     public async Task<ArtistStats> GetArtistDataAsync(string name, string artist_name)
     {
-        artist_name = config.Lastfm_Artist_Input_Replacement.TryGetValue(artist_name, out string? value)
-            ? value
-            : artist_name;
+        artist_name = config.Lastfm_Artist_Input_Replacement.GetValueOrDefault(artist_name, artist_name);
 
         ArtistStats result = new();
 
@@ -314,9 +312,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, Config config)
         {
             //Get artist's name and the track for search
             string artistName = input.Split('>')[0].Trim().ToLower();
-            artistName = config.Lastfm_Artist_Input_Replacement.TryGetValue(artistName, out string? value)
-                ? value
-                : artistName;
+            artistName = config.Lastfm_Artist_Input_Replacement.GetValueOrDefault(artistName, artistName);
             string trackName = input.Split('>')[1].Trim().ToLower();
 
             restResult = await WhoKnowsRequests.WhoKnowsByTrackAsync(config.Lastfm_API_Key, artistName, trackName, usernameList);
@@ -325,9 +321,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, Config config)
         {
             //Get artist's name for search
             string artistName = input.Trim().ToLower();
-            artistName = config.Lastfm_Artist_Input_Replacement.TryGetValue(artistName, out string? value)
-                ? value
-                : artistName;
+            artistName = config.Lastfm_Artist_Input_Replacement.GetValueOrDefault(artistName, artistName);
 
             restResult = await WhoKnowsRequests.WhoKnowsByArtistAsync(config.Lastfm_API_Key, artistName, usernameList);
         }

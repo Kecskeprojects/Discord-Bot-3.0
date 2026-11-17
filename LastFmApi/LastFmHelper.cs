@@ -82,6 +82,17 @@ public static class LastFmHelper
         return period != "";
     }
 
+    //Success when the request returned data, Failure when Last.fm sent an error message, EmptyResponse otherwise
+    public static LastFmRequestResultEnum GetResultCode(object? response, string? message)
+    {
+        if (response != null)
+        {
+            return LastFmRequestResultEnum.Success;
+        }
+
+        return string.IsNullOrEmpty(message) ? LastFmRequestResultEnum.EmptyResponse : LastFmRequestResultEnum.Failure;
+    }
+
     public static string? GetResultMessage(LastFmRequestResultEnum resultCode, string? message)
     {
         return resultCode switch

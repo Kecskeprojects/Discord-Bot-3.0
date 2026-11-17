@@ -136,10 +136,16 @@ public class InstagramEmbedFeature(
         {
             for (int i = 0; i < Math.Ceiling(attachments.Count / 10.0); i++)
             {
-                int count = attachments.Count - (i * 10) >= 10 ? 10 : attachments.Count - (i * 10);
-                _ = i == 0
-                    ? await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count), message, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None))
-                    : await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count));
+                //Discord allows 10 attachments per message; only the first message carries the text and the reply
+                int count = Math.Min(10, attachments.Count - (i * 10));
+                if (i == 0)
+                {
+                    _ = await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count), message, messageReference: refer, allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
+                }
+                else
+                {
+                    _ = await Context.Channel.SendFilesAsync(attachments.GetRange(i * 10, count));
+                }
             }
         }
         //Ignore videos is a second try at sending so that is when we can know if the post is too large to send

@@ -6,17 +6,24 @@ public static class StringTools
 {
     public static string AddNumberPositionIdentifier(string position)
     {
-        return position.Length == 0
-            ? position
-            : position.Length >= 2 && position[^2..] is "11" or "12" or "13"
-            ? $"{position}th"
-            : position[^1] switch
-            {
-                '1' => $"{position}st",
-                '2' => $"{position}nd",
-                '3' => $"{position}rd",
-                _ => $"{position}th"
-            };
+        if (position.Length == 0)
+        {
+            return position;
+        }
+
+        //11th, 12th and 13th, not 11st, 12nd and 13rd
+        if (position.Length >= 2 && position[^2..] is "11" or "12" or "13")
+        {
+            return $"{position}th";
+        }
+
+        return position[^1] switch
+        {
+            '1' => $"{position}st",
+            '2' => $"{position}nd",
+            '3' => $"{position}rd",
+            _ => $"{position}th"
+        };
     }
 
     public static List<string> GetTimeMeasurements(string amountstring)

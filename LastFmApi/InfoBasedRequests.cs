@@ -33,11 +33,7 @@ public class InfoBasedRequests : BaseRequests
             ArtistInfo? deserialized = JsonConvert.DeserializeObject<ArtistInfo>(restResultJSON.Content ?? "");
 
             response.Response = deserialized?.Artist;
-            response.ResultCode = deserialized?.Artist != null
-                                    ? LastFmRequestResultEnum.Success
-                                    : !string.IsNullOrEmpty(deserialized?.Message)
-                                        ? LastFmRequestResultEnum.Failure
-                                        : LastFmRequestResultEnum.EmptyResponse;
+            response.ResultCode = LastFmHelper.GetResultCode(response.Response, deserialized?.Message);
             response.Message = deserialized?.Message;
             response.ErrorCode = deserialized?.Error;
         }
@@ -75,11 +71,7 @@ public class InfoBasedRequests : BaseRequests
             TrackInfo? deserialized = JsonConvert.DeserializeObject<TrackInfo>(restResultJSON.Content ?? "");
 
             response.Response = deserialized?.Track;
-            response.ResultCode = deserialized?.Track != null
-                                    ? LastFmRequestResultEnum.Success
-                                    : !string.IsNullOrEmpty(deserialized?.Message)
-                                        ? LastFmRequestResultEnum.Failure
-                                        : LastFmRequestResultEnum.EmptyResponse;
+            response.ResultCode = LastFmHelper.GetResultCode(response.Response, deserialized?.Message);
             response.Message = deserialized?.Message;
             response.ErrorCode = deserialized?.Error;
         }

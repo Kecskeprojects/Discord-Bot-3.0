@@ -19,11 +19,7 @@ public class ExtendedBiasData
         DateOfBirth = DateOnly.TryParseExact(dateString, "yyyy-MM-dd", out DateOnly date) ? date : null;
         GroupName = CellText(row, ".column-grp");
         string gender = CellText(row, ".column-gender");
-        Gender = gender == GenderEnum.Male.ToDatabaseFriendlyString()
-                 ? GenderEnum.Male
-                 : gender == GenderEnum.Female.ToDatabaseFriendlyString()
-                    ? GenderEnum.Female
-                    : null;
+        Gender = GenderChoiceEnumExtension.FromDatabaseString(gender);
     }
 
     public string ProfileUrl { get; private set; }

@@ -24,4 +24,20 @@ public static class GenderChoiceEnumExtension
     {
         return value.Equals(genderEnum.ToDatabaseFriendlyString(), System.StringComparison.OrdinalIgnoreCase);
     }
+
+    //"M" or "F", in any case; anything else is null
+    public static GenderEnum? FromDatabaseString(string value)
+    {
+        if (GenderEnum.Male.EqualsString(value))
+        {
+            return GenderEnum.Male;
+        }
+
+        if (GenderEnum.Female.EqualsString(value))
+        {
+            return GenderEnum.Female;
+        }
+
+        return null;
+    }
 }
