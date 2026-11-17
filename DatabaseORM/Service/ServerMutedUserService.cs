@@ -9,7 +9,7 @@ using MapsterMapper;
 
 namespace DatabaseORM.Service;
 
-public class ServerMutedUserService(
+internal sealed class ServerMutedUserService(
     IServerMutedUserRepository serverMutedUserRepository,
     IUserRepository userRepository,
     IServerRepository serverRepository,

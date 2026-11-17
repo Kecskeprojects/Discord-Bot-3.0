@@ -2,7 +2,7 @@
 
 namespace DatabaseORM.Interface.Repository;
 
-public interface IGenericRepository<TEntity> where TEntity : class
+internal interface IGenericRepository<TEntity> where TEntity : class
 {
     Task<int> AddAsync(TEntity item, bool saveChanges = true);
     Task<int> AddAsync(IEnumerable<TEntity> items, bool saveChanges = true);

@@ -4,6 +4,6 @@ using DatabaseORM.Model;
 
 namespace DatabaseORM.Repository;
 
-public class CustomCommandRepository(MainDbContext context) : GenericRepository<CustomCommand>(context), ICustomCommandRepository
+internal sealed class CustomCommandRepository(MainDbContext context) : GenericRepository<CustomCommand>(context), ICustomCommandRepository
 {
 }

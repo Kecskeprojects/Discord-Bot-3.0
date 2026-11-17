@@ -9,7 +9,7 @@ using MapsterMapper;
 
 namespace DatabaseORM.Service;
 
-public class RoleService(
+internal sealed class RoleService(
     IRoleRepository roleRepository,
     IServerRepository serverRepository,
     IMapper mapper,

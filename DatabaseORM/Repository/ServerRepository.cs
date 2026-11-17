@@ -4,6 +4,6 @@ using DatabaseORM.Model;
 
 namespace DatabaseORM.Repository;
 
-public class ServerRepository(MainDbContext context) : GenericRepository<Server>(context), IServerRepository
+internal sealed class ServerRepository(MainDbContext context) : GenericRepository<Server>(context), IServerRepository
 {
 }

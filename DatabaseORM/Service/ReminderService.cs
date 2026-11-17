@@ -9,7 +9,7 @@ using MapsterMapper;
 
 namespace DatabaseORM.Service;
 
-public class ReminderService(
+internal sealed class ReminderService(
     IReminderRepository reminderRepository,
     IUserRepository userRepository,
     IMapper mapper,

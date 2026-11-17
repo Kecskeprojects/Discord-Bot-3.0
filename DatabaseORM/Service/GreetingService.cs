@@ -9,7 +9,7 @@ using MapsterMapper;
 
 namespace DatabaseORM.Service;
 
-public class GreetingService(
+internal sealed class GreetingService(
     IGreetingRepository greetingRepository,
     IMapper mapper,
     IBotLogger logger,

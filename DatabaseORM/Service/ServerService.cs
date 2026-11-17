@@ -9,7 +9,7 @@ using MapsterMapper;
 
 namespace DatabaseORM.Service;
 
-public class ServerService(
+internal sealed class ServerService(
     IChannelService channelService,
     IServerRepository serverRepository,
     IRoleRepository roleRepository,

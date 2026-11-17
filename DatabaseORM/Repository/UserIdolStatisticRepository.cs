@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DatabaseORM.Repository;
 
-public class UserIdolStatisticRepository(MainDbContext context) : GenericRepository<UserIdolStatistic>(context), IUserIdolStatisticRepository
+internal sealed class UserIdolStatisticRepository(MainDbContext context) : GenericRepository<UserIdolStatistic>(context), IUserIdolStatisticRepository
 {
     public Task<List<UserIdolStatisticResource>> GetTop10ForUserAsync(int userId, GenderEnum gender)
     {

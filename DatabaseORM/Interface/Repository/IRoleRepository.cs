@@ -2,6 +2,6 @@
 
 namespace DatabaseORM.Interface.Repository;
 
-public interface IRoleRepository : IGenericRepository<Role>
+internal interface IRoleRepository : IGenericRepository<Role>
 {
 }

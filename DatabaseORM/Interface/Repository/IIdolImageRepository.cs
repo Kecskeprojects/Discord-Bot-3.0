@@ -2,7 +2,7 @@
 
 namespace DatabaseORM.Interface.Repository;
 
-public interface IIdolImageRepository : IGenericRepository<IdolImage>
+internal interface IIdolImageRepository : IGenericRepository<IdolImage>
 {
     Task<IdolImage?> GetLatestByIdolIdAsync(int idolId);
 }

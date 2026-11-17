@@ -8,7 +8,7 @@ using MapsterMapper;
 
 namespace DatabaseORM.Service;
 
-public class UserIdolStatisticService(
+internal sealed class UserIdolStatisticService(
     IUserIdolStatisticRepository userIdolStatisticRepository,
     IUserRepository userRepository,
     IMapper mapper,

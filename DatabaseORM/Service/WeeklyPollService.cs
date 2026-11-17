@@ -11,7 +11,7 @@ using System.Reflection;
 
 namespace DatabaseORM.Service;
 
-public class WeeklyPollService(
+internal sealed class WeeklyPollService(
     IWeeklyPollRepository weeklyPollRepository,
     IServerRepository serverRepository,
     IChannelRepository channelRepository,

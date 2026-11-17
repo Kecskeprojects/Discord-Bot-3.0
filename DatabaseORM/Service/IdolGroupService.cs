@@ -10,7 +10,7 @@ using MapsterMapper;
 
 namespace DatabaseORM.Service;
 
-public class IdolGroupService(
+internal sealed class IdolGroupService(
     IIdolGroupRepository idolGroupRepository,
     IMapper mapper,
     IBotLogger logger,

@@ -9,7 +9,7 @@ using MapsterMapper;
 
 namespace DatabaseORM.Service;
 
-public class UserIdolService(
+internal sealed class UserIdolService(
     IIdolRepository idolRepository,
     IUserRepository userRepository,
     IMapper mapper,

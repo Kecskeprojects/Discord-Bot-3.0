@@ -2,6 +2,6 @@
 
 namespace DatabaseORM.Interface.Repository;
 
-public interface IWeeklyPollOptionPresetRepository : IGenericRepository<WeeklyPollOptionPreset>
+internal interface IWeeklyPollOptionPresetRepository : IGenericRepository<WeeklyPollOptionPreset>
 {
 }

@@ -2,6 +2,6 @@
 
 namespace DatabaseORM.Interface.Repository;
 
-public interface IIdolAliasRepository : IGenericRepository<IdolAlias>
+internal interface IIdolAliasRepository : IGenericRepository<IdolAlias>
 {
 }

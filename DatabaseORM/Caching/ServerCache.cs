@@ -2,7 +2,7 @@
 
 namespace DatabaseORM.Caching;
 
-public class ServerCache
+internal sealed class ServerCache
 {
     private SizedDictionary<ulong, ServerResource> Cache { get; } = new(50);
 

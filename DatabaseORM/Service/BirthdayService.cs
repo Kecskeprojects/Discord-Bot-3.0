@@ -9,7 +9,7 @@ using MapsterMapper;
 
 namespace DatabaseORM.Service;
 
-public class BirthdayService(
+internal sealed class BirthdayService(
     IServerRepository serverRepository,
     IUserRepository userRepository,
     IBirthdayRepository birthdayRepository,

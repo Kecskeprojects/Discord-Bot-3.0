@@ -1,11 +1,6 @@
-﻿using DatabaseORM.Caching;
-using DatabaseORM.Context;
+﻿using DatabaseORM;
 using DatabaseORM.Interface;
-using DatabaseORM.Interface.Repository;
-using DatabaseORM.Interface.Service;
 using DatabaseORM.Mapping;
-using DatabaseORM.Repository;
-using DatabaseORM.Service;
 using Discord;
 using Discord.Commands;
 using Discord.Interactions;
@@ -21,7 +16,6 @@ using Discord_Bot.Services;
 using Discord_Bot.Windows;
 using Mapster;
 using MapsterMapper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -69,10 +63,10 @@ public static class Startup
         BotLogger logger = new();
         _ = collection.AddSingleton(logger);
         _ = collection.AddSingleton<IBotLogger>(logger);
-        _ = collection.AddSingleton(new ServerCache());
 
+        //Database layer: DbContext, server cache, DB services and repositories
         Config config = new();
-        _ = collection.AddDbContext<MainDbContext>(options => options.UseSqlServer(config.SqlConnectionString));
+        DatabaseStartup.ConfigureDatabaseServices(collection, () => config.SqlConnectionString);
 
         TypeAdapterConfig mapsterConfig = new();
         new DatabaseMapperConfig().Register(mapsterConfig);
@@ -122,48 +116,6 @@ public static class Startup
         _ = collection.AddTransient<IMusicBrainzAPI, MusicBrainzAPI>();
         _ = collection.AddTransient<ITwitterScraper, TwitterScraper>();
         _ = collection.AddTransient<IKpopDbScraper, KpopDbScraper>();
-
-        //Database Services
-        _ = collection.AddTransient<IServerService, ServerService>();
-        _ = collection.AddTransient<IGreetingService, GreetingService>();
-        _ = collection.AddTransient<ITwitchChannelService, TwitchChannelService>();
-        _ = collection.AddTransient<ICustomCommandService, CustomCommandService>();
-        _ = collection.AddTransient<IRoleService, RoleService>();
-        _ = collection.AddTransient<IReminderService, ReminderService>();
-        _ = collection.AddTransient<IChannelService, ChannelService>();
-        _ = collection.AddTransient<IBirthdayService, BirthdayService>();
-        _ = collection.AddTransient<IIdolService, IdolService>();
-        _ = collection.AddTransient<IUserService, UserService>();
-        _ = collection.AddTransient<IIdolAliasService, IdolAliasService>();
-        _ = collection.AddTransient<IIdolGroupService, IdolGroupService>();
-        _ = collection.AddTransient<IUserIdolService, UserIdolService>();
-        _ = collection.AddTransient<IIdolImageService, IdolImageService>();
-        _ = collection.AddTransient<IUserIdolStatisticService, UserIdolStatisticService>();
-        _ = collection.AddTransient<IWeeklyPollOptionPresetService, WeeklyPollOptionPresetService>();
-        _ = collection.AddTransient<IWeeklyPollOptionService, WeeklyPollOptionService>();
-        _ = collection.AddTransient<IWeeklyPollService, WeeklyPollService>();
-        _ = collection.AddTransient<IServerMutedUserService, ServerMutedUserService>();
-
-        //Database Repositories
-        _ = collection.AddScoped<IServerRepository, ServerRepository>();
-        _ = collection.AddScoped<IGreetingRepository, GreetingRepository>();
-        _ = collection.AddScoped<ITwitchChannelRepository, TwitchChannelRepository>();
-        _ = collection.AddScoped<ICustomCommandRepository, CustomCommandRepository>();
-        _ = collection.AddScoped<IRoleRepository, RoleRepository>();
-        _ = collection.AddScoped<IReminderRepository, ReminderRepository>();
-        _ = collection.AddScoped<IUserRepository, UserRepository>();
-        _ = collection.AddScoped<IChannelRepository, ChannelRepository>();
-        _ = collection.AddScoped<IChannelTypeRepository, ChannelTypeRepository>();
-        _ = collection.AddScoped<IBirthdayRepository, BirthdayRepository>();
-        _ = collection.AddScoped<IIdolRepository, IdolRepository>();
-        _ = collection.AddScoped<IIdolGroupRepository, IdolGroupRepository>();
-        _ = collection.AddScoped<IIdolAliasRepository, IdolAliasRepository>();
-        _ = collection.AddScoped<IIdolImageRepository, IdolImageRepository>();
-        _ = collection.AddScoped<IUserIdolStatisticRepository, UserIdolStatisticRepository>();
-        _ = collection.AddScoped<IWeeklyPollOptionPresetRepository, WeeklyPollOptionPresetRepository>();
-        _ = collection.AddScoped<IWeeklyPollOptionRepository, WeeklyPollOptionRepository>();
-        _ = collection.AddScoped<IWeeklyPollRepository, WeeklyPollRepository>();
-        _ = collection.AddScoped<IServerMutedUserRepository, ServerMutedUserRepository>();
 
         _ = collection.AddLogging();
 

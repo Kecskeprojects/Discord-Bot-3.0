@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DatabaseORM.Repository;
 
-public class ReminderRepository(MainDbContext context) : GenericRepository<Reminder>(context), IReminderRepository
+internal sealed class ReminderRepository(MainDbContext context) : GenericRepository<Reminder>(context), IReminderRepository
 {
     public Task<Reminder> GetByIndexAsync(string userId, int reminderOrderId)
     {

@@ -2,6 +2,6 @@
 
 namespace DatabaseORM.Interface.Repository;
 
-public interface ICustomCommandRepository : IGenericRepository<CustomCommand>
+internal interface ICustomCommandRepository : IGenericRepository<CustomCommand>
 {
 }

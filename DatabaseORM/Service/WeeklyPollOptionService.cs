@@ -9,7 +9,7 @@ using MapsterMapper;
 
 namespace DatabaseORM.Service;
 
-public class WeeklyPollOptionService(
+internal sealed class WeeklyPollOptionService(
     IWeeklyPollOptionRepository weeklyPollOptionRepository,
     IMapper mapper,
     IBotLogger logger,

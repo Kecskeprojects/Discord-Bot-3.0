@@ -9,7 +9,7 @@ using MapsterMapper;
 
 namespace DatabaseORM.Service;
 
-public class CustomCommandService(
+internal sealed class CustomCommandService(
     ICustomCommandRepository customCommandRepository,
     IServerRepository serverRepository,
     IMapper mapper,

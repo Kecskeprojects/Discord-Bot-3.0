@@ -2,6 +2,6 @@
 
 namespace DatabaseORM.Interface.Repository;
 
-public interface IServerMutedUserRepository : IGenericRepository<ServerMutedUser>
+internal interface IServerMutedUserRepository : IGenericRepository<ServerMutedUser>
 {
 }

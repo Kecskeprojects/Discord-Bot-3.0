@@ -11,7 +11,7 @@ using MapsterMapper;
 
 namespace DatabaseORM.Service;
 
-public class IdolService(
+internal sealed class IdolService(
     IIdolRepository idolRepository,
     IIdolGroupRepository idolGroupRepository,
     IIdolImageRepository idolImageRepository,

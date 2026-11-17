@@ -11,7 +11,7 @@ using System.Reflection;
 
 namespace DatabaseORM.Service;
 
-public class WeeklyPollOptionPresetService(
+internal sealed class WeeklyPollOptionPresetService(
     IWeeklyPollOptionPresetRepository weeklyPollOptionPresetRepository,
     IMapper mapper,
     IBotLogger logger,

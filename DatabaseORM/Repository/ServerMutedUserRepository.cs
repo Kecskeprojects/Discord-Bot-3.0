@@ -4,6 +4,6 @@ using DatabaseORM.Model;
 
 namespace DatabaseORM.Repository;
 
-public class ServerMutedUserRepository(MainDbContext context) : GenericRepository<ServerMutedUser>(context), IServerMutedUserRepository
+internal sealed class ServerMutedUserRepository(MainDbContext context) : GenericRepository<ServerMutedUser>(context), IServerMutedUserRepository
 {
 }

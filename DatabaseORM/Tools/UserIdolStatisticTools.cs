@@ -2,7 +2,7 @@
 
 namespace DatabaseORM.Tools;
 
-public static class UserIdolStatisticTools
+internal static class UserIdolStatisticTools
 {
     public static void AddRanking(UserIdolStatistic stat, int pos)
     {

@@ -2,6 +2,6 @@
 
 namespace DatabaseORM.Interface.Repository;
 
-public interface ITwitchChannelRepository : IGenericRepository<TwitchChannel>
+internal interface ITwitchChannelRepository : IGenericRepository<TwitchChannel>
 {
 }

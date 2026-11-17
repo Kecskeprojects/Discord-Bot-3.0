@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DatabaseORM.Repository;
 
-public class IdolRepository(MainDbContext context) : GenericRepository<Idol>(context), IIdolRepository
+internal sealed class IdolRepository(MainDbContext context) : GenericRepository<Idol>(context), IIdolRepository
 {
     public Task<List<Idol>> GetListByNamesAsync(string idolOrGroupName, string idolGroup, string? userId = null)
     {

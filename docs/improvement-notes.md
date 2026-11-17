@@ -99,7 +99,7 @@ Decided against:
 - `DownloadUsersAsync` per command: fine as it is.
 - `RunMode.Async`: tried in the past and dropped (see CLAUDE.md).
 
-## 4. Moving the database layer into its own class library (investigated 2026-11-15, planned 2026-11-17, in progress)
+## 4. Moving the database layer into its own class library (investigated 2026-11-15, planned and done 2026-11-17)
 
 **Verdict: very feasible, moderate effort.** The layering is already mostly clean. Nothing outside `Database/` uses repositories directly, the DB services have no Discord.Net imports, and the bot talks to them only through `I*Service` and `*Resource`. The work is mostly moving files, plus untangling the handful of couplings below.
 
@@ -167,9 +167,13 @@ The target is the `DatabaseORM/` project (created 2026-11-17), modeled on the pr
 
 - The `DatabaseORM` class library targets plain **`net11.0`**, with no Windows, WPF or Discord.Net dependency. The bot references it.
 - It gets the analyzer setup from `Directory.Build.props` automatically; its csproj already has `<Nullable>enable</Nullable>`.
-- `DatabaseStartup` in the library registers the DbContext, repositories, services and cache, which takes about 45 lines out of `Startup.cs`.
-- Repository interfaces could become `internal`, with `InternalsVisibleTo` for tests, so the bot physically can't bypass the services.
-- `MainDB/` (SSDT) is unaffected. Scaffolding commands point at the new project (use the bot as `--startup-project` if EF tooling asks for one).
+- `DatabaseStartup.ConfigureDatabaseServices(services, connectionString)` in the library registers the DbContext, the cache, the services and the repositories. That took about 45 lines out of `Startup.cs`.
+  - The connection string is passed as a `Func<string>` that is read once per scope, so an edited `sql_connection_string` still applies without a restart, as before.
+  - The Mapster registers and `IBotLogger` stay registered in the bot's `Startup`, because the bot's own code shares them.
+- The repositories and their interfaces, the concrete services, `ServerCache` and the DB tools are `internal`, so the bot can't bypass the services. CA1852 then required the leaf classes to be `sealed`.
+  - A future test project needs `InternalsVisibleTo` to reach them.
+  - The scaffolded models and `MainDbContext` stay public, as generated.
+- `MainDB/` (SSDT) is unaffected. Scaffolding points at the new project (`-Project` and `-StartupProject DatabaseORM`).
 
 ### Benefits
 
@@ -189,7 +193,9 @@ Each slice ends in a green build.
    - The bot references `DatabaseORM` and no longer has the EF packages; `SqlServer` comes through the project reference. `Identity.Core` was dropped.
    - The suppressions moved and the `.editorconfig` paths were fixed.
    - The scaffold command is in `Context/update-scaffold.txt`, which is git-ignored and only exists locally, because it names the dev machine. It passes `-StartupProject DatabaseORM`, so the bot needs no `EntityFrameworkCore.Design`.
-4. `DatabaseStartup`, optionally `internal` repository interfaces, and the CLAUDE.md updates (layout, layers, scaffold step, linting paths). Then a quick run against the dev database.
+4. **Done 2026-11-17.** `DatabaseStartup`, the `internal` repositories and services, and the CLAUDE.md updates (layout, layers, scaffold step, linting paths).
+   - A throwaway program ran the bot's real `Startup.Run()` with a dummy connection string. All 19 DB services and three features resolved, and an edited connection string reached the next scope.
+   - Still to do: a run of the bot itself against the dev database.
 
 Slices 1 and 2 are worth doing even inside the current project, and they make the move itself mechanical.
 
@@ -242,13 +248,41 @@ Can the disabled embeds be turned back on as they are, with adjustments and with
 
 **Found on the way:** `BrowserService` downloads PuppeteerSharp's default Chrome build on first use after every PuppeteerSharp upgrade and never removes the old ones. The old `net10.0` output folder alone holds 7 Chrome and 6 ChromeHeadlessShell builds (117 to 150). Check the bot's folder on the live server too, and delete all but the current build.
 
+## 9. Line endings (noted 2026-11-17, to do after section 4)
+
+Settle on one line ending for every file in the repository and enforce it.
+
+**What is true today (checked 2026-11-17):**
+- `.gitattributes` has only `* text=auto`, and `core.autocrlf` is off, so the index stores LF.
+- The working copy is mixed: 277 tracked text files are CRLF, 247 are LF, and `LICENSE` mixes both within the file.
+- The root `.editorconfig` sets no `end_of_line`, so the formatter uses the OS default (CRLF).
+- LF is mostly tolerated, but IDE0055 rejects an LF line break before a comment (for example the comment lines in `Properties/AssemblyInfo.cs`). A file that changes from CRLF to LF can therefore break the build.
+- Git Bash's `sed -i` and similar tools write LF, which is how this showed up during the section 4 move.
+
+**To decide and apply:**
+- Pick the ending: CRLF matches Visual Studio's default and the formatter.
+- Set it in both places: `end_of_line` in the root `.editorconfig`, and `eol=` in `.gitattributes` (e.g. `* text=auto eol=crlf`, with exceptions for files that must stay LF, if any).
+- Re-checkout or renormalize once (`git add --renormalize .`, then a fresh checkout of the working files), and check that the build and `dotnet format --verify-no-changes` pass for all three projects.
+
+## 10. Implicit usings in the bot (noted 2026-11-17, not investigated yet)
+
+`DatabaseORM` and `LastFmApi` already have `<ImplicitUsings>enable</ImplicitUsings>`; only `Discord Bot GUI` doesn't. Investigate whether to turn it on there too.
+
+**Points to check:**
+- **WinForms usings.** The bot has `UseWindowsForms` as well as `UseWPF`. With implicit usings, the Windows Desktop SDK then also imports `System.Drawing` and `System.Windows.Forms`, which clash with WPF names (`Application`, `Color`, `MessageBox`...).
+  - A quick grep found no `System.Windows.Forms` use in the code, so first check whether `UseWindowsForms` is still needed.
+  - Otherwise, drop those two with `<Using Remove="..." />`.
+- **`System.Threading` becomes global.** A bare `Timer` is then ambiguous in any file that also imports `System.Timers`. `App.xaml.cs` already writes `System.Timers.Timer` in full, and the build will point out any others.
+- **`System.IO` is not implicit in WPF projects.** A WPF test project on 2026-11-17 had no `File` or `Path` without it, so files that use them keep their `using System.IO;`.
+- **The redundant usings.** Remove them with `dotnet format --diagnostics IDE0005`, then review the diff.
+
 ## Minor improvements
 
 - **Generic `BaseService`:** turn it into a generic class so simple DB calls need less boilerplate. Each service would still declare its own methods. `GenericRepository<T>` already exists on the repository side.
 - **Last.fm top tags:** a new command for `user.getTopTags`. That endpoint has no period or pagination.
 - **Last.fm artist stats image (found 2026-11-16):** `LastFmAPI.GetArtistDataAsync` picks the MBID from the albums when there are any, but always passes `tracks[0]`'s artist and track name to the Spotify search. An artist with album plays but no track plays would throw there (rare, since album plays come from track plays). Passing a track name also makes the search return that track's album cover instead of the artist's image, as `GetTopArtistsAsync` does. Decide which image the stats should show, and take both values from the same list.
 - **Hand-written results in `Services/Models` (found 2026-11-16):** `Services/Models/LastFm` (`ArtistStats`, `LastFmListResult`, `NowPlayingResult`, `WhoKnows`) and `Services/Models/SpotifyAPI/SpotifyImageSearchResult` are the bot's own result DTOs, not JSON models. Because the folder is marked as generated code, they get no nullable checking and no analyzer warnings. Moving them to `Communication/` (where data types belong by convention) would bring both back. Their nullable fields are `Message`, the image URLs and the optional now-playing data.
-- **Code Cleanup edits the scaffolded models (found 2026-11-16):** `Database/Models` is not marked as generated code (so its `?` annotations count, see CLAUDE.md "Database changes"), so Visual Studio's Code Cleanup changes those files, e.g. it removes unused usings even with IDE0005 off for the folder. Until this is fixed, leave the folder out of Code Cleanup, or re-scaffold afterwards. Fix: mark the folder `generated_code = true` again, and have the scaffold write `#nullable enable` at the top of each model file, which turns nullable back on in generated code. To do that, install EF's templates (`dotnet new install Microsoft.EntityFrameworkCore.Templates`, from nuget.org), run `dotnet new ef-templates` in the bot's project folder, add the directive to `CodeTemplates/EFCore/EntityType.t4`, and re-scaffold once. `Scaffold-DbContext` and `dotnet ef dbcontext scaffold` use those templates automatically. The cost: the templates become the project's own copy, so after an EF upgrade, refresh them and re-add the line.
+- **Code Cleanup edits the scaffolded models (found 2026-11-16):** `DatabaseORM/Model` (formerly `Database/Models`) is not marked as generated code (so its `?` annotations count, see CLAUDE.md "Database changes"), so Visual Studio's Code Cleanup changes those files, e.g. it removes unused usings even with IDE0005 off for the folder. Until this is fixed, leave the folder out of Code Cleanup, or re-scaffold afterwards. Fix: mark the folder `generated_code = true` again, and have the scaffold write `#nullable enable` at the top of each model file, which turns nullable back on in generated code. To do that, install EF's templates (`dotnet new install Microsoft.EntityFrameworkCore.Templates`, from nuget.org), run `dotnet new ef-templates` in the `DatabaseORM` project folder, add the directive to `CodeTemplates/EFCore/EntityType.t4`, and re-scaffold once. `Scaffold-DbContext` and `dotnet ef dbcontext scaffold` use those templates automatically. The cost: the templates become the project's own copy, so after an EF upgrade, refresh them and re-add the line.
 - **Scraped idol gender is stored as `Male`/`Female` (found 2026-11-17, code fixed 2026-11-17, existing rows still to correct):**
   - The `ExtendedBiasData → Idol` mapping (`DatabaseMapperConfig`) writes `Gender.Value.ToString()`, so an idol first filled from dbkpop gets `Male`/`Female`.
   - Everything else uses `M`/`F` (`ToDatabaseFriendlyString`): the edit modal, and the bias game's gender filter in `IdolRepository.GetListForGameAsync`. The game filtered by gender therefore leaves those idols out.

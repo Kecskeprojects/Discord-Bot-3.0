@@ -2,6 +2,6 @@
 
 namespace DatabaseORM.Interface.Repository;
 
-public interface IChannelTypeRepository : IGenericRepository<ChannelType>
+internal interface IChannelTypeRepository : IGenericRepository<ChannelType>
 {
 }

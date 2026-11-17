@@ -4,6 +4,6 @@ using DatabaseORM.Model;
 
 namespace DatabaseORM.Repository;
 
-public class IdolAliasRepository(MainDbContext context) : GenericRepository<IdolAlias>(context), IIdolAliasRepository
+internal sealed class IdolAliasRepository(MainDbContext context) : GenericRepository<IdolAlias>(context), IIdolAliasRepository
 {
 }

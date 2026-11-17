@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace DatabaseORM.Repository;
 
-public class GenericRepository<TEntity>(MainDbContext context) : IGenericRepository<TEntity> where TEntity : class
+internal class GenericRepository<TEntity>(MainDbContext context) : IGenericRepository<TEntity> where TEntity : class
 {
     protected readonly MainDbContext context = context;
 

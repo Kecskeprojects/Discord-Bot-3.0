@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DatabaseORM.Repository;
 
-public class ChannelRepository(MainDbContext context) : GenericRepository<Channel>(context), IChannelRepository
+internal sealed class ChannelRepository(MainDbContext context) : GenericRepository<Channel>(context), IChannelRepository
 {
     public Task<List<ServerChannelResource>> GetServerChannelsAsync(int serverId)
     {

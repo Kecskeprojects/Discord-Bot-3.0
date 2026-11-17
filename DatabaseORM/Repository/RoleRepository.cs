@@ -4,6 +4,6 @@ using DatabaseORM.Model;
 
 namespace DatabaseORM.Repository;
 
-public class RoleRepository(MainDbContext context) : GenericRepository<Role>(context), IRoleRepository
+internal sealed class RoleRepository(MainDbContext context) : GenericRepository<Role>(context), IRoleRepository
 {
 }

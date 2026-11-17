@@ -4,6 +4,6 @@ using DatabaseORM.Model;
 
 namespace DatabaseORM.Repository;
 
-public class WeeklyPollOptionRepository(MainDbContext context) : GenericRepository<WeeklyPollOption>(context), IWeeklyPollOptionRepository
+internal sealed class WeeklyPollOptionRepository(MainDbContext context) : GenericRepository<WeeklyPollOption>(context), IWeeklyPollOptionRepository
 {
 }

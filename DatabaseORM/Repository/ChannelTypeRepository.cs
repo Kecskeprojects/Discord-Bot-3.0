@@ -4,6 +4,6 @@ using DatabaseORM.Model;
 
 namespace DatabaseORM.Repository;
 
-public class ChannelTypeRepository(MainDbContext context) : GenericRepository<ChannelType>(context), IChannelTypeRepository
+internal sealed class ChannelTypeRepository(MainDbContext context) : GenericRepository<ChannelType>(context), IChannelTypeRepository
 {
 }

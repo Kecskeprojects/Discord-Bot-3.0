@@ -4,6 +4,6 @@ using DatabaseORM.Model;
 
 namespace DatabaseORM.Repository;
 
-public class UserRepository(MainDbContext context) : GenericRepository<User>(context), IUserRepository
+internal sealed class UserRepository(MainDbContext context) : GenericRepository<User>(context), IUserRepository
 {
 }

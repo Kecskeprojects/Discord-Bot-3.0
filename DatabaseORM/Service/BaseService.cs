@@ -4,7 +4,7 @@ using MapsterMapper;
 
 namespace DatabaseORM.Service;
 
-public class BaseService(IMapper mapper, IBotLogger logger, ServerCache cache)
+internal class BaseService(IMapper mapper, IBotLogger logger, ServerCache cache)
 {
     protected readonly IMapper mapper = mapper;
     protected readonly IBotLogger logger = logger;

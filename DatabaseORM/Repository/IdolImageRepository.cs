@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DatabaseORM.Repository;
 
-public class IdolImageRepository(MainDbContext context) : GenericRepository<IdolImage>(context), IIdolImageRepository
+internal sealed class IdolImageRepository(MainDbContext context) : GenericRepository<IdolImage>(context), IIdolImageRepository
 {
     public Task<IdolImage?> GetLatestByIdolIdAsync(int idolId)
     {

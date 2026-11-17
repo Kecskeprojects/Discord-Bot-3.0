@@ -2,6 +2,6 @@
 
 namespace DatabaseORM.Interface.Repository;
 
-public interface IWeeklyPollRepository : IGenericRepository<WeeklyPoll>
+internal interface IWeeklyPollRepository : IGenericRepository<WeeklyPoll>
 {
 }

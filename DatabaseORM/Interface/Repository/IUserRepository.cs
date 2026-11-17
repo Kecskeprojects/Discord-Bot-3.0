@@ -2,6 +2,6 @@
 
 namespace DatabaseORM.Interface.Repository;
 
-public interface IUserRepository : IGenericRepository<User>
+internal interface IUserRepository : IGenericRepository<User>
 {
 }

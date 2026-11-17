@@ -2,6 +2,6 @@
 
 namespace DatabaseORM.Interface.Repository;
 
-public interface IServerRepository : IGenericRepository<Server>
+internal interface IServerRepository : IGenericRepository<Server>
 {
 }

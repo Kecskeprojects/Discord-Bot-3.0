@@ -2,7 +2,7 @@
 
 namespace DatabaseORM.Interface.Repository;
 
-public interface IBirthdayRepository : IGenericRepository<Birthday>
+internal interface IBirthdayRepository : IGenericRepository<Birthday>
 {
     Task<List<Birthday>> GetListForServerAsync(string serverId);
 }

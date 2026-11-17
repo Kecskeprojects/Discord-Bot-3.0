@@ -9,7 +9,7 @@ using MapsterMapper;
 
 namespace DatabaseORM.Service;
 
-public class TwitchChannelService(IMapper mapper, IBotLogger logger, ServerCache cache, ITwitchChannelRepository twitchChannelRepository, IServerRepository serverRepository) : BaseService(mapper, logger, cache), ITwitchChannelService
+internal sealed class TwitchChannelService(IMapper mapper, IBotLogger logger, ServerCache cache, ITwitchChannelRepository twitchChannelRepository, IServerRepository serverRepository) : BaseService(mapper, logger, cache), ITwitchChannelService
 {
     private readonly ITwitchChannelRepository twitchChannelRepository = twitchChannelRepository;
     private readonly IServerRepository serverRepository = serverRepository;

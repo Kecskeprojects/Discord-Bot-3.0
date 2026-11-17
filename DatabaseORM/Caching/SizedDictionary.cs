@@ -1,6 +1,6 @@
 ﻿namespace DatabaseORM.Caching;
 
-public sealed class SizedDictionary<TKey, TValue>(int size) : Dictionary<TKey, TValue> where TKey : notnull
+internal sealed class SizedDictionary<TKey, TValue>(int size) : Dictionary<TKey, TValue> where TKey : notnull
 {
 
     private readonly int maxSize = size;

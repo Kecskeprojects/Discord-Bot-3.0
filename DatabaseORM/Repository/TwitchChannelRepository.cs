@@ -4,6 +4,6 @@ using DatabaseORM.Model;
 
 namespace DatabaseORM.Repository;
 
-public class TwitchChannelRepository(MainDbContext context) : GenericRepository<TwitchChannel>(context), ITwitchChannelRepository
+internal sealed class TwitchChannelRepository(MainDbContext context) : GenericRepository<TwitchChannel>(context), ITwitchChannelRepository
 {
 }

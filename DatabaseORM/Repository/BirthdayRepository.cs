@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DatabaseORM.Repository;
 
-public class BirthdayRepository(MainDbContext context) : GenericRepository<Birthday>(context), IBirthdayRepository
+internal sealed class BirthdayRepository(MainDbContext context) : GenericRepository<Birthday>(context), IBirthdayRepository
 {
     public Task<List<Birthday>> GetListForServerAsync(string serverId)
     {

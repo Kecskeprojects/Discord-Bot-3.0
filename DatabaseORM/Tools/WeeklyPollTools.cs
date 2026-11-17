@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace DatabaseORM.Tools;
 
-public static class WeeklyPollTools
+internal static class WeeklyPollTools
 {
     public static List<string> GetAnswerOptions(WeeklyPoll poll)
     {

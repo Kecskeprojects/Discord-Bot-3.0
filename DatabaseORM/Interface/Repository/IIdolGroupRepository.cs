@@ -2,6 +2,6 @@
 
 namespace DatabaseORM.Interface.Repository;
 
-public interface IIdolGroupRepository : IGenericRepository<IdolGroup>
+internal interface IIdolGroupRepository : IGenericRepository<IdolGroup>
 {
 }

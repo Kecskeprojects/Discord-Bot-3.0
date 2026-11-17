@@ -4,6 +4,6 @@ using DatabaseORM.Model;
 
 namespace DatabaseORM.Repository;
 
-public class GreetingRepository(MainDbContext context) : GenericRepository<Greeting>(context), IGreetingRepository
+internal sealed class GreetingRepository(MainDbContext context) : GenericRepository<Greeting>(context), IGreetingRepository
 {
 }

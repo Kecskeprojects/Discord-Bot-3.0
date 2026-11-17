@@ -8,7 +8,7 @@ using MapsterMapper;
 
 namespace DatabaseORM.Service;
 
-public class IdolAliasService(
+internal sealed class IdolAliasService(
     IIdolAliasRepository idolAliasRepository,
     IIdolRepository idolRepository,
     IMapper mapper,
