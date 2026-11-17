@@ -3,6 +3,12 @@
 # Severity changes that silence a rule must say why (same rule as Properties/GlobalSuppressions.cs).
 root = true
 
+# CRLF everywhere, matching .gitattributes (eol=crlf) and what Visual Studio, EF scaffolding and SSDT write.
+# dotnet format then rewrites every LF line (ENDOFLINE) instead of only the ones next to comments (IDE0055),
+# and Prettier in VS Code writes CRLF too. See docs/improvement-notes.md, section 9.
+[*]
+end_of_line = crlf
+
 [*.cs]
 indent_style = space
 indent_size = 4

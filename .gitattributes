@@ -1,2 +1,3 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Auto detect text files: the repository stores them with LF, and every git client checks them out with CRLF
+# whatever its own core.autocrlf says (see docs/improvement-notes.md, section 9)
+* text=auto eol=crlf

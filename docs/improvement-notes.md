@@ -248,21 +248,66 @@ Can the disabled embeds be turned back on as they are, with adjustments and with
 
 **Found on the way:** `BrowserService` downloads PuppeteerSharp's default Chrome build on first use after every PuppeteerSharp upgrade and never removes the old ones. The old `net10.0` output folder alone holds 7 Chrome and 6 ChromeHeadlessShell builds (117 to 150). Check the bot's folder on the live server too, and delete all but the current build.
 
-## 9. Line endings (noted 2026-11-17, to do after section 4)
+## 9. Line endings (noted 2026-11-17, investigated 2026-11-17, not applied yet)
 
 Settle on one line ending for every file in the repository and enforce it.
 
-**What is true today (checked 2026-11-17):**
-- `.gitattributes` has only `* text=auto`, and `core.autocrlf` is off, so the index stores LF.
-- The working copy is mixed: 277 tracked text files are CRLF, 247 are LF, and `LICENSE` mixes both within the file.
-- The root `.editorconfig` sets no `end_of_line`, so the formatter uses the OS default (CRLF).
-- LF is mostly tolerated, but IDE0055 rejects an LF line break before a comment (for example the comment lines in `Properties/AssemblyInfo.cs`). A file that changes from CRLF to LF can therefore break the build.
-- Git Bash's `sed -i` and similar tools write LF, which is how this showed up during the section 4 move.
+### What happens today
 
-**To decide and apply:**
-- Pick the ending: CRLF matches Visual Studio's default and the formatter.
-- Set it in both places: `end_of_line` in the root `.editorconfig`, and `eol=` in `.gitattributes` (e.g. `* text=auto eol=crlf`, with exceptions for files that must stay LF, if any).
-- Re-checkout or renormalize once (`git add --renormalize .`, then a fresh checkout of the working files), and check that the build and `dotnet format --verify-no-changes` pass for all three projects.
+- **The repository is fine.** `.gitattributes` has `* text=auto`, so every commit stores LF (all 525 text files are `i/lf`). The back and forth only happens in the working copy.
+- **Nothing declares a working copy ending.** Each tool writes its own default, and the file keeps that ending until git rewrites it.
+- **Git writes CRLF.** It does so on checkout, discard, reset, stash, merge and pull, but only for the files that operation touches.
+- **An ending-only change looks like an edit.** git status, GitHub Desktop and Visual Studio list the file as modified, with an empty diff ("LF will be replaced by CRLF the next time Git touches it"). Committing it changes nothing.
+- **LF in a `.cs` file can break the build.** On Windows the Roslyn formatter expects CRLF by default (a maintainer: it "uses the line endings of the platform it is running on", [roslyn#73122](https://github.com/dotnet/roslyn/issues/73122)). Without `end_of_line`, IDE0055 flags only the LF line breaks next to comments.
+- **Fixing those spots makes mixed files.** `dotnet format`, or Code Cleanup's formatting, rewrites only the flagged line breaks as CRLF, which leaves the file mixed. That happened twice during the section 4 move.
+
+### Who writes what (checked on this machine 2026-11-17)
+
+| Source | Writes | Evidence |
+|---|---|---|
+| Git for Windows 2.47 (`autocrlf=false`, system config) | CRLF on checkout | `* text=auto` with the default `core.eol=native`. Confirmed in a scratch repo, and on the 170 files restored during section 4 |
+| GitHub Desktop's own git 2.56 (`autocrlf=true` in its bundled config) | CRLF on checkout | Same result through a different setting. It commits LF like the others |
+| Visual Studio 18's own git 2.56 | CRLF on checkout | Its bundled config says `autocrlf=true`, but the Git for Windows config overrides it to `false`. The result is CRLF either way |
+| Visual Studio editor | Keeps a file's ending; templates are CRLF | `.sln`, new `.csproj` and the resx designer file are CRLF. "Check for consistent line endings on load" is on, so it offers to fix mixed files |
+| EF `Scaffold-DbContext` (Package Manager Console) | CRLF | KecskeProjectsSite's scaffolded files share the scaffold run's timestamp (2026-11-16 21:11, no checkout since) and are CRLF |
+| SSDT publish scripts (`MainDB/DB Patch`) | CRLF | Generation timestamps, CRLF |
+| VS Code | New files CRLF (`files.eol` default `auto`); keeps existing endings | No EditorConfig extension is installed, so VS Code ignores `.editorconfig` |
+| VS Code + Prettier (global default formatter, format on save) | LF for files Prettier formats (Markdown, JSON, YAML, JS/TS, CSS, HTML) | Prettier's default `endOfLine` is `lf` since 2.0. It reads `end_of_line` from `.editorconfig`, but none is set. It also reformats the content (for example Markdown tables). It doesn't touch `.cs` |
+| Windows Notepad | Keeps a file's ending; new files CRLF | Since Windows 10 1809 ([announcement](https://devblogs.microsoft.com/commandline/extended-eol-in-notepad/)) |
+| draw.io | LF | `diagram.drawio` |
+| Claude Code's Edit tool | Keeps the file's ending, including on added lines | Tested on a CRLF and an LF file |
+| Claude Code's Write tool | Always LF, even over a CRLF file | Tested. The files created during section 4 are LF this way |
+| Git Bash `sed -i`, `awk`, `>` redirects, heredocs | LF (`sed -i` turns CRLF files into LF) | Tested. `sed -b -i` keeps CRLF. This is what turned about 220 files into LF during section 4 |
+| PowerShell 5.1 `Get-Content \| Set-Content`, `Out-File` | CRLF (LF files become CRLF) | Tested. `[IO.File]::ReadAllText` / `WriteAllText` keeps the ending |
+| `dotnet format` / Code Cleanup | Without `end_of_line`: CRLF only at the flagged spots (mixed files). With `end_of_line = crlf`: every line becomes CRLF | Tested on a scratch project ("ENDOFLINE: Fix end of line marker") |
+
+**Origin of the mix:** every text file last written before the Claude Code sessions (up to 2026-11-13) is CRLF, except `.gitattributes` and `LICENSE` from the repository's creation in 2023 and `diagram.drawio`. The LF files come from Claude Code sessions since 2026-11-15 (the Write tool and Git Bash text tools, e.g. `Directory.Build.props` and `BannedSymbols.txt` from 2026-11-16), plus Prettier for anything saved in VS Code. Visual Studio and git then turn some of them back into CRLF.
+
+**Checking line endings:** `git ls-files --eol`, `od -c` or `cat -A` are reliable. `grep -c $'\r$'` in Git Bash is not: it reported CR on files that had none.
+
+### Recommendation: CRLF in the working copy, LF in the repository
+
+- **Why CRLF:** it is what nearly every Windows tool here writes (Visual Studio, all three gits, EF scaffolding, SSDT, PowerShell, Notepad) and what the formatter expects. The LF writers are few and controllable: Claude Code's tools, Prettier and draw.io.
+  - Going LF instead would mean fighting Visual Studio's templates, the scaffolder, SSDT and the formatter's platform default.
+- **`.gitattributes`:** `* text=auto eol=crlf`. Every git client then checks out CRLF whatever its own `autocrlf` says, and the repository stays LF. No file needs an LF exception today (no shell scripts).
+  - If EF's `.t4` templates are added later (the "Code Cleanup edits the scaffolded models" item), they must stay CRLF. LF templates are reported to produce an extra blank line per line.
+- **`.editorconfig`:** `end_of_line = crlf` under `[*]`. Then:
+  - `dotnet format whitespace` turns every line of a `.cs` file into CRLF, and `--verify-no-changes` reports any LF line.
+  - Visual Studio uses CRLF for new lines.
+  - Prettier writes CRLF when it reads the `.editorconfig`. Check that VS Code's Prettier extension does so by saving a Markdown file once and looking at `git ls-files --eol`.
+  - The Roslyn maintainer's advice against setting `end_of_line` is for repos built on both Windows and Linux. Here both settings say CRLF and everything runs on Windows, so the mismatch that issue describes can't happen.
+- **CLAUDE.md:** a short rule for Claude sessions.
+  - Files are CRLF. Use Edit for existing files.
+  - After Write or Git Bash text tools, convert to CRLF with `sed -b -i 's/\r*$/\r/'`, or run `dotnet format whitespace`, and check with `git ls-files --eol`.
+  - The same rule could go in the global `~/.claude/CLAUDE.md`, since KecskeProjectsSite has the same tools.
+
+### Applying it
+
+On a clean working tree:
+1. Change `.gitattributes` and `.editorconfig`, then commit. The index is already LF, so `git add --renormalize .` should report nothing.
+2. Rewrite every working file in CRLF. git doesn't rewrite files it considers unchanged, so: `git rm -r --cached -q .` then `git reset --hard`.
+3. Check that `git ls-files --eol` shows only `w/crlf` (and `-text` for binaries), that the three projects build, and that `dotnet format --verify-no-changes` passes for each.
+4. Add the CLAUDE.md rule.
 
 ## 10. Implicit usings in the bot (noted 2026-11-17, not investigated yet)
 
