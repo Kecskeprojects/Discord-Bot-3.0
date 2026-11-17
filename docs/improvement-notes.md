@@ -184,6 +184,32 @@ The rule change, the bias list paging fix and the rewrites of the complex and th
 - An `out` variable or a negation in the condition: `LastFmAPI.cs:183`, `DiscordTools.cs:17` (the `!` goes away if the branches are swapped), `DiscordTools.cs:87`, and `TwitchNotificationFeature.cs:44` (swap the branches).
 - `LastFmListResultTools.cs:78`: the long date-parsing branch could go into a local.
 
+## 8. Instagram and Twitter embeds (investigated 2026-11-17)
+
+Can the disabled embeds be turned back on as they are, with adjustments and without logging in?
+
+**How they work today:**
+- **Instagram (`InstaScraper`):** a plain `HttpClient` GET (no User-Agent) to `instagram.com/graphql/query/?doc_id=8845758582119845&variables={"shortcode":…}`. The call in `CommandHandler` is commented out, and so is the Instaloader path in `InstagramEmbedFeature`; `instaloader.exe` is no longer in `External Files`.
+- **Twitter (`TwitterScraper`):** headless Chrome opens the tweet page logged out and reads the page's own `TweetResultByRestId` GraphQL response. Only the commented-out `!twt` command calls it. The Chrome build doesn't matter any more: the comment in `BrowserService` about Chrome 117 is from an older approach that captured video responses, while the scraper now reads the video URLs from the JSON.
+
+**Test (one request, logged out, a well-known public post):** Instagram answers that GraphQL GET with `401` `{"message":"Please wait a few minutes before you try again.","require_login":true}`. So the Instagram scraper doesn't work as it is. Instagram's own logged-out web page sends this query as a POST with tokens taken from the page (`lsd`, the web app ID). Copying that wasn't tested: it means imitating Instagram's internal web client, the `doc_id` changes every few months, and logged-out requests are rate-limited per IP. Twitter wasn't tested live for the same reason.
+
+**Terms of use:** both sites forbid automated collection without their permission (X's terms forbid scraping "in any form, for any purpose" without written consent, and Instagram's forbid collecting data "in an automated way" without permission). This holds whether or not an account is logged in.
+
+**Lower-risk ways to get embeds back:**
+- **Link rewriting:** reply with the link rewritten to an embed-fix service (for X: `fxtwitter.com` / `fixupx.com`; for Instagram, services like `kkinstagram.com` come and go), and suppress the original embed. Discord then builds the embed itself, and the bot fetches nothing. This is a few lines in `InstagramEmbedFeature` / a revived `!twt`, and needs no scraper or browser. The catch is relying on a third-party service.
+- **Official APIs:** the X API's read access is paid (no reasonable tier for a hobby bot). Instagram's oEmbed needs a registered Meta app with an app access token, and returns embed HTML, not media files. Neither fits the "download and re-upload" design.
+
+**If the scrapers are revived anyway, fix these first:**
+- `InstaScraper.ExtractFromUrl` cuts the shortcode at the first `/` of the last segment, so a link without a trailing slash (`/p/ABC`, which `UrlTools.LinkSearch` produces when it strips a `?igsh=…` query) throws `ArgumentOutOfRangeException`.
+- `InstaScraper.GetMediaUris` sends every carousel item as an image, so videos inside a carousel arrive as thumbnails (the video branch is commented out).
+- `TwitterScraper.GetMediaUris` takes `VideoInfo.Variants[^1]`, which isn't necessarily the best MP4 (the variants include an `.m3u8` playlist). Pick the `video/mp4` variant with the highest bitrate that fits Discord's upload limit. It also returns a list that is always empty, which no caller uses.
+- `TwitterScraper.ModifyImageUrl`: `url.Split(".").Length > 1` is always true for `https://pbs.twimg.com/...`, so the size and format logic after it never runs.
+- `TwitterScraper.ExtractFromUrl` calls `DeleteCookieAsync()` without arguments, which deletes nothing.
+- Posts X marks as sensitive (`NsfwLoggedOut`) can't be seen logged out at all.
+
+**Found on the way:** `BrowserService` downloads PuppeteerSharp's default Chrome build on first use after every PuppeteerSharp upgrade and never removes the old ones. The old `net10.0` output folder alone holds 7 Chrome and 6 ChromeHeadlessShell builds (117 to 150). Check the bot's folder on the live server too, and delete all but the current build.
+
 ## Minor improvements
 
 - **Generic `BaseService`:** turn it into a generic class so simple DB calls need less boilerplate. Each service would still declare its own methods. `GenericRepository<T>` already exists on the repository side.
