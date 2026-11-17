@@ -7,8 +7,6 @@ using Discord.Interactions;
 using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Processors.EmbedProcessors.Polls;
-using System;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions.WeeklyPoll;
 

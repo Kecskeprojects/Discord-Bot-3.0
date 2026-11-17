@@ -4,9 +4,7 @@ using Discord_Bot.Communication;
 using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Services.Models.LastFm;
 using Discord_Bot.Tools;
-using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Processors.EmbedProcessors.LastFm;
 

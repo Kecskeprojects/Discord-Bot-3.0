@@ -1,7 +1,6 @@
 ﻿using Discord_Bot.Communication;
 using Discord_Bot.Tools.Extensions;
 using ImageMagick;
-using System;
 using System.Globalization;
 
 namespace Discord_Bot.Tools;

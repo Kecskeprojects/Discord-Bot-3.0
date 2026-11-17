@@ -1,7 +1,5 @@
 ﻿using Discord_Bot.Communication;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Discord_Bot.Tools.NativeTools;

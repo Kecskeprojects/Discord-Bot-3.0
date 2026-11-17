@@ -5,10 +5,6 @@ using Discord;
 using Discord.Commands;
 using Discord.Rest;
 using Discord_Bot.Core.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
 

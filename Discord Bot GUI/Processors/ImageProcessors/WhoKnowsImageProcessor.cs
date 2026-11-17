@@ -3,11 +3,8 @@ using Discord_Bot.Communication;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.Extensions;
 using ImageMagick;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 
 namespace Discord_Bot.Processors.ImageProcessors;
 

@@ -1,7 +1,6 @@
 ﻿using DatabaseORM.Resources;
 using Discord.WebSocket;
 using Discord_Bot.Core;
-using System;
 using System.Globalization;
 
 namespace Discord_Bot.Processors.MessageProcessor;

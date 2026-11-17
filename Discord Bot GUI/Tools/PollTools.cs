@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord_Bot.Enums;
-using System;
 
 namespace Discord_Bot.Tools;
 

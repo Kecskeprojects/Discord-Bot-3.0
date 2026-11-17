@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Discord_Bot.Tools.Extensions;
+﻿namespace Discord_Bot.Tools.Extensions;
 
 public static class TimeSpanExtension
 {

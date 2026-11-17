@@ -9,10 +9,7 @@ using Discord_Bot.Processors;
 using Discord_Bot.Services;
 using Discord_Bot.Windows;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 

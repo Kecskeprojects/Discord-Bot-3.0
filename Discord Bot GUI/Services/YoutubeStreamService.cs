@@ -3,10 +3,8 @@ using Discord.Audio;
 using Discord_Bot.Communication;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Interfaces.Services;
-using System;
 using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
 

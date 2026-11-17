@@ -5,8 +5,6 @@ using Discord.Commands;
 using Discord.Interactions;
 using Discord.Rest;
 using Discord.WebSocket;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Tools;
 

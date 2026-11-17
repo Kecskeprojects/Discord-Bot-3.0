@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Discord_Bot.Communication;
+﻿namespace Discord_Bot.Communication;
 
 public class SocialScrapingResult
 {

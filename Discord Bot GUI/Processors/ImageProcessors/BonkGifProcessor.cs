@@ -3,7 +3,6 @@ using Discord_Bot.Properties;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.Extensions;
 using ImageMagick;
-using System;
 using System.Drawing;
 using System.IO;
 

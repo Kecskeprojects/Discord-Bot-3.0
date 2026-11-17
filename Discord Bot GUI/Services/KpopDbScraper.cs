@@ -8,9 +8,6 @@ using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Tools;
 using PuppeteerSharp;
 using PuppeteerSharp.Input;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
 

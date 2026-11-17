@@ -10,10 +10,7 @@ using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Processors.EmbedProcessors.BiasGame;
 using Discord_Bot.Processors.ImageProcessors;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions;
 

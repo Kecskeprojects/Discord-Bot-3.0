@@ -3,8 +3,6 @@ using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord.Rest;
 using Discord.WebSocket;
-using System;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 

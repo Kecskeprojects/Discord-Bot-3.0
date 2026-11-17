@@ -3,10 +3,8 @@ using Discord_Bot.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.Wotd;
 using RestSharp;
-using System;
 using System.IO;
 using System.Net.Http;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 

@@ -4,8 +4,6 @@ using DatabaseORM.Interface.Service;
 using Discord.Interactions;
 using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core.Configuration;
-using System;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions;
 

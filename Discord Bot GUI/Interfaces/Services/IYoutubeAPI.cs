@@ -1,5 +1,4 @@
 ﻿using Discord_Bot.Enums;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Interfaces.Services;
 

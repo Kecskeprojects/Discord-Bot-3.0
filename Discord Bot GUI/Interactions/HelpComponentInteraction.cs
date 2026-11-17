@@ -7,10 +7,6 @@ using Discord.Interactions;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Processors.EmbedProcessors.Help;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Interactions;
 

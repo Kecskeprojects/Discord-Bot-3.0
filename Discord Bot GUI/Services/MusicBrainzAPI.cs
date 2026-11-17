@@ -5,9 +5,6 @@ using Discord_Bot.Services.Models.MusicBrainz.ArtistLookup;
 using Discord_Bot.Tools;
 using Newtonsoft.Json;
 using RestSharp;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
 

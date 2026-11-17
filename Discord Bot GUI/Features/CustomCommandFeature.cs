@@ -1,8 +1,6 @@
 ﻿using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
-using System;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 

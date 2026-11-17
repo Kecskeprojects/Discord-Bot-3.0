@@ -1,7 +1,5 @@
 ﻿using Discord.Audio;
-using System;
 using System.Diagnostics;
-using System.Threading;
 
 namespace Discord_Bot.Communication;
 

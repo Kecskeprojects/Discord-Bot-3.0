@@ -2,7 +2,6 @@
 using Discord;
 using Discord_Bot.Tools;
 using Mapster;
-using System.Linq;
 
 namespace Discord_Bot.Core;
 

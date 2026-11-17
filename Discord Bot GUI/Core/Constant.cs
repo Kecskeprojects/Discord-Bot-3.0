@@ -1,7 +1,6 @@
 ﻿using Discord_Bot.Communication.Bias;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+//The process thread states, not System.Threading.ThreadState (a global using)
+using ThreadState = System.Diagnostics.ThreadState;
 
 namespace Discord_Bot.Core;
 

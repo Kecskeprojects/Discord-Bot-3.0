@@ -17,7 +17,6 @@ using Discord_Bot.Windows;
 using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace Discord_Bot;
 

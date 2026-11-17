@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord_Bot.Communication;
 using Discord_Bot.Tools.Extensions;
-using System;
 using System.Xml;
 
 namespace Discord_Bot.Processors.EmbedProcessors.Audio;

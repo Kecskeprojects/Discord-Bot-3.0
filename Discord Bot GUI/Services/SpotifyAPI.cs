@@ -5,10 +5,6 @@ using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.SpotifyAPI;
 using Discord_Bot.Tools.NativeTools;
 using SpotifyAPI.Web;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
 

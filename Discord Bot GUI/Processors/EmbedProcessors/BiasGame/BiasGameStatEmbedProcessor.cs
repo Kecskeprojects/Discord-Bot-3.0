@@ -1,7 +1,6 @@
 ﻿using DatabaseORM.Enums;
 using DatabaseORM.Resources;
 using Discord;
-using System.Linq;
 
 namespace Discord_Bot.Processors.EmbedProcessors.BiasGame;
 

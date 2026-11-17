@@ -2,11 +2,8 @@
 using Discord_Bot.Services.Models.InstaLoader;
 using Discord_Bot.Tools;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 
 namespace Discord_Bot.Processors.MessageProcessor;
 

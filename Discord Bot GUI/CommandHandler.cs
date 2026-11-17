@@ -9,8 +9,6 @@ using Discord_Bot.Core.Configuration;
 using Discord_Bot.Features;
 using Discord_Bot.Tools;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Threading.Tasks;
 
 namespace Discord_Bot;
 

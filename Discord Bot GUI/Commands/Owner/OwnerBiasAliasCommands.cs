@@ -3,8 +3,6 @@ using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using Discord.Commands;
 using Discord_Bot.Core.Configuration;
-using System;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Owner;
 

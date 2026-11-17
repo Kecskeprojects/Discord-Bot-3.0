@@ -1,8 +1,6 @@
 ﻿using DatabaseORM.Interface;
 using Discord_Bot.Core.Configuration;
 using PuppeteerSharp;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
 

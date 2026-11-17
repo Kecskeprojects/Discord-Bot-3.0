@@ -12,10 +12,6 @@ using Discord_Bot.Services.Models.LastFm;
 using Discord_Bot.Tools;
 using LastFmApi;
 using LastFmApi.Communication;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
 

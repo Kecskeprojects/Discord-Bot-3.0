@@ -10,11 +10,7 @@ using Discord_Bot.Tools.NativeTools;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
-using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Web;
 
 namespace Discord_Bot.Services;

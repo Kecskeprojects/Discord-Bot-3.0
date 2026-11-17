@@ -10,11 +10,7 @@ using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Processors.MessageProcessor;
 using Discord_Bot.Tools.NativeTools;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
 

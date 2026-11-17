@@ -8,9 +8,7 @@ using Discord_Bot.Core.Configuration;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.EmbedProcessors;
 using Discord_Bot.Services.Models.Wotd;
-using System;
 using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
 

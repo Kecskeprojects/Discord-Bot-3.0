@@ -5,10 +5,6 @@ using DatabaseORM.Resources;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services;
 using Discord_Bot.Tools;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Processors;
 

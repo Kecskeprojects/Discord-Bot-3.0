@@ -7,9 +7,6 @@ using Discord.Commands;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Features;
 using Discord_Bot.Processors.EmbedProcessors.Polls;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
 

@@ -7,11 +7,7 @@ using Discord.WebSocket;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Tools;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
 

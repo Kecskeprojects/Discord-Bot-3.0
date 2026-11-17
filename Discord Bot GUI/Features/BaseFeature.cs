@@ -6,8 +6,6 @@ using Discord.Commands;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Tools;
-using System;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 

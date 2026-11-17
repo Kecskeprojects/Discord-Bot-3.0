@@ -4,8 +4,6 @@ using DatabaseORM.Interface.Service;
 using Discord;
 using Discord.Commands;
 using Discord_Bot.Core.Configuration;
-using System;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
 

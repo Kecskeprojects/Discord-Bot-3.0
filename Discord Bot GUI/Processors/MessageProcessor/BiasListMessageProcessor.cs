@@ -1,8 +1,6 @@
 ﻿using DatabaseORM.Resources;
 using Discord;
 using Discord_Bot.Communication.Bias;
-using System;
-using System.Collections.Generic;
 
 namespace Discord_Bot.Processors.MessageProcessor;
 

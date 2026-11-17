@@ -1,10 +1,7 @@
 ﻿using DatabaseORM.Enums;
 using Discord;
 using Discord_Bot.Properties;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace Discord_Bot.Communication.Bias;
 

@@ -5,11 +5,7 @@ using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.Instagram;
 using Discord_Bot.Tools;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Web;
 
 namespace Discord_Bot.Services;

@@ -1,7 +1,5 @@
 ﻿using DatabaseORM.Resources;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 
 namespace Discord_Bot.Processors.MessageProcessor;
 

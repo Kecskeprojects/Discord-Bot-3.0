@@ -10,8 +10,6 @@ using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.EmbedProcessors;
 using Discord_Bot.Services.Models.Twitch;
 using Discord_Bot.Tools;
-using System;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
 

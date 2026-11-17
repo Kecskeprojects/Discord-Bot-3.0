@@ -6,9 +6,6 @@ using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 

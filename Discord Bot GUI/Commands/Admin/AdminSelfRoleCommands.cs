@@ -8,9 +8,6 @@ using Discord.Rest;
 using Discord.WebSocket;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Processors.MessageProcessor;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Admin;
 

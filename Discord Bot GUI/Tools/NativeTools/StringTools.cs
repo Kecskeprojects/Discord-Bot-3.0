@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Discord_Bot.Tools.NativeTools;
+﻿namespace Discord_Bot.Tools.NativeTools;
 
 public static class StringTools
 {

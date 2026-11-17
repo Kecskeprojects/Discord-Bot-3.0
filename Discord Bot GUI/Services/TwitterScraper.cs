@@ -6,10 +6,6 @@ using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.Twitter;
 using Discord_Bot.Tools;
 using PuppeteerSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Web;
 
 namespace Discord_Bot.Services;

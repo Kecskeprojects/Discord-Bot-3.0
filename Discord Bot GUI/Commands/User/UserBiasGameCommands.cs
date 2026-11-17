@@ -8,8 +8,6 @@ using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Processors.EmbedProcessors.BiasGame;
-using System;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.User;
 

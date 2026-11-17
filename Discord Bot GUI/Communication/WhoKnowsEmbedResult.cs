@@ -1,5 +1,4 @@
 ﻿using Discord;
-using System;
 using System.IO;
 
 namespace Discord_Bot.Communication;

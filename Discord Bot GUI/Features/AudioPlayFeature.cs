@@ -7,8 +7,6 @@ using Discord_Bot.Communication;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Services;
-using System;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace Discord_Bot.Features;

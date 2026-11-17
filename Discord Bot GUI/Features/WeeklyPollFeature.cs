@@ -6,9 +6,6 @@ using Discord.Rest;
 using Discord.WebSocket;
 using Discord_Bot.Tools.NativeTools;
 using MapsterMapper;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 

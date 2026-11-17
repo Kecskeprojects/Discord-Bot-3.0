@@ -1,11 +1,7 @@
 ﻿using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Tools.Extensions;
-using Microsoft.VisualBasic.Devices;
-using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Tools.NativeTools;
 
@@ -30,7 +26,9 @@ public static class ProcessTools
 
         int processorCount = Environment.ProcessorCount;
         int threadCount = GetActiveThreads();
-        double total_ram = new ComputerInfo().TotalPhysicalMemory / 1024.0 / 1024.0;
+        //The machine's physical memory, the same value Microsoft.VisualBasic's ComputerInfo gave, without Windows Forms
+        //(the GC reports less only when the process runs under a memory limit)
+        double total_ram = GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 1024.0 / 1024.0;
         double cpu_usage = cpu.NextValue();
         double ram_usage = ram.NextValue();
         double reserved_ram = reservedRam.NextValue();

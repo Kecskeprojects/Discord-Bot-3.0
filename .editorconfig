@@ -5,10 +5,10 @@ root = true
 
 # CRLF everywhere, matching .gitattributes (eol=crlf) and what Visual Studio, EF scaffolding and SSDT write.
 # dotnet format then rewrites every LF line (ENDOFLINE) instead of only the ones next to comments (IDE0055),
-# and Prettier in VS Code writes CRLF too. See docs/improvement-notes.md, section 9.
+# and Prettier in VS Code writes CRLF too. See CLAUDE.md ("Linting": line endings).
 [*]
 end_of_line = crlf
-# The UTF-8 BOM follows the tool that creates each kind of file (docs/improvement-notes.md, section 11).
+# The UTF-8 BOM follows the tool that creates each kind of file (CLAUDE.md, "Linting").
 # No BOM by default (Markdown, JSON, txt, the git and editor config files), as VS Code, git tooling and File.WriteAllText write them.
 charset = utf-8
 

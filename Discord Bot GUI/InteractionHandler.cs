@@ -4,8 +4,6 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Discord_Bot.Tools;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Threading.Tasks;
 
 namespace Discord_Bot;
 

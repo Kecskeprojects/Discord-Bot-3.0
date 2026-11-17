@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Discord_Bot.Enums;
+﻿namespace Discord_Bot.Enums;
 
 public enum PollCloseInEnum
 {

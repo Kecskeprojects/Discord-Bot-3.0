@@ -6,8 +6,6 @@ using Discord.Commands;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Processors;
 using Discord_Bot.Processors.MessageProcessor;
-using System;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Commands.Owner;
 

@@ -1,6 +1,5 @@
 ﻿using DatabaseORM.Resources;
 using Discord;
-using System.Linq;
 
 namespace Discord_Bot.Processors.EmbedProcessors.Polls;
 

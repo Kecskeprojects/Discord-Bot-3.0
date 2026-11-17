@@ -6,9 +6,6 @@ using Discord_Bot.Communication;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.EmbedProcessors.Audio;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 

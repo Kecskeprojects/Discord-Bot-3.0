@@ -12,9 +12,6 @@ using LastFmApi.Models.Recent;
 using LastFmApi.Models.TopAlbum;
 using LastFmApi.Models.TopArtist;
 using LastFmApi.Models.TopTrack;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Services;
 

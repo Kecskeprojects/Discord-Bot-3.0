@@ -1,9 +1,6 @@
 ﻿using DatabaseORM.Resources;
 using Discord;
 using Discord_Bot.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Discord_Bot.Processors.EmbedProcessors.Polls;
 

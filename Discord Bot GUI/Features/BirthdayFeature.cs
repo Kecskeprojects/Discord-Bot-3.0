@@ -5,9 +5,6 @@ using DatabaseORM.Resources;
 using Discord.WebSocket;
 using Discord_Bot.Processors.MessageProcessor;
 using Discord_Bot.Tools.NativeTools;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Discord_Bot.Features;
 

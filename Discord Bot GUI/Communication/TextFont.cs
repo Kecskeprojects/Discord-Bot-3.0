@@ -1,9 +1,6 @@
 ﻿using ImageMagick;
 using ImageMagick.Drawing;
 using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Discord_Bot.Communication;
 

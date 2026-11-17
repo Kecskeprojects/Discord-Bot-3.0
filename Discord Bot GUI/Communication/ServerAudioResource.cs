@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Discord_Bot.Communication;
+﻿namespace Discord_Bot.Communication;
 
 //No finalizer: it holds only managed objects, which clean up after themselves
 public sealed partial class ServerAudioResource(ulong serverDiscordId) : IDisposable

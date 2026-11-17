@@ -3,11 +3,8 @@ using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Tools.NativeTools;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,7 +16,7 @@ namespace Discord_Bot.Windows;
 
 public sealed partial class BotWindow : Window, IDisposable
 {
-    private readonly Timer? diagnosticsTimer;
+    private readonly System.Timers.Timer? diagnosticsTimer;
     private bool autoScroll = true;
 
     private readonly BotLogger logger;
