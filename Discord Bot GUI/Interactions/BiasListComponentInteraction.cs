@@ -1,9 +1,9 @@
-﻿using Discord.Interactions;
+﻿using DatabaseORM.Interface;
+using DatabaseORM.Interface.Service;
+using DatabaseORM.Resources;
+using Discord.Interactions;
 using Discord_Bot.Core.Configuration;
-using Discord_Bot.Interfaces.Core;
-using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Processors.MessageProcessor;
-using Discord_Bot.Resources;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

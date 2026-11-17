@@ -1,5 +1,5 @@
-﻿using Discord_Bot.Core.Configuration;
-using Discord_Bot.Interfaces.Core;
+﻿using DatabaseORM.Interface;
+using Discord_Bot.Core.Configuration;
 using PuppeteerSharp;
 using System.Collections.Generic;
 using System.Threading.Tasks;

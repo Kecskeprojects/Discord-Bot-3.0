@@ -1,8 +1,8 @@
-﻿using Discord_Bot.Communication;
+﻿using DatabaseORM.Interface;
+using DatabaseORM.Resources;
+using Discord_Bot.Communication;
 using Discord_Bot.Core;
-using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Properties;
-using Discord_Bot.Resources;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.Extensions;
 using ImageMagick;

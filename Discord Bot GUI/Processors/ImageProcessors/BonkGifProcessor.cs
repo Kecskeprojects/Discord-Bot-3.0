@@ -1,4 +1,4 @@
-﻿using Discord_Bot.Interfaces.Core;
+﻿using DatabaseORM.Interface;
 using Discord_Bot.Properties;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.Extensions;

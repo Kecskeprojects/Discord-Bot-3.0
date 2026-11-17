@@ -1,5 +1,5 @@
-﻿using Discord.Interactions;
-using Discord_Bot.Communication.Bias;
+﻿using DatabaseORM.Communication.Bias;
+using Discord.Interactions;
 
 namespace Discord_Bot.Communication.Modal;
 

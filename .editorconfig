@@ -88,7 +88,7 @@ dotnet_diagnostic.CA1716.severity = none
 [Discord Bot GUI/Services/Models/**.cs]
 generated_code = true
 
-[Discord Bot GUI/Database/MainDbContext.cs]
+[DatabaseORM/Context/MainDbContext.cs]
 generated_code = true
 
 [LastFmApi/Models/**.cs]
@@ -97,6 +97,6 @@ generated_code = true
 # The scaffolded EF models are not marked as generated code: with nullable on, the scaffold writes `?` for nullable columns
 # and optional navigations instead of .IsRequired(), so EF and the compiler need those annotations to count (in generated
 # code they are off, and a `?` there is error CS8669). Only the style rules a new scaffold would undo are turned off.
-[Discord Bot GUI/Database/Models/**.cs]
+[DatabaseORM/Model/**.cs]
 dotnet_diagnostic.IDE0005.severity = none
 dotnet_diagnostic.IDE0028.severity = none

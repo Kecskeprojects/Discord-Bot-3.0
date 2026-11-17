@@ -1,5 +1,5 @@
-﻿using Discord;
-using Discord_Bot.Resources;
+﻿using DatabaseORM.Resources;
+using Discord;
 using Discord_Bot.Tools;
 using Mapster;
 using System.Linq;

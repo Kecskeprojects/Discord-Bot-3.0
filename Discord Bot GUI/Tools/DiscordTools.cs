@@ -1,10 +1,10 @@
-﻿using Discord;
+﻿using DatabaseORM.Enums;
+using DatabaseORM.Resources;
+using Discord;
 using Discord.Commands;
 using Discord.Interactions;
 using Discord.Rest;
 using Discord.WebSocket;
-using Discord_Bot.Enums;
-using Discord_Bot.Resources;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

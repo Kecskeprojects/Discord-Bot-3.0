@@ -1,5 +1,5 @@
-﻿using Discord;
-using Discord_Bot.Resources;
+﻿using DatabaseORM.Resources;
+using Discord;
 
 namespace Discord_Bot.Processors.EmbedProcessors;
 

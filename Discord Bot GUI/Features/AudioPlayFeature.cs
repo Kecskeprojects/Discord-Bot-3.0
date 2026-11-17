@@ -1,10 +1,11 @@
-﻿using Discord.Commands;
+﻿using DatabaseORM.Enums;
+using DatabaseORM.Interface;
+using DatabaseORM.Interface.Service;
+using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Bot.Communication;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.Core;
-using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using System;
 using System.Threading.Tasks;

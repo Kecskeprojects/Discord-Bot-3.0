@@ -1,0 +1,39 @@
+using System;
+using System.Collections.Generic;
+
+namespace DatabaseORM.Model;
+
+public partial class Server
+{
+    public int ServerId { get; set; }
+
+    public string DiscordId { get; set; } = null!;
+
+    public int? NotificationRoleId { get; set; }
+
+    public string? RoleMessageDiscordId { get; set; }
+
+    public DateTime CreatedOn { get; set; }
+
+    public DateTime ModifiedOn { get; set; }
+
+    public int? MuteRoleId { get; set; }
+
+    public virtual ICollection<Birthday> Birthdays { get; set; } = new List<Birthday>();
+
+    public virtual ICollection<Channel> Channels { get; set; } = new List<Channel>();
+
+    public virtual ICollection<CustomCommand> CustomCommands { get; set; } = new List<CustomCommand>();
+
+    public virtual Role? MuteRole { get; set; }
+
+    public virtual Role? NotificationRole { get; set; }
+
+    public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
+
+    public virtual ICollection<ServerMutedUser> ServerMutedUsers { get; set; } = new List<ServerMutedUser>();
+
+    public virtual ICollection<TwitchChannel> TwitchChannels { get; set; } = new List<TwitchChannel>();
+
+    public virtual ICollection<WeeklyPoll> WeeklyPolls { get; set; } = new List<WeeklyPoll>();
+}

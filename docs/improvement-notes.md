@@ -121,7 +121,7 @@ The target is the `DatabaseORM/` project (created 2026-11-17), modeled on the pr
 | `Database/Mapping/DatabaseMapperConfig.cs` | `Mapping/` | The DB half of the old `MapperConfig`, an `IRegister` |
 | `Database/Tools/` (`WeeklyPollTools`, `UserIdolStatisticTools`, `Extensions/EntityFrameworkExtension`) | `Tools/` | Helpers only the DB layer uses |
 | The DB registrations in `Startup.cs` | `DatabaseStartup.cs` | As in KecskeProjectsSite, but taking the connection string from the bot's `Config` |
-| EF packages (`SqlServer`, `Design`, `Tools`) | csproj | Scaffolding then targets the library; record the command in `Context/update-scaffold.txt` |
+| EF packages (`SqlServer`, `Design`, `Tools`) | csproj | Scaffolding then targets the library; the command is kept locally in the git-ignored `Context/update-scaffold.txt` |
 
 **Namespaces become `DatabaseORM.*`.** The original idea of keeping `Discord_Bot.Database.*` doesn't fit the new folder names, because IDE0130 (namespace must match folder) is a build error like every other style rule. That means `using` updates in about 110 bot files, plus the enum users. It's mechanical work.
 
@@ -132,9 +132,9 @@ The target is the `DatabaseORM/` project (created 2026-11-17), modeled on the pr
 - The `I*` interfaces stay.
 - `IMapper` stays injected.
 
-**In the new csproj:**
-- `Microsoft.Extensions.Identity.Core` (KecskeProjectsSite's password hasher) isn't needed; remove it.
-- `ImplicitUsings` is on, unlike in the bot, so the moved files' `using System;` lines become IDE0005 errors. Remove them with `dotnet format --diagnostics IDE0005`.
+**In the new csproj (done 2026-11-17):**
+- `Microsoft.Extensions.Identity.Core` (KecskeProjectsSite's password hasher) was removed.
+- `ImplicitUsings` is on, unlike in the bot. The moved files' redundant `using System;` and similar lines were removed with `dotnet format --diagnostics IDE0005`. The scaffolded `Model/` files keep theirs, because IDE0005 is off there and a re-scaffold writes them again.
 
 ### Couplings to untangle first
 
@@ -158,7 +158,10 @@ The target is the `DatabaseORM/` project (created 2026-11-17), modeled on the pr
    - `AddTwitchChannelAsync` now takes the link. The command builds it from `Constant.TwitchBaseUrl`, so base URLs stay in `Constant.cs`.
    - `RestrictedChannelTypes` became a private field of `ChannelTypeEnumExtension`, its only user.
 6. **AngleSharp in `ExtendedBiasData` (found and done 2026-11-17).** Its constructor parsed a dbkpop table row (`IElement`). It is now a plain DTO, and the parsing moved to `KpopDbScraper.ParseRow`.
-7. **`GlobalSuppressions.cs`.** The Database entries have to move to the new project's own `GlobalSuppressions.cs`: CA1309, CA1310 and CA1862 for the `DatabaseORM` namespace, and IDE0290 for `MainDbContext`.
+7. **`GlobalSuppressions.cs`.** **Done 2026-11-17.**
+   - `DatabaseORM/GlobalSuppressions.cs` now holds CA1309, CA1310 and CA1862 for the `DatabaseORM.Repository` and `DatabaseORM.Service` namespaces. That is where the EF query lambdas are. The old `Discord_Bot.Database` scope also covered the models, the mapping and the DB tools, none of which need it.
+   - It also holds IDE0290 for `MainDbContext`, and IDE0305 for the whole library, with the bot's justification.
+   - The bot's commented-out IDE0028 entry for the models was dropped; the `.editorconfig` model section covers it.
 
 ### Shape of the result
 
@@ -180,11 +183,12 @@ Each slice ends in a green build.
 
 1. **Done 2026-11-17.** Boundary leaks and modal → DTO, inside the bot (couplings 1 and 2).
 2. **Done 2026-11-17.** Split `MapperConfig`, the `Tools` helpers, the `Constant` uses and `ExtendedBiasData`'s parsing, still inside the bot (couplings 3–6). A grep confirms that the files to move (the table above) only use each other, `System`, EF Core and Mapster.
-3. The move:
-   - `git mv` into the `DatabaseORM/` folders and switch to `DatabaseORM.*` namespaces.
-   - Strip the implicit usings and update the bot's usings.
-   - In the csproj files: add the project reference, move the EF packages and drop `Identity.Core`.
-   - Move the suppressions, fix the `.editorconfig` paths and add `update-scaffold.txt`.
+3. **Done 2026-11-17.** The move:
+   - `git mv` of 136 files into the `DatabaseORM/` folders, with `DatabaseORM.*` namespaces. The repositories needed `using DatabaseORM.Context;`, because they no longer sit below the context's namespace.
+   - Stripped the implicit usings, and updated and sorted the bot's usings.
+   - The bot references `DatabaseORM` and no longer has the EF packages; `SqlServer` comes through the project reference. `Identity.Core` was dropped.
+   - The suppressions moved and the `.editorconfig` paths were fixed.
+   - The scaffold command is in `Context/update-scaffold.txt`, which is git-ignored and only exists locally, because it names the dev machine. It passes `-StartupProject DatabaseORM`, so the bot needs no `EntityFrameworkCore.Design`.
 4. `DatabaseStartup`, optionally `internal` repository interfaces, and the CLAUDE.md updates (layout, layers, scaffold step, linting paths). Then a quick run against the dev database.
 
 Slices 1 and 2 are worth doing even inside the current project, and they make the move itself mechanical.
@@ -245,11 +249,12 @@ Can the disabled embeds be turned back on as they are, with adjustments and with
 - **Last.fm artist stats image (found 2026-11-16):** `LastFmAPI.GetArtistDataAsync` picks the MBID from the albums when there are any, but always passes `tracks[0]`'s artist and track name to the Spotify search. An artist with album plays but no track plays would throw there (rare, since album plays come from track plays). Passing a track name also makes the search return that track's album cover instead of the artist's image, as `GetTopArtistsAsync` does. Decide which image the stats should show, and take both values from the same list.
 - **Hand-written results in `Services/Models` (found 2026-11-16):** `Services/Models/LastFm` (`ArtistStats`, `LastFmListResult`, `NowPlayingResult`, `WhoKnows`) and `Services/Models/SpotifyAPI/SpotifyImageSearchResult` are the bot's own result DTOs, not JSON models. Because the folder is marked as generated code, they get no nullable checking and no analyzer warnings. Moving them to `Communication/` (where data types belong by convention) would bring both back. Their nullable fields are `Message`, the image URLs and the optional now-playing data.
 - **Code Cleanup edits the scaffolded models (found 2026-11-16):** `Database/Models` is not marked as generated code (so its `?` annotations count, see CLAUDE.md "Database changes"), so Visual Studio's Code Cleanup changes those files, e.g. it removes unused usings even with IDE0005 off for the folder. Until this is fixed, leave the folder out of Code Cleanup, or re-scaffold afterwards. Fix: mark the folder `generated_code = true` again, and have the scaffold write `#nullable enable` at the top of each model file, which turns nullable back on in generated code. To do that, install EF's templates (`dotnet new install Microsoft.EntityFrameworkCore.Templates`, from nuget.org), run `dotnet new ef-templates` in the bot's project folder, add the directive to `CodeTemplates/EFCore/EntityType.t4`, and re-scaffold once. `Scaffold-DbContext` and `dotnet ef dbcontext scaffold` use those templates automatically. The cost: the templates become the project's own copy, so after an EF upgrade, refresh them and re-add the line.
-- **Scraped idol gender is stored as `Male`/`Female` (found 2026-11-17):**
+- **Scraped idol gender is stored as `Male`/`Female` (found 2026-11-17, code fixed 2026-11-17, existing rows still to correct):**
   - The `ExtendedBiasData → Idol` mapping (`DatabaseMapperConfig`) writes `Gender.Value.ToString()`, so an idol first filled from dbkpop gets `Male`/`Female`.
   - Everything else uses `M`/`F` (`ToDatabaseFriendlyString`): the edit modal, and the bias game's gender filter in `IdolRepository.GetListForGameAsync`. The game filtered by gender therefore leaves those idols out.
   - The bug predates the Mapster port (AutoMapper's enum → string did the same).
-  - Fix: map with `ToDatabaseFriendlyString()`, then correct the existing rows (`UPDATE Idol SET Gender = 'M' WHERE Gender = 'Male'`, and the same for `F`).
+  - Fix: the mapping now uses `ToDatabaseFriendlyString()`.
+  - Still to do: correct the existing rows on the dev and the live database (`UPDATE Idol SET Gender = 'M' WHERE Gender = 'Male'`, and `'F'` for `'Female'`). This is a one-off data fix, so it isn't an SSDT patch. Check with `SELECT Gender, COUNT(*) FROM Idol GROUP BY Gender`.
 - **`[RequireOwner]` on the extended idol modal (found 2026-11-17, done 2026-11-17):** `EditIdolExtendedModalSubmit` in `EditIdolModalInteraction` was the only edit handler without `[RequireOwner]`. It only mattered for consistency, because the modal opens only from the owner-only `EditIdolData` menu. The attribute is now added.
 - **Culture in interpolated strings (found 2026-11-16):** CA1305 doesn't cover them. For example `LastFmListResultTools` writes `{percentage}%`, which shows "12,5%" under hu-HU and "12.5%" under en-US. Leave it as is if the server's culture is the intended display format.
 - **YouTube playlist start point:** let the user choose which song or index a playlist import starts from (`YoutubeAPI.PlaylistSearch`). It currently always takes the first page of 50 (`MaxResults`).

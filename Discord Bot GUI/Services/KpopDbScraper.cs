@@ -1,9 +1,9 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
-using Discord_Bot.Communication.Bias;
+using DatabaseORM.Communication.Bias;
+using DatabaseORM.Enums;
+using DatabaseORM.Interface;
 using Discord_Bot.Core;
-using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Tools;
 using PuppeteerSharp;

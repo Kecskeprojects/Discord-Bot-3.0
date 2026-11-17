@@ -1,8 +1,8 @@
-﻿using Discord_Bot.Communication.Bias;
-using Discord_Bot.Interfaces.Core;
-using Discord_Bot.Interfaces.DBServices;
+﻿using DatabaseORM.Communication.Bias;
+using DatabaseORM.Interface;
+using DatabaseORM.Interface.Service;
+using DatabaseORM.Resources;
 using Discord_Bot.Interfaces.Services;
-using Discord_Bot.Resources;
 using Discord_Bot.Services;
 using Discord_Bot.Tools;
 using System;

@@ -1,7 +1,7 @@
-﻿using Discord;
+﻿using DatabaseORM.Enums;
+using DatabaseORM.Resources;
+using Discord;
 using Discord.WebSocket;
-using Discord_Bot.Enums;
-using Discord_Bot.Resources;
 using Discord_Bot.Tools;
 using System;
 using System.Collections.Generic;

@@ -1,4 +1,4 @@
-﻿using Discord_Bot.Resources;
+﻿using DatabaseORM.Resources;
 using System.Collections.Generic;
 
 namespace Discord_Bot.Services.Models.LastFm;

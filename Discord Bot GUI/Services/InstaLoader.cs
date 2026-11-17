@@ -1,4 +1,4 @@
-﻿using Discord_Bot.Interfaces.Core;
+﻿using DatabaseORM.Interface;
 using Discord_Bot.Interfaces.Services;
 using System;
 using System.Diagnostics;

@@ -1,9 +1,9 @@
-﻿using Discord;
+﻿using DatabaseORM.Interface;
+using Discord;
 using Discord.LibDave.Binding;
 using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
-using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using System;

@@ -1,4 +1,4 @@
-﻿using Discord_Bot.Communication.Bias;
+﻿using DatabaseORM.Communication.Bias;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

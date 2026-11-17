@@ -1,6 +1,6 @@
-﻿using Discord;
+﻿using DatabaseORM.Interface;
+using Discord;
 using Discord_Bot.Communication;
-using Discord_Bot.Interfaces.Core;
 using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Services.Models.LastFm;
 using Discord_Bot.Tools;

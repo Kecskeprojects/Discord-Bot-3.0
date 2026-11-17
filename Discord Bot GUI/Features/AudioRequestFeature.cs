@@ -1,9 +1,9 @@
-﻿using Discord;
+﻿using DatabaseORM.Interface;
+using DatabaseORM.Interface.Service;
+using Discord;
 using Discord.WebSocket;
 using Discord_Bot.Communication;
 using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.Core;
-using Discord_Bot.Interfaces.DBServices;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.EmbedProcessors.Audio;
 using System;

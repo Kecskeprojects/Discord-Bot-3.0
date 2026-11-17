@@ -1,6 +1,6 @@
-﻿using Discord;
+﻿using DatabaseORM.Resources;
+using Discord;
 using Discord_Bot.Communication.Bias;
-using Discord_Bot.Resources;
 using System;
 using System.Collections.Generic;
 

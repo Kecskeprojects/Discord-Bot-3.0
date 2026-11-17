@@ -1,6 +1,6 @@
-﻿using Discord.WebSocket;
+﻿using DatabaseORM.Resources;
+using Discord.WebSocket;
 using Discord_Bot.Core;
-using Discord_Bot.Resources;
 using System;
 using System.Globalization;
 

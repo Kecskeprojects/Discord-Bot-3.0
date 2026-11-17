@@ -4,8 +4,8 @@
 //using Discord_Bot.Communication;
 //using Discord_Bot.Core;
 //using Discord_Bot.Core.Configuration;
-//using Discord_Bot.Interfaces.Core;
-//using Discord_Bot.Interfaces.DBServices;
+//using DatabaseORM.Interface;
+//using DatabaseORM.Interface.Service;
 //using Discord_Bot.Interfaces.Services;
 //using Discord_Bot.Processors.MessageProcessor;
 //using Discord_Bot.Tools;

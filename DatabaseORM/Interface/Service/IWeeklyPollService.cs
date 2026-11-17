@@ -1,0 +1,18 @@
+﻿using DatabaseORM.Enums;
+using DatabaseORM.Resources;
+
+namespace DatabaseORM.Interface.Service;
+
+public interface IWeeklyPollService
+{
+    Task<WeeklyPollEditResource?> GetOrCreateDummyPollAsync(ulong serverId);
+    Task<WeeklyPollResource?> GetPollByIdAsync(int pollId);
+    Task<WeeklyPollEditResource?> GetPollByNameForEditAsync(ulong serverId, string pollName);
+    Task<WeeklyPollEditResource?> GetPollByIdForEditAsync(int pollId);
+    Task<List<WeeklyPollResource>> GetPollsByDayOfWeekAsync(DayOfWeek dayOfWeek);
+    Task<List<WeeklyPollResource>> GetPollsByServerIdAsync(ulong serverId);
+    Task<DbProcessResultEnum> RemovePollByNameAsync(ulong serverId, string pollName);
+    Task<DbProcessResultEnum> UpdateAsync(int pollId, string name, string title, ulong channelId, RoleResource? role);
+    Task<DbProcessResultEnum> UpdateFieldAsync(int pollId, string fieldName, string newValue);
+    Task<WeeklyPollResource?> GetPollForForceResendAsync(ulong id, string pollName);
+}

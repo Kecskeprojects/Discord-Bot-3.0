@@ -1,5 +1,5 @@
-﻿using Discord_Bot.Core;
-using Discord_Bot.Interfaces.Core;
+﻿using DatabaseORM.Interface;
+using Discord_Bot.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.MusicBrainz.ArtistLookup;
 using Discord_Bot.Tools;

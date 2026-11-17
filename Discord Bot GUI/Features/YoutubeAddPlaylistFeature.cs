@@ -1,7 +1,7 @@
-﻿using Discord;
+﻿using DatabaseORM.Interface;
+using DatabaseORM.Interface.Service;
+using Discord;
 using Discord.WebSocket;
-using Discord_Bot.Interfaces.Core;
-using Discord_Bot.Interfaces.DBServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;

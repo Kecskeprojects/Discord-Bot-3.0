@@ -1,9 +1,9 @@
-﻿using Discord;
+﻿using DatabaseORM.Enums;
+using DatabaseORM.Interface;
+using DatabaseORM.Interface.Service;
+using Discord;
 using Discord.Commands;
 using Discord_Bot.Core.Configuration;
-using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.Core;
-using Discord_Bot.Interfaces.DBServices;
 using System;
 using System.Threading.Tasks;
 

@@ -1,8 +1,8 @@
-﻿using Discord.Rest;
+﻿using DatabaseORM.Interface;
+using DatabaseORM.Interface.Service;
+using DatabaseORM.Resources;
+using Discord.Rest;
 using Discord.WebSocket;
-using Discord_Bot.Interfaces.Core;
-using Discord_Bot.Interfaces.DBServices;
-using Discord_Bot.Resources;
 using System;
 using System.Threading.Tasks;
 

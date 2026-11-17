@@ -1,4 +1,4 @@
-﻿using Discord_Bot.Resources;
+﻿using DatabaseORM.Resources;
 
 namespace Discord_Bot.Communication;
 

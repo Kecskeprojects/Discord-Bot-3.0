@@ -1,0 +1,25 @@
+using System;
+using System.Collections.Generic;
+
+namespace DatabaseORM.Model;
+
+public partial class WeeklyPollOptionPreset
+{
+    public int WeeklyPollOptionPresetId { get; set; }
+
+    public string Name { get; set; } = null!;
+
+    public string Description { get; set; } = null!;
+
+    public bool IsSpecialPreset { get; set; }
+
+    public bool IsActive { get; set; }
+
+    public DateTime CreatedOn { get; set; }
+
+    public DateTime ModifiedOn { get; set; }
+
+    public virtual ICollection<WeeklyPollOption> WeeklyPollOptions { get; set; } = new List<WeeklyPollOption>();
+
+    public virtual ICollection<WeeklyPoll> WeeklyPolls { get; set; } = new List<WeeklyPoll>();
+}

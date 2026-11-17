@@ -1,0 +1,19 @@
+using System;
+using System.Collections.Generic;
+
+namespace DatabaseORM.Model;
+
+public partial class ServerMutedUser
+{
+    public int ServerId { get; set; }
+
+    public int UserId { get; set; }
+
+    public DateTime MutedUntil { get; set; }
+
+    public string RemovedRoleDiscordIds { get; set; } = null!;
+
+    public virtual Server Server { get; set; } = null!;
+
+    public virtual User User { get; set; } = null!;
+}

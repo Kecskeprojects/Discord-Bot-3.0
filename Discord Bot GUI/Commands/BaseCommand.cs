@@ -1,12 +1,12 @@
-﻿using Discord;
+﻿using DatabaseORM.Enums;
+using DatabaseORM.Interface;
+using DatabaseORM.Interface.Service;
+using DatabaseORM.Resources;
+using Discord;
 using Discord.Commands;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
-using Discord_Bot.Enums;
-using Discord_Bot.Interfaces.Core;
-using Discord_Bot.Interfaces.DBServices;
-using Discord_Bot.Resources;
 using Discord_Bot.Tools;
 using System;
 using System.Threading.Tasks;

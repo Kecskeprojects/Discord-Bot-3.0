@@ -1,0 +1,439 @@
+﻿using DatabaseORM.Caching;
+using DatabaseORM.Communication;
+using DatabaseORM.Communication.Bias;
+using DatabaseORM.Enums;
+using DatabaseORM.Interface;
+using DatabaseORM.Interface.Repository;
+using DatabaseORM.Interface.Service;
+using DatabaseORM.Model;
+using DatabaseORM.Resources;
+using MapsterMapper;
+
+namespace DatabaseORM.Service;
+
+public class IdolService(
+    IIdolRepository idolRepository,
+    IIdolGroupRepository idolGroupRepository,
+    IIdolImageRepository idolImageRepository,
+    IMapper mapper,
+    IBotLogger logger,
+    ServerCache cache) : BaseService(mapper, logger, cache), IIdolService
+{
+    private readonly IIdolRepository idolRepository = idolRepository;
+    private readonly IIdolGroupRepository idolGroupRepository = idolGroupRepository;
+    private readonly IIdolImageRepository idolImageRepository = idolImageRepository;
+
+    public async Task<DbProcessResultEnum> AddIdolAsync(string idolName, string idolGroup)
+    {
+        try
+        {
+            if (await idolRepository.ExistsAsync(
+                i => i.Name == idolName
+                && i.Group.Name == idolGroup,
+                i => i.Group))
+            {
+                logger.Log($"Idol [{idolName}]-[{idolGroup}] is already in database!");
+                return DbProcessResultEnum.AlreadyExists;
+            }
+
+            IdolGroup? group = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.Name == idolGroup);
+
+            group ??= new()
+            {
+                GroupId = 0,
+                Name = idolGroup,
+            };
+
+            Idol idol = new()
+            {
+                IdolId = 0,
+                Group = group,
+                Name = idolName,
+            };
+            _ = await idolRepository.AddAsync(idol);
+
+            logger.Log($"Idol [{idolName}]-[{idolGroup}] added successfully!");
+            return DbProcessResultEnum.Success;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("IdolService.cs AddIdolAsync", ex);
+        }
+        return DbProcessResultEnum.Failure;
+    }
+
+    public async Task<List<IdolResource>> GetIdolsByGroupAsync(string groupName)
+    {
+        List<IdolResource> result = [];
+        try
+        {
+            List<Idol> idols = await idolRepository.GetListAsync(
+                i => string.IsNullOrEmpty(groupName)
+                || i.Group.Name == groupName,
+                ascending: true,
+                orderBy: i => i.Name,
+                includes: i => i.Group);
+
+            result = mapper.Map<List<Idol>, List<IdolResource>>(idols);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("IdolService.cs GetIdolsByGroupAsync", ex);
+        }
+        return result;
+    }
+
+    public async Task<DbProcessResultEnum> RemoveIdolAsync(string idolName, string idolGroup)
+    {
+        try
+        {
+            Idol? idol = await idolRepository.FirstOrDefaultAsync(
+                i => i.Name == idolName
+                && i.Group.Name == idolGroup,
+                i => i.Group);
+            if (idol != null)
+            {
+                _ = await idolRepository.RemoveAsync(idol);
+
+                logger.Log($"Idol [{idolName}]-[{idolGroup}] removed successfully!");
+                return DbProcessResultEnum.Success;
+            }
+            else
+            {
+                logger.Log($"Idol [{idolName}]-[{idolGroup}] could not be found!");
+                return DbProcessResultEnum.NotFound;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("IdolService.cs RemoveIdolAsync", ex);
+        }
+        return DbProcessResultEnum.Failure;
+    }
+
+    public async Task<List<IdolResource>> GetAllIdolsAsync()
+    {
+        List<IdolResource> result = [];
+        try
+        {
+            List<Idol> idols = await idolRepository.GetAllAsync(i => i.Group, i => i.IdolImages);
+
+            result = mapper.Map<List<Idol>, List<IdolResource>>(idols);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("IdolService.cs GetAllIdolsAsync", ex);
+        }
+        return result;
+    }
+
+    public async Task<bool> UpdateIdolDetailsAsync(IdolResource idolResource, ExtendedBiasData? data, AdditionalIdolData? additional)
+    {
+        try
+        {
+            Idol? idol = await idolRepository
+                .FirstOrDefaultAsync(i =>
+                    i.IdolId == idolResource.IdolId,
+                    i => i.Group,
+                    i => i.IdolImages);
+            if (idol == null)
+            {
+                return false;
+            }
+
+            if (idol.IdolImages.Count > 3)
+            {
+                _ = await idolImageRepository.RemoveAsync(idol.IdolImages.OrderByDescending(x => x.CreatedOn).Skip(3).ToList());
+            }
+
+            if (string.IsNullOrEmpty(idol.ProfileUrl) && data != null)
+            {
+                _ = mapper.Map(data, idol);
+            }
+
+            if (additional != null)
+            {
+                if (additional.ImageUrl != null && !idol.IdolImages.Any(x => x.OverriddenUrl == additional.ImageUrl))
+                {
+                    idol.IdolImages.Add(new IdolImage() { ImageUrl = additional.ImageUrl });
+                }
+
+                if (idol.Group.Name != "soloist" && idol.Group.DebutDate == null)
+                {
+                    _ = mapper.Map(additional, idol.Group);
+                }
+            }
+
+            return await idolRepository.UpdateAsync(idol) > 0;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("IdolService.cs UpdateIdolDetailsAsync", ex);
+            return false;
+        }
+    }
+
+    public async Task<int> CorrectUpdateErrorsAsync()
+    {
+        int count = 0;
+        try
+        {
+            List<Idol> idols =
+                await idolRepository.GetListAsync(i =>
+                    i.Group.DebutDate != null
+                    && i.DebutDate == null
+                    && i.ProfileUrl != null,
+                    i => i.Group);
+
+            if (idols.Count > 0)
+            {
+                foreach (Idol item in idols)
+                {
+                    item.DebutDate = item.Group.DebutDate;
+                }
+
+                _ = await idolRepository.SaveChangesAsync();
+                count = idols.Count;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("IdolService.cs CorrectUpdateErrorsAsync", ex);
+        }
+
+        return count;
+    }
+
+    public async Task<IdolExtendedResource?> GetIdolDetailsAsync(string idolName, string idolGroup)
+    {
+        IdolExtendedResource? resource = null;
+        try
+        {
+            Idol? idol = await idolRepository.FirstOrDefaultAsync(
+                i => i.Name == idolName
+                && i.Group.Name == idolGroup,
+                i => i.Group,
+                i => i.IdolImages);
+
+            if (idol == null)
+            {
+                return resource;
+            }
+
+            resource = mapper.Map<Idol, IdolExtendedResource>(idol);
+
+            IdolImage? image = await idolImageRepository.GetLatestByIdolIdAsync(idol.IdolId);
+            resource.LatestImageUrl = image?.ImageUrl;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("IdolService.cs GetIdolDetailsAsync", ex);
+        }
+
+        return resource;
+    }
+
+    public async Task<DbProcessResultEnum> UpdateAsync(int idolId, IdolEditData data)
+    {
+        try
+        {
+            Idol? idol = await idolRepository
+                .FirstOrDefaultAsync(i =>
+                i.IdolId == idolId,
+                i => i.Group);
+            if (idol == null)
+            {
+                return DbProcessResultEnum.NotFound;
+            }
+
+            idol.ProfileUrl = data.ProfileUrl.Trim();
+            idol.DateOfBirth = DateOnly.TryParse(data.DateOfBirth, out DateOnly dateOfBirth) ? dateOfBirth : idol.DateOfBirth;
+            idol.Name = data.Name.ToLower().Trim();
+            //An unknown gender keeps the current one
+            GenderEnum? gender = GenderChoiceEnumExtension.FromDatabaseString(data.Gender);
+            if (gender.HasValue)
+            {
+                idol.Gender = gender.Value.ToDatabaseFriendlyString();
+            }
+            idol.Group = await GetOrCreateGroupAsync(idol.Group, data.Group.ToLower().Trim());
+            _ = await idolRepository.SaveChangesAsync();
+
+            logger.Log($"Idol with ID {idolId} updated successfully!");
+            return DbProcessResultEnum.Success;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("IdolService.cs UpdateAsync", ex);
+        }
+        return DbProcessResultEnum.Failure;
+    }
+
+    public async Task<DbProcessResultEnum> UpdateAsync(int idolId, IdolExtendedEditData data)
+    {
+        try
+        {
+            Idol? idol = await idolRepository
+                .FirstOrDefaultAsync(i => i.IdolId == idolId);
+            if (idol == null)
+            {
+                return DbProcessResultEnum.NotFound;
+            }
+
+            idol.StageName = data.StageName.Trim();
+            idol.KoreanStageName = data.KoreanStageName.Trim();
+            idol.FullName = data.FullName.Trim();
+            idol.KoreanFullName = data.KoreanFullName.Trim();
+            idol.DebutDate = DateOnly.TryParse(data.DebutDate, out DateOnly debutDate) ? debutDate : idol.DebutDate;
+            _ = await idolRepository.SaveChangesAsync();
+
+            logger.Log($"Idol with ID {idolId} updated successfully!");
+            return DbProcessResultEnum.Success;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("IdolService.cs UpdateAsync", ex);
+        }
+        return DbProcessResultEnum.Failure;
+    }
+
+    public async Task<DbProcessResultEnum> UpdateProfileUrlAsync(int idolId, string profileUrl)
+    {
+        try
+        {
+            Idol? idol = await idolRepository
+                .FirstOrDefaultAsync(i => i.IdolId == idolId);
+            if (idol == null)
+            {
+                return DbProcessResultEnum.NotFound;
+            }
+
+            idol.ProfileUrl = profileUrl.Trim();
+            _ = await idolRepository.SaveChangesAsync();
+
+            logger.Log($"Idol with ID {idolId} updated successfully!");
+            return DbProcessResultEnum.Success;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("IdolService.cs UpdateProfileUrlAsync", ex);
+        }
+        return DbProcessResultEnum.Failure;
+    }
+
+    public async Task<DbProcessResultEnum> ChangeGroupAsync(int idolId, string groupName)
+    {
+        try
+        {
+            Idol? idol = await idolRepository
+                .FirstOrDefaultAsync(i => i.IdolId == idolId);
+            if (idol == null)
+            {
+                return DbProcessResultEnum.NotFound;
+            }
+
+            idol.Group = await GetOrCreateGroupAsync(idol.Group, groupName.ToLower().Trim());
+            _ = await idolRepository.SaveChangesAsync();
+
+            logger.Log($"Idol with ID {idolId} updated successfully!");
+            return DbProcessResultEnum.Success;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("IdolService.cs ChangeGroupAsync", ex);
+        }
+        return DbProcessResultEnum.Failure;
+    }
+
+    public async Task<ListWithDbResult<UserResource>> GetUsersByIdolsAsync(string[] nameList)
+    {
+        ListWithDbResult<UserResource> result = new([], DbProcessResultEnum.Failure);
+        try
+        {
+            List<Idol> idols = [];
+            foreach (string item in nameList)
+            {
+                string[] parts = item.Split("-");
+                string idolOrGroupName = parts[0];
+                string groupName = parts.Length == 2 ? parts[1] : "";
+                List<Idol> newIdols = await idolRepository.GetListByNamesAsync(idolOrGroupName, groupName);
+                idols = idols.Union(newIdols).ToList();
+            }
+
+            if (idols.Count == 0)
+            {
+                result.ProcessResultEnum = DbProcessResultEnum.NotFound;
+                return result;
+            }
+
+            List<User> users = idols.SelectMany(i => i.Users).DistinctBy(u => u.UserId).ToList();
+
+            result.List = mapper.Map<List<User>, List<UserResource>>(users);
+            result.ProcessResultEnum = DbProcessResultEnum.Success;
+        }
+        catch (Exception ex)
+        {
+            logger.Error("IdolService.cs GetUsersByIdolsAsync", ex);
+        }
+        return result;
+    }
+
+    public async Task<List<IdolGameResource>> GetListForGameAsync(GenderEnum gender, int debutAfter, int debutBefore)
+    {
+        List<IdolGameResource> result = [];
+        try
+        {
+            List<Idol> idols = await idolRepository.GetListForGameAsync(gender, debutAfter, debutBefore);
+
+            result = mapper.Map<List<Idol>, List<IdolGameResource>>(idols);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("IdolService.cs GetListForGameAsync", ex);
+        }
+        return result;
+    }
+
+    public async Task<IdolGameResource?> GetIdolByIdAsync(int idolId)
+    {
+        IdolGameResource? result = null;
+        try
+        {
+            Idol? idol = await idolRepository
+                .FirstOrDefaultAsync(i =>
+                    i.IdolId == idolId,
+                    i => i.Group,
+                    i => i.IdolImages);
+
+            result = idol == null ? null : mapper.Map<Idol, IdolGameResource>(idol);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("IdolService.cs GetIdolByIdAsync", ex);
+        }
+
+        return result;
+    }
+
+    //An empty name keeps the current group, a name not in the database creates the group
+    private async Task<IdolGroup> GetOrCreateGroupAsync(IdolGroup currentGroup, string groupName)
+    {
+        if (string.IsNullOrWhiteSpace(groupName))
+        {
+            return currentGroup;
+        }
+
+        IdolGroup? group = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.Name == groupName);
+        if (group == null)
+        {
+            group = new IdolGroup()
+            {
+                Name = groupName,
+                CreatedOn = DateTime.UtcNow,
+                ModifiedOn = DateTime.UtcNow
+            };
+
+            _ = await idolGroupRepository.AddAsync(group);
+        }
+        return group;
+    }
+}

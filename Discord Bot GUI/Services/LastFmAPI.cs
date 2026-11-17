@@ -1,7 +1,7 @@
-﻿using Discord_Bot.Core.Configuration;
-using Discord_Bot.Interfaces.Core;
+﻿using DatabaseORM.Interface;
+using DatabaseORM.Resources;
+using Discord_Bot.Core.Configuration;
 using Discord_Bot.Interfaces.Services;
-using Discord_Bot.Resources;
 using Discord_Bot.Services.Models.LastFm;
 using Discord_Bot.Services.Models.SpotifyAPI;
 using Discord_Bot.Tools.LastFmTools;

@@ -1,4 +1,4 @@
-﻿using Discord_Bot.Enums;
+﻿using DatabaseORM.Enums;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

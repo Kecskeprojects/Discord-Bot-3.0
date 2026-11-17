@@ -1,4 +1,4 @@
-﻿using Discord_Bot.Interfaces.Core;
+﻿using DatabaseORM.Interface;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.Twitch;
 using Discord_Bot.Tools.NativeTools;

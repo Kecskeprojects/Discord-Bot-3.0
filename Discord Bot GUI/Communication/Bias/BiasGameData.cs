@@ -1,5 +1,5 @@
-﻿using Discord;
-using Discord_Bot.Enums;
+﻿using DatabaseORM.Enums;
+using Discord;
 using Discord_Bot.Properties;
 using System;
 using System.Collections.Generic;
