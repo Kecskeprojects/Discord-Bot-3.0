@@ -29,7 +29,7 @@ public class EditIdolModalInteraction(
         {
             logger.Log($"Edit Idol Modal Submitted for idol with ID {idolId}", LogOnly: true);
 
-            DbProcessResultEnum result = await idolService.UpdateAsync(idolId, modal);
+            DbProcessResultEnum result = await idolService.UpdateAsync(idolId, modal.ToEditData());
             if (result == DbProcessResultEnum.Success)
             {
                 await RespondAsync("Edited bias successfully!", ephemeral: true);
@@ -44,13 +44,14 @@ public class EditIdolModalInteraction(
     }
 
     [ModalInteraction("EditIdolExtendedModal_*")]
+    [RequireOwner]
     public async Task EditIdolExtendedModalSubmit(int idolId, EditIdolExtendedModal modal)
     {
         try
         {
             logger.Log($"Edit Idol Extended Modal Submitted for idol with ID {idolId}", LogOnly: true);
 
-            DbProcessResultEnum result = await idolService.UpdateAsync(idolId, modal);
+            DbProcessResultEnum result = await idolService.UpdateAsync(idolId, modal.ToEditData());
             if (result == DbProcessResultEnum.Success)
             {
                 await RespondAsync("Edited bias successfully!", ephemeral: true);
@@ -72,7 +73,7 @@ public class EditIdolModalInteraction(
         {
             logger.Log($"Edit Group Modal Submitted for group with ID {groupId}", LogOnly: true);
 
-            DbProcessResultEnum result = await idolGroupService.UpdateAsync(groupId, modal);
+            DbProcessResultEnum result = await idolGroupService.UpdateAsync(groupId, modal.ToEditData());
             if (result == DbProcessResultEnum.Success)
             {
                 await RespondAsync("Edited group successfully!", ephemeral: true);
@@ -94,7 +95,7 @@ public class EditIdolModalInteraction(
         {
             logger.Log($"Change Idol Profile Link Modal Submitted for idol with ID {idolId}", LogOnly: true);
 
-            DbProcessResultEnum result = await idolService.UpdateAsync(idolId, modal);
+            DbProcessResultEnum result = await idolService.UpdateProfileUrlAsync(idolId, modal.ProfileURL);
             if (result == DbProcessResultEnum.Success)
             {
                 await RespondAsync("Edited bias successfully!", ephemeral: true);
@@ -116,7 +117,7 @@ public class EditIdolModalInteraction(
         {
             logger.Log($"Change Idol Group Modal Submitted for idol with ID {idolId}", LogOnly: true);
 
-            DbProcessResultEnum result = await idolService.UpdateAsync(idolId, modal);
+            DbProcessResultEnum result = await idolService.ChangeGroupAsync(idolId, modal.Group);
             if (result == DbProcessResultEnum.Success)
             {
                 await RespondAsync("Edited bias successfully!", ephemeral: true);
@@ -138,7 +139,7 @@ public class EditIdolModalInteraction(
         {
             logger.Log($"Override Image Modal Submitted for idol with ID {idolId}", LogOnly: true);
 
-            DbProcessResultEnum result = await idolImageService.AddOverrideAsync(idolId, modal);
+            DbProcessResultEnum result = await idolImageService.AddOverrideAsync(idolId, modal.ImageUrl);
             if (result == DbProcessResultEnum.Success)
             {
                 await RespondAsync("Edited bias successfully!", ephemeral: true);

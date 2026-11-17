@@ -59,7 +59,7 @@ Config config) : BaseInteraction(serverService, logger, config)
             await DeferAsync();
             logger.Log($"Edit Poll Modal Submitted for poll with ID {presetId}", LogOnly: true);
 
-            DbProcessResultEnum result = await weeklyPollOptionPresetService.UpdateAsync(presetId, modal);
+            DbProcessResultEnum result = await weeklyPollOptionPresetService.UpdateAsync(presetId, modal.Name, modal.Description);
             if (result == DbProcessResultEnum.Success)
             {
                 WeeklyPollOptionPresetResource? resource = await weeklyPollOptionPresetService.GetPresetByIdAsync(presetId);

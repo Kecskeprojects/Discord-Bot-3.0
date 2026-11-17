@@ -1,5 +1,4 @@
-﻿using Discord_Bot.Communication.Modal;
-using Discord_Bot.Core.Caching;
+﻿using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Core;
@@ -226,7 +225,7 @@ public class WeeklyPollService(
         return DbProcessResultEnum.Failure;
     }
 
-    public async Task<DbProcessResultEnum> UpdateAsync(int pollId, EditWeeklyPollModal modal, ulong channelId, RoleResource? role)
+    public async Task<DbProcessResultEnum> UpdateAsync(int pollId, string name, string title, ulong channelId, RoleResource? role)
     {
         try
         {
@@ -257,8 +256,8 @@ public class WeeklyPollService(
                     poll.RoleId = null;
                 }
 
-                poll.Name = modal.Name;
-                poll.Title = modal.PollTitle;
+                poll.Name = name;
+                poll.Title = title;
                 poll.Channel = channel;
                 poll.Role = pollRole;
                 poll.ModifiedOn = DateTime.UtcNow;

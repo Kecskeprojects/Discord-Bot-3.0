@@ -84,7 +84,7 @@ public class WeeklyPollEditInteraction(
 
             RoleResource? pollRole = role == null ? null : new RoleResource() { DiscordId = role.Id, RoleName = role.Name };
 
-            DbProcessResultEnum result = await weeklyPollService.UpdateAsync(pollId, modal, channel.Id, pollRole);
+            DbProcessResultEnum result = await weeklyPollService.UpdateAsync(pollId, modal.Name, modal.PollTitle, channel.Id, pollRole);
             if (result == DbProcessResultEnum.Success)
             {
                 WeeklyPollResource? resource = await weeklyPollService.GetPollByIdAsync(pollId);

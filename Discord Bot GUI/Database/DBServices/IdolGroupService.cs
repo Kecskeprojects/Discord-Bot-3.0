@@ -1,4 +1,4 @@
-﻿using Discord_Bot.Communication.Modal;
+﻿using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
@@ -57,7 +57,7 @@ public class IdolGroupService(
         return result;
     }
 
-    public async Task<DbProcessResultEnum> UpdateAsync(int groupId, EditGroupModal modal)
+    public async Task<DbProcessResultEnum> UpdateAsync(int groupId, IdolGroupEditData data)
     {
         try
         {
@@ -66,10 +66,10 @@ public class IdolGroupService(
             {
                 return DbProcessResultEnum.NotFound;
             }
-            idolGroup.Name = modal.Name.ToLower().Trim();
-            idolGroup.FullName = modal.FullName.Trim();
-            idolGroup.FullKoreanName = modal.FullKoreanName.Trim();
-            idolGroup.DebutDate = DateOnly.TryParse(modal.DebutDate, out DateOnly debutDate) ? debutDate : idolGroup.DebutDate;
+            idolGroup.Name = data.Name.ToLower().Trim();
+            idolGroup.FullName = data.FullName.Trim();
+            idolGroup.FullKoreanName = data.FullKoreanName.Trim();
+            idolGroup.DebutDate = DateOnly.TryParse(data.DebutDate, out DateOnly debutDate) ? debutDate : idolGroup.DebutDate;
 
             _ = await idolGroupRepository.SaveChangesAsync();
 
@@ -81,27 +81,5 @@ public class IdolGroupService(
             logger.Error("IdolGroupService.cs UpdateAsync", ex);
         }
         return DbProcessResultEnum.Failure;
-    }
-
-    public async Task<IdolGroup> UpdateOrCreateGroupAsync(IdolGroup group, string groupName)
-    {
-        if (string.IsNullOrWhiteSpace(groupName))
-        {
-            return group;
-        }
-
-        IdolGroup? newGroup = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.Name == groupName);
-        if (newGroup == null)
-        {
-            newGroup = new IdolGroup()
-            {
-                Name = groupName,
-                CreatedOn = DateTime.UtcNow,
-                ModifiedOn = DateTime.UtcNow
-            };
-
-            _ = await idolGroupRepository.AddAsync(newGroup);
-        }
-        return newGroup;
     }
 }

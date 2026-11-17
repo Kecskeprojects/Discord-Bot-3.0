@@ -1,6 +1,5 @@
 ﻿using Discord_Bot.Communication;
 using Discord_Bot.Communication.Bias;
-using Discord_Bot.Communication.Modal;
 using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using System.Collections.Generic;
@@ -16,10 +15,10 @@ public interface IIdolService
     Task<List<IdolResource>> GetAllIdolsAsync();
     Task<bool> UpdateIdolDetailsAsync(IdolResource idolResource, ExtendedBiasData? data, AdditionalIdolData? additional);
     Task<IdolExtendedResource?> GetIdolDetailsAsync(string idolName, string idolGroup);
-    Task<DbProcessResultEnum> UpdateAsync(int idolId, EditIdolModal modal);
-    Task<DbProcessResultEnum> UpdateAsync(int idolId, EditIdolExtendedModal modal);
-    Task<DbProcessResultEnum> UpdateAsync(int idolId, ChangeIdolProfileLinkModal modal);
-    Task<DbProcessResultEnum> UpdateAsync(int idolId, ChangeIdolGroupModal modal);
+    Task<DbProcessResultEnum> UpdateAsync(int idolId, IdolEditData data);
+    Task<DbProcessResultEnum> UpdateAsync(int idolId, IdolExtendedEditData data);
+    Task<DbProcessResultEnum> UpdateProfileUrlAsync(int idolId, string profileUrl);
+    Task<DbProcessResultEnum> ChangeGroupAsync(int idolId, string groupName);
     Task<ListWithDbResult<UserResource>> GetUsersByIdolsAsync(string[] nameList);
     Task<List<IdolGameResource>> GetListForGameAsync(GenderEnum gender, int debutAfter, int debutBefore);
     Task<int> CorrectUpdateErrorsAsync();

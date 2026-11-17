@@ -1,5 +1,4 @@
-﻿using Discord_Bot.Communication.Modal;
-using Discord_Bot.Core.Caching;
+﻿using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Core;
@@ -21,7 +20,7 @@ public class IdolImageService(
     private readonly IIdolRepository idolRepository = idolRepository;
     private readonly IIdolImageRepository idolImageRepository = idolImageRepository;
 
-    public async Task<DbProcessResultEnum> AddOverrideAsync(int idolId, OverrideImageModal modal)
+    public async Task<DbProcessResultEnum> AddOverrideAsync(int idolId, string imageUrl)
     {
         try
         {
@@ -30,7 +29,7 @@ public class IdolImageService(
             IdolImage newImage = new()
             {
                 IdolId = idolId,
-                ImageUrl = modal.ImageUrl,
+                ImageUrl = imageUrl,
                 OverriddenUrl = currentImage?.ImageUrl,
             };
 

@@ -1,5 +1,4 @@
-﻿using Discord_Bot.Communication.Modal;
-using Discord_Bot.Enums;
+﻿using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -14,6 +13,6 @@ public interface IWeeklyPollOptionPresetService
     Task<WeeklyPollOptionPresetResource?> GetPresetByNameAsync(string presetName);
     Task<List<WeeklyPollOptionPresetResource>> GetPresetsAsync();
     Task<DbProcessResultEnum> RemovePresetByNameAsync(string presetName);
-    Task<DbProcessResultEnum> UpdateAsync(int presetId, EditWeeklyPollOptionPresetModal modal);
+    Task<DbProcessResultEnum> UpdateAsync(int presetId, string name, string description);
     Task<DbProcessResultEnum> UpdateFieldAsync(int presetId, string fieldName, string newValue);
 }

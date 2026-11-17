@@ -1,5 +1,4 @@
-﻿using Discord_Bot.Communication.Modal;
-using Discord_Bot.Enums;
+﻿using Discord_Bot.Enums;
 using Discord_Bot.Resources;
 using System;
 using System.Collections.Generic;
@@ -16,7 +15,7 @@ public interface IWeeklyPollService
     Task<List<WeeklyPollResource>> GetPollsByDayOfWeekAsync(DayOfWeek dayOfWeek);
     Task<List<WeeklyPollResource>> GetPollsByServerIdAsync(ulong serverId);
     Task<DbProcessResultEnum> RemovePollByNameAsync(ulong serverId, string pollName);
-    Task<DbProcessResultEnum> UpdateAsync(int pollId, EditWeeklyPollModal modal, ulong channelId, RoleResource? role);
+    Task<DbProcessResultEnum> UpdateAsync(int pollId, string name, string title, ulong channelId, RoleResource? role);
     Task<DbProcessResultEnum> UpdateFieldAsync(int pollId, string fieldName, string newValue);
     Task<WeeklyPollResource?> GetPollForForceResendAsync(ulong id, string pollName);
 }

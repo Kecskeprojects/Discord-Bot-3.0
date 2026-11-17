@@ -1,4 +1,5 @@
 ﻿using Discord.Interactions;
+using Discord_Bot.Communication.Bias;
 
 namespace Discord_Bot.Communication.Modal;
 
@@ -30,4 +31,16 @@ public class EditIdolModal : IModal
     [InputLabel("Gender")]
     [ModalTextInput("gender", placeholder: "F or M", maxLength: 10)]
     public string Gender { get; set; } = "";
+
+    public IdolEditData ToEditData()
+    {
+        return new IdolEditData()
+        {
+            ProfileUrl = ProfileURL,
+            Name = Name,
+            Group = Group,
+            DateOfBirth = DateOfBirth,
+            Gender = Gender
+        };
+    }
 }

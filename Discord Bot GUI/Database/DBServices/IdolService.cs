@@ -1,6 +1,5 @@
 ﻿using Discord_Bot.Communication;
 using Discord_Bot.Communication.Bias;
-using Discord_Bot.Communication.Modal;
 using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
@@ -20,7 +19,6 @@ namespace Discord_Bot.Database.DBServices;
 public class IdolService(
     IIdolRepository idolRepository,
     IIdolGroupRepository idolGroupRepository,
-    IIdolGroupService idolGroupService,
     IIdolImageRepository idolImageRepository,
     IMapper mapper,
     IBotLogger logger,
@@ -28,7 +26,6 @@ public class IdolService(
 {
     private readonly IIdolRepository idolRepository = idolRepository;
     private readonly IIdolGroupRepository idolGroupRepository = idolGroupRepository;
-    private readonly IIdolGroupService idolGroupService = idolGroupService;
     private readonly IIdolImageRepository idolImageRepository = idolImageRepository;
 
     public async Task<DbProcessResultEnum> AddIdolAsync(string idolName, string idolGroup)
@@ -241,7 +238,7 @@ public class IdolService(
         return resource;
     }
 
-    public async Task<DbProcessResultEnum> UpdateAsync(int idolId, EditIdolModal modal)
+    public async Task<DbProcessResultEnum> UpdateAsync(int idolId, IdolEditData data)
     {
         try
         {
@@ -254,16 +251,16 @@ public class IdolService(
                 return DbProcessResultEnum.NotFound;
             }
 
-            idol.ProfileUrl = modal.ProfileURL.Trim();
-            idol.DateOfBirth = DateOnly.TryParse(modal.DateOfBirth, out DateOnly dateOfBirth) ? dateOfBirth : idol.DateOfBirth;
-            idol.Name = modal.Name.ToLower().Trim();
-            //An unknown gender in the modal keeps the current one
-            GenderEnum? gender = GenderChoiceEnumExtension.FromDatabaseString(modal.Gender);
+            idol.ProfileUrl = data.ProfileUrl.Trim();
+            idol.DateOfBirth = DateOnly.TryParse(data.DateOfBirth, out DateOnly dateOfBirth) ? dateOfBirth : idol.DateOfBirth;
+            idol.Name = data.Name.ToLower().Trim();
+            //An unknown gender keeps the current one
+            GenderEnum? gender = GenderChoiceEnumExtension.FromDatabaseString(data.Gender);
             if (gender.HasValue)
             {
                 idol.Gender = gender.Value.ToDatabaseFriendlyString();
             }
-            idol.Group = await idolGroupService.UpdateOrCreateGroupAsync(idol.Group, modal.Group.ToLower().Trim());
+            idol.Group = await GetOrCreateGroupAsync(idol.Group, data.Group.ToLower().Trim());
             _ = await idolRepository.SaveChangesAsync();
 
             logger.Log($"Idol with ID {idolId} updated successfully!");
@@ -276,7 +273,7 @@ public class IdolService(
         return DbProcessResultEnum.Failure;
     }
 
-    public async Task<DbProcessResultEnum> UpdateAsync(int idolId, EditIdolExtendedModal modal)
+    public async Task<DbProcessResultEnum> UpdateAsync(int idolId, IdolExtendedEditData data)
     {
         try
         {
@@ -287,11 +284,11 @@ public class IdolService(
                 return DbProcessResultEnum.NotFound;
             }
 
-            idol.StageName = modal.StageName.Trim();
-            idol.KoreanStageName = modal.KoreanStageName.Trim();
-            idol.FullName = modal.FullName.Trim();
-            idol.KoreanFullName = modal.KoreanFullName.Trim();
-            idol.DebutDate = DateOnly.TryParse(modal.DebutDate, out DateOnly debutDate) ? debutDate : idol.DebutDate;
+            idol.StageName = data.StageName.Trim();
+            idol.KoreanStageName = data.KoreanStageName.Trim();
+            idol.FullName = data.FullName.Trim();
+            idol.KoreanFullName = data.KoreanFullName.Trim();
+            idol.DebutDate = DateOnly.TryParse(data.DebutDate, out DateOnly debutDate) ? debutDate : idol.DebutDate;
             _ = await idolRepository.SaveChangesAsync();
 
             logger.Log($"Idol with ID {idolId} updated successfully!");
@@ -304,7 +301,7 @@ public class IdolService(
         return DbProcessResultEnum.Failure;
     }
 
-    public async Task<DbProcessResultEnum> UpdateAsync(int idolId, ChangeIdolProfileLinkModal modal)
+    public async Task<DbProcessResultEnum> UpdateProfileUrlAsync(int idolId, string profileUrl)
     {
         try
         {
@@ -315,7 +312,7 @@ public class IdolService(
                 return DbProcessResultEnum.NotFound;
             }
 
-            idol.ProfileUrl = modal.ProfileURL.Trim();
+            idol.ProfileUrl = profileUrl.Trim();
             _ = await idolRepository.SaveChangesAsync();
 
             logger.Log($"Idol with ID {idolId} updated successfully!");
@@ -323,12 +320,12 @@ public class IdolService(
         }
         catch (Exception ex)
         {
-            logger.Error("IdolService.cs UpdateAsync", ex);
+            logger.Error("IdolService.cs UpdateProfileUrlAsync", ex);
         }
         return DbProcessResultEnum.Failure;
     }
 
-    public async Task<DbProcessResultEnum> UpdateAsync(int idolId, ChangeIdolGroupModal modal)
+    public async Task<DbProcessResultEnum> ChangeGroupAsync(int idolId, string groupName)
     {
         try
         {
@@ -339,7 +336,7 @@ public class IdolService(
                 return DbProcessResultEnum.NotFound;
             }
 
-            idol.Group = await idolGroupService.UpdateOrCreateGroupAsync(idol.Group, modal.Group.ToLower().Trim());
+            idol.Group = await GetOrCreateGroupAsync(idol.Group, groupName.ToLower().Trim());
             _ = await idolRepository.SaveChangesAsync();
 
             logger.Log($"Idol with ID {idolId} updated successfully!");
@@ -347,7 +344,7 @@ public class IdolService(
         }
         catch (Exception ex)
         {
-            logger.Error("IdolService.cs UpdateAsync", ex);
+            logger.Error("IdolService.cs ChangeGroupAsync", ex);
         }
         return DbProcessResultEnum.Failure;
     }
@@ -420,5 +417,28 @@ public class IdolService(
         }
 
         return result;
+    }
+
+    //An empty name keeps the current group, a name not in the database creates the group
+    private async Task<IdolGroup> GetOrCreateGroupAsync(IdolGroup currentGroup, string groupName)
+    {
+        if (string.IsNullOrWhiteSpace(groupName))
+        {
+            return currentGroup;
+        }
+
+        IdolGroup? group = await idolGroupRepository.FirstOrDefaultAsync(ig => ig.Name == groupName);
+        if (group == null)
+        {
+            group = new IdolGroup()
+            {
+                Name = groupName,
+                CreatedOn = DateTime.UtcNow,
+                ModifiedOn = DateTime.UtcNow
+            };
+
+            _ = await idolGroupRepository.AddAsync(group);
+        }
+        return group;
     }
 }

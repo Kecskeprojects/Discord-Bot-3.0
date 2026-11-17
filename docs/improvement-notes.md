@@ -99,32 +99,52 @@ Decided against:
 - `DownloadUsersAsync` per command: fine as it is.
 - `RunMode.Async`: tried in the past and dropped (see CLAUDE.md).
 
-## 4. Moving the database layer into its own class library (investigated 2026-11-15)
+## 4. Moving the database layer into its own class library (investigated 2026-11-15, planned 2026-11-17, in progress)
 
 **Verdict: very feasible, moderate effort.** The layering is already mostly clean. Nothing outside `Database/` uses repositories directly, the DB services have no Discord.Net imports, and the bot talks to them only through `I*Service` and `*Resource`. The work is mostly moving files, plus untangling the handful of couplings below.
 
 ### What would move
 
-| From the bot | Notes |
-|---|---|
-| `Database/` (DbContext, 19 models, 20 repositories, 20 services) | As is. The root `.editorconfig` sections for `Database/Models` (IDE0005 / IDE0028 off) and `MainDbContext.cs` (generated code) need their new paths |
-| `Interfaces/DBServices/`, `Interfaces/DBRepositories/` | As is |
-| `Interfaces/Core/IBotLogger.cs` | The services log through it; `BotLogger` stays in the bot and implements it |
-| `Resources/` (22 DTOs) | As is, after the `IdolGroupResource` fix below |
-| `Core/Caching/` (`ServerCache`, `SizedDictionary`) | Only the DB services and `Startup` use it |
-| Enums the DB layer uses (`DbProcessResultEnum`, `ChannelTypeEnum`, `GenderEnum`) | See the `Constant` coupling below |
-| `Communication/ListWithDbResult`, `Communication/Bias/ExtendedBiasData`, `AdditionalIdolData` | Plain DTOs, no Discord dependency |
-| The model ↔ resource half of `MapperConfig` | As an `IRegister` in the library |
-| EF packages (`SqlServer`, `Design`, `Tools`) | Scaffolding then targets the library |
+The target is the `DatabaseORM/` project (created 2026-11-17), modeled on the project of the same name in KecskeProjectsSite.
 
-Keeping the existing `Discord_Bot.Database.*` / `Discord_Bot.Resources` namespaces in the new assembly means no `using` changes in the bot.
+| From the bot | To `DatabaseORM/` | Notes |
+|---|---|---|
+| `Database/MainDbContext.cs` | `Context/` | Generated code; its root `.editorconfig` section needs the new path |
+| `Database/Models/` (19) | `Model/` | Its root `.editorconfig` section (IDE0005 / IDE0028 off) needs the new path |
+| `Database/DBRepositories/` (20), `Database/DBServices/` (20) | `Repository/`, `Service/` | As is |
+| `Interfaces/DBRepositories/`, `Interfaces/DBServices/` | `Interface/Repository/`, `Interface/Service/` | As is |
+| `Interfaces/Core/IBotLogger.cs` | `Interface/` | The services log through it; `BotLogger` stays in the bot and implements it |
+| `Resources/` (21 DTOs) | `Resources/` | As is |
+| `Core/Caching/` (`ServerCache`, `SizedDictionary`) | `Caching/` | Only the DB services and `Startup` use it |
+| Enums the DB layer uses (`DbProcessResultEnum`, `ChannelTypeEnum`, `GenderEnum`) | `Enums/` | See the `Constant` coupling below |
+| `ListWithDbResult`, `Bias/ExtendedBiasData`, `AdditionalIdolData`, the three `*EditData` DTOs | `Communication/` | Plain DTOs, no Discord dependency |
+| The model ↔ resource half of `MapperConfig` | `Mapping/` | As an `IRegister` |
+| The DB registrations in `Startup.cs` | `DatabaseStartup.cs` | As in KecskeProjectsSite, but taking the connection string from the bot's `Config` |
+| EF packages (`SqlServer`, `Design`, `Tools`) | csproj | Scaffolding then targets the library; record the command in `Context/update-scaffold.txt` |
+
+**Namespaces become `DatabaseORM.*`.** The original idea of keeping `Discord_Bot.Database.*` doesn't fit the new folder names, because IDE0130 (namespace must match folder) is a build error like every other style rule. That means `using` updates in about 110 bot files, plus the enum users. It's mechanical work.
+
+**Differences from KecskeProjectsSite's DatabaseORM, kept on purpose:**
+- No nested `.editorconfig` with `root = true`; the path sections go in the root file.
+- `Model/` is not `generated_code`, so its nullable annotations count.
+- Services keep returning `DbProcessResultEnum` instead of throwing.
+- The `I*` interfaces stay.
+- `IMapper` stays injected.
+
+**In the new csproj:**
+- `Microsoft.Extensions.Identity.Core` (KecskeProjectsSite's password hasher) isn't needed; remove it.
+- `ImplicitUsings` is on, unlike in the bot, so the moved files' `using System;` lines become IDE0005 errors. Remove them with `dotnet format --diagnostics IDE0005`.
 
 ### Couplings to untangle first
 
-1. **Modals in service signatures.** The idol, idol group and weekly poll service interfaces take 8 Discord `IModal` types (`EditIdolModal`, `EditIdolExtendedModal`, `ChangeIdolGroupModal`, `ChangeIdolProfileLinkModal`, `OverrideImageModal`, `EditGroupModal`, `EditWeeklyPollModal`, `EditWeeklyPollOptionPresetModal`), which carry `Discord.Interactions` attributes. Fix: plain DTOs (e.g. `IdolEditData`) in the library, and have the interaction classes map the modal into them (by hand or with a Mapster map). Referencing Discord.Net from the library for these would work, but defeats much of the point.
-2. **EF models leaking out.**
-   - `IdolGroupResource.Idols` is a `List<Idol>` (an EF entity). Change it to `List<IdolResource>`; this also fixes a "commands use Resources" violation.
-   - `IIdolGroupService.UpdateOrCreateGroupAsync` takes and returns `IdolGroup`. It's only called from `IdolService`, so make it internal or move it into a repository.
+1. **Modals in service signatures.** **Done 2026-11-17.**
+   - The idol, idol group, image and weekly poll services took 8 Discord `IModal` types.
+   - The three multi-field modals now map themselves into `IdolEditData`, `IdolExtendedEditData` and `IdolGroupEditData` (in `Communication/Bias/`) with `ToEditData()`.
+   - The single- and two-field ones pass plain strings, as `EditWeeklyPollOptionModal` already did. The idol overloads became `UpdateProfileUrlAsync` and `ChangeGroupAsync`.
+   - Parsing and trimming stayed in the services, so behavior is unchanged.
+2. **EF models leaking out.** **Done 2026-11-17.**
+   - `IdolGroupResource` (whose `Idols` was a `List<Idol>`) was deleted with its mapping; nothing used it.
+   - `UpdateOrCreateGroupAsync` left `IIdolGroupService`. It is now the private `IdolService.GetOrCreateGroupAsync`, which uses the repository `IdolService` already had, and `IdolService` no longer depends on `IIdolGroupService`.
 3. **`MapperConfig` mixes layers.** Model ↔ resource and DTO → model mappings go to the library. The `WeeklyPollResource → PollProperties` (Discord) mapping stays in the bot. Register both `IRegister`s at startup.
 4. **Helpers in `Tools/`.**
    - `PollTools.GetAnswerOptions(WeeklyPoll)` (used by a model mapping) and `UserIdolStatisticTools.AddRanking` move to the library.
@@ -134,13 +154,13 @@ Keeping the existing `Discord_Bot.Database.*` / `Discord_Bot.Resources` namespac
    - `TwitchChannelService` uses `Constant.TwitchBaseUrl` (+ `UrlCombine`).
    - `ChannelTypeEnum`'s extension uses `Constant.RestrictedChannelTypes`.
    - Move these constants into the library, or keep the extension method in the bot.
-6. **`GlobalSuppressions.cs`.** The Database entries have to move to the new project: CA1309, CA1310 and CA1862 for the `Discord_Bot.Database` namespace, and IDE0290 for `MainDbContext`.
+6. **`GlobalSuppressions.cs`.** The Database entries have to move to the new project's own `GlobalSuppressions.cs`: CA1309, CA1310 and CA1862 for the `DatabaseORM` namespace, and IDE0290 for `MainDbContext`.
 
 ### Shape of the result
 
-- New `DiscordBot.Data` (name open) class library targeting plain **`net11.0`**, with no Windows, WPF or Discord.Net dependency. The bot references it.
-- It gets the analyzer setup from `Directory.Build.props` automatically, and needs `<Nullable>enable</Nullable>` in its csproj.
-- An `AddDatabase(this IServiceCollection, string connectionString)` extension in the library registers the DbContext, repositories, services and cache, which takes about 45 lines out of `Startup.cs`.
+- The `DatabaseORM` class library targets plain **`net11.0`**, with no Windows, WPF or Discord.Net dependency. The bot references it.
+- It gets the analyzer setup from `Directory.Build.props` automatically; its csproj already has `<Nullable>enable</Nullable>`.
+- `DatabaseStartup` in the library registers the DbContext, repositories, services and cache, which takes about 45 lines out of `Startup.cs`.
 - Repository interfaces could become `internal`, with `InternalsVisibleTo` for tests, so the bot physically can't bypass the services.
 - `MainDB/` (SSDT) is unaffected. Scaffolding commands point at the new project (use the bot as `--startup-project` if EF tooling asks for one).
 
@@ -150,16 +170,20 @@ Keeping the existing `Discord_Bot.Database.*` / `Discord_Bot.Resources` namespac
 - The DB library can be unit-tested from a plain `net11.0` test project with no WPF or Windows target (see section 2).
 - It can be reused later, e.g. by a web dashboard or a separate scraper process.
 
-### Suggested order
+### Slices (planned 2026-11-17)
 
-1. Fix the `IdolGroupResource` / `UpdateOrCreateGroupAsync` leaks.
-2. Modal → DTO for the 8 modals.
-3. Split `MapperConfig` and the `Tools` helpers.
-4. Create the project and move the files (keeping namespaces).
-5. Add the `AddDatabase` extension.
-6. Build, then a quick run against the dev database.
+Each slice ends in a green build.
 
-Steps 1–3 are worth doing even inside the current project, and they make the move itself mechanical.
+1. **Done 2026-11-17.** Boundary leaks and modal → DTO, inside the bot (couplings 1 and 2).
+2. Split `MapperConfig`, the `Tools` helpers and the `Constant` uses, still inside the bot (couplings 3–5). Done when a grep shows the DB layer depends only on files that move with it.
+3. The move:
+   - `git mv` into the `DatabaseORM/` folders and switch to `DatabaseORM.*` namespaces.
+   - Strip the implicit usings and update the bot's usings.
+   - In the csproj files: add the project reference, move the EF packages and drop `Identity.Core`.
+   - Move the suppressions, fix the `.editorconfig` paths and add `update-scaffold.txt`.
+4. `DatabaseStartup`, optionally `internal` repository interfaces, and the CLAUDE.md updates (layout, layers, scaffold step, linting paths). Then a quick run against the dev database.
+
+Slices 1 and 2 are worth doing even inside the current project, and they make the move itself mechanical.
 
 Doing this before the test project (section 2) is a good order: DB-service tests can then live in a plain `net11.0` test project.
 
@@ -217,6 +241,7 @@ Can the disabled embeds be turned back on as they are, with adjustments and with
 - **Last.fm artist stats image (found 2026-11-16):** `LastFmAPI.GetArtistDataAsync` picks the MBID from the albums when there are any, but always passes `tracks[0]`'s artist and track name to the Spotify search. An artist with album plays but no track plays would throw there (rare, since album plays come from track plays). Passing a track name also makes the search return that track's album cover instead of the artist's image, as `GetTopArtistsAsync` does. Decide which image the stats should show, and take both values from the same list.
 - **Hand-written results in `Services/Models` (found 2026-11-16):** `Services/Models/LastFm` (`ArtistStats`, `LastFmListResult`, `NowPlayingResult`, `WhoKnows`) and `Services/Models/SpotifyAPI/SpotifyImageSearchResult` are the bot's own result DTOs, not JSON models. Because the folder is marked as generated code, they get no nullable checking and no analyzer warnings. Moving them to `Communication/` (where data types belong by convention) would bring both back. Their nullable fields are `Message`, the image URLs and the optional now-playing data.
 - **Code Cleanup edits the scaffolded models (found 2026-11-16):** `Database/Models` is not marked as generated code (so its `?` annotations count, see CLAUDE.md "Database changes"), so Visual Studio's Code Cleanup changes those files, e.g. it removes unused usings even with IDE0005 off for the folder. Until this is fixed, leave the folder out of Code Cleanup, or re-scaffold afterwards. Fix: mark the folder `generated_code = true` again, and have the scaffold write `#nullable enable` at the top of each model file, which turns nullable back on in generated code. To do that, install EF's templates (`dotnet new install Microsoft.EntityFrameworkCore.Templates`, from nuget.org), run `dotnet new ef-templates` in the bot's project folder, add the directive to `CodeTemplates/EFCore/EntityType.t4`, and re-scaffold once. `Scaffold-DbContext` and `dotnet ef dbcontext scaffold` use those templates automatically. The cost: the templates become the project's own copy, so after an EF upgrade, refresh them and re-add the line.
+- **`[RequireOwner]` on the extended idol modal (found 2026-11-17, done 2026-11-17):** `EditIdolExtendedModalSubmit` in `EditIdolModalInteraction` was the only edit handler without `[RequireOwner]`. It only mattered for consistency, because the modal opens only from the owner-only `EditIdolData` menu. The attribute is now added.
 - **Culture in interpolated strings (found 2026-11-16):** CA1305 doesn't cover them. For example `LastFmListResultTools` writes `{percentage}%`, which shows "12,5%" under hu-HU and "12.5%" under en-US. Leave it as is if the server's culture is the intended display format.
 - **YouTube playlist start point:** let the user choose which song or index a playlist import starts from (`YoutubeAPI.PlaylistSearch`). It currently always takes the first page of 50 (`MaxResults`).
 - **YouTube duplicate on playlist import:** when a video link that also carries a playlist (`&list=`) is imported as a playlist (`YoutubeAPI.AddPlaylistAsync`), the video itself can be queued twice if it is in the imported part of the playlist. Skip it.

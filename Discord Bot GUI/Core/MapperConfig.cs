@@ -18,7 +18,7 @@ public class MapperConfig : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
-        // Same-type members (e.g. List<Idol> on IdolGroupResource) are copied by reference, like AutoMapper did,
+        // Same-type members are copied by reference, like AutoMapper did,
         // instead of being deep-cloned (which would recurse through EF navigation properties)
         _ = config.Default.ShallowCopyForSameType(true);
 
@@ -47,7 +47,6 @@ public class MapperConfig : IRegister
             .Map(dest => dest.GroupName, src => src.Group != null ? src.Group.Name : null)
             .Map(dest => dest.GroupDebutDate, src => src.Group != null ? src.Group.DebutDate : null)
             .Map(dest => dest.CurrentImageUrl, src => src.IdolImages.OrderByDescending(img => img.CreatedOn).Select(img => img.ImageUrl).FirstOrDefault());
-        _ = config.NewConfig<IdolGroup, IdolGroupResource>();
         _ = config.NewConfig<IdolAlias, IdolAliasResource>();
         _ = config.NewConfig<User, UserResource>()
             .Map(dest => dest.DiscordId, src => ulong.Parse(src.DiscordId))

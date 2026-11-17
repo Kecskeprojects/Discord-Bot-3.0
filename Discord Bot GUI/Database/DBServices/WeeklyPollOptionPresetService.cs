@@ -1,5 +1,4 @@
-﻿using Discord_Bot.Communication.Modal;
-using Discord_Bot.Core.Caching;
+﻿using Discord_Bot.Core.Caching;
 using Discord_Bot.Database.Models;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Core;
@@ -162,15 +161,15 @@ public class WeeklyPollOptionPresetService(
         return DbProcessResultEnum.Failure;
     }
 
-    public async Task<DbProcessResultEnum> UpdateAsync(int presetId, EditWeeklyPollOptionPresetModal modal)
+    public async Task<DbProcessResultEnum> UpdateAsync(int presetId, string name, string description)
     {
         try
         {
             WeeklyPollOptionPreset? poll = await weeklyPollOptionPresetRepository.FirstOrDefaultAsync(p => p.WeeklyPollOptionPresetId == presetId);
             if (poll != null)
             {
-                poll.Name = modal.Name;
-                poll.Description = modal.Description;
+                poll.Name = name;
+                poll.Description = description;
                 poll.ModifiedOn = DateTime.UtcNow;
 
                 _ = await weeklyPollOptionPresetRepository.SaveChangesAsync();

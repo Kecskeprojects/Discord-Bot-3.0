@@ -1,4 +1,5 @@
 ﻿using Discord.Interactions;
+using Discord_Bot.Communication.Bias;
 
 namespace Discord_Bot.Communication.Modal;
 
@@ -25,4 +26,15 @@ public class EditGroupModal : IModal
     [InputLabel("Debut Date")]
     [ModalTextInput("debutdate", placeholder: "YYYY. MM. DD. format")]
     public string DebutDate { get; set; } = "";
+
+    public IdolGroupEditData ToEditData()
+    {
+        return new IdolGroupEditData()
+        {
+            Name = Name,
+            FullName = FullName,
+            FullKoreanName = FullKoreanName,
+            DebutDate = DebutDate
+        };
+    }
 }
