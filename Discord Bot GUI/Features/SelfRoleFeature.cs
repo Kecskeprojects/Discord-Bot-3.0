@@ -8,10 +8,12 @@ namespace Discord_Bot.Features;
 
 public class SelfRoleFeature(
     IRoleService roleService,
+    TimeProvider timeProvider,
     IServerService serverService,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IRoleService roleService = roleService;
+    private readonly TimeProvider timeProvider = timeProvider;
 
     protected override async Task<bool> ExecuteCoreLogicAsync()
     {
@@ -43,7 +45,7 @@ public class SelfRoleFeature(
 
             if (reply != null)
             {
-                await Task.Delay(1500);
+                await Task.Delay(TimeSpan.FromMilliseconds(1500), timeProvider);
 
                 await reply.DeleteAsync();
             }

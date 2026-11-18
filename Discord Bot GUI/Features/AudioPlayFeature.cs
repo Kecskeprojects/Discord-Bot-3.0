@@ -14,10 +14,12 @@ namespace Discord_Bot.Features;
 public class AudioPlayFeature(
     IYoutubeDownloadService youtubeDownloadService,
     IConfig config,
+    TimeProvider timeProvider,
     IServerService serverService,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IYoutubeDownloadService youtubeStreamService = youtubeDownloadService;
+    private readonly TimeProvider timeProvider = timeProvider;
 
     protected override async Task<bool> ExecuteCoreLogicAsync()
     {
@@ -145,7 +147,7 @@ public class AudioPlayFeature(
             else
             {
                 logger.Audio("Intentional waiting when a video is too short to play");
-                await Task.Delay((int) length + 2000);
+                await Task.Delay(TimeSpan.FromMilliseconds(length + 2000), timeProvider);
             }
         }
         catch (Exception ex)
@@ -168,7 +170,7 @@ public class AudioPlayFeature(
                 return true;
             }
 
-            await Task.Delay(1000);
+            await Task.Delay(TimeSpan.FromSeconds(1), timeProvider);
             waitedSeconds++;
         }
         while (audioResource.MusicRequests.Count == 0 && waitedSeconds < config.VoiceWaitSeconds);

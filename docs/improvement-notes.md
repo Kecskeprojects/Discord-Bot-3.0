@@ -12,7 +12,7 @@ Done and removed on 2026-11-17 (the investigations are in `git show 483c1fa:docs
 
 ## To check by hand
 
-- **Run the bot once against the dev database and Discord.** Since the last real run, the database layer moved into `DatabaseORM`, implicit usings were turned on, and Windows Forms was removed (2026-11-17). Since then, `Startup.Run()` was split, `IConfig` added and `TimeProvider` injected (2026-11-18). Worth a try: a reminder (`!remind in 1m>test`) and a short mute.
+- **Run the bot once against the dev database and Discord.** Since the last real run, the database layer moved into `DatabaseORM`, implicit usings were turned on, and Windows Forms was removed (2026-11-17). Since then, `Startup.Run()` was split, `IConfig` added and `TimeProvider` injected (2026-11-18). Worth a try: a reminder (`!remind in 1m>test`), a short mute, a self-role request, and music until the inactivity disconnect.
   - What has been checked: builds, `dotnet format` and throwaway programs. Those resolved every DB service through the real `Startup.Run()`, ran `ProcessTools.GetStatistics()` (RAM figure, WMI child process count) and loaded a resx bitmap.
   - Worth a look in the window: the diagnostics line.
 - **Correct the scraped idol genders on the dev and the live database.**
@@ -74,7 +74,8 @@ The analyzer setup is done and described in CLAUDE.md ("Linting"). Left:
      - The scheduler's decisions in `App.OnTimedEvent` (06:00, midnight, Mondays). `App` is the WPF application and can't be tested; move those decisions into a plain class with `TimeProvider` if they need tests.
      - The bias game's 30-minute expiry (`UserBiasGameCommands`, `BiasGameData.StartedAt`). It moves with `Global.BiasGames` (blocker 2).
      - The "Days Of Week" poll options: the Mapster mapping passes `DateTime.UtcNow` to `WeeklyPollTools`, which is testable on its own.
-     - Waits in the features still use plain `Task.Delay`: `AudioPlayFeature.WaitAsync` (the voice wait for new requests), `YoutubeAddPlaylistFeature` (polling for the user's answer) and `SelfRoleFeature` (1.5 seconds before deleting its reply). Switch them to `Task.Delay(delay, timeProvider)` when their tests are written. The delays in the scrapers, `YoutubeStreamService` and `ProcessTools` are in code that isn't unit-tested.
+     - The delays in the scrapers, `YoutubeStreamService` and `ProcessTools`, which are in code that isn't unit-tested.
+   - The waits in the features use `Task.Delay(delay, timeProvider)` (done 2026-11-18): both in `AudioPlayFeature` (the wait for new requests and the pause for too-short videos), `YoutubeAddPlaylistFeature`'s polling for the user's answer, and `SelfRoleFeature`'s 1.5 seconds before deleting its reply. A fake clock skips them; with `TimeProvider.System` they wait as before.
    - Tests use `FakeTimeProvider` from `Microsoft.Extensions.TimeProvider.Testing`.
 2. **`Global` static state** (`ServerAudioResources`, `BiasGames`, `YoutubeApiKeys`). It is shared between tests and can't be reset cleanly.
    - Fix: move it into DI singletons (e.g. `BiasGameStore`, `AudioStateStore`, `YoutubeKeyStore`).

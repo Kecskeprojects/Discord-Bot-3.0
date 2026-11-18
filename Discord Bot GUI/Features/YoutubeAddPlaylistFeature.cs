@@ -7,10 +7,12 @@ namespace Discord_Bot.Features;
 
 public class YoutubeAddPlaylistFeature(
     DiscordSocketClient client,
+    TimeProvider timeProvider,
     IServerService serverService,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly DiscordSocketClient client = client;
+    private readonly TimeProvider timeProvider = timeProvider;
 
     protected override async Task<bool> ExecuteCoreLogicAsync()
     {
@@ -37,7 +39,7 @@ public class YoutubeAddPlaylistFeature(
                     break;
                 }
 
-                await Task.Delay(1000);
+                await Task.Delay(TimeSpan.FromSeconds(1), timeProvider);
                 timer++;
             }
             await message.DeleteAsync();
