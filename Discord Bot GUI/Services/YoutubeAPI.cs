@@ -38,38 +38,49 @@ public class YoutubeAPI(
         logger.Query("YouTube Data API: Search");
         SearchResultEnum result = SearchResultEnum.YoutubeNotFound;
 
-        string? apiKey = youtubeKeys.CurrentKey;
         try
         {
-            if (apiKey != null)
-            {
-                result = await Run(apiKey, query, username, serverId, channelId);
-            }
-            else
-            {
-                logger.Query("All api key's limits have been exceeded!");
-            }
+            result = await RunWithKeyRotationAsync(apiKey => Run(apiKey, query, username, serverId, channelId));
             logger.Query("============================================================================");
         }
         catch (Exception ex)
         {
-            //switching api keys if quota is exceeded, null when no other key is left
-            bool quotaExceeded = ex.ToString().Contains("quotaExceeded") || ex.ToString().Contains("you have exceeded your");
-            string? newKey = quotaExceeded && apiKey != null ? youtubeKeys.ReplaceExhaustedKey(apiKey) : null;
-
-            if (newKey != null)
-            {
-                logger.Warning("YoutubeAPI.cs Searching", ex, LogOnly: true);
-                logger.Log($"Key switched out, value: {newKey}!");
-
-                result = await Run(newKey, query, username, serverId, channelId);
-            }
-            else
-            {
-                logger.Error("YoutubeAPI.cs Searching", ex);
-            }
+            logger.Error("YoutubeAPI.cs Searching", ex);
         }
         return result;
+    }
+
+    //Runs a request with the current key, and again with the next key each time a key's quota runs out
+    //A request is only repeated from the start if it queued nothing before the quota ran out (see Run and PlaylistSearch)
+    private async Task<SearchResultEnum> RunWithKeyRotationAsync(Func<string, Task<SearchResultEnum>> request)
+    {
+        string? apiKey = youtubeKeys.CurrentKey;
+        while (apiKey != null)
+        {
+            try
+            {
+                return await request(apiKey);
+            }
+            catch (Exception ex) when (IsQuotaExceeded(ex))
+            {
+                logger.Warning("YoutubeAPI.cs RunWithKeyRotationAsync", ex, LogOnly: true);
+                apiKey = youtubeKeys.ReplaceExhaustedKey(apiKey);
+                if (apiKey != null)
+                {
+                    logger.Log($"Key switched out, value: {apiKey}!");
+                }
+            }
+        }
+
+        logger.Query("All api key's limits have been exceeded!");
+        return SearchResultEnum.YoutubeNotFound;
+    }
+
+    //YouTube answers 403 "quotaExceeded" once a key's daily quota is used up
+    private static bool IsQuotaExceeded(Exception ex)
+    {
+        string text = ex.ToString();
+        return text.Contains("quotaExceeded") || text.Contains("you have exceeded your");
     }
 
     //The function running the query
@@ -92,16 +103,19 @@ public class YoutubeAPI(
                 {
                     NameValueCollection queryPart = HttpUtility.ParseQueryString(uri.Query);
 
+                    string? videoId = queryPart["v"];
+                    SearchResultEnum videoResult = string.IsNullOrEmpty(videoId)
+                        ? SearchResultEnum.YoutubeNotFound
+                        : await VideoSearch(youtubeService, videoId, username, serverId);
+
+                    //Offered after the video search, so a retry with the next key (quota) does not offer it twice
                     string? playlistId = queryPart["list"];
                     if (!string.IsNullOrEmpty(playlistId))
                     {
                         _ = AddPlaylistAsync(playlistId, username, serverId, channelId);
                     }
 
-                    string? videoId = queryPart["v"];
-                    return string.IsNullOrEmpty(videoId)
-                        ? SearchResultEnum.YoutubeNotFound
-                        : await VideoSearch(youtubeService, videoId, username, serverId);
+                    return videoResult;
                 }
                 else if (uri.Segments[1] == "playlist")
                 {
@@ -147,7 +161,7 @@ public class YoutubeAPI(
         {
             searchListResponse = await searchListRequest.ExecuteAsync();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!IsQuotaExceeded(ex)) //A used-up quota goes up to RunWithKeyRotationAsync
         {
             logger.Error("YoutubeAPI.cs VideoSearch", ex);
         }
@@ -188,7 +202,7 @@ public class YoutubeAPI(
         {
             searchListResponse = await searchListRequest.ExecuteAsync();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!IsQuotaExceeded(ex)) //A used-up quota goes up to RunWithKeyRotationAsync
         {
             logger.Error("YoutubeAPI.cs KeywordSearch", ex);
         }
@@ -228,7 +242,7 @@ public class YoutubeAPI(
         {
             searchListResponse = await searchListRequest.ExecuteAsync();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!IsQuotaExceeded(ex)) //A used-up quota goes up to RunWithKeyRotationAsync
         {
             logger.Error("YoutubeAPI.cs PlaylistSearch", ex);
         }
@@ -240,9 +254,24 @@ public class YoutubeAPI(
             return SearchResultEnum.YoutubeNotFound;
         }
 
+        int queued = 0;
         foreach (PlaylistItem item in searchListResponse.Items)
         {
-            _ = await VideoSearch(youtubeService, item.ContentDetails.VideoId, username, serverId);
+            try
+            {
+                if (await VideoSearch(youtubeService, item.ContentDetails.VideoId, username, serverId) == SearchResultEnum.YoutubeFoundVideo)
+                {
+                    queued++;
+                }
+            }
+            //Repeating the import with the next key would queue these songs again, so it keeps what it has
+            catch (Exception ex) when (queued > 0 && IsQuotaExceeded(ex))
+            {
+                logger.Warning("YoutubeAPI.cs PlaylistSearch", ex, LogOnly: true);
+                _ = youtubeKeys.ReplaceExhaustedKey(youtubeService.ApiKey);
+                logger.Log($"The quota ran out during the playlist import, {queued} songs were added.");
+                break;
+            }
         }
 
         return SearchResultEnum.YoutubePlaylistFound;
@@ -277,18 +306,13 @@ public class YoutubeAPI(
 
             if (result)
             {
-                //The quota can run out while the user decides
-                string? apiKey = youtubeKeys.CurrentKey;
-                if (apiKey == null)
+                _ = await RunWithKeyRotationAsync(async apiKey =>
                 {
-                    logger.Query("All api key's limits have been exceeded!");
-                    return;
-                }
-
-                using (YouTubeService youtubeService = CreateYoutubeService(apiKey))
-                {
-                    _ = await PlaylistSearch(youtubeService, playlistId, username, serverId);
-                }
+                    using (YouTubeService youtubeService = CreateYoutubeService(apiKey))
+                    {
+                        return await PlaylistSearch(youtubeService, playlistId, username, serverId);
+                    }
+                });
             }
         }
         catch (Exception ex)
