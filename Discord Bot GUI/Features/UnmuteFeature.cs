@@ -11,18 +11,20 @@ namespace Discord_Bot.Features;
 public class UnmuteFeature(
     IServerMutedUserService serverMutedUserService,
     DiscordSocketClient client,
+    TimeProvider timeProvider,
     IServerService serverService,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IServerMutedUserService serverMutedUserService = serverMutedUserService;
     private readonly DiscordSocketClient client = client;
+    private readonly TimeProvider timeProvider = timeProvider;
 
     protected override async Task<bool> ExecuteCoreLogicAsync()
     {
         try
         {
-            //Get the list of reminders that are before or exactly set to this minute
-            DateTime now = DateTime.UtcNow;
+            //Get the list of mutes that ended before or exactly at this minute
+            DateTime now = timeProvider.GetUtcNow().UtcDateTime;
             DateTime dateTime = new(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, now.Kind);
             List<ServerMutedUserResource> result = await serverMutedUserService.GetExpiredMutedUsersAsync(dateTime);
             if (!CollectionTools.IsNullOrEmpty(result))
@@ -71,8 +73,8 @@ public class UnmuteFeature(
                         logger.Log($"Server {serverId} or user {userId} is not available anymore, only the mute entry is removed.");
                     }
 
-                    DbProcessResultEnum reminderResult = await serverMutedUserService.RemoveMutedUserAsync(serverId, userId);
-                    if (reminderResult == DbProcessResultEnum.Failure)
+                    DbProcessResultEnum removeResult = await serverMutedUserService.RemoveMutedUserAsync(serverId, userId);
+                    if (removeResult == DbProcessResultEnum.Failure)
                     {
                         logger.Error("UnmuteFeature.cs ExecuteCoreLogicAsync", "Failure during automatic unmuting process!");
                     }

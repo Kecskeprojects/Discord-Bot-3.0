@@ -51,7 +51,7 @@ public class TwitchAPI(
         }
         catch (Exception ex)
         {
-            logger.Error("TwitchAPI.cs Twitch", ex);
+            logger.Error("TwitchAPI.cs Start", ex);
         }
     }
 

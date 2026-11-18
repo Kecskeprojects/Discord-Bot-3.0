@@ -39,7 +39,7 @@ public class WordOfTheDayService(IBotLogger logger) : IWordOfTheDayService
         }
         catch (Exception ex)
         {
-            logger.Error("WordOfTheDay.cs GetDataAsync", ex);
+            logger.Error("WordOfTheDayService.cs GetDataAsync", ex);
         }
 
         return result;

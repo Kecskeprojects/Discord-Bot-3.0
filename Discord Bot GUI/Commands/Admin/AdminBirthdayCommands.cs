@@ -105,7 +105,7 @@ public class AdminBirthdayCommands(
         }
         catch (Exception ex)
         {
-            logger.Error("AdminBirthdayCommands.cs BirthdayRemove", ex);
+            logger.Error("AdminBirthdayCommands.cs BirthdayRemoveForUser", ex);
         }
     }
 }

@@ -20,7 +20,7 @@ internal sealed class ServerMutedUserService(
     private readonly IServerMutedUserRepository serverMutedUserRepository = serverMutedUserRepository;
     private readonly IUserRepository userRepository = userRepository;
 
-    public async Task<DbProcessResultEnum> AddMutedUserAsync(ulong serverId, ulong userId, DateTime mutedUntil, string removedRoles)
+    public async Task<DbProcessResultEnum> AddMutedUserAsync(ulong serverId, ulong userId, DateTime now, DateTime mutedUntil, string removedRoles)
     {
         try
         {
@@ -31,7 +31,7 @@ internal sealed class ServerMutedUserService(
             if (user != null && server != null && await serverMutedUserRepository.ExistsAsync(smu =>
                 smu.UserId == user.UserId &&
                 smu.ServerId == server.ServerId &&
-                smu.MutedUntil > DateTime.UtcNow))
+                smu.MutedUntil > now))
             {
                 return DbProcessResultEnum.AlreadyExists;
             }

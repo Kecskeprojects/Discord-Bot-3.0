@@ -66,7 +66,7 @@ public class DatabaseMapperConfig : IRegister
             .Map(dest => dest.ServerDiscordId, src => src.Server != null ? ulong.Parse(src.Server.DiscordId) : 0)
             .Map(dest => dest.ChannelDiscordId, src => src.Channel != null ? (ulong?) ulong.Parse(src.Channel.DiscordId) : null)
             .Map(dest => dest.RoleDiscordId, src => src.Role != null ? (ulong?) ulong.Parse(src.Role.DiscordId) : null)
-            .Map(dest => dest.Options, src => WeeklyPollTools.GetAnswerOptions(src));
+            .Map(dest => dest.Options, src => WeeklyPollTools.GetAnswerOptions(src, DateTime.UtcNow));
         _ = config.NewConfig<WeeklyPollOptionPreset, WeeklyPollOptionPresetResource>()
             .Map(dest => dest.Options, src => src.WeeklyPollOptions);
         _ = config.NewConfig<WeeklyPollOption, WeeklyPollOptionResource>()

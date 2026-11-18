@@ -12,7 +12,7 @@ Done and removed on 2026-11-17 (the investigations are in `git show 483c1fa:docs
 
 ## To check by hand
 
-- **Run the bot once against the dev database and Discord.** Since the last real run, the database layer moved into `DatabaseORM`, implicit usings were turned on, and Windows Forms was removed (2026-11-17). Since then, `Startup.Run()` was split and `IConfig` added (2026-11-18).
+- **Run the bot once against the dev database and Discord.** Since the last real run, the database layer moved into `DatabaseORM`, implicit usings were turned on, and Windows Forms was removed (2026-11-17). Since then, `Startup.Run()` was split, `IConfig` added and `TimeProvider` injected (2026-11-18). Worth a try: a reminder (`!remind in 1m>test`) and a short mute.
   - What has been checked: builds, `dotnet format` and throwaway programs. Those resolved every DB service through the real `Startup.Run()`, ran `ProcessTools.GetStatistics()` (RAM figure, WMI child process count) and loaded a resx bitmap.
   - Worth a look in the window: the diagnostics line.
 - **Correct the scraped idol genders on the dev and the live database.**
@@ -65,10 +65,20 @@ The analyzer setup is done and described in CLAUDE.md ("Linting"). Left:
 
 ### Blockers, in order of value
 
-1. **The clock.** 40 `DateTime.UtcNow` / `DateTime.Now` calls in 23 files (recounted 2026-11-17): DB services and `WeeklyPollTools` in `DatabaseORM`, and features, processors, `DateTimeTools` and `BotLoggerTools` in the bot. Reminder, birthday, poll and unmute logic can't be tested deterministically.
-   - Fix: inject `TimeProvider` (built into .NET; `FakeTimeProvider` from `Microsoft.Extensions.TimeProvider.Testing` in tests), or pass `DateTime now` into the static helpers.
+1. **The clock (done 2026-11-18, the rule is in CLAUDE.md "The clock").**
+   - `TimeProvider` is now injected into the reminder, unmute, weekly poll and birthday features, the mute and reminder commands, and `BiasGameInteraction`.
+   - These take the time as a parameter: `DateTimeTools.TryAddValuesToDate`, `BiasGameDebutEmbedProcessor`, `BirthdayMessageProcessor`, `WeeklyPollTools.GetAnswerOptions`, `IBirthdayService.GetBirthdaysByDateAsync` and `IServerMutedUserService.AddMutedUserAsync`.
+   - Checked with a throwaway program: the container validates with a fake clock, all 34 command and interaction modules construct, and the date helpers give the old results for a fixed time.
+   - The birthday and "already muted" queries used to compare against `GETUTCDATE()` on the SQL server; they now send the bot's own UTC time as a parameter. That only differs if the two machines' clocks disagree.
+   - **Left on the system clock:**
+     - The scheduler's decisions in `App.OnTimedEvent` (06:00, midnight, Mondays). `App` is the WPF application and can't be tested; move those decisions into a plain class with `TimeProvider` if they need tests.
+     - The bias game's 30-minute expiry (`UserBiasGameCommands`, `BiasGameData.StartedAt`). It moves with `Global.BiasGames` (blocker 2).
+     - The "Days Of Week" poll options: the Mapster mapping passes `DateTime.UtcNow` to `WeeklyPollTools`, which is testable on its own.
+     - Waits in the features still use plain `Task.Delay`: `AudioPlayFeature.WaitAsync` (the voice wait for new requests), `YoutubeAddPlaylistFeature` (polling for the user's answer) and `SelfRoleFeature` (1.5 seconds before deleting its reply). Switch them to `Task.Delay(delay, timeProvider)` when their tests are written. The delays in the scrapers, `YoutubeStreamService` and `ProcessTools` are in code that isn't unit-tested.
+   - Tests use `FakeTimeProvider` from `Microsoft.Extensions.TimeProvider.Testing`.
 2. **`Global` static state** (`ServerAudioResources`, `BiasGames`, `YoutubeApiKeys`). It is shared between tests and can't be reset cleanly.
    - Fix: move it into DI singletons (e.g. `BiasGameStore`, `AudioStateStore`, `YoutubeKeyStore`).
+   - Give the bias game store `TimeProvider`, and move the 30-minute expiry from `UserBiasGameCommands` into it, with the start time set from the same clock (today `BiasGameData.StartedAt` defaults to `DateTime.UtcNow`).
 3. **`Config` (done 2026-11-18).** The 47 classes inject `IConfig` (`Interfaces/IConfig.cs`) instead, so tests mock it. `DatabaseStartup` takes the connection string as a `Func<IServiceProvider, string>` and `Startup` reads it through `IConfig`, so replacing `IConfig` in a test also replaces the database. Checked with a throwaway program: `ValidateOnBuild` passes on the real registrations, and a fake `IConfig` reached the DbContext.
 4. **Concrete Discord.Net socket types.** `BaseFeature`, `BaseCommand` and `DiscordTools` use `SocketCommandContext` / `SocketInteractionContext`, and several features inject `DiscordSocketClient`. Socket entities have internal constructors and can't be mocked.
    - Fix: use Discord.Net's own interfaces: `ICommandContext`, `IUser`, `IGuild`, `IMessageChannel`, and `IDiscordClient` (or a narrow wrapper like `IDiscordMessenger.SendDmAsync`) instead of `DiscordSocketClient`. `BaseCommand` could derive from `ModuleBase<ICommandContext>`.
@@ -202,7 +212,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
   3. `LastFmApi` made instance-based with the injected client. Then tests for `LastFmApi` and the bot's `LastFmAPI` against saved responses, run in parallel. They go in `Discord Bot GUI.Tests`, which reaches `LastFmApi` through the bot.
   4. Integration tests: the DB layer on LocalDB, and Last.fm through the real container.
   5. `IBrowserService` and `IWebTools`; then `BiasScrapingProcessor` and the who-knows embed.
-  6. `TimeProvider`, and `Global` moved into DI; then the features.
+  6. `Global` moved into DI (`TimeProvider` is done); then the features.
   7. The Discord interfaces, then whole-command integration tests.
   8. YouTube and Spotify.
 

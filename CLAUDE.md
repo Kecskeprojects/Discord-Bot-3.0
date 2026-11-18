@@ -91,6 +91,12 @@ Base URLs live in `Core/Constant.cs`.
 
 **Scheduler:** a 1-minute `System.Timers.Timer` in `App.xaml.cs` reconnects the client if it is logged out, runs `ReminderFeature` and `UnmuteFeature` every tick, runs `BirthdayFeature`, `WeeklyPollFeature` and the YouTube key reset at 06:00 UTC, scrapes bias data on Mondays, and clears the window log at midnight UTC. Times are **UTC**.
 
+**The clock:** the test is whether a test would need to know the time to know the right answer (comparisons, expiry, "today", ages, adding to a date, scheduling). If so, the code doesn't read `DateTime.UtcNow`:
+- Classes created by DI (features, commands, interactions, the bot's services) inject `TimeProvider` (`TimeProvider.System`, registered in `Startup`) and read it once per operation with `GetUtcNow().UtcDateTime`.
+- Static helpers and DB services take that time from their caller as a parameter, so `DatabaseORM` has no `TimeProvider`.
+- A wait that is part of the logic uses `Task.Delay(delay, timeProvider)`, so a test can move a fake clock forward instead of waiting.
+- Where the time is only recorded or shown (embed timestamps, log times, file names, `CreatedOn`/`ModifiedOn`), `DateTime.UtcNow` is fine. Times are UTC; only the log uses local time.
+
 **Two command systems coexist:**
 1. **Text prefix commands** (`Commands/`, Discord.Commands `ModuleBase` via `BaseCommand`) are triggered by `!` or `.`. This is where nearly all commands are. `CommandHandler.ProcessMessageAsync` also:
    - auto-inserts any guild it sees into the DB,

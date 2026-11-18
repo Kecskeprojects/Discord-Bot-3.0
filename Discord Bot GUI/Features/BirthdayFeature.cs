@@ -11,24 +11,27 @@ namespace Discord_Bot.Features;
 public class BirthdayFeature(
     IBirthdayService birthdayService,
     DiscordSocketClient client,
+    TimeProvider timeProvider,
     IServerService serverService,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IBirthdayService birthdayService = birthdayService;
     private readonly DiscordSocketClient client = client;
+    private readonly TimeProvider timeProvider = timeProvider;
 
     protected override async Task<bool> ExecuteCoreLogicAsync()
     {
         try
         {
             //Get the list of birthdays that are on this date
-            List<BirthdayResource> result = await birthdayService.GetBirthdaysByDateAsync();
+            DateTime today = timeProvider.GetUtcNow().UtcDateTime;
+            List<BirthdayResource> result = await birthdayService.GetBirthdaysByDateAsync(today);
             if (!CollectionTools.IsNullOrEmpty(result))
             {
                 logger.Log($"Sending birthday message to {result.Count} people.");
                 foreach (BirthdayResource birthday in result)
                 {
-                    await SendBirthdayMessageAsync(birthday);
+                    await SendBirthdayMessageAsync(birthday, today.Year);
                 }
             }
         }
@@ -40,7 +43,7 @@ public class BirthdayFeature(
         return true;
     }
 
-    private async Task SendBirthdayMessageAsync(BirthdayResource birthday)
+    private async Task SendBirthdayMessageAsync(BirthdayResource birthday, int currentYear)
     {
         ServerResource? server = await serverService.GetByDiscordIdAsync(birthday.ServerDiscordId);
         if (server == null)
@@ -62,7 +65,7 @@ public class BirthdayFeature(
 
             await guild.DownloadUsersAsync();
 
-            string message = BirthdayMessageProcessor.CreateMessage(birthday, guild);
+            string message = BirthdayMessageProcessor.CreateMessage(birthday, guild, currentYear);
 
             _ = await channel.SendMessageAsync(message);
         }

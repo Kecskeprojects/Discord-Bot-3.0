@@ -25,7 +25,7 @@ public class InstaScraper(IBotLogger logger) : IInstaScraper
         }
         catch (Exception ex)
         {
-            logger.Error("InstaScraper.cs GetDataFromUrls", ex);
+            logger.Error("InstaScraper.cs GetDataFromUrl", ex);
             return new SocialScrapingResult("Unexpected error occured");
         }
     }

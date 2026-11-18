@@ -134,11 +134,11 @@ public class KpopDbScraper(IBotLogger logger, BrowserService browserService) : I
         }
         catch (NavigationException ex)
         {
-            logger.Warning("BiasDatabaseService.cs GetAdditionalBiasDataAsync", ex);
+            logger.Warning("KpopDbScraper.cs GetProfileDataAsync", ex);
         }
         catch (Exception ex)
         {
-            logger.Error("BiasDatabaseService.cs GetAdditionalBiasDataAsync", ex);
+            logger.Error("KpopDbScraper.cs GetProfileDataAsync", ex);
         }
         return idolData;
     }

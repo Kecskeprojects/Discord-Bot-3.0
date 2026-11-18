@@ -52,7 +52,7 @@ public class UserBiasGameCommands(
         }
         catch (Exception ex)
         {
-            logger.Error("BiasGameCommands.cs BiasGame", ex);
+            logger.Error("UserBiasGameCommands.cs BiasGame", ex);
         }
     }
 
@@ -86,7 +86,7 @@ public class UserBiasGameCommands(
         }
         catch (Exception ex)
         {
-            logger.Error("BiasGameCommands.cs BiasGameStop", ex);
+            logger.Error("UserBiasGameCommands.cs BiasGameStop", ex);
         }
     }
 
@@ -118,7 +118,7 @@ public class UserBiasGameCommands(
         }
         catch (Exception ex)
         {
-            logger.Error("BiasGameCommands.cs BiasStats", ex);
+            logger.Error("UserBiasGameCommands.cs BiasStats", ex);
         }
     }
 }

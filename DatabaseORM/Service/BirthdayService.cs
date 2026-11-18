@@ -67,14 +67,14 @@ internal sealed class BirthdayService(
         return DbProcessResultEnum.Failure;
     }
 
-    public async Task<List<BirthdayResource>> GetBirthdaysByDateAsync()
+    public async Task<List<BirthdayResource>> GetBirthdaysByDateAsync(DateTime date)
     {
         List<Birthday> birthday = [];
         try
         {
             birthday = await birthdayRepository.GetListAsync(
-                b => b.Date.Month == DateTime.UtcNow.Month
-                && b.Date.Day == DateTime.UtcNow.Day,
+                b => b.Date.Month == date.Month
+                && b.Date.Day == date.Day,
                 b => b.Server,
                 b => b.User);
         }

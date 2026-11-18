@@ -144,7 +144,7 @@ public class AdminWeeklyPollCommands(
         }
         catch (Exception ex)
         {
-            logger.Error("AdminWeeklyPollCommands.cs EditWeeklyPoll", ex);
+            logger.Error("AdminWeeklyPollCommands.cs ResendWeeklyPoll", ex);
         }
     }
 }

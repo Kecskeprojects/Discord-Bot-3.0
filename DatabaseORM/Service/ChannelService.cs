@@ -86,7 +86,7 @@ internal sealed class ChannelService(
         return DbProcessResultEnum.Failure;
     }
 
-    public async Task<DbProcessResultEnum> RemovelSettingChannelAsync(ulong serverId, ChannelTypeEnum channelTypeId, ulong channelId)
+    public async Task<DbProcessResultEnum> RemoveSettingChannelAsync(ulong serverId, ChannelTypeEnum channelTypeId, ulong channelId)
     {
         try
         {

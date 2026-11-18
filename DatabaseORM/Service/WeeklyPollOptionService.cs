@@ -72,7 +72,7 @@ internal sealed class WeeklyPollOptionService(
         }
         catch (Exception ex)
         {
-            logger.Error("WeeklyPollService.cs RemovePollByNameAsync", ex);
+            logger.Error("WeeklyPollOptionService.cs UpdateAsync", ex);
         }
         return DbProcessResultEnum.Failure;
     }

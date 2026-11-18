@@ -69,7 +69,7 @@ public class BiasScrapingProcessor(
 
         if (string.IsNullOrEmpty(profileUrl))
         {
-            logger.Warning("CoreLogic.cs UpdateExtendedBiasData", $"ProfileUrl empty. DATA: {data?.StageName} of {data?.GroupName} | DB: {localIdols[i].Name} of {localIdols[i].GroupName}");
+            logger.Warning("BiasScrapingProcessor.cs UpdateBiasAsync", $"ProfileUrl empty. DATA: {data?.StageName} of {data?.GroupName} | DB: {localIdols[i].Name} of {localIdols[i].GroupName}");
             return false;
         }
 
@@ -77,7 +77,7 @@ public class BiasScrapingProcessor(
 
         if (additional?.ImageUrl == null)
         {
-            logger.Warning("CoreLogic.cs UpdateExtendedBiasData", $"Image not found. DATA: {data?.StageName} of {data?.GroupName} | DB: {localIdols[i].Name} of {localIdols[i].GroupName}");
+            logger.Warning("BiasScrapingProcessor.cs UpdateBiasAsync", $"Image not found. DATA: {data?.StageName} of {data?.GroupName} | DB: {localIdols[i].Name} of {localIdols[i].GroupName}");
             return false;
         }
 
@@ -94,7 +94,7 @@ public class BiasScrapingProcessor(
             if (!localIdols[i].GroupName.Equals(data.GroupName.RemoveSpecialCharacters(), StringComparison.OrdinalIgnoreCase))
             {
                 additional = null;
-                logger.Warning("CoreLogic.cs UpdateExtendedBiasData", "Idol's group in database and site do not match, the result may be inconsistent.");
+                logger.Warning("BiasScrapingProcessor.cs UpdateBiasAsync", "Idol's group in database and site do not match, the result may be inconsistent.");
             }
         }
         else

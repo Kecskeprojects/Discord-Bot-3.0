@@ -16,10 +16,10 @@ public static class DateTimeTools
         return curr.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
     }
 
-    public static bool TryAddValuesToDate(List<string> amounts, out DateTime modifiedDate)
+    //The seconds of the date are dropped, the scheduler checks once a minute
+    public static bool TryAddValuesToDate(DateTime date, List<string> amounts, out DateTime modifiedDate)
     {
-        DateTime temp = DateTime.UtcNow;
-        modifiedDate = new DateTime(temp.Year, temp.Month, temp.Day, temp.Hour, temp.Minute, 0, temp.Kind);
+        modifiedDate = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, 0, date.Kind);
         //Go through the list 2 elements at a time
         for (int i = 0; i < amounts.Count; i += 2)
         {

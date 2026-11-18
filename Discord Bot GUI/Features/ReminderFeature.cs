@@ -11,18 +11,20 @@ namespace Discord_Bot.Features;
 public class ReminderFeature(
     IReminderService reminderService,
     DiscordSocketClient client,
+    TimeProvider timeProvider,
     IServerService serverService,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IReminderService reminderService = reminderService;
     private readonly DiscordSocketClient client = client;
+    private readonly TimeProvider timeProvider = timeProvider;
 
     protected override async Task<bool> ExecuteCoreLogicAsync()
     {
         try
         {
             //Get the list of reminders that are before or exactly set to this minute
-            DateTime now = DateTime.UtcNow;
+            DateTime now = timeProvider.GetUtcNow().UtcDateTime;
             DateTime dateTime = new(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, now.Kind);
             List<ReminderResource> result = await reminderService.GetCurrentRemindersAsync(dateTime);
             if (!CollectionTools.IsNullOrEmpty(result))

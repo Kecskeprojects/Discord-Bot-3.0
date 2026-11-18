@@ -38,7 +38,7 @@ internal sealed class ReminderService(
         }
         catch (Exception ex)
         {
-            logger.Error("ReminderService.cs GetCurrentReminderAsync", ex);
+            logger.Error("ReminderService.cs AddReminderAsync", ex);
         }
         return DbProcessResultEnum.Failure;
     }
@@ -58,7 +58,7 @@ internal sealed class ReminderService(
         }
         catch (Exception ex)
         {
-            logger.Error("ReminderService.cs GetCurrentReminderAsync", ex);
+            logger.Error("ReminderService.cs GetCurrentRemindersAsync", ex);
         }
 
         return result;
@@ -84,7 +84,7 @@ internal sealed class ReminderService(
         }
         catch (Exception ex)
         {
-            logger.Error("ReminderService.cs GetCurrentReminderAsync", ex);
+            logger.Error("ReminderService.cs GetUserReminderListAsync", ex);
         }
 
         return result;
@@ -110,7 +110,7 @@ internal sealed class ReminderService(
         }
         catch (Exception ex)
         {
-            logger.Error("ReminderService.cs RemoveCurrentReminderAsync", ex);
+            logger.Error("ReminderService.cs RemoveCurrentRemindersAsync", ex);
         }
         return DbProcessResultEnum.Failure;
     }
@@ -136,7 +136,7 @@ internal sealed class ReminderService(
         }
         catch (Exception ex)
         {
-            logger.Error("ReminderService.cs RemoveCurrentReminderAsync", ex);
+            logger.Error("ReminderService.cs RemoveUserReminderAsync", ex);
         }
         return DbProcessResultEnum.Failure;
     }

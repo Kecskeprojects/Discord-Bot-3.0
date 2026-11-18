@@ -121,7 +121,7 @@ public class AdminServerSettingCommands(
             else
             {
                 //Removes the given channel of the given type from the settings for the server, removes server from cache
-                result = await channelService.RemovelSettingChannelAsync(Context.Guild.Id, channelTypeEnum.Value, channel.Id);
+                result = await channelService.RemoveSettingChannelAsync(Context.Guild.Id, channelTypeEnum.Value, channel.Id);
             }
 
             string resultMessage = result switch

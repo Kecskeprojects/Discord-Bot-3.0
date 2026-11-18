@@ -5,17 +5,17 @@ namespace Discord_Bot.Processors.EmbedProcessors.BiasGame;
 
 public static class BiasGameDebutEmbedProcessor
 {
-    public static MessageComponent CreateComponent(BiasGameData data)
+    public static MessageComponent CreateComponent(BiasGameData data, int currentYear)
     {
         List<int> options = [1990, 2000, 2010, 2014, 2018];
-        for (int i = 2020; i <= DateTime.UtcNow.Year; i += 2)
+        for (int i = 2020; i <= currentYear; i += 2)
         {
             options.Add(i);
         }
 
-        if ((DateTime.UtcNow.Year - 2020) % 2 > 0)
+        if ((currentYear - 2020) % 2 > 0)
         {
-            options.Add(DateTime.UtcNow.Year);
+            options.Add(currentYear);
         }
 
         SelectMenuBuilder selectMenu = new();

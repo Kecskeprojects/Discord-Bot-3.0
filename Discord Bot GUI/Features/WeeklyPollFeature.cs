@@ -12,19 +12,21 @@ namespace Discord_Bot.Features;
 public class WeeklyPollFeature(
     IWeeklyPollService weeklyPollService,
     DiscordSocketClient client,
+    TimeProvider timeProvider,
     IServerService serverService,
     IMapper mapper,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IWeeklyPollService weeklyPollService = weeklyPollService;
     private readonly DiscordSocketClient client = client;
+    private readonly TimeProvider timeProvider = timeProvider;
 
     protected override async Task<bool> ExecuteCoreLogicAsync()
     {
         try
         {
             //Get the list of polls that are sent out on this day
-            DayOfWeek dayOfWeek = DateTime.UtcNow.DayOfWeek;
+            DayOfWeek dayOfWeek = timeProvider.GetUtcNow().DayOfWeek;
             List<WeeklyPollResource> result = await weeklyPollService.GetPollsByDayOfWeekAsync(dayOfWeek);
 
             if (!CollectionTools.IsNullOrEmpty(result))
@@ -37,7 +39,7 @@ public class WeeklyPollFeature(
         }
         catch (Exception ex)
         {
-            logger.Error("ReminderFeature.cs ExecuteCoreLogicAsync", ex);
+            logger.Error("WeeklyPollFeature.cs ExecuteCoreLogicAsync", ex);
             return false;
         }
         return true;

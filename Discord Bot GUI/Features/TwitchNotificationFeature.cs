@@ -42,7 +42,7 @@ public class TwitchNotificationFeature(
 
                     if (client.GetChannel(channelId) is not IMessageChannel channel)
                     {
-                        logger.Error("TwitchNotificationFeature.cs Run", $"Channel (ID: {channelId}) was not found to send twitch notification. (Server ID: {server.ServerId}).");
+                        logger.Error("TwitchNotificationFeature.cs ExecuteCoreLogicAsync", $"Channel (ID: {channelId}) was not found to send twitch notification. (Server ID: {server.ServerId}).");
                         return false;
                     }
 

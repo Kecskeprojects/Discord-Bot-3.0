@@ -31,7 +31,7 @@ public class MusicBrainzAPI(IBotLogger logger) : IMusicBrainzAPI
         }
         catch (Exception ex)
         {
-            logger.Error("MusicBrainzAPI.cs GetArtistSpotifyUrl", ex);
+            logger.Error("MusicBrainzAPI.cs GetArtistSpotifyUrlAsync", ex);
         }
 
         return null;

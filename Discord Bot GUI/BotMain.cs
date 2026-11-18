@@ -187,7 +187,7 @@ public sealed class BotMain(
         }
         catch (Exception ex)
         {
-            logger.Error("BotMain.cs OnWebSocketDisconnect", ex);
+            logger.Error("BotMain.cs OnWebsocketDisconnect", ex);
         }
         return Task.CompletedTask;
     }

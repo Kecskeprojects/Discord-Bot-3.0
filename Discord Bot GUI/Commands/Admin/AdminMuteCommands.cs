@@ -16,6 +16,7 @@ namespace Discord_Bot.Commands.Admin;
 [Summary("Mute functionality using specified role")]
 public class AdminMuteCommands(
     IServerMutedUserService serverMutedUserService,
+    TimeProvider timeProvider,
     IServerService serverService,
     IBotLogger logger,
     IConfig config) : BaseCommand(logger, config, serverService)
@@ -106,12 +107,13 @@ public class AdminMuteCommands(
             if (amounts.Count % 2 == 0)
             {
                 //Check what lengths of time we need to deal with and add it to the current date
-                if (!DateTimeTools.TryAddValuesToDate(amounts, out DateTime mutedUntil))
+                DateTime now = timeProvider.GetUtcNow().UtcDateTime;
+                if (!DateTimeTools.TryAddValuesToDate(now, amounts, out DateTime mutedUntil))
                 {
                     return;
                 }
 
-                DbProcessResultEnum result = await serverMutedUserService.AddMutedUserAsync(Context.Guild.Id, user.Id, mutedUntil, string.Join(";", roleList.Select(x => x.Id)));
+                DbProcessResultEnum result = await serverMutedUserService.AddMutedUserAsync(Context.Guild.Id, user.Id, now, mutedUntil, string.Join(";", roleList.Select(x => x.Id)));
                 string resultMessage = result switch
                 {
                     DbProcessResultEnum.Success => $"User has been muted until {TimestampTag.FromDateTime(mutedUntil, TimestampTagStyles.ShortDateTime)}",

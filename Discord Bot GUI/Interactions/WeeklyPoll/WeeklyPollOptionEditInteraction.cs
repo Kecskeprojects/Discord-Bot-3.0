@@ -113,7 +113,7 @@ IConfig config) : BaseInteraction(serverService, logger, config)
         }
         catch (Exception ex)
         {
-            logger.Error("WeeklyPollOptionEditInteraction.cs EditWeeklyPollOptionModalSubmit", ex);
+            logger.Error("WeeklyPollOptionEditInteraction.cs EditWeeklyPollOptionPresetModalSubmit", ex);
         }
         await RespondOrFollowupAsync("Something went wrong during the process.", ephemeral: true);
     }

@@ -17,12 +17,14 @@ namespace Discord_Bot.Interactions;
 public class BiasGameInteraction(
     IIdolService idolService,
     BiasGameImageProcessor biasGameImageProcessor,
+    TimeProvider timeProvider,
     IServerService serverService,
     IBotLogger logger,
     IConfig config) : BaseInteraction(serverService, logger, config)
 {
     private readonly IIdolService idolService = idolService;
     private readonly BiasGameImageProcessor biasGameImageProcessor = biasGameImageProcessor;
+    private readonly TimeProvider timeProvider = timeProvider;
 
     [ComponentInteraction("BiasGame_Setup_Gender_*_*")]
     public async Task GenderChosen(GenderEnum chosenGender, ulong userId)
@@ -49,7 +51,7 @@ public class BiasGameInteraction(
             data.Gender = chosenGender;
 
             logger.Log($"BiasGame Setup Gender Chosen: {chosenGender.ToDatabaseFriendlyString()}", LogOnly: true);
-            MessageComponent component = BiasGameDebutEmbedProcessor.CreateComponent(data);
+            MessageComponent component = BiasGameDebutEmbedProcessor.CreateComponent(data, timeProvider.GetUtcNow().Year);
 
             _ = await ModifyOriginalResponseAsync(x => x.Components = component);
             data.IsProcessing = false;

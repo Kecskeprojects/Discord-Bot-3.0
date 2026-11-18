@@ -77,7 +77,7 @@ internal sealed class UserService(
         }
         catch (Exception ex)
         {
-            logger.Error("UserService.cs GetUserAsync", ex);
+            logger.Error("UserService.cs GetTopIdolsAsync", ex);
         }
         return result;
     }

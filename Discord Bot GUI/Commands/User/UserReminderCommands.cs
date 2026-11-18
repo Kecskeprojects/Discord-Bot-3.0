@@ -15,11 +15,13 @@ namespace Discord_Bot.Commands.User;
 [Summary("Adding/Removing personal reminders that will be sent to user as a DM")]
 public class UserReminderCommands(
     IReminderService reminderService,
+    TimeProvider timeProvider,
     IServerService serverService,
     IBotLogger logger,
     IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly IReminderService reminderService = reminderService;
+    private readonly TimeProvider timeProvider = timeProvider;
 
     [Command("reminder in")]
     [Alias(["remind in", "remind at", "reminder at"])]
@@ -56,7 +58,7 @@ public class UserReminderCommands(
             if (amounts.Count % 2 == 0)
             {
                 //Check what lengths of time we need to deal with and add it to the current date
-                if (!DateTimeTools.TryAddValuesToDate(amounts, out DateTime date))
+                if (!DateTimeTools.TryAddValuesToDate(timeProvider.GetUtcNow().UtcDateTime, amounts, out DateTime date))
                 {
                     return;
                 }
