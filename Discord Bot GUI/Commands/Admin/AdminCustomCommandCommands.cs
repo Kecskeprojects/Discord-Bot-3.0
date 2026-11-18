@@ -3,7 +3,7 @@ using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using Discord;
 using Discord.Commands;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 
 namespace Discord_Bot.Commands.Admin;
 
@@ -14,7 +14,7 @@ public class AdminCustomCommandCommands(
     ICustomCommandService customCommandService,
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseCommand(logger, config, serverService)
+    IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly ICustomCommandService customCommandService = customCommandService;
 

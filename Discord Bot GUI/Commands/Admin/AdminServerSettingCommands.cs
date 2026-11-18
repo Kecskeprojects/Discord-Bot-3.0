@@ -5,7 +5,7 @@ using DatabaseORM.Resources;
 using Discord;
 using Discord.Commands;
 using Discord_Bot.Core;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.EmbedProcessors;
 using Discord_Bot.Services.Models.Twitch;
@@ -22,7 +22,7 @@ public class AdminServerSettingCommands(
     ITwitchCLI twitchCLI,
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseCommand(logger, config, serverService)
+    IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly IChannelService channelService = channelService;
     private readonly ITwitchChannelService twitchChannelService = twitchChannelService;

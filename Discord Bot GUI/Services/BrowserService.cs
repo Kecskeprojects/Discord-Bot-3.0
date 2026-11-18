@@ -1,13 +1,13 @@
 ﻿using DatabaseORM.Interface;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 using PuppeteerSharp;
 
 namespace Discord_Bot.Services;
 
-public class BrowserService(IBotLogger logger, Config config)
+public class BrowserService(IBotLogger logger, IConfig config)
 {
     private readonly IBotLogger logger = logger;
-    private readonly Config config = config;
+    private readonly IConfig config = config;
     private IBrowser? Browser { get; set; }
 
     public async Task<IBrowser> OpenBrowser()

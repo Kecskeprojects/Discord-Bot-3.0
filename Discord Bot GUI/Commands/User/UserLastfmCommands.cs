@@ -5,7 +5,7 @@ using DatabaseORM.Resources;
 using Discord;
 using Discord.Commands;
 using Discord_Bot.Communication;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.EmbedProcessors.LastFm;
 using Discord_Bot.Services.Models.LastFm;
@@ -24,7 +24,7 @@ public class UserLastfmCommands(
     LastFmWhoKnowsEmbedProcessor whoKnowsEmbedProcessor,
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseCommand(logger, config, serverService)
+    IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly IUserService userService = userService;
     private readonly ILastFmAPI lastFmAPI = lastFmAPI;

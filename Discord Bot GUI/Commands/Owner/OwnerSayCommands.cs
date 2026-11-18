@@ -2,7 +2,7 @@
 using DatabaseORM.Interface.Service;
 using Discord;
 using Discord.Commands;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 
 namespace Discord_Bot.Commands.Owner;
 
@@ -12,7 +12,7 @@ namespace Discord_Bot.Commands.Owner;
 public class OwnerSayCommands(
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseCommand(logger, config, serverService)
+    IConfig config) : BaseCommand(logger, config, serverService)
 {
     [Command("say")]
     [RequireOwner]

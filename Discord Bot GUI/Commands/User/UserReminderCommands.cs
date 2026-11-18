@@ -4,7 +4,7 @@ using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
 using Discord.Commands;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.EmbedProcessors;
 using Discord_Bot.Tools.NativeTools;
 
@@ -17,7 +17,7 @@ public class UserReminderCommands(
     IReminderService reminderService,
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseCommand(logger, config, serverService)
+    IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly IReminderService reminderService = reminderService;
 

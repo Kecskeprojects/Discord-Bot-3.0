@@ -1,6 +1,6 @@
 ﻿using DatabaseORM.Interface;
 using DatabaseORM.Resources;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.LastFm;
 using Discord_Bot.Services.Models.SpotifyAPI;
@@ -15,11 +15,11 @@ using LastFmApi.Models.TopTrack;
 
 namespace Discord_Bot.Services;
 
-public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, Config config) : ILastFmAPI
+public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, IConfig config) : ILastFmAPI
 {
     private readonly ISpotifyAPI spotifyAPI = spotifyAPI;
     private readonly IBotLogger logger = logger;
-    private readonly Config config = config;
+    private readonly IConfig config = config;
 
     #region Last.fm top calls
     public async Task<LastFmListResult> GetTopAlbumsAsync(string lastFmUsername, int limit, int? page, string period)

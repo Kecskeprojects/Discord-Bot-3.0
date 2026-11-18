@@ -5,7 +5,7 @@ using DatabaseORM.Resources;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.EmbedProcessors;
 using Discord_Bot.Tools.NativeTools;
 
@@ -18,7 +18,7 @@ public class UserBirthdayCommands(
     IBirthdayService birthdayService,
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseCommand(logger, config, serverService)
+    IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly IBirthdayService birthdayService = birthdayService;
 

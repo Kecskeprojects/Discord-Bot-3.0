@@ -7,7 +7,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.MessageProcessor;
 using Discord_Bot.Tools.NativeTools;
 using System.Globalization;
@@ -23,7 +23,7 @@ public class UserBiasCommands(
     IIdolGroupService idolGroupService,
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseCommand(logger, config, serverService)
+    IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly IUserIdolService userIdolService = userIdolService;
     private readonly IIdolService idolService = idolService;

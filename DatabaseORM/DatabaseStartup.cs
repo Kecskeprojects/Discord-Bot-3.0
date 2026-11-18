@@ -18,12 +18,12 @@ public static class DatabaseStartup
 {
     /// <param name="services">The application's service collection.</param>
     /// <param name="connectionString">
-    /// Read whenever a DbContext is configured (once per scope), so a connection string edited in the configuration
-    /// applies without a restart.
+    /// Read from the application's services whenever a DbContext is configured (once per scope), so a connection string
+    /// edited in the configuration applies without a restart, and replacing the configuration in a test replaces it too.
     /// </param>
-    public static void ConfigureDatabaseServices(IServiceCollection services, Func<string> connectionString)
+    public static void ConfigureDatabaseServices(IServiceCollection services, Func<IServiceProvider, string> connectionString)
     {
-        _ = services.AddDbContext<MainDbContext>(options => options.UseSqlServer(connectionString()));
+        _ = services.AddDbContext<MainDbContext>((provider, options) => options.UseSqlServer(connectionString(provider)));
         _ = services.AddSingleton<ServerCache>();
 
         //Services

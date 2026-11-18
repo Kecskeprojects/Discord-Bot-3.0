@@ -4,8 +4,8 @@ using DatabaseORM.Interface.Service;
 using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Bot.Communication;
-using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.Services;
 using System.Xml;
 
@@ -13,7 +13,7 @@ namespace Discord_Bot.Features;
 
 public class AudioPlayFeature(
     IYoutubeDownloadService youtubeDownloadService,
-    Config config,
+    IConfig config,
     IServerService serverService,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {

@@ -1,9 +1,9 @@
 ﻿using DatabaseORM.Interface;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
-using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
 using Discord_Bot.Features;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
@@ -15,12 +15,12 @@ using System.Web;
 
 namespace Discord_Bot.Services;
 
-public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, IBotLogger logger, Config config) : IYoutubeAPI
+public class YoutubeAPI(YoutubeAddPlaylistFeature youtubeAddPlaylistFeature, IBotLogger logger, IConfig config) : IYoutubeAPI
 {
     #region Variables
     private readonly YoutubeAddPlaylistFeature youtubeAddPlaylistFeature = youtubeAddPlaylistFeature;
     private readonly IBotLogger logger = logger;
-    private readonly Config config = config;
+    private readonly IConfig config = config;
     private static int youtubeApiKeyIndex;
     #endregion
 

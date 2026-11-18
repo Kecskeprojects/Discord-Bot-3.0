@@ -6,15 +6,15 @@ using Discord;
 using Discord.Commands;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Tools;
 
 namespace Discord_Bot.Commands;
 
-public class BaseCommand(IBotLogger logger, Config config, IServerService serverService) : ModuleBase<SocketCommandContext>
+public class BaseCommand(IBotLogger logger, IConfig config, IServerService serverService) : ModuleBase<SocketCommandContext>
 {
     protected readonly IBotLogger logger = logger;
-    protected readonly Config config = config;
+    protected readonly IConfig config = config;
     protected readonly IServerService serverService = serverService;
 
     protected async Task<ServerResource> GetCurrentServerAsync()

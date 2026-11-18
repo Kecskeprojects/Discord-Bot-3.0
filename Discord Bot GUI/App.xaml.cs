@@ -2,8 +2,8 @@
 using Discord.WebSocket;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
-using Discord_Bot.Core.Configuration;
 using Discord_Bot.Features;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors;
 using Discord_Bot.Services;
@@ -129,7 +129,7 @@ public sealed partial class App : Application, IDisposable
 
             logger.Log("App started!");
 
-            Config config = scope.ServiceProvider.GetRequiredService<Config>();
+            IConfig config = scope.ServiceProvider.GetRequiredService<IConfig>();
             YoutubeAPI.KeyReset(config.Youtube_API_Keys);
         }
 
@@ -177,7 +177,7 @@ public sealed partial class App : Application, IDisposable
                     WeeklyPollFeature weeklyPollFeature = scope.ServiceProvider.GetRequiredService<WeeklyPollFeature>();
                     _ = await weeklyPollFeature.Run();
 
-                    Config config = scope.ServiceProvider.GetRequiredService<Config>();
+                    IConfig config = scope.ServiceProvider.GetRequiredService<IConfig>();
                     YoutubeAPI.KeyReset(config.Youtube_API_Keys);
                     logger.Log("Youtube keys reset!");
 

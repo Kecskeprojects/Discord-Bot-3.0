@@ -3,7 +3,7 @@ using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using Discord;
 using Discord.Commands;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Processors;
 using Discord_Bot.Processors.MessageProcessor;
 
@@ -17,7 +17,7 @@ public class OwnerBiasCommands(
     IServerService serverService,
     BiasScrapingProcessor biasScrapingProcessor,
     IBotLogger logger,
-    Config config) : BaseCommand(logger, config, serverService)
+    IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly IIdolService idolService = idolService;
     //private readonly BiasScrapingProcessor biasScrapingProcessor = biasScrapingProcessor;

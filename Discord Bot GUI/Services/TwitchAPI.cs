@@ -2,8 +2,8 @@
 using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord_Bot.Communication;
-using Discord_Bot.Core.Configuration;
 using Discord_Bot.Features;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Tools.NativeTools;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,13 +21,13 @@ public class TwitchAPI(
     IServiceProvider services,
     ITwitchCLI twitchCLI,
     IBotLogger logger,
-    Config config) : ITwitchAPI
+    IConfig config) : ITwitchAPI
 {
     #region Variables
     private readonly IServiceProvider services = services;
     private readonly ITwitchCLI twitchCLI = twitchCLI;
     private readonly IBotLogger logger = logger;
-    private readonly Config config = config;
+    private readonly IConfig config = config;
 
     //Both are set by Check before the monitor raises any event, and only the event handlers use them after that
     private LiveStreamMonitorService monitor = null!;

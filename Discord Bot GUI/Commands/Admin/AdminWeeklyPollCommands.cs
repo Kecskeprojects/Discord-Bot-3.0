@@ -4,8 +4,8 @@ using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
 using Discord.Commands;
-using Discord_Bot.Core.Configuration;
 using Discord_Bot.Features;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.EmbedProcessors.Polls;
 
 namespace Discord_Bot.Commands.Admin;
@@ -19,7 +19,7 @@ public class AdminWeeklyPollCommands(
     IWeeklyPollOptionPresetService weeklyPollOptionPresetService,
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseCommand(logger, config, serverService)
+    IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly IWeeklyPollService weeklyPollService = weeklyPollService;
 

@@ -2,7 +2,7 @@
 using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord.Interactions;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.MessageProcessor;
 
 namespace Discord_Bot.Interactions;
@@ -12,7 +12,7 @@ public class BiasListComponentInteraction(
     IIdolService idolService,
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseInteraction(serverService, logger, config)
+    IConfig config) : BaseInteraction(serverService, logger, config)
 {
     private readonly IUserIdolService userIdolService = userIdolService;
     private readonly IIdolService idolService = idolService;

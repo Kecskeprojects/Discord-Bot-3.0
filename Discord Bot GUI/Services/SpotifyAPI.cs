@@ -1,6 +1,6 @@
 ﻿using DatabaseORM.Interface;
-using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.SpotifyAPI;
 using Discord_Bot.Tools.NativeTools;
@@ -8,10 +8,10 @@ using SpotifyAPI.Web;
 
 namespace Discord_Bot.Services;
 
-public class SpotifyAPI(IBotLogger logger, Config config, IYoutubeAPI youtubeAPI, IMusicBrainzAPI musicBrainzAPI) : ISpotifyAPI
+public class SpotifyAPI(IBotLogger logger, IConfig config, IYoutubeAPI youtubeAPI, IMusicBrainzAPI musicBrainzAPI) : ISpotifyAPI
 {
     private readonly IBotLogger logger = logger;
-    private readonly Config config = config;
+    private readonly IConfig config = config;
     private readonly IYoutubeAPI youtubeAPI = youtubeAPI;
     private readonly IMusicBrainzAPI musicBrainzAPI = musicBrainzAPI;
 

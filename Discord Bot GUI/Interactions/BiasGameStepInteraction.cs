@@ -5,7 +5,7 @@ using Discord;
 using Discord.Interactions;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.EmbedProcessors.BiasGame;
 using Discord_Bot.Processors.ImageProcessors;
 using System.IO;
@@ -18,7 +18,7 @@ public class BiasGameStepInteraction(
     IUserIdolStatisticService userIdolStatisticService,
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseInteraction(serverService, logger, config)
+    IConfig config) : BaseInteraction(serverService, logger, config)
 {
     private readonly IIdolService idolService = idolService;
     private readonly BiasGameWinnerBracketImageProcessor biasGameWinnerBracketImageProcessor = biasGameWinnerBracketImageProcessor;

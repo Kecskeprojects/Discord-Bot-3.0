@@ -2,7 +2,7 @@
 using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using Discord.Commands;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 
 namespace Discord_Bot.Commands.Owner;
 
@@ -13,7 +13,7 @@ public class OwnerBiasAliasCommands(
     IIdolAliasService idolAliasService,
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseCommand(logger, config, serverService)
+    IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly IIdolAliasService idolAliasService = idolAliasService;
 

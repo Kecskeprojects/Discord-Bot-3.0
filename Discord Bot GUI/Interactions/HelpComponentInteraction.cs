@@ -4,8 +4,8 @@ using DatabaseORM.Interface.Service;
 using Discord;
 using Discord.Commands;
 using Discord.Interactions;
-using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.EmbedProcessors.Help;
 
 namespace Discord_Bot.Interactions;
@@ -14,7 +14,7 @@ public class HelpComponentInteraction(
     CommandService commandService,
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseInteraction(serverService, logger, config)
+    IConfig config) : BaseInteraction(serverService, logger, config)
 {
 
     [ComponentInteraction("HelpMenu_*")]

@@ -4,7 +4,7 @@ using DatabaseORM.Interface.Service;
 using Discord;
 using Discord.Commands;
 using Discord.Rest;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 
 namespace Discord_Bot.Commands.Admin;
 
@@ -15,7 +15,7 @@ public class AdminBirthdayCommands(
     IBirthdayService birthdayService,
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseCommand(logger, config, serverService)
+    IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly IBirthdayService birthdayService = birthdayService;
 

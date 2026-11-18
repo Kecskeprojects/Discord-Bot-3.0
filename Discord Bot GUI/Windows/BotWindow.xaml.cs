@@ -1,7 +1,7 @@
 ﻿using Discord_Bot.Communication;
 using Discord_Bot.Core;
-using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Tools.NativeTools;
 using System.Diagnostics;
 using System.IO;
@@ -21,7 +21,7 @@ public sealed partial class BotWindow : Window, IDisposable
 
     private readonly BotLogger logger;
 
-    public BotWindow(BotLogger logger, Config config)
+    public BotWindow(BotLogger logger, IConfig config)
     {
         InitializeComponent();
         this.logger = logger;

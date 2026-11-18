@@ -4,7 +4,7 @@ using DatabaseORM.Interface.Service;
 using Discord.Commands;
 using Discord.Rest;
 using Discord.WebSocket;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Tools;
 using System.IO;
@@ -18,7 +18,7 @@ public class UserBonkCommands(
     BonkGifProcessor bonkGifProcessor,
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseCommand(logger, config, serverService)
+    IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly BonkGifProcessor bonkGifProcessor = bonkGifProcessor;
 

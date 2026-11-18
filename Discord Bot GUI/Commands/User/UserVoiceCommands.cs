@@ -6,8 +6,8 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Bot.Communication;
-using Discord_Bot.Core.Configuration;
 using Discord_Bot.Features;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.EmbedProcessors.Audio;
 using Discord_Bot.Tools.NativeTools;
 
@@ -21,7 +21,7 @@ public class UserVoiceCommands(
     AudioRequestFeature audioRequestFeature,
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseCommand(logger, config, serverService)
+    IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly AudioPlayFeature audioPlayFeature = audioPlayFeature;
     private readonly AudioRequestFeature audioRequestFeature = audioRequestFeature;

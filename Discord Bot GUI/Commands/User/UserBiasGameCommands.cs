@@ -6,7 +6,7 @@ using Discord;
 using Discord.Commands;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.EmbedProcessors.BiasGame;
 
 namespace Discord_Bot.Commands.User;
@@ -18,7 +18,7 @@ public class UserBiasGameCommands(
     IUserService userService,
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseCommand(logger, config, serverService)
+    IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly IUserService userService = userService;
 

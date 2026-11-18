@@ -8,6 +8,7 @@ using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Features;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors;
 using Discord_Bot.Processors.EmbedProcessors.LastFm;
@@ -67,15 +68,14 @@ public static class Startup
         _ = collection.AddSingleton(client);
         _ = collection.AddSingleton(interactions);
         _ = collection.AddSingleton(commands);
-        _ = collection.AddTransient<Config>(); //Configuration can be edited without stopping the program
+        _ = collection.AddTransient<IConfig, Config>(); //Configuration can be edited without stopping the program
         //One logger: the bot's code gets IBotLogger, App and BotWindow the concrete type (LogToFile, LogAdded)
         BotLogger logger = new();
         _ = collection.AddSingleton(logger);
         _ = collection.AddSingleton<IBotLogger>(logger);
 
         //Database layer: DbContext, server cache, DB services and repositories
-        Config config = new();
-        DatabaseStartup.ConfigureDatabaseServices(collection, () => config.SqlConnectionString);
+        DatabaseStartup.ConfigureDatabaseServices(collection, provider => provider.GetRequiredService<IConfig>().SqlConnectionString);
 
         TypeAdapterConfig mapsterConfig = new();
         new DatabaseMapperConfig().Register(mapsterConfig);

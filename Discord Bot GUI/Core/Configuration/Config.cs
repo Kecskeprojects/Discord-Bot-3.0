@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Discord_Bot.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System.IO;
 
 namespace Discord_Bot.Core.Configuration;
 
-public class Config
+public class Config : IConfig
 {
     private readonly IConfiguration configuration;
     public struct ConfigModel

@@ -3,8 +3,8 @@ using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using Discord;
 using Discord.Commands;
-using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.EmbedProcessors.Help;
 
 namespace Discord_Bot.Commands;
@@ -13,7 +13,7 @@ public class HelpCommands(
     CommandService commandService,
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseCommand(logger, config, serverService)
+    IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly CommandService commandService = commandService;
 

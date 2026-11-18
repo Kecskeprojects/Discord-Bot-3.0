@@ -3,7 +3,7 @@
 //using Discord.Net;
 //using Discord_Bot.Communication;
 //using Discord_Bot.Core;
-//using Discord_Bot.Core.Configuration;
+//using Discord_Bot.Interfaces;
 //using DatabaseORM.Interface;
 //using DatabaseORM.Interface.Service;
 //using Discord_Bot.Interfaces.Services;
@@ -24,7 +24,7 @@
 //    ITwitterScraper twitterScraper,
 //    IServerService serverService,
 //    IBotLogger logger,
-//    Config config) : BaseCommand(logger, config, serverService)
+//    IConfig config) : BaseCommand(logger, config, serverService)
 //{
 //    private readonly ITwitterScraper twitterScraper = twitterScraper;
 

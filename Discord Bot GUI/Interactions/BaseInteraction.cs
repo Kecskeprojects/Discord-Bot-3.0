@@ -4,16 +4,16 @@ using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
 using Discord.Interactions;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Tools;
 
 namespace Discord_Bot.Interactions;
 
-public class BaseInteraction(IServerService serverService, IBotLogger logger, Config config) : InteractionModuleBase<SocketInteractionContext>
+public class BaseInteraction(IServerService serverService, IBotLogger logger, IConfig config) : InteractionModuleBase<SocketInteractionContext>
 {
     private readonly IServerService serverService = serverService;
     protected readonly IBotLogger logger = logger;
-    protected readonly Config config = config;
+    protected readonly IConfig config = config;
 
     protected Task<bool> IsOwner()
     {

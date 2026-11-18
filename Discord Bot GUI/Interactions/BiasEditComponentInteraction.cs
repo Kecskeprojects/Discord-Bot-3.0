@@ -6,8 +6,8 @@ using Discord;
 using Discord.Interactions;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Communication.Modal;
-using Discord_Bot.Core.Configuration;
 using Discord_Bot.Enums;
+using Discord_Bot.Interfaces;
 using System.Globalization;
 
 namespace Discord_Bot.Interactions;
@@ -26,7 +26,7 @@ public class BiasEditComponentInteraction : BaseInteraction
         IIdolImageService idolImageService,
         IServerService serverService,
         IBotLogger logger,
-        Config config) : base(serverService, logger, config)
+        IConfig config) : base(serverService, logger, config)
     {
         Actions.Add(BiasEditActionTypeEnum.EditIdol, SendEditIdolModalAsync);
         Actions.Add(BiasEditActionTypeEnum.EditIdolExtended, CreateEditIdolExtendedModalAsync);

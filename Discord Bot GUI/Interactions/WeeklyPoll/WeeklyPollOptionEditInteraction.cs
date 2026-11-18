@@ -5,7 +5,7 @@ using DatabaseORM.Resources;
 using Discord;
 using Discord.Interactions;
 using Discord_Bot.Communication.Modal;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.EmbedProcessors.Polls;
 
 namespace Discord_Bot.Interactions.WeeklyPoll;
@@ -16,7 +16,7 @@ IWeeklyPollOptionService weeklyPollOptionService,
 IWeeklyPollService weeklyPollService,
 IServerService serverService,
 IBotLogger logger,
-Config config) : BaseInteraction(serverService, logger, config)
+IConfig config) : BaseInteraction(serverService, logger, config)
 {
     private readonly IWeeklyPollOptionPresetService weeklyPollOptionPresetService = weeklyPollOptionPresetService;
     private readonly IWeeklyPollOptionService weeklyPollOptionService = weeklyPollOptionService;

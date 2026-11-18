@@ -1,16 +1,16 @@
 ﻿using DatabaseORM.Interface;
 using Discord.Audio;
 using Discord_Bot.Communication;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.Services;
 using System.Diagnostics;
 using System.IO;
 
 namespace Discord_Bot.Services;
 
-public class YoutubeStreamService(Config config, IBotLogger logger) : IYoutubeDownloadService
+public class YoutubeStreamService(IConfig config, IBotLogger logger) : IYoutubeDownloadService
 {
-    private readonly Config config = config;
+    private readonly IConfig config = config;
     private readonly IBotLogger logger = logger;
 
     public async Task StreamAsync(ServerAudioResource audioResource, string url)

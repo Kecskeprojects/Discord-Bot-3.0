@@ -3,7 +3,7 @@ using Discord;
 using Discord.LibDave.Binding;
 using Discord.WebSocket;
 using Discord_Bot.Core;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Tools;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -60,7 +60,7 @@ public sealed class BotMain(
 
             using (IServiceScope scope = services.CreateScope())
             {
-                Config config = scope.ServiceProvider.GetRequiredService<Config>();
+                IConfig config = scope.ServiceProvider.GetRequiredService<IConfig>();
                 if (string.IsNullOrEmpty(config.Token))
                 {
                     logger.Error("BotMain.cs RunBotAsync", "Bot cannot start without a valid token, fill out the proper fields in the config file!");

@@ -4,7 +4,7 @@ using DatabaseORM.Interface.Service;
 using Discord;
 using Discord.Commands;
 using Discord_Bot.Core;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.EmbedProcessors;
 using Discord_Bot.Services.Models.Wotd;
@@ -19,7 +19,7 @@ public class UserWordOfTheDayCommands(
     IWordOfTheDayService wordOfTheDayService,
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseCommand(logger, config, serverService)
+    IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly IWordOfTheDayService wordOfTheDayService = wordOfTheDayService;
 

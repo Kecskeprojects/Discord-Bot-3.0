@@ -3,7 +3,7 @@ using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using Discord.Interactions;
 using Discord_Bot.Communication.Modal;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 
 namespace Discord_Bot.Interactions;
 
@@ -13,7 +13,7 @@ public class EditIdolModalInteraction(
     IIdolImageService idolImageService,
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseInteraction(serverService, logger, config)
+    IConfig config) : BaseInteraction(serverService, logger, config)
 {
     private readonly IIdolService idolService = idolService;
     private readonly IIdolGroupService idolGroupService = idolGroupService;

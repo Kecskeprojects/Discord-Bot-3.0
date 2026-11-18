@@ -12,7 +12,7 @@ Done and removed on 2026-11-17 (the investigations are in `git show 483c1fa:docs
 
 ## To check by hand
 
-- **Run the bot once against the dev database and Discord.** Since the last real run, the database layer moved into `DatabaseORM`, implicit usings were turned on, and Windows Forms was removed (2026-11-17).
+- **Run the bot once against the dev database and Discord.** Since the last real run, the database layer moved into `DatabaseORM`, implicit usings were turned on, and Windows Forms was removed (2026-11-17). Since then, `Startup.Run()` was split and `IConfig` added (2026-11-18).
   - What has been checked: builds, `dotnet format` and throwaway programs. Those resolved every DB service through the real `Startup.Run()`, ran `ProcessTools.GetStatistics()` (RAM figure, WMI child process count) and loaded a resx bitmap.
   - Worth a look in the window: the diagnostics line.
 - **Correct the scraped idol genders on the dev and the live database.**
@@ -69,9 +69,7 @@ The analyzer setup is done and described in CLAUDE.md ("Linting"). Left:
    - Fix: inject `TimeProvider` (built into .NET; `FakeTimeProvider` from `Microsoft.Extensions.TimeProvider.Testing` in tests), or pass `DateTime now` into the static helpers.
 2. **`Global` static state** (`ServerAudioResources`, `BiasGames`, `YoutubeApiKeys`). It is shared between tests and can't be reset cleanly.
    - Fix: move it into DI singletons (e.g. `BiasGameStore`, `AudioStateStore`, `YoutubeKeyStore`).
-3. **`Config`** is a concrete class whose constructor reads and writes `Assets/config.json` in the current directory, and 47 classes inject it.
-   - Fix: extract an `IConfig` interface (smallest change), or move to `IOptionsMonitor<BotOptions>`, which keeps reload-on-change.
-   - With it, `DatabaseStartup` should read the connection string from the container (a `Func<IServiceProvider, string>`, through `AddDbContext`'s overload that passes the provider). Today `Startup.ConfigureServices` creates a `Config` of its own for it, so replacing `IConfig` in a test wouldn't change the connection string.
+3. **`Config` (done 2026-11-18).** The 47 classes inject `IConfig` (`Interfaces/IConfig.cs`) instead, so tests mock it. `DatabaseStartup` takes the connection string as a `Func<IServiceProvider, string>` and `Startup` reads it through `IConfig`, so replacing `IConfig` in a test also replaces the database. Checked with a throwaway program: `ValidateOnBuild` passes on the real registrations, and a fake `IConfig` reached the DbContext.
 4. **Concrete Discord.Net socket types.** `BaseFeature`, `BaseCommand` and `DiscordTools` use `SocketCommandContext` / `SocketInteractionContext`, and several features inject `DiscordSocketClient`. Socket entities have internal constructors and can't be mocked.
    - Fix: use Discord.Net's own interfaces: `ICommandContext`, `IUser`, `IGuild`, `IMessageChannel`, and `IDiscordClient` (or a narrow wrapper like `IDiscordMessenger.SendDmAsync`) instead of `DiscordSocketClient`. `BaseCommand` could derive from `ModuleBase<ICommandContext>`.
 5. **Logic inside command bodies.** Commands parse, validate and branch (e.g. `UserReminderCommands.RemindIn`). Commands are the hardest thing to unit-test.
@@ -104,7 +102,7 @@ What has to be mockable so tests can leave out the database, the external APIs a
      - The fake handler picks the file by the `method=` parameter (and the page, for the paging helpers).
      - Use your own account's data, or replace the usernames.
      - Saved responses can drift from the live API, so re-record them when Last.fm changes a format.
-   - **Config:** until blocker 3 (`IConfig`) is done, a `LastFmAPI` test writes an `Assets/config.json` with a dummy `lastfm_api_key` into its working directory, which is where `Config` reads from.
+   - **Config:** a `LastFmAPI` test mocks `IConfig`; only `Lastfm_API_Key` is read.
    - **Spotify:** only artist stats use it (for the image); mock `ISpotifyAPI` there.
 2. **`BrowserService`** (Puppeteer, a concrete singleton) → `IBrowserService` (`OpenBrowser`, `CloseBrowser`, `NewPage`).
    - `BiasScrapingProcessor` (136 lines: matching scraped idols to the database, the group check, image changes) only uses it to close the browser at the end. With the interface it can be tested with mocked `IKpopDbScraper` and `IIdolService`.
@@ -121,7 +119,7 @@ What has to be mockable so tests can leave out the database, the external APIs a
    - This is blocker 4. The birthday, reminder, unmute and poll logic sits in those features, so it matters most for feature tests.
 
 No interface needed:
-- `Config` (47 classes): blocker 3 already covers it (`IConfig`).
+- `Config`: done, behind `IConfig` (blocker 3).
 - `ServerCache` (every DB service): it lives in memory, so tests use a real one.
 - `MainDbContext`: only the repositories use it. Mock the repository interfaces, or test the repositories against LocalDB (below).
 - `IMapper` is already an interface; tests build the real one (see above).
@@ -173,7 +171,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
 **The one enabler they share (done 2026-11-18):** `Startup.ConfigureServices(IServiceCollection)` registers everything, and `Startup.Run()` only builds the provider from it. A test calls `ConfigureServices` on its own collection and replaces only the edges:
 - the Last.fm `RestClient`
 - `ISpotifyAPI`, and other external services as needed
-- the connection string: through a test `Assets/config.json` until blocker 3, then through `IConfig` (see blocker 3)
+- the connection string, by replacing `IConfig` (see blocker 3)
 
 **Not worth it:**
 - A real Discord gateway: it would need a second bot account and a test server, and would be slow and flaky.
@@ -285,6 +283,10 @@ Can the disabled embeds be turned back on as they are, with adjustments and with
 
 ## Minor improvements
 
+- **`Config` as a singleton (investigated 2026-11-18):** `Config` is registered transient. Each instance builds its own configuration with `reloadOnChange`, which watches `Assets/` and is never disposed.
+  - Measured with a throwaway program: 500 instances held about 500 extra OS handles until a full garbage collection released them. So it isn't a leak, but each `Config` a command resolves keeps a handle open until the next collection.
+  - One long-lived `Config` picked up an edit to `config.json` within 1.5 seconds, so a singleton would still apply edits without a restart.
+  - The change: `AddSingleton<IConfig, Config>()` in `Startup`, and the "transient" note in CLAUDE.md.
 - **Generic `BaseService`** (`DatabaseORM/Service`): turn it into a generic class so simple DB calls need less boilerplate. Each service would still declare its own methods. `GenericRepository<T>` already exists on the repository side.
 - **Last.fm top tags:** a new command for `user.getTopTags`. That endpoint has no period or pagination.
 - **Last.fm artist stats image (found 2026-11-16):** `LastFmAPI.GetArtistDataAsync` picks the MBID from the albums when there are any, but always passes `tracks[0]`'s artist and track name to the Spotify search.

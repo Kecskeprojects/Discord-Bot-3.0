@@ -5,7 +5,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Bot.Core;
-using Discord_Bot.Core.Configuration;
+using Discord_Bot.Interfaces;
 using Discord_Bot.Tools;
 
 namespace Discord_Bot.Commands.User;
@@ -16,7 +16,7 @@ namespace Discord_Bot.Commands.User;
 public class UserRandomizeCommands(
     IServerService serverService,
     IBotLogger logger,
-    Config config) : BaseCommand(logger, config, serverService)
+    IConfig config) : BaseCommand(logger, config, serverService)
 {
     [Command("8ball")]
     [Summary("8ball game, takes in a question, returns a cryptic response")]
