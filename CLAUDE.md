@@ -87,7 +87,7 @@ Base URLs live in `Core/Constant.cs`.
 
 ## Architecture
 
-**Startup:** `App.OnStartup` → `Startup.Run()` (builds the DI container by hand; **every new feature, processor or external service must be registered there**, and every new DB service or repository in `DatabaseStartup.ConfigureDatabaseServices` in `DatabaseORM`, which `Startup` calls) → shows `BotWindow` → starts the Twitch monitor thread → `BotMain.RunBotAsync()` logs in and wires up `CommandHandler` and `InteractionHandler`.
+**Startup:** `App.OnStartup` → `Startup.Run()` (builds the DI container by hand from `Startup.ConfigureServices`, which tests reuse; **every new feature, processor or external service must be registered there**, and every new DB service or repository in `DatabaseStartup.ConfigureDatabaseServices` in `DatabaseORM`, which `ConfigureServices` calls) → shows `BotWindow` → starts the Twitch monitor thread → `BotMain.RunBotAsync()` logs in and wires up `CommandHandler` and `InteractionHandler`.
 
 **Scheduler:** a 1-minute `System.Timers.Timer` in `App.xaml.cs` reconnects the client if it is logged out, runs `ReminderFeature` and `UnmuteFeature` every tick, runs `BirthdayFeature`, `WeeklyPollFeature` and the YouTube key reset at 06:00 UTC, scrapes bias data on Mondays, and clears the window log at midnight UTC. Times are **UTC**.
 

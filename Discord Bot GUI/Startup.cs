@@ -24,6 +24,18 @@ public static class Startup
 {
     public static IServiceProvider Run()
     {
+        IServiceCollection collection = new ServiceCollection();
+        ConfigureServices(collection);
+
+        return collection.BuildServiceProvider();
+    }
+
+    /// <summary>
+    /// Registers everything the bot uses, apart from building the provider (<see cref="Run"/>),
+    /// so tests can reuse the real registrations and replace only the outside world.
+    /// </summary>
+    public static void ConfigureServices(IServiceCollection collection)
+    {
         DiscordSocketClient client = new(new DiscordSocketConfig()
         {
             EnableVoiceDaveEncryption = true,
@@ -50,8 +62,6 @@ public static class Startup
         {
             DefaultRunMode = Discord.Commands.RunMode.Sync
         });
-
-        IServiceCollection collection = new ServiceCollection();
 
         //Core
         _ = collection.AddSingleton(client);
@@ -117,7 +127,5 @@ public static class Startup
         _ = collection.AddTransient<IKpopDbScraper, KpopDbScraper>();
 
         _ = collection.AddLogging();
-
-        return collection.BuildServiceProvider();
     }
 }

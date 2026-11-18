@@ -71,6 +71,7 @@ The analyzer setup is done and described in CLAUDE.md ("Linting"). Left:
    - Fix: move it into DI singletons (e.g. `BiasGameStore`, `AudioStateStore`, `YoutubeKeyStore`).
 3. **`Config`** is a concrete class whose constructor reads and writes `Assets/config.json` in the current directory, and 47 classes inject it.
    - Fix: extract an `IConfig` interface (smallest change), or move to `IOptionsMonitor<BotOptions>`, which keeps reload-on-change.
+   - With it, `DatabaseStartup` should read the connection string from the container (a `Func<IServiceProvider, string>`, through `AddDbContext`'s overload that passes the provider). Today `Startup.ConfigureServices` creates a `Config` of its own for it, so replacing `IConfig` in a test wouldn't change the connection string.
 4. **Concrete Discord.Net socket types.** `BaseFeature`, `BaseCommand` and `DiscordTools` use `SocketCommandContext` / `SocketInteractionContext`, and several features inject `DiscordSocketClient`. Socket entities have internal constructors and can't be mocked.
    - Fix: use Discord.Net's own interfaces: `ICommandContext`, `IUser`, `IGuild`, `IMessageChannel`, and `IDiscordClient` (or a narrow wrapper like `IDiscordMessenger.SendDmAsync`) instead of `DiscordSocketClient`. `BaseCommand` could derive from `ModuleBase<ICommandContext>`.
 5. **Logic inside command bodies.** Commands parse, validate and branch (e.g. `UserReminderCommands.RemindIn`). Commands are the hardest thing to unit-test.
@@ -169,17 +170,17 @@ Yes, the bot's test project can run integration tests: real services wired toget
    - This needs blocker 4 first. `BaseCommand` derives from `ModuleBase<SocketCommandContext>`, so a non-socket context fails; deriving from `ModuleBase<ICommandContext>` fixes that.
    - Interactions (buttons, modals) work the same way through `InteractionService`, with the same prerequisite.
 
-**The one enabler they share:** split `Startup.Run()` into a method that registers everything on an `IServiceCollection` and one that builds it. A test then reuses the real registrations and replaces only the edges:
+**The one enabler they share (done 2026-11-18):** `Startup.ConfigureServices(IServiceCollection)` registers everything, and `Startup.Run()` only builds the provider from it. A test calls `ConfigureServices` on its own collection and replaces only the edges:
 - the Last.fm `RestClient`
 - `ISpotifyAPI`, and other external services as needed
-- the connection string, through a test `Assets/config.json`, or a `Func<string>` straight into `DatabaseStartup`
+- the connection string: through a test `Assets/config.json` until blocker 3, then through `IConfig` (see blocker 3)
 
 **Not worth it:**
 - A real Discord gateway: it would need a second bot account and a test server, and would be slow and flaky.
 - Live external APIs as part of the normal run. An optional, opt-in live Last.fm test (a trait, a real key, network) could warn when a saved response no longer matches the real format.
 
 **Where:**
-- Keep them in `Discord Bot GUI.Tests`, marked `[Trait("Category", "Integration")]`. Then `dotnet test --filter "Category!=Integration"` stays the quick run.
+- Keep them in `Discord Bot GUI.Tests` under `Integration/` (see "Project setup"), marked `[Trait("Category", "Integration")]`. Then `dotnet test --filter "Category!=Integration"` stays the quick run.
 - Move them to their own project if the LocalDB setup grows.
 - DB-only integration tests can also go in `DatabaseORM.Tests`.
 
@@ -188,12 +189,17 @@ Yes, the bot's test project can run integration tests: real services wired toget
 - **Two test projects fit the split:**
   - `DatabaseORM.Tests`, plain `net11.0`: DB services, the Mapster mappings, `ServerCache`, the DB tools.
   - `Discord Bot GUI.Tests`, `net11.0-windows10.0.19041.0`, x64, `win-x64`, referencing the bot: tools, processors, features. Referencing a WinExe/WPF project from a test project works; it may need `<UseWPF>true</UseWPF>`.
+- **Folder layout (decided 2026-11-18),** in each test project:
+  - `Unit/` mirrors the folders of the project under test (`Unit/Tools/` for `Tools/`, and so on).
+  - `Integration/` is grouped by theme instead (e.g. `Music/`, `LastFm/`, `Bias/`).
+  - `Mocks/` holds the fakes and mocks, organized by what they stand in for.
+  - Shared constants and helpers keep repetition down, so the tests stay readable and maintainable by hand. Where they live is still open.
 - **Reaching `DatabaseORM`'s internals:** add `[assembly: InternalsVisibleTo("DatabaseORM.Tests")]` to `DatabaseORM` (the repositories, the concrete services, `ServerCache` and the DB tools are `internal`).
   - Mocking an internal interface with NSubstitute or Moq also needs `[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]`.
 - **Shared setup:** `Directory.Build.props` and the root `.editorconfig` apply automatically (analyzers, warnings as errors, banned APIs, CRLF, the BOM rule). Each test project needs its own `<Nullable>enable</Nullable>` and `<ImplicitUsings>enable</ImplicitUsings>`, like the other projects.
 - **Packages:** xUnit v3 (or MSTest / NUnit), NSubstitute (or Moq), `Microsoft.Extensions.TimeProvider.Testing`.
 - **Suggested order:**
-  1. Static tools and Mapster mapping tests, with no code changes. Then split `Startup.Run()` and add the DI composition test.
+  1. Static tools and Mapster mapping tests, with no code changes. Then the DI composition test on `Startup.ConfigureServices`.
   2. DB services with mocked repositories.
   3. `LastFmApi` made instance-based with the injected client. Then tests for `LastFmApi` and the bot's `LastFmAPI` against saved responses, run in parallel. They go in `Discord Bot GUI.Tests`, which reaches `LastFmApi` through the bot.
   4. Integration tests: the DB layer on LocalDB, and Last.fm through the real container.
