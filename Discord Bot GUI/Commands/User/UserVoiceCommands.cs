@@ -6,6 +6,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Bot.Communication;
+using Discord_Bot.Core;
 using Discord_Bot.Features;
 using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.EmbedProcessors.Audio;
@@ -19,12 +20,14 @@ namespace Discord_Bot.Commands.User;
 public class UserVoiceCommands(
     AudioPlayFeature audioPlayFeature,
     AudioRequestFeature audioRequestFeature,
+    AudioStateStore audioStates,
     IServerService serverService,
     IBotLogger logger,
     IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly AudioPlayFeature audioPlayFeature = audioPlayFeature;
     private readonly AudioRequestFeature audioRequestFeature = audioRequestFeature;
+    private readonly AudioStateStore audioStates = audioStates;
 
     [Command("play")]
     [Alias(["p"])]
@@ -34,7 +37,7 @@ public class UserVoiceCommands(
     {
         try
         {
-            ServerAudioResource audioResource = GetCurrentAudioResource();
+            ServerAudioResource audioResource = audioStates.GetOrAdd(Context.Guild.Id);
             if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText))
             {
                 return;
@@ -66,7 +69,7 @@ public class UserVoiceCommands(
     {
         try
         {
-            ServerAudioResource audioResource = GetCurrentAudioResource();
+            ServerAudioResource audioResource = audioStates.GetOrAdd(Context.Guild.Id);
             if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText))
             {
                 return;
@@ -98,7 +101,7 @@ public class UserVoiceCommands(
     {
         try
         {
-            ServerAudioResource audioResource = GetCurrentAudioResource();
+            ServerAudioResource audioResource = audioStates.GetOrAdd(Context.Guild.Id);
             if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText) || audioResource.MusicRequests.Count == 0)
             {
                 return;
@@ -128,7 +131,7 @@ public class UserVoiceCommands(
     {
         try
         {
-            ServerAudioResource audioResource = GetCurrentAudioResource();
+            ServerAudioResource audioResource = audioStates.GetOrAdd(Context.Guild.Id);
             if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText) || audioResource.MusicRequests.Count == 0)
             {
                 return;
@@ -151,7 +154,7 @@ public class UserVoiceCommands(
     {
         try
         {
-            ServerAudioResource audioResource = GetCurrentAudioResource();
+            ServerAudioResource audioResource = audioStates.GetOrAdd(Context.Guild.Id);
             if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText) || audioResource.MusicRequests.Count == 0)
             {
                 return;
@@ -176,7 +179,7 @@ public class UserVoiceCommands(
     {
         try
         {
-            ServerAudioResource audioResource = GetCurrentAudioResource();
+            ServerAudioResource audioResource = audioStates.GetOrAdd(Context.Guild.Id);
             if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText) || audioResource.MusicRequests.Count == 0)
             {
                 return;
@@ -200,7 +203,7 @@ public class UserVoiceCommands(
     {
         try
         {
-            ServerAudioResource audioResource = GetCurrentAudioResource();
+            ServerAudioResource audioResource = audioStates.GetOrAdd(Context.Guild.Id);
             if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText) || position < 1 || position >= audioResource.MusicRequests.Count)
             {
                 return;
@@ -223,7 +226,7 @@ public class UserVoiceCommands(
     {
         try
         {
-            ServerAudioResource audioResource = GetCurrentAudioResource();
+            ServerAudioResource audioResource = audioStates.GetOrAdd(Context.Guild.Id);
             if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText) || audioResource.MusicRequests.Count < 2)
             {
                 return;

@@ -3,6 +3,7 @@ using DatabaseORM.Interface.Service;
 using Discord;
 using Discord.WebSocket;
 using Discord_Bot.Communication;
+using Discord_Bot.Core;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.EmbedProcessors.Audio;
@@ -12,11 +13,13 @@ namespace Discord_Bot.Features;
 public class AudioRequestFeature(
     IYoutubeAPI youtubeAPI,
     ISpotifyAPI spotifyAPI,
+    AudioStateStore audioStates,
     IServerService serverService,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IYoutubeAPI youtubeAPI = youtubeAPI;
     private readonly ISpotifyAPI spotifyAPI = spotifyAPI;
+    private readonly AudioStateStore audioStates = audioStates;
 
     protected override async Task<bool> ExecuteCoreLogicAsync()
     {
@@ -39,7 +42,7 @@ public class AudioRequestFeature(
                 _ = await Context.Channel.SendMessageAsync(result.ToMessageString());
                 return false;
             }
-            ServerAudioResource audioResource = GetCurrentAudioResource();
+            ServerAudioResource audioResource = audioStates.GetOrAdd(Context.Guild.Id);
             //Make embedded message if result was not a playlist and it's not the first song
             if (audioResource.MusicRequests.Count > 1)
             {

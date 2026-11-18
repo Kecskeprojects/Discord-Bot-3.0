@@ -4,7 +4,6 @@ using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
 using Discord.Commands;
-using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces;
 using Discord_Bot.Tools;
@@ -58,16 +57,6 @@ public class BaseCommand(IBotLogger logger, IConfig config, IServerService serve
 
         ServerResource server = await GetCurrentServerAsync();
         return DiscordTools.IsTypeOfChannel(server, type, Context.Channel.Id, allowLackOfType);
-    }
-
-    protected ServerAudioResource GetCurrentAudioResource()
-    {
-        if (!Global.ServerAudioResources.TryGetValue(Context.Guild.Id, out ServerAudioResource? audioResource))
-        {
-            audioResource = new(Context.Guild.Id);
-            _ = Global.ServerAudioResources.TryAdd(Context.Guild.Id, audioResource);
-        }
-        return audioResource;
     }
 
     protected static string[] GetParametersBySplit(string parameters, char splitCharacter = '>', bool toLower = true)

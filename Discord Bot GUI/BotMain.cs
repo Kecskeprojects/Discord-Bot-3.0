@@ -14,6 +14,7 @@ public sealed class BotMain(
     InteractionHandler interactionHandler,
     CommandHandler commandHandler,
     DiscordSocketClient client,
+    AudioStateStore audioStates,
     IBotLogger logger) : IDisposable
 {
     #region Variables
@@ -21,6 +22,7 @@ public sealed class BotMain(
     private readonly InteractionHandler interactionHandler = interactionHandler;
     private readonly CommandHandler commandHandler = commandHandler;
     private readonly DiscordSocketClient client = client;
+    private readonly AudioStateStore audioStates = audioStates;
     private readonly IBotLogger logger = logger;
 
     //Stops the startup call and the reconnect timer from logging in at the same time
@@ -129,10 +131,7 @@ public sealed class BotMain(
 
                     if (arg.Exception.ToString().Contains("The server sent close 1001"))
                     {
-                        foreach (KeyValuePair<ulong, Communication.ServerAudioResource> item in Global.ServerAudioResources)
-                        {
-                            item.Value.AudioVariables.CancellationTokenSource?.Cancel(false);
-                        }
+                        audioStates.CancelAll();
                     }
 
                     logger.Client($"{message}!", ConsoleOnly: true);

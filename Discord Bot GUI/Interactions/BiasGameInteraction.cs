@@ -17,6 +17,7 @@ namespace Discord_Bot.Interactions;
 public class BiasGameInteraction(
     IIdolService idolService,
     BiasGameImageProcessor biasGameImageProcessor,
+    BiasGameStore biasGames,
     TimeProvider timeProvider,
     IServerService serverService,
     IBotLogger logger,
@@ -24,6 +25,7 @@ public class BiasGameInteraction(
 {
     private readonly IIdolService idolService = idolService;
     private readonly BiasGameImageProcessor biasGameImageProcessor = biasGameImageProcessor;
+    private readonly BiasGameStore biasGames = biasGames;
     private readonly TimeProvider timeProvider = timeProvider;
 
     [ComponentInteraction("BiasGame_Setup_Gender_*_*")]
@@ -31,7 +33,7 @@ public class BiasGameInteraction(
     {
         try
         {
-            if (Context.User.Id != userId || !Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData? data))
+            if (Context.User.Id != userId || !biasGames.TryGet(Context.User.Id, out BiasGameData? data))
             {
                 await RespondAsync("You are not the owner of this interaction.", ephemeral: true);
                 return;
@@ -59,7 +61,7 @@ public class BiasGameInteraction(
         catch (Exception ex)
         {
             logger.Error("BiasGameInteraction.cs GenderChosen", ex);
-            _ = Global.BiasGames.TryRemove(Context.User.Id, out _);
+            biasGames.Remove(Context.User.Id);
             await RespondOrFollowupAsync("Failure during setup!");
         }
     }
@@ -69,7 +71,7 @@ public class BiasGameInteraction(
     {
         try
         {
-            if (Context.User.Id != userId || !Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData? data))
+            if (Context.User.Id != userId || !biasGames.TryGet(Context.User.Id, out BiasGameData? data))
             {
                 await RespondAsync("You are not the owner of this interaction.", ephemeral: true);
                 return;
@@ -126,7 +128,7 @@ public class BiasGameInteraction(
         catch (Exception ex)
         {
             logger.Error("BiasGameInteraction.cs DebutChosen", ex);
-            _ = Global.BiasGames.TryRemove(Context.User.Id, out _);
+            biasGames.Remove(Context.User.Id);
             await RespondOrFollowupAsync("Failure during setup!");
         }
     }
@@ -141,7 +143,7 @@ public class BiasGameInteraction(
             await DeleteOriginalResponseAsync();
 
             _ = await FollowupAsync("Not enough idols with your selected parameters!");
-            _ = Global.BiasGames.TryRemove(Context.User.Id, out _);
+            biasGames.Remove(Context.User.Id);
             return false;
         }
 

@@ -12,7 +12,7 @@ Done and removed on 2026-11-17 (the investigations are in `git show 483c1fa:docs
 
 ## To check by hand
 
-- **Run the bot once against the dev database and Discord.** Since the last real run, the database layer moved into `DatabaseORM`, implicit usings were turned on, and Windows Forms was removed (2026-11-17). Since then, `Startup.Run()` was split, `IConfig` added and `TimeProvider` injected (2026-11-18). Worth a try: a reminder (`!remind in 1m>test`), a short mute, a self-role request, and music until the inactivity disconnect.
+- **Run the bot once against the dev database and Discord.** Since the last real run, the database layer moved into `DatabaseORM`, implicit usings were turned on, and Windows Forms was removed (2026-11-17). Since then, `Startup.Run()` was split, `IConfig` added, `TimeProvider` injected and `Global` replaced by the state stores (2026-11-18). Worth a try: a reminder (`!remind in 1m>test`), a short mute, a self-role request, a bias game (start, stop, and one played to the end), and music (a YouTube search, a playlist link, and waiting until the inactivity disconnect).
   - What has been checked: builds, `dotnet format` and throwaway programs. Those resolved every DB service through the real `Startup.Run()`, ran `ProcessTools.GetStatistics()` (RAM figure, WMI child process count) and loaded a resx bitmap.
   - Worth a look in the window: the diagnostics line.
 - **Correct the scraped idol genders on the dev and the live database.**
@@ -72,14 +72,20 @@ The analyzer setup is done and described in CLAUDE.md ("Linting"). Left:
    - The birthday and "already muted" queries used to compare against `GETUTCDATE()` on the SQL server; they now send the bot's own UTC time as a parameter. That only differs if the two machines' clocks disagree.
    - **Left on the system clock:**
      - The scheduler's decisions in `App.OnTimedEvent` (06:00, midnight, Mondays). `App` is the WPF application and can't be tested; move those decisions into a plain class with `TimeProvider` if they need tests.
-     - The bias game's 30-minute expiry (`UserBiasGameCommands`, `BiasGameData.StartedAt`). It moves with `Global.BiasGames` (blocker 2).
      - The "Days Of Week" poll options: the Mapster mapping passes `DateTime.UtcNow` to `WeeklyPollTools`, which is testable on its own.
      - The delays in the scrapers, `YoutubeStreamService` and `ProcessTools`, which are in code that isn't unit-tested.
    - The waits in the features use `Task.Delay(delay, timeProvider)` (done 2026-11-18): both in `AudioPlayFeature` (the wait for new requests and the pause for too-short videos), `YoutubeAddPlaylistFeature`'s polling for the user's answer, and `SelfRoleFeature`'s 1.5 seconds before deleting its reply. A fake clock skips them; with `TimeProvider.System` they wait as before.
    - Tests use `FakeTimeProvider` from `Microsoft.Extensions.TimeProvider.Testing`.
-2. **`Global` static state** (`ServerAudioResources`, `BiasGames`, `YoutubeApiKeys`). It is shared between tests and can't be reset cleanly.
-   - Fix: move it into DI singletons (e.g. `BiasGameStore`, `AudioStateStore`, `YoutubeKeyStore`).
-   - Give the bias game store `TimeProvider`, and move the 30-minute expiry from `UserBiasGameCommands` into it, with the start time set from the same clock (today `BiasGameData.StartedAt` defaults to `DateTime.UtcNow`).
+2. **`Global` static state (done 2026-11-18, described in CLAUDE.md "Shared state").** `Core/Global.cs` is replaced by three singletons in `Core/`: `AudioStateStore`, `BiasGameStore` and `YoutubeKeyStore`.
+   - `GetCurrentAudioResource` left `BaseCommand` and `BaseFeature`. `UserVoiceCommands` and the two audio features inject `AudioStateStore` instead, so the other commands' constructors are unchanged.
+   - `BiasGameStore.TryStart` owns the 30-minute expiry, with `TimeProvider`. `BiasGameData` takes its start time in the constructor.
+   - Checked with a throwaway program: the container validates and all 34 modules construct. The expiry holds at 29 minutes and lets a new game start at 31. The rotation uses each key once, the audio store hands out one instance per server, and `CancelAll` cancels the playback.
+   - **Behavior changes:**
+     - Abandoned games (replaced after 30 minutes, or ended by an error) are now disposed; before, they were left to the garbage collector.
+     - Two "bias game" commands at the same moment now give one game and "You already have a game going!", instead of two games.
+     - The audio state of a server is created atomically (`GetOrAdd`). Before, a lost race returned an instance that wasn't stored.
+     - The key rotation keeps the key string itself. Before, it kept an index into the config's key list, but picked it from the number of keys left, so it could choose a used-up key again or one past the end.
+     - Keys edited in `config.json` apply at the next refill (06:00 UTC or a restart). A duplicate key counts once instead of throwing at startup.
 3. **`Config` (done 2026-11-18).** The 47 classes inject `IConfig` (`Interfaces/IConfig.cs`) instead, so tests mock it. `DatabaseStartup` takes the connection string as a `Func<IServiceProvider, string>` and `Startup` reads it through `IConfig`, so replacing `IConfig` in a test also replaces the database. Checked with a throwaway program: `ValidateOnBuild` passes on the real registrations, and a fake `IConfig` reached the DbContext.
 4. **Concrete Discord.Net socket types.** `BaseFeature`, `BaseCommand` and `DiscordTools` use `SocketCommandContext` / `SocketInteractionContext`, and several features inject `DiscordSocketClient`. Socket entities have internal constructors and can't be mocked.
    - Fix: use Discord.Net's own interfaces: `ICommandContext`, `IUser`, `IGuild`, `IMessageChannel`, and `IDiscordClient` (or a narrow wrapper like `IDiscordMessenger.SendDmAsync`) instead of `DiscordSocketClient`. `BaseCommand` could derive from `ModuleBase<ICommandContext>`.
@@ -123,7 +129,10 @@ What has to be mockable so tests can leave out the database, the external APIs a
    - `WhoKnowsImageProcessor` needs an interface too, so `LastFmWhoKnowsEmbedProcessor` (88 lines: download, draw, fall back to a plain embed) can be tested without Magick.NET.
 4. **YouTube.** `YoutubeAPI` (320 lines: watch, playlist and youtu.be links, keyword search with filtering, the playlist import, key rotation and quota counting) creates a `YouTubeService` for every search.
    - Fix: a small `IYoutubeDataClient` wrapping the three calls it makes (videos by ID, search, playlist items), and an interface for `YoutubeAddPlaylistFeature`, which waits for the user's answer in Discord.
-   - The key quotas and the music queue are in `Global` (blocker 2).
+   - The key quotas and the music queue are in `YoutubeKeyStore` and `AudioStateStore`; tests use real ones.
+   - **The key rotation never runs (found 2026-11-18).** `Searching` switches keys when it catches a "quotaExceeded" exception, but `VideoSearch`, `KeywordSearch` and `PlaylistSearch` catch every exception from `ExecuteAsync`, log it and return "not found". Until the 06:00 UTC refill, every search on a used-up key fails, even when other keys have quota.
+     - Fix: let quota errors (`Google.GoogleApiException` with reason `quotaExceeded`) out of the three searches, so `Searching` can switch keys and retry. Today's string match on `ex.ToString()` could then check the exception's error reason instead.
+   - The quota units counted per key (`YoutubeKeyStore.AddUsage`) are never read. They could decide which key to use next, or show in the diagnostics; otherwise drop them.
 5. **Spotify.** `SpotifyAPI` (201 lines: link handling, playlist or album → search terms, the image search fallback) builds a `SpotifyClient` on every call.
    - SpotifyAPI.Web already has `ISpotifyClient`, so no interface of our own is needed. Inject that, through a small factory if credential edits in `config.json` should still apply without a restart.
 6. **`DiscordSocketClient`**, injected into `BotMain`, `CommandHandler`, `InteractionHandler`, `DiscordTools` and seven features: `BirthdayFeature`, `ReminderFeature`, `UnmuteFeature`, `WeeklyPollFeature`, `TwitchNotificationFeature`, `EasterEggFeature`, `YoutubeAddPlaylistFeature`.
@@ -213,7 +222,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
   3. `LastFmApi` made instance-based with the injected client. Then tests for `LastFmApi` and the bot's `LastFmAPI` against saved responses, run in parallel. They go in `Discord Bot GUI.Tests`, which reaches `LastFmApi` through the bot.
   4. Integration tests: the DB layer on LocalDB, and Last.fm through the real container.
   5. `IBrowserService` and `IWebTools`; then `BiasScrapingProcessor` and the who-knows embed.
-  6. `Global` moved into DI (`TimeProvider` is done); then the features.
+  6. The features (`TimeProvider` and the state stores are done).
   7. The Discord interfaces, then whole-command integration tests.
   8. YouTube and Spotify.
 

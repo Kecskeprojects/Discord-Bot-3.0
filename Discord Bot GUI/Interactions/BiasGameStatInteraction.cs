@@ -13,11 +13,13 @@ namespace Discord_Bot.Interactions;
 
 public class BiasGameStatInteraction(
     IUserService userService,
+    BiasGameStore biasGames,
     IServerService serverService,
     IBotLogger logger,
     IConfig config) : BaseInteraction(serverService, logger, config)
 {
     private readonly IUserService userService = userService;
+    private readonly BiasGameStore biasGames = biasGames;
 
     [ComponentInteraction("BiasStats_Gender_*_*_*")]
     public async Task GenderChosen(GenderEnum chosenGender, GenderEnum currentGender, ulong userId)
@@ -61,7 +63,7 @@ public class BiasGameStatInteraction(
         catch (Exception ex)
         {
             logger.Error("BiasGameStatInteraction.cs GenderChosen", ex);
-            _ = Global.BiasGames.TryRemove(Context.User.Id, out _);
+            biasGames.Remove(Context.User.Id);
             await RespondOrFollowupAsync("Failure during stat collection!");
         }
     }

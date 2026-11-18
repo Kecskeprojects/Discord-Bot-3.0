@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Features;
 using Discord_Bot.Interfaces;
@@ -73,10 +72,7 @@ public sealed partial class App : Application, IDisposable
         {
             logger.Log("Application closing...");
 
-            foreach (ServerAudioResource audioResource in Global.ServerAudioResources.Values)
-            {
-                audioResource.AudioVariables.CancellationTokenSource?.Cancel(false);
-            }
+            services.GetRequiredService<AudioStateStore>().CancelAll();
 
             //Without this the bot stays visible as online until Discord times the session out
             if (botService != null)
@@ -130,7 +126,7 @@ public sealed partial class App : Application, IDisposable
             logger.Log("App started!");
 
             IConfig config = scope.ServiceProvider.GetRequiredService<IConfig>();
-            YoutubeAPI.KeyReset(config.Youtube_API_Keys);
+            scope.ServiceProvider.GetRequiredService<YoutubeKeyStore>().Reset(config.Youtube_API_Keys);
         }
 
         twitchThread = new Thread(new ThreadStart(StartTwitchMonitor));
@@ -178,7 +174,7 @@ public sealed partial class App : Application, IDisposable
                     _ = await weeklyPollFeature.Run();
 
                     IConfig config = scope.ServiceProvider.GetRequiredService<IConfig>();
-                    YoutubeAPI.KeyReset(config.Youtube_API_Keys);
+                    scope.ServiceProvider.GetRequiredService<YoutubeKeyStore>().Reset(config.Youtube_API_Keys);
                     logger.Log("Youtube keys reset!");
 
                     //Only on a monday

@@ -16,6 +16,7 @@ public class BiasGameStepInteraction(
     IIdolService idolService,
     BiasGameWinnerBracketImageProcessor biasGameWinnerBracketImageProcessor,
     IUserIdolStatisticService userIdolStatisticService,
+    BiasGameStore biasGames,
     IServerService serverService,
     IBotLogger logger,
     IConfig config) : BaseInteraction(serverService, logger, config)
@@ -23,13 +24,14 @@ public class BiasGameStepInteraction(
     private readonly IIdolService idolService = idolService;
     private readonly BiasGameWinnerBracketImageProcessor biasGameWinnerBracketImageProcessor = biasGameWinnerBracketImageProcessor;
     private readonly IUserIdolStatisticService userIdolStatisticService = userIdolStatisticService;
+    private readonly BiasGameStore biasGames = biasGames;
 
     [ComponentInteraction("BiasGame_Next_*_*")]
     public async Task BiasGameNext(int idolId, ulong userId)
     {
         try
         {
-            if (Context.User.Id != userId || !Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData? data))
+            if (Context.User.Id != userId || !biasGames.TryGet(Context.User.Id, out BiasGameData? data))
             {
                 await RespondAsync("You are not the owner of this interaction.", ephemeral: true);
                 return;
@@ -90,7 +92,7 @@ public class BiasGameStepInteraction(
         catch (Exception ex)
         {
             logger.Error("BiasGameStepInteraction.cs BiasGameNext", ex);
-            _ = Global.BiasGames.TryRemove(Context.User.Id, out _);
+            biasGames.Remove(Context.User.Id);
             await RespondOrFollowupAsync("Failure during preparing next step!");
         }
     }
@@ -120,7 +122,6 @@ public class BiasGameStepInteraction(
         }
 
         await userIdolStatisticService.UpdateUserStatisticsAsync(data.UserId, data.Ranking);
-        data.Dispose();
-        _ = Global.BiasGames.TryRemove(data.UserId, out _);
+        biasGames.Remove(data.UserId);
     }
 }

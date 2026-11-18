@@ -16,11 +16,13 @@ namespace Discord_Bot.Commands.User;
 [Summary("Elimination tournament to decide your favorite idol")]
 public class UserBiasGameCommands(
     IUserService userService,
+    BiasGameStore biasGames,
     IServerService serverService,
     IBotLogger logger,
     IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly IUserService userService = userService;
+    private readonly BiasGameStore biasGames = biasGames;
 
     [Command("bias game")]
     [Alias(["bg", "biasgame"])]
@@ -34,17 +36,12 @@ public class UserBiasGameCommands(
                 return;
             }
 
-            if (Global.BiasGames.TryGetValue(Context.User.Id, out BiasGameData? data))
+            if (biasGames.TryStart(Context.User.Id) == null)
             {
-                if (data.StartedAt > DateTime.UtcNow.AddMinutes(-30))
-                {
-                    _ = await ReplyAsync("You already have a game going!");
-                    return;
-                }
-                _ = Global.BiasGames.TryRemove(Context.User.Id, out _);
+                _ = await ReplyAsync("You already have a game going!");
+                return;
             }
 
-            _ = Global.BiasGames.TryAdd(Context.User.Id, new BiasGameData(Context.User.Id));
             Embed[] embed = BiasGameGenderEmbedProcessor.CreateEmbed(GetCurrentUserNickname(), GetCurrentUserAvatar());
             MessageComponent components = BiasGameGenderEmbedProcessor.CreateComponent(Context.User.Id);
 
@@ -75,9 +72,9 @@ public class UserBiasGameCommands(
                 return;
             }
 
-            if (Global.BiasGames.TryRemove(Context.User.Id, out BiasGameData? data))
+            using (BiasGameData? data = biasGames.Take(Context.User.Id))
             {
-                using (data)
+                if (data != null)
                 {
                     _ = await ReplyAsync("Game stopped!");
                     await Context.Channel.DeleteMessageAsync(data.MessageId);

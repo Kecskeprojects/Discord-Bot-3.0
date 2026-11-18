@@ -8,16 +8,17 @@ namespace Discord_Bot.Communication.Bias;
 //No finalizer: it holds only managed streams, which clean up after themselves
 public sealed partial class BiasGameData : IDisposable
 {
-    public BiasGameData(ulong userId)
+    public BiasGameData(ulong userId, DateTime startedAt)
     {
         UserId = userId;
+        StartedAt = startedAt;
         Resource.winner_bracket.Save(WinnerBracket, System.Drawing.Imaging.ImageFormat.Png);
     }
 
     private bool isDisposed;
 
     public ulong UserId { get; private set; }
-    public DateTime StartedAt { get; private set; } = DateTime.UtcNow;
+    public DateTime StartedAt { get; private set; }
     public GenderEnum Gender { get; set; }
     public int DebutYearStart { get; private set; }
     public int DebutYearEnd { get; private set; }

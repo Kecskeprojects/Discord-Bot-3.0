@@ -3,8 +3,6 @@ using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord.Commands;
-using Discord_Bot.Communication;
-using Discord_Bot.Core;
 using Discord_Bot.Tools;
 
 namespace Discord_Bot.Features;
@@ -46,16 +44,6 @@ public abstract class BaseFeature(IServerService serverService, IBotLogger logge
     }
 
     protected abstract Task<bool> ExecuteCoreLogicAsync();
-
-    protected ServerAudioResource GetCurrentAudioResource()
-    {
-        if (!Global.ServerAudioResources.TryGetValue(Context.Guild.Id, out ServerAudioResource? audioResource))
-        {
-            audioResource = new(Context.Guild.Id);
-            _ = Global.ServerAudioResources.TryAdd(Context.Guild.Id, audioResource);
-        }
-        return audioResource;
-    }
 
     protected async Task<ServerResource> GetCurrentServerAsync()
     {

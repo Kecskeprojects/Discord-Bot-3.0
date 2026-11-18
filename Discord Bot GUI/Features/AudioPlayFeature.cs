@@ -4,6 +4,7 @@ using DatabaseORM.Interface.Service;
 using Discord.Commands;
 using Discord.WebSocket;
 using Discord_Bot.Communication;
+using Discord_Bot.Core;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.Services;
@@ -13,17 +14,19 @@ namespace Discord_Bot.Features;
 
 public class AudioPlayFeature(
     IYoutubeDownloadService youtubeDownloadService,
+    AudioStateStore audioStates,
     IConfig config,
     TimeProvider timeProvider,
     IServerService serverService,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IYoutubeDownloadService youtubeStreamService = youtubeDownloadService;
+    private readonly AudioStateStore audioStates = audioStates;
     private readonly TimeProvider timeProvider = timeProvider;
 
     protected override async Task<bool> ExecuteCoreLogicAsync()
     {
-        ServerAudioResource audioResource = GetCurrentAudioResource();
+        ServerAudioResource audioResource = audioStates.GetOrAdd(Context.Guild.Id);
         try
         {
             while (audioResource.MusicRequests.Count > 0)

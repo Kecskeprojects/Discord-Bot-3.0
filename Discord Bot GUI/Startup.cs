@@ -70,6 +70,10 @@ public static class Startup
         _ = collection.AddSingleton(commands);
         _ = collection.AddTransient<IConfig, Config>(); //Configuration can be edited without stopping the program
         _ = collection.AddSingleton(TimeProvider.System); //Tests replace it with a FakeTimeProvider
+        //In-memory state shared by every command, interaction and feature, lost on restart
+        _ = collection.AddSingleton<AudioStateStore>();
+        _ = collection.AddSingleton<BiasGameStore>();
+        _ = collection.AddSingleton<YoutubeKeyStore>();
         //One logger: the bot's code gets IBotLogger, App and BotWindow the concrete type (LogToFile, LogAdded)
         BotLogger logger = new();
         _ = collection.AddSingleton(logger);

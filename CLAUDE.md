@@ -76,7 +76,7 @@ Build the projects rather than the `.sln`, because the solution includes `MainDB
 | SQL Server | EF Core, `sql_connection_string` | Schema from `MainDB/` |
 | Last.fm | `LastFmApi` project + `Services/LastFmAPI.cs` | `lastfm_artist_input_replacement` in the config rewrites artist names. Check `IsSuccess` before reading a `GenericResponseItem`'s `Response` |
 | Spotify | SpotifyAPI.Web | Client credentials from the config |
-| YouTube Data API | Google.Apis.YouTube.v3 | **Several keys rotated** by quota through `Global.YoutubeApiKeys`; reset daily by `YoutubeAPI.KeyReset` |
+| YouTube Data API | Google.Apis.YouTube.v3 | **Several keys rotated** by quota through `YoutubeKeyStore`, refilled daily at 06:00 UTC, so edited keys apply then |
 | Twitch | TwitchLib `LiveStreamMonitor` (on its own thread from `App.xaml.cs`) + `twitch.exe` CLI | |
 | MusicBrainz | REST | Artist lookups |
 | dbkpop.com / kprofiles.com | Puppeteer scraping (`KpopDbScraper`, `BiasScrapingProcessor`) | Weekly idol data refresh |
@@ -128,7 +128,10 @@ Every interaction must be acknowledged within 3 seconds, including early returns
 **Discord IDs** are stored as `string` (varchar) in the DB and exposed as `ulong` on resources. Compare against `id.ToString()` in EF queries.
 
 **Shared state:**
-- `Core/Global.cs` holds static `ConcurrentDictionary`s for per-guild audio state (`ServerAudioResources`), running bias games (`BiasGames`) and YouTube key quotas. This state is lost on restart.
+- Three DI singletons in `Core/` hold the in-memory state, which is lost on restart. Classes inject the one they need (there is no static state), and tests use real ones:
+  - `AudioStateStore`: each server's music queue and voice connection.
+  - `BiasGameStore`: the running bias games, one per user. It creates the games and disposes the ones it removes; `Take` hands one to a caller that disposes it. A game counts as abandoned 30 minutes after it started.
+  - `YoutubeKeyStore`: the YouTube API keys that still have quota today, refilled from the config at startup and 06:00 UTC.
 - `ServerCache` (`DatabaseORM/Caching/`) is a 50-entry cache of `ServerResource`. Any DB write that changes server settings **must** call `cache.RemoveCachedEntityManually(serverId)`, or reads go stale.
 
 **Logging:** inject `IBotLogger` (`DatabaseORM/Interface/`, so the DB layer can log through it: `Log`, `Error(location, ex)`, `Warning`, `Query`, `Client`, `Audio`) and never use `Console`. By convention, `location` is `"FileName.cs MethodName"`. One `BotLogger` instance is registered under both types; only `Startup`, `App` (`LogToFile`) and `BotWindow` use the concrete type. The window shows logs by subscribing to `BotLogger.LogAdded`, so the logger has no WPF dependency. Logs are queued and written to `Logs/` in the working directory every minute and at shutdown.
