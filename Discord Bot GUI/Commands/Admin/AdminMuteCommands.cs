@@ -4,8 +4,6 @@ using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
 using Discord.Commands;
-using Discord.Rest;
-using Discord.WebSocket;
 using Discord_Bot.Interfaces;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
@@ -61,15 +59,15 @@ public class AdminMuteCommands(
             string userIdOrName = parts[0].Trim().ToLower();
             string timeData = parts.Length == 2 ? parts[1].Trim().ToLower() : "5000y";
 
-            IUser? user = null;
+            IGuildUser? user = null;
             if (ulong.TryParse(userIdOrName, out ulong id))
             {
-                user = await Context.Client.GetUserAsync(id);
+                user = await Context.Guild.GetUserAsync(id);
             }
             else
             {
                 await Context.Guild.DownloadUsersAsync();
-                IReadOnlyCollection<RestGuildUser> users = await Context.Guild.SearchUsersAsync(userIdOrName, 1);
+                IReadOnlyCollection<IGuildUser> users = await Context.Guild.SearchUsersAsync(userIdOrName, 1);
                 if (users.Count > 0)
                 {
                     user = users.First();
@@ -83,7 +81,7 @@ public class AdminMuteCommands(
             }
 
             timeData = timeData.ToLower();
-            SocketGuildUser guildUser = (SocketGuildUser) user;
+            IGuildUser guildUser = user;
             ServerResource server = await GetCurrentServerAsync();
 
             if (server.MuteRoleDiscordId == null)
@@ -92,12 +90,12 @@ public class AdminMuteCommands(
                 return;
             }
 
-            int highestRolePosition = Context.Guild.CurrentUser.Roles.Max(x => x.Position);
+            //The bot can only take away roles below its own highest one
+            IGuildUser botUser = await Context.Guild.GetCurrentUserAsync(CacheMode.CacheOnly);
+            int highestRolePosition = Context.Guild.Roles.Where(gr => botUser.RoleIds.Contains(gr.Id)).Max(gr => gr.Position);
 
-            List<SocketRole> roleList = Context.Guild.Roles
-                .Where(gr => !gr.IsEveryone && gr.Position < highestRolePosition)
-                .Join(guildUser.Roles, gr => gr.Id, gur => gur.Id, (gr, gur) => new { gr, gur })
-                .Select(group => group.gr)
+            List<IRole> roleList = Context.Guild.Roles
+                .Where(gr => gr.Id != Context.Guild.EveryoneRole.Id && gr.Position < highestRolePosition && guildUser.RoleIds.Contains(gr.Id))
                 .ToList();
 
             await guildUser.RemoveRolesAsync(roleList);
@@ -146,7 +144,7 @@ public class AdminMuteCommands(
     {
         try
         {
-            SocketGuildUser guildUser = (SocketGuildUser) user;
+            IGuildUser guildUser = (IGuildUser) user;
             ServerResource server = await GetCurrentServerAsync();
 
             if (server.MuteRoleDiscordId == null)

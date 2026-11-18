@@ -1,9 +1,8 @@
 ﻿using DatabaseORM.Enums;
 using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
+using Discord;
 using Discord.Commands;
-using Discord.Rest;
-using Discord.WebSocket;
 using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.ImageProcessors;
@@ -71,16 +70,16 @@ public class UserBonkCommands(
 
                 if (ulong.TryParse(userName, out ulong userId))
                 {
-                    SocketGuildUser user = Context.Guild.GetUser(userId);
+                    IGuildUser user = await Context.Guild.GetUserAsync(userId, CacheMode.CacheOnly);
                     userName = user.Username;
                     url = DiscordTools.GetUserAvatarUrl(user);
                 }
                 else
                 {
-                    IReadOnlyCollection<RestGuildUser> users = await Context.Guild.SearchUsersAsync(userName, 1);
+                    IReadOnlyCollection<IGuildUser> users = await Context.Guild.SearchUsersAsync(userName, 1);
                     if (users.Count > 0)
                     {
-                        RestGuildUser user = users.First();
+                        IGuildUser user = users.First();
                         userName = user.Username;
                         url = DiscordTools.GetUserAvatarUrl(user);
                     }

@@ -220,10 +220,10 @@ public class CommandHandler(
     {
         using (IServiceScope scope = services.CreateScope())
         {
-            if (context is SocketCommandContext socketContext && !DiscordTools.IsDM(socketContext))
+            if (!DiscordTools.IsDM(context))
             {
                 CustomCommandFeature customCommandFeature = scope.ServiceProvider.GetRequiredService<CustomCommandFeature>();
-                _ = await customCommandFeature.Run(socketContext);
+                _ = await customCommandFeature.Run(context);
             }
         }
     }

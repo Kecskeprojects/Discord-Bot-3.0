@@ -2,7 +2,7 @@
 using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
-using Discord.WebSocket;
+using Discord;
 using Discord_Bot.Processors.MessageProcessor;
 using Discord_Bot.Tools.NativeTools;
 
@@ -10,13 +10,13 @@ namespace Discord_Bot.Features;
 
 public class BirthdayFeature(
     IBirthdayService birthdayService,
-    DiscordSocketClient client,
+    IDiscordClient client,
     TimeProvider timeProvider,
     IServerService serverService,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IBirthdayService birthdayService = birthdayService;
-    private readonly DiscordSocketClient client = client;
+    private readonly IDiscordClient client = client;
     private readonly TimeProvider timeProvider = timeProvider;
 
     protected override async Task<bool> ExecuteCoreLogicAsync()
@@ -54,10 +54,10 @@ public class BirthdayFeature(
 
         if (server.SettingsChannels.TryGetValue(ChannelTypeEnum.BirthdayText, out List<ulong>? channels))
         {
-            SocketGuild? guild = client.GetGuild(birthday.ServerDiscordId);
+            IGuild? guild = await client.GetGuildAsync(birthday.ServerDiscordId, CacheMode.CacheOnly);
 
             //A deleted channel or a server the bot left is skipped, so the birthdays of the other servers are still sent
-            if (client.GetChannel(channels[0]) is not ISocketMessageChannel channel || guild == null)
+            if (await client.GetChannelAsync(channels[0], CacheMode.CacheOnly) is not IMessageChannel channel || guild == null)
             {
                 logger.Warning("BirthdayFeature.cs SendBirthdayMessageAsync", $"Birthday channel {channels[0]} or server {birthday.ServerDiscordId} is not available.");
                 return;
@@ -65,7 +65,15 @@ public class BirthdayFeature(
 
             await guild.DownloadUsersAsync();
 
-            string message = BirthdayMessageProcessor.CreateMessage(birthday, guild, currentYear);
+            //So is a user who left the server
+            IGuildUser? user = await guild.GetUserAsync(birthday.UserDiscordId, CacheMode.CacheOnly);
+            if (user == null)
+            {
+                logger.Warning("BirthdayFeature.cs SendBirthdayMessageAsync", $"User {birthday.UserDiscordId} is not on server {birthday.ServerDiscordId} anymore, their birthday message is skipped.");
+                return;
+            }
+
+            string message = BirthdayMessageProcessor.CreateMessage(birthday, user, currentYear);
 
             _ = await channel.SendMessageAsync(message);
         }

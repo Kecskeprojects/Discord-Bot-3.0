@@ -13,7 +13,7 @@ public abstract class BaseFeature(IServerService serverService, IBotLogger logge
     protected readonly IBotLogger logger = logger;
 
     //Set by Run before ExecuteCoreLogicAsync; features started without a context or parameters never read them
-    protected SocketCommandContext Context { get; private set; } = null!;
+    protected ICommandContext Context { get; private set; } = null!;
     protected object Parameters { get; private set; } = null!;
 
     public async Task<bool> Run()
@@ -21,7 +21,7 @@ public abstract class BaseFeature(IServerService serverService, IBotLogger logge
         return await ExecuteCoreLogicAsync();
     }
 
-    public async Task<bool> Run(SocketCommandContext context)
+    public async Task<bool> Run(ICommandContext context)
     {
         Context = context;
 
@@ -35,7 +35,7 @@ public abstract class BaseFeature(IServerService serverService, IBotLogger logge
         return await ExecuteCoreLogicAsync();
     }
 
-    public async Task<bool> Run(SocketCommandContext context, object parameters)
+    public async Task<bool> Run(ICommandContext context, object parameters)
     {
         Context = context;
         Parameters = parameters;

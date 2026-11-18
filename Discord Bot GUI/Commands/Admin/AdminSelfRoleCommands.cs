@@ -4,8 +4,6 @@ using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
 using Discord.Commands;
-using Discord.Rest;
-using Discord.WebSocket;
 using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.MessageProcessor;
 
@@ -83,7 +81,7 @@ public class AdminSelfRoleCommands(
                 return;
             }
 
-            if (Context.Client.GetChannel(roleChannels[0]) is not ISocketMessageChannel channel)
+            if (await Context.Client.GetChannelAsync(roleChannels[0], CacheMode.CacheOnly) is not IMessageChannel channel)
             {
                 _ = await ReplyAsync("The role channel could not be found, it may have been deleted.");
                 return;
@@ -101,7 +99,7 @@ public class AdminSelfRoleCommands(
             List<RoleResource> roles = await roleService.GetServerRolesAsync(Context.Guild.Id);
 
             string message = RoleMessageProcessor.CreateMessage(roles);
-            RestUserMessage newMessage = await channel.SendMessageAsync(message);
+            IUserMessage newMessage = await channel.SendMessageAsync(message);
 
             DbProcessResultEnum result = await serverService.ChangeRoleMessageIdAsync(Context.Guild.Id, newMessage.Id);
             string resultMessage = result switch

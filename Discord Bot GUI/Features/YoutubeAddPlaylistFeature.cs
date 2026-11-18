@@ -1,17 +1,16 @@
 ﻿using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using Discord;
-using Discord.WebSocket;
 
 namespace Discord_Bot.Features;
 
 public class YoutubeAddPlaylistFeature(
-    DiscordSocketClient client,
+    IDiscordClient client,
     TimeProvider timeProvider,
     IServerService serverService,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {
-    private readonly DiscordSocketClient client = client;
+    private readonly IDiscordClient client = client;
     private readonly TimeProvider timeProvider = timeProvider;
 
     protected override async Task<bool> ExecuteCoreLogicAsync()
@@ -19,7 +18,7 @@ public class YoutubeAddPlaylistFeature(
         try
         {
             ulong channelId = (ulong) Parameters;
-            if (client.GetChannel(channelId) is not IMessageChannel channel)
+            if (await client.GetChannelAsync(channelId, CacheMode.CacheOnly) is not IMessageChannel channel)
             {
                 logger.Warning("YoutubeAddPlaylistFeature.cs ExecuteCoreLogicAsync", $"Channel {channelId} is not available, the playlist is not offered.");
                 return false;

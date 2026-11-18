@@ -12,7 +12,7 @@ Done and removed on 2026-11-17 (the investigations are in `git show 483c1fa:docs
 
 ## To check by hand
 
-- **Run the bot once against the dev database and Discord.** Since the last real run, the database layer moved into `DatabaseORM`, implicit usings were turned on, and Windows Forms was removed (2026-11-17). Since then, `Startup.Run()` was split, `IConfig` added, `TimeProvider` injected, `Global` replaced by the state stores `LastFmApi` made instance-based, and `IBrowserService` and `IWebService` added (2026-11-18). Worth a try: a Last.fm top list and who-knows (with its image), a bonk, a reminder (`!remind in 1m>test`), a short mute, a self-role request, a bias game (start, stop, and one played to the end), and music (a YouTube search, a playlist link, and waiting until the inactivity disconnect).
+- **Run the bot once against the dev database and Discord.** Since the last real run, the database layer moved into `DatabaseORM`, implicit usings were turned on, and Windows Forms was removed (2026-11-17). Since then, `Startup.Run()` was split, `IConfig` added, `TimeProvider` injected, `Global` replaced by the state stores `LastFmApi` made instance-based, `IBrowserService` and `IWebService` added, and the commands, interactions and features moved onto Discord.Net's interfaces (2026-11-18). Worth a try: a mute (by name and by ID) and an unmute, the R6 randomizer from a voice channel, a weekly poll edit, `!leave` while playing, a Last.fm top list and who-knows (with its image), a bonk, a reminder (`!remind in 1m>test`), a short mute, a self-role request, a bias game (start, stop, and one played to the end), and music (a YouTube search, a playlist link, and waiting until the inactivity disconnect).
   - What has been checked: builds, `dotnet format` and throwaway programs. Those resolved every DB service through the real `Startup.Run()`, ran `ProcessTools.GetStatistics()` (RAM figure, WMI child process count) and loaded a resx bitmap.
   - Worth a look in the window: the diagnostics line.
 - **Correct the scraped idol genders on the dev and the live database.**
@@ -87,8 +87,16 @@ The analyzer setup is done and described in CLAUDE.md ("Linting"). Left:
      - The key rotation keeps the key string itself. Before, it kept an index into the config's key list, but picked it from the number of keys left, so it could choose a used-up key again or one past the end.
      - Keys edited in `config.json` apply at the next refill (06:00 UTC or a restart). A duplicate key counts once instead of throwing at startup.
 3. **`Config` (done 2026-11-18).** The 47 classes inject `IConfig` (`Interfaces/IConfig.cs`) instead, so tests mock it. `DatabaseStartup` takes the connection string as a `Func<IServiceProvider, string>` and `Startup` reads it through `IConfig`, so replacing `IConfig` in a test also replaces the database. Checked with a throwaway program: `ValidateOnBuild` passes on the real registrations, and a fake `IConfig` reached the DbContext.
-4. **Concrete Discord.Net socket types.** `BaseFeature`, `BaseCommand` and `DiscordTools` use `SocketCommandContext` / `SocketInteractionContext`, and several features inject `DiscordSocketClient`. Socket entities have internal constructors and can't be mocked.
-   - Fix: use Discord.Net's own interfaces: `ICommandContext`, `IUser`, `IGuild`, `IMessageChannel`, and `IDiscordClient` (or a narrow wrapper like `IDiscordMessenger.SendDmAsync`) instead of `DiscordSocketClient`. `BaseCommand` could derive from `ModuleBase<ICommandContext>`.
+4. **Concrete Discord.Net socket types (done 2026-11-18, the rule is in CLAUDE.md "Command conventions").**
+   - `BaseCommand` derives from `ModuleBase<ICommandContext>` and `BaseInteraction` from `InteractionModuleBase<IInteractionContext>`. `BaseFeature.Context` is an `ICommandContext`, and `DiscordTools` takes the interface contexts.
+   - The seven features that injected `DiscordSocketClient` take `IDiscordClient`, which `Startup` registers as the same client.
+   - Commands, features, tools and processors use `IGuild`, `IGuildUser`, `IRole`, `IVoiceChannel` and `IComponentInteraction` instead of the socket types. Only `CommandHandler`, `InteractionHandler`, `BotMain`, `App` and `Startup` still use the socket types, since they are where the gateway connects.
+   - **The same behavior:** socket lookups that read the cache synchronously (`Guild.GetUser`, `Guild.CurrentUser`, `client.GetGuild`, `client.GetChannel`) became the interfaces' async ones with `CacheMode.CacheOnly`, so nothing calls the REST API where it didn't before. `RainbowRandomizerTools` finds the voice channel's users from the member cache, the way `SocketVoiceChannel.ConnectedUsers` does.
+   - **Fixed along the way:**
+     - Muting had failed since 2025-02-01 (`34c869b`, which made the command look the user up by name or ID itself). It still cast the user to `SocketGuildUser`, but a user found by name is a `RestGuildUser` and one found by ID was a global user, so both threw. It now looks up a server member (by ID with `Guild.GetUserAsync`) and works with `IGuildUser`; someone not on the server gets "No user was found".
+     - `CommandHandler.CheckCustomCommandAsync` only ran custom commands for a `SocketCommandContext`; it now takes any context.
+     - A birthday of a user who left the server threw on `user.Mention`, which stopped the birthday messages of every server after it. That user is now skipped with a warning.
+   - Checked with a throwaway program: real text commands (`!bias game`, `!bias game stop`) ran through `CommandService` with a fake, non-socket context and sent their replies, and the gender button ran through `InteractionService` with a fake `IInteractionContext`.
 5. **Logic inside command bodies.** Commands parse, validate and branch (e.g. `UserReminderCommands.RemindIn`). Commands are the hardest thing to unit-test.
    - Fix: move that logic into features, processors or tools, and keep commands as thin adapters.
 
@@ -144,8 +152,7 @@ What has to be mockable so tests can leave out the database, the external APIs a
    - The quota units counted per key (`YoutubeKeyStore.AddUsage`) are never read. They could decide which key to use next, or show in the diagnostics; otherwise drop them.
 5. **Spotify.** `SpotifyAPI` (201 lines: link handling, playlist or album → search terms, the image search fallback) builds a `SpotifyClient` on every call.
    - SpotifyAPI.Web already has `ISpotifyClient`, so no interface of our own is needed. Inject that, through a small factory if credential edits in `config.json` should still apply without a restart.
-6. **`DiscordSocketClient`**, injected into `BotMain`, `CommandHandler`, `InteractionHandler`, `DiscordTools` and seven features: `BirthdayFeature`, `ReminderFeature`, `UnmuteFeature`, `WeeklyPollFeature`, `TwitchNotificationFeature`, `EasterEggFeature`, `YoutubeAddPlaylistFeature`.
-   - This is blocker 4. The birthday, reminder, unmute and poll logic sits in those features, so it matters most for feature tests.
+6. **`DiscordSocketClient` (done 2026-11-18, blocker 4).** The seven features and `DiscordTools` take `IDiscordClient`; only the gateway classes keep the socket client.
 
 No interface needed:
 - `Config`: done, behind `IConfig` (blocker 3).
@@ -194,8 +201,10 @@ Yes, the bot's test project can run integration tests: real services wired toget
 4. **Whole text commands, without Discord.**
    - Discord.Net's `CommandService.ExecuteAsync(ICommandContext, …)` runs a command from its text. Give it a fake context that records what the command replies, and a real container with LocalDB and the fake Last.fm client.
    - A test can then send `!lf…` or a bias command and check the reply embed.
-   - This needs blocker 4 first. `BaseCommand` derives from `ModuleBase<SocketCommandContext>`, so a non-socket context fails; deriving from `ModuleBase<ICommandContext>` fixes that.
-   - Interactions (buttons, modals) work the same way through `InteractionService`, with the same prerequisite.
+   - Possible since blocker 4 (2026-11-18), and tried with a throwaway program:
+     - For a command, `new CommandContext(fakeClient, fakeMessage)` (Discord.Net's own non-socket context) is enough, after `commands.AddModulesAsync(...)` on the real container. Pass `argPos: 1` for the `!` prefix.
+     - For a button or modal, the fake context must implement `IRouteMatchContainer` as well as `IInteractionContext`. Without it, the `*` parts of custom IDs such as `BiasGame_Setup_Gender_*_*` can't be read.
+     - Fakes of the Discord interfaces (message, channel, user, interaction) can be NSubstitute substitutes. The throwaway program used a small `DispatchProxy` that answers from a table.
 
 **The one enabler they share (done 2026-11-18):** `Startup.ConfigureServices(IServiceCollection)` registers everything, and `Startup.Run()` only builds the provider from it. A test calls `ConfigureServices` on its own collection and replaces only the edges:
 - the Last.fm `RestClient`
@@ -232,7 +241,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
   4. Integration tests: the DB layer on LocalDB, and Last.fm through the real container.
   5. `BiasScrapingProcessor` and the who-knows embed (`IBrowserService`, `IWebService` and `IWhoKnowsImageProcessor` are done).
   6. The features (`TimeProvider` and the state stores are done).
-  7. The Discord interfaces, then whole-command integration tests.
+  7. Whole-command integration tests (the Discord interfaces are done).
   8. YouTube and Spotify.
 
 ## 3. Discord.Net: optional modernization (investigated 2026-11-15)
@@ -312,6 +321,7 @@ Can the disabled embeds be turned back on as they are, with adjustments and with
 
 ## Minor improvements
 
+- **Birthday list names (found 2026-11-18):** `UserBirthdayCommands` shows the command sender's name for a user who left the server. `GetUserNickname(null)` falls back to `Context.User`. Show "unknown user" instead, or leave those birthdays out.
 - **RestSharp versions aligned (found and done 2026-11-18):** `LastFmApi` referenced 114.0.0 while the bot used 114.1.0, which NuGet then used for both. It now references 114.1.0 too, so the library builds against what it runs with.
 - **`Config` as a singleton (investigated 2026-11-18):** `Config` is registered transient. Each instance builds its own configuration with `reloadOnChange`, which watches `Assets/` and is never disposed.
   - Measured with a throwaway program: 500 instances held about 500 extra OS handles until a full garbage collection released them. So it isn't a leak, but each `Config` a command resolves keeps a handle open until the next collection.

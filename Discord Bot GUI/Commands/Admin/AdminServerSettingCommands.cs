@@ -38,7 +38,7 @@ public class AdminServerSettingCommands(
         try
         {
             ServerResource server = await GetCurrentServerAsync();
-            Embed[] embed = ServerSettingEmbedProcessor.CreateEmbed(server, Context.Guild.TextChannels, config.Img);
+            Embed[] embed = ServerSettingEmbedProcessor.CreateEmbed(server, await Context.Guild.GetTextChannelsAsync(CacheMode.CacheOnly), config.Img);
 
             _ = await ReplyAsync(embeds: embed);
         }

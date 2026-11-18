@@ -4,8 +4,6 @@ using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
 using Discord.Interactions;
-using Discord.Rest;
-using Discord.WebSocket;
 using Discord_Bot.Communication.Modal;
 using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.EmbedProcessors.Polls;
@@ -36,11 +34,11 @@ public class WeeklyPollEditInteraction(
                 return;
             }
 
-            RestRole? role = resource.RoleDiscordId.HasValue
+            IRole? role = resource.RoleDiscordId.HasValue
                 ? await Context.Guild.GetRoleAsync(resource.RoleDiscordId.Value)
                 : null;
-            SocketGuildChannel? channel = resource.ChannelDiscordId.HasValue
-                ? Context.Guild.GetChannel(resource.ChannelDiscordId.Value)
+            IGuildChannel? channel = resource.ChannelDiscordId.HasValue
+                ? await Context.Guild.GetChannelAsync(resource.ChannelDiscordId.Value, CacheMode.CacheOnly)
                 : null;
 
             void Modify(ModalBuilder builder) => builder
@@ -70,13 +68,13 @@ public class WeeklyPollEditInteraction(
             await DeferAsync();
             logger.Log($"Edit Poll Modal Submitted for poll with ID {pollId}", LogOnly: true);
 
-            SocketGuildChannel? channel = Context.Guild.Channels.FirstOrDefault(x => x.Name.Equals(modal.Channel.Trim(), StringComparison.OrdinalIgnoreCase));
+            IGuildChannel? channel = (await Context.Guild.GetChannelsAsync(CacheMode.CacheOnly)).FirstOrDefault(x => x.Name.Equals(modal.Channel.Trim(), StringComparison.OrdinalIgnoreCase));
             if (channel == null)
             {
                 await RespondOrFollowupAsync("Channel not found!", ephemeral: true);
                 return;
             }
-            SocketRole? role = Context.Guild.Roles.FirstOrDefault(x => x.Name.Equals(modal.Role.Trim(), StringComparison.OrdinalIgnoreCase));
+            IRole? role = Context.Guild.Roles.FirstOrDefault(x => x.Name.Equals(modal.Role.Trim(), StringComparison.OrdinalIgnoreCase));
 
             RoleResource? pollRole = role == null ? null : new RoleResource() { DiscordId = role.Id, RoleName = role.Name };
 

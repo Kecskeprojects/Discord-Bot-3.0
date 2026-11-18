@@ -1,7 +1,6 @@
 ﻿using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using Discord;
-using Discord.WebSocket;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Enums;
@@ -26,7 +25,7 @@ public class AudioRequestFeature(
         try
         {
             string input = (string) Parameters;
-            if (string.IsNullOrEmpty(input) || Context.User is not SocketGuildUser { VoiceChannel: not null })
+            if (string.IsNullOrEmpty(input) || Context.User is not IGuildUser { VoiceChannel: not null })
             {
                 return false;
             }

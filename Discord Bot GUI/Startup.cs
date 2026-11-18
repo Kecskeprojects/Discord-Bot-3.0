@@ -69,6 +69,7 @@ public static class Startup
 
         //Core
         _ = collection.AddSingleton(client);
+        _ = collection.AddSingleton<IDiscordClient>(client); //What features and tools use, so tests can replace it
         _ = collection.AddSingleton(interactions);
         _ = collection.AddSingleton(commands);
         _ = collection.AddTransient<IConfig, Config>(); //Configuration can be edited without stopping the program

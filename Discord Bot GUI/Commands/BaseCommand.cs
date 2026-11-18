@@ -10,7 +10,7 @@ using Discord_Bot.Tools;
 
 namespace Discord_Bot.Commands;
 
-public class BaseCommand(IBotLogger logger, IConfig config, IServerService serverService) : ModuleBase<SocketCommandContext>
+public class BaseCommand(IBotLogger logger, IConfig config, IServerService serverService) : ModuleBase<ICommandContext>
 {
     protected readonly IBotLogger logger = logger;
     protected readonly IConfig config = config;

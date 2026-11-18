@@ -3,8 +3,8 @@ using DatabaseORM.Enums;
 using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
+using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces;
@@ -267,12 +267,12 @@ public class UserBiasCommands(
             {
                 await Context.Guild.DownloadUsersAsync();
 
-                List<SocketGuildUser> guildUsers = [];
+                List<IGuildUser> guildUsers = [];
                 bool isUsersBias = false;
                 foreach (UserResource dbUser in result.List)
                 {
                     //Find user on server
-                    SocketGuildUser user = Context.Guild.GetUser(dbUser.DiscordId);
+                    IGuildUser user = await Context.Guild.GetUserAsync(dbUser.DiscordId, CacheMode.CacheOnly);
 
                     //If user is not found or the user is the one sending the command, do not add their mention to the list
                     if (user != null)

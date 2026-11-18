@@ -9,7 +9,7 @@ using Discord_Bot.Tools;
 
 namespace Discord_Bot.Interactions;
 
-public class BaseInteraction(IServerService serverService, IBotLogger logger, IConfig config) : InteractionModuleBase<SocketInteractionContext>
+public class BaseInteraction(IServerService serverService, IBotLogger logger, IConfig config) : InteractionModuleBase<IInteractionContext>
 {
     private readonly IServerService serverService = serverService;
     protected readonly IBotLogger logger = logger;

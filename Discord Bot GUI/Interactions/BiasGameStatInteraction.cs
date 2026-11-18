@@ -4,7 +4,6 @@ using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.EmbedProcessors.BiasGame;
@@ -53,7 +52,6 @@ public class BiasGameStatInteraction(
 
             MessageComponent component = BiasGameStatEmbedProcessor.CreateComponent(chosenGender, Context.User.Id);
 
-            SocketMessageComponent message = (SocketMessageComponent) Context.Interaction;
             _ = await ModifyOriginalResponseAsync(x =>
             {
                 x.Embeds = embed;

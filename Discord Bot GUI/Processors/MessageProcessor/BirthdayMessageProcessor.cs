@@ -1,5 +1,5 @@
 ﻿using DatabaseORM.Resources;
-using Discord.WebSocket;
+using Discord;
 using Discord_Bot.Core;
 using System.Globalization;
 
@@ -7,10 +7,8 @@ namespace Discord_Bot.Processors.MessageProcessor;
 
 public static class BirthdayMessageProcessor
 {
-    public static string CreateMessage(BirthdayResource birthday, SocketGuild guild, int currentYear)
+    public static string CreateMessage(BirthdayResource birthday, IUser user, int currentYear)
     {
-        SocketGuildUser user = guild.GetUser(birthday.UserDiscordId);
-
         Random r = new();
         string baseMessage = Constant.BirthdayMessage[r.Next(0, Constant.BirthdayMessage.Length)];
 

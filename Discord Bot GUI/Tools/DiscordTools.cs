@@ -2,9 +2,6 @@
 using DatabaseORM.Resources;
 using Discord;
 using Discord.Commands;
-using Discord.Interactions;
-using Discord.Rest;
-using Discord.WebSocket;
 
 namespace Discord_Bot.Tools;
 
@@ -17,87 +14,88 @@ public static class DiscordTools
             : value.Contains(channelId);
     }
 
-    public static Task<bool> IsOwner(SocketInteractionContext context)
+    public static Task<bool> IsOwner(IInteractionContext context)
     {
         return IsOwnerBase(context.Client, context.User.Id);
     }
 
-    public static Task<bool> IsOwner(SocketCommandContext context)
+    public static Task<bool> IsOwner(ICommandContext context)
     {
         return IsOwnerBase(context.Client, context.User.Id);
     }
 
-    private static async Task<bool> IsOwnerBase(DiscordSocketClient client, ulong userId)
+    private static async Task<bool> IsOwnerBase(IDiscordClient client, ulong userId)
     {
-        RestApplication application = await client.GetApplicationInfoAsync();
+        IApplication application = await client.GetApplicationInfoAsync();
         return userId == application.Owner.Id;
     }
 
-    public static bool IsAdmin(SocketInteractionContext context)
+    public static bool IsAdmin(IInteractionContext context)
     {
         return IsAdminBase(context.User);
     }
 
-    public static bool IsAdmin(SocketCommandContext context)
+    public static bool IsAdmin(ICommandContext context)
     {
         return IsAdminBase(context.User);
     }
 
-    private static bool IsAdminBase(SocketUser user)
+    private static bool IsAdminBase(IUser user)
     {
         return user is IGuildUser guildUser && guildUser.GuildPermissions.Has(GuildPermission.Administrator);
     }
 
-    public static bool IsDM(SocketInteractionContext context)
+    public static bool IsDM(IInteractionContext context)
     {
         return IsDMBase(context.Channel);
     }
 
-    public static bool IsDM(SocketCommandContext context)
+    public static bool IsDM(ICommandContext context)
     {
         return IsDMBase(context.Channel);
     }
 
-    public static bool IsDM(SocketMessage message)
+    public static bool IsDM(IMessage message)
     {
         return IsDMBase(message.Channel);
     }
 
-    public static bool IsDMBase(ISocketMessageChannel channel)
+    public static bool IsDMBase(IMessageChannel channel)
     {
         return channel.GetChannelType() == ChannelType.DM;
     }
 
-    public static string GetNickName(SocketInteractionContext context, IUser? user = null)
+    public static string GetNickName(IInteractionContext context, IUser? user = null)
     {
         user ??= context.User;
         return GetNickNameBase(user, context.Channel);
     }
 
-    public static string GetNickName(SocketCommandContext context, IUser? user = null)
+    public static string GetNickName(ICommandContext context, IUser? user = null)
     {
         user ??= context.User;
         return GetNickNameBase(user, context.Channel);
     }
 
-    public static string GetNickNameBase(IUser user, ISocketMessageChannel channel)
+    public static string GetNickNameBase(IUser user, IMessageChannel channel)
     {
         return !IsDMBase(channel) ?
-            (user as SocketGuildUser)?.Nickname ?? user.Username :
+            (user as IGuildUser)?.Nickname ?? user.Username :
             user.Username;
     }
 
-    public static List<UserResource> FilterToOnlyServerMembers(SocketCommandContext context, List<UserResource> users)
+    //Only the users in the server's member cache, as before; nothing is downloaded per user
+    public static async Task<List<UserResource>> FilterToOnlyServerMembersAsync(ICommandContext context, List<UserResource> users)
     {
         List<UserResource> filtered = [];
         foreach (UserResource item in users)
         {
             //Check if user is in given server
-            SocketGuildUser temp_user = context.Guild.GetUser(item.DiscordId);
-            if (temp_user != null)
+            IGuildUser? guildUser = await context.Guild.GetUserAsync(item.DiscordId, CacheMode.CacheOnly);
+            if (guildUser != null)
             {
                 //Get their nickname if they have one
-                item.Username = GetNickNameBase(temp_user, context.Channel);
+                item.Username = GetNickNameBase(guildUser, context.Channel);
                 filtered.Add(item);
             }
         }

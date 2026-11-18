@@ -3,7 +3,6 @@ using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using Discord;
 using Discord.Commands;
-using Discord.Rest;
 using Discord_Bot.Interfaces;
 
 namespace Discord_Bot.Commands.Admin;
@@ -39,7 +38,7 @@ public class AdminBirthdayCommands(
             else
             {
                 await Context.Guild.DownloadUsersAsync();
-                IReadOnlyCollection<RestGuildUser> users = await Context.Guild.SearchUsersAsync(userIdOrName, 1);
+                IReadOnlyCollection<IGuildUser> users = await Context.Guild.SearchUsersAsync(userIdOrName, 1);
                 if (users.Count > 0)
                 {
                     user = users.First();

@@ -3,7 +3,6 @@ using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
-using Discord.WebSocket;
 using Discord_Bot.Communication;
 using Discord_Bot.Processors.EmbedProcessors;
 using Discord_Bot.Tools.NativeTools;
@@ -11,11 +10,11 @@ using Discord_Bot.Tools.NativeTools;
 namespace Discord_Bot.Features;
 
 public class TwitchNotificationFeature(
-    DiscordSocketClient client,
+    IDiscordClient client,
     IServerService serverService,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {
-    private readonly DiscordSocketClient client = client;
+    private readonly IDiscordClient client = client;
 
     protected override async Task<bool> ExecuteCoreLogicAsync()
     {
@@ -40,7 +39,7 @@ public class TwitchNotificationFeature(
                     //If there is no notification role set on the server, we just send a message without the role ping
                     string notifRole = !NumberTools.IsNullOrZero(data.TwitchChannel.NotificationRoleDiscordId) ? $"<@&{data.TwitchChannel.NotificationRoleDiscordId}>" : "";
 
-                    if (client.GetChannel(channelId) is not IMessageChannel channel)
+                    if (await client.GetChannelAsync(channelId, CacheMode.CacheOnly) is not IMessageChannel channel)
                     {
                         logger.Error("TwitchNotificationFeature.cs ExecuteCoreLogicAsync", $"Channel (ID: {channelId}) was not found to send twitch notification. (Server ID: {server.ServerId}).");
                         return false;

@@ -4,7 +4,6 @@ using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces;
@@ -90,7 +89,7 @@ public class BiasGameInteraction(
 
             logger.Log($"BiasGame Setup Debut Chosen: {string.Join(", ", chosenYears)}", LogOnly: true);
 
-            SocketMessageComponent component = (SocketMessageComponent) Context.Interaction;
+            IComponentInteraction component = (IComponentInteraction) Context.Interaction;
 
             ComponentBuilder waitButton = new ComponentBuilder()
                 .WithButton("Your game is being set up...", "BiasGame_Setup_Debut_Disabled", disabled: true, style: ButtonStyle.Secondary);

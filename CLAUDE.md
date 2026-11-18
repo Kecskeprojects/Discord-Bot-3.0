@@ -114,6 +114,7 @@ Every interaction must be acknowledged within 3 seconds, including early returns
 - Module-level `[Remarks("User" | "Admin" | "Owner")]` must match `CommandLevelEnum`. `HelpCommands` filters by it, so a module with the wrong value disappears from help. `[Summary]` is the help text.
 - Permissions use `[RequireOwner]`, `[RequireUserPermission]` and `[RequireContext]` attributes. Most user commands also start with `if (!await IsCommandAllowedAsync(ChannelTypeEnum.X)) return;`. Servers can restrict commands to channels of a given `ChannelTypeEnum`, and if a server has set no channel of that type, the command is allowed (`allowLackOfType`).
 - Multiple arguments are usually split on `>` with `GetParametersBySplit` and lowercased by default.
+- Commands, interactions, features, tools and processors use Discord.Net's interfaces (`ICommandContext`, `IInteractionContext`, `IGuild`, `IGuildUser`, `IDiscordClient`), so tests can run them with fakes. Only `CommandHandler`, `InteractionHandler`, `BotMain`, `App` and `Startup` use the socket types. A lookup the socket types did from the cache (`Guild.GetUser`, `Guild.CurrentUser`, `client.GetGuild`) is the async one with `CacheMode.CacheOnly`, so it doesn't start calling the REST API.
 
 **Layers (inside `Discord Bot GUI/`, then `DatabaseORM/`):**
 - `Commands/` and `Interactions/` → Discord entry points; they call DB services, features, and processors.

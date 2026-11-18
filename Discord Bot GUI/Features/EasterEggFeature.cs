@@ -2,7 +2,6 @@
 using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
-using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
@@ -11,12 +10,12 @@ namespace Discord_Bot.Features;
 
 public class EasterEggFeature(
     IGreetingService greetingService,
-    DiscordSocketClient client,
+    IDiscordClient client,
     IServerService serverService,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IGreetingService greetingService = greetingService;
-    private readonly DiscordSocketClient client = client;
+    private readonly IDiscordClient client = client;
 
     protected override async Task<bool> ExecuteCoreLogicAsync()
     {

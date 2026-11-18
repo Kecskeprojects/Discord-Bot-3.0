@@ -3,20 +3,19 @@ using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
-using Discord.WebSocket;
 using Discord_Bot.Tools.NativeTools;
 
 namespace Discord_Bot.Features;
 
 public class UnmuteFeature(
     IServerMutedUserService serverMutedUserService,
-    DiscordSocketClient client,
+    IDiscordClient client,
     TimeProvider timeProvider,
     IServerService serverService,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IServerMutedUserService serverMutedUserService = serverMutedUserService;
-    private readonly DiscordSocketClient client = client;
+    private readonly IDiscordClient client = client;
     private readonly TimeProvider timeProvider = timeProvider;
 
     protected override async Task<bool> ExecuteCoreLogicAsync()
@@ -35,12 +34,12 @@ public class UnmuteFeature(
                     ulong userId = ulong.Parse(mutedUser.UserDiscordId);
 
                     //The bot may have left the server, or the user may have left it (which also drops their roles)
-                    SocketGuild? server = client.GetGuild(serverId);
-                    SocketGuildUser? user = null;
+                    IGuild? server = await client.GetGuildAsync(serverId, CacheMode.CacheOnly);
+                    IGuildUser? user = null;
                     if (server != null)
                     {
                         await server.DownloadUsersAsync();
-                        user = server.GetUser(userId);
+                        user = await server.GetUserAsync(userId, CacheMode.CacheOnly);
                     }
 
                     if (server != null && user != null)

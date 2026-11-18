@@ -4,7 +4,6 @@ using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.EmbedProcessors;
 using Discord_Bot.Tools.NativeTools;
@@ -117,7 +116,7 @@ public class UserBirthdayCommands(
             await Context.Guild.DownloadUsersAsync();
             foreach (BirthdayResource birthday in list)
             {
-                SocketGuildUser user = Context.Guild.GetUser(birthday.UserDiscordId);
+                IGuildUser user = await Context.Guild.GetUserAsync(birthday.UserDiscordId, CacheMode.CacheOnly);
                 string name = GetUserNickname(user);
                 users.Add(name);
             }

@@ -1,5 +1,5 @@
-﻿using Discord.Commands;
-using Discord.WebSocket;
+﻿using Discord;
+using Discord.Commands;
 using System.IO;
 
 namespace Discord_Bot.Tools;
@@ -21,15 +21,15 @@ public static class RainbowRandomizerTools
         return operatorList;
     }
 
-    public static List<SocketUser> GetUserList(SocketCommandContext context)
+    //Everyone in the sender's voice channel, or only the sender outside one (or in a DM)
+    public static async Task<List<IUser>> GetUserListAsync(ICommandContext context)
     {
-        List<SocketVoiceChannel>? voiceChannels = context.Guild?.Channels?.Where(x => x is SocketVoiceChannel).Select(x => (SocketVoiceChannel) x).ToList();
-        SocketVoiceChannel? currentVoiceChannel = voiceChannels?.FirstOrDefault(x => x.ConnectedUsers.Any(y => y.Id == context.User.Id));
-
-        List<SocketUser> userList = [];
-        if (currentVoiceChannel is not null)
+        List<IUser> userList = [];
+        if (context.User is IGuildUser { VoiceChannel: not null } sender)
         {
-            userList.AddRange(currentVoiceChannel.ConnectedUsers);
+            //From the member cache, the way Discord.Net works out a voice channel's connected users
+            IReadOnlyCollection<IGuildUser> members = await context.Guild.GetUsersAsync(CacheMode.CacheOnly);
+            userList.AddRange(members.Where(member => member.VoiceChannel?.Id == sender.VoiceChannel.Id));
         }
         else
         {
@@ -38,7 +38,7 @@ public static class RainbowRandomizerTools
         return userList;
     }
 
-    public static List<string> GetResponseForRound(List<string> operatorList, List<SocketUser> userList)
+    public static List<string> GetResponseForRound(List<string> operatorList, List<IUser> userList)
     {
         //Ensuring the original list remains intact
         List<string> tempOperatorList = [];
@@ -46,7 +46,7 @@ public static class RainbowRandomizerTools
 
         Random r = new();
         List<string> responseParts = [];
-        foreach (SocketUser user in userList)
+        foreach (IUser user in userList)
         {
             int index = r.Next(0, tempOperatorList.Count);
             string chosen = tempOperatorList[index];

@@ -1,14 +1,13 @@
 ﻿using DatabaseORM.Enums;
 using DatabaseORM.Resources;
 using Discord;
-using Discord.WebSocket;
 using Discord_Bot.Tools;
 
 namespace Discord_Bot.Processors.EmbedProcessors;
 
 public static class ServerSettingEmbedProcessor
 {
-    public static Embed[] CreateEmbed(ServerResource server, IReadOnlyCollection<SocketTextChannel> textChannels, string thumbnailUrl)
+    public static Embed[] CreateEmbed(ServerResource server, IReadOnlyCollection<ITextChannel> textChannels, string thumbnailUrl)
     {
         EmbedBuilder embed = new();
 
@@ -18,7 +17,7 @@ public static class ServerSettingEmbedProcessor
             if (server.SettingsChannels.TryGetValue(item.Key, out List<ulong>? settingsChannels))
             {
                 IEnumerable<string> channels = settingsChannels.Select(x => textChannels.FirstOrDefault(n => n.Id == x))
-                                                .OfType<SocketTextChannel>()
+                                                .OfType<ITextChannel>()
                                                 .Select(x => $"`{x.Name}`");
 
                 _ = embed.AddField($"{item.Value}:", $"`{string.Join(", ", channels).Replace("`, `", ", ")}`");

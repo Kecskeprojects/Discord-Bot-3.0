@@ -4,7 +4,6 @@ using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Features;
@@ -78,7 +77,7 @@ public class UserVoiceCommands(
             audioResource.MusicRequests.Clear();
 
             //The bot may not be in a voice channel (e.g. leave sent twice)
-            SocketVoiceChannel voiceChannel = Context.Guild.CurrentUser.VoiceChannel;
+            IVoiceChannel voiceChannel = (await Context.Guild.GetCurrentUserAsync(CacheMode.CacheOnly)).VoiceChannel;
             if (voiceChannel != null)
             {
                 await voiceChannel.DisconnectAsync();

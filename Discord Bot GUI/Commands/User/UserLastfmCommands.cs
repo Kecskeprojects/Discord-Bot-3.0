@@ -343,7 +343,7 @@ public class UserLastfmCommands(
             //Download inactive users
             await Context.Guild.DownloadUsersAsync();
 
-            users = DiscordTools.FilterToOnlyServerMembers(Context, users);
+            users = await DiscordTools.FilterToOnlyServerMembersAsync(Context, users);
 
             //Without parameters the check above made sure the current user has a Last.fm username
             WhoKnows wk = string.IsNullOrEmpty(parameters)

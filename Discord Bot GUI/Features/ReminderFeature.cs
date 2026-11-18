@@ -3,7 +3,6 @@ using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
-using Discord.WebSocket;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
 
@@ -11,13 +10,13 @@ namespace Discord_Bot.Features;
 
 public class ReminderFeature(
     IReminderService reminderService,
-    DiscordSocketClient client,
+    IDiscordClient client,
     TimeProvider timeProvider,
     IServerService serverService,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IReminderService reminderService = reminderService;
-    private readonly DiscordSocketClient client = client;
+    private readonly IDiscordClient client = client;
     private readonly TimeProvider timeProvider = timeProvider;
 
     protected override async Task<bool> ExecuteCoreLogicAsync()

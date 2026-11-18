@@ -3,7 +3,6 @@ using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces;
 using Discord_Bot.Tools;
@@ -126,11 +125,11 @@ public class UserRandomizeCommands(
             }
 
             List<string> operatorList = RainbowRandomizerTools.GetOperatorList(optionString);
-            List<SocketUser> userList = RainbowRandomizerTools.GetUserList(Context);
+            List<IUser> userList = await RainbowRandomizerTools.GetUserListAsync(Context);
 
             List<string> responseParts = RainbowRandomizerTools.GetResponseForRound(operatorList, userList);
 
-            if (channel is not null and SocketTextChannel textChannel)
+            if (channel is not null and ITextChannel textChannel)
             {
                 _ = await textChannel.SendMessageAsync(string.Join("\n", responseParts));
                 return;
@@ -163,7 +162,7 @@ public class UserRandomizeCommands(
 
             List<string> operatorList = RainbowRandomizerTools.GetOperatorList(optionString);
             List<string> otherOperatorList = RainbowRandomizerTools.GetOperatorList(optionString is "a" or "attacker" ? "defender" : "attacker");
-            List<SocketUser> userList = RainbowRandomizerTools.GetUserList(Context);
+            List<IUser> userList = await RainbowRandomizerTools.GetUserListAsync(Context);
 
             List<string> finalResponseParts = [];
             string label = optionString is "a" or "attacker" ? "Attacker" : "Defender";
@@ -178,7 +177,7 @@ public class UserRandomizeCommands(
                 finalResponseParts.AddRange(responseParts);
             }
 
-            if (channel is not null and SocketTextChannel textChannel)
+            if (channel is not null and ITextChannel textChannel)
             {
                 _ = await textChannel.SendMessageAsync(string.Join("\n", finalResponseParts));
                 return;
@@ -210,7 +209,7 @@ public class UserRandomizeCommands(
             }
             List<string> operatorList = RainbowRandomizerTools.GetOperatorList(optionString);
             List<string> otherOperatorList = RainbowRandomizerTools.GetOperatorList(optionString is "a" or "attacker" ? "defender" : "attacker");
-            List<SocketUser> userList = RainbowRandomizerTools.GetUserList(Context);
+            List<IUser> userList = await RainbowRandomizerTools.GetUserListAsync(Context);
 
             List<string> finalResponseParts = [];
             string label = optionString is "a" or "attacker" ? "Attacker" : "Defender";
@@ -225,7 +224,7 @@ public class UserRandomizeCommands(
                 finalResponseParts.AddRange(responseParts);
             }
 
-            if (channel is not null and SocketTextChannel textChannel)
+            if (channel is not null and ITextChannel textChannel)
             {
                 _ = await textChannel.SendMessageAsync(string.Join("\n", finalResponseParts));
                 return;

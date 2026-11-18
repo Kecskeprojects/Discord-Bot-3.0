@@ -2,8 +2,6 @@
 using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
-using Discord.Rest;
-using Discord.WebSocket;
 using Discord_Bot.Tools.NativeTools;
 using MapsterMapper;
 
@@ -11,14 +9,14 @@ namespace Discord_Bot.Features;
 
 public class WeeklyPollFeature(
     IWeeklyPollService weeklyPollService,
-    DiscordSocketClient client,
+    IDiscordClient client,
     TimeProvider timeProvider,
     IServerService serverService,
     IMapper mapper,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IWeeklyPollService weeklyPollService = weeklyPollService;
-    private readonly DiscordSocketClient client = client;
+    private readonly IDiscordClient client = client;
     private readonly TimeProvider timeProvider = timeProvider;
 
     protected override async Task<bool> ExecuteCoreLogicAsync()
@@ -54,14 +52,15 @@ public class WeeklyPollFeature(
 
         PollProperties pollProp = mapper.Map<PollProperties>(poll);
 
-        SocketGuild server = client.GetGuild(poll.ServerDiscordId);
+        IGuild? server = await client.GetGuildAsync(poll.ServerDiscordId, CacheMode.CacheOnly);
 
-        if (poll.ChannelDiscordId.HasValue && server?.GetChannel(poll.ChannelDiscordId.Value) is ISocketMessageChannel channel)
+        if (server != null && poll.ChannelDiscordId.HasValue
+            && await server.GetChannelAsync(poll.ChannelDiscordId.Value, CacheMode.CacheOnly) is IMessageChannel channel)
         {
-            SocketRole? role = poll.RoleDiscordId.HasValue ? server.GetRole(poll.RoleDiscordId.Value) : null;
+            IRole? role = poll.RoleDiscordId.HasValue ? server.GetRole(poll.RoleDiscordId.Value) : null;
             string notifRole = role != null ? $"<@&{role.Id}>" : "";
 
-            RestUserMessage message = await channel.SendMessageAsync(notifRole, poll: pollProp);
+            IUserMessage message = await channel.SendMessageAsync(notifRole, poll: pollProp);
             if (poll.IsPinned)
             {
                 await message.PinAsync();

@@ -1,8 +1,8 @@
 ﻿using DatabaseORM.Enums;
 using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
+using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Enums;
@@ -76,7 +76,7 @@ public class AudioPlayFeature(
             //Logged first, so the original error is not lost if disconnecting fails too
             logger.Error("AudioPlayFeature.cs ExecuteCoreLogicAsync", ex);
 
-            SocketGuildUser clientUser = Context.Guild.CurrentUser;
+            IGuildUser clientUser = await Context.Guild.GetCurrentUserAsync(CacheMode.CacheOnly);
             if (clientUser.VoiceChannel != null)
             {
                 logger.Audio("Disconnected due to Error.");
@@ -95,14 +95,14 @@ public class AudioPlayFeature(
         return true;
     }
 
-    public async Task<VoiceConnectionResultEnum> CheckAndReconnectBotIfNeededAsync(SocketCommandContext context, ServerAudioResource audioResource)
+    public async Task<VoiceConnectionResultEnum> CheckAndReconnectBotIfNeededAsync(ICommandContext context, ServerAudioResource audioResource)
     {
-        SocketGuildUser clientUser = Context.Guild.CurrentUser;
+        IGuildUser clientUser = await Context.Guild.GetCurrentUserAsync(CacheMode.CacheOnly);
         VoiceConnectionResultEnum result = VoiceConnectionResultEnum.AlreadyConnected;
         //First connection
         if (audioResource.AudioVariables.FallbackVoiceChannelId == 0)
         {
-            SocketVoiceChannel channel = ((SocketGuildUser) context.User).VoiceChannel;
+            IVoiceChannel channel = ((IGuildUser) context.User).VoiceChannel;
 
             if (channel == null)
             {
@@ -122,7 +122,7 @@ public class AudioPlayFeature(
         //Reconnection
         else if (clientUser.VoiceChannel == null)
         {
-            SocketVoiceChannel channel = context.Guild.GetVoiceChannel(audioResource.AudioVariables.FallbackVoiceChannelId);
+            IVoiceChannel channel = await context.Guild.GetVoiceChannelAsync(audioResource.AudioVariables.FallbackVoiceChannelId, CacheMode.CacheOnly);
 
             audioResource.AudioVariables.AudioClient = await channel.ConnectAsync(disconnect: false);
             result = VoiceConnectionResultEnum.Reconnected;
@@ -162,10 +162,10 @@ public class AudioPlayFeature(
     private async Task<bool> WaitAsync(ServerAudioResource audioResource)
     {
         int waitedSeconds = 0;
-        SocketGuildUser clientUser;
+        IGuildUser clientUser;
         do
         {
-            clientUser = Context.Guild.CurrentUser;
+            clientUser = await Context.Guild.GetCurrentUserAsync(CacheMode.CacheOnly);
             //if the bot disconnected for some other reason, leave the loop and clear the request list
             if (clientUser.VoiceChannel == null)
             {

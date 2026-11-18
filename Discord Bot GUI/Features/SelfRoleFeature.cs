@@ -1,8 +1,7 @@
 ﻿using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
-using Discord.Rest;
-using Discord.WebSocket;
+using Discord;
 
 namespace Discord_Bot.Features;
 
@@ -21,22 +20,22 @@ public class SelfRoleFeature(
         {
             RoleResource? role = await roleService.GetRoleAsync(Context.Guild.Id, Context.Message.Content[1..].ToLower());
 
-            RestUserMessage? reply = null;
+            IUserMessage? reply = null;
             if (role != null)
             {
-                SocketRole discordRole = Context.Guild.GetRole(role.DiscordId);
+                IRole discordRole = Context.Guild.GetRole(role.DiscordId);
 
                 switch (Context.Message.Content[0])
                 {
                     case '+':
                     {
-                        await ((SocketGuildUser) Context.User).AddRoleAsync(discordRole);
+                        await ((IGuildUser) Context.User).AddRoleAsync(discordRole);
                         reply = await Context.Channel.SendMessageAsync($"You now have the `{discordRole.Name}` role!");
                         break;
                     }
                     case '-':
                     {
-                        await ((SocketGuildUser) Context.User).RemoveRoleAsync(discordRole);
+                        await ((IGuildUser) Context.User).RemoveRoleAsync(discordRole);
                         reply = await Context.Channel.SendMessageAsync($"`{discordRole.Name}` role has been removed!");
                         break;
                     }
