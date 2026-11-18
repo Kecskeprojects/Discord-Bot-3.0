@@ -15,9 +15,11 @@ using Discord_Bot.Processors.EmbedProcessors.LastFm;
 using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Services;
 using Discord_Bot.Windows;
+using LastFmApi;
 using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
+using RestSharp;
 
 namespace Discord_Bot;
 
@@ -130,6 +132,13 @@ public static class Startup
         _ = collection.AddTransient<IMusicBrainzAPI, MusicBrainzAPI>();
         _ = collection.AddTransient<ITwitterScraper, TwitterScraper>();
         _ = collection.AddTransient<IKpopDbScraper, KpopDbScraper>();
+
+        //Last.fm: one long-lived RestClient, as RestSharp recommends; tests replace BaseRequests to fake the HTTP layer
+        _ = collection.AddSingleton(new BaseRequests(new RestClient(LastFmApi.Constant.LastFmApiBaseUri)));
+        _ = collection.AddSingleton<UserBasedRequests>();
+        _ = collection.AddSingleton<InfoBasedRequests>();
+        _ = collection.AddSingleton<UtilityRequests>();
+        _ = collection.AddSingleton<WhoKnowsRequests>();
 
         _ = collection.AddLogging();
     }

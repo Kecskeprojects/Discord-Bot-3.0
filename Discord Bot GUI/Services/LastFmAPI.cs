@@ -15,8 +15,19 @@ using LastFmApi.Models.TopTrack;
 
 namespace Discord_Bot.Services;
 
-public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, IConfig config) : ILastFmAPI
+public class LastFmAPI(
+    UserBasedRequests userBasedRequests,
+    InfoBasedRequests infoBasedRequests,
+    UtilityRequests utilityRequests,
+    WhoKnowsRequests whoKnowsRequests,
+    ISpotifyAPI spotifyAPI,
+    IBotLogger logger,
+    IConfig config) : ILastFmAPI
 {
+    private readonly UserBasedRequests userBasedRequests = userBasedRequests;
+    private readonly InfoBasedRequests infoBasedRequests = infoBasedRequests;
+    private readonly UtilityRequests utilityRequests = utilityRequests;
+    private readonly WhoKnowsRequests whoKnowsRequests = whoKnowsRequests;
     private readonly ISpotifyAPI spotifyAPI = spotifyAPI;
     private readonly IBotLogger logger = logger;
     private readonly IConfig config = config;
@@ -24,7 +35,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, IConfig config
     #region Last.fm top calls
     public async Task<LastFmListResult> GetTopAlbumsAsync(string lastFmUsername, int limit, int? page, string period)
     {
-        GenericResponseItem<Topalbums> restResult = await UserBasedRequests.TopAlbums(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
+        GenericResponseItem<Topalbums> restResult = await userBasedRequests.TopAlbums(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
         logger.Query("Last.fm request URL:\n" + restResult.RequestDetails?.ToString());
 
         LastFmListResult result = new();
@@ -65,7 +76,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, IConfig config
 
     public async Task<LastFmListResult> GetTopArtistsAsync(string lastFmUsername, int limit, int? page, string period)
     {
-        GenericResponseItem<Topartists> restResult = await UserBasedRequests.TopArtists(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
+        GenericResponseItem<Topartists> restResult = await userBasedRequests.TopArtists(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
         logger.Query("Last.fm request URL:\n" + restResult.RequestDetails?.ToString());
 
         LastFmListResult result = new();
@@ -106,7 +117,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, IConfig config
 
     public async Task<LastFmListResult> GetTopTracksAsync(string lastFmUsername, int limit, int? page, string period)
     {
-        GenericResponseItem<Toptracks> restResult = await UserBasedRequests.TopTracks(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
+        GenericResponseItem<Toptracks> restResult = await userBasedRequests.TopTracks(config.Lastfm_API_Key, lastFmUsername, limit, page, period);
         logger.Query("Last.fm request URL:\n" + restResult.RequestDetails?.ToString());
 
         LastFmListResult result = new();
@@ -149,7 +160,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, IConfig config
     #region Last.fm recent calls
     public async Task<NowPlayingResult> GetNowPlayingAsync(string lastFmUsername)
     {
-        GenericResponseItem<Recenttracks> restResult = await UserBasedRequests.NowPlaying(config.Lastfm_API_Key, lastFmUsername);
+        GenericResponseItem<Recenttracks> restResult = await userBasedRequests.NowPlaying(config.Lastfm_API_Key, lastFmUsername);
         logger.Query("Last.fm request URL:\n" + restResult.RequestDetails?.ToString());
 
         NowPlayingResult result = new();
@@ -167,7 +178,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, IConfig config
         SpotifyImageSearchResult? spotifySearch = await spotifyAPI.SearchItemAsync(track.Artist.Mbid, track.Artist.Text, track.Name);
 
         GenericResponseItem<LastFmApi.Models.TrackInfo.Track> trackInfo =
-            await InfoBasedRequests.TrackPlays(config.Lastfm_API_Key, lastFmUsername, track.Artist.Text, track.Name);
+            await infoBasedRequests.TrackPlays(config.Lastfm_API_Key, lastFmUsername, track.Artist.Text, track.Name);
         if (!trackInfo.IsSuccess)
         {
             string? resultMessage = LastFmHelper.GetResultMessage(trackInfo.ResultCode, trackInfo.Message);
@@ -190,7 +201,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, IConfig config
 
     public async Task<LastFmListResult> GetRecentsAsync(string lastFmUsername, int limit)
     {
-        GenericResponseItem<Recenttracks> restResult = await UserBasedRequests.Recents(config.Lastfm_API_Key, lastFmUsername, limit);
+        GenericResponseItem<Recenttracks> restResult = await userBasedRequests.Recents(config.Lastfm_API_Key, lastFmUsername, limit);
         logger.Query("Last.fm request URL:\n" + restResult.RequestDetails?.ToString());
 
         LastFmListResult result = new();
@@ -275,7 +286,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, IConfig config
         result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (albums.Count == 0 ? tracks[0].Image?[^1].Text : albums[0].Image?[^1].Text);
 
         GenericResponseItem<LastFmApi.Models.ArtistInfo.Artist> artistInfo =
-            await InfoBasedRequests.ArtistPlays(config.Lastfm_API_Key, name, artist_name);
+            await infoBasedRequests.ArtistPlays(config.Lastfm_API_Key, name, artist_name);
         if (!artistInfo.IsSuccess)
         {
             result.Message = LastFmHelper.GetResultMessage(artistInfo.ResultCode, artistInfo.Message);
@@ -296,7 +307,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, IConfig config
     {
         List<string> usernameList = users.Select(x => x.LastFmUsername).OfType<string>().ToList();
         GenericResponseItem<WhoKnowsResponseItem> restResult =
-            await WhoKnowsRequests.WhoKnowsByCurrentlyPlayingAsync(config.Lastfm_API_Key, lastFmUsername, usernameList);
+            await whoKnowsRequests.WhoKnowsByCurrentlyPlayingAsync(config.Lastfm_API_Key, lastFmUsername, usernameList);
 
         return await CreateWhoKnowsResultAsync(restResult, users);
     }
@@ -312,7 +323,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, IConfig config
             artistName = config.Lastfm_Artist_Input_Replacement.GetValueOrDefault(artistName, artistName);
             string trackName = input.Split('>')[1].Trim().ToLower();
 
-            restResult = await WhoKnowsRequests.WhoKnowsByTrackAsync(config.Lastfm_API_Key, artistName, trackName, usernameList);
+            restResult = await whoKnowsRequests.WhoKnowsByTrackAsync(config.Lastfm_API_Key, artistName, trackName, usernameList);
         }
         else
         {
@@ -320,7 +331,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, IConfig config
             string artistName = input.Trim().ToLower();
             artistName = config.Lastfm_Artist_Input_Replacement.GetValueOrDefault(artistName, artistName);
 
-            restResult = await WhoKnowsRequests.WhoKnowsByArtistAsync(config.Lastfm_API_Key, artistName, usernameList);
+            restResult = await whoKnowsRequests.WhoKnowsByArtistAsync(config.Lastfm_API_Key, artistName, usernameList);
         }
 
         return await CreateWhoKnowsResultAsync(restResult, users);
@@ -367,7 +378,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, IConfig config
     private async Task<GenericResponseItem<int>> TotalPlaysAsync(string lastFmUsername, string? period = null)
     {
         GenericResponseItem<int> totalPlay =
-            await UtilityRequests.TotalPlays(config.Lastfm_API_Key, lastFmUsername, period);
+            await utilityRequests.TotalPlays(config.Lastfm_API_Key, lastFmUsername, period);
 
         foreach (LastFmRequestDetails item in totalPlay.RequestDetailList)
         {
@@ -389,7 +400,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, IConfig config
     private async Task<string?> GetSongMonthlyRankingAsync(string username, string artist_name, string track_name)
     {
         GenericResponseItem<string> ranking =
-            await UtilityRequests.GetSongMonthlyRankingAsync(config.Lastfm_API_Key, username, artist_name, track_name);
+            await utilityRequests.GetSongMonthlyRankingAsync(config.Lastfm_API_Key, username, artist_name, track_name);
 
         foreach (LastFmRequestDetails item in ranking.RequestDetailList)
         {
@@ -413,7 +424,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, IConfig config
     private async Task<GenericResponseItem<List<LastFmApi.Models.TopAlbum.Album>>> GetEveryAlbumUserListenedToFromArtistAsync(string username, string artistName)
     {
         GenericResponseItem<List<LastFmApi.Models.TopAlbum.Album>> albumsListenedTo =
-            await UtilityRequests.GetEveryAlbumUserListenedToFromArtistAsync(config.Lastfm_API_Key, username, artistName);
+            await utilityRequests.GetEveryAlbumUserListenedToFromArtistAsync(config.Lastfm_API_Key, username, artistName);
 
         foreach (LastFmRequestDetails item in albumsListenedTo.RequestDetailList)
         {
@@ -435,7 +446,7 @@ public class LastFmAPI(ISpotifyAPI spotifyAPI, IBotLogger logger, IConfig config
     private async Task<GenericResponseItem<List<LastFmApi.Models.TopTrack.Track>>> GetEveryTrackUserListenedToFromArtistAsync(string username, string artistName)
     {
         GenericResponseItem<List<LastFmApi.Models.TopTrack.Track>> tracksListenedTo =
-            await UtilityRequests.GetEveryTrackUserListenedToFromArtistAsync(config.Lastfm_API_Key, username, artistName);
+            await utilityRequests.GetEveryTrackUserListenedToFromArtistAsync(config.Lastfm_API_Key, username, artistName);
 
         foreach (LastFmRequestDetails item in tracksListenedTo.RequestDetailList)
         {

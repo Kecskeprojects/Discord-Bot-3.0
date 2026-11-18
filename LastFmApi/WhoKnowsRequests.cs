@@ -3,9 +3,12 @@ using LastFmApi.Enum;
 
 namespace LastFmApi;
 
-public static class WhoKnowsRequests
+public sealed class WhoKnowsRequests(UserBasedRequests userBasedRequests, InfoBasedRequests infoBasedRequests)
 {
-    public static async Task<GenericResponseItem<WhoKnowsResponseItem>> WhoKnowsByCurrentlyPlayingAsync(string apiKey, string username, List<string> usernameList)
+    private readonly UserBasedRequests userBasedRequests = userBasedRequests;
+    private readonly InfoBasedRequests infoBasedRequests = infoBasedRequests;
+
+    public async Task<GenericResponseItem<WhoKnowsResponseItem>> WhoKnowsByCurrentlyPlayingAsync(string apiKey, string username, List<string> usernameList)
     {
         GenericResponseItem<WhoKnowsResponseItem> response = new()
         {
@@ -15,7 +18,7 @@ public static class WhoKnowsRequests
         try
         {
             //Check if they are playing something
-            GenericResponseItem<Models.Recent.Recenttracks> restNowPlaying = await UserBasedRequests.NowPlaying(apiKey, username);
+            GenericResponseItem<Models.Recent.Recenttracks> restNowPlaying = await userBasedRequests.NowPlaying(apiKey, username);
             response.AddRequestDetailsOf(restNowPlaying);
 
             if (!restNowPlaying.IsSuccess)
@@ -37,7 +40,7 @@ public static class WhoKnowsRequests
             {
                 //Get their number of plays on given song
                 GenericResponseItem<Models.TrackInfo.Track> trackInfo =
-                    await InfoBasedRequests.TrackPlays(apiKey, user, artist_name, track_name);
+                    await infoBasedRequests.TrackPlays(apiKey, user, artist_name, track_name);
                 response.AddRequestDetailsOf(trackInfo);
 
                 if (!trackInfo.IsSuccess)
@@ -77,7 +80,7 @@ public static class WhoKnowsRequests
         return response;
     }
 
-    public static async Task<GenericResponseItem<WhoKnowsResponseItem>> WhoKnowsByTrackAsync(string apiKey, string artistName, string trackName, List<string> usernameList)
+    public async Task<GenericResponseItem<WhoKnowsResponseItem>> WhoKnowsByTrackAsync(string apiKey, string artistName, string trackName, List<string> usernameList)
     {
         GenericResponseItem<WhoKnowsResponseItem> response = new()
         {
@@ -90,7 +93,7 @@ public static class WhoKnowsRequests
             {
                 //Get their number of plays on given song
                 GenericResponseItem<Models.TrackInfo.Track> trackInfo =
-                    await InfoBasedRequests.TrackPlays(apiKey, user, artistName, trackName);
+                    await infoBasedRequests.TrackPlays(apiKey, user, artistName, trackName);
                 response.AddRequestDetailsOf(trackInfo);
 
                 if (!trackInfo.IsSuccess)
@@ -130,7 +133,7 @@ public static class WhoKnowsRequests
         return response;
     }
 
-    public static async Task<GenericResponseItem<WhoKnowsResponseItem>> WhoKnowsByArtistAsync(string apiKey, string artistName, List<string> usernameList)
+    public async Task<GenericResponseItem<WhoKnowsResponseItem>> WhoKnowsByArtistAsync(string apiKey, string artistName, List<string> usernameList)
     {
         GenericResponseItem<WhoKnowsResponseItem> response = new()
         {
@@ -166,11 +169,11 @@ public static class WhoKnowsRequests
         return response;
     }
 
-    private static async Task<Models.ArtistInfo.Artist?> FillArtistDataAsync(string apiKey, GenericResponseItem<WhoKnowsResponseItem> response, string userName, string artistName, string? trackName = null)
+    private async Task<Models.ArtistInfo.Artist?> FillArtistDataAsync(string apiKey, GenericResponseItem<WhoKnowsResponseItem> response, string userName, string artistName, string? trackName = null)
     {
         //Get artist data for a few stats
         GenericResponseItem<Models.ArtistInfo.Artist> artistInfo =
-            await InfoBasedRequests.ArtistPlays(apiKey, userName, artistName);
+            await infoBasedRequests.ArtistPlays(apiKey, userName, artistName);
         response.AddRequestDetailsOf(artistInfo);
 
         if (!artistInfo.IsSuccess)

@@ -3,10 +3,15 @@ using RestSharp;
 
 namespace LastFmApi;
 
-public class BaseRequests
+/// <summary>
+/// Sends the two kinds of Last.fm requests. The application keeps one instance with one long-lived client,
+/// as RestSharp recommends; tests pass a client whose message handler returns saved responses.
+/// </summary>
+public sealed class BaseRequests(RestClient client)
 {
-    private static readonly RestClient client = new(Constant.LastFmApiBaseUri);
-    protected static async Task<RestResponse> UserBasedRequestHandler(UserBasedRequestItem item)
+    private readonly RestClient client = client;
+
+    internal async Task<RestResponse> UserBasedRequestHandler(UserBasedRequestItem item)
     {
         string query = $"?method={item.Type}&user={Uri.EscapeDataString(item.Username)}&api_key={item.ApiKey}";
 
@@ -31,7 +36,7 @@ public class BaseRequests
         return await client.GetAsync(request);
     }
 
-    protected static async Task<RestResponse> InfoBasedRequestHandler(InfoBasedRequestItem item)
+    internal async Task<RestResponse> InfoBasedRequestHandler(InfoBasedRequestItem item)
     {
         string query = $"?method={item.Type}&api_key={item.ApiKey}&artist={Uri.EscapeDataString(item.Artist)}&username={Uri.EscapeDataString(item.Username)}";
 

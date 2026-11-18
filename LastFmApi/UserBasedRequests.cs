@@ -9,9 +9,11 @@ using RestSharp;
 
 namespace LastFmApi;
 
-public class UserBasedRequests : BaseRequests
+public sealed class UserBasedRequests(BaseRequests baseRequests)
 {
-    public static async Task<GenericResponseItem<Toptracks>> TopTracks(string apiKey, string username, int? limit, int? page, string? period)
+    private readonly BaseRequests baseRequests = baseRequests;
+
+    public async Task<GenericResponseItem<Toptracks>> TopTracks(string apiKey, string username, int? limit, int? page, string? period)
     {
         GenericResponseItem<Toptracks> response = new()
         {
@@ -28,7 +30,7 @@ public class UserBasedRequests : BaseRequests
             UserBasedRequestItem request = new("user.gettoptracks", username, apiKey, limit, page, period);
             response.RequestDetails = new LastFmRequestDetails(request);
 
-            RestResponse restResultJSON = await UserBasedRequestHandler(request);
+            RestResponse restResultJSON = await baseRequests.UserBasedRequestHandler(request);
             TopTrack? deserialized = JsonConvert.DeserializeObject<TopTrack>(restResultJSON.Content ?? "");
 
             response.Response = deserialized?.TopTracks;
@@ -43,7 +45,7 @@ public class UserBasedRequests : BaseRequests
         return response;
     }
 
-    public static async Task<GenericResponseItem<Topalbums>> TopAlbums(string apiKey, string username, int? limit, int? page, string? period)
+    public async Task<GenericResponseItem<Topalbums>> TopAlbums(string apiKey, string username, int? limit, int? page, string? period)
     {
         GenericResponseItem<Topalbums> response = new()
         {
@@ -62,7 +64,7 @@ public class UserBasedRequests : BaseRequests
             response.RequestDetails = new LastFmRequestDetails(request);
 
             //Getting data from api
-            RestResponse restResultJSON = await UserBasedRequestHandler(request);
+            RestResponse restResultJSON = await baseRequests.UserBasedRequestHandler(request);
             TopAlbum? deserialized = JsonConvert.DeserializeObject<TopAlbum>(restResultJSON.Content ?? "");
 
             response.Response = deserialized?.TopAlbums;
@@ -77,7 +79,7 @@ public class UserBasedRequests : BaseRequests
         return response;
     }
 
-    public static async Task<GenericResponseItem<Topartists>> TopArtists(string apiKey, string username, int? limit, int? page, string? period)
+    public async Task<GenericResponseItem<Topartists>> TopArtists(string apiKey, string username, int? limit, int? page, string? period)
     {
         GenericResponseItem<Topartists> response = new()
         {
@@ -96,7 +98,7 @@ public class UserBasedRequests : BaseRequests
             response.RequestDetails = new LastFmRequestDetails(request);
 
             //Getting data from api
-            RestResponse restResultJSON = await UserBasedRequestHandler(request);
+            RestResponse restResultJSON = await baseRequests.UserBasedRequestHandler(request);
             TopArtist? deserialized = JsonConvert.DeserializeObject<TopArtist>(restResultJSON.Content ?? "");
 
             response.Response = deserialized?.TopArtists;
@@ -111,7 +113,7 @@ public class UserBasedRequests : BaseRequests
         return response;
     }
 
-    public static async Task<GenericResponseItem<Recenttracks>> Recents(string apiKey, string username, int? limit)
+    public async Task<GenericResponseItem<Recenttracks>> Recents(string apiKey, string username, int? limit)
     {
         GenericResponseItem<Recenttracks> response = new()
         {
@@ -133,7 +135,7 @@ public class UserBasedRequests : BaseRequests
             response.RequestDetails = new LastFmRequestDetails(request);
 
             //Getting data from api
-            RestResponse restResultJSON = await UserBasedRequestHandler(request);
+            RestResponse restResultJSON = await baseRequests.UserBasedRequestHandler(request);
             Recent? deserialized = JsonConvert.DeserializeObject<Recent>(restResultJSON.Content ?? "");
 
             response.Response = deserialized?.RecentTracks;
@@ -148,7 +150,7 @@ public class UserBasedRequests : BaseRequests
         return response;
     }
 
-    public static async Task<GenericResponseItem<Recenttracks>> NowPlaying(string apiKey, string username)
+    public async Task<GenericResponseItem<Recenttracks>> NowPlaying(string apiKey, string username)
     {
         GenericResponseItem<Recenttracks> response = new()
         {
@@ -170,7 +172,7 @@ public class UserBasedRequests : BaseRequests
             response.RequestDetails = new LastFmRequestDetails(request);
 
             //Getting data from api
-            RestResponse restResultJSON = await UserBasedRequestHandler(request);
+            RestResponse restResultJSON = await baseRequests.UserBasedRequestHandler(request);
             Recent? deserialized = JsonConvert.DeserializeObject<Recent>(restResultJSON.Content ?? "");
 
             //If the Attr is not empty in the first index, it means the first song is a song that is currently playing

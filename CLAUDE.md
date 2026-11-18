@@ -10,7 +10,7 @@ A self-hosted Discord bot that runs as a **Windows WPF desktop app** (the window
 
 - `Discord Bot GUI/`: the bot itself (WPF app, root namespace `Discord_Bot`, assembly `Discord Bot`).
 - `DatabaseORM/`: the database layer as a plain `net11.0` class library (no WPF or Discord.Net), referenced by the bot and modeled on the project of the same name in KecskeProjectsSite. Its namespaces are `DatabaseORM.*`. Keep its .NET version in step with the bot's.
-- `LastFmApi/`: a small RestSharp/Newtonsoft client for `ws.audioscrobbler.com`, referenced by the bot. Keep its target framework in step with the bot's.
+- `LastFmApi/`: a small RestSharp/Newtonsoft client for `ws.audioscrobbler.com`, referenced by the bot. Keep its target framework in step with the bot's. Its request classes are instances: `BaseRequests` holds the one `RestClient`, the others build on it, and `Startup` registers them all as singletons (tests swap `BaseRequests` for one over a fake HTTP handler).
 - `MainDB/`: a legacy (non-SDK) SSDT `.sqlproj`, the **source of truth for the database schema**. It builds and publishes only from Visual Studio, not `dotnet build`.
 - `Latest_Release.sql`: a full deployment script, but git-ignored and local only. The dev PC's copy dates from 2023, so the source of truth is `MainDB/`.
 - `diagram.drawio` / `diagram.png`: the DB diagram.

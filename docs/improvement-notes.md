@@ -12,7 +12,7 @@ Done and removed on 2026-11-17 (the investigations are in `git show 483c1fa:docs
 
 ## To check by hand
 
-- **Run the bot once against the dev database and Discord.** Since the last real run, the database layer moved into `DatabaseORM`, implicit usings were turned on, and Windows Forms was removed (2026-11-17). Since then, `Startup.Run()` was split, `IConfig` added, `TimeProvider` injected and `Global` replaced by the state stores (2026-11-18). Worth a try: a reminder (`!remind in 1m>test`), a short mute, a self-role request, a bias game (start, stop, and one played to the end), and music (a YouTube search, a playlist link, and waiting until the inactivity disconnect).
+- **Run the bot once against the dev database and Discord.** Since the last real run, the database layer moved into `DatabaseORM`, implicit usings were turned on, and Windows Forms was removed (2026-11-17). Since then, `Startup.Run()` was split, `IConfig` added, `TimeProvider` injected, `Global` replaced by the state stores and `LastFmApi` made instance-based (2026-11-18). Worth a try: a Last.fm top list and who-knows, a reminder (`!remind in 1m>test`), a short mute, a self-role request, a bias game (start, stop, and one played to the end), and music (a YouTube search, a playlist link, and waiting until the inactivity disconnect).
   - What has been checked: builds, `dotnet format` and throwaway programs. Those resolved every DB service through the real `Startup.Run()`, ran `ProcessTools.GetStatistics()` (RAM figure, WMI child process count) and loaded a resx bitmap.
   - Worth a look in the window: the diagnostics line.
 - **Correct the scraped idol genders on the dev and the live database.**
@@ -96,31 +96,32 @@ The analyzer setup is done and described in CLAUDE.md ("Linting"). Left:
 
 What has to be mockable so tests can leave out the database, the external APIs and the scraping. These classes have no interface yet, in order of how much code each one makes testable:
 
-1. **Last.fm: fake only the HTTP layer (updated 2026-11-17).**
-   - **Why this one place is enough:** all of `LastFmApi` (858 lines) sends through one static `RestClient` in `BaseRequests`, in two methods: `UserBasedRequestHandler` and `InfoBasedRequestHandler`, each a single `GetAsync`.
-     - `UserBasedRequests`, `InfoBasedRequests`, `UtilityRequests` and `WhoKnowsRequests` are static methods on top of it, with no other I/O.
-     - The bot's `LastFmAPI` (456 lines) calls 14 of those methods. It also uses `ISpotifyAPI` (already an interface), `IBotLogger` and `Config`, which it reads only for `Lastfm_API_Key`. It uses no clock, `WebTools`, `Global`, files or randomness.
+1. **Last.fm: fake only the HTTP layer (the seam is done, 2026-11-18).**
+   - **Why this one place is enough:** all of `LastFmApi` (858 lines) sends through one `RestClient` in `BaseRequests`, in two methods: `UserBasedRequestHandler` and `InfoBasedRequestHandler`, each a single `GetAsync`. The request classes on top of it do no other I/O.
+     - The bot's `LastFmAPI` (456 lines) calls 14 of their methods. It also uses `ISpotifyAPI` (already an interface), `IBotLogger` and `IConfig`, which it reads only for `Lastfm_API_Key`. It uses no clock, `WebTools`, shared state, files or randomness.
      - Faking only the HTTP responses therefore tests the whole chain:
        - query building (escaping, `limit` / `page` / `period`)
        - success and error handling
        - JSON deserialization
        - the paging and aggregation in `UtilityRequests` and `WhoKnowsRequests`
        - `LastFmAPI`'s list results, now playing, artist stats and who-knows
-   - **The seam: make `LastFmApi` instance-based, with the client injected (chosen 2026-11-17, so the tests can run in parallel).**
-     - `BaseRequests` takes its `RestClient` in the constructor instead of holding a static one. RestSharp recommends one long-lived client, and it is thread-safe, so the bot registers a single instance.
-     - The four request classes become instance classes. `UserBasedRequests` and `InfoBasedRequests` take the `BaseRequests`; `UtilityRequests` and `WhoKnowsRequests` take the request classes they call.
-     - The bot registers them in `Startup`, and `LastFmAPI` takes them in its constructor.
-     - Size: `BaseRequests`, the four classes, 8 cross-calls inside `LastFmApi`, `LastFmAPI`'s 14 calls (the only caller outside the library) and the registrations. `LastFmHelper` stays static (pure helpers).
-     - Keep the API key as a parameter of each call. `LastFmAPI` reads it from `Config` per call, so an edited key still applies without a restart.
-     - Interfaces aren't needed for these tests: they build the real classes over a fake client. Interfaces would only matter for mocking `LastFmAPI`'s own dependencies.
-     - **In a test:** `new RestClient(new RestClientOptions(Constant.LastFmApiBaseUri) { ConfigureMessageHandler = _ => fakeHandler })` (RestSharp 114). The fake `HttpMessageHandler` returns saved JSON and can assert on the request URL.
-     - **Speed, honestly:** tests against saved responses take milliseconds each, so running them in parallel saves little at first. The bigger gain is isolation: no shared static client to reset between tests. That also lets the integration tests (below) swap only the HTTP edge of a real container.
+   - **The seam (done 2026-11-18):** `LastFmApi` is instance-based, with the client injected.
+     - `BaseRequests` takes its `RestClient` in the constructor, and its two handlers are `internal`.
+     - `UserBasedRequests` and `InfoBasedRequests` take the `BaseRequests` instead of inheriting from it. `UtilityRequests` and `WhoKnowsRequests` take the request classes they call.
+     - `Startup` registers one `BaseRequests`, with one long-lived `RestClient` as RestSharp recommends, and the four classes as singletons. `LastFmAPI` takes them in its constructor.
+     - The API key stays a parameter of each call, read from `IConfig` per call. `LastFmHelper` stays static.
+     - Checked with a throwaway program, with a fake HTTP layer behind the real container:
+       - Top tracks sent the same query strings as before, and summed the play count over two pages.
+       - A Last.fm error came back as the result message.
+       - Two containers with different fakes ran in parallel without mixing their results.
+   - **In a test:** register `new BaseRequests(new RestClient(new RestClientOptions(LastFmApi.Constant.LastFmApiBaseUri) { ConfigureMessageHandler = _ => fakeHandler }))` after `Startup.ConfigureServices`, or build the request classes directly over it. The fake `HttpMessageHandler` returns saved JSON and can assert on the request URL.
+     - Tests against saved responses take milliseconds each, so running them in parallel saves little at first. The bigger gain is isolation: no shared static client to reset between tests.
    - **Saved responses:** record each Last.fm method once from the real API (`user.gettoptracks`, `user.gettopalbums`, `user.gettopartists`, `user.getrecenttracks`, `artist.getinfo`, `track.getinfo`, plus an error response). Keep them as JSON files in the test project.
      - The fake handler picks the file by the `method=` parameter (and the page, for the paging helpers).
      - Use your own account's data, or replace the usernames.
      - Saved responses can drift from the live API, so re-record them when Last.fm changes a format.
    - **Config:** a `LastFmAPI` test mocks `IConfig`; only `Lastfm_API_Key` is read.
-   - **Spotify:** only artist stats use it (for the image); mock `ISpotifyAPI` there.
+   - **Spotify:** `LastFmAPI` asks it for the image in the top lists, recents, now playing, artist stats and who-knows (corrected 2026-11-18; it isn't only the artist stats). Mock `ISpotifyAPI` in all of them; returning null falls back to Last.fm's own image.
 2. **`BrowserService`** (Puppeteer, a concrete singleton) → `IBrowserService` (`OpenBrowser`, `CloseBrowser`, `NewPage`).
    - `BiasScrapingProcessor` (136 lines: matching scraped idols to the database, the group check, image changes) only uses it to close the browser at the end. With the interface it can be tested with mocked `IKpopDbScraper` and `IIdolService`.
    - Optional: to test the scrapers' HTML parsing (`KpopDbScraper.ParseRow` and the group scraping), split loading a page from parsing it, so the parsing takes the page content and tests can feed it saved pages.
@@ -223,7 +224,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
 - **Suggested order:**
   1. Static tools and Mapster mapping tests, with no code changes. Then the DI composition test on `Startup.ConfigureServices`.
   2. DB services with mocked repositories.
-  3. `LastFmApi` made instance-based with the injected client. Then tests for `LastFmApi` and the bot's `LastFmAPI` against saved responses, run in parallel. They go in `Discord Bot GUI.Tests`, which reaches `LastFmApi` through the bot.
+  3. Tests for `LastFmApi` and the bot's `LastFmAPI` against saved responses, run in parallel (the injected client is done). They go in `Discord Bot GUI.Tests`, which reaches `LastFmApi` through the bot.
   4. Integration tests: the DB layer on LocalDB, and Last.fm through the real container.
   5. `IBrowserService` and `IWebTools`; then `BiasScrapingProcessor` and the who-knows embed.
   6. The features (`TimeProvider` and the state stores are done).
@@ -307,6 +308,7 @@ Can the disabled embeds be turned back on as they are, with adjustments and with
 
 ## Minor improvements
 
+- **RestSharp versions differ (found 2026-11-18):** `LastFmApi` references 114.0.0 and the bot 114.1.0. NuGet uses 114.1.0 for both in the bot's build, which matters now that the bot creates the `RestClient` that `LastFmApi` uses. Raise `LastFmApi` to 114.1.0, so the library builds against what it runs with.
 - **`Config` as a singleton (investigated 2026-11-18):** `Config` is registered transient. Each instance builds its own configuration with `reloadOnChange`, which watches `Assets/` and is never disposed.
   - Measured with a throwaway program: 500 instances held about 500 extra OS handles until a full garbage collection released them. So it isn't a leak, but each `Config` a command resolves keeps a handle open until the next collection.
   - One long-lived `Config` picked up an edit to `config.json` within 1.5 seconds, so a singleton would still apply edits without a restart.

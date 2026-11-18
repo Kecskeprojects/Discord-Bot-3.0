@@ -3,9 +3,11 @@ using LastFmApi.Enum;
 
 namespace LastFmApi;
 
-public static class UtilityRequests
+public sealed class UtilityRequests(UserBasedRequests userBasedRequests)
 {
-    public static async Task<GenericResponseItem<int>> TotalPlays(string apiKey, string username, string? period)
+    private readonly UserBasedRequests userBasedRequests = userBasedRequests;
+
+    public async Task<GenericResponseItem<int>> TotalPlays(string apiKey, string username, string? period)
     {
         GenericResponseItem<int> response = new()
         {
@@ -16,7 +18,7 @@ public static class UtilityRequests
             int page = 1, totalpage, totalplays = 0;
             do
             {
-                GenericResponseItem<Models.TopArtist.Topartists> restResult = await UserBasedRequests.TopArtists(apiKey, username, 1000, page, period);
+                GenericResponseItem<Models.TopArtist.Topartists> restResult = await userBasedRequests.TopArtists(apiKey, username, 1000, page, period);
                 response.AddRequestDetailsOf(restResult);
 
                 if (!restResult.IsSuccess)
@@ -47,7 +49,7 @@ public static class UtilityRequests
         return response;
     }
 
-    public static async Task<GenericResponseItem<string>> GetSongMonthlyRankingAsync(string apiKey, string username, string artist_name, string track_name)
+    public async Task<GenericResponseItem<string>> GetSongMonthlyRankingAsync(string apiKey, string username, string artist_name, string track_name)
     {
         GenericResponseItem<string> response = new()
         {
@@ -60,7 +62,7 @@ public static class UtilityRequests
             List<Models.TopTrack.Track> allPlays = [];
             do
             {
-                GenericResponseItem<Models.TopTrack.Toptracks> restResult = await UserBasedRequests.TopTracks(apiKey, username, 1000, page, "1month");
+                GenericResponseItem<Models.TopTrack.Toptracks> restResult = await userBasedRequests.TopTracks(apiKey, username, 1000, page, "1month");
                 response.AddRequestDetailsOf(restResult);
 
                 if (!restResult.IsSuccess)
@@ -109,7 +111,7 @@ public static class UtilityRequests
         return response;
     }
 
-    public static async Task<GenericResponseItem<List<Models.TopAlbum.Album>>> GetEveryAlbumUserListenedToFromArtistAsync(string apiKey, string username, string artistName)
+    public async Task<GenericResponseItem<List<Models.TopAlbum.Album>>> GetEveryAlbumUserListenedToFromArtistAsync(string apiKey, string username, string artistName)
     {
         GenericResponseItem<List<Models.TopAlbum.Album>> response = new()
         {
@@ -122,7 +124,7 @@ public static class UtilityRequests
 
             do
             {
-                GenericResponseItem<Models.TopAlbum.Topalbums> restResult = await UserBasedRequests.TopAlbums(apiKey, username, 1000, page, null);
+                GenericResponseItem<Models.TopAlbum.Topalbums> restResult = await userBasedRequests.TopAlbums(apiKey, username, 1000, page, null);
                 response.AddRequestDetailsOf(restResult);
 
                 if (!restResult.IsSuccess)
@@ -161,7 +163,7 @@ public static class UtilityRequests
         return response;
     }
 
-    public static async Task<GenericResponseItem<List<Models.TopTrack.Track>>> GetEveryTrackUserListenedToFromArtistAsync(string apiKey, string username, string artistName)
+    public async Task<GenericResponseItem<List<Models.TopTrack.Track>>> GetEveryTrackUserListenedToFromArtistAsync(string apiKey, string username, string artistName)
     {
         GenericResponseItem<List<Models.TopTrack.Track>> response = new()
         {
@@ -174,7 +176,7 @@ public static class UtilityRequests
 
             do
             {
-                GenericResponseItem<Models.TopTrack.Toptracks> restResult = await UserBasedRequests.TopTracks(apiKey, username, 1000, page, null);
+                GenericResponseItem<Models.TopTrack.Toptracks> restResult = await userBasedRequests.TopTracks(apiKey, username, 1000, page, null);
                 response.AddRequestDetailsOf(restResult);
 
                 if (!restResult.IsSuccess)

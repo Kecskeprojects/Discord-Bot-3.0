@@ -7,10 +7,12 @@ using RestSharp;
 
 namespace LastFmApi;
 
-public class InfoBasedRequests : BaseRequests
+public sealed class InfoBasedRequests(BaseRequests baseRequests)
 {
+    private readonly BaseRequests baseRequests = baseRequests;
+
     #region Api getInfo calls
-    public static async Task<GenericResponseItem<Models.ArtistInfo.Artist>> ArtistPlays(string apiKey, string username, string artistName)
+    public async Task<GenericResponseItem<Models.ArtistInfo.Artist>> ArtistPlays(string apiKey, string username, string artistName)
     {
         GenericResponseItem<Models.ArtistInfo.Artist> response = new()
         {
@@ -29,7 +31,7 @@ public class InfoBasedRequests : BaseRequests
             InfoBasedRequestItem request = new("artist.getInfo", username, apiKey, artistName);
             response.RequestDetails = new LastFmRequestDetails(request);
 
-            RestResponse restResultJSON = await InfoBasedRequestHandler(request);
+            RestResponse restResultJSON = await baseRequests.InfoBasedRequestHandler(request);
             ArtistInfo? deserialized = JsonConvert.DeserializeObject<ArtistInfo>(restResultJSON.Content ?? "");
 
             response.Response = deserialized?.Artist;
@@ -44,7 +46,7 @@ public class InfoBasedRequests : BaseRequests
         return response;
     }
 
-    public static async Task<GenericResponseItem<Track>> TrackPlays(string apiKey, string username, string artistName, string trackName)
+    public async Task<GenericResponseItem<Track>> TrackPlays(string apiKey, string username, string artistName, string trackName)
     {
         GenericResponseItem<Track> response = new()
         {
@@ -67,7 +69,7 @@ public class InfoBasedRequests : BaseRequests
             };
             response.RequestDetails = new LastFmRequestDetails(request);
 
-            RestResponse restResultJSON = await InfoBasedRequestHandler(request);
+            RestResponse restResultJSON = await baseRequests.InfoBasedRequestHandler(request);
             TrackInfo? deserialized = JsonConvert.DeserializeObject<TrackInfo>(restResultJSON.Content ?? "");
 
             response.Response = deserialized?.Track;
