@@ -4,6 +4,7 @@ using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
 using Discord.WebSocket;
+using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
 
 namespace Discord_Bot.Features;
@@ -32,7 +33,7 @@ public class ReminderFeature(
                 foreach (ReminderResource reminder in result)
                 {
                     //Modify message
-                    reminder.Message = reminder.Message.Insert(0, $"You told me to remind you at `{reminder.Date}` with the following message:\n\n");
+                    reminder.Message = reminder.Message.Insert(0, $"You told me to remind you at {DiscordTools.UtcTimestamp(reminder.Date, TimestampTagStyles.ShortDateTime)} with the following message:\n\n");
 
                     //Try getting user
                     IUser user = await client.GetUserAsync(reminder.UserDiscordId);

@@ -308,7 +308,7 @@ Can the disabled embeds be turned back on as they are, with adjustments and with
 
 ## Minor improvements
 
-- **RestSharp versions differ (found 2026-11-18):** `LastFmApi` references 114.0.0 and the bot 114.1.0. NuGet uses 114.1.0 for both in the bot's build, which matters now that the bot creates the `RestClient` that `LastFmApi` uses. Raise `LastFmApi` to 114.1.0, so the library builds against what it runs with.
+- **RestSharp versions aligned (found and done 2026-11-18):** `LastFmApi` referenced 114.0.0 while the bot used 114.1.0, which NuGet then used for both. It now references 114.1.0 too, so the library builds against what it runs with.
 - **`Config` as a singleton (investigated 2026-11-18):** `Config` is registered transient. Each instance builds its own configuration with `reloadOnChange`, which watches `Assets/` and is never disposed.
   - Measured with a throwaway program: 500 instances held about 500 extra OS handles until a full garbage collection released them. So it isn't a leak, but each `Config` a command resolves keeps a handle open until the next collection.
   - One long-lived `Config` picked up an edit to `config.json` within 1.5 seconds, so a singleton would still apply edits without a restart.
@@ -328,7 +328,12 @@ Can the disabled embeds be turned back on as they are, with adjustments and with
   - To do that, install EF's templates (`dotnet new install Microsoft.EntityFrameworkCore.Templates`, from nuget.org), run `dotnet new ef-templates` in the `DatabaseORM` folder, add the directive to `CodeTemplates/EFCore/EntityType.t4`, and re-scaffold once. `Scaffold-DbContext` and `dotnet ef dbcontext scaffold` use those templates automatically.
   - The templates must stay CRLF; LF templates are reported to produce an extra blank line per line. `.gitattributes` already checks them out that way.
   - The cost: the templates become the project's own copy, so after an EF upgrade, refresh them and re-add the line.
-- **Culture in interpolated strings (found 2026-11-16):** CA1305 doesn't cover them. For example `LastFmListResultTools` writes `{percentage}%`, which shows "12,5%" under hu-HU and "12.5%" under en-US. Leave it as is if the server's culture is the intended display format.
+- **Culture in interpolated strings (found 2026-11-16, done 2026-11-18):** CA1305 doesn't cover interpolated strings, so their numbers and dates followed the culture of the Windows account that runs the bot (the dev PC is hu-HU). Only two reached Discord, and both are fixed:
+  - **The Last.fm top lists:** the percentage now uses `CultureInfo.InvariantCulture` ("33.33%"; before, "33,33%" under hu-HU).
+  - **The reminder DM:** the time is now a Discord timestamp, which Discord shows in each reader's own time zone and language. Before, it was the UTC time in the machine's date format, without saying it was UTC.
+  - **Found along the way, the same fix:** the reminder list already used a Discord timestamp, but on the date read from the database. SQL Server returns it without a `DateTimeKind`, and `TimestampTag` then reads it as the machine's local time. On a machine set to Central European time, the list showed every reminder one hour early (two in summer); on a server set to UTC, it was right.
+    - `DiscordTools.UtcTimestamp` marks the time as UTC first. The reminder DM, the reminder list, the "I will remind you" reply and the two mute messages all use it now.
+  - Checked with a throwaway program on the hu-HU, Central European dev PC: the top list shows "33.33%", and a database date of 14:00 UTC becomes `<t:1795010400:f>`, which is 14:00 UTC.
 - **YouTube playlist start point:** let the user choose which song or index a playlist import starts from (`YoutubeAPI.PlaylistSearch`). It currently always takes the first page of 50 (`MaxResults`).
 - **YouTube duplicate on playlist import:** when a video link that also carries a playlist (`&list=`) is imported as a playlist (`YoutubeAPI.AddPlaylistAsync`), the video itself can be queued twice if it is in the imported part of the playlist. Skip it.
 - **YouTube search matching:** look into a similarity or points-based ranking of search results, beyond the current channel and filter-word filtering in `YoutubeAPI.FilteredResults`. It first came up searching for "Withcha" by Apink.

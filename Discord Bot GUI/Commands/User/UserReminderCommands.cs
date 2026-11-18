@@ -6,6 +6,7 @@ using Discord;
 using Discord.Commands;
 using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.EmbedProcessors;
+using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
 
 namespace Discord_Bot.Commands.User;
@@ -66,7 +67,7 @@ public class UserReminderCommands(
                 DbProcessResultEnum result = await reminderService.AddReminderAsync(Context.User.Id, date, remindMessage);
                 string resultMessage = result switch
                 {
-                    DbProcessResultEnum.Success => $"Alright, I will remind you {TimestampTag.FromDateTime(date, TimestampTagStyles.Relative)}.",
+                    DbProcessResultEnum.Success => $"Alright, I will remind you {DiscordTools.UtcTimestamp(date, TimestampTagStyles.Relative)}.",
                     _ => "Reminder could not be added, talk to dumbass owner!"
                 };
                 _ = await ReplyAsync(resultMessage);

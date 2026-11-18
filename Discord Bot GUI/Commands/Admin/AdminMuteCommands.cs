@@ -7,6 +7,7 @@ using Discord.Commands;
 using Discord.Rest;
 using Discord.WebSocket;
 using Discord_Bot.Interfaces;
+using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
 
 namespace Discord_Bot.Commands.Admin;
@@ -116,7 +117,7 @@ public class AdminMuteCommands(
                 DbProcessResultEnum result = await serverMutedUserService.AddMutedUserAsync(Context.Guild.Id, user.Id, now, mutedUntil, string.Join(";", roleList.Select(x => x.Id)));
                 string resultMessage = result switch
                 {
-                    DbProcessResultEnum.Success => $"User has been muted until {TimestampTag.FromDateTime(mutedUntil, TimestampTagStyles.ShortDateTime)}",
+                    DbProcessResultEnum.Success => $"User has been muted until {DiscordTools.UtcTimestamp(mutedUntil, TimestampTagStyles.ShortDateTime)}",
                     DbProcessResultEnum.AlreadyExists => "User Already muted.",
                     _ => "User can't be unmuted because of a database error!"
                 };
@@ -128,7 +129,7 @@ public class AdminMuteCommands(
                 }
 
                 _ = await ReplyAsync(resultMessage);
-                _ = await guildUser.SendMessageAsync($"You have been muted in '**{Context.Guild.Name}**' until {TimestampTag.FromDateTime(mutedUntil, TimestampTagStyles.ShortDateTime)}.");
+                _ = await guildUser.SendMessageAsync($"You have been muted in '**{Context.Guild.Name}**' until {DiscordTools.UtcTimestamp(mutedUntil, TimestampTagStyles.ShortDateTime)}.");
             }
         }
         catch (Exception ex)

@@ -1,5 +1,6 @@
 ﻿using DatabaseORM.Resources;
 using Discord;
+using Discord_Bot.Tools;
 
 namespace Discord_Bot.Processors.EmbedProcessors;
 
@@ -13,7 +14,7 @@ public static class UserReminderListEmbedProcessor
         int i = 1;
         foreach (ReminderResource reminder in list)
         {
-            _ = builder.AddField($"#{i} {TimestampTag.FromDateTime(reminder.Date, TimestampTagStyles.ShortDateTime)}", reminder.Message);
+            _ = builder.AddField($"#{i} {DiscordTools.UtcTimestamp(reminder.Date, TimestampTagStyles.ShortDateTime)}", reminder.Message);
             i++;
         }
         return [builder.Build()];

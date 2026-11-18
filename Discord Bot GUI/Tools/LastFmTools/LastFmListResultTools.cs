@@ -15,7 +15,7 @@ public static class LastFmListResultTools
             double percentage = Math.Round(double.Parse(album.PlayCount, CultureInfo.InvariantCulture) / result.TotalPlays * 100, 2);
 
             //One line in the embed
-            result.EmbedFields[index] += $"`#{i + 1}`**{album.Name}** by **{album.Artist.Name}** - *{percentage}%* (*{album.PlayCount} plays*)\n";
+            result.EmbedFields[index] += $"`#{i + 1}`**{album.Name}** by **{album.Artist.Name}** - *{percentage.ToString(CultureInfo.InvariantCulture)}%* (*{album.PlayCount} plays*)\n";
 
             //If we went through 10 results, start filling a new list page
             if (i > 0 && (i + 1) % 10 == 0)
@@ -35,7 +35,7 @@ public static class LastFmListResultTools
             double percentage = Math.Round(double.Parse(artist.PlayCount, CultureInfo.InvariantCulture) / result.TotalPlays * 100, 2);
 
             //One line in the embed
-            result.EmbedFields[index] += $"`#{i + 1}`**{artist.Name}** - *{percentage}%* (*{artist.PlayCount} plays*)\n";
+            result.EmbedFields[index] += $"`#{i + 1}`**{artist.Name}** - *{percentage.ToString(CultureInfo.InvariantCulture)}%* (*{artist.PlayCount} plays*)\n";
 
             //If we went through 10 results, start filling a new list page
             if (i > 0 && (i + 1) % 10 == 0)
@@ -54,7 +54,7 @@ public static class LastFmListResultTools
             double percentage = Math.Round(double.Parse(track.PlayCount, CultureInfo.InvariantCulture) / result.TotalPlays * 100, 2);
 
             //One line in the embed
-            result.EmbedFields[index] += $"`#{i + 1}`**{track.Name}** by **{track.Artist.Name}** - *{percentage}%* (*{track.PlayCount} plays*)\n";
+            result.EmbedFields[index] += $"`#{i + 1}`**{track.Name}** by **{track.Artist.Name}** - *{percentage.ToString(CultureInfo.InvariantCulture)}%* (*{track.PlayCount} plays*)\n";
 
             //If we went through 10 results, start filling a new list page
             if (i > 0 && (i + 1) % 10 == 0)

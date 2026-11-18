@@ -110,6 +110,13 @@ public static class DiscordTools
         return user.GetDisplayAvatarUrl(format, size);
     }
 
+    //Discord shows a timestamp in each reader's own time zone and language
+    //The bot's times are UTC, but the database returns them without a kind, which TimestampTag would read as the machine's local time
+    public static TimestampTag UtcTimestamp(DateTime utcTime, TimestampTagStyles style)
+    {
+        return TimestampTag.FromDateTime(DateTime.SpecifyKind(utcTime, DateTimeKind.Utc), style);
+    }
+
     //An interaction can only be responded to once, after that (including after DeferAsync) only followups are accepted
     public static async Task RespondOrFollowupAsync(IDiscordInteraction interaction, string text, bool ephemeral = false)
     {
