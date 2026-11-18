@@ -22,11 +22,13 @@
 //[Summary("Twitter related commands")]
 //public class UserTwitterScraperCommands(
 //    ITwitterScraper twitterScraper,
+//    IWebService webService,
 //    IServerService serverService,
 //    IBotLogger logger,
 //    IConfig config) : BaseCommand(logger, config, serverService)
 //{
 //    private readonly ITwitterScraper twitterScraper = twitterScraper;
+//    private readonly IWebService webService = webService;
 
 //    [Command("twt")]
 //    [Summary("For embedding twitter links, replacing the built in discord embeds\n*Links have to be separated by at least a space")]
@@ -70,7 +72,7 @@
 //                        }
 //                    }
 
-//                    List<FileAttachment> attachments = await SocialMessageProcessor.GetAttachments("twitter", result.Content, limit: 30);
+//                    List<FileAttachment> attachments = await SocialMessageProcessor.GetAttachments(webService, "twitter", result.Content, limit: 30);
 //                    if (!CollectionTools.IsNullOrEmpty(attachments))
 //                    {
 //                        try
@@ -84,7 +86,7 @@
 //                            {
 //                                logger.Warning("UserTwitterScraperCommands.cs ScrapeFromUrl", "Embed too large, only sending images!");
 
-//                                attachments = await SocialMessageProcessor.GetAttachments("twitter", result.Content, sendVideos: false, limit: 30);
+//                                attachments = await SocialMessageProcessor.GetAttachments(webService, "twitter", result.Content, sendVideos: false, limit: 30);
 //                                if (!CollectionTools.IsNullOrEmpty(attachments))
 //                                {
 //                                    _ = await SendTwitterMessageAsync(attachments, result.TextContent, refer, true);

@@ -10,9 +10,10 @@ using System.Web;
 
 namespace Discord_Bot.Services;
 
-public class InstaScraper(IBotLogger logger) : IInstaScraper
+public class InstaScraper(IWebService webService, IBotLogger logger) : IInstaScraper
 {
     private readonly IBotLogger logger = logger;
+    private readonly IWebService webService = webService;
 
     #region Main Methods
     public async Task<SocialScrapingResult> GetDataFromUrl(Uri uri)
@@ -40,7 +41,7 @@ public class InstaScraper(IBotLogger logger) : IInstaScraper
             string shortcode = lastSegment[..slashIndex];
 
             string response =
-                await WebTools.GetBody($"https://www.instagram.com/graphql/query/?doc_id=8845758582119845&variables={{\"shortcode\":\"{shortcode}\"}}");
+                await webService.GetBody($"https://www.instagram.com/graphql/query/?doc_id=8845758582119845&variables={{\"shortcode\":\"{shortcode}\"}}");
 
             Root? body = JsonConvert.DeserializeObject<Root>(response);
 

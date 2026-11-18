@@ -3,7 +3,6 @@ using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord_Bot.Interfaces.Services;
-using Discord_Bot.Services;
 using Discord_Bot.Tools;
 
 namespace Discord_Bot.Processors;
@@ -11,7 +10,7 @@ namespace Discord_Bot.Processors;
 public class BiasScrapingProcessor(
     IIdolService idolService,
     IKpopDbScraper kpopDbScraper,
-    BrowserService browserService,
+    IBrowserService browserService,
     IBotLogger logger)
 {
     private readonly IIdolService idolService = idolService;

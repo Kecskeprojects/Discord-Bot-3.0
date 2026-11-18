@@ -5,7 +5,6 @@ using Discord_Bot.Features;
 using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors;
-using Discord_Bot.Services;
 using Discord_Bot.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
@@ -20,7 +19,7 @@ public sealed partial class App : Application, IDisposable
     //Set in OnStartup, which WPF runs before anything else in this class
     private IServiceProvider services = null!;
     private BotLogger logger = null!;
-    private BrowserService browserService = null!;
+    private IBrowserService browserService = null!;
     private Thread twitchThread = null!;
     //Null until OnStartup creates them, and stays null when startup fails before that
     private System.Timers.Timer? mainTimer;
@@ -109,7 +108,7 @@ public sealed partial class App : Application, IDisposable
 
         services = Discord_Bot.Startup.Run();
         logger = services.GetRequiredService<BotLogger>();
-        browserService = services.GetRequiredService<BrowserService>();
+        browserService = services.GetRequiredService<IBrowserService>();
 
         using (IServiceScope scope = services.CreateScope())
         {

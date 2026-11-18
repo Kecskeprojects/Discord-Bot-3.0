@@ -9,6 +9,7 @@ using Discord_Bot.Core;
 using Discord_Bot.Core.Configuration;
 using Discord_Bot.Features;
 using Discord_Bot.Interfaces;
+using Discord_Bot.Interfaces.Processors;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors;
 using Discord_Bot.Processors.EmbedProcessors.LastFm;
@@ -97,7 +98,7 @@ public static class Startup
         _ = collection.AddSingleton<BotWindow>();
 
         //Processors
-        _ = collection.AddTransient<WhoKnowsImageProcessor>();
+        _ = collection.AddTransient<IWhoKnowsImageProcessor, WhoKnowsImageProcessor>();
         _ = collection.AddTransient<BonkGifProcessor>();
         _ = collection.AddTransient<BiasGameImageProcessor>();
         _ = collection.AddTransient<BiasGameWinnerBracketImageProcessor>();
@@ -119,7 +120,8 @@ public static class Startup
         _ = collection.AddTransient<WeeklyPollFeature>();
 
         //Services
-        _ = collection.AddSingleton<BrowserService>();
+        _ = collection.AddSingleton<IBrowserService, BrowserService>();
+        _ = collection.AddSingleton<IWebService, WebService>();
         _ = collection.AddTransient<ITwitchAPI, TwitchAPI>();
         _ = collection.AddTransient<ITwitchCLI, TwitchCLI>();
         _ = collection.AddTransient<ISpotifyAPI, Services.SpotifyAPI>();

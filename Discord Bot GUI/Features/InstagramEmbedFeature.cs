@@ -14,10 +14,12 @@ namespace Discord_Bot.Features;
 public class InstagramEmbedFeature(
     //IInstaLoader instaLoader,
     IInstaScraper instaScraper,
+    IWebService webService,
     IServerService serverService,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IInstaScraper instaScraper = instaScraper;
+    private readonly IWebService webService = webService;
 
     //private readonly IInstaLoader instaLoader = instaLoader;
 
@@ -77,7 +79,7 @@ public class InstagramEmbedFeature(
                 }
             }
 
-            List<FileAttachment> attachments = await SocialMessageProcessor.GetAttachments("instagram", result.Content, limit: 30);
+            List<FileAttachment> attachments = await SocialMessageProcessor.GetAttachments(webService, "instagram", result.Content, limit: 30);
             if (!CollectionTools.IsNullOrEmpty(attachments))
             {
                 try
@@ -96,7 +98,7 @@ public class InstagramEmbedFeature(
                             item.Dispose();
                         }
                         attachments.Clear();
-                        attachments = await SocialMessageProcessor.GetAttachments("instagram", result.Content, sendVideos: false, limit: 1000);
+                        attachments = await SocialMessageProcessor.GetAttachments(webService, "instagram", result.Content, sendVideos: false, limit: 1000);
                         if (!CollectionTools.IsNullOrEmpty(attachments))
                         {
                             _ = await SendInstagramMessageAsync(attachments, result.TextContent, refer, true);

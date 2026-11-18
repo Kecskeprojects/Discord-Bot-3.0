@@ -4,7 +4,7 @@ using Discord.LibDave.Binding;
 using Discord.WebSocket;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces;
-using Discord_Bot.Tools;
+using Discord_Bot.Interfaces.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord_Bot;
@@ -15,6 +15,7 @@ public sealed class BotMain(
     CommandHandler commandHandler,
     DiscordSocketClient client,
     AudioStateStore audioStates,
+    IWebService webService,
     IBotLogger logger) : IDisposable
 {
     #region Variables
@@ -23,6 +24,7 @@ public sealed class BotMain(
     private readonly CommandHandler commandHandler = commandHandler;
     private readonly DiscordSocketClient client = client;
     private readonly AudioStateStore audioStates = audioStates;
+    private readonly IWebService webService = webService;
     private readonly IBotLogger logger = logger;
 
     //Stops the startup call and the reconnect timer from logging in at the same time
@@ -40,7 +42,7 @@ public sealed class BotMain(
 
         try
         {
-            if (!WebTools.TestConnection())
+            if (!webService.TestConnection())
             {
                 return;
             }

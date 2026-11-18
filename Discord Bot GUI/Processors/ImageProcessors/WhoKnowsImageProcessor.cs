@@ -1,5 +1,6 @@
 ﻿using DatabaseORM.Interface;
 using Discord_Bot.Communication;
+using Discord_Bot.Interfaces.Processors;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.Extensions;
 using ImageMagick;
@@ -8,7 +9,7 @@ using System.IO;
 
 namespace Discord_Bot.Processors.ImageProcessors;
 
-public class WhoKnowsImageProcessor(IBotLogger logger)
+public class WhoKnowsImageProcessor(IBotLogger logger) : IWhoKnowsImageProcessor
 {
     private readonly IBotLogger logger = logger;
 

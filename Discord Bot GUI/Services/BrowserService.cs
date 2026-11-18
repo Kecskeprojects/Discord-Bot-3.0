@@ -1,16 +1,17 @@
 ﻿using DatabaseORM.Interface;
 using Discord_Bot.Interfaces;
+using Discord_Bot.Interfaces.Services;
 using PuppeteerSharp;
 
 namespace Discord_Bot.Services;
 
-public class BrowserService(IBotLogger logger, IConfig config)
+public class BrowserService(IBotLogger logger, IConfig config) : IBrowserService
 {
     private readonly IBotLogger logger = logger;
     private readonly IConfig config = config;
     private IBrowser? Browser { get; set; }
 
-    public async Task<IBrowser> OpenBrowser()
+    private async Task<IBrowser> OpenBrowser()
     {
         BrowserFetcher browserFetcher = new(SupportedBrowser.Chrome);
         _ = await browserFetcher.DownloadAsync(PuppeteerSharp.BrowserData.Chrome.DefaultBuildId); //117.0.5938.62 is the last version where videos were sent as media http responses

@@ -11,10 +11,10 @@ using PuppeteerSharp.Input;
 
 namespace Discord_Bot.Services;
 
-public class KpopDbScraper(IBotLogger logger, BrowserService browserService) : IKpopDbScraper
+public class KpopDbScraper(IBotLogger logger, IBrowserService browserService) : IKpopDbScraper
 {
     private readonly IBotLogger logger = logger;
-    private readonly BrowserService browserService = browserService;
+    private readonly IBrowserService browserService = browserService;
 
     public async Task<List<ExtendedBiasData>> ExtractFromDatabaseTableAsync()
     {

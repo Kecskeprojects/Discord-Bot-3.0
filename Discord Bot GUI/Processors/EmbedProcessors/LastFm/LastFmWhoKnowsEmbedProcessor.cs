@@ -1,16 +1,17 @@
 ﻿using DatabaseORM.Interface;
 using Discord;
 using Discord_Bot.Communication;
-using Discord_Bot.Processors.ImageProcessors;
+using Discord_Bot.Interfaces.Processors;
+using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.LastFm;
-using Discord_Bot.Tools;
 using System.IO;
 
 namespace Discord_Bot.Processors.EmbedProcessors.LastFm;
 
-public class LastFmWhoKnowsEmbedProcessor(WhoKnowsImageProcessor whoKnowsImageProcessor, IBotLogger logger) : LastFmBaseEmbedProcessor
+public class LastFmWhoKnowsEmbedProcessor(IWhoKnowsImageProcessor whoKnowsImageProcessor, IWebService webService, IBotLogger logger) : LastFmBaseEmbedProcessor
 {
-    private readonly WhoKnowsImageProcessor whoKnowsImageProcessor = whoKnowsImageProcessor;
+    private readonly IWhoKnowsImageProcessor whoKnowsImageProcessor = whoKnowsImageProcessor;
+    private readonly IWebService webService = webService;
     private readonly IBotLogger logger = logger;
 
     public async Task<WhoKnowsEmbedResult> CreateEmbed(WhoKnows wk)
@@ -23,7 +24,7 @@ public class LastFmWhoKnowsEmbedProcessor(WhoKnowsImageProcessor whoKnowsImagePr
         {
             //Download image and get back it's filepath
             logger.Query($"Getting album cover image:\n{wk.ImageUrl}");
-            using (MemoryStream originalImage = await WebTools.GetStream(wk.ImageUrl))
+            using (MemoryStream originalImage = await webService.GetStream(wk.ImageUrl))
             {
                 //Edit the picture to the list format
                 EditPictureResult? modifiedImage = whoKnowsImageProcessor.EditPicture(originalImage, wk.Plays, wk.EmbedTitle);

@@ -5,6 +5,7 @@ using Discord.Commands;
 using Discord.Rest;
 using Discord.WebSocket;
 using Discord_Bot.Interfaces;
+using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Tools;
 using System.IO;
@@ -16,11 +17,13 @@ namespace Discord_Bot.Commands.User;
 [Summary("Bonk")]
 public class UserBonkCommands(
     BonkGifProcessor bonkGifProcessor,
+    IWebService webService,
     IServerService serverService,
     IBotLogger logger,
     IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly BonkGifProcessor bonkGifProcessor = bonkGifProcessor;
+    private readonly IWebService webService = webService;
 
     [Command("bonk")]
     [Alias(["hornyjail, hit me please"])]
@@ -87,7 +90,7 @@ public class UserBonkCommands(
             if (!string.IsNullOrEmpty(url))
             {
                 logger.Query($"Getting profile image:\n{url}");
-                using (MemoryStream stream = await WebTools.GetStream(url))
+                using (MemoryStream stream = await webService.GetStream(url))
                 using (MemoryStream? gifStream = bonkGifProcessor.CreateBonkImage(stream, frameDelay))
                 {
                     //Null when the gif could not be made, the processor already logged why

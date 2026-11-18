@@ -10,10 +10,10 @@ using System.Web;
 
 namespace Discord_Bot.Services;
 
-public class TwitterScraper(IBotLogger logger, BrowserService browserService) : ITwitterScraper
+public class TwitterScraper(IBotLogger logger, IBrowserService browserService) : ITwitterScraper
 {
     private readonly IBotLogger logger = logger;
-    private readonly BrowserService browserService = browserService;
+    private readonly IBrowserService browserService = browserService;
 
     private Root? Body { get; set; }
 

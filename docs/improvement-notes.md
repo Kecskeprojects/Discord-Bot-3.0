@@ -12,7 +12,7 @@ Done and removed on 2026-11-17 (the investigations are in `git show 483c1fa:docs
 
 ## To check by hand
 
-- **Run the bot once against the dev database and Discord.** Since the last real run, the database layer moved into `DatabaseORM`, implicit usings were turned on, and Windows Forms was removed (2026-11-17). Since then, `Startup.Run()` was split, `IConfig` added, `TimeProvider` injected, `Global` replaced by the state stores and `LastFmApi` made instance-based (2026-11-18). Worth a try: a Last.fm top list and who-knows, a reminder (`!remind in 1m>test`), a short mute, a self-role request, a bias game (start, stop, and one played to the end), and music (a YouTube search, a playlist link, and waiting until the inactivity disconnect).
+- **Run the bot once against the dev database and Discord.** Since the last real run, the database layer moved into `DatabaseORM`, implicit usings were turned on, and Windows Forms was removed (2026-11-17). Since then, `Startup.Run()` was split, `IConfig` added, `TimeProvider` injected, `Global` replaced by the state stores `LastFmApi` made instance-based, and `IBrowserService` and `IWebService` added (2026-11-18). Worth a try: a Last.fm top list and who-knows (with its image), a bonk, a reminder (`!remind in 1m>test`), a short mute, a self-role request, a bias game (start, stop, and one played to the end), and music (a YouTube search, a playlist link, and waiting until the inactivity disconnect).
   - What has been checked: builds, `dotnet format` and throwaway programs. Those resolved every DB service through the real `Startup.Run()`, ran `ProcessTools.GetStatistics()` (RAM figure, WMI child process count) and loaded a resx bitmap.
   - Worth a look in the window: the diagnostics line.
 - **Correct the scraped idol genders on the dev and the live database.**
@@ -122,12 +122,16 @@ What has to be mockable so tests can leave out the database, the external APIs a
      - Saved responses can drift from the live API, so re-record them when Last.fm changes a format.
    - **Config:** a `LastFmAPI` test mocks `IConfig`; only `Lastfm_API_Key` is read.
    - **Spotify:** `LastFmAPI` asks it for the image in the top lists, recents, now playing, artist stats and who-knows (corrected 2026-11-18; it isn't only the artist stats). Mock `ISpotifyAPI` in all of them; returning null falls back to Last.fm's own image.
-2. **`BrowserService`** (Puppeteer, a concrete singleton) → `IBrowserService` (`OpenBrowser`, `CloseBrowser`, `NewPage`).
-   - `BiasScrapingProcessor` (136 lines: matching scraped idols to the database, the group check, image changes) only uses it to close the browser at the end. With the interface it can be tested with mocked `IKpopDbScraper` and `IIdolService`.
+2. **`BrowserService` → `IBrowserService` (done 2026-11-18).** The interface has the two members its users call, `NewPage` and `CloseBrowser`; `OpenBrowser` became private, since only `NewPage` uses it.
+   - `BiasScrapingProcessor` (136 lines: matching scraped idols to the database, the group check, image changes) only uses it to close the browser at the end. It can now be tested with mocked `IBrowserService`, `IKpopDbScraper` and `IIdolService`.
    - Optional: to test the scrapers' HTML parsing (`KpopDbScraper.ParseRow` and the group scraping), split loading a page from parsing it, so the parsing takes the page content and tests can feed it saved pages.
-3. **`WebTools`** (static `HttpClient`: `GetStream`, `GetBody`, `TestConnection`) → an instance service behind an interface (e.g. `IWebTools`).
-   - `LastFmWhoKnowsEmbedProcessor`, `BiasGameImageProcessor`, `SocialMessageProcessor`, `InstaScraper`, `UserBonkCommands` and `BotMain` use it. With the interface, the image processors get a local test image instead of a download.
-   - `WhoKnowsImageProcessor` needs an interface too, so `LastFmWhoKnowsEmbedProcessor` (88 lines: download, draw, fall back to a plain embed) can be tested without Magick.NET.
+3. **`WebTools` → `IWebService` (done 2026-11-18).** `GetStream`, `GetBody` and `TestConnection` moved to `Services/WebService.cs`, a singleton behind `Interfaces/Services/IWebService.cs`. It's named a service because `Tools/` holds only static helpers.
+   - The old class created a new `HttpClient` for every call (not a static one, as this note said before). `WebService` keeps one, with connections renewed every 15 minutes so DNS changes still apply, and disposes each response.
+   - `LastFmWhoKnowsEmbedProcessor`, `BiasGameImageProcessor`, `InstaScraper`, `InstagramEmbedFeature`, `UserBonkCommands` and `BotMain` inject it. The static `SocialMessageProcessor.GetAttachments` takes it as a parameter.
+   - `WhoKnowsImageProcessor` is behind `Interfaces/Processors/IWhoKnowsImageProcessor.cs`, so `LastFmWhoKnowsEmbedProcessor` (download, draw, fall back to a plain embed) can be tested without a download or Magick.NET.
+   - Checked with a throwaway program:
+     - Against a local HTTP server, `WebService` returned a PNG byte for byte, converted an AVIF to PNG, and returned page text, including five calls at once.
+     - With a fake `IWebService` and `IWhoKnowsImageProcessor`, the who-knows embed fell back to the plain embed when the image failed and attached it when it worked.
 4. **YouTube.** `YoutubeAPI` (320 lines: watch, playlist and youtu.be links, keyword search with filtering, the playlist import, key rotation and quota counting) creates a `YouTubeService` for every search.
    - Fix: a small `IYoutubeDataClient` wrapping the three calls it makes (videos by ID, search, playlist items), and an interface for `YoutubeAddPlaylistFeature`, which waits for the user's answer in Discord.
    - The key quotas and the music queue are in `YoutubeKeyStore` and `AudioStateStore`; tests use real ones.
@@ -226,7 +230,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
   2. DB services with mocked repositories.
   3. Tests for `LastFmApi` and the bot's `LastFmAPI` against saved responses, run in parallel (the injected client is done). They go in `Discord Bot GUI.Tests`, which reaches `LastFmApi` through the bot.
   4. Integration tests: the DB layer on LocalDB, and Last.fm through the real container.
-  5. `IBrowserService` and `IWebTools`; then `BiasScrapingProcessor` and the who-knows embed.
+  5. `BiasScrapingProcessor` and the who-knows embed (`IBrowserService`, `IWebService` and `IWhoKnowsImageProcessor` are done).
   6. The features (`TimeProvider` and the state stores are done).
   7. The Discord interfaces, then whole-command integration tests.
   8. YouTube and Spotify.

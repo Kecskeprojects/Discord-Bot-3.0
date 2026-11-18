@@ -2,6 +2,7 @@
 using DatabaseORM.Resources;
 using Discord_Bot.Communication;
 using Discord_Bot.Core;
+using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Properties;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.Extensions;
@@ -10,9 +11,10 @@ using System.IO;
 
 namespace Discord_Bot.Processors.ImageProcessors;
 
-public class BiasGameImageProcessor(IBotLogger logger)
+public class BiasGameImageProcessor(IWebService webService, IBotLogger logger)
 {
     private readonly IBotLogger logger = logger;
+    private readonly IWebService webService = webService;
 
     public static Stream CombineImages(MemoryStream left, MemoryStream right)
     {
@@ -34,7 +36,7 @@ public class BiasGameImageProcessor(IBotLogger logger)
         logger.Query($"Getting latest idol image:\n{idol.LatestImageUrl}");
         //The game only picks idols that have an image (IdolRepository.GetListForGameAsync)
         string imageUrl = idol.LatestImageUrl ?? throw new InvalidOperationException($"Idol {idol.IdolId} has no image");
-        using MemoryStream stream = await WebTools.GetStream(imageUrl);
+        using MemoryStream stream = await webService.GetStream(imageUrl);
 
         return CreatePolaroid(idol, imageUrl, stream);
     }

@@ -1,13 +1,13 @@
 ﻿using Discord;
 using Discord_Bot.Communication;
 using Discord_Bot.Enums;
-using Discord_Bot.Tools;
+using Discord_Bot.Interfaces.Services;
 
 namespace Discord_Bot.Processors.MessageProcessor;
 
 public static class SocialMessageProcessor
 {
-    public static async Task<List<FileAttachment>> GetAttachments(string socialMedia, List<MediaContent> content, bool sendVideos = true, int limit = 10)
+    public static async Task<List<FileAttachment>> GetAttachments(IWebService webService, string socialMedia, List<MediaContent> content, bool sendVideos = true, int limit = 10)
     {
         List<FileAttachment> Embeds = [];
         string commonFileName = $"{socialMedia}_{DateTime.UtcNow:yyMMdd}_{DateTime.UtcNow:HHmmss}";
@@ -26,7 +26,7 @@ public static class SocialMessageProcessor
                 _ => ""
             };
 
-            Embeds.Add(new FileAttachment(await WebTools.GetStream(content[i].Url.OriginalString), fileName));
+            Embeds.Add(new FileAttachment(await webService.GetStream(content[i].Url.OriginalString), fileName));
         }
 
         return Embeds;
