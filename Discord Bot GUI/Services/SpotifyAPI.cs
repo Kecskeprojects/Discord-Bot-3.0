@@ -1,6 +1,5 @@
 ﻿using DatabaseORM.Interface;
 using Discord_Bot.Enums;
-using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.SpotifyAPI;
 using Discord_Bot.Tools.NativeTools;
@@ -8,10 +7,10 @@ using SpotifyAPI.Web;
 
 namespace Discord_Bot.Services;
 
-public class SpotifyAPI(IBotLogger logger, IConfig config, IYoutubeAPI youtubeAPI, IMusicBrainzAPI musicBrainzAPI) : ISpotifyAPI
+public class SpotifyAPI(IBotLogger logger, ISpotifyClientFactory spotifyClients, IYoutubeAPI youtubeAPI, IMusicBrainzAPI musicBrainzAPI) : ISpotifyAPI
 {
     private readonly IBotLogger logger = logger;
-    private readonly IConfig config = config;
+    private readonly ISpotifyClientFactory spotifyClients = spotifyClients;
     private readonly IYoutubeAPI youtubeAPI = youtubeAPI;
     private readonly IMusicBrainzAPI musicBrainzAPI = musicBrainzAPI;
 
@@ -41,8 +40,7 @@ public class SpotifyAPI(IBotLogger logger, IConfig config, IYoutubeAPI youtubeAP
     //The function running the query
     private async Task<SearchResultEnum> Run(string query, ulong serverId, ulong channelId, string username)
     {
-        SpotifyClientConfig configuration = SpotifyClientConfig.CreateDefault().WithAuthenticator(new ClientCredentialsAuthenticator(config.Spotify_Client_Id, config.Spotify_Client_Secret));
-        SpotifyClient spotify = new(configuration);
+        ISpotifyClient spotify = spotifyClients.GetClient();
 
         //Spotify link format: https://open.spotify.com/[TYPE]/[ID]?query, the id is 22 characters long
         if (Uri.IsWellFormedUriString(query, UriKind.Absolute))
@@ -128,8 +126,7 @@ public class SpotifyAPI(IBotLogger logger, IConfig config, IYoutubeAPI youtubeAP
 
             string artistId = new Uri(url).Segments[^1];
 
-            SpotifyClientConfig configuration = SpotifyClientConfig.CreateDefault().WithAuthenticator(new ClientCredentialsAuthenticator(config.Spotify_Client_Id, config.Spotify_Client_Secret));
-            SpotifyClient spotify = new(configuration);
+            ISpotifyClient spotify = spotifyClients.GetClient();
 
             string spotifyArtist = "";
 

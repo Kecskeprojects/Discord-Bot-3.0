@@ -7,8 +7,6 @@ using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
-using Google.Apis.Services;
-using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
 using System.Collections.Specialized;
 using System.Web;
@@ -17,6 +15,7 @@ namespace Discord_Bot.Services;
 
 public class YoutubeAPI(
     YoutubeAddPlaylistFeature youtubeAddPlaylistFeature,
+    IYoutubeDataClient youtubeData,
     YoutubeKeyStore youtubeKeys,
     AudioStateStore audioStates,
     IBotLogger logger,
@@ -24,6 +23,7 @@ public class YoutubeAPI(
 {
     #region Variables
     private readonly YoutubeAddPlaylistFeature youtubeAddPlaylistFeature = youtubeAddPlaylistFeature;
+    private readonly IYoutubeDataClient youtubeData = youtubeData;
     private readonly YoutubeKeyStore youtubeKeys = youtubeKeys;
     private readonly AudioStateStore audioStates = audioStates;
     private readonly IBotLogger logger = logger;
@@ -86,8 +86,6 @@ public class YoutubeAPI(
     //The function running the query
     private async Task<SearchResultEnum> Run(string apiKey, string query, string username, ulong serverId, ulong channelId)
     {
-        using YouTubeService youtubeService = CreateYoutubeService(apiKey);
-
         logger.Query($"API key used: {apiKey}");
 
         if (Uri.IsWellFormedUriString(query, UriKind.Absolute))
@@ -97,7 +95,7 @@ public class YoutubeAPI(
             {
                 if (uri.Host.Contains("youtu.be"))
                 {
-                    return await VideoSearch(youtubeService, uri.Segments[1], username, serverId);
+                    return await VideoSearch(apiKey, uri.Segments[1], username, serverId);
                 }
                 else if (uri.Segments[1] == "watch")
                 {
@@ -106,7 +104,7 @@ public class YoutubeAPI(
                     string? videoId = queryPart["v"];
                     SearchResultEnum videoResult = string.IsNullOrEmpty(videoId)
                         ? SearchResultEnum.YoutubeNotFound
-                        : await VideoSearch(youtubeService, videoId, username, serverId);
+                        : await VideoSearch(apiKey, videoId, username, serverId);
 
                     //Offered after the video search, so a retry with the next key (quota) does not offer it twice
                     string? playlistId = queryPart["list"];
@@ -124,7 +122,7 @@ public class YoutubeAPI(
                     string? playlistId = queryPart["list"];
                     return string.IsNullOrEmpty(playlistId)
                         ? SearchResultEnum.YoutubeNotFound
-                        : await PlaylistSearch(youtubeService, playlistId, username, serverId);
+                        : await PlaylistSearch(apiKey, playlistId, username, serverId);
                 }
                 else
                 {
@@ -134,39 +132,25 @@ public class YoutubeAPI(
         }
 
         //In any other case, search the result as a keyword
-        return await KeywordSearch(youtubeService, query, username, serverId);
+        return await KeywordSearch(apiKey, query, username, serverId);
     }
     #endregion
 
     #region Helper Methods
-    //The caller owns the service and has to dispose it
-    private YouTubeService CreateYoutubeService(string apiKey)
-    {
-        return new(new BaseClientService.Initializer()
-        {
-            ApiKey = apiKey,
-            ApplicationName = GetType().ToString()
-        });
-    }
-
     //Searching by video ID
-    private async Task<SearchResultEnum> VideoSearch(YouTubeService youtubeService, string query, string username, ulong serverId)
+    private async Task<SearchResultEnum> VideoSearch(string apiKey, string query, string username, ulong serverId)
     {
-        VideosResource.ListRequest searchListRequest = youtubeService.Videos.List("snippet,contentDetails");
-        searchListRequest.Id = query;
-        searchListRequest.MaxResults = 1;
-
         VideoListResponse searchListResponse = new();
         try
         {
-            searchListResponse = await searchListRequest.ExecuteAsync();
+            searchListResponse = await youtubeData.GetVideoAsync(apiKey, query);
         }
         catch (Exception ex) when (!IsQuotaExceeded(ex)) //A used-up quota goes up to RunWithKeyRotationAsync
         {
             logger.Error("YoutubeAPI.cs VideoSearch", ex);
         }
 
-        youtubeKeys.AddUsage(youtubeService.ApiKey, 1);
+        youtubeKeys.AddUsage(apiKey, 1);
 
         if (searchListResponse.Items == null || searchListResponse.Items.Count < 1)
         {
@@ -191,23 +175,19 @@ public class YoutubeAPI(
     }
 
     //Searching by keywords
-    private async Task<SearchResultEnum> KeywordSearch(YouTubeService youtubeService, string query, string username, ulong serverId)
+    private async Task<SearchResultEnum> KeywordSearch(string apiKey, string query, string username, ulong serverId)
     {
-        SearchResource.ListRequest searchListRequest = youtubeService.Search.List("id,snippet");
-        searchListRequest.Q = query;
-        searchListRequest.MaxResults = 20;
-
         SearchListResponse searchListResponse = new();
         try
         {
-            searchListResponse = await searchListRequest.ExecuteAsync();
+            searchListResponse = await youtubeData.SearchAsync(apiKey, query);
         }
         catch (Exception ex) when (!IsQuotaExceeded(ex)) //A used-up quota goes up to RunWithKeyRotationAsync
         {
             logger.Error("YoutubeAPI.cs KeywordSearch", ex);
         }
 
-        youtubeKeys.AddUsage(youtubeService.ApiKey, 100);
+        youtubeKeys.AddUsage(apiKey, 100);
 
         if (searchListResponse.Items == null || searchListResponse.Items.Count < 1)
         {
@@ -220,34 +200,29 @@ public class YoutubeAPI(
 
         if (searchListResponse.Items[0].Id.PlaylistId != null)
         {
-            return await PlaylistSearch(youtubeService, searchListResponse.Items[0].Id.PlaylistId, username, serverId);
+            return await PlaylistSearch(apiKey, searchListResponse.Items[0].Id.PlaylistId, username, serverId);
         }
         else if (searchListResponse.Items[0].Id.VideoId != null)
         {
-            return await VideoSearch(youtubeService, searchListResponse.Items[0].Id.VideoId, username, serverId);
+            return await VideoSearch(apiKey, searchListResponse.Items[0].Id.VideoId, username, serverId);
         }
         return SearchResultEnum.YoutubeNotFound;
     }
 
     //Searching by playlist ID
-    private async Task<SearchResultEnum> PlaylistSearch(YouTubeService youtubeService, string query, string username, ulong serverId)
+    private async Task<SearchResultEnum> PlaylistSearch(string apiKey, string query, string username, ulong serverId)
     {
-        PlaylistItemsResource.ListRequest searchListRequest = youtubeService.PlaylistItems.List("snippet,contentDetails");
-
-        searchListRequest.PlaylistId = query;
-        searchListRequest.MaxResults = 50;
-
         PlaylistItemListResponse searchListResponse = new();
         try
         {
-            searchListResponse = await searchListRequest.ExecuteAsync();
+            searchListResponse = await youtubeData.GetPlaylistItemsAsync(apiKey, query);
         }
         catch (Exception ex) when (!IsQuotaExceeded(ex)) //A used-up quota goes up to RunWithKeyRotationAsync
         {
             logger.Error("YoutubeAPI.cs PlaylistSearch", ex);
         }
 
-        youtubeKeys.AddUsage(youtubeService.ApiKey, 1);
+        youtubeKeys.AddUsage(apiKey, 1);
 
         if (searchListResponse.Items == null || searchListResponse.Items.Count < 1)
         {
@@ -259,7 +234,7 @@ public class YoutubeAPI(
         {
             try
             {
-                if (await VideoSearch(youtubeService, item.ContentDetails.VideoId, username, serverId) == SearchResultEnum.YoutubeFoundVideo)
+                if (await VideoSearch(apiKey, item.ContentDetails.VideoId, username, serverId) == SearchResultEnum.YoutubeFoundVideo)
                 {
                     queued++;
                 }
@@ -268,7 +243,7 @@ public class YoutubeAPI(
             catch (Exception ex) when (queued > 0 && IsQuotaExceeded(ex))
             {
                 logger.Warning("YoutubeAPI.cs PlaylistSearch", ex, LogOnly: true);
-                _ = youtubeKeys.ReplaceExhaustedKey(youtubeService.ApiKey);
+                _ = youtubeKeys.ReplaceExhaustedKey(apiKey);
                 logger.Log($"The quota ran out during the playlist import, {queued} songs were added.");
                 break;
             }
@@ -296,8 +271,7 @@ public class YoutubeAPI(
         return items;
     }
 
-    //Checking if user wants to add playlist
-    //It keeps running after Run returned and disposed its service, so it creates its own once the user said yes
+    //Checking if user wants to add playlist; it keeps running after Run returned, while the user decides
     private async Task AddPlaylistAsync(string playlistId, string username, ulong serverId, ulong channelId)
     {
         try
@@ -306,13 +280,7 @@ public class YoutubeAPI(
 
             if (result)
             {
-                _ = await RunWithKeyRotationAsync(async apiKey =>
-                {
-                    using (YouTubeService youtubeService = CreateYoutubeService(apiKey))
-                    {
-                        return await PlaylistSearch(youtubeService, playlistId, username, serverId);
-                    }
-                });
+                _ = await RunWithKeyRotationAsync(apiKey => PlaylistSearch(apiKey, playlistId, username, serverId));
             }
         }
         catch (Exception ex)

@@ -126,7 +126,9 @@ public static class Startup
         _ = collection.AddTransient<ITwitchAPI, TwitchAPI>();
         _ = collection.AddTransient<ITwitchCLI, TwitchCLI>();
         _ = collection.AddTransient<ISpotifyAPI, Services.SpotifyAPI>();
+        _ = collection.AddSingleton<ISpotifyClientFactory, SpotifyClientFactory>();
         _ = collection.AddTransient<IYoutubeAPI, YoutubeAPI>();
+        _ = collection.AddSingleton<IYoutubeDataClient, YoutubeDataClient>();
         //collection.AddTransient<IInstaLoader, InstaLoader>();
         _ = collection.AddTransient<IInstaScraper, InstaScraper>();
         _ = collection.AddTransient<IWordOfTheDayService, WordOfTheDayService>();

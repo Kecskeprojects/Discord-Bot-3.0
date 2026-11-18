@@ -75,8 +75,8 @@ Build the projects rather than the `.sln`, because the solution includes `MainDB
 | Discord | Discord.Net (`Startup.cs`, `BotMain.cs`) | Only the gateway intents in use (each is commented in `Startup.cs`); add one only when handling its events |
 | SQL Server | EF Core, `sql_connection_string` | Schema from `MainDB/` |
 | Last.fm | `LastFmApi` project + `Services/LastFmAPI.cs` | `lastfm_artist_input_replacement` in the config rewrites artist names. Check `IsSuccess` before reading a `GenericResponseItem`'s `Response` |
-| Spotify | SpotifyAPI.Web | Client credentials from the config |
-| YouTube Data API | Google.Apis.YouTube.v3 | **Several keys rotated** by quota through `YoutubeKeyStore`, refilled daily at 06:00 UTC, so edited keys apply then |
+| Spotify | SpotifyAPI.Web, through `ISpotifyClientFactory` | Client credentials from the config; one client until they change |
+| YouTube Data API | Google.Apis.YouTube.v3, through `IYoutubeDataClient` | **Several keys rotated** by quota through `YoutubeKeyStore`, refilled daily at 06:00 UTC, so edited keys apply then |
 | Twitch | TwitchLib `LiveStreamMonitor` (on its own thread from `App.xaml.cs`) + `twitch.exe` CLI | |
 | MusicBrainz | REST | Artist lookups |
 | dbkpop.com / kprofiles.com | Puppeteer scraping (`KpopDbScraper`, `BiasScrapingProcessor`) | Weekly idol data refresh |

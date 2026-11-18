@@ -12,7 +12,7 @@ Done and removed on 2026-11-17 (the investigations are in `git show 483c1fa:docs
 
 ## To check by hand
 
-- **Run the bot once against the dev database and Discord.** Since the last real run, the database layer moved into `DatabaseORM`, implicit usings were turned on, and Windows Forms was removed (2026-11-17). Since then, `Startup.Run()` was split, `IConfig` added, `TimeProvider` injected, `Global` replaced by the state stores `LastFmApi` made instance-based, `IBrowserService` and `IWebService` added, and the commands, interactions and features moved onto Discord.Net's interfaces (2026-11-18). Worth a try: a mute (by name and by ID) and an unmute, the R6 randomizer from a voice channel, a weekly poll edit, `!leave` while playing, a Last.fm top list and who-knows (with its image), a bonk, a reminder (`!remind in 1m>test`), a short mute, a self-role request, a bias game (start, stop, and one played to the end), and music (a YouTube search, a playlist link, and waiting until the inactivity disconnect).
+- **Run the bot once against the dev database and Discord.** Since the last real run, the database layer moved into `DatabaseORM`, implicit usings were turned on, and Windows Forms was removed (2026-11-17). Since then, `Startup.Run()` was split, `IConfig` added, `TimeProvider` injected, `Global` replaced by the state stores `LastFmApi` made instance-based, `IBrowserService` and `IWebService` added, and the commands, interactions and features moved onto Discord.Net's interfaces, and YouTube and Spotify put behind `IYoutubeDataClient` and `ISpotifyClientFactory` (2026-11-18). Worth a try: a Spotify track and playlist link, a mute (by name and by ID) and an unmute, the R6 randomizer from a voice channel, a weekly poll edit, `!leave` while playing, a Last.fm top list and who-knows (with its image), a bonk, a reminder (`!remind in 1m>test`), a short mute, a self-role request, a bias game (start, stop, and one played to the end), and music (a YouTube search, a playlist link, and waiting until the inactivity disconnect).
   - What has been checked: builds, `dotnet format` and throwaway programs. Those resolved every DB service through the real `Startup.Run()`, ran `ProcessTools.GetStatistics()` (RAM figure, WMI child process count) and loaded a resx bitmap.
   - Worth a look in the window: the diagnostics line.
 - **Correct the scraped idol genders on the dev and the live database.**
@@ -64,6 +64,8 @@ The analyzer setup is done and described in CLAUDE.md ("Linting"). Left:
 - **Everything logs through `IBotLogger`,** so tests can pass a mock and assert that an error was logged. The concrete `BotLogger` has no WPF dependency either; the window subscribes to its `LogAdded` event.
 
 ### Blockers, in order of value
+
+Blockers 1 to 4 and the interfaces below are done (2026-11-18). Blocker 5 is handled per command, as each one gets tests.
 
 1. **The clock (done 2026-11-18, the rule is in CLAUDE.md "The clock").**
    - `TimeProvider` is now injected into the reminder, unmute, weekly poll and birthday features, the mute and reminder commands, and `BiasGameInteraction`.
@@ -140,9 +142,15 @@ What has to be mockable so tests can leave out the database, the external APIs a
    - Checked with a throwaway program:
      - Against a local HTTP server, `WebService` returned a PNG byte for byte, converted an AVIF to PNG, and returned page text, including five calls at once.
      - With a fake `IWebService` and `IWhoKnowsImageProcessor`, the who-knows embed fell back to the plain embed when the image failed and attached it when it worked.
-4. **YouTube.** `YoutubeAPI` (320 lines: watch, playlist and youtu.be links, keyword search with filtering, the playlist import, key rotation and quota counting) creates a `YouTubeService` for every search.
-   - Fix: a small `IYoutubeDataClient` wrapping the three calls it makes (videos by ID, search, playlist items), and an interface for `YoutubeAddPlaylistFeature`, which waits for the user's answer in Discord.
+4. **YouTube (done 2026-11-18).** `YoutubeAPI` (watch, playlist and youtu.be links, keyword search with filtering, the playlist import, key rotation and quota counting) calls YouTube through `IYoutubeDataClient` (`Interfaces/Services/`).
+   - It has the three calls the bot makes (video by ID, keyword search, playlist items), each taking the API key, so the rotation stays in `YoutubeAPI`. A test returns Google's own response classes (`VideoListResponse` and so on, plain data classes), or throws a `Google.GoogleApiException` with "quotaExceeded" in it.
+   - `YoutubeDataClient` keeps one `YouTubeService` per key for the bot's lifetime. Before, `YoutubeAPI` created one, with its own HTTP client, for every search.
+   - `YoutubeAddPlaylistFeature` got no interface after all. Since blocker 4 it takes only `IDiscordClient` and `TimeProvider`, so a test builds the real feature over fakes (a channel that isn't found means "no").
    - The key quotas and the music queue are in `YoutubeKeyStore` and `AudioStateStore`; tests use real ones.
+   - Checked with a throwaway program, with a fake `IYoutubeDataClient` behind the real container:
+     - A keyword search queued the first result, and a youtu.be link made a single video call.
+     - A playlist whose third video hit the quota kept the two queued songs and didn't repeat them.
+     - A used-up first key switched to the next one and queued the song once.
    - **The key rotation never ran (found and fixed 2026-11-18).**
      - The cause: `VideoSearch`, `KeywordSearch` and `PlaylistSearch` caught every exception from `ExecuteAsync`, logged it and returned "not found", so the quota error never reached the key switch in `Searching`. Until the 06:00 UTC refill, every search on a used-up key failed, even when other keys had quota.
      - It dates from `b33c2ae` (2023-08-27, "YoutubeAPI reimplemented"), which added the catch blocks and the key switch together; no later change touched them. The earlier version, which `KeyReset` comes from, isn't in this repository.
@@ -150,8 +158,9 @@ What has to be mockable so tests can leave out the database, the external APIs a
      - Repeating must not queue anything twice. So the "add the playlist?" offer for a watch link with `&list=` now starts after the video search. A playlist import that runs out of quota after queuing songs keeps what it queued, drops the key and stops, instead of starting over.
      - Checked with a throwaway program against the Google library, with a fake HTTP layer that answers YouTube's 403 `quotaExceeded`. The committed version swallowed the error and returned "not found". With the fix, the error reaches the rotation, the keys are tried in turn until one works, the song is queued once, and the search stops cleanly when no key is left. Other errors are still logged and return "not found".
    - The quota units counted per key (`YoutubeKeyStore.AddUsage`) are never read. They could decide which key to use next, or show in the diagnostics; otherwise drop them.
-5. **Spotify.** `SpotifyAPI` (201 lines: link handling, playlist or album → search terms, the image search fallback) builds a `SpotifyClient` on every call.
-   - SpotifyAPI.Web already has `ISpotifyClient`, so no interface of our own is needed. Inject that, through a small factory if credential edits in `config.json` should still apply without a restart.
+5. **Spotify (done 2026-11-18).** `SpotifyAPI` (link handling, playlist or album → search terms, the image search fallback) gets SpotifyAPI.Web's own `ISpotifyClient` from `ISpotifyClientFactory`.
+   - `SpotifyClientFactory` (a singleton) keeps one client while the credentials in `config.json` stay the same, so an edit still applies without a restart. Before, every call built a new client, which also asked Spotify for a new token each time.
+   - A test mocks the factory to return a mocked `ISpotifyClient` (`Tracks`, `Playlists`, `Albums`, `Artists` and `Search` are interfaces too). The throwaway program checked a track link becoming the YouTube search "name artist", and the factory reusing its client until the secret changed.
 6. **`DiscordSocketClient` (done 2026-11-18, blocker 4).** The seven features and `DiscordTools` take `IDiscordClient`; only the gateway classes keep the socket client.
 
 No interface needed:
@@ -242,7 +251,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
   5. `BiasScrapingProcessor` and the who-knows embed (`IBrowserService`, `IWebService` and `IWhoKnowsImageProcessor` are done).
   6. The features (`TimeProvider` and the state stores are done).
   7. Whole-command integration tests (the Discord interfaces are done).
-  8. YouTube and Spotify.
+  8. `YoutubeAPI` and `SpotifyAPI` (their seams are done).
 
 ## 3. Discord.Net: optional modernization (investigated 2026-11-15)
 
