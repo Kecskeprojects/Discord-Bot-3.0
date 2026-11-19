@@ -172,15 +172,20 @@ public sealed partial class App : Application, IDisposable
                     WeeklyPollFeature weeklyPollFeature = scope.ServiceProvider.GetRequiredService<WeeklyPollFeature>();
                     _ = await weeklyPollFeature.Run();
 
-                    IConfig config = scope.ServiceProvider.GetRequiredService<IConfig>();
-                    scope.ServiceProvider.GetRequiredService<YoutubeKeyStore>().Reset(config.Youtube_API_Keys);
-                    logger.Log("Youtube keys reset!");
-
                     //Only on a monday
                     if (DateTime.UtcNow.DayOfWeek == DayOfWeek.Monday)
                     {
                         _ = StartBiasScraping();
                     }
+                }
+
+                //YouTube resets the quotas at midnight Pacific time: 08:00 UTC in winter, 07:00 in summer.
+                //Refilled any earlier, a search before that reset would drop the used-up keys again until the next refill
+                if (DateTime.UtcNow.Hour == 8 && DateTime.UtcNow.Minute == 0)
+                {
+                    IConfig config = scope.ServiceProvider.GetRequiredService<IConfig>();
+                    scope.ServiceProvider.GetRequiredService<YoutubeKeyStore>().Reset(config.Youtube_API_Keys);
+                    logger.Log("Youtube keys reset!");
                 }
 
                 ReminderFeature reminderFeature = scope.ServiceProvider.GetRequiredService<ReminderFeature>();

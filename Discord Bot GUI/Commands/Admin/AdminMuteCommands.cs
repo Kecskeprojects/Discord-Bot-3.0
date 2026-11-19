@@ -80,8 +80,6 @@ public class AdminMuteCommands(
                 return;
             }
 
-            timeData = timeData.ToLower();
-            IGuildUser guildUser = user;
             ServerResource server = await GetCurrentServerAsync();
 
             if (server.MuteRoleDiscordId == null)
@@ -89,50 +87,86 @@ public class AdminMuteCommands(
                 _ = await ReplyAsync("Mute role not set on server.");
                 return;
             }
+            ulong muteRoleId = server.MuteRoleDiscordId.Value;
 
-            //The bot can only take away roles below its own highest one
+            //Read before any role changes, so a mistyped duration leaves the user as they were
+            List<string> amounts = StringTools.GetTimeMeasurements(timeData);
+            DateTime now = timeProvider.GetUtcNow().UtcDateTime;
+            if (amounts.Count % 2 != 0 || !DateTimeTools.TryAddValuesToDate(now, amounts, out DateTime mutedUntil))
+            {
+                _ = await ReplyAsync("The duration could not be read!");
+                return;
+            }
+
+            //The bot can only take away roles below its own highest one. The mute role is never one to give back,
+            //or unmuting would put it back on
             IGuildUser botUser = await Context.Guild.GetCurrentUserAsync(CacheMode.CacheOnly);
             int highestRolePosition = Context.Guild.Roles.Where(gr => botUser.RoleIds.Contains(gr.Id)).Max(gr => gr.Position);
 
             List<IRole> roleList = Context.Guild.Roles
-                .Where(gr => gr.Id != Context.Guild.EveryoneRole.Id && gr.Position < highestRolePosition && guildUser.RoleIds.Contains(gr.Id))
+                .Where(gr => gr.Id != Context.Guild.EveryoneRole.Id && gr.Id != muteRoleId && gr.Position < highestRolePosition && user.RoleIds.Contains(gr.Id))
                 .ToList();
 
-            await guildUser.RemoveRolesAsync(roleList);
-            await guildUser.AddRoleAsync(server.MuteRoleDiscordId.Value);
-
-            List<string> amounts = StringTools.GetTimeMeasurements(timeData);
-
-            if (amounts.Count % 2 == 0)
+            //Saved before the roles change: a user who is already muted is left as they are,
+            //and roles are only taken once they can be given back
+            DbProcessResultEnum result = await serverMutedUserService.AddMutedUserAsync(Context.Guild.Id, user.Id, now, mutedUntil, string.Join(";", roleList.Select(x => x.Id)));
+            if (result != DbProcessResultEnum.Success)
             {
-                //Check what lengths of time we need to deal with and add it to the current date
-                DateTime now = timeProvider.GetUtcNow().UtcDateTime;
-                if (!DateTimeTools.TryAddValuesToDate(now, amounts, out DateTime mutedUntil))
-                {
-                    return;
-                }
-
-                DbProcessResultEnum result = await serverMutedUserService.AddMutedUserAsync(Context.Guild.Id, user.Id, now, mutedUntil, string.Join(";", roleList.Select(x => x.Id)));
-                string resultMessage = result switch
-                {
-                    DbProcessResultEnum.Success => $"User has been muted until {DiscordTools.UtcTimestamp(mutedUntil, TimestampTagStyles.ShortDateTime)}",
-                    DbProcessResultEnum.AlreadyExists => "User Already muted.",
-                    _ => "User can't be unmuted because of a database error!"
-                };
-
-                if (result != DbProcessResultEnum.Success)
-                {
-                    await guildUser.RemoveRoleAsync(server.MuteRoleDiscordId.Value);
-                    await guildUser.AddRolesAsync(roleList);
-                }
-
-                _ = await ReplyAsync(resultMessage);
-                _ = await guildUser.SendMessageAsync($"You have been muted in '**{Context.Guild.Name}**' until {DiscordTools.UtcTimestamp(mutedUntil, TimestampTagStyles.ShortDateTime)}.");
+                _ = await ReplyAsync(result == DbProcessResultEnum.AlreadyExists ? "User Already muted." : "User can't be muted because of a database error!");
+                return;
             }
+
+            if (!await TryMuteRolesAsync(user, roleList, muteRoleId))
+            {
+                _ = await serverMutedUserService.RemoveMutedUserAsync(Context.Guild.Id, user.Id);
+                _ = await ReplyAsync("The user's roles could not be changed. The bot needs the Manage Roles permission, and its role has to be above the mute role.");
+                return;
+            }
+
+            _ = await ReplyAsync($"User has been muted until {DiscordTools.UtcTimestamp(mutedUntil, TimestampTagStyles.ShortDateTime)}");
+            await TellUserAsync(user, $"You have been muted in '**{Context.Guild.Name}**' until {DiscordTools.UtcTimestamp(mutedUntil, TimestampTagStyles.ShortDateTime)}.");
         }
         catch (Exception ex)
         {
             logger.Error("AdminMuteCommands.cs MuteUser", ex);
+        }
+    }
+
+    //False when Discord refused the change; the roles taken by then are given back
+    private async Task<bool> TryMuteRolesAsync(IGuildUser user, List<IRole> roleList, ulong muteRoleId)
+    {
+        try
+        {
+            await user.RemoveRolesAsync(roleList);
+            await user.AddRoleAsync(muteRoleId);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            logger.Warning("AdminMuteCommands.cs TryMuteRolesAsync", ex);
+        }
+
+        try
+        {
+            await user.AddRolesAsync(roleList);
+        }
+        catch (Exception ex)
+        {
+            logger.Error("AdminMuteCommands.cs TryMuteRolesAsync", ex);
+        }
+        return false;
+    }
+
+    //The roles have changed by then, so a user with closed direct messages only costs a warning
+    private async Task TellUserAsync(IGuildUser user, string message)
+    {
+        try
+        {
+            _ = await user.SendMessageAsync(message);
+        }
+        catch (Exception ex)
+        {
+            logger.Warning("AdminMuteCommands.cs TellUserAsync", ex);
         }
     }
 
@@ -155,13 +189,17 @@ public class AdminMuteCommands(
 
             ServerMutedUserResource? mutedUser = await serverMutedUserService.GetMutedUserByUsernameAsync(Context.Guild.Id, guildUser.Id);
 
-            if (mutedUser == null || string.IsNullOrEmpty(mutedUser.RemovedRoleDiscordIds))
+            if (mutedUser == null)
             {
                 _ = await ReplyAsync("User is not currently muted.");
                 return;
             }
 
-            await guildUser.AddRolesAsync(mutedUser.RemovedRoleDiscordIds.Split(";").Select(ulong.Parse));
+            //Empty when the user had no roles below the bot's at the time of the mute
+            if (!string.IsNullOrEmpty(mutedUser.RemovedRoleDiscordIds))
+            {
+                await guildUser.AddRolesAsync(mutedUser.RemovedRoleDiscordIds.Split(";").Select(ulong.Parse));
+            }
             await guildUser.RemoveRoleAsync(server.MuteRoleDiscordId.Value);
 
             DbProcessResultEnum result = await serverMutedUserService.RemoveMutedUserAsync(Context.Guild.Id, guildUser.Id);
@@ -171,7 +209,7 @@ public class AdminMuteCommands(
                 _ => "User can't be unmuted because of a database error!"
             };
             _ = await ReplyAsync(resultMessage);
-            _ = await guildUser.SendMessageAsync($"You have now been unmuted in '**{Context.Guild.Name}**'.");
+            await TellUserAsync(guildUser, $"You have now been unmuted in '**{Context.Guild.Name}**'.");
         }
         catch (Exception ex)
         {

@@ -81,7 +81,7 @@ Build the projects rather than the `.sln`, because the solution includes `MainDB
 | SQL Server | EF Core, `sql_connection_string` | Schema from `MainDB/` |
 | Last.fm | `LastFmApi` project + `Services/LastFmAPI.cs` | `lastfm_artist_input_replacement` in the config rewrites artist names. Check `IsSuccess` before reading a `GenericResponseItem`'s `Response` |
 | Spotify | SpotifyAPI.Web, through `ISpotifyClientFactory` | Client credentials from the config; one client until they change |
-| YouTube Data API | Google.Apis.YouTube.v3, through `IYoutubeDataClient` | **Several keys rotated** by quota through `YoutubeKeyStore`, refilled daily at 06:00 UTC, so edited keys apply then |
+| YouTube Data API | Google.Apis.YouTube.v3, through `IYoutubeDataClient` | **Several keys rotated** by quota through `YoutubeKeyStore`, refilled daily at 08:00 UTC (after YouTube's midnight-Pacific reset), so edited keys apply then |
 | Twitch | TwitchLib `LiveStreamMonitor` (on its own thread from `App.xaml.cs`) + `twitch.exe` CLI | |
 | MusicBrainz | REST | Artist lookups |
 | dbkpop.com / kprofiles.com | Puppeteer scraping (`KpopDbScraper`, `BiasScrapingProcessor`) | Weekly idol data refresh |
@@ -94,7 +94,7 @@ Base URLs live in `Core/Constant.cs`.
 
 **Startup:** `App.OnStartup` → `Startup.Run()` (builds the DI container by hand from `Startup.ConfigureServices`, which tests reuse; **every new feature, processor or external service must be registered there**, and every new DB service or repository in `DatabaseStartup.ConfigureDatabaseServices` in `DatabaseORM`, which `ConfigureServices` calls) → shows `BotWindow` → starts the Twitch monitor thread → `BotMain.RunBotAsync()` logs in and wires up `CommandHandler` and `InteractionHandler`.
 
-**Scheduler:** a 1-minute `System.Timers.Timer` in `App.xaml.cs` reconnects the client if it is logged out, runs `ReminderFeature` and `UnmuteFeature` every tick, runs `BirthdayFeature`, `WeeklyPollFeature` and the YouTube key reset at 06:00 UTC, scrapes bias data on Mondays, and clears the window log at midnight UTC. Times are **UTC**. Each scheduled feature handles its items one by one and logs a failure without stopping the rest. A reminder whose DM Discord refuses stays for the next tick, while an unmute whose roles are back is removed even if its DM fails.
+**Scheduler:** a 1-minute `System.Timers.Timer` in `App.xaml.cs` reconnects the client if it is logged out, runs `ReminderFeature` and `UnmuteFeature` every tick, runs `BirthdayFeature` and `WeeklyPollFeature` at 06:00 UTC, refills the YouTube keys at 08:00 UTC, scrapes bias data on Mondays, and clears the window log at midnight UTC. Times are **UTC**. Each scheduled feature handles its items one by one and logs a failure without stopping the rest. A reminder whose DM Discord refuses stays for the next tick, while an unmute whose roles are back is removed even if its DM fails.
 
 **The clock:** the test is whether a test would need to know the time to know the right answer (comparisons, expiry, "today", ages, adding to a date, scheduling). If so, the code doesn't read `DateTime.UtcNow`:
 - Classes created by DI (features, commands, interactions, the bot's services) inject `TimeProvider` (`TimeProvider.System`, registered in `Startup`) and read it once per operation with `GetUtcNow().UtcDateTime`.
@@ -140,7 +140,7 @@ Every interaction must be acknowledged within 3 seconds, including early returns
 - Three DI singletons in `Core/` hold the in-memory state, which is lost on restart. Classes inject the one they need (there is no static state), and tests use real ones:
   - `AudioStateStore`: each server's music queue and voice connection.
   - `BiasGameStore`: the running bias games, one per user. It creates the games and disposes the ones it removes; `Take` hands one to a caller that disposes it. A game counts as abandoned 30 minutes after it started.
-  - `YoutubeKeyStore`: the YouTube API keys that still have quota today, refilled from the config at startup and 06:00 UTC.
+  - `YoutubeKeyStore`: the YouTube API keys that still have quota today, refilled from the config at startup and 08:00 UTC.
 - `ServerCache` (`DatabaseORM/Caching/`) is a 50-entry cache of `ServerResource`. Any DB write that changes server settings **must** call `cache.RemoveCachedEntityManually(serverId)`, or reads go stale.
 
 **Logging:** inject `IBotLogger` (`DatabaseORM/Interface/`, so the DB layer can log through it: `Log`, `Error(location, ex)`, `Warning`, `Query`, `Client`, `Audio`) and never use `Console`. By convention, `location` is `"FileName.cs MethodName"`. One `BotLogger` instance is registered under both types; only `Startup`, `App` (`LogToFile`) and `BotWindow` use the concrete type. The window shows logs by subscribing to `BotLogger.LogAdded`, so the logger has no WPF dependency. Logs are queued and written to `Logs/` in the working directory every minute and at shutdown.

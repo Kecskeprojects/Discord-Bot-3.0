@@ -22,6 +22,13 @@ public class UnmuteFeature(
     {
         try
         {
+            //Until the gateway is connected no server is cached (a start without internet, or the minute that logs back in),
+            //and a missing server would look like one the bot left: its mutes would be dropped without giving the roles back
+            if (client.ConnectionState != ConnectionState.Connected)
+            {
+                return false;
+            }
+
             //Get the list of mutes that ended before or exactly at this minute
             DateTime now = timeProvider.GetUtcNow().UtcDateTime;
             DateTime dateTime = new(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, now.Kind);

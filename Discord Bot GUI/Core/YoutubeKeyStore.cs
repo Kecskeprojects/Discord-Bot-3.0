@@ -2,7 +2,7 @@
 
 /// <summary>
 /// The YouTube Data API keys that still have quota today, and the one in use.
-/// <see cref="Reset"/> fills it from the configuration at startup and every day at 06:00 UTC.
+/// <see cref="Reset"/> fills it from the configuration at startup and every day at 08:00 UTC, after YouTube's own reset.
 /// </summary>
 public sealed class YoutubeKeyStore
 {

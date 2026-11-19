@@ -15,9 +15,6 @@ Done and removed on 2026-11-17 (the investigations are in `git show 483c1fa:docs
 - **Run the bot once against the dev database and Discord.** Since the last real run, the database layer moved into `DatabaseORM`, implicit usings were turned on, and Windows Forms was removed (2026-11-17). Since then, `Startup.Run()` was split, `IConfig` added, `TimeProvider` injected, `Global` replaced by the state stores `LastFmApi` made instance-based, `IBrowserService` and `IWebService` added, and the commands, interactions and features moved onto Discord.Net's interfaces, and YouTube and Spotify put behind `IYoutubeDataClient` and `ISpotifyClientFactory` (2026-11-18). Worth a try: a Spotify track and playlist link, a mute (by name and by ID) and an unmute, the R6 randomizer from a voice channel, a weekly poll edit, `!leave` while playing, a Last.fm top list and who-knows (with its image), a bonk, a reminder (`!remind in 1m>test`), a short mute, a self-role request, a bias game (start, stop, and one played to the end), and music (a YouTube search, a playlist link, and waiting until the inactivity disconnect).
   - What has been checked: builds, `dotnet format` and throwaway programs. Those resolved every DB service through the real `Startup.Run()`, ran `ProcessTools.GetStatistics()` (RAM figure, WMI child process count) and loaded a resx bitmap.
   - Worth a look in the window: the diagnostics line.
-- **Correct the scraped idol genders on the dev and the live database.**
-  - Until 2026-11-17, an idol first filled from dbkpop was saved with `Male`/`Female`. The bias game's gender filter (`IdolRepository.GetListForGameAsync`) and the edit modal use `M`/`F`, so the filtered game left those idols out. The mapping is fixed (`DatabaseMapperConfig` uses `ToDatabaseFriendlyString()`); the existing rows aren't.
-  - Run `UPDATE Idol SET Gender = 'M' WHERE Gender = 'Male'` and `UPDATE Idol SET Gender = 'F' WHERE Gender = 'Female'`, then check with `SELECT Gender, COUNT(*) FROM Idol GROUP BY Gender`. This is a one-off data fix, not an SSDT patch.
 - **VS Code's Prettier and CRLF.** Prettier writes LF by default. It should take `end_of_line = crlf` from the root `.editorconfig`, but that is untested in the VS Code extension.
   - To check: save a Markdown file in VS Code, then run `git ls-files --eol -- <file>`. It should say `w/crlf`.
   - If it doesn't, add a `.prettierrc` with `"endOfLine": "crlf"`.
@@ -89,7 +86,7 @@ Blockers 1 to 4 and the interfaces below are done (2026-11-18). Blocker 5 is han
      - Two "bias game" commands at the same moment now give one game and "You already have a game going!", instead of two games.
      - The audio state of a server is created atomically (`GetOrAdd`). Before, a lost race returned an instance that wasn't stored.
      - The key rotation keeps the key string itself. Before, it kept an index into the config's key list, but picked it from the number of keys left, so it could choose a used-up key again or one past the end.
-     - Keys edited in `config.json` apply at the next refill (06:00 UTC or a restart). A duplicate key counts once instead of throwing at startup.
+     - Keys edited in `config.json` apply at the next refill (08:00 UTC since 2026-11-19, or a restart). A duplicate key counts once instead of throwing at startup.
 3. **`Config` (done 2026-11-18).** The 47 classes inject `IConfig` (`Interfaces/IConfig.cs`) instead, so tests mock it. `DatabaseStartup` takes the connection string as a `Func<IServiceProvider, string>` and `Startup` reads it through `IConfig`, so replacing `IConfig` in a test also replaces the database. Checked with a throwaway program: `ValidateOnBuild` passes on the real registrations, and a fake `IConfig` reached the DbContext.
 4. **Concrete Discord.Net socket types (done 2026-11-18, the rule is in CLAUDE.md "Command conventions").**
    - `BaseCommand` derives from `ModuleBase<ICommandContext>` and `BaseInteraction` from `InteractionModuleBase<IInteractionContext>`. `BaseFeature.Context` is an `ICommandContext`, and `DiscordTools` takes the interface contexts.
@@ -154,7 +151,7 @@ What has to be mockable so tests can leave out the database, the external APIs a
      - A playlist whose third video hit the quota kept the two queued songs and didn't repeat them.
      - A used-up first key switched to the next one and queued the song once.
    - **The key rotation never ran (found and fixed 2026-11-18).**
-     - The cause: `VideoSearch`, `KeywordSearch` and `PlaylistSearch` caught every exception from `ExecuteAsync`, logged it and returned "not found", so the quota error never reached the key switch in `Searching`. Until the 06:00 UTC refill, every search on a used-up key failed, even when other keys had quota.
+     - The cause: `VideoSearch`, `KeywordSearch` and `PlaylistSearch` caught every exception from `ExecuteAsync`, logged it and returned "not found", so the quota error never reached the key switch in `Searching`. Until YouTube's own reset (midnight Pacific time), every search on a used-up key failed, even when other keys had quota.
      - It dates from `b33c2ae` (2023-08-27, "YoutubeAPI reimplemented"), which added the catch blocks and the key switch together; no later change touched them. The earlier version, which `KeyReset` comes from, isn't in this repository.
      - The fix: the three searches let quota errors through (`catch ... when (!IsQuotaExceeded(ex))`, the same string match as before). `RunWithKeyRotationAsync` repeats the request with each remaining key until one works, for searches and for the playlist import.
      - Repeating must not queue anything twice. So the "add the playlist?" offer for a watch link with `&list=` now starts after the video search. A playlist import that runs out of quota after queuing songs keeps what it queued, drops the key and stops, instead of starting over.
@@ -464,6 +461,21 @@ SQL projects have a newer format: SDK-style projects built on the `Microsoft.Bui
 5. Build, then compare the two dacpacs with `DacpacVerify` (`dotnet tool install --global Microsoft.DacpacVerify --prerelease`). That check covers the schema model, not the post-deployment script, refactorlog or project settings, so compare those by eye.
 
 **When to revisit:** when Visual Studio 2026 supports SDK-style SQL projects. It could happen sooner if SSMS's Database DevOps workload covers the schema work: try it on a converted copy of `MainDB` first. Check that it builds the same dacpac, that Generate Script makes a patch from the existing profiles, and that editing tables as scripts without the designer is acceptable. A community SDK, `MSBuild.Sdk.SqlProj`, also builds dacpacs with `dotnet build`. Not looked at.
+
+## 9. Review of the bug fixes since 2026-11-13 (investigated and fixed 2026-11-19)
+
+Every bug fix in the commits from `6a8e309` (2026-11-13) to `1d03ec2` (2026-11-19) was checked against its callers. They all fixed real bugs. Three of them caused or uncovered a problem, fixed here:
+- **Expired mutes dropped while the bot is offline (done):** since `62498fa`, `UnmuteFeature` took a server missing from the cache for one the bot had left, and deleted the mute without giving the roles back. Before the gateway connects the cache is empty: at a start without internet, and in the minute that logs back in (`StartAsync` returns before READY). It now waits for `ConnectionState.Connected`. Discord.Net fills the server list before it sets that state.
+  - Left as is: right after connecting, a server Discord hasn't sent yet (or one in an outage) has no members, so a mute ending in that minute would count its user as gone. `IGuild.Available` can't tell, since `SocketGuild` always answers true (checked 2026-11-19); only the socket type's `IsConnected` could. The window is seconds long, and the next tick is a minute later.
+- **YouTube keys refilled too early (done):** YouTube resets the quotas at midnight Pacific time (08:00 UTC in winter, 07:00 in summer). The refill ran at 06:00 UTC, and since the rotation works (`b93a12c`), a search before YouTube's reset dropped the used-up keys again, for almost a day. The refill is now at 08:00 UTC, on its own in `App.OnTimedEvent`.
+- **The mute commands after muting was fixed (done):** `7b3cf08` made `!mute` work again (broken since `34c869b`, 2025-02-01). That also brought older bugs back into use:
+  - `!unmute` answered "User is not currently muted." for a user who had no roles to give back, and left the mute role on.
+  - A refused mute ("already muted") or a failed one still sent the user "You have been muted until …". For "already muted", the roles were also taken and put back.
+  - A duration that couldn't be read left the user muted, with their roles gone and no saved mute.
+  - A user already wearing the mute role got it saved as a role to give back, so unmuting put it back on.
+  - `!mute` now reads the duration first, saves the mute, and only then changes the roles. If Discord refuses the roles (no Manage Roles, or the mute role above the bot's), it gives back what it took, drops the saved mute and says why. The direct messages only cost a warning when refused. `Integration/Mute/MuteCommandTests` covers both commands.
+- **Not a problem:** `af1d5ea`'s gender mapping only reaches idols filled from dbkpop from then on, but the database has no `Male`/`Female` rows (only `M`, `F` and 9 nulls), so the earlier "correct the genders" check is dropped.
+- **Still open: a reminder to closed direct messages repeats forever.** `ReminderFeature` keeps a reminder whose DM fails, by design (the problem may be temporary). Discord's 50007 (closed DMs, or no shared server) is usually permanent, so that reminder is retried and logged every minute. Treat 50007 as handled, or give up after a day.
 
 ## Minor improvements
 

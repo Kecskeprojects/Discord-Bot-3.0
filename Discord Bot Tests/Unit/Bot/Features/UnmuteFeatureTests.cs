@@ -31,6 +31,7 @@ public sealed class UnmuteFeatureTests
     public UnmuteFeatureTests()
     {
         feature = new UnmuteFeature(mutedUserService, client, new FakeTimeProvider(TestTimes.Now), serverService, logger);
+        client.ConnectionState.Returns(ConnectionState.Connected);
         client.GetGuildAsync(DiscordIds.Server, CacheMode.CacheOnly).Returns(guild);
         guild.GetUserAsync(DiscordIds.User, CacheMode.CacheOnly).Returns(user);
         userMessages = RecordingChannel.DirectMessagesOf(user);
@@ -106,6 +107,21 @@ public sealed class UnmuteFeatureTests
 
         Assert.Empty(user.ReceivedCalls());
         await mutedUserService.Received().RemoveMutedUserAsync(DiscordIds.Server, DiscordIds.User);
+    }
+
+    //Before the gateway connects no server is cached, which must not count as the bot having left them
+    [Theory]
+    [InlineData(ConnectionState.Disconnected)]
+    [InlineData(ConnectionState.Connecting)]
+    public async Task Run_NotConnected_KeepsEveryMuteForTheNextRun(ConnectionState state)
+    {
+        client.ConnectionState.Returns(state);
+        client.GetGuildAsync(DiscordIds.Server, CacheMode.CacheOnly).Returns((IGuild?) null);
+        ExpiredMutes(Mute(DiscordIds.User, $"{DiscordIds.Role}"));
+
+        Assert.False(await feature.Run());
+
+        await mutedUserService.DidNotReceiveWithAnyArgs().RemoveMutedUserAsync(default, default);
     }
 
     //The roles are back by then; kept, the old entry would take the mute role off again if the user were muted meanwhile
