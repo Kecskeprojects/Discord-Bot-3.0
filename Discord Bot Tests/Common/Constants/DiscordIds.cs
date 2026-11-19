@@ -5,6 +5,7 @@ public static class DiscordIds
 {
     public const ulong User = 100_001;
     public const ulong OtherUser = 100_002;
+    public const ulong ThirdUser = 100_003;
     public const ulong Server = 200_001;
     public const ulong OtherServer = 200_002;
     public const ulong Channel = 300_001;

@@ -30,6 +30,10 @@
 		<ProjectReference Include="..\Discord Bot GUI\Discord Bot GUI.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+		<!-- The ChannelType rows the LocalDB tests seed, from the schema's own post-deployment script -->
+		<None Include="..\MainDB\Post-deployment\ChannelType_Inserts.sql" Link="Database\ChannelType_Inserts.sql" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+	<ItemGroup>
 		<!-- Used by nearly every test file -->
 		<Using Include="Xunit" />
 		<Using Include="NSubstitute" />

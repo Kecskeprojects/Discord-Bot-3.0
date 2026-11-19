@@ -23,6 +23,7 @@ namespace Discord_Bot.Tests.Common.Tools;
 public sealed class TestHost : IDisposable
 {
     private readonly ServiceCollection services = [];
+    private readonly List<IServiceScope> scopes = [];
     private ServiceProvider? provider;
     private bool modulesLoaded;
 
@@ -61,6 +62,14 @@ public sealed class TestHost : IDisposable
         return this;
     }
 
+    //A service from a scope of its own, as each command gets one (and with it a DbContext of its own); the scopes end with the host
+    public T FromNewScope<T>() where T : notnull
+    {
+        IServiceScope scope = Services.CreateScope();
+        scopes.Add(scope);
+        return scope.ServiceProvider.GetRequiredService<T>();
+    }
+
     //Runs a text command the way CommandHandler does: in its own scope, after the one-character prefix
     public async Task<CommandResult> RunCommandAsync(ICommandContext context)
     {
@@ -93,6 +102,7 @@ public sealed class TestHost : IDisposable
 
     public void Dispose()
     {
+        scopes.ForEach(scope => scope.Dispose());
         if (provider != null)
         {
             //Registered as instances, so the container leaves them to their creator (in the bot, BotMain disposes the client)

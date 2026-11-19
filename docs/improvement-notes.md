@@ -189,7 +189,7 @@ Randomness and files (no interface, but tests have to account for them):
 
 Don't use EF InMemory or SQLite. The schema uses the `SQL_Latin1_General_CP1_CI_AS` collation (case-insensitive comparisons that queries rely on, see the CA1862 suppression) and `getutcdate()` defaults, so results would differ.
 
-If repository tests are wanted (checked 2026-11-17):
+The repository tests, planned 2026-11-17 and built on 2026-11-19 as `Integration/Database/` (described in CLAUDE.md "Tests"):
 - **Run them against SQL Server LocalDB.** `MSSQLLocalDB` is installed on the dev PC (SQL Server 2025, `Microsoft SQL Server/170`).
   - **The default instance doesn't start (found 2026-11-19).** It was created by LocalDB 2019 (v15), and only the 2025 version (v17) is installed now. The Application event log says "LocalDB parent instance version is invalid: MSSQL15E.LOCALDB".
   - **Fixed 2026-11-19** with `sqllocaldb delete MSSQLLocalDB`, then `sqllocaldb create MSSQLLocalDB`. It is now version 17.0.4025.3, starts on first connection, and its server collation is `SQL_Latin1_General_CP1_CI_AS`, the same as the schema's.
@@ -197,11 +197,19 @@ If repository tests are wanted (checked 2026-11-17):
   - Those checks also confirmed the approach: `EnsureCreatedAsync()` on a unique database name, seeded rows with fixed `ChannelTypeId`s, the real services and repositories with a fresh `MainDbContext` per call, then `EnsureDeletedAsync()`.
 - **Create the schema with `Database.EnsureCreated()` from the scaffolded model.**
   - It carries `UseCollation("SQL_Latin1_General_CP1_CI_AS")` and all 26 `getutcdate()` defaults, so the result matches the SSDT schema closely enough.
-  - Then run `MainDB/Post-deployment/ChannelType_Inserts.sql` for the 6 lookup rows.
+  - Then run `MainDB/Post-deployment/ChannelType_Inserts.sql` for the 6 lookup rows. The test project links that file into its output (`Database/`), and `LocalDatabase` runs it without its `USE [$(DatabaseName)]` line.
 - **Why not the other two schema sources:**
   - `Latest_Release.sql` is git-ignored, and the dev PC's copy is from 2023.
   - Publishing `MainDB.dacpac` (DacFx or SqlPackage) would be exact, but it needs a Visual Studio build of `MainDB` first.
-- **Isolation:** give each test collection its own database (a unique name, created at the start and dropped at the end), so collections run in parallel. Within one collection, reset between tests (e.g. Respawn).
+- **Isolation:** give each test collection its own database (a unique name, created at the start and dropped at the end), so collections run in parallel. Within one collection, reset between tests.
+  - **Done 2026-11-19 without Respawn.** Each test class is its own collection and gets a `LocalDatabase` class fixture.
+  - `ResetAsync` empties every table except `ChannelType` before each test. It lists the tables from the EF model, join tables included, and switches the foreign keys off meanwhile.
+  - The six classes run in parallel; the whole suite still takes about 4 seconds.
+  - **A run that is killed** leaves its `DiscordBotTests_<guid>` databases behind. To list them:
+    ```powershell
+    sqlcmd -S "(localdb)\MSSQLLocalDB" -Q "SELECT name FROM sys.databases WHERE name LIKE 'DiscordBotTests[_]%'"
+    ```
+    Drop each with `DROP DATABASE [name]`.
 
 ### Integration tests (investigated 2026-11-17)
 
@@ -252,6 +260,9 @@ Yes, the bot's test project can run integration tests: real services wired toget
     - `WeeklyPollTools`; `LastFmHelper`
     - The Mapster mappings (added 2026-11-19, 48 more cases, 140 in all; see "Next" item 1)
     - Seven DB services over substitute repositories (added 2026-11-19, 79 more cases, 219 in all; see "Next" item 2)
+  - Integration on LocalDB (added 2026-11-19, 38 more cases, 257 in all; see "Next" item 5):
+    - Settings channels, the server's row, roles and Twitch channels, and the cached server across scopes.
+    - The bias list, reminders, birthdays and mutes.
   - Integration:
     - Every registration and every command and interaction module.
     - Last.fm top tracks through the real container with a fake HTTP layer.
@@ -275,7 +286,13 @@ Yes, the bot's test project can run integration tests: real services wired toget
      - Seen, not changed: `IdolService.ChangeGroupAsync` loads the idol without its group, so an empty group name would set the group to null. Its caller shouldn't pass one.
   3. The features: reminder, unmute, birthday and weekly poll with the fake clock and an `IDiscordClient` substitute.
   4. More Last.fm (recents, now playing, who-knows, artist stats). Saved responses recorded from the real API would replace the hand-built JSON in `LastFmResponses`.
-  5. The DB layer on LocalDB (see "Repositories and the database"). All three bugs under item 2 were of the kind only these tests catch (a missing `Include`, a repository that throws), which is a reason to move this item up.
+  5. The DB layer on LocalDB (see "Repositories and the database"). **First batch done 2026-11-19:**
+     - Six classes in `Integration/Database/` cover the real services, repositories and cache:
+       - `SettingsChannelTests` and `ServerSettingsTests`: the settings, with the cached server read before and after each change
+       - `BiasListTests`: the name, alias and group lookups (in another letter case too), the user-idol links, clearing the list
+       - `ReminderTests`, `BirthdayTests` and `MuteTests`: positions, due reminders, the day-of-year query and list order, and the "still muted" check
+     - They guard the three bugs fixed under item 2: with the pre-fix code, exactly those five cases fail.
+     - Left: weekly polls and presets (`WeeklyPollService`'s queries); the idol queries (search, `GetListForGameAsync`, `UserIdolStatisticRepository.GetTop10ForUserAsync`, `IdolImageRepository.GetLatestByIdolIdAsync`); custom commands, self-roles, greetings and users.
   6. `BiasScrapingProcessor` and the who-knows embed.
   7. More whole commands. Guild commands need an `IGuild` substitute and a `ServerResource` from a substituted `IServerService`.
   8. Commands with a random branch: `UserBiasGameCommands.BiasGameStop` answers with an easter egg 1 time in 100, so a test of it fails now and then. A `Random` passed in would fix that (see "Randomness" above).
