@@ -240,19 +240,25 @@ Yes, the bot's test project can run integration tests: real services wired toget
     - Visual Studio chooses which projects to scan by its own rules. The vstest maintainers say they can't change those rules ([microsoft/vstest#2130](https://github.com/microsoft/vstest/issues/2130), closed with "There isn't unfortunately a way to avoid this"). A 2023 comment there says `<IsTestProject>false</IsTestProject>` and `<TestProject>false</TestProject>` don't stop the scan.
     - The `TestContainer` capability decides this only for SDK-style projects. `MainDB` is a legacy SSDT project, so it doesn't apply.
     - The only route found is turning `MainDB` into an SDK-style SQL project (section 8). Untested.
-- **The first 92 test cases (39 tests; theories count once per case):**
+- **The test cases (theories count once per case):**
   - Unit:
     - `DateTimeTools`; the top-list percentage under hu-HU; `DiscordTools` (UTC timestamps, channel types)
     - `BiasGameStore` and `YoutubeKeyStore`; the debut-year menu
     - `YoutubeAPI` (search, links, key rotation, a playlist that runs out of quota)
     - `WeeklyPollTools`; `LastFmHelper`
+    - The Mapster mappings (added 2026-11-19, 48 more cases, 140 in all; see "Next" item 1)
   - Integration:
     - Every registration and every command and interaction module.
     - Last.fm top tracks through the real container with a fake HTTP layer.
     - The bias game in a direct message, from `!bias game` to the gender button.
     - A Spotify track link through the real `SpotifyAPI` and `YoutubeAPI`.
 - **Next, roughly in order of value:**
-  1. The Mapster mappings (`DatabaseMapperConfig`, `MapperConfig`).
+  1. The Mapster mappings (`DatabaseMapperConfig`, `MapperConfig`). **Done 2026-11-19:**
+     - The tests cover every hand-written mapping, including navigations a query didn't load. One theory compiles each resource mapping with `RequireDestinationMemberSource`, so a new resource member without a mapping fails it.
+     - They found that a missing group, server or user gave `null` in `IdolResource.GroupName`, `IdolExtendedResource.GroupName` and the two `ServerMutedUserResource` IDs, which are non-nullable. These now give `""`.
+     - They found three members that are filled after the mapping. `SettingsChannels`, `IdolExtendedResource.LatestImageUrl` and `UserResource.Username` are now `.Ignore`d, with a comment saying who fills them.
+     - `TwitchChannelResource.TwitchDiscordId` was never set or read, so it's removed.
+     - Not covered: the "Days Of Week" options in the weekly poll mapping read the system clock (see "Left on the system clock" above); `WeeklyPollToolsTests` covers them.
   2. DB services with mocked repositories.
   3. The features: reminder, unmute, birthday and weekly poll with the fake clock and an `IDiscordClient` substitute.
   4. More Last.fm (recents, now playing, who-knows, artist stats). Saved responses recorded from the real API would replace the hand-built JSON in `LastFmResponses`.

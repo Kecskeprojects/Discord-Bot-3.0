@@ -10,4 +10,6 @@ public static class DiscordIds
     public const ulong OtherChannel = 300_002;
     public const ulong DirectMessageChannel = 300_003;
     public const ulong Message = 400_001;
+    public const ulong Role = 500_001;
+    public const ulong OtherRole = 500_002;
 }

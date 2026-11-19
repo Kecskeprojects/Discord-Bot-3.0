@@ -27,7 +27,8 @@ public class DatabaseMapperConfig : IRegister
             .Map(dest => dest.NotificationRoleDiscordId, src => src.NotificationRole != null ? (ulong?) ulong.Parse(src.NotificationRole.DiscordId) : null)
             .Map(dest => dest.NotificationRoleName, src => src.NotificationRole != null ? src.NotificationRole.RoleName : null)
             .Map(dest => dest.MuteRoleDiscordId, src => src.MuteRole != null ? (ulong?) ulong.Parse(src.MuteRole.DiscordId) : null)
-            .Map(dest => dest.MuteRoleName, src => src.MuteRole != null ? src.MuteRole.RoleName : null);
+            .Map(dest => dest.MuteRoleName, src => src.MuteRole != null ? src.MuteRole.RoleName : null)
+            .Ignore(dest => dest.SettingsChannels); //ServerService fills it from the server's channels
         _ = config.NewConfig<Greeting, GreetingResource>();
         _ = config.NewConfig<TwitchChannel, TwitchChannelResource>()
             .Map(dest => dest.ServerDiscordId, src => src.Server != null ? ulong.Parse(src.Server.DiscordId) : 0)
@@ -42,15 +43,17 @@ public class DatabaseMapperConfig : IRegister
             .Map(dest => dest.UserDiscordId, src => src.User != null ? ulong.Parse(src.User.DiscordId) : 0)
             .Map(dest => dest.ServerDiscordId, src => src.Server != null ? ulong.Parse(src.Server.DiscordId) : 0);
         _ = config.NewConfig<Idol, IdolResource>()
-            .Map(dest => dest.GroupName, src => src.Group != null ? src.Group.Name : null)
+            .Map(dest => dest.GroupName, src => src.Group != null ? src.Group.Name : "")
             .Map(dest => dest.GroupDebutDate, src => src.Group != null ? src.Group.DebutDate : null)
             .Map(dest => dest.CurrentImageUrl, src => src.IdolImages.OrderByDescending(img => img.CreatedOn).Select(img => img.ImageUrl).FirstOrDefault());
         _ = config.NewConfig<IdolAlias, IdolAliasResource>();
         _ = config.NewConfig<User, UserResource>()
             .Map(dest => dest.DiscordId, src => ulong.Parse(src.DiscordId))
-            .Map(dest => dest.LastFmUsername, src => src.LastFmusername);
+            .Map(dest => dest.LastFmUsername, src => src.LastFmusername)
+            .Ignore(dest => dest.Username); //The bot fills it with the member's name on the server (DiscordTools)
         _ = config.NewConfig<Idol, IdolExtendedResource>()
-            .Map(dest => dest.GroupName, src => src.Group != null ? src.Group.Name : null);
+            .Map(dest => dest.GroupName, src => src.Group != null ? src.Group.Name : "")
+            .Ignore(dest => dest.LatestImageUrl); //IdolService looks it up separately
         _ = config.NewConfig<IdolGroup, IdolGroupExtendedResource>();
         _ = config.NewConfig<Idol, IdolGameResource>()
             .Map(dest => dest.GroupFullName, src => src.Group != null && src.Group.FullName != null ? src.Group.FullName : "Soloist")
@@ -60,8 +63,8 @@ public class DatabaseMapperConfig : IRegister
             .Map(dest => dest.DiscordId, src => ulong.Parse(src.DiscordId))
             .Ignore(dest => dest.Stats);
         _ = config.NewConfig<ServerMutedUser, ServerMutedUserResource>()
-            .Map(dest => dest.ServerDiscordId, src => src.Server != null ? src.Server.DiscordId : null)
-            .Map(dest => dest.UserDiscordId, src => src.User != null ? src.User.DiscordId : null);
+            .Map(dest => dest.ServerDiscordId, src => src.Server != null ? src.Server.DiscordId : "")
+            .Map(dest => dest.UserDiscordId, src => src.User != null ? src.User.DiscordId : "");
         _ = config.NewConfig<WeeklyPoll, WeeklyPollResource>()
             .Map(dest => dest.ServerDiscordId, src => src.Server != null ? ulong.Parse(src.Server.DiscordId) : 0)
             .Map(dest => dest.ChannelDiscordId, src => src.Channel != null ? (ulong?) ulong.Parse(src.Channel.DiscordId) : null)
