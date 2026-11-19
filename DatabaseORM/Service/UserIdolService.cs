@@ -157,7 +157,12 @@ internal sealed class UserIdolService(
 
             User? user = await userRepository.FirstOrDefaultAsync(u => u.DiscordId == userId.ToString(), u => u.Idols);
             user ??= new User() { DiscordId = userId.ToString() };
-            List<Idol> idols = user.Idols.Where(i => i.Name == biasName && (string.IsNullOrEmpty(idolGroup) || idolGroup == i.Group.Name)).ToList();
+            //Found by the database, because the user's idols are loaded without their groups
+            List<Idol> idols = await idolRepository.GetListAsync(i =>
+                i.Name == biasName
+                && (string.IsNullOrEmpty(idolGroup) || i.Group.Name == idolGroup)
+                && i.Users.FirstOrDefault(u => u.DiscordId == userId.ToString()) != null,
+                i => i.Group);
             if (idols.Count == 0)
             {
                 logger.Log($"{userId} user's with idol [{biasName}]-[{(noGroup ? "No group specified" : idolGroup)}] are not connected currently!");

@@ -28,7 +28,7 @@ internal sealed class ChannelService(
             Channel? channel = await channelRepository.FirstOrDefaultAsync(
                 c => c.Server.DiscordId == serverId.ToString()
                 && c.DiscordId == channelId.ToString(),
-                c => c.Server);
+                c => c.ChannelTypes);
 
             ChannelType? channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int) channelTypeId);
             if (channelType == null)
@@ -93,7 +93,7 @@ internal sealed class ChannelService(
             Channel? channel = await channelRepository.FirstOrDefaultAsync(
                 c => c.Server.DiscordId == serverId.ToString()
                 && c.DiscordId == channelId.ToString(),
-                c => c.Server);
+                c => c.ChannelTypes);
             ChannelType? channelType = await channelTypeRepository.FirstOrDefaultAsync(ct => ct.ChannelTypeId == (int) channelTypeId);
             if (channelType == null)
             {

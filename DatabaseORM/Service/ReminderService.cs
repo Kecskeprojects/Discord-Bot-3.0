@@ -119,7 +119,7 @@ internal sealed class ReminderService(
     {
         try
         {
-            Reminder reminder = await reminderRepository.GetByIndexAsync(userId.ToString(), reminderId);
+            Reminder? reminder = await reminderRepository.GetByIndexAsync(userId.ToString(), reminderId);
 
             if (reminder != null)
             {

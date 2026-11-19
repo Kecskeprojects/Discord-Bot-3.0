@@ -191,6 +191,10 @@ Don't use EF InMemory or SQLite. The schema uses the `SQL_Latin1_General_CP1_CI_
 
 If repository tests are wanted (checked 2026-11-17):
 - **Run them against SQL Server LocalDB.** `MSSQLLocalDB` is installed on the dev PC (SQL Server 2025, `Microsoft SQL Server/170`).
+  - **The default instance doesn't start (found 2026-11-19).** It was created by LocalDB 2019 (v15), and only the 2025 version (v17) is installed now. The Application event log says "LocalDB parent instance version is invalid: MSSQL15E.LOCALDB".
+  - **Fixed 2026-11-19** with `sqllocaldb delete MSSQLLocalDB`, then `sqllocaldb create MSSQLLocalDB`. It is now version 17.0.4025.3, starts on first connection, and its server collation is `SQL_Latin1_General_CP1_CI_AS`, the same as the schema's.
+  - The 2026-11-19 checks below used an instance of their own instead (`sqllocaldb create <name> -s`, then `sqllocaldb stop` and `sqllocaldb delete`). `delete` leaves the instance's log folder under `%LOCALAPPDATA%\Microsoft\Microsoft SQL Server Local DB\Instances\`.
+  - Those checks also confirmed the approach: `EnsureCreatedAsync()` on a unique database name, seeded rows with fixed `ChannelTypeId`s, the real services and repositories with a fresh `MainDbContext` per call, then `EnsureDeletedAsync()`.
 - **Create the schema with `Database.EnsureCreated()` from the scaffolded model.**
   - It carries `UseCollation("SQL_Latin1_General_CP1_CI_AS")` and all 26 `getutcdate()` defaults, so the result matches the SSDT schema closely enough.
   - Then run `MainDB/Post-deployment/ChannelType_Inserts.sql` for the 6 lookup rows.
@@ -247,6 +251,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
     - `YoutubeAPI` (search, links, key rotation, a playlist that runs out of quota)
     - `WeeklyPollTools`; `LastFmHelper`
     - The Mapster mappings (added 2026-11-19, 48 more cases, 140 in all; see "Next" item 1)
+    - Seven DB services over substitute repositories (added 2026-11-19, 79 more cases, 219 in all; see "Next" item 2)
   - Integration:
     - Every registration and every command and interaction module.
     - Last.fm top tracks through the real container with a fake HTTP layer.
@@ -259,10 +264,18 @@ Yes, the bot's test project can run integration tests: real services wired toget
      - They found three members that are filled after the mapping. `SettingsChannels`, `IdolExtendedResource.LatestImageUrl` and `UserResource.Username` are now `.Ignore`d, with a comment saying who fills them.
      - `TwitchChannelResource.TwitchDiscordId` was never set or read, so it's removed.
      - Not covered: the "Days Of Week" options in the weekly poll mapping read the system clock (see "Left on the system clock" above); `WeeklyPollToolsTests` covers them.
-  2. DB services with mocked repositories.
+  2. DB services with mocked repositories. **First batch done 2026-11-19:**
+     - Covered: `ServerService`, `ChannelService` and `TwitchChannelService` (the three that change cached server settings, so each write is checked to drop the cached server), `ReminderService`, `BirthdayService`, `ServerMutedUserService` (the dates and times) and `UserIdolService` (the bias list results).
+     - Left: `IdolService`, `WeeklyPollService`, `WeeklyPollOptionPresetService`, `WeeklyPollOptionService`, `UserService`, `RoleService`, `CustomCommandService`, `GreetingService`, `IdolAliasService`, `IdolGroupService`, `IdolImageService` and `UserIdolStatisticService`.
+     - The repositories are substitutes answering from rows (`HasRows`, described in CLAUDE.md "Tests"), so these tests can't see a missing `Include`.
+     - Three bugs were found while reading the services, confirmed on a throwaway LocalDB database, and fixed (2026-11-19):
+       - **Removing one settings channel always answered "not found",** and adding a type a channel already had failed with a primary-key violation instead of "already exists". `ChannelService`'s single-channel lookups included `Server` instead of `ChannelTypes`, so the channel's types were never loaded. The cause was the generic-repository refactor in `28b13de` (2024-03-31); the old `GetChannelByDiscordIdAsync` included `ChannelTypes`.
+       - **Removing a bias by `name>group` threw a null reference,** which is the form the bot asks for when two biases share a name. `UserIdolService.RemoveUserIdolAsync` filtered the user's idols on `Group.Name`, but the groups weren't loaded with them. The database now finds the matching idols, as `RemoveUserIdolGroupAsync` already did. That also makes the name comparison case-insensitive, like the other lookups.
+       - **`!remind remove` with a number past the end logged an error** and answered "Reminder could not be removed!" instead of "Reminder doesn't exist with that ID". `ReminderRepository.GetByIndexAsync` used `FirstAsync`, and 0 or below sent a negative `OFFSET` to SQL Server. It now returns null for both.
+     - Seen, not changed: `IdolService.ChangeGroupAsync` loads the idol without its group, so an empty group name would set the group to null. Its caller shouldn't pass one.
   3. The features: reminder, unmute, birthday and weekly poll with the fake clock and an `IDiscordClient` substitute.
   4. More Last.fm (recents, now playing, who-knows, artist stats). Saved responses recorded from the real API would replace the hand-built JSON in `LastFmResponses`.
-  5. The DB layer on LocalDB (see "Repositories and the database").
+  5. The DB layer on LocalDB (see "Repositories and the database"). All three bugs under item 2 were of the kind only these tests catch (a missing `Include`, a repository that throws), which is a reason to move this item up.
   6. `BiasScrapingProcessor` and the who-knows embed.
   7. More whole commands. Guild commands need an `IGuild` substitute and a `ServerResource` from a substituted `IServerService`.
   8. Commands with a random branch: `UserBiasGameCommands.BiasGameStop` answers with an easter egg 1 time in 100, so a test of it fails now and then. A `Random` passed in would fix that (see "Randomness" above).

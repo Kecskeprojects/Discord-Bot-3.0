@@ -3,6 +3,7 @@ using DatabaseORM.Enums;
 using DatabaseORM.Mapping;
 using DatabaseORM.Model;
 using DatabaseORM.Resources;
+using Discord_Bot.Tests.Common.Builders;
 using Discord_Bot.Tests.Common.Constants;
 using Discord_Bot.Tests.Common.Tools;
 using Mapster;
@@ -14,15 +15,13 @@ namespace Discord_Bot.Tests.Unit.DatabaseORM.Mapping;
 //The hand-written mappings: the string → ulong ids, the navigations (null when a query didn't load them) and the renamed members
 public sealed class DatabaseMapperConfigTests
 {
-    private const int ServerId = 7;
-    private const int UserId = 3;
     private const int IdolId = 11;
     private const int PollId = 21;
     private const string NewestImageUrl = "https://example.com/newest.png";
     private static readonly DateTime today = TestTimes.Now.UtcDateTime;
     private static readonly DateOnly groupDebut = new(2015, 4, 22);
 
-    private readonly IMapper mapper = TestMapper.Create(new DatabaseMapperConfig());
+    private readonly IMapper mapper = TestMapper.Database;
 
     //A resource member without a source stays empty without any error, so each one is either mapped or ignored on purpose
     [Theory]
@@ -52,14 +51,14 @@ public sealed class DatabaseMapperConfigTests
     [Fact]
     public void Map_Server_ParsesTheIdsAndTakesTheRoles()
     {
-        Server server = NewServer();
+        Server server = Entities.Server();
         server.RoleMessageDiscordId = DiscordIds.Message.ToString();
-        server.NotificationRole = NewRole(DiscordIds.Role, "notified");
-        server.MuteRole = NewRole(DiscordIds.OtherRole, "muted");
+        server.NotificationRole = Entities.Role(DiscordIds.Role, "notified");
+        server.MuteRole = Entities.Role(DiscordIds.OtherRole, "muted");
 
         ServerResource resource = mapper.Map<ServerResource>(server);
 
-        Assert.Equal(ServerId, resource.ServerId);
+        Assert.Equal(RowIds.Server, resource.ServerId);
         Assert.Equal(DiscordIds.Server, resource.DiscordId);
         Assert.Equal(DiscordIds.Message, resource.RoleMessageDiscordId);
         Assert.Equal(DiscordIds.Role, resource.NotificationRoleDiscordId);
@@ -74,7 +73,7 @@ public sealed class DatabaseMapperConfigTests
     [InlineData("")]
     public void Map_ServerWithoutRoles_LeavesThemNull(string? roleMessageId)
     {
-        Server server = NewServer();
+        Server server = Entities.Server();
         server.RoleMessageDiscordId = roleMessageId;
 
         ServerResource resource = mapper.Map<ServerResource>(server);
@@ -89,8 +88,8 @@ public sealed class DatabaseMapperConfigTests
     [Fact]
     public void Map_ServerWithTwitchChannels_GivesThemTheServersIdAndRole()
     {
-        Server server = NewServer();
-        server.NotificationRole = NewRole(DiscordIds.Role, "notified");
+        Server server = Entities.Server();
+        server.NotificationRole = Entities.Role(DiscordIds.Role, "notified");
         server.TwitchChannels.Add(new TwitchChannel { TwitchId = "twitch-id", TwitchLink = "https://www.twitch.tv/tester", TwitchName = "tester", Server = server });
 
         TwitchChannelResource channel = Assert.Single(mapper.Map<ServerResource>(server).TwitchChannels);
@@ -115,7 +114,7 @@ public sealed class DatabaseMapperConfigTests
     [Fact]
     public void Map_Role_ParsesTheId()
     {
-        RoleResource resource = mapper.Map<RoleResource>(NewRole(DiscordIds.Role, "notified"));
+        RoleResource resource = mapper.Map<RoleResource>(Entities.Role(DiscordIds.Role, "notified"));
 
         Assert.Equal(DiscordIds.Role, resource.DiscordId);
         Assert.Equal("notified", resource.RoleName);
@@ -124,12 +123,12 @@ public sealed class DatabaseMapperConfigTests
     [Fact]
     public void Map_User_ParsesTheIdAndTakesTheLastFmUsername()
     {
-        User user = NewUser();
+        User user = Entities.User();
         user.LastFmusername = TestValues.LastFmUsername;
 
         UserResource resource = mapper.Map<UserResource>(user);
 
-        Assert.Equal(UserId, resource.UserId);
+        Assert.Equal(RowIds.User, resource.UserId);
         Assert.Equal(DiscordIds.User, resource.DiscordId);
         Assert.Equal(TestValues.LastFmUsername, resource.LastFmUsername);
         Assert.Null(resource.Username); //The bot fills it from the server member
@@ -138,7 +137,7 @@ public sealed class DatabaseMapperConfigTests
     [Fact]
     public void Map_Reminder_TakesTheUsersId()
     {
-        Reminder reminder = new() { ReminderId = 5, Message = "test", Date = today, User = NewUser() };
+        Reminder reminder = new() { ReminderId = 5, Message = "test", Date = today, User = Entities.User() };
 
         ReminderResource resource = mapper.Map<ReminderResource>(reminder);
 
@@ -151,7 +150,7 @@ public sealed class DatabaseMapperConfigTests
     [Fact]
     public void Map_Birthday_TakesTheUsersAndTheServersIds()
     {
-        Birthday birthday = new() { BirthdayId = 6, Date = new DateOnly(2000, 3, 4), User = NewUser(), Server = NewServer() };
+        Birthday birthday = new() { BirthdayId = 6, Date = new DateOnly(2000, 3, 4), User = Entities.User(), Server = Entities.Server() };
 
         BirthdayResource resource = mapper.Map<BirthdayResource>(birthday);
 
@@ -235,7 +234,7 @@ public sealed class DatabaseMapperConfigTests
     [Fact]
     public void Map_UserToBiasGameStats_LeavesTheStatsToTheService()
     {
-        User user = NewUser();
+        User user = Entities.User();
         user.BiasGameCount = 12;
 
         UserBiasGameStatResource resource = mapper.Map<UserBiasGameStatResource>(user);
@@ -248,7 +247,7 @@ public sealed class DatabaseMapperConfigTests
     [Fact]
     public void Map_ServerMutedUser_KeepsTheIdsAsText()
     {
-        ServerMutedUser mutedUser = new() { MutedUntil = today, RemovedRoleDiscordIds = "removed roles", Server = NewServer(), User = NewUser() };
+        ServerMutedUser mutedUser = new() { MutedUntil = today, RemovedRoleDiscordIds = "removed roles", Server = Entities.Server(), User = Entities.User() };
 
         ServerMutedUserResource resource = mapper.Map<ServerMutedUserResource>(mutedUser);
 
@@ -273,7 +272,7 @@ public sealed class DatabaseMapperConfigTests
     {
         WeeklyPoll poll = NewPoll();
         poll.Channel = new Channel { DiscordId = DiscordIds.Channel.ToString() };
-        poll.Role = NewRole(DiscordIds.Role, "voters");
+        poll.Role = Entities.Role(DiscordIds.Role, "voters");
 
         WeeklyPollResource resource = mapper.Map<WeeklyPollResource>(poll);
 
@@ -388,21 +387,6 @@ public sealed class DatabaseMapperConfigTests
         Assert.True(group.ModifiedOn >= before);
     }
 
-    private static Server NewServer()
-    {
-        return new Server { ServerId = ServerId, DiscordId = DiscordIds.Server.ToString() };
-    }
-
-    private static Role NewRole(ulong discordId, string name)
-    {
-        return new Role { DiscordId = discordId.ToString(), RoleName = name };
-    }
-
-    private static User NewUser()
-    {
-        return new User { UserId = UserId, DiscordId = DiscordIds.User.ToString() };
-    }
-
     private static Idol NewIdol()
     {
         Idol idol = new()
@@ -430,7 +414,7 @@ public sealed class DatabaseMapperConfigTests
             RepeatOnDayOfWeek = "Monday",
             IsMultipleAnswer = true,
             CloseInTimeSpanTicks = TimeSpan.FromDays(1).Ticks,
-            Server = NewServer()
+            Server = Entities.Server()
         };
         poll.WeeklyPollOptions.Add(new WeeklyPollOption { WeeklyPollId = PollId, OrderNumber = 2, Title = "Second" });
         poll.WeeklyPollOptions.Add(new WeeklyPollOption { WeeklyPollId = PollId, OrderNumber = 1, Title = "First" });
