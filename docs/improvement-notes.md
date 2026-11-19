@@ -236,6 +236,10 @@ Yes, the bot's test project can run integration tests: real services wired toget
   - DatabaseORM lets the tests and NSubstitute's proxies see its internals (`InternalsVisibleTo` in its project file).
   - The root `global.json` makes `dotnet test` use Microsoft.Testing.Platform. Without it, the .NET 11 SDK refuses to run xUnit v3 ("Testing with VSTest target is no longer supported").
   - The solution lists the test project with only its own Debug/Release lines: `dotnet sln add` also added x64 and x86 platforms to every project, so those were left out.
+  - **Test Explorer warns "No test is available in `MainDB\obj\Debug\MainDB.dll`" (investigated 2026-11-19).** It is harmless, and no project setting stops it:
+    - Visual Studio chooses which projects to scan by its own rules. The vstest maintainers say they can't change those rules ([microsoft/vstest#2130](https://github.com/microsoft/vstest/issues/2130), closed with "There isn't unfortunately a way to avoid this"). A 2023 comment there says `<IsTestProject>false</IsTestProject>` and `<TestProject>false</TestProject>` don't stop the scan.
+    - The `TestContainer` capability decides this only for SDK-style projects. `MainDB` is a legacy SSDT project, so it doesn't apply.
+    - The only route found is turning `MainDB` into an SDK-style SQL project (section 8). Untested.
 - **The first 92 test cases (39 tests; theories count once per case):**
   - Unit:
     - `DateTimeTools`; the top-list percentage under hu-HU; `DiscordTools` (UTC timestamps, channel types)
@@ -331,6 +335,44 @@ Can the disabled embeds be turned back on as they are, with adjustments and with
 - `TwitterScraper.ModifyImageUrl`: `url.Split(".").Length > 1` is always true for `https://pbs.twimg.com/...`, so the size and format logic after it never runs.
 - `TwitterScraper.ExtractFromUrl` calls `DeleteCookieAsync()` without arguments, which deletes nothing.
 - Posts X marks as sensitive (`NsfwLoggedOut`) can't be seen logged out at all.
+
+## 8. MainDB as an SDK-style SQL project (investigated 2026-11-19, not started)
+
+SQL projects have a newer format: SDK-style projects built on the `Microsoft.Build.Sql` SDK, which do for `.sqlproj` what SDK-style projects did for `.csproj`. The SDK is generally available (latest stable 2.3.0, 2026-09-17, needs the .NET 8 SDK or later). Microsoft calls it "the format that will be supported in the future" ([overview](https://learn.microsoft.com/en-us/sql/tools/sql-database-projects/sql-database-projects)). `MainDB` is in the original SSDT format.
+
+**What it would bring here:**
+- `dotnet build` builds `MainDB.dacpac`, so the whole solution would build from the command line. CLAUDE.md's "build the projects rather than the `.sln`" would no longer be needed.
+- The DB tests could put the real schema on LocalDB from that dacpac (section 2, "Repositories and the database"). Today that needs a Visual Studio build first.
+- `.sql` files in the project folder are included by default, so a new table needs no project-file edit.
+- Probably ends the Test Explorer warning about `MainDB.dll` (section 2, "Project setup"), since Visual Studio's `TestContainer` rule covers SDK-style projects. Unverified.
+
+**Which tools can open it (checked 2026-11-19; the dev PC has Visual Studio Community 2026 18.12 and SSMS 22.12):**
+- **Visual Studio 2026 can't.** It only supports the original format ([SSDT SDK-style page](https://learn.microsoft.com/en-us/sql/ssdt/sql-server-data-tools-sdk-style)).
+  - Microsoft's [March 2026 SSMS post](https://techcommunity.microsoft.com/blog/azuresqlblog/database-devops-preview-in-ssms-22-4-1/4503858) says support in 2026 "is not yet on the roadmap". A July 2026 Microsoft reply under it says the Visual Studio 2022 preview work was paused because of conflicting changes in 2026, and that the item is under review. The roadmap is at aka.ms/sqlprojects-roadmap.
+  - After a conversion, Visual Studio 2026 would probably show `MainDB` as unloaded in the solution (untested). The bot projects aren't affected.
+- **SSMS 22.4 and later can,** through the Database DevOps workload (preview) ([SSMS docs](https://learn.microsoft.com/en-us/ssms/database-devops)). It opens SDK-style projects only, with `Microsoft.Build.Sql` 2.1.0 or later.
+  - The dev PC's SSMS doesn't have that workload. To add it: Visual Studio Installer → Modify on SSMS 22 → Workloads.
+  - It can build, publish to a server or generate a script, and it handles the post-deployment script, SQLCMD variables and code analysis.
+  - It has no table designer and no rename/refactoring, and it can't create publish profiles. The docs don't say whether it reads existing ones.
+  - Schema compare: Microsoft's [tools table](https://learn.microsoft.com/en-us/sql/tools/sql-database-projects/sql-projects-tools) says yes, the March post says it's coming.
+- **VS Code can** (SQL Database Projects extension). It opens both formats, creates publish profiles and has schema compare, but has no table designer.
+- **Visual Studio 2022 can,** with the SDK-style preview component. That would mean a second Visual Studio install just for this.
+
+**What `MainDB` uses, and how it would carry over (checked 2026-11-19):**
+- The 21 table files are `<Build Include>` items. They would be removed, because the default glob picks the files up.
+- The insert scripts under `Post-deployment/` and the archived `DB Patch/Patched/` scripts are `<None>` items. The default glob would compile them into the model, so they need `<Build Remove="…" />` (check with the first build).
+- Keep as they are, per the convert guide: `PostDeploy`, the three publish profiles, `MainDB.refactorlog` and the `BuildConfiguration` SQLCMD variable.
+- No SQLCLR code and no database references, so the format's known gaps don't apply.
+- Patch scripts come from SSDT publish in Visual Studio today. Without it, `SqlPackage /Action:Script /SourceFile:MainDB.dacpac /Profile:Main_Release.publish.xml` should produce them from the same profiles. Untested. SSMS's Publish → Generate Script does the same from its dialog.
+
+**How:** Microsoft's [convert guide](https://learn.microsoft.com/en-us/sql/tools/sql-database-projects/howto/convert-original-sql-project) has these steps:
+1. Back up the `.sqlproj`, and keep a dacpac built from the original.
+2. Add `<Sdk Name="Microsoft.Build.Sql" Version="…" />`.
+3. Remove the `<Import>` lines, the `Properties` folder entry and the `<Build Include>` items.
+4. Change the project type GUID in the `.sln` to `{42EA0DBD-9CF1-443E-919E-BE9C484E4577}`.
+5. Build, then compare the two dacpacs with `DacpacVerify` (`dotnet tool install --global Microsoft.DacpacVerify --prerelease`). That check covers the schema model, not the post-deployment script, refactorlog or project settings, so compare those by eye.
+
+**When to revisit:** when Visual Studio 2026 supports SDK-style SQL projects. It could happen sooner if SSMS's Database DevOps workload covers the schema work: try it on a converted copy of `MainDB` first. Check that it builds the same dacpac, that Generate Script makes a patch from the existing profiles, and that editing tables as scripts without the designer is acceptable. A community SDK, `MSBuild.Sdk.SqlProj`, also builds dacpacs with `dotnet build`. Not looked at.
 
 ## Minor improvements
 
