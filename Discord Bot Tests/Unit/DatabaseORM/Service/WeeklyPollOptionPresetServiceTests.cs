@@ -121,6 +121,18 @@ public sealed class WeeklyPollOptionPresetServiceTests
     }
 
     [Fact]
+    public async Task RemovePresetByNameAsync_UsedByAPoll_KeepsItWithItsAnswersAndReturnsInUse()
+    {
+        yesOrNo.WeeklyPolls.Add(new WeeklyPoll { WeeklyPollId = 21, Name = "weekly", Title = "", RepeatOnDayOfWeek = "Monday", OptionPresetId = 4 });
+        List<WeeklyPollOptionPreset> presetTable = presets.HasRows(yesOrNo);
+        List<WeeklyPollOption> answerTable = options.HasRows([.. yesOrNo.WeeklyPollOptions]);
+
+        Assert.Equal(DbProcessResultEnum.InUse, await service.RemovePresetByNameAsync("yes or no"));
+        Assert.Same(yesOrNo, Assert.Single(presetTable));
+        Assert.Equal(2, answerTable.Count);
+    }
+
+    [Fact]
     public async Task RemovePresetByNameAsync_Unknown_ReturnsNotFound()
     {
         presets.HasRows(yesOrNo);

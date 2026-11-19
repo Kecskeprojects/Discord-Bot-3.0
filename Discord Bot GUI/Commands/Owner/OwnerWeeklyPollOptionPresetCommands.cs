@@ -88,6 +88,7 @@ public class OwnerWeeklyPollOptionPresetCommands(
             {
                 DbProcessResultEnum.Success => $"The '{presetName}' preset has been removed.",
                 DbProcessResultEnum.NotFound => "Preset does not exist.",
+                DbProcessResultEnum.InUse => $"The '{presetName}' preset is still used by a weekly poll. Switch that poll to another preset or to its own answers first.",
                 _ => "Preset could not be removed!"
             };
             _ = await ReplyAsync(resultMessage);

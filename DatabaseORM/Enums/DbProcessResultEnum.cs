@@ -10,5 +10,7 @@ public enum DbProcessResultEnum
     UpdatedExisting = 5,
     MultipleResults = 6,
     PartialNotFound = 7,
-    MultipleExists = 8
+    MultipleExists = 8,
+    //Something else still relies on it, so it was left as it is
+    InUse = 9
 }

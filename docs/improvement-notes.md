@@ -352,13 +352,10 @@ Yes, the bot's test project can run integration tests: real services wired toget
        - **A poll's own answers couldn't be added through its edit message.** The poll's answer menu said `PollOption_Change_CustomOption_True_<pollId>`, so `WeeklyPollOptionEditInteraction` saved the new answer as a preset's. With no preset of that ID it failed on `FK_WeeklyPollOption_WeeklyPollOptionPresetId` ("The poll option could not be found."); with one, the answer went to that preset. It now says `False`.
        - **A preset's existing answers couldn't be edited.** The preset's answer menu gave each answer the preset's ID instead of its own, so the bot looked up the wrong answer. It answered "could not be found", or opened a different answer whose ID happened to match.
        - Both menu slips came with `d07284f` (2025-03-01, "added logic for preset editing"), which added the true/false part to the custom ID.
-     - **To decide:** removing a preset that a poll still uses fails on `FK_WeeklyPoll_WeeklyPollOptionPresetId`, and the owner is told it could not be removed. It could refuse with a clear message instead, or detach the polls (they'd fall back to their own answers).
-     - **To check on the live database:**
-       - Answers orphaned by earlier preset removals:
-         ```sql
-         SELECT COUNT(*) FROM WeeklyPollOption WHERE WeeklyPollId IS NULL AND WeeklyPollOptionPresetId IS NULL
-         ```
-       - Poll answers that went to a preset with the same ID through the old menu. They show as two answers in one slot of a preset:
+     - **Removing a preset that a poll still uses is refused (decided and done 2026-11-19).** It used to fail on `FK_WeeklyPoll_WeeklyPollOptionPresetId` with "Preset could not be removed!".
+       - `RemovePresetByNameAsync` now returns the new `DbProcessResultEnum.InUse`, and `!weekly poll preset remove` says the preset is still used by a weekly poll and to switch that poll to another preset or its own answers first.
+       - No preset had been removed on the live bot before, so there are no orphaned answers to clean up.
+     - **To check on the live database:** poll answers that went to a preset with the same ID through the old menu. They show as two answers in one slot of a preset:
          ```sql
          SELECT WeeklyPollOptionPresetId, OrderNumber, COUNT(*) FROM WeeklyPollOption WHERE WeeklyPollOptionPresetId IS NOT NULL GROUP BY WeeklyPollOptionPresetId, OrderNumber HAVING COUNT(*) > 1
          ```

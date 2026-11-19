@@ -142,6 +142,23 @@ public sealed class WeeklyPollTests(LocalDatabase database) : IClassFixture<Loca
         Assert.Equal(0, await AnswerRowsAsync());
     }
 
+    //It failed on the poll's foreign key until 2026-11-19; now it's refused until the poll stops using it
+    [Fact]
+    public async Task RemovePresetByNameAsync_UsedByAPoll_IsRefusedUntilThePollSwitchesAway()
+    {
+        int presetId = await NewPresetAsync("Yes or No", "Yes", "No");
+        int pollId = await NewPollAsync("weekly");
+        await PollsService.UpdateFieldAsync(pollId, nameof(WeeklyPoll.OptionPresetId), presetId.ToString());
+
+        Assert.Equal(DbProcessResultEnum.InUse, await PresetsService.RemovePresetByNameAsync("yes or no"));
+        Assert.NotNull(await PresetsService.GetPresetByNameAsync("yes or no"));
+
+        //"custom" is the edit message's choice for the poll's own answers
+        await PollsService.UpdateFieldAsync(pollId, nameof(WeeklyPoll.OptionPresetId), "custom");
+        Assert.Equal(DbProcessResultEnum.Success, await PresetsService.RemovePresetByNameAsync("yes or no"));
+        Assert.Equal(0, await AnswerRowsAsync());
+    }
+
     [Fact]
     public async Task GetPresetByNameAsync_NameInAnotherCase_FindsItWithItsAnswers()
     {

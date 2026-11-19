@@ -137,23 +137,29 @@ internal sealed class WeeklyPollOptionPresetService(
         try
         {
             presetName = presetName.ToLower();
-            WeeklyPollOptionPreset? poll = await weeklyPollOptionPresetRepository.FirstOrDefaultAsync(
+            WeeklyPollOptionPreset? preset = await weeklyPollOptionPresetRepository.FirstOrDefaultAsync(
                 p => p.Name.ToLower() == presetName,
-                wp => wp.WeeklyPollOptions);
-            if (poll != null)
+                wp => wp.WeeklyPollOptions,
+                wp => wp.WeeklyPolls);
+            if (preset == null)
             {
-                //Its answers go with it, in the same save, instead of staying behind belonging to nothing
-                _ = await weeklyPollOptionRepository.RemoveAsync(poll.WeeklyPollOptions.ToList(), saveChanges: false);
-                _ = await weeklyPollOptionPresetRepository.RemoveAsync(poll);
-
-                logger.Log("Poll removed successfully!");
-                return DbProcessResultEnum.Success;
-            }
-            else
-            {
-                logger.Log("Poll not found!");
+                logger.Log("Preset not found!");
                 return DbProcessResultEnum.NotFound;
             }
+
+            //A poll that uses it would lose its answers, and its foreign key would refuse the removal anyway
+            if (preset.WeeklyPolls.Count > 0)
+            {
+                logger.Log($"Preset '{presetName}' is still used by {preset.WeeklyPolls.Count} poll(s), so it is kept.");
+                return DbProcessResultEnum.InUse;
+            }
+
+            //Its answers go with it, in the same save, instead of staying behind belonging to nothing
+            _ = await weeklyPollOptionRepository.RemoveAsync(preset.WeeklyPollOptions.ToList(), saveChanges: false);
+            _ = await weeklyPollOptionPresetRepository.RemoveAsync(preset);
+
+            logger.Log("Preset removed successfully!");
+            return DbProcessResultEnum.Success;
         }
         catch (Exception ex)
         {
