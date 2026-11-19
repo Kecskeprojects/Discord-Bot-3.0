@@ -4,6 +4,7 @@
 public static class TestValues
 {
     public const string Username = "tester";
+    public const string ServerName = "Test Server";
     public const string AvatarUrl = "https://example.com/avatar.png";
 
     public const string LastFmUsername = "lastfm-tester";

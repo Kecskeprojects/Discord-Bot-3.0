@@ -27,37 +27,59 @@ public class ReminderFeature(
             DateTime now = timeProvider.GetUtcNow().UtcDateTime;
             DateTime dateTime = new(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, now.Kind);
             List<ReminderResource> result = await reminderService.GetCurrentRemindersAsync(dateTime);
-            if (!CollectionTools.IsNullOrEmpty(result))
+            if (CollectionTools.IsNullOrEmpty(result))
             {
-                foreach (ReminderResource reminder in result)
+                return true;
+            }
+
+            //Each reminder on its own, so one that Discord refuses doesn't stop the others
+            List<int> handledIds = [];
+            foreach (ReminderResource reminder in result)
+            {
+                if (await TrySendAsync(reminder))
                 {
-                    //Modify message
-                    reminder.Message = reminder.Message.Insert(0, $"You told me to remind you at {DiscordTools.UtcTimestamp(reminder.Date, TimestampTagStyles.ShortDateTime)} with the following message:\n\n");
-
-                    //Try getting user
-                    IUser user = await client.GetUserAsync(reminder.UserDiscordId);
-
-                    //If user exists send a direct message to the user
-                    if (user != null)
-                    {
-                        _ = await user.SendMessageAsync(reminder.Message);
-                    }
+                    handledIds.Add(reminder.ReminderId);
                 }
+            }
 
-                List<int> reminderIds = result.Select(r => r.ReminderId).ToList();
-                DbProcessResultEnum reminderResult = await reminderService.RemoveCurrentRemindersAsync(reminderIds);
+            if (handledIds.Count > 0)
+            {
+                DbProcessResultEnum reminderResult = await reminderService.RemoveCurrentRemindersAsync(handledIds);
                 if (reminderResult == DbProcessResultEnum.Failure)
                 {
                     logger.Error("ReminderFeature.cs ExecuteCoreLogicAsync", "Failure during reminder check!");
                     return false;
                 }
             }
+
+            return handledIds.Count == result.Count;
         }
         catch (Exception ex)
         {
             logger.Error("ReminderFeature.cs ExecuteCoreLogicAsync", ex);
             return false;
         }
-        return true;
+    }
+
+    //False when Discord refused it: the reminder then stays for the next minute, in case the problem was temporary
+    private async Task<bool> TrySendAsync(ReminderResource reminder)
+    {
+        try
+        {
+            IUser user = await client.GetUserAsync(reminder.UserDiscordId);
+
+            //A user Discord doesn't know anymore can't be reached later either, so their reminder counts as handled
+            if (user != null)
+            {
+                string message = $"You told me to remind you at {DiscordTools.UtcTimestamp(reminder.Date, TimestampTagStyles.ShortDateTime)} with the following message:\n\n{reminder.Message}";
+                _ = await user.SendMessageAsync(message);
+            }
+            return true;
+        }
+        catch (Exception ex)
+        {
+            logger.Warning("ReminderFeature.cs TrySendAsync", ex);
+            return false;
+        }
     }
 }

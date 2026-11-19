@@ -290,10 +290,31 @@ Yes, the bot's test project can run integration tests: real services wired toget
        - **`!remind remove` with a number past the end logged an error** and answered "Reminder could not be removed!" instead of "Reminder doesn't exist with that ID". `ReminderRepository.GetByIndexAsync` used `FirstAsync`, and 0 or below sent a negative `OFFSET` to SQL Server. It now returns null for both.
      - Seen, not changed:
        - `IdolService.ChangeGroupAsync` loads the idol without its group, so an empty group name would set the group to null. Its caller shouldn't pass one.
-       - **The weekly scrape adds an idol's image again even when it already has it** (`UpdateIdolDetailsAsync`). It only skips an image someone replaced. After the oldest are trimmed, the 3 or 4 images an idol keeps are often the same URL, so the earlier images are lost. To fix: also skip the image when the idol's newest one has that URL. That changes what the bias game shows over time, so it's your call.
+       - `UpdateIdolDetailsAsync` only skips a scraped image that someone replaced. That is enough, because `BiasScrapingProcessor.UpdateBiasAsync` doesn't call it when the idol's newest image already has the scraped URL. A first reading of the service alone wrongly suggested the weekly scrape re-adds images; the live table's 767 rows agree that it doesn't (checked 2026-11-19).
        - `WeeklyPollService.GetPollByIdAsync` includes neither the server nor the preset, so its result has `ServerDiscordId` 0 and no answers for a preset poll. Its only caller, the edit interaction, reads just the name, title, channel and role, so it's harmless today.
        - `RoleService.RemoveSelfRoleAsync` on a role that is also the server's notification or mute role would probably fail on the foreign key, because the server row points at it. Unverified; a LocalDB test could check.
-  3. The features: reminder, unmute, birthday and weekly poll with the fake clock and an `IDiscordClient` substitute.
+  3. The features: reminder, unmute, birthday and weekly poll with the fake clock and an `IDiscordClient` substitute. **Done 2026-11-19** (`Unit/Bot/Features/`, 29 cases, 433 in all):
+     - Reminders: what's due by the start of the minute, the DM text, and removing them.
+     - Unmutes: the mute role off, the removed roles back, the DM, a user or server that's gone.
+     - Birthdays: the greeting in the birthday channel, and the server, channel or user that's missing.
+     - Weekly polls: the poll and role mention in its channel, pinning, and a poll without answers or channel.
+     - New mocks for this:
+       - `DiscordMocks.Guild` and `GuildUser`.
+       - `RecordingChannel.Text`, and `DirectMessagesOf` (the user's DMs, which Discord.Net's `SendMessageAsync` extension opens).
+       - `DiscordErrors`: the `HttpException`s Discord.Net throws for closed DMs (50007) and missing permissions (50013).
+       - `SentMessage` now also records a sent poll and the message the channel returned.
+     - The birthday greeting is picked at random and only some greetings give the age, so the test checks only the mention.
+     - **One failure stopped the rest of the run (found and fixed 2026-11-19).**
+       - Each feature had one try/catch around its whole loop, so the first exception Discord threw ended the run. A throwaway test confirmed it, failing the first of two items as Discord does.
+       - **Reminders:** nothing after the failing one was sent, and none was removed. The scheduler gets the same list every minute, so a failing reminder blocked those behind it indefinitely, and any sent before it were sent again every minute.
+       - **Unmutes:** the failing user's roles came back but their mute entry stayed, so it was retried every minute, and users after them were never unmuted.
+       - **Birthdays and weekly polls:** the servers after the failing one got nothing that day.
+       - Not seen on the live bot. The log would show `ReminderFeature.cs ExecuteCoreLogicAsync` or `UnmuteFeature.cs ExecuteCoreLogicAsync` errors every minute.
+     - **The fix:** each item now runs on its own, and a failure is logged without stopping the others. With the pre-fix code, five of the six new failure tests fail, the weekly poll one included.
+       - **Reminders (decided 2026-11-19):** a reminder whose DM fails stays for the next minute, in case Discord's problem was temporary. Only the sent ones are removed, along with those whose user Discord doesn't know anymore. A user with closed DMs is therefore retried, and a warning logged, every minute. If that gets noisy, give up after some time.
+       - **Unmutes:** a failed DM is only a warning, and the entry is still removed once the roles are back. Kept, the old entry would run again and take the mute role off a user who was muted again meanwhile. If the role change itself fails, the entry stays for the next run.
+       - **Birthdays and weekly polls:** a failure is logged and the next server's message is sent. A message that failed isn't retried, since they run once a day.
+       - `Run()` now returns false when any item failed. The scheduler doesn't read it.
   4. More Last.fm (recents, now playing, who-knows, artist stats). Saved responses recorded from the real API would replace the hand-built JSON in `LastFmResponses`.
   5. The DB layer on LocalDB (see "Repositories and the database"). **First batch done 2026-11-19:**
      - Six classes in `Integration/Database/` cover the real services, repositories and cache:

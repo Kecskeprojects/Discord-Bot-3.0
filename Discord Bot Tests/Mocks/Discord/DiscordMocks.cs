@@ -17,6 +17,26 @@ public static class DiscordMocks
         return user;
     }
 
+    //A server member; messages ping them with Mention
+    public static IGuildUser GuildUser(ulong id = DiscordIds.User, ulong guildId = DiscordIds.Server, string username = TestValues.Username)
+    {
+        IGuildUser user = Substitute.For<IGuildUser>();
+        user.Id.Returns(id);
+        user.GuildId.Returns(guildId);
+        user.Username.Returns(username);
+        user.Mention.Returns($"<@{id}>");
+        return user;
+    }
+
+    //A server the bot is in. Give it members and channels with GetUserAsync(id, CacheMode.CacheOnly).Returns(...) and the like
+    public static IGuild Guild(ulong id = DiscordIds.Server, string name = TestValues.ServerName)
+    {
+        IGuild guild = Substitute.For<IGuild>();
+        guild.Id.Returns(id);
+        guild.Name.Returns(name);
+        return guild;
+    }
+
     //A text command in Discord.Net's own (non-socket) CommandContext, the kind CommandHandler makes from a gateway message;
     //run it with TestHost.RunCommandAsync
     public static ICommandContext TextCommand(string text, IUser author, IMessageChannel channel)

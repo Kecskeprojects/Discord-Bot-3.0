@@ -26,21 +26,31 @@ public class BirthdayFeature(
             //Get the list of birthdays that are on this date
             DateTime today = timeProvider.GetUtcNow().UtcDateTime;
             List<BirthdayResource> result = await birthdayService.GetBirthdaysByDateAsync(today);
+            bool allSent = true;
             if (!CollectionTools.IsNullOrEmpty(result))
             {
                 logger.Log($"Sending birthday message to {result.Count} people.");
                 foreach (BirthdayResource birthday in result)
                 {
-                    await SendBirthdayMessageAsync(birthday, today.Year);
+                    //Each on its own, so a server whose channel refuses the message doesn't stop the greetings of the others
+                    try
+                    {
+                        await SendBirthdayMessageAsync(birthday, today.Year);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error("BirthdayFeature.cs SendBirthdayMessageAsync", ex);
+                        allSent = false;
+                    }
                 }
             }
+            return allSent;
         }
         catch (Exception ex)
         {
             logger.Error("BirthdayFeature.cs ExecuteCoreLogicAsync", ex);
             return false;
         }
-        return true;
     }
 
     private async Task SendBirthdayMessageAsync(BirthdayResource birthday, int currentYear)

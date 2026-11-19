@@ -18,10 +18,9 @@ public sealed class RecordingChannel
         {
             object?[] args = call.Args();
             List<Embed> embeds = [.. args.OfType<Embed>(), .. args.OfType<Embed[]>().SelectMany(e => e)];
-            Sent.Add(new SentMessage(call.ArgAt<string?>(0), embeds, args.OfType<MessageComponent>().FirstOrDefault()));
-
             IUserMessage message = Substitute.For<IUserMessage>();
-            message.Id.Returns(DiscordIds.Message + (ulong) Sent.Count);
+            message.Id.Returns(DiscordIds.Message + (ulong) Sent.Count + 1);
+            Sent.Add(new SentMessage(call.ArgAt<string?>(0), embeds, args.OfType<MessageComponent>().FirstOrDefault(), args.OfType<PollProperties>().FirstOrDefault(), message));
             return Task.FromResult(message);
         });
         channel.DeleteMessageAsync(default(ulong)).ReturnsForAnyArgs(call =>
@@ -38,5 +37,19 @@ public sealed class RecordingChannel
     public static RecordingChannel DirectMessage(ulong id = DiscordIds.DirectMessageChannel)
     {
         return new(Substitute.For<IDMChannel>(), id);
+    }
+
+    //A server's text channel; ITextChannel is also an IGuildChannel, so a guild can hand it out
+    public static RecordingChannel Text(ulong id = DiscordIds.Channel)
+    {
+        return new(Substitute.For<ITextChannel>(), id);
+    }
+
+    //The user's direct messages: Discord.Net's IUser.SendMessageAsync extension opens them with CreateDMChannelAsync
+    public static RecordingChannel DirectMessagesOf(IUser user)
+    {
+        RecordingChannel messages = DirectMessage();
+        user.CreateDMChannelAsync(default).ReturnsForAnyArgs((IDMChannel) messages.Channel);
+        return messages;
     }
 }

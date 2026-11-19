@@ -26,21 +26,30 @@ public class WeeklyPollFeature(
             //Get the list of polls that are sent out on this day
             DayOfWeek dayOfWeek = timeProvider.GetUtcNow().DayOfWeek;
             List<WeeklyPollResource> result = await weeklyPollService.GetPollsByDayOfWeekAsync(dayOfWeek);
-
+            bool allSent = true;
             if (!CollectionTools.IsNullOrEmpty(result))
             {
                 foreach (WeeklyPollResource poll in result)
                 {
-                    bool _ = await ProcessWeeklyPollAsync(poll);
+                    //Each on its own, so a channel that refuses the poll doesn't stop the other servers' polls
+                    try
+                    {
+                        _ = await ProcessWeeklyPollAsync(poll);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error("WeeklyPollFeature.cs ProcessWeeklyPollAsync", ex);
+                        allSent = false;
+                    }
                 }
             }
+            return allSent;
         }
         catch (Exception ex)
         {
             logger.Error("WeeklyPollFeature.cs ExecuteCoreLogicAsync", ex);
             return false;
         }
-        return true;
     }
 
     public async Task<bool> ProcessWeeklyPollAsync(WeeklyPollResource poll)
