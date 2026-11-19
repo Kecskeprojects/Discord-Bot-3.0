@@ -177,7 +177,7 @@ No interface needed:
 - `CommandService` / `InteractionService` (Discord.Net): only the handlers and the help command use them.
 
 Randomness and files (no interface, but tests have to account for them):
-- **Randomness:** `new Random()` appears in `CollectionTools`, `StringExtension.ToMockText`, `RainbowRandomizerTools`, `BirthdayMessageProcessor`, `EasterEggFeature`, `WhoKnowsImageProcessor` (file names), `YoutubeAPI` (key choice) and several commands. Tests can check properties (a shuffle keeps every item), or the helpers take a `Random` so a test passes a seeded one.
+- **Randomness:** `new Random()` appears in `CollectionTools`, `StringExtension.ToMockText`, `RainbowRandomizerTools`, `BirthdayMessageProcessor`, `WhoKnowsImageProcessor` (file names), `YoutubeAPI` (key choice) and several commands. Tests can check properties (a shuffle keeps every item), or the code takes the injected `Random`, as `EasterEggFeature` does since 2026-11-19 (described in CLAUDE.md "Randomness").
 - **Files:** `RainbowRandomizerTools.GetOperatorList` reads `R6_Attackers.txt` / `R6_Defenders.txt` from the working directory. Copy them to the test output, or pass the list in.
 
 ### Not worth unit-testing
@@ -317,6 +317,13 @@ Yes, the bot's test project can run integration tests: real services wired toget
        - `Run()` now returns false when any item failed. The scheduler doesn't read it.
        - **Corrected 2026-11-19 after commit `1b0aa13`:** in that commit the unmute loop reads `allUnmuted = allUnmuted && await TryUnmuteAsync(...)`. The line was rewritten outside the session before the commit, possibly by an IDE quick fix. `&&` stops calling `TryUnmuteAsync` after the first failure, which brings back the bug the fix removed. `Run_RoleChangeRefused_KeepsThatMuteForTheNextRunAndUnmutesTheOthers` caught it. The loop now uses an `if`, which no short-circuit suggestion applies to.
      - `SelfRoleFeature` too (2026-11-19, 6 cases, 439 in all): `+role` and `-role`, the reply deleted after 1.5 seconds on the fake clock, a role that isn't on the list, one deleted on Discord, and Discord refusing the change.
+     - `CustomCommandFeature` and `EasterEggFeature` too (2026-11-19, 15 cases, 454 in all):
+       - Custom commands: the server's link for `!name`, an unknown name, and a channel that refuses.
+       - Easter eggs: the greeting for a mention, the 1-in-5000 message, and the 1-in-20 replies to "I think" and "I am".
+       - `EasterEggFeature` now takes the injected `Random`, so the tests decide each roll.
+     - **Fixed with them (confirmed by tests first):**
+       - **Mentions in the older `<@!id>` form weren't recognized.** The second check was `CurrentUser.Mention.Remove(2, 1)`. Discord.Net 3.20 gives `<@id>`, so that drops the first digit of the ID and can never match. A probe showed `<@123456789012345678>` becoming `<@23456789012345678>`. Both forms are now checked by ID. Current Discord clients send `<@id>`, so the impact was small.
+       - **In a direct message, the 1-in-20 reply logged an error instead of replying.** `CommandHandler` runs this feature for DMs too, where `Context.Guild` is null, and the reply's `MessageReference` read `Context.Guild.Id`. It now passes `Context.Guild?.Id`.
      - **Every role the bot stores is a self-role, by design (checked on LocalDB 2026-11-19).**
        - The mute, notification and poll ping roles are kept in the same `Role` table as the self-roles. So they are listed by `!update role message` and found for `+name`/`-name` in the role channel.
        - That is intended: the notification and poll ping roles are opt-in roles. A user who gives themselves the mute role has only themselves to blame.
@@ -333,7 +340,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
      - Left: weekly polls and presets (`WeeklyPollService`'s queries); the idol queries (search, `GetListForGameAsync`, `UserIdolStatisticRepository.GetTop10ForUserAsync`, `IdolImageRepository.GetLatestByIdolIdAsync`); custom commands, self-roles, greetings and users.
   6. `BiasScrapingProcessor` and the who-knows embed.
   7. More whole commands. Guild commands need an `IGuild` substitute and a `ServerResource` from a substituted `IServerService`.
-  8. Commands with a random branch: `UserBiasGameCommands.BiasGameStop` answers with an easter egg 1 time in 100, so a test of it fails now and then. A `Random` passed in would fix that (see "Randomness" above).
+  8. Commands with a random branch: `UserBiasGameCommands.BiasGameStop` answers with an easter egg 1 time in 100, so a test of it fails now and then. It can take the injected `Random` like `EasterEggFeature` (see "Randomness" above).
 
 ## 3. Discord.Net: optional modernization (investigated 2026-11-15)
 

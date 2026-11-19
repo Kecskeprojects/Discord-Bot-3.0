@@ -74,6 +74,7 @@ public static class Startup
         _ = collection.AddSingleton(commands);
         _ = collection.AddTransient<IConfig, Config>(); //Configuration can be edited without stopping the program
         _ = collection.AddSingleton(TimeProvider.System); //Tests replace it with a FakeTimeProvider
+        _ = collection.AddSingleton(Random.Shared); //Thread-safe; tests replace it to choose which random branch runs
         //In-memory state shared by every command, interaction and feature, lost on restart
         _ = collection.AddSingleton<AudioStateStore>();
         _ = collection.AddSingleton<BiasGameStore>();

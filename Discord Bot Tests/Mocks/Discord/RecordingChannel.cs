@@ -20,7 +20,7 @@ public sealed class RecordingChannel
             List<Embed> embeds = [.. args.OfType<Embed>(), .. args.OfType<Embed[]>().SelectMany(e => e)];
             IUserMessage message = Substitute.For<IUserMessage>();
             message.Id.Returns(DiscordIds.Message + (ulong) Sent.Count + 1);
-            Sent.Add(new SentMessage(call.ArgAt<string?>(0), embeds, args.OfType<MessageComponent>().FirstOrDefault(), args.OfType<PollProperties>().FirstOrDefault(), message));
+            Sent.Add(new SentMessage(call.ArgAt<string?>(0), embeds, args.OfType<MessageComponent>().FirstOrDefault(), args.OfType<PollProperties>().FirstOrDefault(), args.OfType<MessageReference>().FirstOrDefault(), message));
             return Task.FromResult(message);
         });
         channel.DeleteMessageAsync(default(ulong)).ReturnsForAnyArgs(call =>

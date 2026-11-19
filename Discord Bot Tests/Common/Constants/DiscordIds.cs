@@ -3,6 +3,7 @@
 //Discord snowflake IDs for the tests; any value works, they only have to differ from each other
 public static class DiscordIds
 {
+    public const ulong Bot = 100_000;
     public const ulong User = 100_001;
     public const ulong OtherUser = 100_002;
     public const ulong ThirdUser = 100_003;

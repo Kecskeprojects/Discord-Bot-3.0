@@ -11,40 +11,43 @@ namespace Discord_Bot.Features;
 public class EasterEggFeature(
     IGreetingService greetingService,
     IDiscordClient client,
+    Random random,
     IServerService serverService,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {
     private readonly IGreetingService greetingService = greetingService;
     private readonly IDiscordClient client = client;
+    private readonly Random random = random;
 
     protected override async Task<bool> ExecuteCoreLogicAsync()
     {
         try
         {
-            //Response to mention
-            if (Context.Message.Content.Contains(client.CurrentUser.Mention) || Context.Message.Content.Contains(client.CurrentUser.Mention.Remove(2, 1)))
+            //Response to mention: <@id>, or the older nickname form <@!id> that some messages still use
+            ulong botId = client.CurrentUser.Id;
+            if (Context.Message.Content.Contains($"<@{botId}>", StringComparison.Ordinal) || Context.Message.Content.Contains($"<@!{botId}>", StringComparison.Ordinal))
             {
                 List<GreetingResource> list = await greetingService.GetAllGreetingAsync();
                 if (!CollectionTools.IsNullOrEmpty(list))
                 {
-                    _ = await Context.Channel.SendMessageAsync(list[new Random().Next(0, list.Count)].Url);
+                    _ = await Context.Channel.SendMessageAsync(list[random.Next(0, list.Count)].Url);
                     return false;
                 }
             }
 
             //Easter egg messages
-            Random r = new();
-            if (r.Next(0, 5000) == 0)
+            if (random.Next(0, 5000) == 0)
             {
-                _ = await Context.Channel.SendMessageAsync(Constant.EasterEggMessages[r.Next(0, Constant.EasterEggMessages.Length)]);
+                _ = await Context.Channel.SendMessageAsync(Constant.EasterEggMessages[random.Next(0, Constant.EasterEggMessages.Length)]);
             }
-            else if (r.Next(0, 20) == 0)
+            else if (random.Next(0, 20) == 0)
             {
-                MessageReference refer = new(Context.Message.Id, Context.Channel.Id, Context.Guild.Id, false);
+                //No guild in a direct message
+                MessageReference refer = new(Context.Message.Id, Context.Channel.Id, Context.Guild?.Id, false);
                 string mess = Context.Message.Content.ToLower();
                 if (mess.StartsWith("i think", StringComparison.Ordinal))
                 {
-                    string reply = r.Next(0, 2) == 0 ? "I agree wholeheartedly!" : Context.Message.Content.ToMockText();
+                    string reply = random.Next(0, 2) == 0 ? "I agree wholeheartedly!" : Context.Message.Content.ToMockText();
                     _ = await Context.Channel.SendMessageAsync(reply, messageReference: refer);
                 }
                 else if ((mess.StartsWith("i am", StringComparison.Ordinal) && mess != "i am") || (mess.StartsWith("i'm", StringComparison.Ordinal) && mess != "i'm"))
