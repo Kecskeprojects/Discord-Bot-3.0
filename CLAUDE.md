@@ -103,7 +103,7 @@ Base URLs live in `Core/Constant.cs`.
 - Where the time is only recorded or shown (embed timestamps, log times, file names, `CreatedOn`/`ModifiedOn`), `DateTime.UtcNow` is fine. Times are UTC; only the log uses local time.
 - Show a time to users with `DiscordTools.UtcTimestamp`, a Discord timestamp in each reader's own time zone. It marks the time as UTC first, because dates read from the database come back without a `DateTimeKind`, which `TimestampTag` would read as the machine's local time.
 
-**Randomness:** a random choice that a test has to decide comes from an injected `Random`. `Startup` registers the thread-safe `Random.Shared`. Tests pass `Substitute.For<Random>()` and set each `Next(...)` roll (an unset roll returns 0). `EasterEggFeature` works this way; the other `new Random()` uses are listed in the improvement notes.
+**Randomness:** a random choice that a test has to decide comes from an injected `Random`. `Startup` registers the thread-safe `Random.Shared`. Tests pass `Substitute.For<Random>()` and set each `Next(...)` roll (an unset roll returns 0). `EasterEggFeature` and `!bias game stop` work this way; the other `new Random()` uses are listed in the improvement notes.
 
 **Two command systems coexist:**
 1. **Text prefix commands** (`Commands/`, Discord.Commands `ModuleBase` via `BaseCommand`) are triggered by `!` or `.`. This is where nearly all commands are. `CommandHandler.ProcessMessageAsync` also:

@@ -264,6 +264,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
   - Integration on LocalDB (added 2026-11-19, 38 more cases, 257 in all; see "Next" item 5):
     - Settings channels, the server's row, roles and Twitch channels, and the cached server across scopes.
     - The bias list, reminders, birthdays and mutes.
+    - The bias game's data (added 2026-11-19 with `!bias game stop` and the bias game embeds, 22 more cases, 476 in all).
   - Integration:
     - Every registration and every command and interaction module.
     - Last.fm top tracks through the real container with a fake HTTP layer.
@@ -337,10 +338,19 @@ Yes, the bot's test project can run integration tests: real services wired toget
        - `BiasListTests`: the name, alias and group lookups (in another letter case too), the user-idol links, clearing the list
        - `ReminderTests`, `BirthdayTests` and `MuteTests`: positions, due reminders, the day-of-year query and list order, and the "still muted" check
      - They guard the three bugs fixed under item 2: with the pre-fix code, exactly those five cases fail.
-     - Left: weekly polls and presets (`WeeklyPollService`'s queries); the idol queries (search, `GetListForGameAsync`, `UserIdolStatisticRepository.GetTop10ForUserAsync`, `IdolImageRepository.GetLatestByIdolIdAsync`); custom commands, self-roles, greetings and users.
-  6. `BiasScrapingProcessor` and the who-knows embed.
+     - **Second batch done 2026-11-19:** `BiasGameDataTests` (10 cases).
+       - The idol picker (`GetListForGameAsync`): the gender, the debut years at both ends, no debut or no image left out, at most 16 different idols, each with its newest image and "Soloist" for a group without a full name.
+       - The top-10 statistics: the weights (a win counts 2, a second place 0.5, a quarter-final 0.125), the order, the heart for biases, the gender filter and the cut at 10. An idol without images gets no image: SQL Server answers the projection's `.First()` with NULL, where LINQ to objects would throw.
+       - Two whole games through `UpdateUserStatisticsAsync`, read back by `!bias stats`'s query.
+       - The newest image (`GetLatestByIdolIdAsync`), and an override recording the image it replaces.
+       - Nothing new turned up.
+     - Left: weekly polls and presets (`WeeklyPollService`'s queries), custom commands, greetings and users.
+  6. `BiasScrapingProcessor` and the who-knows embed. The other bias game embeds are tested (2026-11-19): the match and its arrows (picking one idol sends the other's ID), the result, the setup's gender buttons, and the stats list. A test also checks that the gender buttons' numbers are `GenderEnum`'s values.
   7. More whole commands. Guild commands need an `IGuild` substitute and a `ServerResource` from a substituted `IServerService`.
-  8. Commands with a random branch: `UserBiasGameCommands.BiasGameStop` answers with an easter egg 1 time in 100, so a test of it fails now and then. It can take the injected `Random` like `EasterEggFeature` (see "Randomness" above).
+  8. Commands with a random branch: `UserBiasGameCommands.BiasGameStop` answers with an easter egg 1 time in 100. **Done 2026-11-19:** it takes the injected `Random`, and `Integration/BiasGame/BiasGameStopTests` (5 cases) covers:
+     - stopping a game: the reply, the game's message deleted, the game disposed, and all three aliases
+     - no game to stop: nothing is said
+     - the easter egg: the game keeps going
 
 ## 3. Discord.Net: optional modernization (investigated 2026-11-15)
 

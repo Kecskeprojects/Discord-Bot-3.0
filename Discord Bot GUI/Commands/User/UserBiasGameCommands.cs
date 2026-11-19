@@ -17,12 +17,14 @@ namespace Discord_Bot.Commands.User;
 public class UserBiasGameCommands(
     IUserService userService,
     BiasGameStore biasGames,
+    Random random,
     IServerService serverService,
     IBotLogger logger,
     IConfig config) : BaseCommand(logger, config, serverService)
 {
     private readonly IUserService userService = userService;
     private readonly BiasGameStore biasGames = biasGames;
+    private readonly Random random = random;
 
     [Command("bias game")]
     [Alias(["bg", "biasgame"])]
@@ -65,10 +67,9 @@ public class UserBiasGameCommands(
                 return;
             }
 
-            Random r = new();
-            if (r.Next(0, 100) == 0)
+            if (random.Next(0, 100) == 0)
             {
-                _ = await ReplyAsync(Constant.BiasGameStopMessages[r.Next(0, Constant.BiasGameStopMessages.Length)]);
+                _ = await ReplyAsync(Constant.BiasGameStopMessages[random.Next(0, Constant.BiasGameStopMessages.Length)]);
                 return;
             }
 
