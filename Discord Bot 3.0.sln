@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LastFmApi", "LastFmApi\Last
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseORM", "DatabaseORM\DatabaseORM.csproj", "{3E036299-198F-03FE-BEB7-8321BAC8B75F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord Bot Tests", "Discord Bot Tests\Discord Bot Tests.csproj", "{BD458151-84B6-40F3-8B04-88E5C027BA79}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{3E036299-198F-03FE-BEB7-8321BAC8B75F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E036299-198F-03FE-BEB7-8321BAC8B75F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E036299-198F-03FE-BEB7-8321BAC8B75F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD458151-84B6-40F3-8B04-88E5C027BA79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD458151-84B6-40F3-8B04-88E5C027BA79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD458151-84B6-40F3-8B04-88E5C027BA79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD458151-84B6-40F3-8B04-88E5C027BA79}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

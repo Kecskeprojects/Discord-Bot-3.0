@@ -14,8 +14,9 @@ A self-hosted Discord bot that runs as a **Windows WPF desktop app** (the window
 - `MainDB/`: a legacy (non-SDK) SSDT `.sqlproj`, the **source of truth for the database schema**. It builds and publishes only from Visual Studio, not `dotnet build`.
 - `Latest_Release.sql`: a full deployment script, but git-ignored and local only. The dev PC's copy dates from 2023, so the source of truth is `MainDB/`.
 - `diagram.drawio` / `diagram.png`: the DB diagram.
+- `Discord Bot Tests/`: the tests for all three projects (see Tests).
 
-There is no test project. Linting is done by analyzers during the build (see Linting).
+Linting is done by analyzers during the build (see Linting).
 
 ## Commands
 
@@ -31,13 +32,17 @@ dotnet run --project "Discord Bot GUI/Discord Bot GUI.csproj"
 dotnet format "Discord Bot GUI/Discord Bot GUI.csproj" --verify-no-changes
 ```
 
+```bash
+dotnet test --project "Discord Bot Tests/Discord Bot Tests.csproj"
+```
+
 Check every tracked text file against the BOM rule (Git Bash; no output means all match). Keep its patterns in step with the `charset` sections in `.editorconfig`:
 
 ```bash
 git ls-files --eol | grep -v 'i/-text' | cut -f2 | while IFS= read -r f; do case "$f" in DatabaseORM/Model/*|DatabaseORM/Context/MainDbContext.cs) want=none;; *.cs|*.csproj|*.sln|*.sqlproj|*.xaml|*.resx|*.sql|*.props|*.refactorlog) want=bom;; *) want=none;; esac; [ "$(head -c3 "$f" | od -An -tx1 | tr -d ' \n')" = efbbbf ] && has=bom || has=none; [ "$want" = "$has" ] || echo "expected $want, has $has: $f"; done
 ```
 
-Build the projects rather than the `.sln`, because the solution includes `MainDB.sqlproj`, which needs Visual Studio/SSDT. Warnings fail the build (`TreatWarningsAsErrors`), so fix them rather than suppressing them. `dotnet format` without `--verify-no-changes` applies every fix it has (whitespace, style and analyzer code fixes such as CA1310), so review its diff. It covers one project at a time (run it for `DatabaseORM/DatabaseORM.csproj` and `LastFmApi/LastFmApi.csproj` too) and also reports IDE0001 and IDE0002, which the build doesn't.
+Build the projects rather than the `.sln`, because the solution includes `MainDB.sqlproj`, which needs Visual Studio/SSDT. Warnings fail the build (`TreatWarningsAsErrors`), so fix them rather than suppressing them. `dotnet format` without `--verify-no-changes` applies every fix it has (whitespace, style and analyzer code fixes such as CA1310), so review its diff. It covers one project at a time (run it for `DatabaseORM/DatabaseORM.csproj`, `LastFmApi/LastFmApi.csproj` and `Discord Bot Tests/Discord Bot Tests.csproj` too) and also reports IDE0001 and IDE0002, which the build doesn't.
 
 ## Linting
 
@@ -137,6 +142,18 @@ Every interaction must be acknowledged within 3 seconds, including early returns
 - `ServerCache` (`DatabaseORM/Caching/`) is a 50-entry cache of `ServerResource`. Any DB write that changes server settings **must** call `cache.RemoveCachedEntityManually(serverId)`, or reads go stale.
 
 **Logging:** inject `IBotLogger` (`DatabaseORM/Interface/`, so the DB layer can log through it: `Log`, `Error(location, ex)`, `Warning`, `Query`, `Client`, `Audio`) and never use `Console`. By convention, `location` is `"FileName.cs MethodName"`. One `BotLogger` instance is registered under both types; only `Startup`, `App` (`LogToFile`) and `BotWindow` use the concrete type. The window shows logs by subscribing to `BotLogger.LogAdded`, so the logger has no WPF dependency. Logs are queued and written to `Logs/` in the working directory every minute and at shutdown.
+
+## Tests
+
+`Discord Bot Tests/` uses xUnit v3, NSubstitute and `FakeTimeProvider`, and covers all three projects. It is a Windows/WPF project like the bot. DatabaseORM lets it see its internals (`InternalsVisibleTo`, plus `DynamicProxyGenAssembly2` so NSubstitute can mock the internal interfaces). The root `global.json` opts `dotnet test` into Microsoft.Testing.Platform, which xUnit v3 needs on the .NET 10+ SDK.
+- **Layout:**
+  - `Unit/Bot/`, `Unit/DatabaseORM/` and `Unit/LastFmApi/` mirror their project's folders. A test of `Tools/NativeTools/DateTimeTools.cs` is `Unit/Bot/Tools/NativeTools/DateTimeToolsTests.cs`.
+  - `Integration/<theme>/` (`Container`, `LastFm`, `BiasGame`, `Music`, ...) runs real services together.
+  - `Mocks/` holds the fakes, by what they stand in for (`Config`, `Discord`, `Http`, `Youtube`).
+  - `Common/Constants/` holds the shared IDs, times and values; `Common/Tools/` the helpers (`TestHost`, `CultureScope`).
+- **`TestHost`** is `Startup.ConfigureServices` with a `TestConfig`, a `FakeTimeProvider` at `TestTimes.Now` and a substitute `IBotLogger`. `Replace<T>` swaps another service before first use. `RunCommandAsync` and `RunInteractionAsync` run a text command or a button through Discord.Net's own services, with contexts from `DiscordMocks` and `FakeInteractionContext`.
+- **Conventions:** test names are `Method_Situation_Outcome`. Namespaces follow the folders, so inside `Discord_Bot.Tests.Unit.*` a qualified `DatabaseORM.X` or `LastFmApi.X` means the test folder; use `using` directives. IDE0058 is off for the tests, because NSubstitute's setup calls return values only meant for chaining.
+- **Nothing reaches the network or a database:** the test config's connection string points at a closed port. Code with a random branch (the 1% easter egg in `!bias game stop`) can't be tested reliably yet.
 
 ## Database changes
 

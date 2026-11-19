@@ -48,11 +48,13 @@ The analyzer setup is done and described in CLAUDE.md ("Linting"). Left:
   - CA5394: `Random` is for games and easter eggs.
   - CA1008: the enums start at 1 on purpose (database IDs, command levels).
 
-## 2. Test project (investigated 2026-11-15 and 2026-11-16, updated 2026-11-17)
+## 2. Test project (investigated 2026-11-15 to 2026-11-17, the project exists since 2026-11-19)
+
+`Discord Bot Tests/` is set up (see "Project setup" below and CLAUDE.md "Tests"). The rest of this section is the investigation behind it and what is still to test.
 
 ### Already in good shape
 
-- **The DB layer is a plain `net11.0` library.** `DatabaseORM` has no WPF or Discord.Net dependency, so its tests can live in a plain `net11.0` test project.
+- **The DB layer is a plain `net11.0` library.** `DatabaseORM` has no WPF or Discord.Net dependency.
   - Its services are behind `I*Service` interfaces. Its repositories are behind interfaces too, but those are `internal`, as are the concrete services, `ServerCache` and the DB tools.
   - Everything is registered by `DatabaseStartup.ConfigureDatabaseServices`, so DB services can be unit-tested by mocking their repositories (see "Project setup" for reaching the internals).
 - **External services are behind interfaces** (`Interfaces/Services/` in the bot), so code that uses one can mock it. What the services' own logic still needs is under "Interfaces for mocking" below.
@@ -224,34 +226,36 @@ Yes, the bot's test project can run integration tests: real services wired toget
 - A real Discord gateway: it would need a second bot account and a test server, and would be slow and flaky.
 - Live external APIs as part of the normal run. An optional, opt-in live Last.fm test (a trait, a real key, network) could warn when a saved response no longer matches the real format.
 
-**Where:**
-- Keep them in `Discord Bot GUI.Tests` under `Integration/` (see "Project setup"), marked `[Trait("Category", "Integration")]`. Then `dotnet test --filter "Category!=Integration"` stays the quick run.
-- Move them to their own project if the LocalDB setup grows.
-- DB-only integration tests can also go in `DatabaseORM.Tests`.
+**Where:** in `Discord Bot Tests/Integration/<theme>/`, without a trait. The whole run takes about 2 seconds, so there's no quick run to split off yet; the tests could be filtered by namespace if LocalDB makes the run slow.
 
-### Project setup
+### Project setup (done 2026-11-19, described in CLAUDE.md "Tests")
 
-- **Two test projects fit the split:**
-  - `DatabaseORM.Tests`, plain `net11.0`: DB services, the Mapster mappings, `ServerCache`, the DB tools.
-  - `Discord Bot GUI.Tests`, `net11.0-windows10.0.19041.0`, x64, `win-x64`, referencing the bot: tools, processors, features. Referencing a WinExe/WPF project from a test project works; it may need `<UseWPF>true</UseWPF>`.
-- **Folder layout (decided 2026-11-18),** in each test project:
-  - `Unit/` mirrors the folders of the project under test (`Unit/Tools/` for `Tools/`, and so on).
-  - `Integration/` is grouped by theme instead (e.g. `Music/`, `LastFm/`, `Bias/`).
-  - `Mocks/` holds the fakes and mocks, organized by what they stand in for.
-  - Shared constants and helpers keep repetition down, so the tests stay readable and maintainable by hand. Where they live is still open.
-- **Reaching `DatabaseORM`'s internals:** add `[assembly: InternalsVisibleTo("DatabaseORM.Tests")]` to `DatabaseORM` (the repositories, the concrete services, `ServerCache` and the DB tools are `internal`).
-  - Mocking an internal interface with NSubstitute or Moq also needs `[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]`.
-- **Shared setup:** `Directory.Build.props` and the root `.editorconfig` apply automatically (analyzers, warnings as errors, banned APIs, CRLF, the BOM rule). Each test project needs its own `<Nullable>enable</Nullable>` and `<ImplicitUsings>enable</ImplicitUsings>`, like the other projects.
-- **Packages:** xUnit v3 (or MSTest / NUnit), NSubstitute (or Moq), `Microsoft.Extensions.TimeProvider.Testing`.
-- **Suggested order:**
-  1. Static tools and Mapster mapping tests, with no code changes. Then the DI composition test on `Startup.ConfigureServices`.
+- **Decided 2026-11-19:** xUnit v3, NSubstitute, and one test project for all three projects (`Discord Bot Tests`, Windows/WPF like the bot), with `Unit/` mirroring each project, `Integration/` by theme, `Mocks/`, and `Common/Constants/` and `Common/Tools/` for the shared values and helpers.
+- **Packages (2026-11-19):** xunit.v3 4.0.3, xunit.runner.visualstudio 4.0.1, Microsoft.NET.Test.Sdk 18.12.0, NSubstitute 6.2.0, Microsoft.Extensions.TimeProvider.Testing 11.0.0.
+- **Setup:**
+  - DatabaseORM lets the tests and NSubstitute's proxies see its internals (`InternalsVisibleTo` in its project file).
+  - The root `global.json` makes `dotnet test` use Microsoft.Testing.Platform. Without it, the .NET 11 SDK refuses to run xUnit v3 ("Testing with VSTest target is no longer supported").
+  - The solution lists the test project with only its own Debug/Release lines: `dotnet sln add` also added x64 and x86 platforms to every project, so those were left out.
+- **The first 92 test cases (39 tests; theories count once per case):**
+  - Unit:
+    - `DateTimeTools`; the top-list percentage under hu-HU; `DiscordTools` (UTC timestamps, channel types)
+    - `BiasGameStore` and `YoutubeKeyStore`; the debut-year menu
+    - `YoutubeAPI` (search, links, key rotation, a playlist that runs out of quota)
+    - `WeeklyPollTools`; `LastFmHelper`
+  - Integration:
+    - Every registration and every command and interaction module.
+    - Last.fm top tracks through the real container with a fake HTTP layer.
+    - The bias game in a direct message, from `!bias game` to the gender button.
+    - A Spotify track link through the real `SpotifyAPI` and `YoutubeAPI`.
+- **Next, roughly in order of value:**
+  1. The Mapster mappings (`DatabaseMapperConfig`, `MapperConfig`).
   2. DB services with mocked repositories.
-  3. Tests for `LastFmApi` and the bot's `LastFmAPI` against saved responses, run in parallel (the injected client is done). They go in `Discord Bot GUI.Tests`, which reaches `LastFmApi` through the bot.
-  4. Integration tests: the DB layer on LocalDB, and Last.fm through the real container.
-  5. `BiasScrapingProcessor` and the who-knows embed (`IBrowserService`, `IWebService` and `IWhoKnowsImageProcessor` are done).
-  6. The features (`TimeProvider` and the state stores are done).
-  7. Whole-command integration tests (the Discord interfaces are done).
-  8. `YoutubeAPI` and `SpotifyAPI` (their seams are done).
+  3. The features: reminder, unmute, birthday and weekly poll with the fake clock and an `IDiscordClient` substitute.
+  4. More Last.fm (recents, now playing, who-knows, artist stats). Saved responses recorded from the real API would replace the hand-built JSON in `LastFmResponses`.
+  5. The DB layer on LocalDB (see "Repositories and the database").
+  6. `BiasScrapingProcessor` and the who-knows embed.
+  7. More whole commands. Guild commands need an `IGuild` substitute and a `ServerResource` from a substituted `IServerService`.
+  8. Commands with a random branch: `UserBiasGameCommands.BiasGameStop` answers with an easter egg 1 time in 100, so a test of it fails now and then. A `Random` passed in would fix that (see "Randomness" above).
 
 ## 3. Discord.Net: optional modernization (investigated 2026-11-15)
 

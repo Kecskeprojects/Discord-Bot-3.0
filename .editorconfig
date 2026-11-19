@@ -118,3 +118,8 @@ dotnet_diagnostic.IDE0005.severity = none
 dotnet_diagnostic.IDE0028.severity = none
 # EF Core 11 scaffolds without a BOM, so a re-scaffold matches without an extra step
 charset = utf-8
+
+# The tests. IDE0058 (unused expression value) is off: NSubstitute's setup calls (x.Returns(...), x.When(...)) return a
+# value that is only there for chaining, and a `_ =` in front of every setup line would make the tests harder to read.
+[Discord Bot Tests/**.cs]
+dotnet_diagnostic.IDE0058.severity = none

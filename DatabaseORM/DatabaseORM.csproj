@@ -7,6 +7,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<!-- The tests reach the internal repositories, services and tools; NSubstitute's proxies (DynamicProxyGenAssembly2) mock the internal interfaces -->
+		<InternalsVisibleTo Include="Discord Bot Tests" />
+		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Mapster" Version="10.0.14" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="11.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="11.0.0">
