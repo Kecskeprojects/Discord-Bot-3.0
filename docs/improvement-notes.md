@@ -317,22 +317,12 @@ Yes, the bot's test project can run integration tests: real services wired toget
        - `Run()` now returns false when any item failed. The scheduler doesn't read it.
        - **Corrected 2026-11-19 after commit `1b0aa13`:** in that commit the unmute loop reads `allUnmuted = allUnmuted && await TryUnmuteAsync(...)`. The line was rewritten outside the session before the commit, possibly by an IDE quick fix. `&&` stops calling `TryUnmuteAsync` after the first failure, which brings back the bug the fix removed. `Run_RoleChangeRefused_KeepsThatMuteForTheNextRunAndUnmutesTheOthers` caught it. The loop now uses an `if`, which no short-circuit suggestion applies to.
      - `SelfRoleFeature` too (2026-11-19, 6 cases, 439 in all): `+role` and `-role`, the reply deleted after 1.5 seconds on the fake clock, a role that isn't on the list, one deleted on Discord, and Discord refusing the change.
-     - **Every role the bot stores counts as a self-role (found 2026-11-19, confirmed on LocalDB, not changed).**
-       - `RoleService` treats every row of the server's `Role` table as a self-role. `ServerService` (the mute and notification roles) and `WeeklyPollService` (a poll's ping role) store their roles in that same table.
-       - Checked with a throwaway LocalDB test that set one of each:
-         - All four appear in `GetServerRolesAsync`, which `!update role message` posts as "The current list of roles".
-         - All four are found by `GetRoleAsync`, the lookup `SelfRoleFeature` uses for `+name` and `-name` in the role channel.
-         - `!self role remove` fails on the foreign key for the mute, notification and poll role (`FK_Server_MuteRole`, `FK_Server_NotificationRole`, `FK_WeeklyPoll_RoleId`), and the admin is told it could not be removed.
-       - **The mute role:** a muted user who can still post in the role channel can take it off themselves with `-muted`. Whether they can post there depends on the server's channel permissions.
-       - **The notification and poll ping roles:** anyone can opt in or out of these. That may be intended, as an opt-in to the pings.
-       - To check on the live server: if a mute role is set and `!update role message` ran after it, the role message lists it (e.g. ``- `Muted` ``).
-       - **Options:**
-         1. **Mark self-roles in the table:** add `IsSelfRole bit NOT NULL DEFAULT 0` to `MainDB/Tables/Role.sql` (an SSDT patch, then a re-scaffold).
-            - `!self role add` sets the flag, on a new row or on an existing one, so a notification role can still be made a self-role on purpose.
-            - The list and the `+`/`-` lookup only read flagged rows.
-            - `!self role remove` clears the flag, and deletes the row only when nothing else uses it.
-            - The patch would flag the existing rows that aren't the server's mute role.
-         2. **No schema change:** leave the server's mute role (and optionally the notification and poll roles) out of the list and the lookup. `!self role remove` answers that the role is in use, instead of failing. A notification role could then no longer also be a self-role, unless it's left in.
+     - **Every role the bot stores is a self-role, by design (checked on LocalDB 2026-11-19).**
+       - The mute, notification and poll ping roles are kept in the same `Role` table as the self-roles. So they are listed by `!update role message` and found for `+name`/`-name` in the role channel.
+       - That is intended: the notification and poll ping roles are opt-in roles. A user who gives themselves the mute role has only themselves to blame.
+       - Known consequences, accepted:
+         - A muted user who can still post in the role channel could take the mute role off with `-muted`; that depends on the server's channel permissions.
+         - `!self role remove` fails while the role is in use as the mute, notification or poll role (its foreign key), and the admin is told it could not be removed.
   4. More Last.fm (recents, now playing, who-knows, artist stats). Saved responses recorded from the real API would replace the hand-built JSON in `LastFmResponses`.
   5. The DB layer on LocalDB (see "Repositories and the database"). **First batch done 2026-11-19:**
      - Six classes in `Integration/Database/` cover the real services, repositories and cache:
