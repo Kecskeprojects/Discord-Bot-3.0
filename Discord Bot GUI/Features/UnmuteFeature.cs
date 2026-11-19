@@ -32,7 +32,11 @@ public class UnmuteFeature(
                 //Each user on their own, so one that fails doesn't stop the users after them from being unmuted
                 foreach (ServerMutedUserResource mutedUser in result)
                 {
-                    allUnmuted = allUnmuted && await TryUnmuteAsync(mutedUser);
+                    //Not "allUnmuted = allUnmuted && ...": that would skip everyone after the first failure
+                    if (!await TryUnmuteAsync(mutedUser))
+                    {
+                        allUnmuted = false;
+                    }
                 }
             }
             return allUnmuted;
