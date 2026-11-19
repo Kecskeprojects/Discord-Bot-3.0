@@ -13,11 +13,13 @@ namespace DatabaseORM.Service;
 
 internal sealed class WeeklyPollOptionPresetService(
     IWeeklyPollOptionPresetRepository weeklyPollOptionPresetRepository,
+    IWeeklyPollOptionRepository weeklyPollOptionRepository,
     IMapper mapper,
     IBotLogger logger,
     ServerCache cache) : BaseService(mapper, logger, cache), IWeeklyPollOptionPresetService
 {
     private readonly IWeeklyPollOptionPresetRepository weeklyPollOptionPresetRepository = weeklyPollOptionPresetRepository;
+    private readonly IWeeklyPollOptionRepository weeklyPollOptionRepository = weeklyPollOptionRepository;
 
     public async Task<List<WeeklyPollOptionPresetResource>> GetActivePresetsAsync()
     {
@@ -140,6 +142,8 @@ internal sealed class WeeklyPollOptionPresetService(
                 wp => wp.WeeklyPollOptions);
             if (poll != null)
             {
+                //Its answers go with it, in the same save, instead of staying behind belonging to nothing
+                _ = await weeklyPollOptionRepository.RemoveAsync(poll.WeeklyPollOptions.ToList(), saveChanges: false);
                 _ = await weeklyPollOptionPresetRepository.RemoveAsync(poll);
 
                 logger.Log("Poll removed successfully!");

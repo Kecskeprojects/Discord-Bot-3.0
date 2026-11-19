@@ -262,6 +262,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
     - Settings channels, the server's row, roles and Twitch channels, and the cached server across scopes.
     - The bias list, reminders, birthdays and mutes.
     - The bias game's data (added 2026-11-19 with `!bias game stop` and the bias game embeds, 22 more cases, 476 in all).
+    - Weekly polls and presets (added 2026-11-19 with the answer menus through the interaction service, the poll embeds and `PollTools`, 41 more cases, 528 in all).
   - Integration:
     - Every registration and every command and interaction module.
     - Last.fm top tracks through the real container with a fake HTTP layer.
@@ -341,7 +342,27 @@ Yes, the bot's test project can run integration tests: real services wired toget
        - Two whole games through `UpdateUserStatisticsAsync`, read back by `!bias stats`'s query.
        - The newest image (`GetLatestByIdolIdAsync`), and an override recording the image it replaces.
        - Nothing new turned up.
-     - Left: weekly polls and presets (`WeeklyPollService`'s queries), custom commands, greetings and users.
+     - **Third batch done 2026-11-19:** `WeeklyPollTests` (13 cases).
+       - Polls are built the way the edit message builds them: a draft, then its name, then each answer created empty and given its title.
+       - Covered: the day and active filters, the preset's answers through the nested include, the "Days Of Week" preset, the draft left out of the list, and the same channel reused.
+     - `Integration/Polls/AnswerEditTests` drives the answer menus through Discord.Net's interaction service on LocalDB: a choice from the real menu, then the rows written and the modal opened.
+     - **Fixed in this batch (each confirmed on LocalDB first, 2026-11-19):**
+       - **Removing a poll with its own answers failed** on `FK_WeeklyPollOption_WeeklyPollId`: the poll was deleted without its answer rows. Its answers are now removed with it, in the same save.
+       - **Removing a preset left its answers behind** with both keys null; they are now removed with it.
+       - **A poll's own answers couldn't be added through its edit message.** The poll's answer menu said `PollOption_Change_CustomOption_True_<pollId>`, so `WeeklyPollOptionEditInteraction` saved the new answer as a preset's. With no preset of that ID it failed on `FK_WeeklyPollOption_WeeklyPollOptionPresetId` ("The poll option could not be found."); with one, the answer went to that preset. It now says `False`.
+       - **A preset's existing answers couldn't be edited.** The preset's answer menu gave each answer the preset's ID instead of its own, so the bot looked up the wrong answer. It answered "could not be found", or opened a different answer whose ID happened to match.
+       - Both menu slips came with `d07284f` (2025-03-01, "added logic for preset editing"), which added the true/false part to the custom ID.
+     - **To decide:** removing a preset that a poll still uses fails on `FK_WeeklyPoll_WeeklyPollOptionPresetId`, and the owner is told it could not be removed. It could refuse with a clear message instead, or detach the polls (they'd fall back to their own answers).
+     - **To check on the live database:**
+       - Answers orphaned by earlier preset removals:
+         ```sql
+         SELECT COUNT(*) FROM WeeklyPollOption WHERE WeeklyPollId IS NULL AND WeeklyPollOptionPresetId IS NULL
+         ```
+       - Poll answers that went to a preset with the same ID through the old menu. They show as two answers in one slot of a preset:
+         ```sql
+         SELECT WeeklyPollOptionPresetId, OrderNumber, COUNT(*) FROM WeeklyPollOption WHERE WeeklyPollOptionPresetId IS NOT NULL GROUP BY WeeklyPollOptionPresetId, OrderNumber HAVING COUNT(*) > 1
+         ```
+     - Left: custom commands, greetings and users.
   6. `BiasScrapingProcessor` and the who-knows embed. The other bias game embeds are tested (2026-11-19): the match and its arrows (picking one idol sends the other's ID), the result, the setup's gender buttons, and the stats list. A test also checks that the gender buttons' numbers are `GenderEnum`'s values.
   7. More whole commands. Guild commands need an `IGuild` substitute and a `ServerResource` from a substituted `IServerService`.
   8. Commands with a random branch: `UserBiasGameCommands.BiasGameStop` answers with an easter egg 1 time in 100. **Done 2026-11-19:** it takes the injected `Random`, and `Integration/BiasGame/BiasGameStopTests` (5 cases) covers:

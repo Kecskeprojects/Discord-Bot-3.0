@@ -49,6 +49,21 @@ public static class DiscordMocks
         return new CommandContext(Substitute.For<IDiscordClient>(), message);
     }
 
+    //A choice in a select menu with this custom ID; RespondWithModalAsync succeeds, check it with Received()
+    public static IComponentInteraction SelectMenuChoice(string customId, string value, IUser user)
+    {
+        IComponentInteractionData data = Substitute.For<IComponentInteractionData>();
+        data.CustomId.Returns(customId);
+        data.Type.Returns(ComponentType.SelectMenu);
+        data.Values.Returns([value]);
+
+        IComponentInteraction choice = Substitute.For<IComponentInteraction>();
+        choice.Data.Returns(data);
+        choice.User.Returns(user);
+        choice.Type.Returns(InteractionType.MessageComponent);
+        return choice;
+    }
+
     //A click on a button with this custom ID. DeferAsync and ModifyOriginalResponseAsync succeed; check them with Received()
     public static IComponentInteraction ButtonClick(string customId, IUser user)
     {

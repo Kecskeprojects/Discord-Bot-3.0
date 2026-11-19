@@ -19,6 +19,7 @@ public sealed class WeeklyPollServiceTests
     private const int PollId = 21;
 
     private readonly IWeeklyPollRepository polls = Substitute.For<IWeeklyPollRepository>();
+    private readonly IWeeklyPollOptionRepository options = Substitute.For<IWeeklyPollOptionRepository>();
     private readonly IServerRepository servers = Substitute.For<IServerRepository>();
     private readonly IChannelRepository channels = Substitute.For<IChannelRepository>();
     private readonly IRoleRepository roles = Substitute.For<IRoleRepository>();
@@ -30,7 +31,7 @@ public sealed class WeeklyPollServiceTests
 
     public WeeklyPollServiceTests()
     {
-        service = new WeeklyPollService(polls, servers, channels, roles, TestMapper.Database, logger, new ServerCache());
+        service = new WeeklyPollService(polls, options, servers, channels, roles, TestMapper.Database, logger, new ServerCache());
         servers.HasRows(server, otherServer);
     }
 
@@ -149,6 +150,19 @@ public sealed class WeeklyPollServiceTests
 
         Assert.Equal(DbProcessResultEnum.Success, await service.RemovePollByNameAsync(DiscordIds.Server, "Weekly"));
         Assert.Same(otherServers, Assert.Single(table));
+    }
+
+    [Fact]
+    public async Task RemovePollByNameAsync_PollWithItsOwnAnswers_RemovesThemWithIt()
+    {
+        WeeklyPoll poll = Poll(PollId, server, "weekly", "Yes", "No");
+        WeeklyPollOption otherPolls = new() { WeeklyPollId = 22, Title = "Kept" };
+        List<WeeklyPoll> pollTable = polls.HasRows(poll);
+        List<WeeklyPollOption> answerTable = options.HasRows([.. poll.WeeklyPollOptions, otherPolls]);
+
+        Assert.Equal(DbProcessResultEnum.Success, await service.RemovePollByNameAsync(DiscordIds.Server, "weekly"));
+        Assert.Empty(pollTable);
+        Assert.Same(otherPolls, Assert.Single(answerTable));
     }
 
     [Fact]

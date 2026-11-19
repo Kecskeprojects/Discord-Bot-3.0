@@ -152,7 +152,8 @@ public static class PollEditEmbedProcessor
     {
         SelectMenuBuilder optionPresetSelect = new()
         {
-            CustomId = $"PollOption_Change_CustomOption_{true}_{poll.WeeklyPollId}",
+            //False: the poll's own answers, not a preset's (WeeklyPollOptionEditInteraction reads it as isPresetOption)
+            CustomId = $"PollOption_Change_CustomOption_{false}_{poll.WeeklyPollId}",
             Placeholder = $"Select an option to edit it",
             MinValues = 1,
             MaxValues = 1,

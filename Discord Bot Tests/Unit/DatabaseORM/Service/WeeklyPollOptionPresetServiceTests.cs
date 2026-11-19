@@ -14,6 +14,7 @@ namespace Discord_Bot.Tests.Unit.DatabaseORM.Service;
 public sealed class WeeklyPollOptionPresetServiceTests
 {
     private readonly IWeeklyPollOptionPresetRepository presets = Substitute.For<IWeeklyPollOptionPresetRepository>();
+    private readonly IWeeklyPollOptionRepository options = Substitute.For<IWeeklyPollOptionRepository>();
     private readonly IBotLogger logger = Substitute.For<IBotLogger>();
     private readonly WeeklyPollOptionPresetService service;
 
@@ -22,7 +23,7 @@ public sealed class WeeklyPollOptionPresetServiceTests
 
     public WeeklyPollOptionPresetServiceTests()
     {
-        service = new WeeklyPollOptionPresetService(presets, TestMapper.Database, logger, new ServerCache());
+        service = new WeeklyPollOptionPresetService(presets, options, TestMapper.Database, logger, new ServerCache());
     }
 
     [Fact]
@@ -106,6 +107,17 @@ public sealed class WeeklyPollOptionPresetServiceTests
 
         Assert.Equal(DbProcessResultEnum.Success, await service.RemovePresetByNameAsync("retired"));
         Assert.Same(yesOrNo, Assert.Single(table));
+    }
+
+    [Fact]
+    public async Task RemovePresetByNameAsync_RemovesItsAnswersWithIt()
+    {
+        List<WeeklyPollOptionPreset> presetTable = presets.HasRows(yesOrNo, retired);
+        List<WeeklyPollOption> answerTable = options.HasRows([.. yesOrNo.WeeklyPollOptions, .. retired.WeeklyPollOptions]);
+
+        Assert.Equal(DbProcessResultEnum.Success, await service.RemovePresetByNameAsync("yes or no"));
+        Assert.Same(retired, Assert.Single(presetTable));
+        Assert.Equal(["Old"], answerTable.Select(option => option.Title));
     }
 
     [Fact]

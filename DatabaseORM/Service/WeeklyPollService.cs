@@ -13,6 +13,7 @@ namespace DatabaseORM.Service;
 
 internal sealed class WeeklyPollService(
     IWeeklyPollRepository weeklyPollRepository,
+    IWeeklyPollOptionRepository weeklyPollOptionRepository,
     IServerRepository serverRepository,
     IChannelRepository channelRepository,
     IRoleRepository roleRepository,
@@ -21,6 +22,7 @@ internal sealed class WeeklyPollService(
     ServerCache cache) : BaseService(mapper, logger, cache), IWeeklyPollService
 {
     private readonly IWeeklyPollRepository weeklyPollRepository = weeklyPollRepository;
+    private readonly IWeeklyPollOptionRepository weeklyPollOptionRepository = weeklyPollOptionRepository;
 
     public async Task<WeeklyPollEditResource?> GetOrCreateDummyPollAsync(ulong serverId)
     {
@@ -201,9 +203,13 @@ internal sealed class WeeklyPollService(
         try
         {
             pollName = pollName.ToLower();
-            WeeklyPoll? poll = await weeklyPollRepository.FirstOrDefaultAsync(p => p.Server.DiscordId == serverId.ToString() && p.Name.ToLower() == pollName);
+            WeeklyPoll? poll = await weeklyPollRepository.FirstOrDefaultAsync(
+                p => p.Server.DiscordId == serverId.ToString() && p.Name.ToLower() == pollName,
+                p => p.WeeklyPollOptions);
             if (poll != null)
             {
+                //Its own answers go with it, in the same save: nothing else uses them, and their foreign key would refuse the poll's removal
+                _ = await weeklyPollOptionRepository.RemoveAsync(poll.WeeklyPollOptions.ToList(), saveChanges: false);
                 _ = await weeklyPollRepository.RemoveAsync(poll);
 
                 logger.Log("Poll removed successfully!");
