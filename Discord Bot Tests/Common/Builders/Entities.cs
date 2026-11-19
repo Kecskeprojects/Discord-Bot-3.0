@@ -32,4 +32,17 @@ public static class Entities
     {
         return new Channel { ServerId = server.ServerId, Server = server, DiscordId = discordId.ToString(), ChannelTypes = [.. types] };
     }
+
+    public static IdolGroup Group(string name, int groupId = RowIds.New)
+    {
+        return new IdolGroup { GroupId = groupId, Name = name };
+    }
+
+    //Added to the group's idols too, as a query returns both sides
+    public static Idol Idol(string name, IdolGroup group, int idolId = RowIds.New)
+    {
+        Idol idol = new() { IdolId = idolId, Name = name, GroupId = group.GroupId, Group = group };
+        group.Idols.Add(idol);
+        return idol;
+    }
 }

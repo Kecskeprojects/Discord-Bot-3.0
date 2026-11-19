@@ -8,6 +8,7 @@ using DatabaseORM.Interface.Service;
 using DatabaseORM.Model;
 using DatabaseORM.Resources;
 using MapsterMapper;
+using System.Globalization;
 
 namespace DatabaseORM.Service;
 
@@ -247,7 +248,7 @@ internal sealed class IdolService(
             }
 
             idol.ProfileUrl = data.ProfileUrl.Trim();
-            idol.DateOfBirth = DateOnly.TryParse(data.DateOfBirth, out DateOnly dateOfBirth) ? dateOfBirth : idol.DateOfBirth;
+            idol.DateOfBirth = DateOnly.TryParse(data.DateOfBirth, CultureInfo.InvariantCulture, out DateOnly dateOfBirth) ? dateOfBirth : idol.DateOfBirth;
             idol.Name = data.Name.ToLower().Trim();
             //An unknown gender keeps the current one
             GenderEnum? gender = GenderChoiceEnumExtension.FromDatabaseString(data.Gender);
@@ -283,7 +284,7 @@ internal sealed class IdolService(
             idol.KoreanStageName = data.KoreanStageName.Trim();
             idol.FullName = data.FullName.Trim();
             idol.KoreanFullName = data.KoreanFullName.Trim();
-            idol.DebutDate = DateOnly.TryParse(data.DebutDate, out DateOnly debutDate) ? debutDate : idol.DebutDate;
+            idol.DebutDate = DateOnly.TryParse(data.DebutDate, CultureInfo.InvariantCulture, out DateOnly debutDate) ? debutDate : idol.DebutDate;
             _ = await idolRepository.SaveChangesAsync();
 
             logger.Log($"Idol with ID {idolId} updated successfully!");

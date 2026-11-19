@@ -260,6 +260,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
     - `WeeklyPollTools`; `LastFmHelper`
     - The Mapster mappings (added 2026-11-19, 48 more cases, 140 in all; see "Next" item 1)
     - Seven DB services over substitute repositories (added 2026-11-19, 79 more cases, 219 in all; see "Next" item 2)
+    - The other twelve DB services and `UserIdolStatisticTools` (added 2026-11-19, 147 more cases, 404 in all with the LocalDB ones below)
   - Integration on LocalDB (added 2026-11-19, 38 more cases, 257 in all; see "Next" item 5):
     - Settings channels, the server's row, roles and Twitch channels, and the cached server across scopes.
     - The bias list, reminders, birthdays and mutes.
@@ -275,15 +276,23 @@ Yes, the bot's test project can run integration tests: real services wired toget
      - They found three members that are filled after the mapping. `SettingsChannels`, `IdolExtendedResource.LatestImageUrl` and `UserResource.Username` are now `.Ignore`d, with a comment saying who fills them.
      - `TwitchChannelResource.TwitchDiscordId` was never set or read, so it's removed.
      - Not covered: the "Days Of Week" options in the weekly poll mapping read the system clock (see "Left on the system clock" above); `WeeklyPollToolsTests` covers them.
-  2. DB services with mocked repositories. **First batch done 2026-11-19:**
-     - Covered: `ServerService`, `ChannelService` and `TwitchChannelService` (the three that change cached server settings, so each write is checked to drop the cached server), `ReminderService`, `BirthdayService`, `ServerMutedUserService` (the dates and times) and `UserIdolService` (the bias list results).
-     - Left: `IdolService`, `WeeklyPollService`, `WeeklyPollOptionPresetService`, `WeeklyPollOptionService`, `UserService`, `RoleService`, `CustomCommandService`, `GreetingService`, `IdolAliasService`, `IdolGroupService`, `IdolImageService` and `UserIdolStatisticService`.
+  2. DB services with mocked repositories. **Done 2026-11-19, all 19 services:**
+     - First batch: `ServerService`, `ChannelService` and `TwitchChannelService` (the three that change cached server settings, so each write is checked to drop the cached server), `ReminderService`, `BirthdayService`, `ServerMutedUserService` (the dates and times) and `UserIdolService` (the bias list results).
+     - Second batch: `IdolService` (including what the weekly bias scraping does to each idol), the three weekly poll services (including the field updates from the edit message's buttons), `UserService`, `RoleService`, `CustomCommandService`, `GreetingService`, `IdolAliasService`, `IdolGroupService`, `IdolImageService` and `UserIdolStatisticService`.
+     - **Fixed in the second batch:**
+       - The idol and group edit modals show dates as `yyyy. MM. dd.`, but `IdolService` and `IdolGroupService` parsed them in the machine's culture. Under German (`de-DE`), that format can't be read, and the edit silently kept the old date.
+       - Checked 2026-11-19: Hungarian, both English cultures and the invariant culture read it, as well as `2000-01-02` and `2000.01.02`. The three parses now use `CultureInfo.InvariantCulture`, as CLAUDE.md asks, and tests run them under `de-DE`.
+       - `RoleService.ChangeServerMuteRoleAsync` only threw `NotImplementedException` and wasn't on `IRoleService`. The mute command uses `ServerService`'s method, so the dead one is removed.
      - The repositories are substitutes answering from rows (`HasRows`, described in CLAUDE.md "Tests"), so these tests can't see a missing `Include`.
      - Three bugs were found while reading the services, confirmed on a throwaway LocalDB database, and fixed (2026-11-19):
        - **Removing one settings channel always answered "not found",** and adding a type a channel already had failed with a primary-key violation instead of "already exists". `ChannelService`'s single-channel lookups included `Server` instead of `ChannelTypes`, so the channel's types were never loaded. The cause was the generic-repository refactor in `28b13de` (2024-03-31); the old `GetChannelByDiscordIdAsync` included `ChannelTypes`.
        - **Removing a bias by `name>group` threw a null reference,** which is the form the bot asks for when two biases share a name. `UserIdolService.RemoveUserIdolAsync` filtered the user's idols on `Group.Name`, but the groups weren't loaded with them. The database now finds the matching idols, as `RemoveUserIdolGroupAsync` already did. That also makes the name comparison case-insensitive, like the other lookups.
        - **`!remind remove` with a number past the end logged an error** and answered "Reminder could not be removed!" instead of "Reminder doesn't exist with that ID". `ReminderRepository.GetByIndexAsync` used `FirstAsync`, and 0 or below sent a negative `OFFSET` to SQL Server. It now returns null for both.
-     - Seen, not changed: `IdolService.ChangeGroupAsync` loads the idol without its group, so an empty group name would set the group to null. Its caller shouldn't pass one.
+     - Seen, not changed:
+       - `IdolService.ChangeGroupAsync` loads the idol without its group, so an empty group name would set the group to null. Its caller shouldn't pass one.
+       - **The weekly scrape adds an idol's image again even when it already has it** (`UpdateIdolDetailsAsync`). It only skips an image someone replaced. After the oldest are trimmed, the 3 or 4 images an idol keeps are often the same URL, so the earlier images are lost. To fix: also skip the image when the idol's newest one has that URL. That changes what the bias game shows over time, so it's your call.
+       - `WeeklyPollService.GetPollByIdAsync` includes neither the server nor the preset, so its result has `ServerDiscordId` 0 and no answers for a preset poll. Its only caller, the edit interaction, reads just the name, title, channel and role, so it's harmless today.
+       - `RoleService.RemoveSelfRoleAsync` on a role that is also the server's notification or mute role would probably fail on the foreign key, because the server row points at it. Unverified; a LocalDB test could check.
   3. The features: reminder, unmute, birthday and weekly poll with the fake clock and an `IDiscordClient` substitute.
   4. More Last.fm (recents, now playing, who-knows, artist stats). Saved responses recorded from the real API would replace the hand-built JSON in `LastFmResponses`.
   5. The DB layer on LocalDB (see "Repositories and the database"). **First batch done 2026-11-19:**

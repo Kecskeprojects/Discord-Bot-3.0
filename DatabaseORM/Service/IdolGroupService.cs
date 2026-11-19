@@ -7,6 +7,7 @@ using DatabaseORM.Interface.Service;
 using DatabaseORM.Model;
 using DatabaseORM.Resources;
 using MapsterMapper;
+using System.Globalization;
 
 namespace DatabaseORM.Service;
 
@@ -67,7 +68,7 @@ internal sealed class IdolGroupService(
             idolGroup.Name = data.Name.ToLower().Trim();
             idolGroup.FullName = data.FullName.Trim();
             idolGroup.FullKoreanName = data.FullKoreanName.Trim();
-            idolGroup.DebutDate = DateOnly.TryParse(data.DebutDate, out DateOnly debutDate) ? debutDate : idolGroup.DebutDate;
+            idolGroup.DebutDate = DateOnly.TryParse(data.DebutDate, CultureInfo.InvariantCulture, out DateOnly debutDate) ? debutDate : idolGroup.DebutDate;
 
             _ = await idolGroupRepository.SaveChangesAsync();
 
