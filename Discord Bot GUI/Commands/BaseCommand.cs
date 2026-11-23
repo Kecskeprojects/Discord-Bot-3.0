@@ -10,7 +10,8 @@ using Discord_Bot.Tools;
 
 namespace Discord_Bot.Commands;
 
-public class BaseCommand(IBotLogger logger, IConfig config, IServerService serverService) : ModuleBase<ICommandContext>
+//Abstract, so Discord.Net's command service doesn't load it as a module without commands
+public abstract class BaseCommand(IBotLogger logger, IConfig config, IServerService serverService) : ModuleBase<ICommandContext>
 {
     protected readonly IBotLogger logger = logger;
     protected readonly IConfig config = config;

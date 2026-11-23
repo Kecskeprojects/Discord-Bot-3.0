@@ -269,6 +269,8 @@ Yes, the bot's test project can run integration tests: real services wired toget
     - Last.fm top tracks through the real container with a fake HTTP layer.
     - The bias game in a direct message, from `!bias game` to the gender button.
     - A Spotify track link through the real `SpotifyAPI` and `YoutubeAPI`.
+    - `!remind`, `!birthday` (and the admin's `!birthday a`), and `!help` with its category menu, plus `BaseCommand` and the message processors as unit tests (added 2026-11-23, 79 more cases, 674 in all; the container test lost two cases when the base classes became abstract; see "Next" item 7)
+    - The replies for input the reminder, birthday and mute commands couldn't read (added 2026-11-23, 16 more cases, 690 in all)
 - **Next, roughly in order of value:**
   1. The Mapster mappings (`DatabaseMapperConfig`, `MapperConfig`). **Done 2026-11-19:**
      - The tests cover every hand-written mapping, including navigations a query didn't load. One theory compiles each resource mapping with `RequireDestinationMemberSource`, so a new resource member without a mapping fails it.
@@ -363,7 +365,39 @@ Yes, the bot's test project can run integration tests: real services wired toget
          ```
      - Left: custom commands, greetings and users.
   6. `BiasScrapingProcessor` and the who-knows embed. The other bias game embeds are tested (2026-11-19): the match and its arrows (picking one idol sends the other's ID), the result, the setup's gender buttons, and the stats list. A test also checks that the gender buttons' numbers are `GenderEnum`'s values.
-  7. More whole commands. Guild commands need an `IGuild` substitute and a `ServerResource` from a substituted `IServerService`.
+  7. More whole commands. Guild commands need an `IGuild` substitute and a `ServerResource` from a substituted `IServerService`. **First batch done 2026-11-23:**
+     - `Integration/Reminders`, `Integration/Birthdays` and `Integration/Help` run the commands through Discord.Net's command service:
+       - `!remind in` and its aliases, in a server and in DMs, with the command channel restriction, the length limit, the list and the removal results.
+       - `!birthday add/remove/list` and the admin's `a add` (by ID and by name) and `a remove`, with the guild-only and Manage Roles preconditions.
+       - `!help` at each level and its category menu.
+     - `Unit/Bot/Commands/BaseCommandTests`: the channel check (DMs, a type the server has or hasn't set) and the argument splitting.
+     - The message processors (`Unit/Bot/Processors/MessageProcessor/`): the bias list and its group menus, a group's members, the birthday greetings, `!bias edit`'s menu read back by `BiasEditData`, and the role message. `SocialMessageProcessor` is left out, since only the disabled embeds use it.
+     - Two convention tests over the real modules:
+       - Every module's `[Remarks]` is a `CommandLevelEnum` name, and every module and command has a `[Summary]`.
+       - Every help page and category page builds within Discord's limits (fields, empty values, 6000 characters).
+       - Both passed for the bot's modules.
+     - **Fixed (each confirmed by its test failing first):**
+       - **`!remind in` dropped the part of a message after a `>`:** `1h>check if a > b` saved "check if a". Only the first `>` splits it now.
+       - **`!birthday list` showed a user who left the server under the name of whoever asked.** `GetNickName(context, null)` falls back to the command's author. They are left out now, as the daily greeting skips them, and a list of only such users says there are none.
+       - **`!bias list` and `!my biases` without a group failed past 125 groups.** The groups go into select menus of 25, and a message holds 5 rows; Discord.Net threw "Value must be less than 5". The first 125 are offered and the message says how many more there are, which can still be named in the command.
+         - **To check on the live database:** `SELECT COUNT(DISTINCT GroupId) FROM Idol` above 125 means `!bias list` has been failing (logged as `UserBiasCommands.cs BiasList`).
+       - `BaseCommand` and `BaseInteraction` are abstract now. Discord.Net loaded both as modules without commands, like `BaseFeature`, which already was.
+     - **Commands that answered nothing (confirmed with a probe 2026-11-23, replies added the same day):** each of these returned without a reply, so the user couldn't tell what went wrong.
+       - `!remind in` with an unknown unit (`1x`, or `1H`: units are case-sensitive because `M` is months and `m` minutes). It now says the amount couldn't be read, with the units and an example.
+       - `!remind in` with a unit before its number (`h1`), a number too big for `int`, or a date past year 9999 (`10000y`). These three also logged an exception. `DateTimeTools.TryAddValuesToDate` now returns false for them, so they get the same reply.
+         - `!mute` uses the same parser, so these durations now get its "The duration could not be read!" instead of an exception. That follows from the shared parser, and the mute tests cover it.
+         - The parser also counted weeks in days as an `int`, which could wrap around: 613566757 weeks gave 3 days. They are a `double` now.
+       - `!remind in` without a `>`: it now says to separate the amount and the message with `>`, with an example.
+       - `!remind list` with no reminders: "You do not have any reminders set!"
+       - `!birthday a add` without a `>` (it logged an `IndexOutOfRangeException`): "Incorrect input parameters", as for a date it can't split.
+       - Left as it was: `!remind in tomorrow>...` (no number at all) still answers "Incorrect number of inputs!".
+     - Seen, not changed:
+       - `!remind at` took a date until the 2024-08-28 cleanup removed it (`890b7de`); it has been an alias of `!remind in` since.
+       - The birthday date is parsed in the machine's culture (`DateTime.TryParse` without a provider), but year-month-day input reads the same under hu-HU, en-US, en-GB, de-DE, fr-FR and ja-JP. A test covers them.
+       - `!birthday a add` by ID accepts any Discord user, not only the server's members.
+       - `BiasListMessageProcessor`'s "unsorted" branch never runs, since every idol has a group (`Idol.GroupId` is `NOT NULL`, and both list queries load it).
+       - The bias list's group order and the role message's order follow the machine's culture (`SortedDictionary` and `Order()` with the default comparer). This only matters for names with Hungarian digraphs such as "cs" or "ly".
+       - No command passes `allowLackOfType: false`.
   8. Commands with a random branch: `UserBiasGameCommands.BiasGameStop` answers with an easter egg 1 time in 100. **Done 2026-11-19:** it takes the injected `Random`, and `Integration/BiasGame/BiasGameStopTests` (5 cases) covers:
      - stopping a game: the reply, the game's message deleted, the game disposed, and all three aliases
      - no game to stop: nothing is said

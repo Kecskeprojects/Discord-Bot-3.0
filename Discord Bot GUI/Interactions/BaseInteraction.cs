@@ -9,7 +9,8 @@ using Discord_Bot.Tools;
 
 namespace Discord_Bot.Interactions;
 
-public class BaseInteraction(IServerService serverService, IBotLogger logger, IConfig config) : InteractionModuleBase<IInteractionContext>
+//Abstract, so Discord.Net's interaction service doesn't load it as a module without handlers
+public abstract class BaseInteraction(IServerService serverService, IBotLogger logger, IConfig config) : InteractionModuleBase<IInteractionContext>
 {
     private readonly IServerService serverService = serverService;
     protected readonly IBotLogger logger = logger;

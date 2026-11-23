@@ -90,6 +90,13 @@ public sealed class TestHost : IDisposable
         }
     }
 
+    //Discord.Net's command service with the bot's modules loaded, as !help reads it
+    public async Task<CommandService> GetCommandServiceAsync()
+    {
+        await LoadModulesAsync();
+        return Services.GetRequiredService<CommandService>();
+    }
+
     private async Task LoadModulesAsync()
     {
         if (!modulesLoaded)

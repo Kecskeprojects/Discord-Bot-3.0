@@ -48,4 +48,17 @@ public sealed class DateTimeToolsTests
     {
         Assert.False(DateTimeTools.TryAddValuesToDate(now, ["2", "fortnights"], out _));
     }
+
+    //Until 2026-11-23 the first four threw: a unit before its number ("h1" splits as "h", ""), a number too big for an int,
+    //and amounts past the year 9999. The days of a week count were an int too, which could wrap around: 613566757 weeks gave 3 days
+    [Theory]
+    [InlineData("h", "")]
+    [InlineData("99999999999", "h")]
+    [InlineData("10000", "y")]
+    [InlineData("400000000", "w")]
+    [InlineData("613566757", "w")]
+    public void TryAddValuesToDate_AmountItCantAdd_ReturnsFalse(string amount, string unit)
+    {
+        Assert.False(DateTimeTools.TryAddValuesToDate(now, [amount, unit], out _));
+    }
 }

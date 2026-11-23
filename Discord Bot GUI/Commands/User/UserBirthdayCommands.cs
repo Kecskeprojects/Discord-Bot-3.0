@@ -6,7 +6,6 @@ using Discord;
 using Discord.Commands;
 using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.EmbedProcessors;
-using Discord_Bot.Tools.NativeTools;
 
 namespace Discord_Bot.Commands.User;
 
@@ -106,22 +105,32 @@ public class UserBirthdayCommands(
             }
 
             List<BirthdayResource> list = await birthdayService.GetServerBirthdayListAsync(Context.Guild.Id);
-            if (CollectionTools.IsNullOrEmpty(list))
+
+            //A user who left the server is left out, as the daily greeting skips them
+            //(until 2026-11-23 they were listed under the name of whoever asked for the list)
+            List<BirthdayResource> members = [];
+            List<string> users = [];
+            if (list.Count > 0)
+            {
+                await Context.Guild.DownloadUsersAsync();
+                foreach (BirthdayResource birthday in list)
+                {
+                    IGuildUser? user = await Context.Guild.GetUserAsync(birthday.UserDiscordId, CacheMode.CacheOnly);
+                    if (user != null)
+                    {
+                        members.Add(birthday);
+                        users.Add(GetUserNickname(user));
+                    }
+                }
+            }
+
+            if (members.Count == 0)
             {
                 _ = await ReplyAsync("There are no birthdays set on this server!");
                 return;
             }
 
-            List<string> users = [];
-            await Context.Guild.DownloadUsersAsync();
-            foreach (BirthdayResource birthday in list)
-            {
-                IGuildUser user = await Context.Guild.GetUserAsync(birthday.UserDiscordId, CacheMode.CacheOnly);
-                string name = GetUserNickname(user);
-                users.Add(name);
-            }
-
-            Embed[] embed = BirthdayListEmbedProcessor.CreateEmbed(list, users);
+            Embed[] embed = BirthdayListEmbedProcessor.CreateEmbed(members, users);
 
             _ = await ReplyAsync(embeds: embed);
         }

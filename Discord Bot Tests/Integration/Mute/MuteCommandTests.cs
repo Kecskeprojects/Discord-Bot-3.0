@@ -97,6 +97,10 @@ public sealed class MuteCommandTests : IDisposable
     [Theory]
     [InlineData("1 parsec")]
     [InlineData("1h 2")]
+    //These three threw until 2026-11-23, and !mute answered nothing
+    [InlineData("h1")]
+    [InlineData("99999999999h")]
+    [InlineData("10000y")]
     public async Task Mute_DurationThatCantBeRead_ChangesNothing(string duration)
     {
         await RunAsync($"!mute {DiscordIds.User}>{duration}");

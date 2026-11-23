@@ -62,7 +62,8 @@ public static class BiasListMessageProcessor
         else
         {
             int selectCount = 0;
-            List<string> keys = [.. groups.Keys];
+            //A message holds 5 rows, so 5 menus of 25 groups (more failed the whole list until 2026-11-23); the rest can still be named
+            List<string> keys = [.. groups.Keys.Take(ComponentBuilder.MaxActionRowCount * SelectMenuBuilder.MaxOptionCount)];
             ComponentBuilder builder = new();
             while (Math.Ceiling(keys.Count / 25.0) > selectCount)
             {
@@ -83,7 +84,8 @@ public static class BiasListMessageProcessor
                 selectCount++;
             }
 
-            return new BiasMessageResult() { Message = headMessage, Component = builder.Build() };
+            string message = groups.Count > keys.Count ? $"{headMessage}\n{groups.Count - keys.Count} more not shown, give a group's name to see its members" : headMessage;
+            return new BiasMessageResult() { Message = message, Component = builder.Build() };
         }
     }
 }

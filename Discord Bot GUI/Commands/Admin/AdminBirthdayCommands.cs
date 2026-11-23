@@ -26,9 +26,15 @@ public class AdminBirthdayCommands(
     {
         try
         {
-            //Get artist's name and the track for search
-            string userIdOrName = parameters.Split('>')[0].Trim().ToLower();
-            string dateString = parameters.Split('>')[1].Trim().ToLower();
+            //The user's ID or name, and the date (without a '>' this threw and answered nothing until 2026-11-23)
+            string[] parts = parameters.Split('>', StringSplitOptions.TrimEntries);
+            if (parts.Length != 2)
+            {
+                _ = await ReplyAsync("Incorrect input parameters");
+                return;
+            }
+            string userIdOrName = parts[0].ToLower();
+            string dateString = parts[1].ToLower();
 
             IUser? user = null;
             if (ulong.TryParse(userIdOrName, out ulong id))

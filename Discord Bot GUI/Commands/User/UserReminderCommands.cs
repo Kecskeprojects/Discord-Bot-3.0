@@ -31,7 +31,8 @@ public class UserReminderCommands(
     {
         try
         {
-            string[] paramArray = GetParametersBySplit(parameters, '>', false);
+            //Only the first arrow ends the amount, so the message can hold one too (the rest of it was dropped until 2026-11-23)
+            string[] paramArray = parameters.Split('>', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
             if (!await IsCommandAllowedAsync(ChannelTypeEnum.CommandText, canBeDM: true))
             {
@@ -40,6 +41,7 @@ public class UserReminderCommands(
 
             if (paramArray.Length < 2)
             {
+                _ = await ReplyAsync("The amount of time and the message have to be separated by `>`, e.g.: `!remind in 1h 30m>stretch`");
                 return;
             }
 
@@ -61,6 +63,7 @@ public class UserReminderCommands(
                 //Check what lengths of time we need to deal with and add it to the current date
                 if (!DateTimeTools.TryAddValuesToDate(timeProvider.GetUtcNow().UtcDateTime, amounts, out DateTime date))
                 {
+                    _ = await ReplyAsync("The amount of time could not be read! Put y, M, w, d, h or m after each number (`M` is months, `m` is minutes), e.g.: `1h 30m`");
                     return;
                 }
 
@@ -97,11 +100,14 @@ public class UserReminderCommands(
 
             List<ReminderResource> list = await reminderService.GetUserReminderListAsync(Context.User.Id);
 
-            if (list.Count > 0)
+            if (list.Count == 0)
             {
-                Embed[] embed = UserReminderListEmbedProcessor.CreateEmbed(list);
-                _ = await ReplyAsync(embeds: embed);
+                _ = await ReplyAsync("You do not have any reminders set!");
+                return;
             }
+
+            Embed[] embed = UserReminderListEmbedProcessor.CreateEmbed(list);
+            _ = await ReplyAsync(embeds: embed);
         }
         catch (Exception ex)
         {
