@@ -68,8 +68,10 @@ public class AdminServerSettingCommands(
                 return;
             }
 
+            //It answered nothing until 2026-11-23
             if (channel == null)
             {
+                _ = await ReplyAsync("Name the channel too: `!channel add music [channel name]`");
                 return;
             }
 

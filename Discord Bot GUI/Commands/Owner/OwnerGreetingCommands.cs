@@ -6,7 +6,6 @@ using Discord;
 using Discord.Commands;
 using Discord_Bot.Interfaces;
 using Discord_Bot.Processors.EmbedProcessors;
-using Discord_Bot.Tools.NativeTools;
 
 namespace Discord_Bot.Commands.Owner;
 
@@ -29,11 +28,16 @@ public class OwnerGreetingCommands(
         try
         {
             List<GreetingResource> greetings = await greetingService.GetAllGreetingAsync();
-            if (!CollectionTools.IsNullOrEmpty(greetings))
+
+            //It answered nothing until 2026-11-23
+            if (greetings.Count == 0)
             {
-                Embed[] embed = GreetingListEmbedProcessor.CreateEmbed(greetings);
-                _ = await ReplyAsync(embeds: embed);
+                _ = await ReplyAsync("There are no greetings yet!");
+                return;
             }
+
+            Embed[] embed = GreetingListEmbedProcessor.CreateEmbed(greetings);
+            _ = await ReplyAsync(embeds: embed);
         }
         catch (Exception ex)
         {
@@ -73,7 +77,7 @@ public class OwnerGreetingCommands(
             string resultMessage = result switch
             {
                 DbProcessResultEnum.Success => $"Greeting with the ID {id} has been removed.",
-                DbProcessResultEnum.NotFound => "Greeting doesn't exist with that ID or it is not yours.",
+                DbProcessResultEnum.NotFound => "Greeting doesn't exist with that ID.",
                 _ => "Greeting could not be removed!"
             };
             _ = await ReplyAsync(resultMessage);

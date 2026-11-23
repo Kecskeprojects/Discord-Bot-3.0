@@ -76,8 +76,10 @@ public class AdminSelfRoleCommands(
         {
             ServerResource server = await GetCurrentServerAsync();
 
+            //It answered nothing until 2026-11-23
             if (!server.SettingsChannels.TryGetValue(ChannelTypeEnum.RoleText, out List<ulong>? roleChannels))
             {
+                _ = await ReplyAsync("This server has no role channel, set one with `!channel add role [channel name]`");
                 return;
             }
 

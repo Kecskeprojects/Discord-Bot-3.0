@@ -271,6 +271,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
     - A Spotify track link through the real `SpotifyAPI` and `YoutubeAPI`.
     - `!remind`, `!birthday` (and the admin's `!birthday a`), and `!help` with its category menu, plus `BaseCommand` and the message processors as unit tests (added 2026-11-23, 79 more cases, 674 in all; the container test lost two cases when the base classes became abstract; see "Next" item 7)
     - The replies for input the reminder, birthday and mute commands couldn't read (added 2026-11-23, 16 more cases, 690 in all)
+    - The server setup and owner commands, and the LocalDB queries for custom commands, greetings and users (added 2026-11-23, 58 more cases, 748 in all; see "Next" items 5 and 7)
 - **Next, roughly in order of value:**
   1. The Mapster mappings (`DatabaseMapperConfig`, `MapperConfig`). **Done 2026-11-19:**
      - The tests cover every hand-written mapping, including navigations a query didn't load. One theory compiles each resource mapping with `RequireDestinationMemberSource`, so a new resource member without a mapping fails it.
@@ -363,7 +364,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
          ```sql
          SELECT WeeklyPollOptionPresetId, OrderNumber, COUNT(*) FROM WeeklyPollOption WHERE WeeklyPollOptionPresetId IS NOT NULL GROUP BY WeeklyPollOptionPresetId, OrderNumber HAVING COUNT(*) > 1
          ```
-     - Left: custom commands, greetings and users.
+     - **Fourth batch done 2026-11-23:** `CustomCommandTests` (names per server and in any letter case, the list by name, removal), `GreetingTests` (removal by the listed ID) and `UserTests` (the Last.fm name: a new user gets a row, an existing name is kept, the list leaves out empty names, and clearing it). Nothing new turned up.
   6. `BiasScrapingProcessor` and the who-knows embed. The other bias game embeds are tested (2026-11-19): the match and its arrows (picking one idol sends the other's ID), the result, the setup's gender buttons, and the stats list. A test also checks that the gender buttons' numbers are `GenderEnum`'s values.
   7. More whole commands. Guild commands need an `IGuild` substitute and a `ServerResource` from a substituted `IServerService`. **First batch done 2026-11-23:**
      - `Integration/Reminders`, `Integration/Birthdays` and `Integration/Help` run the commands through Discord.Net's command service:
@@ -398,6 +399,26 @@ Yes, the bot's test project can run integration tests: real services wired toget
        - `BiasListMessageProcessor`'s "unsorted" branch never runs, since every idol has a group (`Idol.GroupId` is `NOT NULL`, and both list queries load it).
        - The bias list's group order and the role message's order follow the machine's culture (`SortedDictionary` and `Order()` with the default comparer). This only matters for names with Hungarian digraphs such as "cs" or "ly".
        - No command passes `allowLackOfType: false`.
+     - **Second batch done 2026-11-23:** the server setup and owner commands, through the command service.
+       - `Integration/ServerSetup`:
+         - `!server settings`
+         - `!channel add/remove`: the type list, an unknown type, a channel by name, and the one-per-server types
+         - `!twitch add/remove` by name or link, with the Twitch CLI as a substitute
+         - `!twitch role add/remove`
+         - `!self role add/remove` and `!update role message`
+         - `!command add/remove` and `!custom list`
+       - `Integration/Owner`: `!greeting add/list/remove` and `!say`, with `[RequireOwner]` asking the client for the application's owner.
+       - **Changed (each confirmed by its test failing first):**
+         - **Replies for what answered nothing**, as decided for the reminder commands. Channels are given by name, as the commands are used:
+           - `!channel add <type>` without a channel: "Name the channel too: `!channel add music [channel name]`".
+           - `!update role message` without a role channel: "This server has no role channel, set one with `!channel add role [channel name]`".
+           - `!greeting list` with no greetings: "There are no greetings yet!".
+         - `!greeting remove` no longer says "or it is not yours" (copied from the reminders), since greetings are the bot's.
+       - **Considered and kept as they are (decided 2026-11-23):**
+         - `!self role remove` takes a role that exists on Discord (an `IRole`). A role deleted on Discord answers "Role not found.", and the owner confirmed the rest of the self-role logic copes with such a role.
+         - `!command add` accepts a name a built-in command or alias already has (`help`, `customlist`). Such a command never runs, since `CommandHandler` falls back to custom commands only when no built-in one matches; no check is needed.
+         - `!greeting add` takes any text, not only a link: greetings were never meant to be links only.
+       - Seen, not changed: the Twitch monitor reloads its channel list every tick, so `!twitch add` applies without a restart. It skips an empty list, though, so after the last channel anywhere is removed it keeps checking that one. Its notification then finds no server and sends nothing.
   8. Commands with a random branch: `UserBiasGameCommands.BiasGameStop` answers with an easter egg 1 time in 100. **Done 2026-11-19:** it takes the injected `Random`, and `Integration/BiasGame/BiasGameStopTests` (5 cases) covers:
      - stopping a game: the reply, the game's message deleted, the game disposed, and all three aliases
      - no game to stop: nothing is said
