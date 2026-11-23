@@ -25,7 +25,7 @@ public class UserBonkCommands(
     private readonly IWebService webService = webService;
 
     [Command("bonk")]
-    [Alias(["hornyjail, hit me please"])]
+    [Alias(["hornyjail", "hit me please"])]
     [RequireContext(ContextType.Guild)]
     [Summary("Inserts a gif with the user's local profile picture, if no user is given, it will be yourself")]
     public async Task Bonk([Remainder][Name("username  delay(ms)")] string parameters = "")
@@ -58,46 +58,41 @@ public class UserBonkCommands(
                 userName = string.Join(" ", paramParts);
             }
 
-            string url = "";
-            if (string.IsNullOrEmpty(userName))
-            {
-                url = GetCurrentUserAvatar();
-                userName = Context.User.Username;
-            }
-            else
+            //The user named by ID or name, or the sender; until 2026-11-23 a name not found answered nothing,
+            //and an ID of someone not on the server threw
+            IUser? target = Context.User;
+            if (!string.IsNullOrEmpty(userName))
             {
                 await Context.Guild.DownloadUsersAsync();
-
                 if (ulong.TryParse(userName, out ulong userId))
                 {
-                    IGuildUser user = await Context.Guild.GetUserAsync(userId, CacheMode.CacheOnly);
-                    userName = user.Username;
-                    url = DiscordTools.GetUserAvatarUrl(user);
+                    target = await Context.Guild.GetUserAsync(userId, CacheMode.CacheOnly);
                 }
                 else
                 {
-                    IReadOnlyCollection<IGuildUser> users = await Context.Guild.SearchUsersAsync(userName, 1);
-                    if (users.Count > 0)
-                    {
-                        IGuildUser user = users.First();
-                        userName = user.Username;
-                        url = DiscordTools.GetUserAvatarUrl(user);
-                    }
+                    target = (await Context.Guild.SearchUsersAsync(userName, 1)).FirstOrDefault();
                 }
             }
 
-            if (!string.IsNullOrEmpty(url))
+            if (target == null)
             {
-                logger.Query($"Getting profile image:\n{url}");
-                using (MemoryStream stream = await webService.GetStream(url))
-                using (MemoryStream? gifStream = bonkGifProcessor.CreateBonkImage(stream, frameDelay))
+                _ = await ReplyAsync("No user was found with that name or ID!");
+                return;
+            }
+
+            string url = DiscordTools.GetUserAvatarUrl(target);
+            logger.Query($"Getting profile image:\n{url}");
+            using (MemoryStream stream = await webService.GetStream(url))
+            using (MemoryStream? gifStream = bonkGifProcessor.CreateBonkImage(stream, frameDelay))
+            {
+                //Null when the gif could not be made, the processor already logged why (it answered nothing until 2026-11-23)
+                if (gifStream == null)
                 {
-                    //Null when the gif could not be made, the processor already logged why
-                    if (gifStream != null)
-                    {
-                        _ = await Context.Channel.SendFileAsync(gifStream, $"bonk_{userName}.gif");
-                    }
+                    _ = await ReplyAsync("The bonk gif could not be made!");
+                    return;
                 }
+
+                _ = await Context.Channel.SendFileAsync(gifStream, $"bonk_{target.Username}.gif");
             }
         }
         catch (Exception ex)

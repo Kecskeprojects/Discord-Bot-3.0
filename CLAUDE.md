@@ -84,7 +84,7 @@ Build the projects rather than the `.sln`, because the solution includes `MainDB
 | YouTube Data API | Google.Apis.YouTube.v3, through `IYoutubeDataClient` | **Several keys rotated** by quota through `YoutubeKeyStore`, refilled daily at 08:00 UTC (after YouTube's midnight-Pacific reset), so edited keys apply then |
 | Twitch | TwitchLib `LiveStreamMonitor` (on its own thread from `App.xaml.cs`) + `twitch.exe` CLI | |
 | MusicBrainz | REST | Artist lookups |
-| dbkpop.com / kprofiles.com | Puppeteer scraping (`KpopDbScraper`, `BiasScrapingProcessor`) | Weekly idol data refresh |
+| dbkpop.com / kprofiles.com | Puppeteer scraping (`KpopDbScraper`, `BiasScrapingProcessor`) | Weekly idol data refresh. Reading dbkpop.com's table is commented out on purpose (the site blocked the bot or timed out), so only idols with a profile link are refreshed |
 | Twitter/X, Instagram | Puppeteer scraping / GraphQL | **Both embeds are currently disabled.** `UserTwitterScraperCommands.cs` is fully commented out, and the Instagram embed call is commented out in `CommandHandler`. The `TwitterScraper`/`InstaScraper` services, their DI registrations and the `enable_*_embed` config keys remain |
 | Word of the Day | `wotd.transparent.com` RSS | |
 

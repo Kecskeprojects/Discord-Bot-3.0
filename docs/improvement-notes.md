@@ -277,6 +277,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
     - Who may manage weekly polls and presets: refusals for a member who can create polls and for an administrator who isn't the owner (added 2026-11-23, 2 more cases, 869 in all)
     - Last.fm: the service over a fake Last.fm, every `!lf` command and the embeds (added 2026-11-23, 51 more cases, 920 in all; see "Next" item 4)
     - Music: the queue commands, `!play` and the play loop on the fake clock (added 2026-11-23, 32 more cases, 952 in all; see "Next" item 7)
+    - The weekly bias data refresh, smoke tests of the four images, and `!bonk` (added 2026-11-23, 22 more cases, 974 in all; see "Next" items 6 and 7)
 - **Next, roughly in order of value:**
   1. The Mapster mappings (`DatabaseMapperConfig`, `MapperConfig`). **Done 2026-11-19:**
      - The tests cover every hand-written mapping, including navigations a query didn't load. One theory compiles each resource mapping with `RequireDestinationMemberSource`, so a new resource member without a mapping fails it.
@@ -391,7 +392,16 @@ Yes, the bot's test project can run integration tests: real services wired toget
          SELECT WeeklyPollOptionPresetId, OrderNumber, COUNT(*) FROM WeeklyPollOption WHERE WeeklyPollOptionPresetId IS NOT NULL GROUP BY WeeklyPollOptionPresetId, OrderNumber HAVING COUNT(*) > 1
          ```
      - **Fourth batch done 2026-11-23:** `CustomCommandTests` (names per server and in any letter case, the list by name, removal), `GreetingTests` (removal by the listed ID) and `UserTests` (the Last.fm name: a new user gets a row, an existing name is kept, the list leaves out empty names, and clearing it). Nothing new turned up.
-  6. `BiasScrapingProcessor` and the who-knows embed (the embed is tested since 2026-11-23, see item 4). The other bias game embeds are tested (2026-11-19): the match and its arrows (picking one idol sends the other's ID), the result, the setup's gender buttons, and the stats list. A test also checks that the gender buttons' numbers are `GenderEnum`'s values.
+  6. `BiasScrapingProcessor` and the who-knows embed (the embed is tested since 2026-11-23, see item 4). The other bias game embeds are tested (2026-11-19): the match and its arrows (picking one idol sends the other's ID), the result, the setup's gender buttons, and the stats list. A test also checks that the gender buttons' numbers are `GenderEnum`'s values. **Done 2026-11-23:**
+     - `BiasScrapingProcessorTests`: the weekly refresh with the scraper and the idol service replaced.
+       - An idol with a profile link and a new image gets its details saved.
+       - Without a link, with the same image or with a page without an image, an idol is left as it is.
+       - The group's page is read only while its debut date is missing.
+       - The corrections run at the end, and the browser is closed even when the refresh fails.
+     - **The dbkpop.com table step is off on purpose (confirmed by the owner 2026-11-23).** `ExtractFromDatabaseTableAsync` is commented out in `RunUpdateBiasDataAsync`, because the site either blocked the bot (perhaps by its address) or became so slow that requests were unusable and often timed out.
+       - So the list it gave is always empty: idols without a profile link never get one, and only the per-idol pages are read.
+       - The tests describe that, and don't pin the commented-out step either way.
+     - `ImageProcessorTests`: smoke tests of the four Magick.NET images, from plain pictures made in the test. Each comes out in its format and size: the who-knows ranking (800x500 PNG, also with 30 listeners and long names), the bias game polaroid (280x338) and match (610x338), the winner bracket after a pair and after the final (its own size), and `!bonk`'s GIF (two 1000x1000 frames with the delay). They use the machine's fonts, as the bot does.
   7. More whole commands. Guild commands need an `IGuild` substitute and a `ServerResource` from a substituted `IServerService`. **First batch done 2026-11-23:**
      - `Integration/Reminders`, `Integration/Birthdays` and `Integration/Help` run the commands through Discord.Net's command service:
        - `!remind in` and its aliases, in a server and in DMs, with the command channel restriction, the length limit, the list and the removal results.
@@ -511,6 +521,14 @@ Yes, the bot's test project can run integration tests: real services wired toget
        - **Done after the batch (2026-11-23):**
          - The play loop's `finally` replaced `AudioVariables` without disposing the old one, so its `AudioClient` was never disposed. It is disposed now, and the loop test checks it.
          - No feature called `BaseFeature.IsCommandAllowedAsync` any more, now that the voice check compares the voice channel directly. Its two overloads are removed; the owner will check whether that should stay so.
+     - **Sixth batch done 2026-11-23:** `!bonk` (`Integration/Bonk`), with the real GIF processor and the avatar download replaced: the sender, a user by name or ID, the frame delay and its range.
+       - **Fixed (each confirmed by its test failing first):**
+         - **`!hornyjail` and `!hit me please` didn't exist.** The alias was one string, `"hornyjail, hit me please"`; it is two now.
+         - **A user who couldn't be found answered nothing,** and an ID of someone not on the server threw. Both now get "No user was found with that name or ID!".
+         - **A GIF that couldn't be made answered nothing** (the processor logs why); it now says so.
+       - Seen, not changed:
+         - The delay is documented as milliseconds (`username  delay(ms)`, "1-1000"), but a GIF frame's delay is in hundredths of a second. So the default of 10 is 0.1 seconds, and `!bonk 500` holds each frame for 5 seconds.
+         - The last word counts as the delay when it is a number that fits an `int`, which a Discord ID never does, so `!bonk <id>` works without a delay.
   8. Commands with a random branch: `UserBiasGameCommands.BiasGameStop` answers with an easter egg 1 time in 100. **Done 2026-11-19:** it takes the injected `Random`, and `Integration/BiasGame/BiasGameStopTests` (5 cases) covers:
      - stopping a game: the reply, the game's message deleted, the game disposed, and all three aliases
      - no game to stop: nothing is said
