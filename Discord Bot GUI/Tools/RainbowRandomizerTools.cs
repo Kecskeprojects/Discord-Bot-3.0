@@ -38,17 +38,17 @@ public static class RainbowRandomizerTools
         return userList;
     }
 
-    public static List<string> GetResponseForRound(List<string> operatorList, List<IUser> userList)
+    //A different operator for each user; the caller's Random decides which (the injected one, so tests can)
+    public static List<string> GetResponseForRound(List<string> operatorList, List<IUser> userList, Random random)
     {
         //Ensuring the original list remains intact
         List<string> tempOperatorList = [];
         tempOperatorList.AddRange(operatorList);
 
-        Random r = new();
         List<string> responseParts = [];
         foreach (IUser user in userList)
         {
-            int index = r.Next(0, tempOperatorList.Count);
+            int index = random.Next(0, tempOperatorList.Count);
             string chosen = tempOperatorList[index];
             responseParts.Add($"{user.GlobalName ?? user.Username}: {chosen}");
             tempOperatorList.RemoveAt(index);

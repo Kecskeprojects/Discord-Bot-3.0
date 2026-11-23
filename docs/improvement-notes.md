@@ -174,7 +174,7 @@ No interface needed:
 - `CommandService` / `InteractionService` (Discord.Net): only the handlers and the help command use them.
 
 Randomness and files (no interface, but tests have to account for them):
-- **Randomness:** `new Random()` appears in `CollectionTools`, `StringExtension.ToMockText`, `RainbowRandomizerTools`, `BirthdayMessageProcessor`, `WhoKnowsImageProcessor` (file names) and `UserRandomizeCommands`; `YoutubeKeyStore` picks a key with `Random.Shared` (checked 2026-11-23). Tests can check properties (a shuffle keeps every item), or the code takes the injected `Random`, as `EasterEggFeature` does since 2026-11-19 and `!my biases` since 2026-11-23 (described in CLAUDE.md "Randomness").
+- **Randomness:** `new Random()` appears in `CollectionTools`, `StringExtension.ToMockText`, `BirthdayMessageProcessor` and `WhoKnowsImageProcessor` (file names); `YoutubeKeyStore` picks a key with `Random.Shared` (checked 2026-11-23). Tests can check properties (a shuffle keeps every item), or the code takes the injected `Random`, as `EasterEggFeature` does since 2026-11-19 and `!my biases` and the randomizer commands (with `RainbowRandomizerTools`) since 2026-11-23 (described in CLAUDE.md "Randomness").
 - **Files:** `RainbowRandomizerTools.GetOperatorList` reads `R6_Attackers.txt` / `R6_Defenders.txt` from the working directory. Copy them to the test output, or pass the list in.
 
 ### Not worth unit-testing
@@ -273,6 +273,8 @@ Yes, the bot's test project can run integration tests: real services wired toget
     - The replies for input the reminder, birthday and mute commands couldn't read (added 2026-11-23, 16 more cases, 690 in all)
     - The server setup and owner commands, and the LocalDB queries for custom commands, greetings and users (added 2026-11-23, 58 more cases, 748 in all; see "Next" items 5 and 7)
     - The bias commands, `!ping` and its query on LocalDB, and the idol edit menu with its modals (added 2026-11-23, 74 more cases, 822 in all; see "Next" item 7)
+    - The weekly poll and preset text commands, the randomizer commands and `!wotd` (added 2026-11-23, 45 more cases, 867 in all; see "Next" item 7)
+    - Who may manage weekly polls and presets: refusals for a member who can create polls and for an administrator who isn't the owner (added 2026-11-23, 2 more cases, 869 in all)
 - **Next, roughly in order of value:**
   1. The Mapster mappings (`DatabaseMapperConfig`, `MapperConfig`). **Done 2026-11-19:**
      - The tests cover every hand-written mapping, including navigations a query didn't load. One theory compiles each resource mapping with `RequireDestinationMemberSource`, so a new resource member without a mapping fails it.
@@ -445,6 +447,27 @@ Yes, the bot's test project can run integration tests: real services wired toget
            SELECT Name FROM Idol WHERE Name LIKE '%-%' UNION ALL SELECT Name FROM IdolGroup WHERE Name LIKE '%-%'
            ```
          - A fix was tried and dropped on 2026-11-23. It took as the separator the `-` before an existing group's name, and looked up `!ping`'s whole text first and then each `-` in turn. For `!biaslist add` it fell back to the first `-`, since that command may create the group. It worked for all the cases above on LocalDB, if this is ever needed.
+     - **Fourth batch done 2026-11-23:** the weekly polls' text commands, the randomizers and `!wotd`.
+       - `Integration/Polls`:
+         - `WeeklyPollCommandTests`: `!weekly poll create/edit/remove/list/resend` and the short forms (`!wp c`), with the edit message, "Poll not found!", each removal result and a resend posting the poll in its channel.
+         - `PresetCommandTests`: `!weekly poll preset create/edit/remove/list` (`!wpp`), including the "still used by a weekly poll" reply.
+       - `Integration/Randomizer`:
+         - `!8ball`, `!coin flip` (both sides, the edge at 50 and 51, two given choices) and `!decide`
+         - the three R6 randomizers: the sender alone or everyone in their voice channel, a different operator each, the rounds' sides, a named channel
+       - `Integration/WordOfTheDay` and `WordOfTheDayEmbedProcessorTests`: `!wotd` with the feed replaced (a language, an unknown one, the site down, DMs) and its embed.
+       - **Changed (confirmed by its test failing first):** `!weekly poll resend` of a poll without answers sent nothing and answered nothing. It now says the poll has no answers yet.
+       - The randomizer commands and `RainbowRandomizerTools.GetResponseForRound` take the injected `Random`, so the tests decide each roll.
+       - **Who may manage weekly polls and presets (decided and changed 2026-11-23).**
+         - Until then, every weekly poll and preset command, and every button and modal of their edit messages, required only `ChannelPermission.SendPolls`, Discord's "Create Polls". That had been so since the feature was added (`d400f59`, 2025-02-02).
+         - Discord gives "Create Polls" to @everyone unless a server takes it away, as far as I know. So any member could create, edit, resend or remove a server's weekly polls; a test confirmed that a member with only that permission got through.
+         - The presets are shared by every server, and their commands, though in the owner module, had no `[RequireOwner]`. So a member of any server the bot is in could edit or remove the presets other servers' polls use.
+         - **Now:** the weekly poll commands and the poll edit message's buttons, menus and modals require `GuildPermission.Administrator`, like the other admin commands. The preset commands and the preset edit message's require `[RequireOwner]`.
+         - The answer menu was one handler for both (`PollOption_Change_CustomOption_*_*`, `True` for a preset). It is now two routes, `..._False_*` for administrators and `..._True_*` for the owner, sharing one method.
+         - `WeeklyPollCommandTests`, `PresetCommandTests` and `AnswerEditTests` run as an administrator and as the owner. They check that a member who can create polls but isn't an administrator is refused, and so is an administrator who isn't the owner, for the commands and the edit messages alike.
+       - Seen, not changed:
+         - `WordOfTheDayService` reports a site outage (`HttpRequestException`) but answers `null` for a timeout or a page it can't read. `!wotd` then says the language isn't supported.
+         - The service itself has no tests: it calls the real site through a static `RestClient`.
+         - The R6 operator lists hold 39 operators each, and a round fails for a voice channel with more users than that. `!decide` with only commas logs an exception.
   8. Commands with a random branch: `UserBiasGameCommands.BiasGameStop` answers with an easter egg 1 time in 100. **Done 2026-11-19:** it takes the injected `Random`, and `Integration/BiasGame/BiasGameStopTests` (5 cases) covers:
      - stopping a game: the reply, the game's message deleted, the game disposed, and all three aliases
      - no game to stop: nothing is said

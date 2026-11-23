@@ -22,10 +22,25 @@ IConfig config) : BaseInteraction(serverService, logger, config)
     private readonly IWeeklyPollOptionService weeklyPollOptionService = weeklyPollOptionService;
     private readonly IWeeklyPollService weeklyPollService = weeklyPollService;
 
-    [ComponentInteraction("PollOption_Change_CustomOption_*_*")]
-    [RequireUserPermission(ChannelPermission.SendPolls)]
+    //A poll's answer menu (False) is for the server's administrators, a preset's (True) for the owner, as every server's polls
+    //share the presets; until 2026-11-23 one handler took both, and "Create Polls" was enough
+    [ComponentInteraction("PollOption_Change_CustomOption_False_*")]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
-    public async Task EditWeeklyPollOptionHandler(bool isPresetOption, int Id, string[] selectedOption)
+    public Task EditWeeklyPollOptionHandler(int Id, string[] selectedOption)
+    {
+        return OpenOptionModalAsync(false, Id, selectedOption);
+    }
+
+    [ComponentInteraction("PollOption_Change_CustomOption_True_*")]
+    [RequireOwner]
+    [RequireContext(ContextType.Guild)]
+    public Task EditWeeklyPollOptionPresetHandler(int Id, string[] selectedOption)
+    {
+        return OpenOptionModalAsync(true, Id, selectedOption);
+    }
+
+    private async Task OpenOptionModalAsync(bool isPresetOption, int Id, string[] selectedOption)
     {
         try
         {
@@ -52,7 +67,7 @@ IConfig config) : BaseInteraction(serverService, logger, config)
     }
 
     [ModalInteraction("EditPollOptionModal_*_*")]
-    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     public async Task EditWeeklyPollOptionModalSubmit(int pollId, int pollOptionId, EditWeeklyPollOptionModal modal)
     {
@@ -86,7 +101,7 @@ IConfig config) : BaseInteraction(serverService, logger, config)
     }
 
     [ModalInteraction("EditPollOptionPresetModal_*_*")]
-    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireOwner]
     [RequireContext(ContextType.Guild)]
     public async Task EditWeeklyPollOptionPresetModalSubmit(int presetId, int pollOptionId, EditWeeklyPollOptionModal modal)
     {

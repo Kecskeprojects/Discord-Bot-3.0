@@ -12,6 +12,7 @@ namespace Discord_Bot.Commands.Owner;
 [Name("Weekly Poll Option Preset")]
 [Remarks("Owner")]
 [Summary("Manage presets for Weekly Polls")]
+//The owner's only, as every server's polls share the presets; until 2026-11-23 "Create Polls" on any server was enough
 public class OwnerWeeklyPollOptionPresetCommands(
     IWeeklyPollOptionPresetService weeklyPollOptionPresetService,
     IServerService serverService,
@@ -22,7 +23,7 @@ public class OwnerWeeklyPollOptionPresetCommands(
 
     [Command("weekly poll preset create")]
     [Alias(["wpp c", "weekly poll preset c", "wpp create", "weeklypollpreset c", "weeklypollpreset create"])]
-    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireOwner]
     [RequireContext(ContextType.Guild)]
     [Summary("Adding a new Weekly Poll Option Preset")]
     public async Task AddWeeklyPollOptionPreset()
@@ -49,7 +50,7 @@ public class OwnerWeeklyPollOptionPresetCommands(
 
     [Command("weekly poll preset edit")]
     [Alias(["wpp e", "weekly poll preset e", "wpp edit", "weeklypollpreset e", "weeklypollpreset edit"])]
-    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireOwner]
     [RequireContext(ContextType.Guild)]
     [Summary("Editing an existing Weekly Poll Option Preset")]
     public async Task EditWeeklyPollOptionPreset([Remainder][Name("name")] string presetName)
@@ -76,7 +77,7 @@ public class OwnerWeeklyPollOptionPresetCommands(
 
     [Command("weekly poll preset remove")]
     [Alias(["wpp r", "weekly poll preset r", "wpp remove", "weeklypollpreset r", "weeklypollpreset remove"])]
-    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireOwner]
     [RequireContext(ContextType.Guild)]
     [Summary("Removing an existing Weekly Poll Option Preset")]
     public async Task RemoveWeeklyPollOptionPreset([Remainder][Name("name")] string presetName)
@@ -101,7 +102,7 @@ public class OwnerWeeklyPollOptionPresetCommands(
 
     [Command("weekly poll preset list")]
     [Alias(["wpp l", "weekly poll preset l", "wpp list", "weeklypollpreset l", "weeklypollpreset list"])]
-    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireOwner]
     [RequireContext(ContextType.Guild)]
     [Summary("Listing the Weekly Poll Option Presets that currently exist")]
     public async Task ListWeeklyPollOptionPreset()

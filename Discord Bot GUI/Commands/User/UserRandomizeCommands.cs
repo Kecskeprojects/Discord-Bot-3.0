@@ -13,10 +13,13 @@ namespace Discord_Bot.Commands.User;
 [Remarks("User")]
 [Summary("Random result generator")]
 public class UserRandomizeCommands(
+    Random random,
     IServerService serverService,
     IBotLogger logger,
     IConfig config) : BaseCommand(logger, config, serverService)
 {
+    private readonly Random random = random;
+
     [Command("8ball")]
     [Summary("8ball game, takes in a question, returns a cryptic response")]
     public async Task Eightball([Remainder] string question)
@@ -34,7 +37,7 @@ public class UserRandomizeCommands(
                 return;
             }
 
-            _ = await ReplyAsync(Constant.Answers8ball[new Random().Next(0, Constant.Answers8ball.Length)]);
+            _ = await ReplyAsync(Constant.Answers8ball[random.Next(0, Constant.Answers8ball.Length)]);
         }
         catch (Exception ex)
         {
@@ -54,8 +57,7 @@ public class UserRandomizeCommands(
                 return;
             }
 
-            Random r = new();
-            int chance = r.Next(0, 100);
+            int chance = random.Next(0, 100);
 
             string[] choices = ["Heads", "Tails"];
 
@@ -94,9 +96,7 @@ public class UserRandomizeCommands(
                 return;
             }
 
-            Random r = new();
-
-            string chosen = options[r.Next(0, options.Length)];
+            string chosen = options[random.Next(0, options.Length)];
 
             _ = await ReplyAsync(chosen);
         }
@@ -127,7 +127,7 @@ public class UserRandomizeCommands(
             List<string> operatorList = RainbowRandomizerTools.GetOperatorList(optionString);
             List<IUser> userList = await RainbowRandomizerTools.GetUserListAsync(Context);
 
-            List<string> responseParts = RainbowRandomizerTools.GetResponseForRound(operatorList, userList);
+            List<string> responseParts = RainbowRandomizerTools.GetResponseForRound(operatorList, userList, random);
 
             if (channel is not null and ITextChannel textChannel)
             {
@@ -172,7 +172,7 @@ public class UserRandomizeCommands(
                 string currentLabel = i / 3 < 1 ? label : otherLabel;
                 List<string> currentOperatorList = i / 3 < 1 ? operatorList : otherOperatorList;
 
-                List<string> responseParts = RainbowRandomizerTools.GetResponseForRound(currentOperatorList, userList);
+                List<string> responseParts = RainbowRandomizerTools.GetResponseForRound(currentOperatorList, userList, random);
                 finalResponseParts.Add($"\n{currentLabel} Round {i + 1}:");
                 finalResponseParts.AddRange(responseParts);
             }
@@ -219,7 +219,7 @@ public class UserRandomizeCommands(
                 string currentLabel = i % 2 != 1 ? label : otherLabel;
                 List<string> currentOperatorList = i % 2 != 1 ? operatorList : otherOperatorList;
 
-                List<string> responseParts = RainbowRandomizerTools.GetResponseForRound(currentOperatorList, userList);
+                List<string> responseParts = RainbowRandomizerTools.GetResponseForRound(currentOperatorList, userList, random);
                 finalResponseParts.Add($"\n{currentLabel} Round {i + 1}:");
                 finalResponseParts.AddRange(responseParts);
             }

@@ -21,7 +21,7 @@ public class WeeklyPollEditInteraction(
     private readonly IWeeklyPollService weeklyPollService = weeklyPollService;
 
     [ComponentInteraction("EditPoll_*")]
-    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     public async Task EditWeeklyPollHandler(int pollId)
     {
@@ -59,7 +59,7 @@ public class WeeklyPollEditInteraction(
     }
 
     [ModalInteraction("EditPollModal_*")]
-    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     public async Task EditWeeklyPollModalSubmit(int pollId, EditWeeklyPollModal modal)
     {
@@ -104,7 +104,7 @@ public class WeeklyPollEditInteraction(
     }
 
     [ComponentInteraction("Poll_Change_*_*_*")]
-    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     public async Task DynamicChangeWeeklyPollButtonHandler(string fieldName, int pollId, bool value)
     {
@@ -137,7 +137,7 @@ public class WeeklyPollEditInteraction(
     }
 
     [ComponentInteraction("Poll_SelectChange_*_*")]
-    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     public async Task DynamicChangeWeeklyPollSelectHandler(string fieldName, int pollId, string[] selectedValues)
     {

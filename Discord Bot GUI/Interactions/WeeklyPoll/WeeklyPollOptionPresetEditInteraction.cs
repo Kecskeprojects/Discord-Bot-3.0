@@ -19,7 +19,7 @@ IConfig config) : BaseInteraction(serverService, logger, config)
     private readonly IWeeklyPollOptionPresetService weeklyPollOptionPresetService = weeklyPollOptionPresetService;
 
     [ComponentInteraction("EditPollPreset_*")]
-    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireOwner]
     [RequireContext(ContextType.Guild)]
     public async Task EditWeeklyPollPresetHandler(int presetId)
     {
@@ -48,7 +48,7 @@ IConfig config) : BaseInteraction(serverService, logger, config)
     }
 
     [ModalInteraction("EditPollPresetModal_*")]
-    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireOwner]
     [RequireContext(ContextType.Guild)]
     public async Task EditWeeklyPollPresetModalSubmit(int presetId, EditWeeklyPollOptionPresetModal modal)
     {
@@ -83,7 +83,7 @@ IConfig config) : BaseInteraction(serverService, logger, config)
     }
 
     [ComponentInteraction("PollPreset_Change_*_*_*")]
-    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireOwner]
     [RequireContext(ContextType.Guild)]
     public async Task DynamicChangeWeeklyPollPresetButtonHandler(string fieldName, int presetId, bool value)
     {

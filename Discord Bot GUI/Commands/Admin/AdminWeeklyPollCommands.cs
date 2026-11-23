@@ -13,6 +13,7 @@ namespace Discord_Bot.Commands.Admin;
 [Name("Weekly Poll")]
 [Remarks("Admin")]
 [Summary("Manage Weekly Polls on your server")]
+//Administrators only, like the other admin commands; until 2026-11-23 "Create Polls" was enough, which Discord gives everyone by default
 public class AdminWeeklyPollCommands(
     WeeklyPollFeature weeklyPollFeature,
     IWeeklyPollService weeklyPollService,
@@ -25,7 +26,7 @@ public class AdminWeeklyPollCommands(
 
     [Command("weekly poll create")]
     [Alias(["wp c", "weekly poll c", "wp create", "weeklypoll c", "weeklypoll create"])]
-    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Adding a new Weekly Poll to the server (calling the command will create a dummy poll unless there already an incomplete poll present)")]
     public async Task AddWeeklyPoll()
@@ -53,7 +54,7 @@ public class AdminWeeklyPollCommands(
 
     [Command("weekly poll edit")]
     [Alias(["wp e", "weekly poll e", "wp edit", "weeklypoll e", "weeklypoll edit"])]
-    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Editing an existing Weekly Poll on the server")]
     public async Task EditWeeklyPoll([Remainder][Name("name")] string pollName)
@@ -81,7 +82,7 @@ public class AdminWeeklyPollCommands(
 
     [Command("weekly poll remove")]
     [Alias(["wp r", "weekly poll r", "wp remove", "weeklypoll r", "weeklypoll remove"])]
-    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Removing an existing Weekly Poll on the server")]
     public async Task RemoveWeeklyPoll([Remainder][Name("name")] string pollName)
@@ -105,7 +106,7 @@ public class AdminWeeklyPollCommands(
 
     [Command("weekly poll list")]
     [Alias(["wp l", "weekly poll l", "wp list", "weeklypoll l", "weeklypoll list"])]
-    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Listing the Weekly Polls currently active on the server")]
     public async Task ListWeeklyPoll()
@@ -126,7 +127,7 @@ public class AdminWeeklyPollCommands(
 
     [Command("weekly poll resend")]
     [Alias(["wp re", "weekly poll re", "wp resend", "weeklypoll re", "weeklypoll resend"])]
-    [RequireUserPermission(ChannelPermission.SendPolls)]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [RequireContext(ContextType.Guild)]
     [Summary("Resending an existing Weekly Poll on the server")]
     public async Task ResendWeeklyPoll([Remainder][Name("name")] string pollName)
@@ -140,7 +141,11 @@ public class AdminWeeklyPollCommands(
                 return;
             }
 
-            _ = await weeklyPollFeature.ProcessWeeklyPollAsync(resource);
+            //The feature sends nothing for a poll without answers (it answered nothing until 2026-11-23)
+            if (!await weeklyPollFeature.ProcessWeeklyPollAsync(resource))
+            {
+                _ = await ReplyAsync("The poll has no answers to send yet, add them with `!weekly poll edit`.");
+            }
         }
         catch (Exception ex)
         {

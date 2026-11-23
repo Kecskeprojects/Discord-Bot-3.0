@@ -3,6 +3,7 @@ using DatabaseORM.Interface.Service;
 using DatabaseORM.Model;
 using DatabaseORM.Resources;
 using Discord;
+using Discord.Interactions;
 using Discord_Bot.Processors.EmbedProcessors.Polls;
 using Discord_Bot.Tests.Common.Constants;
 using Discord_Bot.Tests.Common.Tools;
@@ -20,6 +21,8 @@ public sealed class AnswerEditTests(LocalDatabase database) : IClassFixture<Loca
     private readonly IGuild guild = DiscordMocks.Guild();
     private readonly IGuildUser admin = DiscordMocks.GuildUser();
     private readonly RecordingChannel channel = RecordingChannel.Text();
+    //The bot's owner: the administrator choosing, unless a test says otherwise
+    private ulong ownerId = DiscordIds.User;
 
     public async ValueTask InitializeAsync()
     {
@@ -27,8 +30,8 @@ public sealed class AnswerEditTests(LocalDatabase database) : IClassFixture<Loca
         await database.ResetAsync();
         await host.FromNewScope<IServerService>().AddServerAsync(DiscordIds.Server);
         ((IGuildChannel) channel.Channel).Guild.Returns(guild);
-        //The handlers require Send Polls in the channel
-        admin.GetPermissions(Arg.Any<IGuildChannel>()).Returns(new ChannelPermissions(ulong.MaxValue));
+        //A poll's edit message is for the server's administrators, a preset's for the bot's owner
+        admin.GuildPermissions.Returns(new GuildPermissions(administrator: true));
     }
 
     [Fact]
@@ -66,6 +69,27 @@ public sealed class AnswerEditTests(LocalDatabase database) : IClassFixture<Loca
         await choice.Received().RespondWithModalAsync(Arg.Is<Modal>(modal => modal.CustomId == $"EditPollOptionPresetModal_{presetId}_{presetAnswer.WeeklyPollOptionId}"), Arg.Any<RequestOptions>());
     }
 
+    //Until 2026-11-23 "Create Polls" in the channel was enough for all of these, which Discord gives everyone by default
+    [Fact]
+    public async Task PollsEditMessage_MemberWhoIsNoAdministrator_IsRefused()
+    {
+        IGuildUser member = DiscordMocks.GuildUser(DiscordIds.OtherUser);
+        member.GetPermissions(Arg.Any<IGuildChannel>()).Returns(new ChannelPermissions(ulong.MaxValue));
+
+        Assert.Equal(InteractionCommandError.UnmetPrecondition, (await RunAsync(DiscordMocks.SelectMenuChoice("PollOption_Change_CustomOption_False_1", "0_0", member), member)).Error);
+        Assert.Equal(InteractionCommandError.UnmetPrecondition, (await RunAsync(DiscordMocks.ButtonClick("EditPoll_1", member), member)).Error);
+    }
+
+    //Presets are shared by every server's polls
+    [Fact]
+    public async Task PresetsEditMessage_AdministratorWhoIsNotTheOwner_IsRefused()
+    {
+        ownerId = DiscordIds.OtherUser;
+
+        Assert.Equal(InteractionCommandError.UnmetPrecondition, (await RunAsync(DiscordMocks.SelectMenuChoice("PollOption_Change_CustomOption_True_1", "0_0", admin), admin)).Error);
+        Assert.Equal(InteractionCommandError.UnmetPrecondition, (await RunAsync(DiscordMocks.ButtonClick("EditPollPreset_1", admin), admin)).Error);
+    }
+
     public ValueTask DisposeAsync()
     {
         host.Dispose();
@@ -80,9 +104,20 @@ public sealed class AnswerEditTests(LocalDatabase database) : IClassFixture<Loca
     private async Task<IComponentInteraction> ChooseAsync(SelectMenuComponent menu, string value)
     {
         IComponentInteraction choice = DiscordMocks.SelectMenuChoice(menu.CustomId, value, admin);
-        InteractionResult result = await host.RunInteractionAsync(new FakeInteractionContext(choice, admin, channel.Channel, guild));
+        InteractionResult result = await RunAsync(choice, admin);
         Assert.True(result.IsSuccess, result.ErrorReason);
         return choice;
+    }
+
+    private Task<InteractionResult> RunAsync(IComponentInteraction interaction, IGuildUser user)
+    {
+        FakeInteractionContext context = new(interaction, user, channel.Channel, guild);
+        IUser owner = DiscordMocks.User(ownerId);
+        IApplication application = Substitute.For<IApplication>();
+        application.Owner.Returns(owner);
+        context.Client.TokenType.Returns(TokenType.Bot);
+        context.Client.GetApplicationInfoAsync().Returns(application);
+        return host.RunInteractionAsync(context);
     }
 
     private async Task<WeeklyPollOption> SingleAnswerAsync()

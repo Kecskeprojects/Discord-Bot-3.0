@@ -103,7 +103,7 @@ Base URLs live in `Core/Constant.cs`.
 - Where the time is only recorded or shown (embed timestamps, log times, file names, `CreatedOn`/`ModifiedOn`), `DateTime.UtcNow` is fine. Times are UTC; only the log uses local time.
 - Show a time to users with `DiscordTools.UtcTimestamp`, a Discord timestamp in each reader's own time zone. It marks the time as UTC first, because dates read from the database come back without a `DateTimeKind`, which `TimestampTag` would read as the machine's local time.
 
-**Randomness:** a random choice that a test has to decide comes from an injected `Random`. `Startup` registers the thread-safe `Random.Shared`. Tests pass `Substitute.For<Random>()` and set each `Next(...)` roll (an unset roll returns 0). `EasterEggFeature`, `!bias game stop` and `!my biases` work this way; the other `new Random()` uses are listed in the improvement notes.
+**Randomness:** a random choice that a test has to decide comes from an injected `Random`. `Startup` registers the thread-safe `Random.Shared`. Tests pass `Substitute.For<Random>()` and set each `Next(...)` roll (an unset roll returns 0). `EasterEggFeature`, `!bias game stop`, `!my biases` and the randomizer commands work this way (a static helper takes the `Random` as a parameter, as `RainbowRandomizerTools` does); the other `new Random()` uses are listed in the improvement notes.
 
 **Two command systems coexist:**
 1. **Text prefix commands** (`Commands/`, Discord.Commands `ModuleBase` via `BaseCommand`) are triggered by `!` or `.`. This is where nearly all commands are. `CommandHandler.ProcessMessageAsync` also:
@@ -152,7 +152,7 @@ Every interaction must be acknowledged within 3 seconds, including early returns
   - `Unit/Bot/`, `Unit/DatabaseORM/` and `Unit/LastFmApi/` mirror their project's folders. A test of `Tools/NativeTools/DateTimeTools.cs` is `Unit/Bot/Tools/NativeTools/DateTimeToolsTests.cs`.
   - `Integration/<theme>/` (`Container`, `Database`, `LastFm`, `BiasGame`, `Music`, ...) runs real services together.
   - `Mocks/` holds the fakes, by what they stand in for (`Config`, `Database`, `Discord`, `Http`, `Youtube`).
-  - `Common/Constants/` holds the shared IDs (`DiscordIds`, `RowIds`), times and values; `Common/Builders/` the EF entities built from them (`Entities`); `Common/Tools/` the helpers (`TestHost`, `LocalDatabase`, `CultureScope`, `CachedServer`, and `TestMapper`, a real `IMapper` over the given registrations).
+  - `Common/Constants/` holds the shared IDs (`DiscordIds`, `RowIds`), times and values; `Common/Builders/` the EF entities built from them (`Entities`) and what external services return (`ServiceModels`); `Common/Tools/` the helpers (`TestHost`, `LocalDatabase`, `CultureScope`, `CachedServer`, and `TestMapper`, a real `IMapper` over the given registrations).
 - **DB services, two ways:**
   - **Unit tests over substitute repositories.** `HasRows(...)` (`Mocks/Database/RepositoryFakes`) makes a repository answer from a list of rows by running the service's own predicate on them, and `Fails()` makes every call throw. They can't catch a missing `Include` (every navigation of a row counts as loaded), and string comparisons are case-sensitive there.
   - **`Integration/Database/` on LocalDB**, for the queries, includes and collation. Each class takes a `LocalDatabase` class fixture: a database of its own on `(localdb)\MSSQLLocalDB`, created from the scaffolded model and seeded with MainDB's `ChannelType_Inserts.sql`.
