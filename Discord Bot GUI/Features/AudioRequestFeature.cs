@@ -25,8 +25,15 @@ public class AudioRequestFeature(
         try
         {
             string input = (string) Parameters;
-            if (string.IsNullOrEmpty(input) || Context.User is not IGuildUser { VoiceChannel: not null })
+            if (string.IsNullOrEmpty(input))
             {
+                return false;
+            }
+
+            //The play loop says the same, but it doesn't start for a request that was never queued (this answered nothing until 2026-11-23)
+            if (Context.User is not IGuildUser { VoiceChannel: not null })
+            {
+                _ = await Context.Channel.SendMessageAsync("You must be in a valid voice channel!");
                 return false;
             }
 

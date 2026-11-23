@@ -276,6 +276,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
     - The weekly poll and preset text commands, the randomizer commands and `!wotd` (added 2026-11-23, 45 more cases, 867 in all; see "Next" item 7)
     - Who may manage weekly polls and presets: refusals for a member who can create polls and for an administrator who isn't the owner (added 2026-11-23, 2 more cases, 869 in all)
     - Last.fm: the service over a fake Last.fm, every `!lf` command and the embeds (added 2026-11-23, 51 more cases, 920 in all; see "Next" item 4)
+    - Music: the queue commands, `!play` and the play loop on the fake clock (added 2026-11-23, 32 more cases, 952 in all; see "Next" item 7)
 - **Next, roughly in order of value:**
   1. The Mapster mappings (`DatabaseMapperConfig`, `MapperConfig`). **Done 2026-11-19:**
      - The tests cover every hand-written mapping, including navigations a query didn't load. One theory compiles each resource mapping with `RequireDestinationMemberSource`, so a new resource member without a mapping fails it.
@@ -390,7 +391,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
          SELECT WeeklyPollOptionPresetId, OrderNumber, COUNT(*) FROM WeeklyPollOption WHERE WeeklyPollOptionPresetId IS NOT NULL GROUP BY WeeklyPollOptionPresetId, OrderNumber HAVING COUNT(*) > 1
          ```
      - **Fourth batch done 2026-11-23:** `CustomCommandTests` (names per server and in any letter case, the list by name, removal), `GreetingTests` (removal by the listed ID) and `UserTests` (the Last.fm name: a new user gets a row, an existing name is kept, the list leaves out empty names, and clearing it). Nothing new turned up.
-  6. `BiasScrapingProcessor` and the who-knows embed. The other bias game embeds are tested (2026-11-19): the match and its arrows (picking one idol sends the other's ID), the result, the setup's gender buttons, and the stats list. A test also checks that the gender buttons' numbers are `GenderEnum`'s values.
+  6. `BiasScrapingProcessor` and the who-knows embed (the embed is tested since 2026-11-23, see item 4). The other bias game embeds are tested (2026-11-19): the match and its arrows (picking one idol sends the other's ID), the result, the setup's gender buttons, and the stats list. A test also checks that the gender buttons' numbers are `GenderEnum`'s values.
   7. More whole commands. Guild commands need an `IGuild` substitute and a `ServerResource` from a substituted `IServerService`. **First batch done 2026-11-23:**
      - `Integration/Reminders`, `Integration/Birthdays` and `Integration/Help` run the commands through Discord.Net's command service:
        - `!remind in` and its aliases, in a server and in DMs, with the command channel restriction, the length limit, the list and the removal results.
@@ -490,6 +491,25 @@ Yes, the bot's test project can run integration tests: real services wired toget
          - `WordOfTheDayService` reports a site outage (`HttpRequestException`) but answers `null` for a timeout or a page it can't read. `!wotd` then says the language isn't supported.
          - The service itself has no tests: it calls the real site through a static `RestClient`.
          - The R6 operator lists hold 39 operators each, and a round fails for a voice channel with more users than that. `!decide` with only commas logs an exception.
+     - **Fifth batch done 2026-11-23:** music.
+       - `Integration/Music/QueueCommandTests`: `!queue` (pages), `!now playing`, `!clear`, `!skip`, `!remove`, `!shuffle` and `!leave` on the server's queue in `AudioStateStore`, with the queue, now-playing and request embeds.
+       - `Integration/Music/PlayTests`: `!play` and the play loop (`AudioPlayFeature`). YouTube, Spotify, the download (yt-dlp and ffmpeg behind `IYoutubeDownloadService`) and the voice connection are replaced.
+         - The loop plays each song in turn and leaves after the wait. It also plays a song added during the wait, and stops quietly if the bot was removed from the channel.
+         - A song under 3 seconds is waited out instead of downloaded, a playlist link is downloaded without its list part, and a failed download moves on to the next song.
+         - The waits run on the fake clock, which the tests move on a second at a time while the loop waits.
+       - **Fixed (each confirmed by its test failing first):**
+         - **A server that set a music voice channel couldn't play music at all.** The play loop checked the command's text channel against the music voice channels instead of the voice channel the user is in, so it always answered "Current voice channel is not music channel!". The refactor of 2024-08-27 (`0444579`) had changed `channel.Id` to `Context.Channel.Id`.
+           - **To check on the live database** whether any server was affected: one with a channel of the `musicvoice` type.
+         - **`!play` outside a voice channel answered nothing.** The request returned before queueing, so the play loop that says "You must be in a valid voice channel!" never started. The request now says it.
+         - **`!queue` said "page 1 of 0"** when only the playing song was left, and allowed an empty page after the last, as the playing song was counted with the queue. A page that doesn't exist now gets "There is no such page in the queue!".
+         - **Replies for the queue commands that answered nothing,** as decided for the other commands:
+           - `!queue`, `!now playing`, `!clear` and `!skip` with nothing playing: "Nothing is playing right now!"
+           - `!remove` at a position outside the queue (0 is the playing song, which `!skip` is for): "There is no song at that position in the queue!"
+           - `!shuffle` with fewer than two songs after the playing one: "There is nothing to shuffle!" With one queued song it used to say "Shuffle complete!" while nothing could change.
+       - Seen, not changed:
+         - The commands change the queue list while the play loop reads it, without a lock. A clash is unlikely and depends on timing, so no test covers it.
+         - The play loop's `finally` replaces `AudioVariables` without disposing the old one, so its `AudioClient` isn't disposed there.
+         - No feature calls `BaseFeature.IsCommandAllowedAsync` any more, now that the voice check compares the voice channel directly; its two overloads are unused.
   8. Commands with a random branch: `UserBiasGameCommands.BiasGameStop` answers with an easter egg 1 time in 100. **Done 2026-11-19:** it takes the injected `Random`, and `Integration/BiasGame/BiasGameStopTests` (5 cases) covers:
      - stopping a game: the reply, the game's message deleted, the game disposed, and all three aliases
      - no game to stop: nothing is said

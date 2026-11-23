@@ -101,20 +101,30 @@ public class UserVoiceCommands(
         try
         {
             ServerAudioResource audioResource = audioStates.GetOrAdd(Context.Guild.Id);
-            if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText) || audioResource.MusicRequests.Count == 0)
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText))
             {
                 return;
             }
 
-            int songcount = audioResource.MusicRequests.Count;
-
-            //If queue does not have songs on that page, do not show a queue
-            if (page * 10 <= songcount || ((page - 1) * 10 < songcount && page * 10 >= songcount))
+            //It answered nothing until 2026-11-23
+            if (audioResource.MusicRequests.Count == 0)
             {
-                Embed[] embed = AudioQueueEmbedProcessor.CreateEmbed(audioResource, page);
-
-                _ = await ReplyAsync(embeds: embed);
+                _ = await ReplyAsync("Nothing is playing right now!");
+                return;
             }
+
+            //The first song is the one playing, and ten of the others fit on a page; until 2026-11-23 the playing one was counted
+            //here too, which allowed an empty page past the last, and a page that didn't exist answered nothing
+            int pageCount = Math.Max(1, (int) Math.Ceiling((audioResource.MusicRequests.Count - 1) / 10.0));
+            if (page < 1 || page > pageCount)
+            {
+                _ = await ReplyAsync("There is no such page in the queue!");
+                return;
+            }
+
+            Embed[] embed = AudioQueueEmbedProcessor.CreateEmbed(audioResource, page);
+
+            _ = await ReplyAsync(embeds: embed);
         }
         catch (Exception ex)
         {
@@ -131,8 +141,15 @@ public class UserVoiceCommands(
         try
         {
             ServerAudioResource audioResource = audioStates.GetOrAdd(Context.Guild.Id);
-            if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText) || audioResource.MusicRequests.Count == 0)
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText))
             {
+                return;
+            }
+
+            //It answered nothing until 2026-11-23
+            if (audioResource.MusicRequests.Count == 0)
+            {
+                _ = await ReplyAsync("Nothing is playing right now!");
                 return;
             }
 
@@ -154,8 +171,15 @@ public class UserVoiceCommands(
         try
         {
             ServerAudioResource audioResource = audioStates.GetOrAdd(Context.Guild.Id);
-            if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText) || audioResource.MusicRequests.Count == 0)
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText))
             {
+                return;
+            }
+
+            //It answered nothing until 2026-11-23
+            if (audioResource.MusicRequests.Count == 0)
+            {
+                _ = await ReplyAsync("Nothing is playing right now!");
                 return;
             }
 
@@ -179,8 +203,15 @@ public class UserVoiceCommands(
         try
         {
             ServerAudioResource audioResource = audioStates.GetOrAdd(Context.Guild.Id);
-            if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText) || audioResource.MusicRequests.Count == 0)
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText))
             {
+                return;
+            }
+
+            //It answered nothing until 2026-11-23
+            if (audioResource.MusicRequests.Count == 0)
+            {
+                _ = await ReplyAsync("Nothing is playing right now!");
                 return;
             }
 
@@ -203,8 +234,15 @@ public class UserVoiceCommands(
         try
         {
             ServerAudioResource audioResource = audioStates.GetOrAdd(Context.Guild.Id);
-            if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText) || position < 1 || position >= audioResource.MusicRequests.Count)
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText))
             {
+                return;
+            }
+
+            //Position 0 is the song playing, which !skip is for (a position out of range answered nothing until 2026-11-23)
+            if (position < 1 || position >= audioResource.MusicRequests.Count)
+            {
+                _ = await ReplyAsync("There is no song at that position in the queue!");
                 return;
             }
 
@@ -226,8 +264,15 @@ public class UserVoiceCommands(
         try
         {
             ServerAudioResource audioResource = audioStates.GetOrAdd(Context.Guild.Id);
-            if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText) || audioResource.MusicRequests.Count < 2)
+            if (!await IsCommandAllowedAsync(ChannelTypeEnum.MusicText))
             {
+                return;
+            }
+
+            //The playing song stays first, so it takes two songs after it (fewer answered nothing until 2026-11-23)
+            if (audioResource.MusicRequests.Count < 3)
+            {
+                _ = await ReplyAsync("There is nothing to shuffle!");
                 return;
             }
 

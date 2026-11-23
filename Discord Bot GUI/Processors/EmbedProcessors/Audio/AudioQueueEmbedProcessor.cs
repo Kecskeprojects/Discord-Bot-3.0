@@ -12,7 +12,8 @@ public static class AudioQueueEmbedProcessor
         EmbedBuilder builder = new();
 
         int songcount = audioResource.MusicRequests.Count;
-        _ = builder.WithTitle($"Queue (page {index} of {Math.Ceiling((songcount - 1) / 10.0)}):");
+        //At least one page, the playing song's (it said "page 1 of 0" until 2026-11-23)
+        _ = builder.WithTitle($"Queue (page {index} of {Math.Max(1, Math.Ceiling((songcount - 1) / 10.0))}):");
 
         int time = 0;
         for (int i = 0; i < audioResource.MusicRequests.Count; i++)
