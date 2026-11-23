@@ -435,7 +435,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
          - **`!ping` failed for more fans than one message holds.** Discord takes 2000 characters per message, about 90 mentions. All of them went into one message, which Discord.Net refuses. The command had been deleted by then, so nobody was pinged and only an error was logged. The mentions are now sent in as many messages as they need.
          - **Replies for the owner commands that answered nothing** when a part was missing (`!biaslist add/remove`, `!edit biasdata` without a group, `!bias alias add/remove` without all three parts). They now give the format.
          - `!my biases` takes its 1-in-10 remark roll from the injected `Random`, so tests decide it.
-       - **Open, for the owner to decide: names and groups that contain a hyphen (confirmed on LocalDB 2026-11-23).**
+       - **Names and groups that contain a hyphen (confirmed on LocalDB 2026-11-23; left as it is until it becomes a problem, decided the same day).**
          - The bias commands split their text on `-` to tell the name from the group. So does `!ping`'s query, for each name.
          - An idol named `j-hope` or a group named `(g)i-dle` therefore can't be added, removed or edited by name. `!bias add j-hope`, `j-hope-bts`, `(g)i-dle` and `miyeon-(g)i-dle` all answer "Bias not in database." `!ping j-hope` and `!ping (g)i-dle` find nothing.
          - `!ping miyeon-(g)i-dle` works only because three parts make it ignore the group.
@@ -444,7 +444,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
            ```sql
            SELECT Name FROM Idol WHERE Name LIKE '%-%' UNION ALL SELECT Name FROM IdolGroup WHERE Name LIKE '%-%'
            ```
-         - A possible fix: try the whole text as a name, alias or group first, and only then split, trying each `-` as the separator until one matches.
+         - A fix was tried and dropped on 2026-11-23. It took as the separator the `-` before an existing group's name, and looked up `!ping`'s whole text first and then each `-` in turn. For `!biaslist add` it fell back to the first `-`, since that command may create the group. It worked for all the cases above on LocalDB, if this is ever needed.
   8. Commands with a random branch: `UserBiasGameCommands.BiasGameStop` answers with an easter egg 1 time in 100. **Done 2026-11-19:** it takes the injected `Random`, and `Integration/BiasGame/BiasGameStopTests` (5 cases) covers:
      - stopping a game: the reply, the game's message deleted, the game disposed, and all three aliases
      - no game to stop: nothing is said
