@@ -258,6 +258,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
     - The Mapster mappings (added 2026-11-19, 48 more cases, 140 in all; see "Next" item 1)
     - Seven DB services over substitute repositories (added 2026-11-19, 79 more cases, 219 in all; see "Next" item 2)
     - The other twelve DB services and `UserIdolStatisticTools` (added 2026-11-19, 147 more cases, 404 in all with the LocalDB ones below)
+    - The text, number, collection, URL and channel-type helpers, the list and server-settings embeds, and `TwitchNotificationFeature` (added 2026-11-23, 67 more cases, 597 in all; see "Next" items 3 and 9)
   - Integration on LocalDB (added 2026-11-19, 38 more cases, 257 in all; see "Next" item 5):
     - Settings channels, the server's row, roles and Twitch channels, and the cached server across scopes.
     - The bias list, reminders, birthdays and mutes.
@@ -329,6 +330,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
        - Known consequences, accepted:
          - A muted user who can still post in the role channel could take the mute role off with `-muted`; that depends on the server's channel permissions.
          - `!self role remove` fails while the role is in use as the mute, notification or poll role (its foreign key), and the admin is told it could not be removed.
+     - `TwitchNotificationFeature` too (2026-11-23, 5 cases): the post in the notification channel with the role ping and the stream's embed (the thumbnail sized 1024x576), no role or title, no notification channel, a deleted channel, and a server that didn't load. Nothing new turned up. The notification channel is one per server, so a failure can't stop other channels.
   4. More Last.fm (recents, now playing, who-knows, artist stats). Saved responses recorded from the real API would replace the hand-built JSON in `LastFmResponses`.
   5. The DB layer on LocalDB (see "Repositories and the database"). **First batch done 2026-11-19:**
      - Six classes in `Integration/Database/` cover the real services, repositories and cache:
@@ -366,6 +368,12 @@ Yes, the bot's test project can run integration tests: real services wired toget
      - stopping a game: the reply, the game's message deleted, the game disposed, and all three aliases
      - no game to stop: nothing is said
      - the easter egg: the game keeps going
+  9. The static helpers and the simple embeds. **Done 2026-11-23** (62 cases):
+     - Helpers (`Unit/Bot/Tools/`): `StringTools` (the 1st/2nd/3rd/11th endings, reading "1d 2h 30m"), `NumberTools`, `CollectionTools` (the shuffle keeps the playing song first and every song once), `UrlTools`, `ChannelTypeEnumTools`, `StringExtension` (`ToMockText` never gives three capitals in a row) and `TimeSpanExtension`.
+     - Embeds: the birthday, greeting, custom command and reminder lists, and `!server settings`.
+     - **Fixed (each confirmed by its test failing first):** Discord.Net refuses an embed with more than 25 fields or an empty field value, so these lists failed whole.
+       - **`!birthday list` failed at 16, 31 or 46 birthdays, and at more than 60.** A field opens after every 15th birthday (the first field holds 16), so a list ending there left a new, empty field. The loop also stops when the fifth field opens, which left that field empty for any longer list. Empty fields are now skipped. The list shows the first 61, with "N more not shown" in the footer.
+       - **`!greeting list` and `!remind list` failed past 25 entries** (one field each). They now show 25 and the same footer. The reminders are by date, so those are the soonest, and `!remind remove` still takes any position.
 
 ## 3. Discord.Net: optional modernization (investigated 2026-11-15)
 
@@ -441,6 +449,7 @@ Can the disabled embeds be turned back on as they are, with adjustments and with
 - `TwitterScraper.ModifyImageUrl`: `url.Split(".").Length > 1` is always true for `https://pbs.twimg.com/...`, so the size and format logic after it never runs.
 - `TwitterScraper.ExtractFromUrl` calls `DeleteCookieAsync()` without arguments, which deletes nothing.
 - Posts X marks as sensitive (`NsfwLoggedOut`) can't be seen logged out at all.
+- `UrlTools.SanitizeText`, which puts the links in a caption in angle brackets so Discord doesn't embed them, brackets a link twice (`<<https://x.com/p>>`) when it's already bracketed or appears twice: `Replace` changes every copy, and the next pass finds the copy again with the `>` attached (found with a probe 2026-11-23). Only these two embeds use it.
 
 ## 8. MainDB as an SDK-style SQL project (investigated 2026-11-19, not started)
 

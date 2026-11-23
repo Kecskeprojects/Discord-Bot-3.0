@@ -10,9 +10,15 @@ public static class GreetingListEmbedProcessor
         EmbedBuilder builder = new();
         _ = builder.WithTitle("Greetings:");
 
-        foreach (GreetingResource greeting in greetings)
+        //Discord allows 25 fields in an embed
+        foreach (GreetingResource greeting in greetings.Take(EmbedBuilder.MaxFieldCount))
         {
             _ = builder.AddField($"ID:{greeting.GreetingId}", greeting.Url);
+        }
+
+        if (greetings.Count > EmbedBuilder.MaxFieldCount)
+        {
+            _ = builder.WithFooter($"{greetings.Count - EmbedBuilder.MaxFieldCount} more not shown");
         }
 
         return [builder.Build()];
