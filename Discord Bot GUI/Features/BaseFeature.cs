@@ -1,5 +1,4 @@
-﻿using DatabaseORM.Enums;
-using DatabaseORM.Interface;
+﻿using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord.Commands;
@@ -52,30 +51,8 @@ public abstract class BaseFeature(IServerService serverService, IBotLogger logge
             ?? throw new InvalidOperationException($"Server {Context.Guild.Id} could not be loaded from the database");
     }
 
-    protected async Task<bool> IsCommandAllowedAsync(ChannelTypeEnum type, bool allowLackOfType = true)
-    {
-        if (DiscordTools.IsDM(Context))
-        {
-            return false;
-        }
-
-        ServerResource server = await GetCurrentServerAsync();
-        return DiscordTools.IsTypeOfChannel(server, type, Context.Channel.Id, allowLackOfType);
-    }
-
     protected string GetCurrentUserNickname()
     {
         return DiscordTools.GetNickName(Context);
-    }
-
-    protected async Task<bool> IsCommandAllowedAsync(ChannelTypeEnum type, bool allowLackOfType = true, bool canBeDM = false)
-    {
-        if (DiscordTools.IsDM(Context))
-        {
-            return canBeDM;
-        }
-
-        ServerResource server = await GetCurrentServerAsync();
-        return DiscordTools.IsTypeOfChannel(server, type, Context.Channel.Id, allowLackOfType);
     }
 }

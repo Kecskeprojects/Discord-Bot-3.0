@@ -36,6 +36,7 @@ public sealed class PlayTests : IDisposable
     private readonly IGuildUser member = DiscordMocks.GuildUser();
     private readonly IGuildUser bot = DiscordMocks.GuildUser(DiscordIds.Bot);
     private readonly IVoiceChannel voice = Substitute.For<IVoiceChannel>();
+    private readonly IAudioClient audioClient = Substitute.For<IAudioClient>();
     private readonly RecordingChannel channel = RecordingChannel.Text();
 
     public PlayTests()
@@ -45,7 +46,6 @@ public sealed class PlayTests : IDisposable
         ServerHas([]);
         audio = host.Services.GetRequiredService<AudioStateStore>().GetOrAdd(DiscordIds.Server);
 
-        IAudioClient audioClient = Substitute.For<IAudioClient>();
         voice.Id.Returns(VoiceId);
         voice.ConnectAsync(default, default, default, default).ReturnsForAnyArgs(audioClient);
         member.Nickname.Returns("Ali");
@@ -138,6 +138,9 @@ public sealed class PlayTests : IDisposable
         await voice.Received().DisconnectAsync();
         Assert.Empty(audio.MusicRequests);
         Assert.False(audio.AudioVariables.Playing);
+        //The session's voice client goes with it (until 2026-11-23 it was replaced without being disposed)
+        audioClient.Received().Dispose();
+        Assert.Null(audio.AudioVariables.AudioClient);
     }
 
     [Fact]

@@ -89,6 +89,8 @@ public class AudioPlayFeature(
         finally
         {
             audioResource.AudioVariables.Playing = false;
+            //The session's voice client goes with its variables (until 2026-11-23 they were replaced without being disposed)
+            audioResource.AudioVariables.Dispose();
             audioResource.AudioVariables = new();
             audioResource.MusicRequests.Clear();
         }

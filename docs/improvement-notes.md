@@ -508,8 +508,9 @@ Yes, the bot's test project can run integration tests: real services wired toget
            - `!shuffle` with fewer than two songs after the playing one: "There is nothing to shuffle!" With one queued song it used to say "Shuffle complete!" while nothing could change.
        - Seen, not changed:
          - The commands change the queue list while the play loop reads it, without a lock. A clash is unlikely and depends on timing, so no test covers it.
-         - The play loop's `finally` replaces `AudioVariables` without disposing the old one, so its `AudioClient` isn't disposed there.
-         - No feature calls `BaseFeature.IsCommandAllowedAsync` any more, now that the voice check compares the voice channel directly; its two overloads are unused.
+       - **Done after the batch (2026-11-23):**
+         - The play loop's `finally` replaced `AudioVariables` without disposing the old one, so its `AudioClient` was never disposed. It is disposed now, and the loop test checks it.
+         - No feature called `BaseFeature.IsCommandAllowedAsync` any more, now that the voice check compares the voice channel directly. Its two overloads are removed; the owner will check whether that should stay so.
   8. Commands with a random branch: `UserBiasGameCommands.BiasGameStop` answers with an easter egg 1 time in 100. **Done 2026-11-19:** it takes the injected `Random`, and `Integration/BiasGame/BiasGameStopTests` (5 cases) covers:
      - stopping a game: the reply, the game's message deleted, the game disposed, and all three aliases
      - no game to stop: nothing is said
