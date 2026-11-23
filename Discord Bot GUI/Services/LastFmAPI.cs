@@ -292,7 +292,8 @@ public class LastFmAPI(
         string mbid = albums.Count == 0 ? tracks[0].Artist.Mbid : albums[0].Artist.Mbid;
         //Albums count by the album's artist and tracks by the track's, so a collaboration can give albums without tracks
         //(that threw until 2026-11-23); the cover is then searched by the top album
-        (string searchArtist, string searchItem) = tracks.Count > 0 ? (tracks[0].Artist.Name, tracks[0].Name) : (albums[0].Artist.Name, albums[0].Name);
+        string searchArtist = tracks.Count > 0 ? tracks[0].Artist.Name : albums[0].Artist.Name;
+        string searchItem = tracks.Count > 0 ? tracks[0].Name : albums[0].Name;
         SpotifyImageSearchResult? spotifySearch = await spotifyAPI.SearchItemAsync(mbid, searchArtist, searchItem);
         result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (albums.Count == 0 ? tracks[0].Image?[^1].Text : albums[0].Image?[^1].Text);
 
