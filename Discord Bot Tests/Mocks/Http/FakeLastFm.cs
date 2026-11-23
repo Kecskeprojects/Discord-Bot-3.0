@@ -1,4 +1,6 @@
-﻿using LastFmApi;
+﻿using Discord_Bot.Interfaces.Services;
+using Discord_Bot.Tests.Common.Tools;
+using LastFmApi;
 using RestSharp;
 
 namespace Discord_Bot.Tests.Mocks.Http;
@@ -20,6 +22,12 @@ public sealed class FakeLastFm : IDisposable
 
     public FakeHttpHandler Handler { get; }
     public BaseRequests Requests { get; }
+
+    //A TestHost whose LastFmAPI asks this fake; Spotify finds no cover, so Last.fm's own image is used
+    public TestHost Host()
+    {
+        return new TestHost().Replace(Requests).Replace(Substitute.For<ISpotifyAPI>());
+    }
 
     public void Dispose()
     {

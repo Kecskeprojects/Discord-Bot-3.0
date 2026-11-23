@@ -275,6 +275,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
     - The bias commands, `!ping` and its query on LocalDB, and the idol edit menu with its modals (added 2026-11-23, 74 more cases, 822 in all; see "Next" item 7)
     - The weekly poll and preset text commands, the randomizer commands and `!wotd` (added 2026-11-23, 45 more cases, 867 in all; see "Next" item 7)
     - Who may manage weekly polls and presets: refusals for a member who can create polls and for an administrator who isn't the owner (added 2026-11-23, 2 more cases, 869 in all)
+    - Last.fm: the service over a fake Last.fm, every `!lf` command and the embeds (added 2026-11-23, 51 more cases, 920 in all; see "Next" item 4)
 - **Next, roughly in order of value:**
   1. The Mapster mappings (`DatabaseMapperConfig`, `MapperConfig`). **Done 2026-11-19:**
      - The tests cover every hand-written mapping, including navigations a query didn't load. One theory compiles each resource mapping with `RequireDestinationMemberSource`, so a new resource member without a mapping fails it.
@@ -337,7 +338,28 @@ Yes, the bot's test project can run integration tests: real services wired toget
          - A muted user who can still post in the role channel could take the mute role off with `-muted`; that depends on the server's channel permissions.
          - `!self role remove` fails while the role is in use as the mute, notification or poll role (its foreign key), and the admin is told it could not be removed.
      - `TwitchNotificationFeature` too (2026-11-23, 5 cases): the post in the notification channel with the role ping and the stream's embed (the thumbnail sized 1024x576), no role or title, no notification channel, a deleted channel, and a server that didn't load. Nothing new turned up. The notification channel is one per server, so a failure can't stop other channels.
-  4. More Last.fm (recents, now playing, who-knows, artist stats). Saved responses recorded from the real API would replace the hand-built JSON in `LastFmResponses`.
+  4. More Last.fm (recents, now playing, who-knows, artist stats). Saved responses recorded from the real API would replace the hand-built JSON in `LastFmResponses`. **Done 2026-11-23:**
+     - `Integration/LastFm/ListeningTests` and `ArtistAndWhoKnowsTests` run the bot's `LastFmAPI` over the LastFmApi library and a fake Last.fm:
+       - top albums and artists with their share of all plays, recents with the now-playing track first
+       - now playing with the previous track, the user's plays of it and its monthly ranking
+       - artist stats, including the `lastfm_artist_input_replacement` config
+       - who-knows by artist, by artist and track, and by what the user plays now
+     - `LastFmResponses` builds each response the bot reads, and `Router` answers by Last.fm method and user. `FakeLastFm.Host()` gives a TestHost over the fake.
+     - `LastFmCommandTests` runs every `!lf` command through the command service with the service replaced:
+       - connecting and disconnecting, the reply without a linked account
+       - the titles, Last.fm's messages passed on
+       - who-knows among the server's members, sent as the ranking image or as text
+     - `LastFmEmbedProcessorTests` covers the list, now playing, artist and who-knows embeds.
+     - **Fixed (each confirmed by its test failing first, or by a probe for `!lf rc`):**
+       - **`!lf np` threw for a new account.** With no scrobbles it read the first track, and with one it read the previous track. It now says there is nothing yet, and leaves out the previous track when there is none, along with its embed field.
+       - **`!lf rc` with a length over 30 threw** once there were more than 30 tracks, as the list has room for 30. It now takes 10 instead of any length outside 1 to 30, as the top lists already did.
+       - **`!lf artist` threw when the user had albums but no tracks of the artist.** Albums count by the album's artist and tracks by the track's, so a collaboration (`Sour Candy`, credited to Lady Gaga & BLACKPINK, on a BLACKPINK album) can do that. The cover is then searched by the top album.
+       - **`!lf whoknows` threw when two listeners shared a nickname,** as the ranking is keyed by the name shown. The second now gets their Last.fm name added: "Alice (alice-fm)".
+       - **`!lf whoknows` without the ranking image threw past 45 listeners** (three fields of 15). It now shows 45 and counts the rest in the footer.
+     - **Seen and kept as they are (decided 2026-11-23):**
+       - Who-knows stops at the first listener Last.fm answers with an error. So a linked member whose Last.fm account was deleted might break it for the whole server. Unverified: it depends on whether Last.fm answers `track.getInfo`/`artist.getInfo` for an unknown username with an error or without a play count.
+       - `!lf artist` pages through the user's whole library, 1000 items a page, until it has 5 albums and 8 tracks of the artist. For a large library and a rarely played artist that is many requests. The owner knew of it; Last.fm offers no better way to get one user's plays of one artist's albums and tracks.
+       - The top lists' parameter check throws for three or more words (`!lf tal 10 7day extra`), and the command then answers nothing.
   5. The DB layer on LocalDB (see "Repositories and the database"). **First batch done 2026-11-19:**
      - Six classes in `Integration/Database/` cover the real services, repositories and cache:
        - `SettingsChannelTests` and `ServerSettingsTests`: the settings, with the cached server read before and after each change

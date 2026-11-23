@@ -173,6 +173,14 @@ public class LastFmAPI(
             }
             return result;
         }
+
+        //A new account has no scrobbles yet (this threw until 2026-11-23)
+        if (restResult.Response.Track.Count == 0)
+        {
+            result.Message = "You haven't listened to anything recently!";
+            return result;
+        }
+
         LastFmApi.Models.Recent.Track track = restResult.Response.Track[0];
 
         SpotifyImageSearchResult? spotifySearch = await spotifyAPI.SearchItemAsync(track.Artist.Mbid, track.Artist.Text, track.Name);
@@ -282,7 +290,10 @@ public class LastFmAPI(
         }
 
         string mbid = albums.Count == 0 ? tracks[0].Artist.Mbid : albums[0].Artist.Mbid;
-        SpotifyImageSearchResult? spotifySearch = await spotifyAPI.SearchItemAsync(mbid, tracks[0].Artist.Name, tracks[0].Name);
+        //Albums count by the album's artist and tracks by the track's, so a collaboration can give albums without tracks
+        //(that threw until 2026-11-23); the cover is then searched by the top album
+        (string searchArtist, string searchItem) = tracks.Count > 0 ? (tracks[0].Artist.Name, tracks[0].Name) : (albums[0].Artist.Name, albums[0].Name);
+        SpotifyImageSearchResult? spotifySearch = await spotifyAPI.SearchItemAsync(mbid, searchArtist, searchItem);
         result.ImageUrl = spotifySearch != null ? spotifySearch.ImageUrl : (albums.Count == 0 ? tracks[0].Image?[^1].Text : albums[0].Image?[^1].Text);
 
         GenericResponseItem<LastFmApi.Models.ArtistInfo.Artist> artistInfo =
@@ -368,7 +379,13 @@ public class LastFmAPI(
             return result;
         }
 
-        result.Plays = restResult.Response.Plays.OrderByDescending(x => x.Value).ToDictionary(x => users.First(y => y.LastFmUsername == x.Key).Username ?? x.Key, x => x.Value);
+        //Each listener under their name on the server; nicknames aren't unique, so a name already listed gets the Last.fm name added
+        //(two listeners with the same one threw until 2026-11-23)
+        foreach (KeyValuePair<string, int> play in restResult.Response.Plays.OrderByDescending(x => x.Value))
+        {
+            string name = users.First(y => y.LastFmUsername == play.Key).Username ?? play.Key;
+            result.Plays[result.Plays.ContainsKey(name) ? $"{name} ({play.Key})" : name] = play.Value;
+        }
 
         return result;
     }

@@ -60,7 +60,8 @@ public class LastFmWhoKnowsEmbedProcessor(IWhoKnowsImageProcessor whoKnowsImageP
         string[] list = ["", "", ""];
         int i = 1;
         int index = 0;
-        foreach (KeyValuePair<string, int> userplays in wk.Plays)
+        //Three fields of 15, so the list stops at 45 listeners (a 46th threw until 2026-11-23)
+        foreach (KeyValuePair<string, int> userplays in wk.Plays.Take(list.Length * 15))
         {
             //One line in embed
             list[index] += $"`#{i}` **{userplays.Key}** with *{userplays.Value} plays*";
@@ -82,6 +83,11 @@ public class LastFmWhoKnowsEmbedProcessor(IWhoKnowsImageProcessor whoKnowsImageP
             {
                 _ = builder.AddField("\u200b", item, false);
             }
+        }
+
+        if (wk.Plays.Count > list.Length * 15)
+        {
+            _ = builder.WithFooter($"{wk.Plays.Count - (list.Length * 15)} more not shown");
         }
     }
 }

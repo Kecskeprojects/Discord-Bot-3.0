@@ -14,8 +14,12 @@ public static class LastFmNowPlayingTools
         result.AlbumName = track.Album.Text;
         result.ArtistMbid = track.Artist.Mbid;
 
-        result.SecondTrackArtist = recentTracks.Track[1].Artist.Text;
-        result.SecondTrackName = recentTracks.Track[1].Name;
+        //After a single scrobble there is no previous track (that threw until 2026-11-23)
+        if (recentTracks.Track.Count > 1)
+        {
+            result.SecondTrackArtist = recentTracks.Track[1].Artist.Text;
+            result.SecondTrackName = recentTracks.Track[1].Name;
+        }
         if (spotifySearch != null)
         {
             result.ImageUrl = spotifySearch.ImageUrl;

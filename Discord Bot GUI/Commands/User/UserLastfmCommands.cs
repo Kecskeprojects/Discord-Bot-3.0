@@ -258,6 +258,12 @@ public class UserLastfmCommands(
                 return;
             }
 
+            //The list has room for 30, like the top lists, which also take 10 instead of more (until 2026-11-23 more threw)
+            if (limit is < 1 or > 30)
+            {
+                limit = 10;
+            }
+
             LastFmListResult response = await lastFmAPI.GetRecentsAsync(user.LastFmUsername, limit);
 
             if (string.IsNullOrEmpty(response.Message))

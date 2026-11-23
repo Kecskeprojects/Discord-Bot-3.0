@@ -13,7 +13,10 @@ public class LastFmNowPlayingEmbedProcessor : LastFmBaseEmbedProcessor
         _ = builder.WithTitle(nowPlaying.TrackName);
         _ = builder.WithUrl(nowPlaying.Url);
         _ = builder.AddField($"By *{nowPlaying.ArtistName}*", $"**On *{nowPlaying.AlbumName}***");
-        _ = builder.AddField("__Previous Track__", $"*{nowPlaying.SecondTrackName}* By *{nowPlaying.SecondTrackArtist}*");
+        if (!string.IsNullOrEmpty(nowPlaying.SecondTrackName))
+        {
+            _ = builder.AddField("__Previous Track__", $"*{nowPlaying.SecondTrackName}* By *{nowPlaying.SecondTrackArtist}*");
+        }
 
         string footerString = !string.IsNullOrEmpty(nowPlaying.TrackPlays) ? $"{nowPlaying.TrackPlays} listen" : "";
 
