@@ -78,4 +78,29 @@ public static class DiscordMocks
         click.Type.Returns(InteractionType.MessageComponent);
         return click;
     }
+
+    //A submitted modal with this custom ID; the interaction service reads each text input's value by its custom ID.
+    //RespondAsync succeeds; check it with Received()
+    public static IModalInteraction ModalSubmit(string customId, IReadOnlyDictionary<string, string> inputs, IUser user)
+    {
+        List<IComponentInteractionData> components = [];
+        foreach ((string inputId, string value) in inputs)
+        {
+            IComponentInteractionData input = Substitute.For<IComponentInteractionData>();
+            input.CustomId.Returns(inputId);
+            input.Type.Returns(ComponentType.TextInput);
+            input.Value.Returns(value);
+            components.Add(input);
+        }
+
+        IModalInteractionData data = Substitute.For<IModalInteractionData>();
+        data.CustomId.Returns(customId);
+        data.Components.Returns(components);
+
+        IModalInteraction submit = Substitute.For<IModalInteraction>();
+        submit.Data.Returns(data);
+        submit.User.Returns(user);
+        submit.Type.Returns(InteractionType.ModalSubmit);
+        return submit;
+    }
 }

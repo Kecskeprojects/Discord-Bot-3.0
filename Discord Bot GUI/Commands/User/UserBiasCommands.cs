@@ -21,6 +21,7 @@ public class UserBiasCommands(
     IUserIdolService userIdolService,
     IIdolService idolService,
     IIdolGroupService idolGroupService,
+    Random random,
     IServerService serverService,
     IBotLogger logger,
     IConfig config) : BaseCommand(logger, config, serverService)
@@ -28,6 +29,7 @@ public class UserBiasCommands(
     private readonly IUserIdolService userIdolService = userIdolService;
     private readonly IIdolService idolService = idolService;
     private readonly IIdolGroupService idolGroupService = idolGroupService;
+    private readonly Random random = random;
 
     [Command("bias add")]
     [Summary("Adding a new bias to your list, the group is optional but may be needed if multiple idols of the same stage name exist")]
@@ -191,15 +193,14 @@ public class UserBiasCommands(
             _ = await ReplyAsync(result.Message, components: result.Component);
 
             //Generate a random number, 10% chance for an additional message to appear
-            Random r = new();
-            if (r.Next(0, 10) == 0)
+            if (random.Next(0, 10) == 0)
             {
                 //Pick a random bias
-                string bias = list[r.Next(0, list.Count)].Name;
+                string bias = list[random.Next(0, list.Count)].Name;
                 //Also make the first letter upper case
                 bias = bias.ToUpper();
 
-                string baseMessage = Constant.BiasExtraMessage[r.Next(0, Constant.BiasExtraMessage.Length)];
+                string baseMessage = Constant.BiasExtraMessage[random.Next(0, Constant.BiasExtraMessage.Length)];
                 string message = string.Format(CultureInfo.InvariantCulture, baseMessage, bias);
 
                 _ = await ReplyAsync(message);
@@ -295,12 +296,24 @@ public class UserBiasCommands(
                     return;
                 }
 
-                //Make a list of mentions out of them
-                string message = string.Join(" ", guildUsers.Select(u => u.Mention));
+                //Make a list of mentions out of them; Discord takes 2000 characters per message, about 90 mentions, so a longer
+                //list goes in several (until 2026-11-23 it went in one, which Discord refused after the command was deleted)
+                List<string> messages = [""];
+                foreach (string mention in guildUsers.Select(u => u.Mention))
+                {
+                    if (messages[^1].Length + 1 + mention.Length > DiscordConfig.MaxMessageSize)
+                    {
+                        messages.Add("");
+                    }
+                    messages[^1] = messages[^1].Length == 0 ? mention : $"{messages[^1]} {mention}";
+                }
 
                 //delete command and send mentions
                 await Context.Message.DeleteAsync();
-                _ = await ReplyAsync(message);
+                foreach (string message in messages)
+                {
+                    _ = await ReplyAsync(message);
+                }
             }
         }
         catch (Exception ex)

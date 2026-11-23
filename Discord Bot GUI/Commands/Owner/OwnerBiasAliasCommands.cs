@@ -25,8 +25,10 @@ public class OwnerBiasAliasCommands(
         try
         {
             string[] paramArray = GetParametersBySplit(parameters, '-');
+            //It answered nothing until 2026-11-23
             if (paramArray.Length != 3)
             {
+                _ = await ReplyAsync("Give the alias, the name and the group in the following format: [alias]-[name]-[group].");
                 return;
             }
 
@@ -63,8 +65,10 @@ public class OwnerBiasAliasCommands(
         try
         {
             string[] paramArray = GetParametersBySplit(parameters, '-');
+            //It answered nothing until 2026-11-23
             if (paramArray.Length != 3)
             {
+                _ = await ReplyAsync("Give the alias, the name and the group in the following format: [alias]-[name]-[group].");
                 return;
             }
 

@@ -174,7 +174,7 @@ No interface needed:
 - `CommandService` / `InteractionService` (Discord.Net): only the handlers and the help command use them.
 
 Randomness and files (no interface, but tests have to account for them):
-- **Randomness:** `new Random()` appears in `CollectionTools`, `StringExtension.ToMockText`, `RainbowRandomizerTools`, `BirthdayMessageProcessor`, `WhoKnowsImageProcessor` (file names), `YoutubeAPI` (key choice) and several commands. Tests can check properties (a shuffle keeps every item), or the code takes the injected `Random`, as `EasterEggFeature` does since 2026-11-19 (described in CLAUDE.md "Randomness").
+- **Randomness:** `new Random()` appears in `CollectionTools`, `StringExtension.ToMockText`, `RainbowRandomizerTools`, `BirthdayMessageProcessor`, `WhoKnowsImageProcessor` (file names) and `UserRandomizeCommands`; `YoutubeKeyStore` picks a key with `Random.Shared` (checked 2026-11-23). Tests can check properties (a shuffle keeps every item), or the code takes the injected `Random`, as `EasterEggFeature` does since 2026-11-19 and `!my biases` since 2026-11-23 (described in CLAUDE.md "Randomness").
 - **Files:** `RainbowRandomizerTools.GetOperatorList` reads `R6_Attackers.txt` / `R6_Defenders.txt` from the working directory. Copy them to the test output, or pass the list in.
 
 ### Not worth unit-testing
@@ -272,6 +272,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
     - `!remind`, `!birthday` (and the admin's `!birthday a`), and `!help` with its category menu, plus `BaseCommand` and the message processors as unit tests (added 2026-11-23, 79 more cases, 674 in all; the container test lost two cases when the base classes became abstract; see "Next" item 7)
     - The replies for input the reminder, birthday and mute commands couldn't read (added 2026-11-23, 16 more cases, 690 in all)
     - The server setup and owner commands, and the LocalDB queries for custom commands, greetings and users (added 2026-11-23, 58 more cases, 748 in all; see "Next" items 5 and 7)
+    - The bias commands, `!ping` and its query on LocalDB, and the idol edit menu with its modals (added 2026-11-23, 74 more cases, 822 in all; see "Next" item 7)
 - **Next, roughly in order of value:**
   1. The Mapster mappings (`DatabaseMapperConfig`, `MapperConfig`). **Done 2026-11-19:**
      - The tests cover every hand-written mapping, including navigations a query didn't load. One theory compiles each resource mapping with `RequireDestinationMemberSource`, so a new resource member without a mapping fails it.
@@ -419,6 +420,31 @@ Yes, the bot's test project can run integration tests: real services wired toget
          - `!command add` accepts a name a built-in command or alias already has (`help`, `customlist`). Such a command never runs, since `CommandHandler` falls back to custom commands only when no built-in one matches; no check is needed.
          - `!greeting add` takes any text, not only a link: greetings were never meant to be links only.
        - Seen, not changed: the Twitch monitor reloads its channel list every tick, so `!twitch add` applies without a restart. It skips an empty list, though, so after the last channel anywhere is removed it keeps checking that one. Its notification then finds no server and sends nothing.
+     - **Third batch done 2026-11-23:** the bias commands.
+       - `Integration/Biases/BiasCommandTests`:
+         - `!bias add/remove` by name, by `name-group` and by a whole group, with each result message
+         - `!bias clear`, `!my biases` (the menu, one group's members, the remark) and `!bias list`
+         - `!ping`: who is pinged, the sender and users who left the server left out, both "nobody else" replies, and the command deleted
+       - `Integration/Biases/OwnerBiasCommandTests`: `!biaslist add/remove`, `!bias alias add/remove` and `!edit biasdata`, owner-only.
+       - `Integration/Biases/BiasEditTests`:
+         - `!edit biasdata`'s menu through the interaction service: each action opens its modal for the idol, filled with its data, and an unknown idol or group is answered.
+         - Each modal submitted, with the values reaching the service. `DiscordMocks.ModalSubmit` is the new fake for this.
+       - `Integration/Database/BiasPingTests`: `!ping`'s query (`GetUsersByIdolsAsync`) by name, name-group, alias and group, each fan once over several names.
+       - The edit modals' maximum lengths match or exceed the columns they edit, so a saved value always fits its modal (checked 2026-11-23).
+       - **Fixed (each confirmed by its test failing first):**
+         - **`!ping` failed for more fans than one message holds.** Discord takes 2000 characters per message, about 90 mentions. All of them went into one message, which Discord.Net refuses. The command had been deleted by then, so nobody was pinged and only an error was logged. The mentions are now sent in as many messages as they need.
+         - **Replies for the owner commands that answered nothing** when a part was missing (`!biaslist add/remove`, `!edit biasdata` without a group, `!bias alias add/remove` without all three parts). They now give the format.
+         - `!my biases` takes its 1-in-10 remark roll from the injected `Random`, so tests decide it.
+       - **Open, for the owner to decide: names and groups that contain a hyphen (confirmed on LocalDB 2026-11-23).**
+         - The bias commands split their text on `-` to tell the name from the group. So does `!ping`'s query, for each name.
+         - An idol named `j-hope` or a group named `(g)i-dle` therefore can't be added, removed or edited by name. `!bias add j-hope`, `j-hope-bts`, `(g)i-dle` and `miyeon-(g)i-dle` all answer "Bias not in database." `!ping j-hope` and `!ping (g)i-dle` find nothing.
+         - `!ping miyeon-(g)i-dle` works only because three parts make it ignore the group.
+         - An alias can't help either, because `!bias alias add` splits on `-` too. Only adding the whole group (`!bias add bts`) reaches such an idol.
+         - **To check on the live database** whether any names are affected:
+           ```sql
+           SELECT Name FROM Idol WHERE Name LIKE '%-%' UNION ALL SELECT Name FROM IdolGroup WHERE Name LIKE '%-%'
+           ```
+         - A possible fix: try the whole text as a name, alias or group first, and only then split, trying each `-` as the separator until one matches.
   8. Commands with a random branch: `UserBiasGameCommands.BiasGameStop` answers with an easter egg 1 time in 100. **Done 2026-11-19:** it takes the injected `Random`, and `Integration/BiasGame/BiasGameStopTests` (5 cases) covers:
      - stopping a game: the reply, the game's message deleted, the game disposed, and all three aliases
      - no game to stop: nothing is said

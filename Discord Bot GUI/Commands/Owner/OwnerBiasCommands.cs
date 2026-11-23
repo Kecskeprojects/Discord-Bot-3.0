@@ -30,8 +30,10 @@ public class OwnerBiasCommands(
         try
         {
             string[] paramArray = GetParametersBySplit(parameters, '-');
+            //It answered nothing until 2026-11-23
             if (paramArray.Length != 2)
             {
+                _ = await ReplyAsync("Give both the name and the group in the following format: [name]-[group].");
                 return;
             }
 
@@ -66,8 +68,10 @@ public class OwnerBiasCommands(
         try
         {
             string[] paramArray = GetParametersBySplit(parameters, '-');
+            //It answered nothing until 2026-11-23
             if (paramArray.Length != 2)
             {
+                _ = await ReplyAsync("Give both the name and the group in the following format: [name]-[group].");
                 return;
             }
 
@@ -100,8 +104,10 @@ public class OwnerBiasCommands(
         {
             //Make the name lowercase and clear and accidental spaces
             string[] paramArray = GetParametersBySplit(parameters, '-');
+            //It answered nothing until 2026-11-23
             if (paramArray.Length != 2)
             {
+                _ = await ReplyAsync("Give both the name and the group in the following format: [name]-[group].");
                 return;
             }
 
