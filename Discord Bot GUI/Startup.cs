@@ -124,19 +124,19 @@ public static class Startup
         //Services
         _ = collection.AddSingleton<IBrowserService, BrowserService>();
         _ = collection.AddSingleton<IWebService, WebService>();
-        _ = collection.AddTransient<ITwitchAPI, TwitchAPI>();
+        _ = collection.AddTransient<TwitchAPI>();
         _ = collection.AddTransient<ITwitchCLI, TwitchCLI>();
         _ = collection.AddTransient<ISpotifyAPI, Services.SpotifyAPI>();
         _ = collection.AddSingleton<ISpotifyClientFactory, SpotifyClientFactory>();
         _ = collection.AddTransient<IYoutubeAPI, YoutubeAPI>();
         _ = collection.AddSingleton<IYoutubeDataClient, YoutubeDataClient>();
-        //collection.AddTransient<IInstaLoader, InstaLoader>();
-        _ = collection.AddTransient<IInstaScraper, InstaScraper>();
+        //collection.AddTransient<InstaLoader>();
+        _ = collection.AddTransient<InstaScraper>();
         _ = collection.AddTransient<IWordOfTheDayService, WordOfTheDayService>();
         _ = collection.AddTransient<IYoutubeDownloadService, YoutubeStreamService>();
         _ = collection.AddTransient<ILastFmAPI, LastFmAPI>();
         _ = collection.AddTransient<IMusicBrainzAPI, MusicBrainzAPI>();
-        _ = collection.AddTransient<ITwitterScraper, TwitterScraper>();
+        _ = collection.AddTransient<TwitterScraper>();
         _ = collection.AddTransient<IKpopDbScraper, KpopDbScraper>();
 
         //Last.fm: one long-lived RestClient, as RestSharp recommends; tests replace BaseRequests to fake the HTTP layer

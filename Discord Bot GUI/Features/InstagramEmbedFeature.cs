@@ -6,22 +6,23 @@ using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.MessageProcessor;
+using Discord_Bot.Services;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
 
 namespace Discord_Bot.Features;
 
 public class InstagramEmbedFeature(
-    //IInstaLoader instaLoader,
-    IInstaScraper instaScraper,
+    //InstaLoader instaLoader,
+    InstaScraper instaScraper,
     IWebService webService,
     IServerService serverService,
     IBotLogger logger) : BaseFeature(serverService, logger)
 {
-    private readonly IInstaScraper instaScraper = instaScraper;
+    private readonly InstaScraper instaScraper = instaScraper;
     private readonly IWebService webService = webService;
 
-    //private readonly IInstaLoader instaLoader = instaLoader;
+    //private readonly InstaLoader instaLoader = instaLoader;
 
     protected override async Task<bool> ExecuteCoreLogicAsync()
     {

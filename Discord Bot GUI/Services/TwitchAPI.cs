@@ -21,7 +21,7 @@ public class TwitchAPI(
     IServiceProvider services,
     ITwitchCLI twitchCLI,
     IBotLogger logger,
-    IConfig config) : ITwitchAPI
+    IConfig config)
 {
     #region Variables
     private readonly IServiceProvider services = services;

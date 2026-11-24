@@ -8,6 +8,7 @@
 //using DatabaseORM.Interface.Service;
 //using Discord_Bot.Interfaces.Services;
 //using Discord_Bot.Processors.MessageProcessor;
+//using Discord_Bot.Services;
 //using Discord_Bot.Tools;
 //using Discord_Bot.Tools.NativeTools;
 //using System;
@@ -21,13 +22,13 @@
 //[Remarks("User")]
 //[Summary("Twitter related commands")]
 //public class UserTwitterScraperCommands(
-//    ITwitterScraper twitterScraper,
+//    TwitterScraper twitterScraper,
 //    IWebService webService,
 //    IServerService serverService,
 //    IBotLogger logger,
 //    IConfig config) : BaseCommand(logger, config, serverService)
 //{
-//    private readonly ITwitterScraper twitterScraper = twitterScraper;
+//    private readonly TwitterScraper twitterScraper = twitterScraper;
 //    private readonly IWebService webService = webService;
 
 //    [Command("twt")]

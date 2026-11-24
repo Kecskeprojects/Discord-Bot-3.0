@@ -6,6 +6,7 @@ using Discord_Bot.Features;
 using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors;
+using Discord_Bot.Services;
 using Discord_Bot.Tools;
 using Discord_Bot.Windows;
 using Microsoft.Extensions.DependencyInjection;
@@ -221,7 +222,7 @@ public sealed partial class App : Application, IDisposable
         {
             using (IServiceScope scope = services.CreateScope())
             {
-                ITwitchAPI twitchAPI = scope.ServiceProvider.GetRequiredService<ITwitchAPI>();
+                TwitchAPI twitchAPI = scope.ServiceProvider.GetRequiredService<TwitchAPI>();
                 await twitchAPI.Start();
             }
         }

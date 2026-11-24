@@ -2,7 +2,6 @@
 using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
-using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services;
 using Discord_Bot.Tests.Common.Constants;
 using Discord_Bot.Tests.Common.Tools;
@@ -41,7 +40,7 @@ public sealed class TwitchMonitorTests : IDisposable
         ServerNotifiesIn(DiscordIds.OtherServer, DiscordIds.OtherChannel);
         client.GetChannelAsync(DiscordIds.Channel, CacheMode.CacheOnly).Returns(firstServer.Channel);
         client.GetChannelAsync(DiscordIds.OtherChannel, CacheMode.CacheOnly).Returns(secondServer.Channel);
-        monitor = (TwitchAPI) host.Services.GetRequiredService<ITwitchAPI>();
+        monitor = host.Services.GetRequiredService<TwitchAPI>();
     }
 
     //Until 2026-11-23 the stream counted as online after the first server's notification, so the others got none

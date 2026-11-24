@@ -1,11 +1,10 @@
 ﻿using DatabaseORM.Interface;
-using Discord_Bot.Interfaces.Services;
 using System.Diagnostics;
 using System.IO;
 
 namespace Discord_Bot.Services;
 
-public class InstaLoader(IBotLogger logger) : IInstaLoader
+public class InstaLoader(IBotLogger logger)
 {
     private readonly IBotLogger logger = logger;
 

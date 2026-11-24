@@ -10,7 +10,7 @@ using System.Web;
 
 namespace Discord_Bot.Services;
 
-public class InstaScraper(IWebService webService, IBotLogger logger) : IInstaScraper
+public class InstaScraper(IWebService webService, IBotLogger logger)
 {
     private readonly IBotLogger logger = logger;
     private readonly IWebService webService = webService;
