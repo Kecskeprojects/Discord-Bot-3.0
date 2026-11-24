@@ -81,7 +81,7 @@ Build the projects rather than the `.sln`, because the solution includes `MainDB
 | SQL Server | EF Core, `sql_connection_string` | Schema from `MainDB/` |
 | Last.fm | `LastFmApi` project + `Services/LastFmAPI.cs` | `lastfm_artist_input_replacement` in the config rewrites artist names. Check `IsSuccess` before reading a `GenericResponseItem`'s `Response` |
 | Spotify | SpotifyAPI.Web, through `ISpotifyClientFactory` | Client credentials from the config; one client until they change |
-| YouTube Data API | Google.Apis.YouTube.v3, through `IYoutubeDataClient` | **Several keys:** each request uses the one with the fewest quota units used today (`YoutubeKeyStore`), and a key whose quota runs out is dropped until the daily refill at 08:00 UTC (after YouTube's midnight-Pacific reset), so edited keys apply then |
+| YouTube Data API | Google.Apis.YouTube.v3, through `IYoutubeDataClient` | **Several keys, one at a time** (`YoutubeKeyStore`): a key is used until YouTube says its quota ran out or its counted units reach the default daily 10,000, then the next in the config's order takes over. Used-up keys come back at the daily refill at 08:00 UTC (after YouTube's midnight-Pacific reset), so edited keys apply then |
 | Twitch | TwitchLib `LiveStreamMonitor` (on its own thread from `App.xaml.cs`) + `twitch.exe` CLI | |
 | MusicBrainz | REST | Artist lookups |
 | dbkpop.com / kprofiles.com | Puppeteer scraping (`KpopDbScraper`, `BiasScrapingProcessor`) | Weekly idol data refresh. Reading dbkpop.com's table is commented out on purpose (the site blocked the bot or timed out), so only idols with a profile link are refreshed |

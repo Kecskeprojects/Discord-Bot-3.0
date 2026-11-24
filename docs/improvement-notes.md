@@ -8,7 +8,7 @@ Done and removed on 2026-11-24 (the full notes are in `git show bb5b065:docs/imp
 - the review of the bug fixes from 2026-11-13 to 2026-11-19
 - the birthday list names, the RestSharp versions, the culture in interpolated strings, and the four interfaces without a use
 - the reminders to closed direct messages: Discord's 50007 now removes the reminder with a warning, instead of retrying it every minute
-- `Config` as a singleton, the least-used YouTube key from the quota counts, the linked video left out of its playlist's import, the dead "unsorted" bias list branch, and `allowLackOfType` on the command checks (it stays on `DiscordTools.IsTypeOfChannel`, which the role channel needs)
+- `Config` as a singleton, the YouTube quota counts (a key whose units reach the daily 10,000 now hands over to the next, as one YouTube refuses does), the linked video left out of its playlist's import, the dead "unsorted" bias list branch, and `allowLackOfType` on the command checks (it stays on `DiscordTools.IsTypeOfChannel`, which the role channel needs)
 - the CA1849 hand fixes, dropped: `CancelAsync` and `WaitForExitAsync` would change nothing that matters here, and the current calls have caused no problems
 - the checks by hand: a test run of the bot, Prettier's line endings and the old Chrome builds (not needed for now), the removed `BaseFeature` checks (confirmed), and the live database (nothing to clean up: the two polls that share a preset's ID got no answers saved to it, there are 45 groups, and no server has a music voice channel)
 

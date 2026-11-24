@@ -13,25 +13,35 @@ public sealed class YoutubeKeyStoreTests
     }
 
     [Fact]
-    public void CurrentKey_IsTheKeyThatUsedTheFewestUnits()
-    {
-        keys.Reset(["a", "b", "c"]);
-        keys.AddUsage("a", 100);
-        keys.AddUsage("b", 1);
-
-        Assert.Equal("c", keys.CurrentKey);
-
-        keys.AddUsage("c", 100);
-
-        Assert.Equal("b", keys.CurrentKey);
-    }
-
-    [Fact]
-    public void CurrentKey_KeysThatUsedTheSame_FollowTheConfigurationsOrder()
+    public void CurrentKey_StartsWithTheConfigurationsFirstKey()
     {
         keys.Reset(["b", "a"]);
 
         Assert.Equal("b", keys.CurrentKey);
+    }
+
+    //Switching on every request would spread the quota over every key; one key is used until it's spent
+    [Fact]
+    public void AddUsage_BelowTheDailyQuota_KeepsTheKey()
+    {
+        keys.Reset(["a", "b"]);
+
+        keys.AddUsage("a", 9_999);
+
+        Assert.Equal("a", keys.CurrentKey);
+    }
+
+    [Fact]
+    public void AddUsage_ReachingTheDailyQuota_SwitchesToTheNextKey()
+    {
+        keys.Reset(["a", "b"]);
+        keys.AddUsage("a", 9_900);
+
+        keys.AddUsage("a", 100);
+
+        Assert.Equal("b", keys.CurrentKey);
+        //Dropped until the next refill, like a key YouTube refused
+        Assert.Null(keys.ReplaceExhaustedKey("b"));
     }
 
     [Fact]
@@ -52,7 +62,6 @@ public sealed class YoutubeKeyStoreTests
     public void ReplaceExhaustedKey_ForAKeyThatIsNotCurrent_KeepsTheCurrentOne()
     {
         keys.Reset(["a", "b"]);
-        keys.AddUsage("b", 1);
 
         Assert.Equal("a", keys.ReplaceExhaustedKey("b"));
         Assert.Null(keys.ReplaceExhaustedKey("a"));

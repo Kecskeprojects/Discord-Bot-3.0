@@ -69,7 +69,7 @@ public sealed class YoutubeAPITests
     [Fact]
     public async Task Searching_WithAUsedUpKey_SwitchesToTheNextKey()
     {
-        //Neither key has been used yet, so the store starts with the first
+        //The store starts with the configuration's first key
         keys.Reset([SpentKey, Key]);
         youtube.SearchAsync(SpentKey, Arg.Any<string>()).Returns(YoutubeResponses.QuotaExceeded<SearchListResponse>());
         youtube.SearchAsync(Key, "some song").Returns(YoutubeResponses.SearchFindingVideo("vid1"));
