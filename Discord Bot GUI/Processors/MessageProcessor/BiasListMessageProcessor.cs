@@ -8,7 +8,8 @@ public static class BiasListMessageProcessor
 {
     public static BiasMessageResult BuildBiasMessage(List<IdolResource> list, string groupName, string headMessage, ulong userId, bool isUser)
     {
-        SortedDictionary<string, List<string>> groups = [];
+        //The same order on every machine: until 2026-11-24 it followed the machine's culture, and Hungarian sorts "cs" after "c"
+        SortedDictionary<string, List<string>> groups = [with(StringComparer.InvariantCulture)];
         foreach (IdolResource bias in list)
         {
             //Check if key exists for group, if not, make it

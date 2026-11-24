@@ -3,6 +3,7 @@ using Discord;
 using Discord_Bot.Communication.Bias;
 using Discord_Bot.Processors.MessageProcessor;
 using Discord_Bot.Tests.Common.Constants;
+using Discord_Bot.Tests.Common.Tools;
 
 namespace Discord_Bot.Tests.Unit.Bot.Processors.MessageProcessor;
 
@@ -32,6 +33,19 @@ public sealed class BiasListMessageProcessorTests
         //BiasListComponentInteraction reads the user's ID back from the value
         Assert.Equal([$"aespa><{DiscordIds.User}", $"blackpink><{DiscordIds.User}"], menu.Options.Select(option => option.Value));
         Assert.Equal(["2 biases...", "2 biases..."], menu.Options.Select(option => option.Description));
+    }
+
+    //Hungarian sorts "cs" as a letter of its own after "c", so until 2026-11-24 the order followed the machine's culture
+    [Theory]
+    [InlineData("en-US")]
+    [InlineData("hu-HU")]
+    public void BuildBiasMessage_InAnyCulture_OrdersTheGroupsTheSame(string culture)
+    {
+        using CultureScope scope = new(culture);
+
+        BiasMessageResult result = BiasListMessageProcessor.BuildBiasMessage([Idol("a", "cube"), Idol("b", "csr")], "", "head", DiscordIds.User, false);
+
+        Assert.Equal(["CSR", "CUBE"], Assert.Single(Menus(result)).Options.Select(option => option.Label));
     }
 
     [Fact]
