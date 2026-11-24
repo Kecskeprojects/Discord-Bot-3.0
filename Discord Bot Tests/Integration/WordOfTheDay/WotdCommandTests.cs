@@ -1,5 +1,4 @@
-﻿using System.Net.Http;
-using DatabaseORM.Interface.Service;
+﻿using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
 using Discord_Bot.Interfaces.Services;
@@ -8,7 +7,6 @@ using Discord_Bot.Tests.Common.Builders;
 using Discord_Bot.Tests.Common.Constants;
 using Discord_Bot.Tests.Common.Tools;
 using Discord_Bot.Tests.Mocks.Discord;
-using NSubstitute.ExceptionExtensions;
 using CommandResult = Discord.Commands.IResult;
 
 namespace Discord_Bot.Tests.Integration.WordOfTheDay;
@@ -46,19 +44,20 @@ public sealed class WotdCommandTests : IDisposable
     [Fact]
     public async Task Wotd_UnknownLanguage_ListsTheLanguages()
     {
-        wordOfTheDayService.GetDataAsync("klingon").Returns((WotdBase?) null);
-
         await RunAsync("!wotd klingon");
 
         string reply = Assert.Single(channel.Sent).Text!;
         Assert.StartsWith("Language is not supported, here is the list of languages:\n", reply, StringComparison.Ordinal);
         Assert.Contains("korean", reply, StringComparison.Ordinal);
+        await wordOfTheDayService.DidNotReceiveWithAnyArgs().GetDataAsync(default!);
     }
 
+    //The service answers null when the site fails, times out or sends something other than the feed;
+    //until 2026-11-24 only an outage said so, and the rest answered that the language isn't supported
     [Fact]
-    public async Task Wotd_SiteDown_SaysSo()
+    public async Task Wotd_SiteFails_SaysItIsUnavailable()
     {
-        wordOfTheDayService.GetDataAsync("korean").ThrowsAsync(new HttpRequestException("503"));
+        wordOfTheDayService.GetDataAsync("korean").Returns((WotdBase?) null);
 
         await RunAsync("!wotd");
 

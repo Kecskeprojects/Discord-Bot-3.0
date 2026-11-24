@@ -8,7 +8,6 @@ using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.EmbedProcessors;
 using Discord_Bot.Services.Models.Wotd;
-using System.Net.Http;
 
 namespace Discord_Bot.Commands.User;
 
@@ -35,22 +34,23 @@ public class UserWordOfTheDayCommands(
                 return;
             }
 
-            WotdBase? result = await wordOfTheDayService.GetDataAsync(language);
-
-            if (result != null)
-            {
-                Embed[] embed = WordOfTheDayEmbedProcessor.CreateEmbed(result);
-
-                _ = await ReplyAsync(embeds: embed);
-            }
-            else
+            if (!Constant.WotdLanguages.ContainsKey(language.ToLower()))
             {
                 _ = await ReplyAsync("Language is not supported, here is the list of languages:\n" + string.Join(", ", Constant.WotdLanguages.Keys));
+                return;
             }
-        }
-        catch (HttpRequestException)
-        {
-            _ = await ReplyAsync("Site is currently unavailable, try again in a little bit");
+
+            //Null when the site failed, timed out or sent something other than the feed (the service logged why);
+            //until 2026-11-24 only an outage said so, and the rest answered that the language isn't supported
+            WotdBase? result = await wordOfTheDayService.GetDataAsync(language);
+            if (result == null)
+            {
+                _ = await ReplyAsync("Site is currently unavailable, try again in a little bit");
+                return;
+            }
+
+            Embed[] embed = WordOfTheDayEmbedProcessor.CreateEmbed(result);
+            _ = await ReplyAsync(embeds: embed);
         }
         catch (Exception ex)
         {

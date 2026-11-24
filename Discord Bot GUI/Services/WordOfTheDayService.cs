@@ -4,7 +4,6 @@ using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services.Models.Wotd;
 using RestSharp;
 using System.IO;
-using System.Net.Http;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -21,9 +20,9 @@ public class WordOfTheDayService(IBotLogger logger) : IWordOfTheDayService
         WotdBase? result = null;
         try
         {
-            if (Constant.WotdLanguages.ContainsKey(language.ToLower()))
+            if (Constant.WotdLanguages.TryGetValue(language.ToLower(), out string? path))
             {
-                RestRequest request = new(Constant.WotdLanguages[language.ToLower()]);
+                RestRequest request = new(path);
                 RestResponse response = await client.GetAsync(request);
 
                 XmlSerializer serializer = new(typeof(WotdBase));
@@ -32,10 +31,6 @@ public class WordOfTheDayService(IBotLogger logger) : IWordOfTheDayService
                 using XmlReader reader = XmlReader.Create(stringReader, new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore });
                 result = (WotdBase?) serializer.Deserialize(reader);
             }
-        }
-        catch (HttpRequestException)
-        {
-            throw;
         }
         catch (Exception ex)
         {

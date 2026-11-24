@@ -12,6 +12,13 @@ Done and removed on 2026-11-24 (the full notes are in `git show bb5b065:docs/imp
 - CA1508 (dead conditional code), kept after its trial: 4 of its first 5 findings were right, and the false positive is suppressed with its reason
 - the CA1849 hand fixes, dropped: `CancelAsync` and `WaitForExitAsync` would change nothing that matters here, and the current calls have caused no problems
 - the checks by hand: a test run of the bot, Prettier's line endings and the old Chrome builds (not needed for now), the removed `BaseFeature` checks (confirmed), and the live database (nothing to clean up: the two polls that share a preset's ID got no answers saved to it, there are 45 groups, and no server has a music voice channel)
+- `!wotd` when the site fails: a timeout or a page that isn't the feed answered that the language isn't supported. The command now checks the language itself, and says the site is unavailable for every failure
+- `IdolService.ChangeGroupAsync` with a blank group name, which wasn't a bug: on LocalDB the idol keeps its group, because the group isn't loaded, so setting it to null changes nothing EF saves
+
+Decided against on 2026-11-24, so they don't need another look:
+- a generic `BaseService` like `GenericRepository<T>`: the owner removed such generic service methods from the other projects, because simple queries weren't worth it
+- dropping the 13 empty repository interfaces: they stay
+- EF's own templates for the scaffold (to mark `DatabaseORM/Model` as generated code with `#nullable enable`): they would need refreshing after every EF upgrade. CLAUDE.md ("Database changes") has the workaround for Code Cleanup
 
 Done and removed on 2026-11-17 (the investigations are in `git show 483c1fa:docs/improvement-notes.md`, sections 4 and 9–11):
 - the move of the database layer into `DatabaseORM`
@@ -71,7 +78,6 @@ Seen while testing (2026-11-19 to 2026-11-24) and not changed. Some were decided
 - `!birthday a add` by ID accepts any Discord user, not only the server's members.
 - `!bonk`'s delay is documented as milliseconds (`username  delay(ms)`, "1-1000"), but a GIF frame's delay is in hundredths of a second. So the default of 10 is 0.1 seconds, and `!bonk 500` holds each frame for 5 seconds.
 - The R6 operator lists hold 39 operators each, and a round fails for a voice channel with more users than that. `!decide` with only commas logs an exception.
-- `!wotd` says the language isn't supported when the site times out or sends a page it can't read: `WordOfTheDayService` reports only an outage (`HttpRequestException`) and answers `null` for the rest.
 - The bias list's group order and the role message's order follow the machine's culture (`SortedDictionary` and `Order()` with the default comparer). This only matters for names with Hungarian digraphs such as "cs" or "ly".
 
 **Last.fm (decided 2026-11-23):**
@@ -79,14 +85,13 @@ Seen while testing (2026-11-19 to 2026-11-24) and not changed. Some were decided
 - `!lf artist` pages through the user's whole library, 1000 items a page, until it has 5 albums and 8 tracks of the artist. For a large library and a rarely played artist that is many requests. Last.fm offers no better way to get one user's plays of one artist's albums and tracks.
 
 **Handlers and background work:**
-- **The Twitch monitor's channel list.** The monitor reloads its channel list every tick, so `!twitch add` applies without a restart. It skips an empty list, though, so after the last channel anywhere is removed it keeps checking that one; its notification then finds no server and sends nothing. And when no server follows any Twitch channel at startup, `TwitchAPI.Check` logs "No channels to monitor on twitch, service stopped!" and never starts the monitor, so a channel added after that needs a restart (found 2026-11-24).
+- **The Twitch monitor's channel list (accepted 2026-11-24: unlikely, and a restart fixes it).** The monitor reloads its channel list every tick, so `!twitch add` applies without a restart. It skips an empty list, though, so after the last channel anywhere is removed it keeps checking that one; its notification then finds no server and sends nothing. And when no server follows any Twitch channel at startup, `TwitchAPI.Check` logs "No channels to monitor on twitch, service stopped!" and never starts the monitor, so a channel added after that needs a restart (found 2026-11-24).
 - **Unmutes right after connecting.** A server Discord hasn't sent yet (or one in an outage) has no members, so a mute ending in that minute would count its user as gone. `IGuild.Available` can't tell, since `SocketGuild` always answers true (checked 2026-11-19); only the socket type's `IsConnected` could. The window is seconds long, and the next tick is a minute later.
 - The music commands change the queue list while the play loop reads it, without a lock. A clash is unlikely and depends on timing, so no test covers it.
 - **Discord.Net answers twice for a custom ID it can't read (accepted 2026-11-24).** For a component or modal whose `*` part doesn't convert (`BiasGame_Setup_Gender_nobody_someone`), `ComponentCommandInfo.ParseArgumentsAsync` raises `InteractionExecuted`, and `CommandInfo.ExecuteInternalAsync` raises it again with the same result. `InteractionHandler` then logs two warnings and answers twice: once as the reply, then as a follow-up. Only a custom ID the bot built wrong can reach it.
   - A fix was tried and reverted on 2026-11-24: `InteractionHandler` remembered the interactions it had answered in a `ConditionalWeakTable` and skipped the second report. The harm is a repeated error message and log line, so it wasn't worth adding state to the singleton.
 
 **Database services:**
-- `IdolService.ChangeGroupAsync` loads the idol without its group, so an empty group name would set the group to null. Its caller shouldn't pass one.
 - `WeeklyPollService.GetPollByIdAsync` includes neither the server nor the preset, so its result has `ServerDiscordId` 0 and no answers for a preset poll. Its only caller, the edit interaction, reads just the name, title, channel and role, so it's harmless today.
 
 ## 4. Discord.Net: optional modernization (investigated 2026-11-15)
@@ -196,8 +201,6 @@ SQL projects have a newer format: SDK-style projects built on the `Microsoft.Bui
 
 ## Minor improvements
 
-- **Generic `BaseService`** (`DatabaseORM/Service`): turn it into a generic class so simple DB calls need less boilerplate. Each service would still declare its own methods. `GenericRepository<T>` already exists on the repository side.
-- **Empty repository interfaces (investigated 2026-11-24, kept for now):** 13 of the 19 entity repository interfaces declare nothing beyond `IGenericRepository<T>` (such as `IServerRepository : IGenericRepository<Server> { }`), and each has an empty class behind it. The tests could substitute `IGenericRepository<Server>` just as well. Dropping them means registering the open generic `GenericRepository<>`, and changing the services' constructors and the tests. `DatabaseORM` is modeled on KecskeProjectsSite's, so check that project's layout first.
 - **Last.fm top tags:** a new command for `user.getTopTags`. That endpoint has no period or pagination.
 - **Last.fm artist stats image (found 2026-11-16):** `LastFmAPI.GetArtistDataAsync` takes the MBID from the albums when there are any, but the artist and item it searches Spotify for from the tracks when there are any. The throw for an artist with album plays but no track plays is fixed (2026-11-23).
   - Passing a track name makes the search return that track's album cover instead of the artist's image, as `GetTopArtistsAsync` does.
@@ -205,12 +208,6 @@ SQL projects have a newer format: SDK-style projects built on the `Microsoft.Bui
 - **Hand-written results in `Services/Models` (found 2026-11-16):** `Services/Models/LastFm` (`ArtistStats`, `LastFmListResult`, `NowPlayingResult`, `WhoKnows`) and `Services/Models/SpotifyAPI/SpotifyImageSearchResult` are the bot's own result DTOs, not JSON models.
   - Because the folder is marked as generated code, they get no nullable checking and no analyzer warnings.
   - Moving them to `Communication/` (where data types belong by convention) would bring both back. Their nullable fields are `Message`, the image URLs and the optional now-playing data.
-- **Code Cleanup edits the scaffolded models (found 2026-11-16):** `DatabaseORM/Model` isn't marked as generated code, so that its `?` annotations count (see CLAUDE.md "Database changes"). Visual Studio's Code Cleanup therefore changes those files; for example, it removes unused usings even with IDE0005 off for the folder.
-  - Until this is fixed, leave the folder out of Code Cleanup, or re-scaffold afterwards.
-  - Fix: mark the folder `generated_code = true` again, and have the scaffold write `#nullable enable` at the top of each model file, which turns nullable back on in generated code. The folder's `charset = utf-8` (no BOM, as EF Core 11 scaffolds) stays as it is.
-  - To do that, install EF's templates (`dotnet new install Microsoft.EntityFrameworkCore.Templates`, from nuget.org), run `dotnet new ef-templates` in the `DatabaseORM` folder, add the directive to `CodeTemplates/EFCore/EntityType.t4`, and re-scaffold once. `Scaffold-DbContext` and `dotnet ef dbcontext scaffold` use those templates automatically.
-  - The templates must stay CRLF; LF templates are reported to produce an extra blank line per line. `.gitattributes` already checks them out that way.
-  - The cost: the templates become the project's own copy, so after an EF upgrade, refresh them and re-add the line.
 - **YouTube playlist start point:** let the user choose which song or index a playlist import starts from (`YoutubeAPI.PlaylistSearch`). It currently always takes the first page of 50 (`MaxResults`).
 - **YouTube search matching:** look into a similarity or points-based ranking of search results, beyond the current channel and filter-word filtering in `YoutubeAPI.FilteredResults`. It first came up searching for "Withcha" by Apink.
 
