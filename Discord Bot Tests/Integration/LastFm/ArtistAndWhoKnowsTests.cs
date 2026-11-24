@@ -1,6 +1,6 @@
 ﻿using DatabaseORM.Resources;
+using Discord_Bot.Communication.LastFm;
 using Discord_Bot.Interfaces.Services;
-using Discord_Bot.Services.Models.LastFm;
 using Discord_Bot.Tests.Common.Constants;
 using Discord_Bot.Tests.Common.Tools;
 using Discord_Bot.Tests.Mocks.Http;

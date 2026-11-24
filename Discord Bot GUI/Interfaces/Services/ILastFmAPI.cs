@@ -1,5 +1,5 @@
 ﻿using DatabaseORM.Resources;
-using Discord_Bot.Services.Models.LastFm;
+using Discord_Bot.Communication.LastFm;
 
 namespace Discord_Bot.Interfaces.Services;
 

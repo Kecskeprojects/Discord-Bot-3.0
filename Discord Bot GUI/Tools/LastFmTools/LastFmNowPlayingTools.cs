@@ -1,5 +1,5 @@
-﻿using Discord_Bot.Services.Models.LastFm;
-using Discord_Bot.Services.Models.SpotifyAPI;
+﻿using Discord_Bot.Communication;
+using Discord_Bot.Communication.LastFm;
 using LastFmApi.Models.Recent;
 
 namespace Discord_Bot.Tools.LastFmTools;

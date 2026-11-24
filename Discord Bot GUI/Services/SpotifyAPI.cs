@@ -1,7 +1,7 @@
 ﻿using DatabaseORM.Interface;
+using Discord_Bot.Communication;
 using Discord_Bot.Enums;
 using Discord_Bot.Interfaces.Services;
-using Discord_Bot.Services.Models.SpotifyAPI;
 using Discord_Bot.Tools.NativeTools;
 using SpotifyAPI.Web;
 

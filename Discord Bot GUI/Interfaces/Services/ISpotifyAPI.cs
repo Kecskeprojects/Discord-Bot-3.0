@@ -1,5 +1,5 @@
-﻿using Discord_Bot.Enums;
-using Discord_Bot.Services.Models.SpotifyAPI;
+﻿using Discord_Bot.Communication;
+using Discord_Bot.Enums;
 
 namespace Discord_Bot.Interfaces.Services;
 

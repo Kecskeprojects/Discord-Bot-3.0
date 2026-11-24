@@ -1,4 +1,4 @@
-﻿using Discord_Bot.Services.Models.LastFm;
+﻿using Discord_Bot.Communication.LastFm;
 using Discord_Bot.Tests.Common.Tools;
 using Discord_Bot.Tools.LastFmTools;
 using LastFmApi.Models.TopTrack;

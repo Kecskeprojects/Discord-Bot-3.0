@@ -2,10 +2,10 @@
 using DatabaseORM.Interface;
 using Discord;
 using Discord_Bot.Communication;
+using Discord_Bot.Communication.LastFm;
 using Discord_Bot.Interfaces.Processors;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.EmbedProcessors.LastFm;
-using Discord_Bot.Services.Models.LastFm;
 
 namespace Discord_Bot.Tests.Unit.Bot.Processors.EmbedProcessors.LastFm;
 
@@ -41,8 +41,8 @@ public sealed class LastFmEmbedProcessorTests
     public void NowPlaying_NoPreviousTrack_LeavesItsFieldOut()
     {
         NowPlayingResult nowPlaying = NowPlaying();
-        nowPlaying.SecondTrackName = null!;
-        nowPlaying.SecondTrackArtist = null!;
+        nowPlaying.SecondTrackName = null;
+        nowPlaying.SecondTrackArtist = null;
 
         Embed embed = Assert.Single(LastFmNowPlayingEmbedProcessor.CreateEmbed("Ali is currently listening to...", nowPlaying));
 

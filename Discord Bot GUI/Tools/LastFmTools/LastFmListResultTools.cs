@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Discord_Bot.Services.Models.LastFm;
+using Discord_Bot.Communication.LastFm;
 using System.Globalization;
 
 namespace Discord_Bot.Tools.LastFmTools;

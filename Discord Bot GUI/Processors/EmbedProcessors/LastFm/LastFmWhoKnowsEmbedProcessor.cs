@@ -1,9 +1,9 @@
 ﻿using DatabaseORM.Interface;
 using Discord;
 using Discord_Bot.Communication;
+using Discord_Bot.Communication.LastFm;
 using Discord_Bot.Interfaces.Processors;
 using Discord_Bot.Interfaces.Services;
-using Discord_Bot.Services.Models.LastFm;
 using System.IO;
 
 namespace Discord_Bot.Processors.EmbedProcessors.LastFm;
