@@ -14,11 +14,20 @@ Done and removed on 2026-11-24 (the full notes are in `git show bb5b065:docs/imp
 - the checks by hand: a test run of the bot, Prettier's line endings and the old Chrome builds (not needed for now), the removed `BaseFeature` checks (confirmed), and the live database (nothing to clean up: the two polls that share a preset's ID got no answers saved to it, there are 45 groups, and no server has a music voice channel)
 - `!wotd` when the site fails: a timeout or a page that isn't the feed answered that the language isn't supported. The command now checks the language itself, and says the site is unavailable for every failure
 - `IdolService.ChangeGroupAsync` with a blank group name, which wasn't a bug: on LocalDB the idol keeps its group, because the group isn't loaded, so setting it to null changes nothing EF saves
+- the bot's own Last.fm and Spotify result classes (`ArtistStats`, `LastFmListResult`, `NowPlayingResult`, `WhoKnows`, `SpotifyImageSearchResult`), moved from `Services/Models`, which is marked as generated code, to `Communication/`, so nullable and the analyzers check them; `NowPlayingResult.LastTrack`, which nothing set, is gone
+- who-knows' 50 ms pause after each member's request waits on the `TimeProvider`, so its tests move the fake clock instead of waiting
+- `!bonk`'s delay is milliseconds, as its help says (20–1000, the default of 100 looks as before): the number went into the GIF as hundredths of a second, so frames lasted ten times longer. A padded number ("0250") no longer stays in the name
+- `!decide` with only commas, `!remind in` with a number or unit missing (and `!remind at 18:00`, since it's an alias), and `!birthday a add` by ID, which now finds only the server's members
+- the bias list's and the role message's order, which followed the machine's culture (Hungarian sorts "cs" after "c"), and the server and preset in `WeeklyPollService.GetPollByIdAsync`
+- who-knows and a deleted Last.fm account, which isn't a problem: `artist.getInfo` for a username that doesn't exist answers the artist without the user's play count, which counts as not listened (checked by hand; `track.getInfo` wasn't checked)
 
 Decided against on 2026-11-24, so they don't need another look:
 - a generic `BaseService` like `GenericRepository<T>`: the owner removed such generic service methods from the other projects, because simple queries weren't worth it
 - dropping the 13 empty repository interfaces: they stay
 - EF's own templates for the scaffold (to mark `DatabaseORM/Model` as generated code with `#nullable enable`): they would need refreshing after every EF upgrade. CLAUDE.md ("Database changes") has the workaround for Code Cleanup
+- `!lf artist`'s image: the top track's album cover from Spotify, or the top album's from Last.fm, works as intended
+- the injected `Random` for the shuffle, the mocking easter egg, the birthday greeting and the who-knows image's file name, and the fake clock for the "Days Of Week" answers and the waits in `YoutubeStreamService`, the scrapers and `ProcessTools`: their tests check properties, or they aren't tested by decision
+- R6 rounds for more than 39 players: a voice channel that full won't happen
 
 Done and removed on 2026-11-17 (the investigations are in `git show 483c1fa:docs/improvement-notes.md`, sections 4 and 9–11):
 - the move of the database layer into `DatabaseORM`
@@ -51,10 +60,8 @@ The analyzer setup is done and described in CLAUDE.md ("Linting"), and nothing i
 
 ## 2. Tests: what is left (updated 2026-11-24)
 
-The test project and its conventions are described in CLAUDE.md "Tests". Not covered yet:
+The test project and its conventions are described in CLAUDE.md "Tests". Nothing is open; the leftover `new Random()` and system clock uses were decided against on 2026-11-24 (see the top).
 
-- **Randomness:** `new Random()` is still in `CollectionTools`, `StringExtension.ToMockText`, `BirthdayMessageProcessor` and `WhoKnowsImageProcessor` (file names). Their tests check properties (a shuffle keeps every item). Pass the injected `Random` in, as CLAUDE.md "Randomness" describes, if a test needs to decide a roll.
-- **Left on the system clock:** the "Days Of Week" poll options (the Mapster mapping passes `DateTime.UtcNow` to `WeeklyPollTools`, which is tested on its own), and the delays in the scrapers, `YoutubeStreamService` and `ProcessTools`.
 - **Not worth testing (decided 2026-11-17):** the CLI processes (`yt-dlp`/`ffmpeg`, `twitch.exe`, `instaloader`), the Puppeteer scrapers, `ProcessTools` (performance counters and WMI), the real Discord connection (`BotMain`; a test would need a second bot account and a test server), live external APIs in the normal run, and the WPF parts (`App`, `BotWindow`). Where their callers are tested, the tests replace them. Decided 2026-11-24: no tests over responses recorded from the real APIs or saved scraper pages either, and none of `MusicBrainzAPI` and `WordOfTheDayService` themselves (their callers are tested with fakes); the tests keep building their responses by hand.
 
 ## 3. Known issues, left as they are
@@ -74,14 +81,8 @@ Seen while testing (2026-11-19 to 2026-11-24) and not changed. Some were decided
 - **Every role the bot stores is a self-role, by design (checked on LocalDB 2026-11-19).** The mute, notification and poll ping roles are in the same `Role` table as the self-roles, so `!update role message` lists them and `+name`/`-name` in the role channel finds them. The notification and poll ping roles are opt-in roles. Accepted consequences:
   - A muted user who can still post in the role channel could take the mute role off with `-muted`; that depends on the server's channel permissions.
   - `!self role remove` fails while the role is in use as the mute, notification or poll role (its foreign key), and the admin is told it could not be removed.
-- `!remind in tomorrow>...` (no number at all) answers "Incorrect number of inputs!".
-- `!birthday a add` by ID accepts any Discord user, not only the server's members.
-- `!bonk`'s delay is documented as milliseconds (`username  delay(ms)`, "1-1000"), but a GIF frame's delay is in hundredths of a second. So the default of 10 is 0.1 seconds, and `!bonk 500` holds each frame for 5 seconds.
-- The R6 operator lists hold 39 operators each, and a round fails for a voice channel with more users than that. `!decide` with only commas logs an exception.
-- The bias list's group order and the role message's order follow the machine's culture (`SortedDictionary` and `Order()` with the default comparer). This only matters for names with Hungarian digraphs such as "cs" or "ly".
 
 **Last.fm (decided 2026-11-23):**
-- Who-knows stops at the first listener Last.fm answers with an error. So a linked member whose Last.fm account was deleted might break it for the whole server. Unverified: it depends on whether Last.fm answers `track.getInfo`/`artist.getInfo` for an unknown username with an error or without a play count.
 - `!lf artist` pages through the user's whole library, 1000 items a page, until it has 5 albums and 8 tracks of the artist. For a large library and a rarely played artist that is many requests. Last.fm offers no better way to get one user's plays of one artist's albums and tracks.
 
 **Handlers and background work:**
@@ -90,9 +91,6 @@ Seen while testing (2026-11-19 to 2026-11-24) and not changed. Some were decided
 - The music commands change the queue list while the play loop reads it, without a lock. A clash is unlikely and depends on timing, so no test covers it.
 - **Discord.Net answers twice for a custom ID it can't read (accepted 2026-11-24).** For a component or modal whose `*` part doesn't convert (`BiasGame_Setup_Gender_nobody_someone`), `ComponentCommandInfo.ParseArgumentsAsync` raises `InteractionExecuted`, and `CommandInfo.ExecuteInternalAsync` raises it again with the same result. `InteractionHandler` then logs two warnings and answers twice: once as the reply, then as a follow-up. Only a custom ID the bot built wrong can reach it.
   - A fix was tried and reverted on 2026-11-24: `InteractionHandler` remembered the interactions it had answered in a `ConditionalWeakTable` and skipped the second report. The harm is a repeated error message and log line, so it wasn't worth adding state to the singleton.
-
-**Database services:**
-- `WeeklyPollService.GetPollByIdAsync` includes neither the server nor the preset, so its result has `ServerDiscordId` 0 and no answers for a preset poll. Its only caller, the edit interaction, reads just the name, title, channel and role, so it's harmless today.
 
 ## 4. Discord.Net: optional modernization (investigated 2026-11-15)
 
@@ -120,7 +118,7 @@ The `Services/` folder (API wrappers, scrapers and CLI tools, most of them behin
 
 ## 7. Conditional (`?:`) expressions (investigated 2026-11-16)
 
-154 conditional expressions were left after the 2026-11-17 cleanup (see CLAUDE.md "Linting"). The borderline ones (fine as ternaries, `if`/`else` by taste) were left as they are. Their list is in `git show bb5b065:docs/improvement-notes.md`, section 6, with line numbers from 2026-11-17 that have since moved. The nested one it found is the image fallback in `LastFmAPI.GetArtistDataAsync`, which goes with "Last.fm artist stats image" under Minor improvements.
+154 conditional expressions were left after the 2026-11-17 cleanup (see CLAUDE.md "Linting"). The borderline ones (fine as ternaries, `if`/`else` by taste) were left as they are. Their list is in `git show bb5b065:docs/improvement-notes.md`, section 6, with line numbers from 2026-11-17 that have since moved. The nested one it found is the image fallback in `LastFmAPI.GetArtistDataAsync`, kept with the image choice, which works as intended (2026-11-24).
 
 ## 8. Instagram and Twitter embeds (investigated 2026-11-17)
 
@@ -202,12 +200,6 @@ SQL projects have a newer format: SDK-style projects built on the `Microsoft.Bui
 ## Minor improvements
 
 - **Last.fm top tags:** a new command for `user.getTopTags`. That endpoint has no period or pagination.
-- **Last.fm artist stats image (found 2026-11-16):** `LastFmAPI.GetArtistDataAsync` takes the MBID from the albums when there are any, but the artist and item it searches Spotify for from the tracks when there are any. The throw for an artist with album plays but no track plays is fixed (2026-11-23).
-  - Passing a track name makes the search return that track's album cover instead of the artist's image, as `GetTopArtistsAsync` does.
-  - Decide which image the stats should show, and take the values from one list. Its image fallback is a nested ternary.
-- **Hand-written results in `Services/Models` (found 2026-11-16):** `Services/Models/LastFm` (`ArtistStats`, `LastFmListResult`, `NowPlayingResult`, `WhoKnows`) and `Services/Models/SpotifyAPI/SpotifyImageSearchResult` are the bot's own result DTOs, not JSON models.
-  - Because the folder is marked as generated code, they get no nullable checking and no analyzer warnings.
-  - Moving them to `Communication/` (where data types belong by convention) would bring both back. Their nullable fields are `Message`, the image URLs and the optional now-playing data.
 - **YouTube playlist start point:** let the user choose which song or index a playlist import starts from (`YoutubeAPI.PlaylistSearch`). It currently always takes the first page of 50 (`MaxResults`).
 - **YouTube search matching:** look into a similarity or points-based ranking of search results, beyond the current channel and filter-word filtering in `YoutubeAPI.FilteredResults`. It first came up searching for "Withcha" by Apink.
 
