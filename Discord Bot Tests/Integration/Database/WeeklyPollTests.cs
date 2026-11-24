@@ -60,6 +60,21 @@ public sealed class WeeklyPollTests(LocalDatabase database) : IClassFixture<Loca
         Assert.Equal(["Yes", "No", "Maybe"], poll.Options);
     }
 
+    //It loaded neither the server nor the preset until 2026-11-24, so it gave server ID 0 and no answers
+    [Fact]
+    public async Task GetPollByIdAsync_PollWithAPreset_GivesItsServerAndThePresetsAnswers()
+    {
+        int presetId = await NewPresetAsync("Yes or No", "Yes", "No");
+        int pollId = await NewPollAsync("weekly");
+        await PollsService.UpdateFieldAsync(pollId, nameof(WeeklyPoll.OptionPresetId), presetId.ToString());
+
+        WeeklyPollResource? poll = await PollsService.GetPollByIdAsync(pollId);
+
+        Assert.NotNull(poll);
+        Assert.Equal(DiscordIds.Server, poll.ServerDiscordId);
+        Assert.Equal(["Yes", "No"], poll.Options);
+    }
+
     //Its answers are the coming week's days (from the system clock, see WeeklyPollToolsTests) and "None of the above"
     [Fact]
     public async Task GetPollsByDayOfWeekAsync_DaysOfWeekPreset_GivesEightAnswers()

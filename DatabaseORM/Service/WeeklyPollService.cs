@@ -70,11 +70,18 @@ internal sealed class WeeklyPollService(
         WeeklyPollResource? result = null;
         try
         {
+            //The server and the preset too, so the resource is whole (until 2026-11-24 it had server ID 0 and, for a preset
+            //poll, no options; the edit interaction only reads the name, title, channel and role)
             WeeklyPoll? poll = await weeklyPollRepository.FirstOrDefaultAsync(
                 wp => wp.WeeklyPollId == pollId,
-                includes: [wp => wp.Role,
-                wp => wp.Channel,
-                wp => wp.WeeklyPollOptions]);
+                includes: [
+                    wp => wp.Server,
+                    wp => wp.Role,
+                    wp => wp.Channel,
+                    wp => wp.WeeklyPollOptions,
+                    wp => wp.OptionPreset,
+                    wp => wp.OptionPreset!.WeeklyPollOptions
+                ]);
 
             result = poll == null ? null : mapper.Map<WeeklyPoll, WeeklyPollResource>(poll);
         }
