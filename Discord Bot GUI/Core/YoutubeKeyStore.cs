@@ -1,23 +1,24 @@
 ﻿namespace Discord_Bot.Core;
 
 /// <summary>
-/// The YouTube Data API keys that still have quota today, and the one in use.
+/// The YouTube Data API keys that still have quota today, with the quota units each one has used.
 /// <see cref="Reset"/> fills it from the configuration at startup and every day at 08:00 UTC, after YouTube's own reset.
 /// </summary>
 public sealed class YoutubeKeyStore
 {
     private readonly Lock keyLock = new();
-    private readonly Dictionary<string, int> usedQuota = [];
-    private string? currentKey;
+    //In the configuration's order, which decides between keys that used the same amount
+    private readonly OrderedDictionary<string, int> usedQuota = [];
 
-    //Null when every key's quota is used up
+    //The key that used the fewest units today, so the requests spread over every key; null when every key's quota is used up.
+    //Until 2026-11-24 one key was picked at random and used until its quota ran out, and the units were counted but never read
     public string? CurrentKey
     {
         get
         {
             lock (keyLock)
             {
-                return currentKey;
+                return LeastUsedKey();
             }
         }
     }
@@ -31,7 +32,6 @@ public sealed class YoutubeKeyStore
             {
                 _ = usedQuota.TryAdd(key, 0);
             }
-            currentKey = PickKey();
         }
     }
 
@@ -53,16 +53,12 @@ public sealed class YoutubeKeyStore
         lock (keyLock)
         {
             _ = usedQuota.Remove(exhaustedKey);
-            if (currentKey == exhaustedKey)
-            {
-                currentKey = PickKey();
-            }
-            return currentKey;
+            return LeastUsedKey();
         }
     }
 
-    private string? PickKey()
+    private string? LeastUsedKey()
     {
-        return usedQuota.Count == 0 ? null : usedQuota.Keys.ElementAt(Random.Shared.Next(usedQuota.Count));
+        return usedQuota.Count == 0 ? null : usedQuota.MinBy(entry => entry.Value).Key;
     }
 }

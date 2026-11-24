@@ -8,6 +8,8 @@ Done and removed on 2026-11-24 (the full notes are in `git show bb5b065:docs/imp
 - the review of the bug fixes from 2026-11-13 to 2026-11-19
 - the birthday list names, the RestSharp versions, the culture in interpolated strings, and the four interfaces without a use
 - the reminders to closed direct messages: Discord's 50007 now removes the reminder with a warning, instead of retrying it every minute
+- `Config` as a singleton, the least-used YouTube key from the quota counts, the linked video left out of its playlist's import, the dead "unsorted" bias list branch, and `allowLackOfType` on the command checks (it stays on `DiscordTools.IsTypeOfChannel`, which the role channel needs)
+- the CA1849 hand fixes, dropped: `CancelAsync` and `WaitForExitAsync` would change nothing that matters here, and the current calls have caused no problems
 - the checks by hand: a test run of the bot, Prettier's line endings and the old Chrome builds (not needed for now), the removed `BaseFeature` checks (confirmed), and the live database (nothing to clean up: the two polls that share a preset's ID got no answers saved to it, there are 45 groups, and no server has a music voice channel)
 
 Done and removed on 2026-11-17 (the investigations are in `git show 483c1fa:docs/improvement-notes.md`, sections 4 and 9–11):
@@ -23,9 +25,6 @@ Done and removed on 2026-11-17 (the investigations are in `git show 483c1fa:docs
 The analyzer setup is done and described in CLAUDE.md ("Linting"). Left:
 
 - **CA1508 (dead conditional code) is on trial.** Of its first 5 findings, 4 were right and 1 was a false positive (`AudioPlayFeature.WaitAsync`, suppressed in the bot's `Properties/GlobalSuppressions.cs`). Decide whether to keep it once it has run on new code for a while.
-- **CA1849 cases worth fixing by hand.** The rule isn't turned on, because half of its 12 findings are false positives (`GetChannel` / `GetRole` are cache lookups in Discord.Net's socket client). The real ones (rechecked 2026-11-24):
-  - `CancellationTokenSource.Cancel(false)` runs the cancellation callbacks on the calling thread: `UserVoiceCommands.cs` (3) and `AudioStateStore.cs`. `CancelAsync` avoids that.
-  - `YoutubeStreamService` blocks a thread for up to a minute in `Process.WaitForExit(TimeSpan)`. `WaitForExitAsync` with a timeout token avoids that.
 - **Optional, explicitness only (no behavior change):**
   - CA1307 (38): spell out `StringComparison` on `Contains` / `Replace` / `EndsWith(char)`, which are already ordinal. None are in `DatabaseORM`.
   - CA1820 (15): `== ""` → `string.IsNullOrEmpty`. Not a pure rename, because `IsNullOrEmpty` also accepts null.
@@ -52,7 +51,7 @@ The test project and its conventions are described in CLAUDE.md "Tests". Not cov
   - An optional, opt-in live test (a trait, a real key, the network) could warn when a saved response no longer matches the real format.
 - **The scrapers' HTML parsing** (`KpopDbScraper.ParseRow` and the group scraping): split loading a page from parsing it, so the parsing takes the page content and tests can feed it saved pages. Optional.
 - **`MusicBrainzAPI` and `WordOfTheDayService`** have no tests of their own; their callers are tested with fakes. They could take their `RestClient`, as `BaseRequests` does (`WordOfTheDayService` uses a static one). No test reaches `SpotifyAPI.SearchItemAsync`'s MusicBrainz lookup yet, since the test artists have no MBID.
-- **Randomness:** `new Random()` is still in `CollectionTools`, `StringExtension.ToMockText`, `BirthdayMessageProcessor` and `WhoKnowsImageProcessor` (file names), and `YoutubeKeyStore` picks a key with `Random.Shared`. Their tests check properties (a shuffle keeps every item). Pass the injected `Random` in, as CLAUDE.md "Randomness" describes, if a test needs to decide a roll.
+- **Randomness:** `new Random()` is still in `CollectionTools`, `StringExtension.ToMockText`, `BirthdayMessageProcessor` and `WhoKnowsImageProcessor` (file names). Their tests check properties (a shuffle keeps every item). Pass the injected `Random` in, as CLAUDE.md "Randomness" describes, if a test needs to decide a roll.
 - **Left on the system clock:** the "Days Of Week" poll options (the Mapster mapping passes `DateTime.UtcNow` to `WeeklyPollTools`, which is tested on its own), and the delays in the scrapers, `YoutubeStreamService` and `ProcessTools`.
 - **Not worth testing (decided 2026-11-17):** the CLI processes (`yt-dlp`/`ffmpeg`, `twitch.exe`, `instaloader`), the Puppeteer scrapers, `ProcessTools` (performance counters and WMI), the real Discord connection (`BotMain`; a test would need a second bot account and a test server), live external APIs in the normal run, and the WPF parts (`App`, `BotWindow`). Where their callers are tested, the tests replace them.
 
@@ -202,14 +201,8 @@ SQL projects have a newer format: SDK-style projects built on the `Microsoft.Bui
 
 ## Minor improvements
 
-- **`Config` as a singleton (investigated 2026-11-18):** `Config` is registered transient. Each instance builds its own configuration with `reloadOnChange`, which watches `Assets/` and is never disposed.
-  - Measured with a throwaway program: 500 instances held about 500 extra OS handles until a full garbage collection released them. So it isn't a leak, but each `Config` a command resolves keeps a handle open until the next collection.
-  - One long-lived `Config` picked up an edit to `config.json` within 1.5 seconds, so a singleton would still apply edits without a restart.
-  - The change: `AddSingleton<IConfig, Config>()` in `Startup`, and the "transient" note in CLAUDE.md.
-- **YouTube key usage (found 2026-11-18):** the quota units counted per key (`YoutubeKeyStore.AddUsage`) are never read. They could decide which key to use next, or show in the diagnostics; otherwise drop them.
 - **Generic `BaseService`** (`DatabaseORM/Service`): turn it into a generic class so simple DB calls need less boilerplate. Each service would still declare its own methods. `GenericRepository<T>` already exists on the repository side.
 - **Empty repository interfaces (investigated 2026-11-24, kept for now):** 13 of the 19 entity repository interfaces declare nothing beyond `IGenericRepository<T>` (such as `IServerRepository : IGenericRepository<Server> { }`), and each has an empty class behind it. The tests could substitute `IGenericRepository<Server>` just as well. Dropping them means registering the open generic `GenericRepository<>`, and changing the services' constructors and the tests. `DatabaseORM` is modeled on KecskeProjectsSite's, so check that project's layout first.
-- **Dead code (found 2026-11-23):** `BiasListMessageProcessor`'s "unsorted" branch never runs, since every idol has a group (`Idol.GroupId` is `NOT NULL`, and both list queries load it). And no command passes `allowLackOfType: false` to `IsCommandAllowedAsync`.
 - **Last.fm top tags:** a new command for `user.getTopTags`. That endpoint has no period or pagination.
 - **Last.fm artist stats image (found 2026-11-16):** `LastFmAPI.GetArtistDataAsync` takes the MBID from the albums when there are any, but the artist and item it searches Spotify for from the tracks when there are any. The throw for an artist with album plays but no track plays is fixed (2026-11-23).
   - Passing a track name makes the search return that track's album cover instead of the artist's image, as `GetTopArtistsAsync` does.
@@ -224,7 +217,6 @@ SQL projects have a newer format: SDK-style projects built on the `Microsoft.Bui
   - The templates must stay CRLF; LF templates are reported to produce an extra blank line per line. `.gitattributes` already checks them out that way.
   - The cost: the templates become the project's own copy, so after an EF upgrade, refresh them and re-add the line.
 - **YouTube playlist start point:** let the user choose which song or index a playlist import starts from (`YoutubeAPI.PlaylistSearch`). It currently always takes the first page of 50 (`MaxResults`).
-- **YouTube duplicate on playlist import:** when a video link that also carries a playlist (`&list=`) is imported as a playlist (`YoutubeAPI.AddPlaylistAsync`), the video itself can be queued twice if it is in the imported part of the playlist. Skip it.
 - **YouTube search matching:** look into a similarity or points-based ranking of search results, beyond the current channel and filter-word filtering in `YoutubeAPI.FilteredResults`. It first came up searching for "Withcha" by Apink.
 
 ## Feature ideas

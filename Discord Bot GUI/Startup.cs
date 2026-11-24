@@ -72,7 +72,7 @@ public static class Startup
         _ = collection.AddSingleton<IDiscordClient>(client); //What features and tools use, so tests can replace it
         _ = collection.AddSingleton(interactions);
         _ = collection.AddSingleton(commands);
-        _ = collection.AddTransient<IConfig, Config>(); //Configuration can be edited without stopping the program
+        _ = collection.AddSingleton<IConfig, Config>(); //One file watch; each property reads the file's current values, so edits apply without a restart
         _ = collection.AddSingleton(TimeProvider.System); //Tests replace it with a FakeTimeProvider
         _ = collection.AddSingleton(Random.Shared); //Thread-safe; tests replace it to choose which random branch runs
         //In-memory state shared by every command, interaction and feature, lost on restart

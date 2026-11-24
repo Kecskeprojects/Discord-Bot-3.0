@@ -36,7 +36,7 @@ public abstract class BaseInteraction(IServerService serverService, IBotLogger l
         return DiscordTools.GetNickName(Context);
     }
 
-    protected async Task<bool> IsCommandAllowedAsync(ChannelTypeEnum type, bool allowLackOfType = true, bool canBeDM = false)
+    protected async Task<bool> IsCommandAllowedAsync(ChannelTypeEnum type, bool canBeDM = false)
     {
         if (DiscordTools.IsDM(Context))
         {
@@ -44,7 +44,7 @@ public abstract class BaseInteraction(IServerService serverService, IBotLogger l
         }
 
         ServerResource server = await GetCurrentServerAsync();
-        return DiscordTools.IsTypeOfChannel(server, type, Context.Channel.Id, allowLackOfType);
+        return DiscordTools.IsTypeOfChannel(server, type, Context.Channel.Id);
     }
 
     protected async Task<ServerResource> GetCurrentServerAsync()

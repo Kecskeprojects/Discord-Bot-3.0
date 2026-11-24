@@ -106,11 +106,12 @@ public class YoutubeAPI(
                         ? SearchResultEnum.YoutubeNotFound
                         : await VideoSearch(apiKey, videoId, username, serverId);
 
-                    //Offered after the video search, so a retry with the next key (quota) does not offer it twice
+                    //Offered after the video search, so a retry with the next key (quota) does not offer it twice.
+                    //The import leaves out the video this link queued
                     string? playlistId = queryPart["list"];
                     if (!string.IsNullOrEmpty(playlistId))
                     {
-                        _ = AddPlaylistAsync(playlistId, username, serverId, channelId);
+                        _ = AddPlaylistAsync(playlistId, videoResult == SearchResultEnum.YoutubeFoundVideo ? videoId : null, username, serverId, channelId);
                     }
 
                     return videoResult;
@@ -209,8 +210,9 @@ public class YoutubeAPI(
         return SearchResultEnum.YoutubeNotFound;
     }
 
-    //Searching by playlist ID
-    private async Task<SearchResultEnum> PlaylistSearch(string apiKey, string query, string username, ulong serverId)
+    //Searching by playlist ID; queuedVideoId is a video already queued from the same link, which is left out once.
+    //Until 2026-11-24 a watch link's video was queued again if it was in the imported part of its playlist
+    private async Task<SearchResultEnum> PlaylistSearch(string apiKey, string query, string username, ulong serverId, string? queuedVideoId = null)
     {
         PlaylistItemListResponse searchListResponse = new();
         try
@@ -232,6 +234,12 @@ public class YoutubeAPI(
         int queued = 0;
         foreach (PlaylistItem item in searchListResponse.Items)
         {
+            if (queuedVideoId != null && item.ContentDetails.VideoId == queuedVideoId)
+            {
+                queuedVideoId = null;
+                continue;
+            }
+
             try
             {
                 if (await VideoSearch(apiKey, item.ContentDetails.VideoId, username, serverId) == SearchResultEnum.YoutubeFoundVideo)
@@ -272,7 +280,7 @@ public class YoutubeAPI(
     }
 
     //Checking if user wants to add playlist; it keeps running after Run returned, while the user decides
-    private async Task AddPlaylistAsync(string playlistId, string username, ulong serverId, ulong channelId)
+    private async Task AddPlaylistAsync(string playlistId, string? queuedVideoId, string username, ulong serverId, ulong channelId)
     {
         try
         {
@@ -280,7 +288,7 @@ public class YoutubeAPI(
 
             if (result)
             {
-                _ = await RunWithKeyRotationAsync(apiKey => PlaylistSearch(apiKey, playlistId, username, serverId));
+                _ = await RunWithKeyRotationAsync(apiKey => PlaylistSearch(apiKey, playlistId, username, serverId, queuedVideoId));
             }
         }
         catch (Exception ex)

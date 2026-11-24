@@ -49,7 +49,7 @@ public abstract class BaseCommand(IBotLogger logger, IConfig config, IServerServ
         return DiscordTools.GetNickName(Context, user);
     }
 
-    protected async Task<bool> IsCommandAllowedAsync(ChannelTypeEnum type, bool allowLackOfType = true, bool canBeDM = false)
+    protected async Task<bool> IsCommandAllowedAsync(ChannelTypeEnum type, bool canBeDM = false)
     {
         if (DiscordTools.IsDM(Context))
         {
@@ -57,7 +57,7 @@ public abstract class BaseCommand(IBotLogger logger, IConfig config, IServerServ
         }
 
         ServerResource server = await GetCurrentServerAsync();
-        return DiscordTools.IsTypeOfChannel(server, type, Context.Channel.Id, allowLackOfType);
+        return DiscordTools.IsTypeOfChannel(server, type, Context.Channel.Id);
     }
 
     protected static string[] GetParametersBySplit(string parameters, char splitCharacter = '>', bool toLower = true)

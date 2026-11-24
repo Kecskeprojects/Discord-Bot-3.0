@@ -11,28 +11,14 @@ public static class BiasListMessageProcessor
         SortedDictionary<string, List<string>> groups = [];
         foreach (IdolResource bias in list)
         {
-            if (bias.GroupName != null)
+            //Check if key exists for group, if not, make it
+            if (!groups.TryGetValue(bias.GroupName, out List<string>? memberList))
             {
-                //Check if key exists for group, if not, make it
-                if (!groups.TryGetValue(bias.GroupName, out List<string>? memberList))
-                {
-                    groups.Add(bias.GroupName, [bias.Name.ToUpper()]);
-                    continue;
-                }
-
-                memberList.Add(bias.Name.ToUpper());
+                groups.Add(bias.GroupName, [bias.Name.ToUpper()]);
+                continue;
             }
-            else
-            {
-                //Check if key exists for group, if not, make it
-                if (!groups.TryGetValue("unsorted", out List<string>? memberList))
-                {
-                    groups.Add("unsorted", [bias.Name.ToUpper()]);
-                    continue;
-                }
 
-                memberList.Add(bias.Name.ToUpper());
-            }
+            memberList.Add(bias.Name.ToUpper());
         }
 
         if (groupName != "")

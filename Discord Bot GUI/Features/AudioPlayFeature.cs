@@ -114,7 +114,7 @@ public class AudioPlayFeature(
 
             //The voice channel the user is in; from the 2024-08-27 refactor until 2026-11-23 the command's text channel was checked,
             //so a server that set a music voice channel couldn't play at all
-            if (!DiscordTools.IsTypeOfChannel(await GetCurrentServerAsync(), ChannelTypeEnum.MusicVoice, channel.Id, allowLackOfType: true))
+            if (!DiscordTools.IsTypeOfChannel(await GetCurrentServerAsync(), ChannelTypeEnum.MusicVoice, channel.Id))
             {
                 return VoiceConnectionResultEnum.VoiceChannelNotMusicChannel;
             }

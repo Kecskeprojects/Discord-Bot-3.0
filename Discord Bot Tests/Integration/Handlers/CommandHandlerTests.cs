@@ -166,6 +166,19 @@ public sealed class CommandHandlerTests : IAsyncLifetime
         await message.DidNotReceive().DeleteAsync();
     }
 
+    //A server that set no role channel has none, rather than every channel being one (where every message would be deleted)
+    [Fact]
+    public async Task NoRoleChannel_RoleRequest_IsNeitherHandledNorDeleted()
+    {
+        serverService.GetByDiscordIdAsync(DiscordIds.Server).Returns(new ServerResource { DiscordId = DiscordIds.Server });
+        IUserMessage message = DiscordMocks.UserMessage("+Dancer", member, channel.Channel);
+
+        await handler.ProcessMessageAsync(message);
+
+        await roleService.DidNotReceiveWithAnyArgs().GetRoleAsync(default, default!);
+        await message.DidNotReceive().DeleteAsync();
+    }
+
     [Fact]
     public async Task OtherMessage_RunsTheEasterEggs()
     {

@@ -9,6 +9,7 @@ using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Services;
 using Discord_Bot.Tests.Common.Constants;
 using Discord_Bot.Tests.Mocks.Config;
+using Discord_Bot.Tests.Mocks.Discord;
 using Discord_Bot.Tests.Mocks.Youtube;
 using Google.Apis.YouTube.v3.Data;
 using Microsoft.Extensions.Time.Testing;
@@ -24,6 +25,7 @@ public sealed class YoutubeAPITests
     private readonly IYoutubeDataClient youtube = Substitute.For<IYoutubeDataClient>();
     private readonly YoutubeKeyStore keys = new();
     private readonly IBotLogger logger = Substitute.For<IBotLogger>();
+    private readonly IDiscordClient client = Substitute.For<IDiscordClient>();
     private readonly ServerAudioResource audio;
     private readonly YoutubeAPI api;
 
@@ -32,8 +34,8 @@ public sealed class YoutubeAPITests
         AudioStateStore audioStates = new();
         audio = audioStates.GetOrAdd(DiscordIds.Server);
 
-        //Asks in Discord whether to add a playlist; with a client that finds no channel, the answer is always no
-        YoutubeAddPlaylistFeature addPlaylist = new(Substitute.For<IDiscordClient>(), new FakeTimeProvider(), Substitute.For<IServerService>(), logger);
+        //Asks in Discord whether to add a playlist; while the client finds no channel, the answer is no
+        YoutubeAddPlaylistFeature addPlaylist = new(client, new FakeTimeProvider(), Substitute.For<IServerService>(), logger);
         api = new YoutubeAPI(addPlaylist, youtube, keys, audioStates, logger, new TestConfig());
         keys.Reset([Key]);
     }
@@ -67,12 +69,8 @@ public sealed class YoutubeAPITests
     [Fact]
     public async Task Searching_WithAUsedUpKey_SwitchesToTheNextKey()
     {
-        //The store picks its first key at random, so reset until the used-up one comes first
-        do
-        {
-            keys.Reset([SpentKey, Key]);
-        }
-        while (keys.CurrentKey != SpentKey);
+        //Neither key has been used yet, so the store starts with the first
+        keys.Reset([SpentKey, Key]);
         youtube.SearchAsync(SpentKey, Arg.Any<string>()).Returns(YoutubeResponses.QuotaExceeded<SearchListResponse>());
         youtube.SearchAsync(Key, "some song").Returns(YoutubeResponses.SearchFindingVideo("vid1"));
         youtube.GetVideoAsync(Key, "vid1").Returns(YoutubeResponses.Video("vid1"));
@@ -114,6 +112,26 @@ public sealed class YoutubeAPITests
         await youtube.DidNotReceive().GetVideoAsync(Key, "p4");
     }
 
+    //Until 2026-11-24 the linked video was queued a second time when the import reached it
+    [Fact]
+    public async Task Searching_WatchLinkWithItsPlaylistAdded_LeavesTheLinkedVideoOutOfTheImport()
+    {
+        PlaylistOfferAnsweredYes();
+        youtube.GetVideoAsync(Key, Arg.Any<string>()).Returns(call => Task.FromResult(YoutubeResponses.Video(call.ArgAt<string>(1))));
+        youtube.GetPlaylistItemsAsync(Key, "PL1").Returns(YoutubeResponses.Playlist("p1", "vid1", "p2"));
+
+        SearchResultEnum result = await SearchAsync("https://www.youtube.com/watch?v=vid1&list=PL1");
+
+        //The offer and the import run on after the search returned
+        for (int i = 0; audio.MusicRequests.Count < 3 && i < 100; i++)
+        {
+            await Task.Delay(10, TestContext.Current.CancellationToken);
+        }
+        Assert.Equal(SearchResultEnum.YoutubeFoundVideo, result);
+        string[] expected = ["Title of vid1", "Title of p1", "Title of p2"];
+        Assert.Equal(expected, audio.MusicRequests.Select(request => request.Title));
+    }
+
     [Fact]
     public async Task Searching_OtherErrors_AreLoggedAndFindNothing()
     {
@@ -128,5 +146,18 @@ public sealed class YoutubeAPITests
     private Task<SearchResultEnum> SearchAsync(string query)
     {
         return api.Searching(query, TestValues.Username, DiscordIds.Server, DiscordIds.Channel);
+    }
+
+    //The offer in the command's channel gets the user's reaction next to the bot's own, which YoutubeAddPlaylistFeature reads as yes
+    private void PlaylistOfferAnsweredYes()
+    {
+        IReadOnlyCollection<IUser> reacted = [DiscordMocks.User(DiscordIds.Bot), DiscordMocks.User()];
+        IAsyncEnumerable<IReadOnlyCollection<IUser>> reactions = new[] { reacted }.ToAsyncEnumerable();
+
+        IUserMessage offer = Substitute.For<IUserMessage>();
+        offer.GetReactionUsersAsync(default, default).ReturnsForAnyArgs(reactions);
+        IMessageChannel channel = Substitute.For<IMessageChannel>();
+        channel.SendMessageAsync().ReturnsForAnyArgs(offer);
+        client.GetChannelAsync(DiscordIds.Channel, CacheMode.CacheOnly).Returns(channel);
     }
 }

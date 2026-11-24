@@ -7,6 +7,8 @@ namespace Discord_Bot.Tools;
 
 public static class DiscordTools
 {
+    //For a server that set no channel of this type, allowLackOfType decides: commands are allowed in every channel,
+    //while CommandHandler's role channel needs to be set (it deletes every other message there)
     public static bool IsTypeOfChannel(ServerResource server, ChannelTypeEnum type, ulong channelId, bool allowLackOfType = true)
     {
         return !server.SettingsChannels.TryGetValue(type, out List<ulong>? value)

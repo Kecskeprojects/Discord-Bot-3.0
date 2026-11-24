@@ -13,6 +13,28 @@ public sealed class YoutubeKeyStoreTests
     }
 
     [Fact]
+    public void CurrentKey_IsTheKeyThatUsedTheFewestUnits()
+    {
+        keys.Reset(["a", "b", "c"]);
+        keys.AddUsage("a", 100);
+        keys.AddUsage("b", 1);
+
+        Assert.Equal("c", keys.CurrentKey);
+
+        keys.AddUsage("c", 100);
+
+        Assert.Equal("b", keys.CurrentKey);
+    }
+
+    [Fact]
+    public void CurrentKey_KeysThatUsedTheSame_FollowTheConfigurationsOrder()
+    {
+        keys.Reset(["b", "a"]);
+
+        Assert.Equal("b", keys.CurrentKey);
+    }
+
+    [Fact]
     public void ReplaceExhaustedKey_GoesThroughEveryKeyOnce()
     {
         keys.Reset(["a", "b", "c"]);
@@ -23,19 +45,17 @@ public sealed class YoutubeKeyStoreTests
             used.Add(key);
         }
 
-        string[] expected = ["a", "b", "c"];
-        Assert.Equal(expected, used.Order());
+        Assert.Equal(["a", "b", "c"], used);
     }
 
     [Fact]
     public void ReplaceExhaustedKey_ForAKeyThatIsNotCurrent_KeepsTheCurrentOne()
     {
         keys.Reset(["a", "b"]);
-        string current = keys.CurrentKey!;
-        string other = current == "a" ? "b" : "a";
+        keys.AddUsage("b", 1);
 
-        Assert.Equal(current, keys.ReplaceExhaustedKey(other));
-        Assert.Null(keys.ReplaceExhaustedKey(current));
+        Assert.Equal("a", keys.ReplaceExhaustedKey("b"));
+        Assert.Null(keys.ReplaceExhaustedKey("a"));
     }
 
     [Fact]

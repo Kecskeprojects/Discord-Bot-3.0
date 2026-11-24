@@ -52,15 +52,6 @@ public sealed class BaseCommandTests
         Assert.Equal(allowed, await Command(channel, DiscordMocks.GuildUser()).IsAllowedAsync(ChannelTypeEnum.CommandText));
     }
 
-    //Not passed by any command yet
-    [Fact]
-    public async Task IsCommandAllowed_TypeRequiredButNotSet_Refuses()
-    {
-        ServerHas([]);
-
-        Assert.False(await Command(channel, DiscordMocks.GuildUser()).IsAllowedAsync(ChannelTypeEnum.CommandText, allowLackOfType: false));
-    }
-
     //CommandHandler adds every server it sees, so a missing row means the database failed
     [Fact]
     public async Task GetCurrentServer_ServerNotLoaded_Throws()
@@ -111,9 +102,9 @@ public sealed class BaseCommandTests
     //Opens up BaseCommand's protected helpers; the bot's command service never sees it
     private sealed class ProbeCommand(IBotLogger logger, IConfig config, IServerService serverService) : BaseCommand(logger, config, serverService)
     {
-        public Task<bool> IsAllowedAsync(ChannelTypeEnum type, bool allowLackOfType = true, bool canBeDM = false)
+        public Task<bool> IsAllowedAsync(ChannelTypeEnum type, bool canBeDM = false)
         {
-            return IsCommandAllowedAsync(type, allowLackOfType, canBeDM);
+            return IsCommandAllowedAsync(type, canBeDM);
         }
 
         public static string[] Split(string text, char separator, bool toLower = true)

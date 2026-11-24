@@ -93,7 +93,7 @@ public class CommandHandler(
                 //Command execution
                 await ExecuteCommandAsync(context, argPos);
             }
-            else if (server != null && DiscordTools.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id, false))
+            else if (server != null && DiscordTools.IsTypeOfChannel(server, ChannelTypeEnum.RoleText, context.Channel.Id, allowLackOfType: false))
             {
                 //Role handling
                 await HandleRoleAssignmentAsync(context, argPos);
