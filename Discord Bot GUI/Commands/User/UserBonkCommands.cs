@@ -37,26 +37,22 @@ public class UserBonkCommands(
                 return;
             }
 
+            //A number at the end is the frame delay in milliseconds. Browsers, and Discord's desktop app, play a frame shorter
+            //than 20 ms for 100 ms, so 20 is the fastest that works. Until 2026-11-24 the number was used as hundredths of a
+            //second, and it was removed from the name by its text, so a padded one ("0250") stayed in the name
             List<string> paramParts = [.. parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
-            string userName = "";
-            int frameDelay = 10;
-            if (paramParts.Count > 0)
+            int frameDelay = 100;
+            if (paramParts.Count > 0 && int.TryParse(paramParts[^1], out int givenDelay))
             {
-                if (int.TryParse(paramParts[^1], out frameDelay))
+                if (givenDelay is < 20 or > 1000)
                 {
-                    if (frameDelay is < 1 or > 1000)
-                    {
-                        _ = await ReplyAsync("Invalid frame delay length. (1-1000)");
-                        return;
-                    }
+                    _ = await ReplyAsync("Invalid frame delay length. (20-1000 ms)");
+                    return;
                 }
-                else
-                {
-                    frameDelay = 10;
-                }
-                _ = paramParts.Remove(frameDelay.ToString());
-                userName = string.Join(" ", paramParts);
+                frameDelay = givenDelay;
+                paramParts.RemoveAt(paramParts.Count - 1);
             }
+            string userName = string.Join(" ", paramParts);
 
             //The user named by ID or name, or the sender; until 2026-11-23 a name not found answered nothing,
             //and an ID of someone not on the server threw

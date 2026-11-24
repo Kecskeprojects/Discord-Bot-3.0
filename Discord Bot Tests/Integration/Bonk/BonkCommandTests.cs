@@ -60,11 +60,14 @@ public sealed class BonkCommandTests : IDisposable
         await webService.Received().GetStream(TestValues.AvatarUrl);
     }
 
+    //The delay is in milliseconds, as the help says, and the GIF counts hundredths of a second; until 2026-11-24 the number
+    //went into the GIF as it was, so frames lasted ten times longer. A padded number ("0250") stayed in the name until then
     [Theory]
-    [InlineData("!bonk alice 25")]
-    [InlineData("!bonk 123456789012345678 25")]
-    [InlineData("!bonk 123456789012345678")]
-    public async Task Bonk_UserByNameOrIdAndADelay_BonksThemWithIt(string command)
+    [InlineData("!bonk alice 250", 25u)]
+    [InlineData("!bonk alice 0250", 25u)]
+    [InlineData("!bonk 123456789012345678 250", 25u)]
+    [InlineData("!bonk 123456789012345678", 10u)]
+    public async Task Bonk_UserByNameOrIdAndADelay_BonksThemWithIt(string command, uint hundredths)
     {
         await RunAsync(command);
 
@@ -72,17 +75,20 @@ public sealed class BonkCommandTests : IDisposable
         using (gif)
         {
             Assert.Equal("bonk_alice.gif", fileName);
-            Assert.Equal(command.EndsWith(" 25", StringComparison.Ordinal) ? 25u : 10u, gif[0].AnimationDelay);
+            Assert.Equal(hundredths, gif[0].AnimationDelay);
         }
         await webService.Received().GetStream("https://example.com/alice.png");
     }
 
-    [Fact]
-    public async Task Bonk_DelayOutOfRange_SaysSo()
+    //Browsers, and Discord's desktop app, play a frame shorter than 20 ms for 100 ms, so 20 is the fastest that works
+    [Theory]
+    [InlineData("!bonk 5000")]
+    [InlineData("!bonk 10")]
+    public async Task Bonk_DelayOutOfRange_SaysSo(string command)
     {
-        await RunAsync("!bonk 5000");
+        await RunAsync(command);
 
-        Assert.Equal("Invalid frame delay length. (1-1000)", Assert.Single(channel.Sent).Text);
+        Assert.Equal("Invalid frame delay length. (20-1000 ms)", Assert.Single(channel.Sent).Text);
     }
 
     //A name answered nothing until 2026-11-23, and an ID of someone not on the server threw

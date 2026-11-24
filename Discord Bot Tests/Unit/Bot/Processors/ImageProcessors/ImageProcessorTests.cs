@@ -22,7 +22,7 @@ public sealed class ImageProcessorTests
     {
         using MemoryStream avatar = Picture(128, 128);
 
-        using MemoryStream? gif = new BonkGifProcessor(logger).CreateBonkImage(avatar, 20);
+        using MemoryStream? gif = new BonkGifProcessor(logger).CreateBonkImage(avatar, 200);
 
         Assert.NotNull(gif);
         using MagickImageCollection frames = new(gif.ToArray());
@@ -31,6 +31,7 @@ public sealed class ImageProcessorTests
         {
             Assert.Equal(MagickFormat.Gif, frame.Format);
             Assert.Equal((1000u, 1000u), (frame.Width, frame.Height));
+            //200 ms, in the hundredths of a second GIF counts in
             Assert.Equal(20u, frame.AnimationDelay);
         });
     }
@@ -40,7 +41,7 @@ public sealed class ImageProcessorTests
     {
         using MemoryStream notAnImage = new([1, 2, 3, 4]);
 
-        Assert.Null(new BonkGifProcessor(logger).CreateBonkImage(notAnImage, 20));
+        Assert.Null(new BonkGifProcessor(logger).CreateBonkImage(notAnImage, 200));
         logger.Received().Error("BonkGifProcessor.cs CreateBonkImage", Arg.Any<Exception>());
     }
 

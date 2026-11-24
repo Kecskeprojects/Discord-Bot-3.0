@@ -13,7 +13,7 @@ public class BonkGifProcessor(IBotLogger logger)
     private readonly IBotLogger logger = logger;
 
     //Null when the gif could not be made, the error is logged
-    public MemoryStream? CreateBonkImage(Stream stream, int delay)
+    public MemoryStream? CreateBonkImage(Stream stream, int frameDelayMs)
     {
         try
         {
@@ -39,8 +39,8 @@ public class BonkGifProcessor(IBotLogger logger)
                 frame.Composite(profile, 10, 500, CompositeOperator.Over);
                 frame.Composite(winter, 0, 0, CompositeOperator.Over);
 
-                //Delay is in hundredths of a second, 0 iterations loops forever
-                frame.AnimationDelay = (uint) delay;
+                //GIF counts the delay in hundredths of a second, 0 iterations loops forever
+                frame.AnimationDelay = (uint) (frameDelayMs / 10);
                 frame.AnimationIterations = 0;
                 frame.GifDisposeMethod = GifDisposeMethod.Background;
 
