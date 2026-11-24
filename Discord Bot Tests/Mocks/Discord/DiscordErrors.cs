@@ -18,4 +18,10 @@ public static class DiscordErrors
     {
         return new HttpException(HttpStatusCode.Forbidden, null, DiscordErrorCode.InsufficientPermissions);
     }
+
+    //A failure on Discord's side, such as an outage, which may be gone by the next try
+    public static HttpException ServerError()
+    {
+        return new HttpException(HttpStatusCode.InternalServerError, null);
+    }
 }

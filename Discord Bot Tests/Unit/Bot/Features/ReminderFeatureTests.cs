@@ -85,13 +85,11 @@ public sealed class ReminderFeatureTests
         logger.Received().Error("ReminderFeature.cs ExecuteCoreLogicAsync", "Failure during reminder check!");
     }
 
-    //A refused reminder stays for the next minute, in case Discord's problem was temporary; it no longer holds up the others
+    //A failed reminder stays for the next minute, in case Discord's problem was temporary; it no longer holds up the others
     [Fact]
-    public async Task Run_OneUsersDirectMessagesRefused_StillSendsTheOthersAndKeepsOnlyTheRefusedOne()
+    public async Task Run_OneReminderFails_StillSendsTheOthersAndKeepsOnlyTheFailedOne()
     {
-        IUser closed = DiscordMocks.User(DiscordIds.User);
-        closed.CreateDMChannelAsync(default).ThrowsAsyncForAnyArgs(DiscordErrors.ClosedDirectMessages());
-        client.GetUserAsync(DiscordIds.User, Arg.Any<CacheMode>(), Arg.Any<RequestOptions>()).Returns(closed);
+        FailingDirectMessagesOf(DiscordIds.User, DiscordErrors.ServerError());
         RecordingChannel otherUserMessages = DirectMessagesOf(DiscordIds.OtherUser);
         DueReminders(Reminder(1, DiscordIds.User, minuteStart, "drink water"), Reminder(2, DiscordIds.OtherUser, minuteStart, "stretch"));
 
@@ -103,15 +101,35 @@ public sealed class ReminderFeatureTests
     }
 
     [Fact]
-    public async Task Run_EveryReminderRefused_RemovesNone()
+    public async Task Run_EveryReminderFails_RemovesNone()
     {
-        IUser closed = DiscordMocks.User(DiscordIds.User);
-        closed.CreateDMChannelAsync(default).ThrowsAsyncForAnyArgs(DiscordErrors.ClosedDirectMessages());
-        client.GetUserAsync(DiscordIds.User, Arg.Any<CacheMode>(), Arg.Any<RequestOptions>()).Returns(closed);
+        FailingDirectMessagesOf(DiscordIds.User, DiscordErrors.ServerError());
         DueReminders(Reminder(1, DiscordIds.User, minuteStart, "drink water"));
 
         Assert.False(await feature.Run());
         await reminderService.DidNotReceiveWithAnyArgs().RemoveCurrentRemindersAsync(default!);
+    }
+
+    //Discord's 50007 doesn't pass: the user closed their direct messages to the bot, or shares no server with it.
+    //Until 2026-11-24 such a reminder was retried, and a warning logged, every minute
+    [Fact]
+    public async Task Run_UsersDirectMessagesClosed_RemovesTheirReminderWithAWarning()
+    {
+        FailingDirectMessagesOf(DiscordIds.User, DiscordErrors.ClosedDirectMessages());
+        DirectMessagesOf(DiscordIds.OtherUser);
+        DueReminders(Reminder(1, DiscordIds.User, minuteStart, "drink water"), Reminder(2, DiscordIds.OtherUser, minuteStart, "stretch"));
+
+        Assert.True(await feature.Run());
+
+        await reminderService.Received().RemoveCurrentRemindersAsync(Arg.Is<List<int>>(ids => string.Join(",", ids) == "1,2"));
+        logger.Received().Warning("ReminderFeature.cs TrySendAsync", Arg.Is<string>(text => text.Contains($"user {DiscordIds.User}", StringComparison.Ordinal)));
+    }
+
+    private void FailingDirectMessagesOf(ulong userId, HttpException error)
+    {
+        IUser user = DiscordMocks.User(userId);
+        user.CreateDMChannelAsync(default).ThrowsAsyncForAnyArgs(error);
+        client.GetUserAsync(userId, Arg.Any<CacheMode>(), Arg.Any<RequestOptions>()).Returns(user);
     }
 
     private RecordingChannel DirectMessagesOf(ulong userId)

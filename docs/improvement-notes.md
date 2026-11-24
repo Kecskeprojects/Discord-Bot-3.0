@@ -7,6 +7,7 @@ Done and removed on 2026-11-24 (the full notes are in `git show bb5b065:docs/imp
 - the ten batches of tests (1021 cases), the bugs they found, and the checks that found nothing to change
 - the review of the bug fixes from 2026-11-13 to 2026-11-19
 - the birthday list names, the RestSharp versions, the culture in interpolated strings, and the four interfaces without a use
+- the reminders to closed direct messages: Discord's 50007 now removes the reminder with a warning, instead of retrying it every minute
 - the checks by hand: a test run of the bot, Prettier's line endings and the old Chrome builds (not needed for now), the removed `BaseFeature` checks (confirmed), and the live database (nothing to clean up: the two polls that share a preset's ID got no answers saved to it, there are 45 groups, and no server has a music voice channel)
 
 Done and removed on 2026-11-17 (the investigations are in `git show 483c1fa:docs/improvement-notes.md`, sections 4 and 9–11):
@@ -201,7 +202,6 @@ SQL projects have a newer format: SDK-style projects built on the `Microsoft.Bui
 
 ## Minor improvements
 
-- **Reminders to closed direct messages repeat forever (found 2026-11-19).** `ReminderFeature` keeps a reminder whose DM fails, by design, in case Discord's problem was temporary. Discord's 50007 (closed DMs, or no shared server) is usually permanent, so that reminder is retried, and a warning logged, every minute. Treat 50007 as handled, or give up after a day.
 - **`Config` as a singleton (investigated 2026-11-18):** `Config` is registered transient. Each instance builds its own configuration with `reloadOnChange`, which watches `Assets/` and is never disposed.
   - Measured with a throwaway program: 500 instances held about 500 extra OS handles until a full garbage collection released them. So it isn't a leak, but each `Config` a command resolves keeps a handle open until the next collection.
   - One long-lived `Config` picked up an edit to `config.json` within 1.5 seconds, so a singleton would still apply edits without a restart.

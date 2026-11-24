@@ -3,6 +3,7 @@ using DatabaseORM.Interface;
 using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
+using Discord.Net;
 using Discord_Bot.Tools;
 using Discord_Bot.Tools.NativeTools;
 
@@ -61,7 +62,7 @@ public class ReminderFeature(
         }
     }
 
-    //False when Discord refused it: the reminder then stays for the next minute, in case the problem was temporary
+    //False when sending failed: the reminder then stays for the next minute, in case the problem was temporary
     private async Task<bool> TrySendAsync(ReminderResource reminder)
     {
         try
@@ -74,6 +75,13 @@ public class ReminderFeature(
                 string message = $"You told me to remind you at {DiscordTools.UtcTimestamp(reminder.Date, TimestampTagStyles.ShortDateTime)} with the following message:\n\n{reminder.Message}";
                 _ = await user.SendMessageAsync(message);
             }
+            return true;
+        }
+        //50007: the user closed their direct messages to the bot, or shares no server with it. That rarely changes before
+        //the next minute, so the reminder counts as handled; until 2026-11-24 it was retried, with a warning, every minute
+        catch (HttpException ex) when (ex.DiscordCode == DiscordErrorCode.CannotSendMessageToUser)
+        {
+            logger.Warning("ReminderFeature.cs TrySendAsync", $"Discord can't deliver direct messages to user {reminder.UserDiscordId} (closed, or no shared server), so reminder {reminder.ReminderId} is removed unsent");
             return true;
         }
         catch (Exception ex)
