@@ -15,6 +15,11 @@ A self-hosted Discord bot that runs as a **Windows WPF desktop app** (the window
 - `Latest_Release.sql`: a full deployment script, but git-ignored and local only. The dev PC's copy dates from 2023, so the source of truth is `MainDB/`.
 - `diagram.drawio` / `diagram.png`: the DB diagram.
 - `Discord Bot Tests/`: the tests for all three projects (see Tests).
+- `docs/`: three files that cover every project in the repository. New entries go in the matching one, not in this file:
+  - `improvement-notes.md`: open work only; an item is removed once it is applied.
+  - `known-issues.md`: what is known not to work quite right but is left as it is.
+  - `decisions.md`: ideas decided against, and code facts (why something looks the way it does, so it isn't "fixed").
+- `README.md`: what the bot is, its requirements and external files, and the build, run and test commands.
 
 Linting is done by analyzers during the build (see Linting).
 
@@ -70,7 +75,7 @@ Build the projects rather than the `.sln`, because the solution includes `MainDB
 ## Runtime requirements
 
 - **Config:** read from `Assets/config.json` **in the current working directory** (with `reloadOnChange`, so edits apply without a restart). Classes inject `IConfig` (`Interfaces/`), a singleton `Config` whose properties read the file's current values, so a new setting needs a property on both. The DbContext reads its connection string through `IConfig` too, so replacing `IConfig` in a test also replaces the database. `Discord Bot GUI/Core/Configuration/config.json` is only a key template and is **not** copied to the output. Never put real values in the tracked template. If the file is missing, `Config`'s constructor writes an empty one, and the bot refuses to log in until `token` is set. A missing value reads as `""`, `[]` or an empty dictionary, never null (the binder turns an empty JSON object into null, so `Config` covers that too).
-- **Native/CLI dependencies** in `External Files/` are copied to the output root and invoked through `cmd.exe /C`: `yt-dlp.exe` piped into `ffmpeg.exe` for audio, `twitch.exe` (Twitch CLI) for tokens and user lookup, and `instaloader.exe` (Instagram, currently disabled). `opus.dll`, `libsodium.dll` and `libdave.dll` are needed for voice. Discord's DAVE E2EE is enabled (`EnableVoiceDaveEncryption`).
+- **Native/CLI dependencies** in `External Files/` are copied to the output with their folders: the DLLs at the root, the tools under `Dependencies/`, which are invoked through `cmd.exe /C` with a working directory under the current one: `yt-dlp.exe` piped into `ffmpeg.exe` for audio (`Dependencies/Audio`), `twitch.exe` (Twitch CLI) for tokens and user lookup, and `instaloader.exe` (Instagram, currently disabled). `opus.dll`, `libsodium.dll` and `libdave.dll` are needed for voice; `libdave.dll` is pinned (`docs/decisions.md`). Discord's DAVE E2EE is enabled (`EnableVoiceDaveEncryption`).
 - **Headless Chrome:** PuppeteerSharp downloads Chrome on first use (`BrowserService` behind `IBrowserService`, a singleton browser shared by the scrapers). `headless_browser` in the config toggles it.
 
 ## External services
@@ -84,7 +89,7 @@ Build the projects rather than the `.sln`, because the solution includes `MainDB
 | YouTube Data API | Google.Apis.YouTube.v3, through `IYoutubeDataClient` | **Several keys, one at a time** (`YoutubeKeyStore`): a key is used until YouTube says its quota ran out or its counted units reach the default daily 10,000, then the next in the config's order takes over. Used-up keys come back at the daily refill at 08:00 UTC (after YouTube's midnight-Pacific reset), so edited keys apply then |
 | Twitch | TwitchLib `LiveStreamMonitor` (on its own thread from `App.xaml.cs`) + `twitch.exe` CLI | |
 | MusicBrainz | REST | Artist lookups |
-| dbkpop.com / kprofiles.com | Puppeteer scraping (`KpopDbScraper`, `BiasScrapingProcessor`) | Weekly idol data refresh. Reading dbkpop.com's table is commented out on purpose (the site blocked the bot or timed out), so only idols with a profile link are refreshed |
+| dbkpop.com / kprofiles.com | Puppeteer scraping (`KpopDbScraper`, `BiasScrapingProcessor`) | Weekly idol data refresh. dbkpop.com's table isn't read on purpose (`docs/known-issues.md`) |
 | Twitter/X, Instagram | Puppeteer scraping / GraphQL | **Both embeds are currently disabled.** `UserTwitterScraperCommands.cs` is fully commented out, and the Instagram embed call is commented out in `CommandHandler`. The `TwitterScraper`/`InstaScraper` services, their DI registrations and the `enable_*_embed` config keys remain |
 | Word of the Day | `wotd.transparent.com` RSS | |
 
@@ -115,7 +120,7 @@ Base URLs live in `Core/Constant.cs`.
 
 Each command or interaction runs in its own DI scope (`services.CreateScope()`) with `RunMode.Sync`. The handlers dispatch it in the background (`Task.Run` / fire-and-forget), so the gateway isn't blocked. `RunMode.Async` was tried and rejected, so keep this setup. `BotMain` registers handlers once; the reconnect timer only logs in again.
 
-Every interaction must be acknowledged within 3 seconds, including early returns (use `DeferAsync()`). In error paths use `RespondOrFollowupAsync`, because a plain `RespondAsync` throws after a defer. Open findings and ideas are tracked in `docs/improvement-notes.md`.
+Every interaction must be acknowledged within 3 seconds, including early returns (use `DeferAsync()`). In error paths use `RespondOrFollowupAsync`, because a plain `RespondAsync` throws after a defer.
 
 **Command conventions:**
 - Module-level `[Remarks("User" | "Admin" | "Owner")]` must match `CommandLevelEnum`. `HelpCommands` filters by it, so a module with the wrong value disappears from help. `[Summary]` is the help text.
@@ -132,7 +137,7 @@ Every interaction must be acknowledged within 3 seconds, including early returns
 - `DatabaseORM/Model/` are EF entities, and `DatabaseORM/Resources/` are the DTOs that services return. **Commands should work with `*Resource` types, not EF models.**
 - `Communication/`: in-memory DTOs, including modal definitions. The DTOs the DB services take are in `DatabaseORM/Communication/`, such as the `*EditData` classes that the edit modals map to with `ToEditData()`.
 
-**Mapping:** Mapster, configured in `DatabaseORM/Mapping/DatabaseMapperConfig.cs` (EF models and scraped data) and `Core/MapperConfig.cs` (resources to Discord types). `Startup` registers both and compiles them, so an invalid mapping fails fast. The project moved off AutoMapper. Mapster does **not** null-guard navigation chains or convert `string` → `ulong` on its own, so write these mappings out explicitly. A navigation's null check gives `""` for a non-nullable string, not `null`. Every member of a `*Resource` is mapped or `.Ignore`d with a comment saying who fills it, because an unmapped member stays empty without an error (a test compiles each resource mapping with `RequireDestinationMemberSource`). `ShallowCopyForSameType(true)` is on to avoid deep-cloning EF navigation graphs.
+**Mapping:** Mapster, configured in `DatabaseORM/Mapping/DatabaseMapperConfig.cs` (EF models and scraped data) and `Core/MapperConfig.cs` (resources to Discord types). `Startup` registers both and compiles them, so an invalid mapping fails fast. Mapster does **not** null-guard navigation chains or convert `string` → `ulong` on its own, so write these mappings out explicitly. A navigation's null check gives `""` for a non-nullable string, not `null`. Every member of a `*Resource` is mapped or `.Ignore`d with a comment saying who fills it, because an unmapped member stays empty without an error (a test compiles each resource mapping with `RequireDestinationMemberSource`). `ShallowCopyForSameType(true)` is on to avoid deep-cloning EF navigation graphs.
 
 **Discord IDs** are stored as `string` (varchar) in the DB and exposed as `ulong` on resources. Compare against `id.ToString()` in EF queries.
 
@@ -167,12 +172,11 @@ Every interaction must be acknowledged within 3 seconds, including early returns
 The schema is **database-first**:
 1. Edit the table definitions in `MainDB/Tables/*.sql`.
 2. Generate the deployment or patch script with SSDT publish (profiles: `Local_Debug`, `Local_Release`, `Main_Release`). Applied patches are archived as `MainDB/DB Patch/Patched/Patch_N.sql`. A full script can be generated too, but `Latest_Release.sql` is git-ignored, so it only exists locally.
-3. Re-scaffold `DatabaseORM/Model/*` and `DatabaseORM/Context/MainDbContext.cs` from the Package Manager Console: `Scaffold-DbContext "<connection string>" -Project "DatabaseORM" -StartupProject "DatabaseORM" Microsoft.EntityFrameworkCore.SqlServer -f -NoOnConfiguring -OutputDir Model -ContextDir Context -Context MainDbContext`. The full local command is in the git-ignored `DatabaseORM/Context/update-scaffold.txt`. Don't hand-edit or hand-style the scaffolded files. With nullable on, the scaffold writes `?` for nullable columns and optional navigations instead of `.IsRequired()`, so EF and the compiler read required columns from those annotations. That is why the models are not marked as generated code (there a `?` would be error CS8669), and also why Visual Studio's Code Cleanup changes them (it removes unused usings even with IDE0005 off there): leave `DatabaseORM/Model` out of Code Cleanup, or re-scaffold afterwards. Custom EF templates were decided against. In an `Include` path through an optional navigation, use `!` (`wp => wp.OptionPreset!.WeeklyPollOptions`): EF only reads the path.
+3. Re-scaffold `DatabaseORM/Model/*` and `DatabaseORM/Context/MainDbContext.cs` from the Package Manager Console: `Scaffold-DbContext "<connection string>" -Project "DatabaseORM" -StartupProject "DatabaseORM" Microsoft.EntityFrameworkCore.SqlServer -f -NoOnConfiguring -OutputDir Model -ContextDir Context -Context MainDbContext`. The full local command is in the git-ignored `DatabaseORM/Context/update-scaffold.txt`. Don't hand-edit or hand-style the scaffolded files. With nullable on, the scaffold writes `?` for nullable columns and optional navigations instead of `.IsRequired()`, so EF and the compiler read required columns from those annotations. That is why the models are not marked as generated code (there a `?` would be error CS8669), and also why Visual Studio's Code Cleanup changes them (it removes unused usings even with IDE0005 off there): leave `DatabaseORM/Model` out of Code Cleanup, or re-scaffold afterwards. Custom EF templates were decided against (`docs/decisions.md`). In an `Include` path through an optional navigation, use `!` (`wp => wp.OptionPreset!.WeeklyPollOptions`): EF only reads the path.
 4. Update the matching `Resource`, Mapster mapping, repository and service.
 
 Lookup data such as `ChannelType` rows is seeded from `MainDB/Post-deployment/`. Adding a `ChannelTypeEnum` value needs a matching insert there and its string forms in `ChannelTypeEnumExtension` (`DatabaseORM/Enums/ChannelTypeEnum.cs`).
 
 ## Gotchas
 
-- Image work uses **Magick.NET** (Q16, so channels are 0–65535) through `Tools/ImageTools.cs`, `Tools/MagickTools.cs`, `Tools/Extensions/MagickImageExtension.cs` and `Communication/TextFont.cs`. SixLabors ImageSharp was removed because its fixed versions need a paid license, so don't add it back. `DrawText` treats (x, y) as the top left of the text, and `TextFont` finds per-user installed fonts such as "Bot Font" through the registry.
-- The comment in `BrowserService` about Chrome 117 is from an older approach that captured video responses. The Twitter scraper now reads the video URLs from the page's JSON, so the Chrome build no longer matters (checked 2026-11-17, section 8 of the improvement notes).
+- Image work uses **Magick.NET** (Q16, so channels are 0–65535) through `Tools/ImageTools.cs`, `Tools/MagickTools.cs`, `Tools/Extensions/MagickImageExtension.cs` and `Communication/TextFont.cs`. Don't add SixLabors ImageSharp back, and don't "fix" the accepted differences from its output (both in `docs/decisions.md`). `DrawText` treats (x, y) as the top left of the text, and `TextFont` finds per-user installed fonts such as "Bot Font" through the registry.

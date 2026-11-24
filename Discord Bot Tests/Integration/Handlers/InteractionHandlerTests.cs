@@ -53,7 +53,7 @@ public sealed class InteractionHandlerTests : IAsyncLifetime
     }
 
     //The custom ID's parts can't be read as the handler's parameters, here a gender and a user ID. For such a part Discord.Net
-    //raises InteractionExecuted twice (improvement notes, 2026-11-24), so this checks what every answer says, not how many there are
+    //raises InteractionExecuted twice (docs/known-issues.md), so this checks what every answer says, not how many there are
     [Fact]
     public async Task OtherFailure_SaysSomethingWentWrong()
     {

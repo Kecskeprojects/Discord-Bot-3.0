@@ -1,135 +1,36 @@
 # Improvement notes
 
-Open work from code-quality investigations, kept so it can be picked up later. Items are removed once they are applied; the git history has the details of earlier work. Last brought up to date 2026-11-24.
+Open work, kept so it can be picked up later. This file covers every project in the repository. Items are removed once they are applied; the git history has the earlier work. Known issues left as they are are in `known-issues.md`, and decisions and code facts in `decisions.md`. Last brought up to date 2026-11-24.
 
-Done and removed on 2026-11-24 (the full notes are in `git show bb5b065:docs/improvement-notes.md`, sections 2 and 9 and the minor improvements):
-- the test project (described in CLAUDE.md "Tests") and what it needed: the clock, the state stores, `IConfig`, Discord.Net's interfaces, and the seams for Last.fm, the browser, web requests, YouTube and Spotify
-- the ten batches of tests (1021 cases), the bugs they found, and the checks that found nothing to change
-- the review of the bug fixes from 2026-11-13 to 2026-11-19
-- the birthday list names, the RestSharp versions, the culture in interpolated strings, and the four interfaces without a use
-- the reminders to closed direct messages: Discord's 50007 now removes the reminder with a warning, instead of retrying it every minute
-- `Config` as a singleton, the YouTube quota counts (a key whose units reach the daily 10,000 now hands over to the next, as one YouTube refuses does), the linked video left out of its playlist's import, the dead "unsorted" bias list branch, and `allowLackOfType` on the command checks (it stays on `DiscordTools.IsTypeOfChannel`, which the role channel needs)
-- CA1508 (dead conditional code), kept after its trial: 4 of its first 5 findings were right, and the false positive is suppressed with its reason
-- the CA1849 hand fixes, dropped: `CancelAsync` and `WaitForExitAsync` would change nothing that matters here, and the current calls have caused no problems
-- the checks by hand: a test run of the bot, Prettier's line endings and the old Chrome builds (not needed for now), the removed `BaseFeature` checks (confirmed), and the live database (nothing to clean up: the two polls that share a preset's ID got no answers saved to it, there are 45 groups, and no server has a music voice channel)
-- `!wotd` when the site fails: a timeout or a page that isn't the feed answered that the language isn't supported. The command now checks the language itself, and says the site is unavailable for every failure
-- `IdolService.ChangeGroupAsync` with a blank group name, which wasn't a bug: on LocalDB the idol keeps its group, because the group isn't loaded, so setting it to null changes nothing EF saves
-- the bot's own Last.fm and Spotify result classes (`ArtistStats`, `LastFmListResult`, `NowPlayingResult`, `WhoKnows`, `SpotifyImageSearchResult`), moved from `Services/Models`, which is marked as generated code, to `Communication/`, so nullable and the analyzers check them; `NowPlayingResult.LastTrack`, which nothing set, is gone
-- who-knows' 50 ms pause after each member's request waits on the `TimeProvider`, so its tests move the fake clock instead of waiting
-- `!bonk`'s delay is milliseconds, as its help says (20–1000, the default of 100 looks as before): the number went into the GIF as hundredths of a second, so frames lasted ten times longer. A padded number ("0250") no longer stays in the name
-- `!decide` with only commas, `!remind in` with a number or unit missing (and `!remind at 18:00`, since it's an alias), and `!birthday a add` by ID, which now finds only the server's members
-- the bias list's and the role message's order, which followed the machine's culture (Hungarian sorts "cs" after "c"), and the server and preset in `WeeklyPollService.GetPollByIdAsync`
-- who-knows and a deleted Last.fm account, which isn't a problem: `artist.getInfo` for a username that doesn't exist answers the artist without the user's play count, which counts as not listened (checked by hand; `track.getInfo` wasn't checked)
+## 1. Discord.Net: optional modernization (investigated 2026-11-15)
 
-Decided against on 2026-11-24, so they don't need another look:
-- a generic `BaseService` like `GenericRepository<T>`: the owner removed such generic service methods from the other projects, because simple queries weren't worth it
-- dropping the 13 empty repository interfaces: they stay
-- EF's own templates for the scaffold (to mark `DatabaseORM/Model` as generated code with `#nullable enable`): they would need refreshing after every EF upgrade. CLAUDE.md ("Database changes") has the workaround for Code Cleanup
-- `!lf artist`'s image: the top track's album cover from Spotify, or the top album's from Last.fm, works as intended
-- the injected `Random` for the shuffle, the mocking easter egg, the birthday greeting and the who-knows image's file name, and the fake clock for the "Days Of Week" answers and the waits in `YoutubeStreamService`, the scrapers and `ProcessTools`: their tests check properties, or they aren't tested by decision
-- R6 rounds for more than 39 players: a voice channel that full won't happen
-
-Done and removed on 2026-11-17 (the investigations are in `git show 483c1fa:docs/improvement-notes.md`, sections 4 and 9–11):
-- the move of the database layer into `DatabaseORM`
-- CRLF line endings
-- implicit usings in the bot, with Windows Forms removed
-- the BOM rule
-- the direct `System.Management` reference
-- `[RequireOwner]` on the extended idol modal
-
-## 1. Linting rules decided against (investigated 2026-11-15 to 2026-11-24)
-
-The analyzer setup is done and described in CLAUDE.md ("Linting"), and nothing is left open. These were decided against, so they don't need another look.
-
-**2026-11-24:**
-- CA1307 (36 places): spelling out `StringComparison` on `Contains` / `Replace` / `EndsWith(char)`, which are already ordinal. Explicitness only; the culture-sensitive calls are covered by CA1310, which is on.
-- CA1820 (14 places): `== ""` → `string.IsNullOrEmpty`. Marginally faster, and not a pure rename, because `IsNullOrEmpty` also accepts null.
-
-**2026-11-16:**
-- `Microsoft.VisualStudio.Threading.Analyzers`: 180 warnings in a trial build, mostly VSTHRD200 (`Async` suffix on command methods, which Discord.Net doesn't care about). It found nothing the current rules miss.
-- From `AnalysisLevel=latest-all`:
-  - CA2007 `ConfigureAwait`: the handlers run on the thread pool, and in the WPF UI code `ConfigureAwait(false)` would be wrong.
-  - CA1515 internal types: Discord.Net only discovers public modules.
-  - CA1031 catching `Exception`: the project's convention (handlers log and carry on).
-  - CA1062: nullable reference types cover it.
-  - CA1002 / CA2227 / CA1819 / CA1034 / CA1815: library API design; Mapster, JSON and Discord.Net (`Embed[]`) work with settable collections and arrays.
-  - CA1056 / CA1054 / CA1055: URLs come from the database, JSON and the config as strings.
-  - CA1724: type names that are also namespace names (`Log`, `User`, `Owner`, `Data`); renaming churn only.
-  - CA5394: `Random` is for games and easter eggs.
-  - CA1008: the enums start at 1 on purpose (database IDs, command levels).
-
-## 2. Tests: what is left (updated 2026-11-24)
-
-The test project and its conventions are described in CLAUDE.md "Tests". Nothing is open; the leftover `new Random()` and system clock uses were decided against on 2026-11-24 (see the top).
-
-- **Not worth testing (decided 2026-11-17):** the CLI processes (`yt-dlp`/`ffmpeg`, `twitch.exe`, `instaloader`), the Puppeteer scrapers, `ProcessTools` (performance counters and WMI), the real Discord connection (`BotMain`; a test would need a second bot account and a test server), live external APIs in the normal run, and the WPF parts (`App`, `BotWindow`). Where their callers are tested, the tests replace them. Decided 2026-11-24: no tests over responses recorded from the real APIs or saved scraper pages either, and none of `MusicBrainzAPI` and `WordOfTheDayService` themselves (their callers are tested with fakes); the tests keep building their responses by hand.
-
-## 3. Known issues, left as they are
-
-Seen while testing (2026-11-19 to 2026-11-24) and not changed. Some were decided; the rest wait until they become a problem.
-
-**Commands:**
-- **Names and groups that contain a hyphen (decided 2026-11-23: left until it becomes a problem).** The bias commands split their text on `-` to tell the name from the group, and so does `!ping`'s query, for each name.
-  - An idol named `j-hope` or a group named `(g)i-dle` therefore can't be added, removed or edited by name, and `!ping` finds nothing for them. `!ping miyeon-(g)i-dle` works only because three parts make it ignore the group.
-  - An alias can't help, because `!bias alias add` splits on `-` too. Only adding the whole group (`!bias add bts`) reaches such an idol.
-  - A fix was tried and dropped. It took as the separator the `-` before an existing group's name, and looked up `!ping`'s whole text first and then each `-` in turn. For `!biaslist add` it fell back to the first `-`, since that command may create the group. It worked for all the cases above on LocalDB. The live database had no idol or group name with a hyphen (checked 2026-11-24).
-- **Kept as they are (decided 2026-11-23):**
-  - `!command add` accepts a name a built-in command or alias already has (`help`, `customlist`). Such a command never runs, since `CommandHandler` falls back to custom commands only when no built-in one matches.
-  - `!greeting add` takes any text, not only a link.
-  - `!self role remove` takes a role that exists on Discord (an `IRole`). A role deleted on Discord answers "Role not found.", and the rest of the self-role logic copes with such a role.
-  - The Last.fm top lists' parameter check throws for three or more words (`!lf tal 10 7day extra`), and the command then answers nothing.
-- **Every role the bot stores is a self-role, by design (checked on LocalDB 2026-11-19).** The mute, notification and poll ping roles are in the same `Role` table as the self-roles, so `!update role message` lists them and `+name`/`-name` in the role channel finds them. The notification and poll ping roles are opt-in roles. Accepted consequences:
-  - A muted user who can still post in the role channel could take the mute role off with `-muted`; that depends on the server's channel permissions.
-  - `!self role remove` fails while the role is in use as the mute, notification or poll role (its foreign key), and the admin is told it could not be removed.
-
-**Last.fm (decided 2026-11-23):**
-- `!lf artist` pages through the user's whole library, 1000 items a page, until it has 5 albums and 8 tracks of the artist. For a large library and a rarely played artist that is many requests. Last.fm offers no better way to get one user's plays of one artist's albums and tracks.
-
-**Handlers and background work:**
-- **The Twitch monitor's channel list (accepted 2026-11-24: unlikely, and a restart fixes it).** The monitor reloads its channel list every tick, so `!twitch add` applies without a restart. It skips an empty list, though, so after the last channel anywhere is removed it keeps checking that one; its notification then finds no server and sends nothing. And when no server follows any Twitch channel at startup, `TwitchAPI.Check` logs "No channels to monitor on twitch, service stopped!" and never starts the monitor, so a channel added after that needs a restart (found 2026-11-24).
-- **Unmutes right after connecting.** A server Discord hasn't sent yet (or one in an outage) has no members, so a mute ending in that minute would count its user as gone. `IGuild.Available` can't tell, since `SocketGuild` always answers true (checked 2026-11-19); only the socket type's `IsConnected` could. The window is seconds long, and the next tick is a minute later.
-- The music commands change the queue list while the play loop reads it, without a lock. A clash is unlikely and depends on timing, so no test covers it.
-- **Discord.Net answers twice for a custom ID it can't read (accepted 2026-11-24).** For a component or modal whose `*` part doesn't convert (`BiasGame_Setup_Gender_nobody_someone`), `ComponentCommandInfo.ParseArgumentsAsync` raises `InteractionExecuted`, and `CommandInfo.ExecuteInternalAsync` raises it again with the same result. `InteractionHandler` then logs two warnings and answers twice: once as the reply, then as a follow-up. Only a custom ID the bot built wrong can reach it.
-  - A fix was tried and reverted on 2026-11-24: `InteractionHandler` remembered the interactions it had answered in a `ConditionalWeakTable` and skipped the second report. The harm is a repeated error message and log line, so it wasn't worth adding state to the singleton.
-
-## 4. Discord.Net: optional modernization (investigated 2026-11-15)
-
-When checked, Discord.Net 3.20.2 was the latest release, no `[Obsolete]` Discord.Net APIs were in use, and Discord.Commands was not deprecated. The docs note that text commands need the privileged MessageContent intent and recommend slash commands. The fixes from that review are done.
+When checked, Discord.Net 3.20.2 was the latest release, no `[Obsolete]` Discord.Net APIs were in use, and Discord.Commands was not deprecated. The docs note that text commands need the privileged MessageContent intent and recommend slash commands.
 
 - **Slash commands.** MessageContent only needs Discord approval once the bot is in 100+ servers, so text commands are fine for a self-hosted bot. Slash commands would bring built-in argument parsing, autocomplete and permissions, but would be a large migration.
 - **Components V2** (stable since 3.18) could replace the embed + button layouts for help paging, bias lists and poll editing. Cosmetic, not required.
 - **Modal improvements** (3.19–3.20): select menus, checkboxes and radio groups in modals could simplify the weekly poll and idol edit modals.
 
-Decided against:
-- Adding guilds on `JoinedGuild` instead of on every message: the bot can be added while it isn't running, so the per-message check stays.
-- `DownloadUsersAsync` per command: fine as it is.
-- `RunMode.Async`: tried in the past and dropped (see CLAUDE.md).
+## 2. Cleaning up the external services (not investigated yet)
 
-## 5. Cleaning up the external services (not investigated yet)
+The `Services/` folder (API wrappers, scrapers and CLI tools, most of them behind `Interfaces/Services/`) has grown over time. Investigate whether these services can be cleaned up or split, and whether one or more base classes would help, e.g. a shared base for REST API clients and one for the Puppeteer scrapers. The tests replace many of them through their interfaces, so a cleanup should keep those. These services stay in the bot, unlike the database layer in `DatabaseORM`.
 
-The `Services/` folder (API wrappers, scrapers and CLI tools, most of them behind `Interfaces/Services/`) has grown over time. Investigate whether these services can be cleaned up or split, and whether one or more base classes would help, e.g. a shared base for REST API clients and one for the Puppeteer scrapers. The tests replace many of them through their interfaces, so a cleanup should keep those. The database layer already moved into `DatabaseORM` (2026-11-17); these services stay in the bot.
-
-## 6. Last.fm: past periods and daily listens (not started)
+## 3. Last.fm: past periods and daily listens (not started)
 
 - **Past periods in all list commands.** Let users ask for a specific past year, and possibly a half year, quarter, month or week. Today only the rolling periods Last.fm supports work (`7day`, `1month`, `3month`, `6month`, `12month`, `overall`; see `LastFmHelper.LastfmTimePeriod`). The `user.getWeekly*Chart` endpoints return older data for a time range given as Unix timestamps:
   - `?method=user.getweeklychartlist&user=[username]&api_key=[API_KEY]&format=json` lists the available ranges.
   - `?method=user.getweeklyartistchart&user=[username]&api_key=[API_KEY]&from=1704067200&to=1735689599&format=json` returns one range (this example is the whole of 2024).
 - **Daily listens.** Last.fm has no `day` period. Add a method in `LastFmApi` (`BaseRequests`) that builds daily stats from the recent tracks endpoint when the requested period is `day` (or anything that converts to it), and use it from the list commands.
 
-## 7. Conditional (`?:`) expressions (investigated 2026-11-16)
-
-154 conditional expressions were left after the 2026-11-17 cleanup (see CLAUDE.md "Linting"). The borderline ones (fine as ternaries, `if`/`else` by taste) were left as they are. Their list is in `git show bb5b065:docs/improvement-notes.md`, section 6, with line numbers from 2026-11-17 that have since moved. The nested one it found is the image fallback in `LastFmAPI.GetArtistDataAsync`, kept with the image choice, which works as intended (2026-11-24).
-
-## 8. Instagram and Twitter embeds (investigated 2026-11-17)
+## 4. Instagram and Twitter embeds (investigated 2026-11-17)
 
 Can the disabled embeds be turned back on as they are, with adjustments and without logging in?
 
 **How they work today:**
 - **Instagram (`InstaScraper`):** a plain `HttpClient` GET (no User-Agent) to `instagram.com/graphql/query/?doc_id=8845758582119845&variables={"shortcode":…}`.
   - The call in `CommandHandler` is commented out, and so is the Instaloader path in `InstagramEmbedFeature`.
-  - `instaloader.exe` is no longer in `External Files`.
+  - `instaloader.exe` is still in `External Files/Dependencies/Instagram`.
 - **Twitter (`TwitterScraper`):** headless Chrome opens the tweet page logged out and reads the page's own `TweetResultByRestId` GraphQL response. Only the commented-out `!twt` command calls it.
-  - The Chrome build doesn't matter any more. The comment in `BrowserService` about Chrome 117 is from an older approach that captured video responses; the scraper now reads the video URLs from the JSON.
+  - The Chrome build doesn't matter any more (`decisions.md`, the Chrome 117 comment).
 
 **Test (one request, logged out, a well-known public post):**
 - Instagram answers that GraphQL GET with `401` `{"message":"Please wait a few minutes before you try again.","require_login":true}`. So the Instagram scraper doesn't work as it is.
@@ -157,7 +58,7 @@ Can the disabled embeds be turned back on as they are, with adjustments and with
 - Posts X marks as sensitive (`NsfwLoggedOut`) can't be seen logged out at all.
 - `UrlTools.SanitizeText`, which puts the links in a caption in angle brackets so Discord doesn't embed them, brackets a link twice (`<<https://x.com/p>>`) when it's already bracketed or appears twice: `Replace` changes every copy, and the next pass finds the copy again with the `>` attached (found with a probe 2026-11-23). Only these two embeds use it.
 
-## 9. MainDB as an SDK-style SQL project (investigated 2026-11-19, not started)
+## 5. MainDB as an SDK-style SQL project (investigated 2026-11-19, not started)
 
 SQL projects have a newer format: SDK-style projects built on the `Microsoft.Build.Sql` SDK, which do for `.sqlproj` what SDK-style projects did for `.csproj`. The SDK is generally available (latest stable 2.3.0, 2026-09-17, needs the .NET 8 SDK or later). Microsoft calls it "the format that will be supported in the future" ([overview](https://learn.microsoft.com/en-us/sql/tools/sql-database-projects/sql-database-projects)). `MainDB` is in the original SSDT format.
 
@@ -202,6 +103,12 @@ SQL projects have a newer format: SDK-style projects built on the `Microsoft.Bui
 - **Last.fm top tags:** a new command for `user.getTopTags`. That endpoint has no period or pagination.
 - **YouTube playlist start point:** let the user choose which song or index a playlist import starts from (`YoutubeAPI.PlaylistSearch`). It currently always takes the first page of 50 (`MaxResults`).
 - **YouTube search matching:** look into a similarity or points-based ranking of search results, beyond the current channel and filter-word filtering in `YoutubeAPI.FilteredResults`. It first came up searching for "Withcha" by Apink.
+- **A fuller README (noted 2026-11-24):** `README.md` covers what the bot is, the requirements, the external files and how to build, run and test it. A rework could add:
+  - what each feature does, with the commands (`!help` lists them from the modules' `[Summary]`), and perhaps screenshots of the window and of the bias game, who-knows and bonk images
+  - `config.json` key by key: what each one is for, and where to get the token, the Spotify, Last.fm and Twitch credentials and the YouTube keys
+  - setting up the database: publishing `MainDB` to a new server, and the `ChannelType` rows its post-deployment script adds
+  - a first run on a new machine (the .NET Desktop Runtime, the Visual C++ runtime, the fonts, Chrome's first download) and updating the external files (yt-dlp, and `libdave.dll`'s pin)
+  - how the projects fit together, for a reader who doesn't read CLAUDE.md
 
 ## Feature ideas
 
