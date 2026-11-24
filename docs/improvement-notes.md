@@ -9,6 +9,7 @@ Done and removed on 2026-11-24 (the full notes are in `git show bb5b065:docs/imp
 - the birthday list names, the RestSharp versions, the culture in interpolated strings, and the four interfaces without a use
 - the reminders to closed direct messages: Discord's 50007 now removes the reminder with a warning, instead of retrying it every minute
 - `Config` as a singleton, the YouTube quota counts (a key whose units reach the daily 10,000 now hands over to the next, as one YouTube refuses does), the linked video left out of its playlist's import, the dead "unsorted" bias list branch, and `allowLackOfType` on the command checks (it stays on `DiscordTools.IsTypeOfChannel`, which the role channel needs)
+- CA1508 (dead conditional code), kept after its trial: 4 of its first 5 findings were right, and the false positive is suppressed with its reason
 - the CA1849 hand fixes, dropped: `CancelAsync` and `WaitForExitAsync` would change nothing that matters here, and the current calls have caused no problems
 - the checks by hand: a test run of the bot, Prettier's line endings and the old Chrome builds (not needed for now), the removed `BaseFeature` checks (confirmed), and the live database (nothing to clean up: the two polls that share a preset's ID got no answers saved to it, there are 45 groups, and no server has a music voice channel)
 
@@ -20,16 +21,15 @@ Done and removed on 2026-11-17 (the investigations are in `git show 483c1fa:docs
 - the direct `System.Management` reference
 - `[RequireOwner]` on the extended idol modal
 
-## 1. Linting follow-ups (investigated 2026-11-15 and 2026-11-16)
+## 1. Linting rules decided against (investigated 2026-11-15 to 2026-11-24)
 
-The analyzer setup is done and described in CLAUDE.md ("Linting"). Left:
+The analyzer setup is done and described in CLAUDE.md ("Linting"), and nothing is left open. These were decided against, so they don't need another look.
 
-- **CA1508 (dead conditional code) is on trial.** Of its first 5 findings, 4 were right and 1 was a false positive (`AudioPlayFeature.WaitAsync`, suppressed in the bot's `Properties/GlobalSuppressions.cs`). Decide whether to keep it once it has run on new code for a while.
-- **Optional, explicitness only (no behavior change):**
-  - CA1307 (38): spell out `StringComparison` on `Contains` / `Replace` / `EndsWith(char)`, which are already ordinal. None are in `DatabaseORM`.
-  - CA1820 (15): `== ""` → `string.IsNullOrEmpty`. Not a pure rename, because `IsNullOrEmpty` also accepts null.
+**2026-11-24:**
+- CA1307 (36 places): spelling out `StringComparison` on `Contains` / `Replace` / `EndsWith(char)`, which are already ordinal. Explicitness only; the culture-sensitive calls are covered by CA1310, which is on.
+- CA1820 (14 places): `== ""` → `string.IsNullOrEmpty`. Marginally faster, and not a pure rename, because `IsNullOrEmpty` also accepts null.
 
-**Decided against (2026-11-16)**, so these don't need another look:
+**2026-11-16:**
 - `Microsoft.VisualStudio.Threading.Analyzers`: 180 warnings in a trial build, mostly VSTHRD200 (`Async` suffix on command methods, which Discord.Net doesn't care about). It found nothing the current rules miss.
 - From `AnalysisLevel=latest-all`:
   - CA2007 `ConfigureAwait`: the handlers run on the thread pool, and in the WPF UI code `ConfigureAwait(false)` would be wrong.
@@ -46,14 +46,9 @@ The analyzer setup is done and described in CLAUDE.md ("Linting"). Left:
 
 The test project and its conventions are described in CLAUDE.md "Tests". Not covered yet:
 
-- **Saved responses:** `LastFmResponses` builds each Last.fm response by hand. Recording each method once from the real API (`user.gettoptracks`, `user.gettopalbums`, `user.gettopartists`, `user.getrecenttracks`, `artist.getinfo`, `track.getinfo`, plus an error response) would be closer to the real format.
-  - Use your own account's data, or replace the usernames, and re-record them when Last.fm changes a format.
-  - An optional, opt-in live test (a trait, a real key, the network) could warn when a saved response no longer matches the real format.
-- **The scrapers' HTML parsing** (`KpopDbScraper.ParseRow` and the group scraping): split loading a page from parsing it, so the parsing takes the page content and tests can feed it saved pages. Optional.
-- **`MusicBrainzAPI` and `WordOfTheDayService`** have no tests of their own; their callers are tested with fakes. They could take their `RestClient`, as `BaseRequests` does (`WordOfTheDayService` uses a static one). No test reaches `SpotifyAPI.SearchItemAsync`'s MusicBrainz lookup yet, since the test artists have no MBID.
 - **Randomness:** `new Random()` is still in `CollectionTools`, `StringExtension.ToMockText`, `BirthdayMessageProcessor` and `WhoKnowsImageProcessor` (file names). Their tests check properties (a shuffle keeps every item). Pass the injected `Random` in, as CLAUDE.md "Randomness" describes, if a test needs to decide a roll.
 - **Left on the system clock:** the "Days Of Week" poll options (the Mapster mapping passes `DateTime.UtcNow` to `WeeklyPollTools`, which is tested on its own), and the delays in the scrapers, `YoutubeStreamService` and `ProcessTools`.
-- **Not worth testing (decided 2026-11-17):** the CLI processes (`yt-dlp`/`ffmpeg`, `twitch.exe`, `instaloader`), the Puppeteer scrapers, `ProcessTools` (performance counters and WMI), the real Discord connection (`BotMain`; a test would need a second bot account and a test server), live external APIs in the normal run, and the WPF parts (`App`, `BotWindow`). Where their callers are tested, the tests replace them.
+- **Not worth testing (decided 2026-11-17):** the CLI processes (`yt-dlp`/`ffmpeg`, `twitch.exe`, `instaloader`), the Puppeteer scrapers, `ProcessTools` (performance counters and WMI), the real Discord connection (`BotMain`; a test would need a second bot account and a test server), live external APIs in the normal run, and the WPF parts (`App`, `BotWindow`). Where their callers are tested, the tests replace them. Decided 2026-11-24: no tests over responses recorded from the real APIs or saved scraper pages either, and none of `MusicBrainzAPI` and `WordOfTheDayService` themselves (their callers are tested with fakes); the tests keep building their responses by hand.
 
 ## 3. Known issues, left as they are
 

@@ -3,8 +3,7 @@
 namespace Discord_Bot.Tests.Mocks.Http;
 
 /// <summary>
-/// Last.fm answers in the shape the real API sends, with the fields the bot reads. Responses recorded once from the real
-/// API would be closer still (see "Saved responses" in the improvement notes).
+/// Last.fm answers in the shape the real API sends, with the fields the bot reads.
 /// </summary>
 public static class LastFmResponses
 {
