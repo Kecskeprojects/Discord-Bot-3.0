@@ -95,7 +95,7 @@ public sealed class ArtistAndWhoKnowsTests
         }));
         using TestHost host = lastFm.Host();
 
-        WhoKnows result = await Api(host).GetWhoKnowsDataAsync("BLACKPINK", Members(("alice-fm", "Alice"), ("bob-fm", "Bob"), ("carol-fm", "Carol")));
+        WhoKnows result = await WhoKnowsAsync(host, api => api.GetWhoKnowsDataAsync("BLACKPINK", Members(("alice-fm", "Alice"), ("bob-fm", "Bob"), ("carol-fm", "Carol"))));
 
         Assert.Null(result.Message);
         Assert.Equal("BLACKPINK", result.EmbedTitle);
@@ -113,7 +113,7 @@ public sealed class ArtistAndWhoKnowsTests
         }));
         using TestHost host = lastFm.Host();
 
-        WhoKnows result = await Api(host).GetWhoKnowsDataAsync("BLACKPINK > Shut Down", Members(("alice-fm", "Alice"), ("bob-fm", "Bob")));
+        WhoKnows result = await WhoKnowsAsync(host, api => api.GetWhoKnowsDataAsync("BLACKPINK > Shut Down", Members(("alice-fm", "Alice"), ("bob-fm", "Bob"))));
 
         Assert.Equal("shut down by BLACKPINK", result.EmbedTitle);
         Assert.Equal([("Bob", 5), ("Alice", 2)], result.Plays.Select(play => (play.Key, play.Value)));
@@ -131,7 +131,7 @@ public sealed class ArtistAndWhoKnowsTests
         }));
         using TestHost host = lastFm.Host();
 
-        WhoKnows result = await Api(host).GetWhoKnowsByNowPlayingAsync("alice-fm", Members(("alice-fm", "Alice")));
+        WhoKnows result = await WhoKnowsAsync(host, api => api.GetWhoKnowsByNowPlayingAsync("alice-fm", Members(("alice-fm", "Alice"))));
 
         Assert.Equal("Shut Down by BLACKPINK", result.EmbedTitle);
         Assert.Equal([("Alice", 4)], result.Plays.Select(play => (play.Key, play.Value)));
@@ -143,7 +143,7 @@ public sealed class ArtistAndWhoKnowsTests
         using FakeLastFm lastFm = new(LastFmResponses.Router(new() { ["artist.getInfo"] = LastFmResponses.ArtistInfo("BLACKPINK", 0) }));
         using TestHost host = lastFm.Host();
 
-        WhoKnows result = await Api(host).GetWhoKnowsDataAsync("blackpink", Members(("alice-fm", "Alice")));
+        WhoKnows result = await WhoKnowsAsync(host, api => api.GetWhoKnowsDataAsync("blackpink", Members(("alice-fm", "Alice"))));
 
         Assert.Equal("No one has listened to this song/artist according to last.fm!", result.Message);
     }
@@ -159,7 +159,7 @@ public sealed class ArtistAndWhoKnowsTests
         }));
         using TestHost host = lastFm.Host();
 
-        WhoKnows result = await Api(host).GetWhoKnowsDataAsync("blackpink", Members(("alice-fm", "Alice"), ("other-alice-fm", "Alice")));
+        WhoKnows result = await WhoKnowsAsync(host, api => api.GetWhoKnowsDataAsync("blackpink", Members(("alice-fm", "Alice"), ("other-alice-fm", "Alice"))));
 
         Assert.Equal([("Alice", 9), ("Alice (alice-fm)", 3)], result.Plays.Select(play => (play.Key, play.Value)));
     }
@@ -173,5 +173,11 @@ public sealed class ArtistAndWhoKnowsTests
     private static ILastFmAPI Api(TestHost host)
     {
         return host.Services.GetRequiredService<ILastFmAPI>();
+    }
+
+    //Who-knows pauses on the clock after each member's request (it waited 50 ms each for real until 2026-11-24), so the fake clock moves on
+    private static Task<WhoKnows> WhoKnowsAsync(TestHost host, Func<ILastFmAPI, Task<WhoKnows>> call)
+    {
+        return host.RunOnClockAsync(call(Api(host)), TimeSpan.FromMilliseconds(50));
     }
 }

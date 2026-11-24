@@ -3,10 +3,14 @@ using LastFmApi.Enum;
 
 namespace LastFmApi;
 
-public sealed class WhoKnowsRequests(UserBasedRequests userBasedRequests, InfoBasedRequests infoBasedRequests)
+public sealed class WhoKnowsRequests(UserBasedRequests userBasedRequests, InfoBasedRequests infoBasedRequests, TimeProvider timeProvider)
 {
+    //A short pause after each member's request goes easy on Last.fm; it waits on the TimeProvider, so tests move a fake clock instead
+    private static readonly TimeSpan pauseBetweenMembers = TimeSpan.FromMilliseconds(50);
+
     private readonly UserBasedRequests userBasedRequests = userBasedRequests;
     private readonly InfoBasedRequests infoBasedRequests = infoBasedRequests;
+    private readonly TimeProvider timeProvider = timeProvider;
 
     public async Task<GenericResponseItem<WhoKnowsResponseItem>> WhoKnowsByCurrentlyPlayingAsync(string apiKey, string username, List<string> usernameList)
     {
@@ -68,7 +72,7 @@ public sealed class WhoKnowsRequests(UserBasedRequests userBasedRequests, InfoBa
                     response.Response.Plays.Add(user, playcount);
                 }
 
-                await Task.Delay(50);
+                await Task.Delay(pauseBetweenMembers, timeProvider);
             }
 
             response.ResultCode = LastFmRequestResultEnum.Success;
@@ -121,7 +125,7 @@ public sealed class WhoKnowsRequests(UserBasedRequests userBasedRequests, InfoBa
                     response.Response.Plays.Add(user, playcount);
                 }
 
-                await Task.Delay(50);
+                await Task.Delay(pauseBetweenMembers, timeProvider);
             }
 
             response.ResultCode = LastFmRequestResultEnum.Success;
@@ -157,7 +161,7 @@ public sealed class WhoKnowsRequests(UserBasedRequests userBasedRequests, InfoBa
                     response.Response.Plays.Add(user, playcount);
                 }
 
-                await Task.Delay(50);
+                await Task.Delay(pauseBetweenMembers, timeProvider);
             }
 
             response.ResultCode = LastFmRequestResultEnum.Success;

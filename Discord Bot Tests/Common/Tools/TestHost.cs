@@ -70,6 +70,18 @@ public sealed class TestHost : IDisposable
         return scope.ServiceProvider.GetRequiredService<T>();
     }
 
+    //Waits for a call that waits on the fake clock (Task.Delay with the TimeProvider), moving the clock on by step until it finishes
+    public async Task<T> RunOnClockAsync<T>(Task<T> call, TimeSpan step)
+    {
+        for (int i = 0; !call.IsCompleted && i < 100_000; i++)
+        {
+            Clock.Advance(step);
+            await Task.Yield();
+        }
+        Assert.True(call.IsCompleted, "The call didn't finish while the clock moved on");
+        return await call;
+    }
+
     //Runs a text command the way CommandHandler does: in its own scope, after the one-character prefix
     public async Task<CommandResult> RunCommandAsync(ICommandContext context)
     {
