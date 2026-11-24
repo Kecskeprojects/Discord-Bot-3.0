@@ -7,6 +7,7 @@ Done and removed on 2026-11-24 (the full notes are in `git show bb5b065:docs/imp
 - the ten batches of tests (1021 cases), the bugs they found, and the checks that found nothing to change
 - the review of the bug fixes from 2026-11-13 to 2026-11-19
 - the birthday list names, the RestSharp versions, the culture in interpolated strings, and the four interfaces without a use
+- the checks by hand: a test run of the bot, Prettier's line endings and the old Chrome builds (not needed for now), the removed `BaseFeature` checks (confirmed), and the live database (nothing to clean up: the two polls that share a preset's ID got no answers saved to it, there are 45 groups, and no server has a music voice channel)
 
 Done and removed on 2026-11-17 (the investigations are in `git show 483c1fa:docs/improvement-notes.md`, sections 4 and 9–11):
 - the move of the database layer into `DatabaseORM`
@@ -15,28 +16,6 @@ Done and removed on 2026-11-17 (the investigations are in `git show 483c1fa:docs
 - the BOM rule
 - the direct `System.Management` reference
 - `[RequireOwner]` on the extended idol modal
-
-## To check by hand
-
-- **Run the bot once against the dev database and Discord.** The last real run was before 2026-11-17. Since then the database layer moved into `DatabaseORM`, the services went behind interfaces, the commands moved onto Discord.Net's interfaces, and most commands changed while they got tests. What has been checked: builds, `dotnet format`, the tests, and throwaway programs (one ran `ProcessTools.GetStatistics()` and loaded a resx bitmap).
-  - Worth a try: a Spotify track and playlist link, a mute (by name and by ID) and an unmute, the R6 randomizer from a voice channel, a weekly poll edit, `!leave` while playing, a Last.fm top list and who-knows (with its image), a bonk, a reminder (`!remind in 1m>test`), a short mute, a self-role request, a bias game (start, stop, and one played to the end), and music (a YouTube search, a playlist link, and waiting until the inactivity disconnect).
-  - Worth a look in the window: the diagnostics line.
-- **VS Code's Prettier and CRLF.** Prettier writes LF by default. It should take `end_of_line = crlf` from the root `.editorconfig`, but that is untested in the VS Code extension.
-  - To check: save a Markdown file in VS Code, then run `git ls-files --eol -- <file>`. It should say `w/crlf`.
-  - If it doesn't, add a `.prettierrc` with `"endOfLine": "crlf"`.
-- **Old Chrome builds.** `BrowserService` downloads PuppeteerSharp's default Chrome build on first use after every PuppeteerSharp upgrade, and never removes the old ones. On 2026-11-17 the old `net10.0` output folder alone held 7 Chrome and 6 ChromeHeadlessShell builds (117 to 150). Delete all but the current build, in the bot's folder on the live server too.
-- **The removed `BaseFeature` checks.** Its two `IsCommandAllowedAsync` overloads were removed on 2026-11-23, since no feature called them once the music voice check compared the user's voice channel directly. Check that they should stay removed.
-- **On the live database**, for what the fixes of 2026-11-19 to 2026-11-23 may have left behind:
-  - Poll answers that went to a preset with the same ID through the old answer menu. They show as two answers in one slot of a preset; clean them up:
-    ```sql
-    SELECT WeeklyPollOptionPresetId, OrderNumber, COUNT(*) FROM WeeklyPollOption WHERE WeeklyPollOptionPresetId IS NOT NULL GROUP BY WeeklyPollOptionPresetId, OrderNumber HAVING COUNT(*) > 1
-    ```
-  - Idol and group names with a hyphen, which the bias commands can't reach (see "Known issues"). Any rows here would be a reason to bring back the dropped fix:
-    ```sql
-    SELECT Name FROM Idol WHERE Name LIKE '%-%' UNION ALL SELECT Name FROM IdolGroup WHERE Name LIKE '%-%'
-    ```
-  - `SELECT COUNT(DISTINCT GroupId) FROM Idol` above 125 means `!bias list` and `!my biases` without a group had been failing (logged as `UserBiasCommands.cs BiasList`).
-  - A server with a channel of the `musicvoice` type couldn't play music at all.
 
 ## 1. Linting follow-ups (investigated 2026-11-15 and 2026-11-16)
 
@@ -84,7 +63,7 @@ Seen while testing (2026-11-19 to 2026-11-24) and not changed. Some were decided
 - **Names and groups that contain a hyphen (decided 2026-11-23: left until it becomes a problem).** The bias commands split their text on `-` to tell the name from the group, and so does `!ping`'s query, for each name.
   - An idol named `j-hope` or a group named `(g)i-dle` therefore can't be added, removed or edited by name, and `!ping` finds nothing for them. `!ping miyeon-(g)i-dle` works only because three parts make it ignore the group.
   - An alias can't help, because `!bias alias add` splits on `-` too. Only adding the whole group (`!bias add bts`) reaches such an idol.
-  - A fix was tried and dropped. It took as the separator the `-` before an existing group's name, and looked up `!ping`'s whole text first and then each `-` in turn. For `!biaslist add` it fell back to the first `-`, since that command may create the group. It worked for all the cases above on LocalDB. The live check is under "To check by hand".
+  - A fix was tried and dropped. It took as the separator the `-` before an existing group's name, and looked up `!ping`'s whole text first and then each `-` in turn. For `!biaslist add` it fell back to the first `-`, since that command may create the group. It worked for all the cases above on LocalDB. The live database had no idol or group name with a hyphen (checked 2026-11-24).
 - **Kept as they are (decided 2026-11-23):**
   - `!command add` accepts a name a built-in command or alias already has (`help`, `customlist`). Such a command never runs, since `CommandHandler` falls back to custom commands only when no built-in one matches.
   - `!greeting add` takes any text, not only a link.
