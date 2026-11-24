@@ -72,7 +72,7 @@ Blockers 1 to 4 and the interfaces below are done (2026-11-18). Blocker 5 is han
    - Checked with a throwaway program: the container validates with a fake clock, all 34 command and interaction modules construct, and the date helpers give the old results for a fixed time.
    - The birthday and "already muted" queries used to compare against `GETUTCDATE()` on the SQL server; they now send the bot's own UTC time as a parameter. That only differs if the two machines' clocks disagree.
    - **Left on the system clock:**
-     - The scheduler's decisions in `App.OnTimedEvent` (06:00, midnight, Mondays). `App` is the WPF application and can't be tested; move those decisions into a plain class with `TimeProvider` if they need tests.
+     - ~~The scheduler's decisions in `App.OnTimedEvent` (06:00, midnight, Mondays).~~ **Done 2026-11-24:** `ScheduleTools.DueAt` decides them from the time `App` reads once per tick from `TimeProvider` (see "Next" item 10).
      - The "Days Of Week" poll options: the Mapster mapping passes `DateTime.UtcNow` to `WeeklyPollTools`, which is testable on its own.
      - The delays in the scrapers, `YoutubeStreamService` and `ProcessTools`, which are in code that isn't unit-tested.
    - The waits in the features use `Task.Delay(delay, timeProvider)` (done 2026-11-18): both in `AudioPlayFeature` (the wait for new requests and the pause for too-short videos), `YoutubeAddPlaylistFeature`'s polling for the user's answer, and `SelfRoleFeature`'s 1.5 seconds before deleting its reply. A fake clock skips them; with `TimeProvider.System` they wait as before.
@@ -170,7 +170,7 @@ No interface needed:
 - Features and processors that only commands and interactions inject (`AudioPlayFeature`, `AudioRequestFeature`, `WeeklyPollFeature`, `BiasScrapingProcessor`, the image processors): commands aren't test targets (blocker 5), so nothing has to mock them.
 - `MusicBrainzAPI` and `WordOfTheDayService`: thin wrappers, already behind interfaces, so their consumers can mock them. Their own parsing could be tested by passing in the `RestClient`, as for `BaseRequests` (optional).
 - `TwitchCLI`, `YoutubeStreamService`, `InstaLoader` (CLI processes) and `ProcessTools` / `ProcessExtension` (performance counters and WMI for the window's diagnostics): not worth testing.
-- `TwitchAPI`: TwitchLib's monitor raises the events. To test the live / offline decisions, move them into a plain class that the event handlers call, rather than wrapping the monitor.
+- `TwitchAPI`: TwitchLib's monitor raises the events. **Done 2026-11-24** without a new class: the event handlers call two internal methods, which the tests run directly (see "Next" item 10).
 - `CommandService` / `InteractionService` (Discord.Net): only the handlers and the help command use them.
 
 Randomness and files (no interface, but tests have to account for them):
@@ -278,6 +278,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
     - Last.fm: the service over a fake Last.fm, every `!lf` command and the embeds (added 2026-11-23, 51 more cases, 920 in all; see "Next" item 4)
     - Music: the queue commands, `!play` and the play loop on the fake clock (added 2026-11-23, 32 more cases, 952 in all; see "Next" item 7)
     - The weekly bias data refresh, smoke tests of the four images, and `!bonk` (added 2026-11-23, 22 more cases, 974 in all; see "Next" items 6 and 7)
+    - The scheduler's timing, the Twitch monitor, `BotLogger`, `Config`, and the routing and error replies of both handlers (added 2026-11-24, 47 more cases, 1021 in all; see "Next" item 10)
 - **Next, roughly in order of value:**
   1. The Mapster mappings (`DatabaseMapperConfig`, `MapperConfig`). **Done 2026-11-19:**
      - The tests cover every hand-written mapping, including navigations a query didn't load. One theory compiles each resource mapping with `RequireDestinationMemberSource`, so a new resource member without a mapping fails it.
@@ -455,6 +456,7 @@ Yes, the bot's test project can run integration tests: real services wired toget
          - `!command add` accepts a name a built-in command or alias already has (`help`, `customlist`). Such a command never runs, since `CommandHandler` falls back to custom commands only when no built-in one matches; no check is needed.
          - `!greeting add` takes any text, not only a link: greetings were never meant to be links only.
        - Seen, not changed: the Twitch monitor reloads its channel list every tick, so `!twitch add` applies without a restart. It skips an empty list, though, so after the last channel anywhere is removed it keeps checking that one. Its notification then finds no server and sends nothing.
+         - **Corrected 2026-11-24:** only while the monitor runs. When no server follows any Twitch channel at startup, `TwitchAPI.Check` logs "No channels to monitor on twitch, service stopped!" and never starts the monitor, so a channel added after that needs a restart.
      - **Third batch done 2026-11-23:** the bias commands.
        - `Integration/Biases/BiasCommandTests`:
          - `!bias add/remove` by name, by `name-group` and by a whole group, with each result message
@@ -539,6 +541,18 @@ Yes, the bot's test project can run integration tests: real services wired toget
      - **Fixed (each confirmed by its test failing first):** Discord.Net refuses an embed with more than 25 fields or an empty field value, so these lists failed whole.
        - **`!birthday list` failed at 16, 31 or 46 birthdays, and at more than 60.** A field opens after every 15th birthday (the first field holds 16), so a list ending there left a new, empty field. The loop also stops when the fifth field opens, which left that field empty for any longer list. Empty fields are now skipped. The list shows the first 61, with "N more not shown" in the footer.
        - **`!greeting list` and `!remind list` failed past 25 entries** (one field each). They now show 25 and the same footer. The reminders are by date, so those are the soonest, and `!remind remove` still takes any position.
+  10. The scheduler, the Twitch monitor, the logger, the config and the two handlers. **Done 2026-11-24** (47 cases). The bot's project file now lets the tests see its internals (`InternalsVisibleTo`), for the seams below.
+     - `Unit/Bot/Tools/ScheduleToolsTests` (11): `ScheduleTools.DueAt` gives what is due at a minute (`ScheduledTaskEnum` flags): the window log at midnight, birthdays and weekly polls at 06:00, plus the bias data on Mondays, and the YouTube keys at 08:00.
+     - `Integration/Twitch/TwitchMonitorTests` (5): `TwitchAPI.StreamOnlineAsync` and `StreamOffline`, which TwitchLib's event handlers call, on the real container with the channel list and Discord replaced.
+     - `Unit/Bot/Core/Configuration/ConfigTests` (4): `Config` over a folder of its own (an internal constructor): a missing file is written, keys match in any case, missing values read as empty, and an edit applies without a restart.
+     - `Unit/Bot/Core/BotLoggerTests` (4): the window and the file, `LogOnly` and `ConsoleOnly`, the indented error, and a log file in use keeping the logs for the next write.
+     - `Integration/Handlers/CommandHandlerTests` (19): `CommandHandler.ProcessMessageAsync` now takes an `IMessage` and builds Discord.Net's plain `CommandContext`, so the tests send messages to the bot's own handler: both prefixes, direct messages, a new server added first (or the error when it can't be), bot, webhook and system messages only logged, the role channel, the easter eggs, the custom command fallback (not in DMs), and the reply, or the warning, for a command that fails.
+     - `Integration/Handlers/InteractionHandlerTests` (4): the answers for an unknown custom ID, a precondition that fails and a custom ID that can't be read, and a follow-up when the interaction was already answered.
+     - **Fixed:**
+       - **Only the first server following a Twitch stream was notified** (confirmed by its test failing first). The stream counted as online after the first server's notification, so the others found it online already. The status now flips once, atomically, before the servers are notified.
+       - **The scheduler read the clock again for every check** (seen in the code; `App` itself isn't tested). Each check read `DateTime.UtcNow` after the reconnect, which can take over a minute. A slow reconnect at 06:00 then read 06:01 and skipped that day's birthdays and polls, and one that started at 05:59 could run them, with the 06:00 tick running them again. The tick now reads the time once, before the reconnect.
+     - **Checked, not a problem:** `Config`'s file watcher. A probe on 2026-11-23 found no handle leak, which matches the 2026-11-18 measurement (see "`Config` as a singleton" under "Minor improvements").
+     - **Found, not changed: Discord.Net answers twice for a custom ID it can't read** (checked in its source on 2026-11-24). For a component or modal whose `*` part doesn't convert (`BiasGame_Setup_Gender_nobody_someone`), `ComponentCommandInfo.ParseArgumentsAsync` raises `InteractionExecuted`, and `CommandInfo.ExecuteInternalAsync` raises it again with the same result. `InteractionHandler` then logs two warnings and answers twice: once as the reply, then as a follow-up. Only a custom ID the bot built wrong can reach it. A fix would answer each interaction once in `InteractionHandler` (for example, remember the interactions it answered in a `ConditionalWeakTable`).
 
 ## 3. Discord.Net: optional modernization (investigated 2026-11-15)
 

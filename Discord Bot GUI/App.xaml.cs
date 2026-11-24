@@ -1,10 +1,12 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Discord_Bot.Core;
+using Discord_Bot.Enums;
 using Discord_Bot.Features;
 using Discord_Bot.Interfaces;
 using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors;
+using Discord_Bot.Tools;
 using Discord_Bot.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
@@ -150,6 +152,9 @@ public sealed partial class App : Application, IDisposable
         {
             using (IServiceScope scope = services.CreateScope())
             {
+                //Read once, before the reconnect, which can take a while (until 2026-11-23 each check read the clock again after it)
+                ScheduledTaskEnum due = ScheduleTools.DueAt(scope.ServiceProvider.GetRequiredService<TimeProvider>().GetUtcNow().UtcDateTime);
+
                 DiscordSocketClient client = scope.ServiceProvider.GetRequiredService<DiscordSocketClient>();
                 if (client.LoginState == LoginState.LoggedOut && botService != null)
                 {
@@ -157,31 +162,28 @@ public sealed partial class App : Application, IDisposable
                     await botService.RunBotAsync();
                 }
 
-                //Do at GMT+0 midnight every day
-                if (DateTime.UtcNow.Hour == 0 && DateTime.UtcNow.Minute == 0)
+                if (due.HasFlag(ScheduledTaskEnum.ClearWindowLog))
                 {
                     BotWindow.ClearWindowLog();
                 }
 
-                //Do at GMT+0 6 am every day
-                if (DateTime.UtcNow.Hour == 6 && DateTime.UtcNow.Minute == 0)
+                if (due.HasFlag(ScheduledTaskEnum.BirthdaysAndWeeklyPolls))
                 {
                     BirthdayFeature birthdayFeature = scope.ServiceProvider.GetRequiredService<BirthdayFeature>();
                     _ = await birthdayFeature.Run();
 
                     WeeklyPollFeature weeklyPollFeature = scope.ServiceProvider.GetRequiredService<WeeklyPollFeature>();
                     _ = await weeklyPollFeature.Run();
+                }
 
-                    //Only on a monday
-                    if (DateTime.UtcNow.DayOfWeek == DayOfWeek.Monday)
-                    {
-                        _ = StartBiasScraping();
-                    }
+                if (due.HasFlag(ScheduledTaskEnum.BiasScraping))
+                {
+                    _ = StartBiasScraping();
                 }
 
                 //YouTube resets the quotas at midnight Pacific time: 08:00 UTC in winter, 07:00 in summer.
                 //Refilled any earlier, a search before that reset would drop the used-up keys again until the next refill
-                if (DateTime.UtcNow.Hour == 8 && DateTime.UtcNow.Minute == 0)
+                if (due.HasFlag(ScheduledTaskEnum.YoutubeKeyRefill))
                 {
                     IConfig config = scope.ServiceProvider.GetRequiredService<IConfig>();
                     scope.ServiceProvider.GetRequiredService<YoutubeKeyStore>().Reset(config.Youtube_API_Keys);

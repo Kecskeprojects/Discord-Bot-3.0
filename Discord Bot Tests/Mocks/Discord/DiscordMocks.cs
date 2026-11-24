@@ -37,16 +37,23 @@ public static class DiscordMocks
         return guild;
     }
 
-    //A text command in Discord.Net's own (non-socket) CommandContext, the kind CommandHandler makes from a gateway message;
-    //run it with TestHost.RunCommandAsync
-    public static ICommandContext TextCommand(string text, IUser author, IMessageChannel channel)
+    //A message as the gateway delivers it to CommandHandler; a substitute's Source would be System, which the handler only logs
+    public static IUserMessage UserMessage(string text, IUser author, IMessageChannel channel, MessageSource source = MessageSource.User)
     {
         IUserMessage message = Substitute.For<IUserMessage>();
         message.Content.Returns(text);
         message.Author.Returns(author);
         message.Channel.Returns(channel);
         message.Id.Returns(DiscordIds.Message);
-        return new CommandContext(Substitute.For<IDiscordClient>(), message);
+        message.Source.Returns(source);
+        return message;
+    }
+
+    //A text command in Discord.Net's own (non-socket) CommandContext, the kind CommandHandler makes from a gateway message;
+    //run it with TestHost.RunCommandAsync
+    public static ICommandContext TextCommand(string text, IUser author, IMessageChannel channel)
+    {
+        return new CommandContext(Substitute.For<IDiscordClient>(), UserMessage(text, author, channel));
     }
 
     //A choice in a select menu with this custom ID; RespondWithModalAsync succeeds, check it with Received()

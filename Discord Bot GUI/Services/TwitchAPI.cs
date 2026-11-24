@@ -101,32 +101,7 @@ public class TwitchAPI(
         try
         {
             logger.Query($"Streamer turned online: {e.Stream.UserName} with id: {e.Stream.Id}");
-            List<TwitchChannelResource> channels = await GetTwitchChannelsAsync();
-            if (channels == null)
-            {
-                return;
-            }
-
-            foreach (TwitchChannelResource channel in channels)
-            {
-                if (channelStatuses.TryGetValue(channel.TwitchId, out bool channelStatus) &&
-                    !channelStatus &&
-                    channel.TwitchId == e.Stream.UserId)
-                {
-                    TwitchNotificationData data = new()
-                    {
-                        TwitchChannel = channel,
-                        ThumbnailUrl = e.Stream.ThumbnailUrl,
-                        Title = e.Stream.Title
-                    };
-                    using (IServiceScope scope = services.CreateScope())
-                    {
-                        TwitchNotificationFeature twitchNotificationFeature = scope.ServiceProvider.GetRequiredService<TwitchNotificationFeature>();
-                        _ = await twitchNotificationFeature.Run(data);
-                    }
-                    channelStatuses[channel.TwitchId] = true;
-                }
-            }
+            await StreamOnlineAsync(e.Stream.UserId, e.Stream.ThumbnailUrl, e.Stream.Title);
         }
         catch (Exception ex)
         {
@@ -134,33 +109,51 @@ public class TwitchAPI(
         }
     }
 
+    //A tracked stream that went online notifies each server following it, once until it goes offline; internal so tests can run it
+    //without TwitchLib's monitor. The handlers can overlap, so the status flips atomically. Until 2026-11-23 it flipped after the
+    //first server's notification, so the other servers following the same stream got none
+    internal async Task StreamOnlineAsync(string twitchId, string thumbnailUrl, string title)
+    {
+        if (!channelStatuses.TryUpdate(twitchId, true, false))
+        {
+            return;
+        }
+
+        List<TwitchChannelResource> channels = await GetTwitchChannelsAsync();
+        foreach (TwitchChannelResource channel in channels.Where(channel => channel.TwitchId == twitchId))
+        {
+            TwitchNotificationData data = new()
+            {
+                TwitchChannel = channel,
+                ThumbnailUrl = thumbnailUrl,
+                Title = title
+            };
+            using (IServiceScope scope = services.CreateScope())
+            {
+                TwitchNotificationFeature twitchNotificationFeature = scope.ServiceProvider.GetRequiredService<TwitchNotificationFeature>();
+                _ = await twitchNotificationFeature.Run(data);
+            }
+        }
+    }
+
     //Make console message when stream goes offline
-    private async void MonitorOnStreamOffline(object? sender, OnStreamOfflineArgs e)
+    private void MonitorOnStreamOffline(object? sender, OnStreamOfflineArgs e)
     {
         try
         {
             logger.Query($"Streamer turned offline: {e.Stream.UserName} with id: {e.Stream.Id}");
-
-            List<TwitchChannelResource> channels = await GetTwitchChannelsAsync();
-            if (channels == null)
-            {
-                return;
-            }
-
-            foreach (TwitchChannelResource channel in channels)
-            {
-                if (channelStatuses.TryGetValue(channel.TwitchId, out bool channelStatus) &&
-                    channelStatus &&
-                    channel.TwitchId == e.Stream.UserId)
-                {
-                    channelStatuses[channel.TwitchId] = false;
-                }
-            }
+            StreamOffline(e.Stream.UserId);
         }
         catch (Exception ex)
         {
             logger.Error("TwitchAPI.cs MonitorOnStreamOffline", ex);
         }
+    }
+
+    //The next time the stream goes online notifies again; internal so tests can run it without TwitchLib's monitor
+    internal void StreamOffline(string twitchId)
+    {
+        _ = channelStatuses.TryUpdate(twitchId, false, true);
     }
 
     //Every 2 hours, send message on console, every 24 hours, refresh token and reset counter
@@ -234,7 +227,8 @@ public class TwitchAPI(
         }
     }
 
-    private async Task<List<string>> GetChannelsAsync()
+    //Tracks every followed channel as offline until the monitor says otherwise; internal so tests can load them
+    internal async Task<List<string>> GetChannelsAsync()
     {
         List<TwitchChannelResource> channels = await GetTwitchChannelsAsync();
         List<string> lst = [];

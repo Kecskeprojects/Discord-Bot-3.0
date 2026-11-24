@@ -42,7 +42,8 @@ public class CommandHandler(
         return Task.CompletedTask;
     }
 
-    private async Task ProcessMessageAsync(SocketMessage arg)
+    //The routing works on Discord.Net's interfaces (since 2026-11-23), so tests can send it messages; the socket event above is its only caller
+    internal async Task ProcessMessageAsync(IMessage arg)
     {
         try
         {
@@ -57,7 +58,7 @@ public class CommandHandler(
             {
                 if (!DiscordTools.IsDM(arg))
                 {
-                    logger.MesOther(arg.Content, ((SocketGuildChannel) arg.Channel).Guild.Name);
+                    logger.MesOther(arg.Content, ((IGuildChannel) arg.Channel).Guild.Name);
                 }
                 else
                 {
@@ -66,12 +67,12 @@ public class CommandHandler(
                 return;
             }
 
-            if (arg is not SocketUserMessage message)
+            if (arg is not IUserMessage message)
             {
                 return;
             }
 
-            SocketCommandContext context = new(client, message);
+            CommandContext context = new(client, message);
             int argPos = 0;
 
             //Check if the message is an embed or not
@@ -110,7 +111,7 @@ public class CommandHandler(
     }
 
     //Null only in DMs; in a server it throws when the server can't be loaded or added
-    private async Task<ServerResource?> GetServerAsync(SocketCommandContext context)
+    private async Task<ServerResource?> GetServerAsync(CommandContext context)
     {
         if (DiscordTools.IsDM(context))
         {
@@ -137,7 +138,7 @@ public class CommandHandler(
         }
     }
 
-    private async Task ExecuteCommandAsync(SocketCommandContext context, int argPos)
+    private async Task ExecuteCommandAsync(ICommandContext context, int argPos)
     {
         using (IServiceScope scope = services.CreateScope())
         {
@@ -145,7 +146,7 @@ public class CommandHandler(
         }
     }
 
-    private async Task HandleRoleAssignmentAsync(SocketCommandContext context, int argPos)
+    private async Task HandleRoleAssignmentAsync(CommandContext context, int argPos)
     {
         using (IServiceScope scope = services.CreateScope())
         {
@@ -160,7 +161,7 @@ public class CommandHandler(
         }
     }
 
-    private async Task HandleFeatureCheckAsync(SocketCommandContext context)
+    private async Task HandleFeatureCheckAsync(ICommandContext context)
     {
         using (IServiceScope scope = services.CreateScope())
         {

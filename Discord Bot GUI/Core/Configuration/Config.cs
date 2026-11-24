@@ -30,10 +30,13 @@ public class Config : IConfig
         public bool show_diagnostics;
     }
 
-    public Config()
+    public Config() : this(Path.Combine(Directory.GetCurrentDirectory(), "Assets"))
     {
-        string assetDir = Path.Combine(Directory.GetCurrentDirectory(), "Assets");
+    }
 
+    //The folder that holds config.json; internal so tests can use a folder of their own
+    internal Config(string assetDir)
+    {
         if (!Directory.Exists(assetDir))
         {
             _ = Directory.CreateDirectory(assetDir);
