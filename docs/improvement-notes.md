@@ -98,6 +98,22 @@ SQL projects have a newer format: SDK-style projects built on the `Microsoft.Bui
 
 **When to revisit:** when Visual Studio 2026 supports SDK-style SQL projects. It could happen sooner if SSMS's Database DevOps workload covers the schema work: try it on a converted copy of `MainDB` first. Check that it builds the same dacpac, that Generate Script makes a patch from the existing profiles, and that editing tables as scripts without the designer is acceptable. A community SDK, `MSBuild.Sdk.SqlProj`, also builds dacpacs with `dotnet build`. Not looked at.
 
+## 6. Deployment and CI/CD (noted 2026-11-24, not started)
+
+There is no pipeline yet: the build, the tests and the deploy to the live server (Windows Server 2022) are done by hand, and database patches are published from Visual Studio with the `Main_Release` profile. The goal is an automatic build and test on every push, and eventually a repeatable deploy. (The dev PC has an empty, untracked `.github/workflows` folder from 2024.)
+
+To work out:
+- **CI:** GitHub Actions, since the repository is on GitHub, on a Windows runner (the projects target `net11.0-windows`):
+  - build the four projects (not the `.sln`, see CLAUDE.md "Commands"), run `dotnet format --verify-no-changes` for each, the BOM check and the tests
+  - the `Integration/Database/` tests need LocalDB: check whether the runner image has it, install it in the job, or leave those tests to the dev PC
+  - `MainDB` only builds with Visual Studio's SSDT; §5 (SDK-style) would let CI build its dacpac too
+- **Deploy:** `dotnet publish` the bot for `win-x64` as the build's artifact. On the server: stop the bot, replace its folder while keeping `Assets/config.json` and `Logs/`, start it again, and keep the previous folder to go back to.
+  - The bot is a WPF window, not a service, so it has to start in a logged-on user's session (a scheduled task at logon, for example).
+  - The two obvious routes are a script the dev PC runs against the server, or a self-hosted runner on the server. GitHub advises against self-hosted runners for public repositories, because a pull request from a fork could run code on the machine.
+- **Database patches:** `SqlPackage` (`/Action:Script` or `/Action:Publish` with `Main_Release.publish.xml`) could replace the Visual Studio step, with the script still archived as `Patch_N.sql`.
+- **Secrets:** the config with the token and API keys stays on the server. Building and testing need none of it (the tests use `TestConfig`).
+- **The server's requirements** (the .NET Desktop Runtime, the Visual C++ runtime, the fonts) are in the README; a deploy could check them first.
+
 ## Minor improvements
 
 - **Last.fm top tags:** a new command for `user.getTopTags`. That endpoint has no period or pagination.
