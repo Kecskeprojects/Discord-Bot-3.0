@@ -166,14 +166,27 @@ public sealed class BirthdayCommandTests : IDisposable
     [Fact]
     public async Task AdminBirthdayAdd_UserById_SavesTheirBirthday()
     {
-        ICommandContext context = DiscordMocks.TextCommand($"!birthday a add {DiscordIds.User}>2000.03.04", admin, channel.Channel);
-        context.Client.GetUserAsync(DiscordIds.User).Returns(member);
-
-        CommandResult result = await host.RunCommandAsync(context);
+        CommandResult result = await RunAsync($"!birthday a add {DiscordIds.User}>2000.03.04", admin);
 
         Assert.True(result.IsSuccess, result.ErrorReason);
         await birthdayService.Received().AddBirthdayAsync(DiscordIds.Server, DiscordIds.User, march4);
         Assert.Equal("Birthday added to database.", Assert.Single(channel.Sent).Text);
+    }
+
+    //Any Discord account was looked up by ID until 2026-11-24, so a wrong ID was saved, and its greeting skipped every year
+    [Fact]
+    public async Task AdminBirthdayAdd_IdOfSomeoneNotOnTheServer_SaysSo()
+    {
+        const ulong stranger = 987654321098765432;
+        ICommandContext context = DiscordMocks.TextCommand($"!birthday a add {stranger}>2000.03.04", admin, channel.Channel);
+        IUser strangerUser = DiscordMocks.User(stranger);
+        context.Client.GetUserAsync(stranger).Returns(strangerUser);
+        guild.GetUserAsync(stranger, CacheMode.CacheOnly).Returns((IGuildUser?) null);
+
+        await host.RunCommandAsync(context);
+
+        await birthdayService.DidNotReceiveWithAnyArgs().AddBirthdayAsync(default, default, default);
+        Assert.Equal("No user was found with that ID!", Assert.Single(channel.Sent).Text);
     }
 
     [Fact]

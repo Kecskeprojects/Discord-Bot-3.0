@@ -36,14 +36,16 @@ public class AdminBirthdayCommands(
             string userIdOrName = parts[0].ToLower();
             string dateString = parts[1].ToLower();
 
+            //Only the server's members, by ID too: until 2026-11-24 an ID was looked up as any Discord account, so a wrong one was
+            //saved, and its greeting skipped every year
             IUser? user = null;
+            await Context.Guild.DownloadUsersAsync();
             if (ulong.TryParse(userIdOrName, out ulong id))
             {
-                user = await Context.Client.GetUserAsync(id);
+                user = await Context.Guild.GetUserAsync(id, CacheMode.CacheOnly);
             }
             else
             {
-                await Context.Guild.DownloadUsersAsync();
                 IReadOnlyCollection<IGuildUser> users = await Context.Guild.SearchUsersAsync(userIdOrName, 1);
                 if (users.Count > 0)
                 {

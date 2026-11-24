@@ -82,6 +82,16 @@ public sealed class RandomizerCommandTests : IDisposable
         Assert.Equal("Sushi", Assert.Single(channel.Sent).Text);
     }
 
+    //It threw, logged the exception and answered nothing until 2026-11-24
+    [Fact]
+    public async Task Decide_OnlyCommas_SaysHowToGiveOptions()
+    {
+        await RunAsync("!decide , ,");
+
+        Assert.Equal("Give at least one option, separated by commas, e.g.: `!decide pizza, pasta`", Assert.Single(channel.Sent).Text);
+        host.Logger.DidNotReceiveWithAnyArgs().Error(default!, default(Exception)!);
+    }
+
     [Fact]
     public async Task R6Randomizer_OutsideAVoiceChannel_GivesOnlyTheSenderAnOperator()
     {

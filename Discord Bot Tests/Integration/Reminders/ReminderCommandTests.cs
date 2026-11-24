@@ -90,14 +90,6 @@ public sealed class ReminderCommandTests : IDisposable
         Assert.Equal("Reminder message too long!(maximum **150** characters)", Assert.Single(channel.Sent).Text);
     }
 
-    [Fact]
-    public async Task RemindIn_AmountWithoutNumbers_SaysTheInputIsWrong()
-    {
-        await RunAsync("!remind in tomorrow>stretch");
-
-        await reminderService.DidNotReceiveWithAnyArgs().AddReminderAsync(default, default, default!);
-        Assert.Equal("Incorrect number of inputs!", Assert.Single(channel.Sent).Text);
-    }
 
     //It answered nothing until 2026-11-23
     [Fact]
@@ -109,16 +101,21 @@ public sealed class ReminderCommandTests : IDisposable
         Assert.Equal("The amount of time and the message have to be separated by `>`, e.g.: `!remind in 1h 30m>stretch`", Assert.Single(channel.Sent).Text);
     }
 
-    //They answered nothing until 2026-11-23, and the last three logged an exception; units are case-sensitive, as M is months
+    //They answered nothing until 2026-11-23, and the next three logged an exception; units are case-sensitive, as M is months.
+    //The last three, where a number or unit is missing, answered "Incorrect number of inputs!" until 2026-11-24. A time of day
+    //is a likely one, since !remind at is an alias of !remind in
     [Theory]
-    [InlineData("1x")]
-    [InlineData("1H")]
-    [InlineData("h1")]
-    [InlineData("99999999999h")]
-    [InlineData("10000y")]
+    [InlineData("in 1x")]
+    [InlineData("in 1H")]
+    [InlineData("in h1")]
+    [InlineData("in 99999999999h")]
+    [InlineData("in 10000y")]
+    [InlineData("in tomorrow")]
+    [InlineData("in 1h 30")]
+    [InlineData("at 18:00")]
     public async Task RemindIn_AmountItCantRead_SaysHowToWriteIt(string amount)
     {
-        await RunAsync($"!remind in {amount}>stretch");
+        await RunAsync($"!remind {amount}>stretch");
 
         await reminderService.DidNotReceiveWithAnyArgs().AddReminderAsync(default, default, default!);
         Assert.Equal("The amount of time could not be read! Put y, M, w, d, h or m after each number (`M` is months, `m` is minutes), e.g.: `1h 30m`", Assert.Single(channel.Sent).Text);

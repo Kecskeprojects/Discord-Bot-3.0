@@ -96,6 +96,13 @@ public class UserRandomizeCommands(
                 return;
             }
 
+            //Only commas leave no option (that threw until 2026-11-24)
+            if (options.Length == 0)
+            {
+                _ = await ReplyAsync("Give at least one option, separated by commas, e.g.: `!decide pizza, pasta`");
+                return;
+            }
+
             string chosen = options[random.Next(0, options.Length)];
 
             _ = await ReplyAsync(chosen);

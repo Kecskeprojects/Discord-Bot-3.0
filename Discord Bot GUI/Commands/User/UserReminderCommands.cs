@@ -57,28 +57,21 @@ public class UserReminderCommands(
                 return;
             }
 
-            //Check if amounts has an even amount of elements, meaning every number has it's type pair and vice versa
-            if (amounts.Count % 2 == 0)
+            //Every number needs its unit, so an odd count can't be read either; it answered "Incorrect number of inputs!" until
+            //2026-11-24, as did a time of day, since !remind at is an alias of this command
+            if (amounts.Count % 2 != 0 || !DateTimeTools.TryAddValuesToDate(timeProvider.GetUtcNow().UtcDateTime, amounts, out DateTime date))
             {
-                //Check what lengths of time we need to deal with and add it to the current date
-                if (!DateTimeTools.TryAddValuesToDate(timeProvider.GetUtcNow().UtcDateTime, amounts, out DateTime date))
-                {
-                    _ = await ReplyAsync("The amount of time could not be read! Put y, M, w, d, h or m after each number (`M` is months, `m` is minutes), e.g.: `1h 30m`");
-                    return;
-                }
+                _ = await ReplyAsync("The amount of time could not be read! Put y, M, w, d, h or m after each number (`M` is months, `m` is minutes), e.g.: `1h 30m`");
+                return;
+            }
 
-                DbProcessResultEnum result = await reminderService.AddReminderAsync(Context.User.Id, date, remindMessage);
-                string resultMessage = result switch
-                {
-                    DbProcessResultEnum.Success => $"Alright, I will remind you {DiscordTools.UtcTimestamp(date, TimestampTagStyles.Relative)}.",
-                    _ => "Reminder could not be added, talk to dumbass owner!"
-                };
-                _ = await ReplyAsync(resultMessage);
-            }
-            else
+            DbProcessResultEnum result = await reminderService.AddReminderAsync(Context.User.Id, date, remindMessage);
+            string resultMessage = result switch
             {
-                _ = await ReplyAsync("Incorrect number of inputs!");
-            }
+                DbProcessResultEnum.Success => $"Alright, I will remind you {DiscordTools.UtcTimestamp(date, TimestampTagStyles.Relative)}.",
+                _ => "Reminder could not be added, talk to dumbass owner!"
+            };
+            _ = await ReplyAsync(resultMessage);
         }
         catch (Exception ex)
         {
