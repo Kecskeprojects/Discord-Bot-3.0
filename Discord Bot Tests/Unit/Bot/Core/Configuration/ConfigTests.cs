@@ -1,6 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Discord_Bot.Core.Configuration;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using Discord_Bot.Core.Configuration;
 
 namespace Discord_Bot.Tests.Unit.Bot.Core.Configuration;
 

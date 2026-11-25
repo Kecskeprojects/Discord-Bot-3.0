@@ -1,6 +1,6 @@
-﻿using System.Globalization;
-using Discord_Bot.Enums;
+﻿using Discord_Bot.Enums;
 using Discord_Bot.Tools;
+using System.Globalization;
 
 namespace Discord_Bot.Tests.Unit.Bot.Tools;
 

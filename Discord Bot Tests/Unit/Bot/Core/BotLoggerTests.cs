@@ -1,8 +1,8 @@
-﻿using System.IO;
-using Discord_Bot.Communication;
+﻿using Discord_Bot.Communication;
 using Discord_Bot.Core;
 using Discord_Bot.Enums;
 using Discord_Bot.Tools.NativeTools;
+using System.IO;
 
 namespace Discord_Bot.Tests.Unit.Bot.Core;
 

@@ -1,10 +1,10 @@
-﻿using System.Globalization;
-using DatabaseORM.Resources;
+﻿using DatabaseORM.Resources;
 using Discord;
 using Discord_Bot.Core;
 using Discord_Bot.Processors.MessageProcessor;
 using Discord_Bot.Tests.Common.Constants;
 using Discord_Bot.Tests.Mocks.Discord;
+using System.Globalization;
 
 namespace Discord_Bot.Tests.Unit.Bot.Processors.MessageProcessor;
 

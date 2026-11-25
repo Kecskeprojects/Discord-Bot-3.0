@@ -1,5 +1,4 @@
-﻿using System.IO;
-using DatabaseORM.Interface;
+﻿using DatabaseORM.Interface;
 using DatabaseORM.Resources;
 using Discord_Bot.Communication;
 using Discord_Bot.Communication.Bias;
@@ -7,6 +6,7 @@ using Discord_Bot.Interfaces.Services;
 using Discord_Bot.Processors.ImageProcessors;
 using Discord_Bot.Tests.Common.Constants;
 using ImageMagick;
+using System.IO;
 
 namespace Discord_Bot.Tests.Unit.Bot.Processors.ImageProcessors;
 

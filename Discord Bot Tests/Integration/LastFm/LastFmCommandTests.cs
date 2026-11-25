@@ -1,5 +1,4 @@
-﻿using System.IO;
-using DatabaseORM.Enums;
+﻿using DatabaseORM.Enums;
 using DatabaseORM.Interface.Service;
 using DatabaseORM.Resources;
 using Discord;
@@ -11,6 +10,7 @@ using Discord_Bot.Tests.Common.Constants;
 using Discord_Bot.Tests.Common.Tools;
 using Discord_Bot.Tests.Mocks.Discord;
 using NSubstitute.Core;
+using System.IO;
 using CommandResult = Discord.Commands.IResult;
 
 namespace Discord_Bot.Tests.Integration.LastFm;
