@@ -10,24 +10,24 @@ namespace Discord_Bot.Tests.Mocks.Database;
 //case-sensitive here, and every navigation a row has set counts as loaded, so a missing include goes unnoticed.
 internal static class RepositoryFakes
 {
-    public static List<TEntity> HasRows<TEntity>(this IGenericRepository<TEntity> repository, params TEntity[] rows) where TEntity : class
+    public static List<TEntity> HasRows<TEntity>(this IGenericRepository<TEntity> repository, params IEnumerable<TEntity> rows) where TEntity : class
     {
-        List<TEntity> table = [.. rows];
+        List<TEntity> table = rows.ToList();
 
         repository.FirstOrDefaultAsync(AnyPredicate<TEntity>()).Returns(call => table.FirstOrDefault(Predicate<TEntity>(call)));
         repository.FirstOrDefaultAsync(AnyPredicate<TEntity>(), AnyIncludes<TEntity>()).Returns(call => table.FirstOrDefault(Predicate<TEntity>(call)));
         repository.ExistsAsync(AnyPredicate<TEntity>()).Returns(call => table.Any(Predicate<TEntity>(call)));
         repository.ExistsAsync(AnyPredicate<TEntity>(), AnyIncludes<TEntity>()).Returns(call => table.Any(Predicate<TEntity>(call)));
 
-        repository.GetListAsync(AnyPredicate<TEntity>()).Returns(call => [.. table.Where(Predicate<TEntity>(call))]);
-        repository.GetListAsync(AnyPredicate<TEntity>(), AnyIncludes<TEntity>()).Returns(call => [.. table.Where(Predicate<TEntity>(call))]);
+        repository.GetListAsync(AnyPredicate<TEntity>()).Returns(call => table.Where(Predicate<TEntity>(call)).ToList());
+        repository.GetListAsync(AnyPredicate<TEntity>(), AnyIncludes<TEntity>()).Returns(call => table.Where(Predicate<TEntity>(call)).ToList());
         repository.GetListAsync(AnyPredicate<TEntity>(), AnyOrder<TEntity>(), Arg.Any<bool>())
             .Returns(call => Ordered(table.Where(Predicate<TEntity>(call)), call, 1));
         repository.GetListAsync(AnyPredicate<TEntity>(), AnyOrder<TEntity>(), Arg.Any<bool>(), AnyIncludes<TEntity>())
             .Returns(call => Ordered(table.Where(Predicate<TEntity>(call)), call, 1));
 
-        repository.GetAllAsync().Returns(_ => [.. table]);
-        repository.GetAllAsync(AnyIncludes<TEntity>()).Returns(_ => [.. table]);
+        repository.GetAllAsync().Returns(_ => table.ToList());
+        repository.GetAllAsync(AnyIncludes<TEntity>()).Returns(_ => table.ToList());
         repository.GetAllAsync(AnyOrder<TEntity>(), Arg.Any<bool>()).Returns(call => Ordered(table, call, 0));
         repository.GetAllAsync(AnyOrder<TEntity>(), Arg.Any<bool>(), AnyIncludes<TEntity>()).Returns(call => Ordered(table, call, 0));
 
@@ -38,7 +38,7 @@ internal static class RepositoryFakes
         });
         repository.AddAsync(Arg.Any<IEnumerable<TEntity>>(), Arg.Any<bool>()).Returns(call =>
         {
-            List<TEntity> items = [.. call.ArgAt<IEnumerable<TEntity>>(0)];
+            List<TEntity> items = call.ArgAt<IEnumerable<TEntity>>(0).ToList();
             table.AddRange(items);
             return items.Count;
         });
@@ -105,6 +105,6 @@ internal static class RepositoryFakes
     private static List<TEntity> Ordered<TEntity>(IEnumerable<TEntity> rows, CallInfo call, int orderIndex)
     {
         Func<TEntity, object?> key = call.ArgAt<Expression<Func<TEntity, object?>>>(orderIndex).Compile();
-        return call.ArgAt<bool>(orderIndex + 1) ? [.. rows.OrderBy(key)] : [.. rows.OrderByDescending(key)];
+        return (call.ArgAt<bool>(orderIndex + 1) ? rows.OrderBy(key) : rows.OrderByDescending(key)).ToList();
     }
 }

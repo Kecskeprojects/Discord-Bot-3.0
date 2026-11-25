@@ -28,9 +28,9 @@ public static class Entities
         return new ChannelType { ChannelTypeId = (int) type, Name = type.ToString() };
     }
 
-    public static Channel Channel(Server server, ulong discordId, params ChannelType[] types)
+    public static Channel Channel(Server server, ulong discordId, params List<ChannelType> types)
     {
-        return new Channel { ServerId = server.ServerId, Server = server, DiscordId = discordId.ToString(), ChannelTypes = [.. types] };
+        return new Channel { ServerId = server.ServerId, Server = server, DiscordId = discordId.ToString(), ChannelTypes = types };
     }
 
     public static IdolGroup Group(string name, int groupId = RowIds.New)

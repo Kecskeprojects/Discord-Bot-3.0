@@ -167,7 +167,7 @@ public sealed class ArtistAndWhoKnowsTests
     //The members with a Last.fm account, as !lf whoknows passes them: the name is their name on the server
     private static List<UserResource> Members(params (string LastFm, string Name)[] members)
     {
-        return [.. members.Select((member, i) => new UserResource { DiscordId = DiscordIds.User + (ulong) i, LastFmUsername = member.LastFm, Username = member.Name })];
+        return members.Select((member, i) => new UserResource { DiscordId = DiscordIds.User + (ulong) i, LastFmUsername = member.LastFm, Username = member.Name }).ToList();
     }
 
     private static ILastFmAPI Api(TestHost host)

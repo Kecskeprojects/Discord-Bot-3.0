@@ -13,10 +13,9 @@ public static class CollectionTools
 
     public static List<MusicRequest> ShufflePlaylist(List<MusicRequest> playlist)
     {
-        //Get the server's playlist, and remove the currently playing song, but saving it for later
-        List<MusicRequest> current = [.. playlist];
-        MusicRequest nowPlaying = current[0];
-        current.RemoveAt(0);
+        //Copy the server's playlist without the currently playing song, saving that song for later
+        MusicRequest nowPlaying = playlist[0];
+        List<MusicRequest> current = playlist.Skip(1).ToList();
 
         List<MusicRequest> shuffled = [];
         int length = current.Count;

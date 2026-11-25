@@ -44,6 +44,11 @@ dotnet_analyzer_diagnostic.category-CodeQuality.severity = warning
 dotnet_diagnostic.IDE0010.severity = suggestion
 dotnet_diagnostic.IDE0072.severity = suggestion
 
+# Collection expression for fluent calls (IDE0305) off in every project, the tests included: a LINQ chain ends in .ToList() /
+# .ToArray() / .ToHashSet(), which reads better than a spread around the whole chain ([.. items.Where(...)]). As a warning
+# it made the build reject the .ToList() form. A spread is still fine for a plain conversion ([.. someArray]).
+dotnet_diagnostic.IDE0305.severity = none
+
 #### Naming (IDE1006) ####
 # Private fields are camelCase without a prefix, static and readonly ones included.
 dotnet_naming_rule.private_fields_camel_case.symbols = private_fields

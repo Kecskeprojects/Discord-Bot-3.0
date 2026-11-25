@@ -15,7 +15,7 @@ public sealed class EditBiasDataMessageProcessorTests
 
         SelectMenuComponent menu = Assert.IsType<SelectMenuComponent>(Assert.Single(Assert.IsType<ActionRowComponent>(Assert.Single(component.Components)).Components));
         Assert.Equal("EditIdolData", menu.CustomId);
-        List<BiasEditData> choices = [.. menu.Options.Select(option => new BiasEditData(option.Value))];
+        List<BiasEditData> choices = menu.Options.Select(option => new BiasEditData(option.Value)).ToList();
         Assert.Equal(Enum.GetValues<BiasEditActionTypeEnum>(), choices.Select(choice => choice.Action));
         Assert.All(choices, choice => Assert.Equal(("jisoo", "blackpink"), (choice.BiasName, choice.BiasGroupName)));
     }

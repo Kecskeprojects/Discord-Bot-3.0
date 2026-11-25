@@ -34,7 +34,7 @@ public sealed class ScheduleToolsTests
     public void DueAt_AWeekOfMinutes_GivesEachTaskItsCount()
     {
         DateTime monday = Utc("2026-11-23 00:00:00");
-        List<ScheduledTaskEnum> week = [.. Enumerable.Range(0, 7 * 24 * 60).Select(minute => ScheduleTools.DueAt(monday.AddMinutes(minute)))];
+        List<ScheduledTaskEnum> week = Enumerable.Range(0, 7 * 24 * 60).Select(minute => ScheduleTools.DueAt(monday.AddMinutes(minute))).ToList();
 
         Assert.Equal(7, week.Count(due => due.HasFlag(ScheduledTaskEnum.ClearWindowLog)));
         Assert.Equal(7, week.Count(due => due.HasFlag(ScheduledTaskEnum.BirthdaysAndWeeklyPolls)));

@@ -113,7 +113,7 @@ public sealed class WeeklyPollOptionPresetServiceTests
     public async Task RemovePresetByNameAsync_RemovesItsAnswersWithIt()
     {
         List<WeeklyPollOptionPreset> presetTable = presets.HasRows(yesOrNo, retired);
-        List<WeeklyPollOption> answerTable = options.HasRows([.. yesOrNo.WeeklyPollOptions, .. retired.WeeklyPollOptions]);
+        List<WeeklyPollOption> answerTable = options.HasRows(yesOrNo.WeeklyPollOptions.Concat(retired.WeeklyPollOptions));
 
         Assert.Equal(DbProcessResultEnum.Success, await service.RemovePresetByNameAsync("yes or no"));
         Assert.Same(retired, Assert.Single(presetTable));
@@ -125,7 +125,7 @@ public sealed class WeeklyPollOptionPresetServiceTests
     {
         yesOrNo.WeeklyPolls.Add(new WeeklyPoll { WeeklyPollId = 21, Name = "weekly", Title = "", RepeatOnDayOfWeek = "Monday", OptionPresetId = 4 });
         List<WeeklyPollOptionPreset> presetTable = presets.HasRows(yesOrNo);
-        List<WeeklyPollOption> answerTable = options.HasRows([.. yesOrNo.WeeklyPollOptions]);
+        List<WeeklyPollOption> answerTable = options.HasRows(yesOrNo.WeeklyPollOptions);
 
         Assert.Equal(DbProcessResultEnum.InUse, await service.RemovePresetByNameAsync("yes or no"));
         Assert.Same(yesOrNo, Assert.Single(presetTable));

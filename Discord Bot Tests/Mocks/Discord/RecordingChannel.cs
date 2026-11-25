@@ -17,7 +17,7 @@ public sealed class RecordingChannel
         channel.SendMessageAsync().ReturnsForAnyArgs(call =>
         {
             object?[] args = call.Args();
-            List<Embed> embeds = [.. args.OfType<Embed>(), .. args.OfType<Embed[]>().SelectMany(e => e)];
+            List<Embed> embeds = args.OfType<Embed>().Concat(args.OfType<Embed[]>().SelectMany(e => e)).ToList();
             IUserMessage message = Substitute.For<IUserMessage>();
             message.Id.Returns(DiscordIds.Message + (ulong) Sent.Count + 1);
             Sent.Add(new SentMessage(call.ArgAt<string?>(0), embeds, args.OfType<MessageComponent>().FirstOrDefault(), args.OfType<PollProperties>().FirstOrDefault(), args.OfType<MessageReference>().FirstOrDefault(), message));

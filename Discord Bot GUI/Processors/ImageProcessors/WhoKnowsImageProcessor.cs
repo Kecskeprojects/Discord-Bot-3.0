@@ -109,7 +109,7 @@ public class WhoKnowsImageProcessor(IBotLogger logger) : IWhoKnowsImageProcessor
     private static void WriteUserNames(Dictionary<string, int> plays, MagickImage mainImage, MagickColor rowColor, TextFont font, MagickColor textColor)
     {
         //At most 12 users fit on the image
-        KeyValuePair<string, int>[] rows = [.. plays.Take(12)];
+        KeyValuePair<string, int>[] rows = plays.Take(12).ToArray();
         for (int i = 0; i < rows.Length; i++)
         {
             string user = $"{i + 1}# {rows[i].Key}";

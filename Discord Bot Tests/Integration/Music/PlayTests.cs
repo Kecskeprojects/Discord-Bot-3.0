@@ -258,7 +258,7 @@ public sealed class PlayTests : IDisposable
 
     private List<string> StreamedUrls()
     {
-        return [.. download.ReceivedCalls().Select(call => (string) call.GetArguments()[1]!)];
+        return download.ReceivedCalls().Select(call => (string) call.GetArguments()[1]!).ToList();
     }
 
     private static async Task Until(Func<bool> condition)

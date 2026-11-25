@@ -7,11 +7,11 @@ public static class ComponentParts
 {
     public static List<ButtonComponent> Buttons(MessageComponent component)
     {
-        return [.. component.Components.OfType<ActionRowComponent>().SelectMany(row => row.Components).OfType<ButtonComponent>()];
+        return component.Components.OfType<ActionRowComponent>().SelectMany(row => row.Components).OfType<ButtonComponent>().ToList();
     }
 
     public static List<SelectMenuComponent> SelectMenus(MessageComponent component)
     {
-        return [.. component.Components.OfType<ActionRowComponent>().SelectMany(row => row.Components).OfType<SelectMenuComponent>()];
+        return component.Components.OfType<ActionRowComponent>().SelectMany(row => row.Components).OfType<SelectMenuComponent>().ToList();
     }
 }

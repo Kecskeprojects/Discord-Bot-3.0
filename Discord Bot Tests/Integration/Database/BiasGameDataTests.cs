@@ -230,7 +230,7 @@ public sealed class BiasGameDataTests(LocalDatabase database) : IClassFixture<Lo
 
     private static List<string?> Names(List<IdolGameResource> idols)
     {
-        return [.. idols.Select(idol => idol.StageName).Order(StringComparer.Ordinal)];
+        return idols.Select(idol => idol.StageName).Order(StringComparer.Ordinal).ToList();
     }
 
     //In the order they were added

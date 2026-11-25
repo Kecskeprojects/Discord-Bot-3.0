@@ -33,9 +33,9 @@ public sealed class ServiceRegistrationTests
         }
     }
 
-    public static TheoryData<Type> Modules()
+    public static IEnumerable<TheoryDataRow<Type>> Modules()
     {
-        return [.. typeof(Startup).Assembly.GetTypes().Where(IsModule)];
+        return typeof(Startup).Assembly.GetTypes().Where(IsModule).Select(type => new TheoryDataRow<Type>(type));
     }
 
     private static bool IsModule(Type type)

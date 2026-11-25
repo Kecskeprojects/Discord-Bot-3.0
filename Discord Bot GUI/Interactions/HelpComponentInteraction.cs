@@ -38,7 +38,7 @@ public class HelpComponentInteraction(
                 .First(x => x.Remarks == commandLevel.ToString() && x.Name == category)
                 .Commands;
 
-            Embed[] embed = HelpDetailEmbedProcessor.CreateEmbed(commandLevel, category, [.. commands], config.Img);
+            Embed[] embed = HelpDetailEmbedProcessor.CreateEmbed(commandLevel, category, commands, config.Img);
 
             _ = await FollowupAsync(embeds: embed, ephemeral: true);
         }

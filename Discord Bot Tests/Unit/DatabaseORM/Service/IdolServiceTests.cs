@@ -178,7 +178,7 @@ public sealed class IdolServiceTests
         {
             Image(idol, $"https://example.com/{daysAgo}.png", now.AddDays(-daysAgo));
         }
-        List<IdolImage> imageTable = images.HasRows([.. idol.IdolImages]);
+        List<IdolImage> imageTable = images.HasRows(idol.IdolImages);
 
         await service.UpdateIdolDetailsAsync(Resource(), null, null);
 

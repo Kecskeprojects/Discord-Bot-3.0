@@ -155,7 +155,7 @@ public sealed class RandomizerCommandTests : IDisposable
 
     private static List<string> Rounds(string reply)
     {
-        return [.. reply.Split('\n').Where(line => line.Contains("Round", StringComparison.Ordinal))];
+        return reply.Split('\n').Where(line => line.Contains("Round", StringComparison.Ordinal)).ToList();
     }
 
     //The sender and the named members share a voice channel

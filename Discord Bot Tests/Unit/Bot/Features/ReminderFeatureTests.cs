@@ -139,9 +139,9 @@ public sealed class ReminderFeatureTests
         return RecordingChannel.DirectMessagesOf(user);
     }
 
-    private void DueReminders(params ReminderResource[] reminders)
+    private void DueReminders(params List<ReminderResource> reminders)
     {
-        reminderService.GetCurrentRemindersAsync(minuteStart).Returns([.. reminders]);
+        reminderService.GetCurrentRemindersAsync(minuteStart).Returns(reminders);
     }
 
     private static ReminderResource Reminder(int id, ulong userId, DateTime date, string message)

@@ -127,12 +127,12 @@ public sealed class BiasListTests(LocalDatabase database) : IClassFixture<LocalD
     private async Task<List<string>> BiasesAsync()
     {
         List<IdolResource> biases = await host.FromNewScope<IUserIdolService>().GetUserIdolsListAsync(DiscordIds.User, "");
-        return [.. biases.Select(idol => $"{idol.Name}>{idol.GroupName}").Order(StringComparer.Ordinal)];
+        return biases.Select(idol => $"{idol.Name}>{idol.GroupName}").Order(StringComparer.Ordinal).ToList();
     }
 
-    private static IdolGroup Group(string name, params Idol[] idols)
+    private static IdolGroup Group(string name, params List<Idol> idols)
     {
-        return new IdolGroup { Name = name, Idols = [.. idols] };
+        return new IdolGroup { Name = name, Idols = idols };
     }
 
     private static Idol Idol(string name, string? alias = null)

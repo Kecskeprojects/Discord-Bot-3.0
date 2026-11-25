@@ -18,7 +18,7 @@ public sealed class FakeHttpHandler(Func<Uri, string> respond) : HttpMessageHand
         {
             lock (requests)
             {
-                return [.. requests];
+                return requests.ToArray();
             }
         }
     }

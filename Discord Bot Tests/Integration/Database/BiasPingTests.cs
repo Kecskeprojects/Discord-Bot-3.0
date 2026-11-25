@@ -68,9 +68,9 @@ public sealed class BiasPingTests(LocalDatabase database) : IClassFixture<LocalD
         Assert.Equal(DbProcessResultEnum.Success, await host.FromNewScope<IUserIdolService>().AddUserIdolAsync(userId, name, group));
     }
 
-    private static IdolGroup Group(string name, params Idol[] idols)
+    private static IdolGroup Group(string name, params List<Idol> idols)
     {
-        return new IdolGroup { Name = name, Idols = [.. idols] };
+        return new IdolGroup { Name = name, Idols = idols };
     }
 
     private static Idol Idol(string name, string? alias = null)

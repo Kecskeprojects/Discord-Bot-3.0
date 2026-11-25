@@ -35,7 +35,7 @@ public static class YoutubeResponses
     {
         return new PlaylistItemListResponse
         {
-            Items = [.. videoIds.Select(id => new PlaylistItem { ContentDetails = new PlaylistItemContentDetails { VideoId = id } })]
+            Items = videoIds.Select(id => new PlaylistItem { ContentDetails = new PlaylistItemContentDetails { VideoId = id } }).ToList()
         };
     }
 

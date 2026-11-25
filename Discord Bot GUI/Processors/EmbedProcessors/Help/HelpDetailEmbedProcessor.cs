@@ -7,7 +7,7 @@ namespace Discord_Bot.Processors.EmbedProcessors.Help;
 
 public static class HelpDetailEmbedProcessor
 {
-    public static Embed[] CreateEmbed(CommandLevelEnum commandLevel, string category, List<CommandInfo> commands, string imageUrl)
+    public static Embed[] CreateEmbed(CommandLevelEnum commandLevel, string category, IReadOnlyList<CommandInfo> commands, string imageUrl)
     {
         EmbedBuilder builder = new();
         _ = builder.WithTitle($"{commandLevel} {category} Commands:");

@@ -61,7 +61,7 @@ public sealed class InteractionHandlerTests : IAsyncLifetime
 
         await RunAsync(click);
 
-        List<ICall> responses = [.. click.ReceivedCalls().Where(call => call.GetMethodInfo().Name == nameof(IDiscordInteraction.RespondAsync))];
+        List<ICall> responses = click.ReceivedCalls().Where(call => call.GetMethodInfo().Name == nameof(IDiscordInteraction.RespondAsync)).ToList();
         Assert.NotEmpty(responses);
         Assert.All(responses, call => Assert.Equal("Something went wrong during the process.", call.GetArguments()[0]));
     }

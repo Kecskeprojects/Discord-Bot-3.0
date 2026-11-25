@@ -9,7 +9,7 @@ public static class LastFmResponses
 {
     public static string TopTracks(params (string Name, string Artist, int Plays)[] tracks)
     {
-        JsonNode?[] items = [.. tracks.Select((track, i) => new JsonObject
+        JsonObject[] items = tracks.Select((track, i) => new JsonObject
         {
             ["name"] = track.Name,
             ["playcount"] = track.Plays.ToString(),
@@ -18,7 +18,7 @@ public static class LastFmResponses
             ["artist"] = new JsonObject { ["name"] = track.Artist, ["mbid"] = "", ["url"] = "https://www.last.fm/music/artist" },
             ["image"] = new JsonArray(new JsonObject { ["size"] = "small", ["#text"] = "https://example.com/cover.png" }),
             ["@attr"] = new JsonObject { ["rank"] = (i + 1).ToString() }
-        })];
+        }).ToArray();
 
         return new JsonObject { ["toptracks"] = new JsonObject { ["track"] = new JsonArray(items), ["@attr"] = Page(1, 1) } }.ToJsonString();
     }
@@ -26,14 +26,14 @@ public static class LastFmResponses
     //One page of a user's top artists; only the play counts matter to the bot's totals
     public static string TopArtists(int page, int totalPages, params int[] plays)
     {
-        JsonNode?[] items = [.. plays.Select((count, i) => new JsonObject
+        JsonObject[] items = plays.Select((count, i) => new JsonObject
         {
             ["name"] = $"Artist {page}-{i}",
             ["playcount"] = count.ToString(),
             ["mbid"] = "",
             ["url"] = "https://www.last.fm/music/artist",
             ["@attr"] = new JsonObject { ["rank"] = (i + 1).ToString() }
-        })];
+        }).ToArray();
 
         return new JsonObject { ["topartists"] = new JsonObject { ["artist"] = new JsonArray(items), ["@attr"] = Page(page, totalPages) } }.ToJsonString();
     }
@@ -41,7 +41,7 @@ public static class LastFmResponses
     //One page of a user's top artists by name
     public static string TopArtistsNamed(params (string Name, int Plays)[] artists)
     {
-        JsonNode?[] items = [.. artists.Select((artist, i) => new JsonObject
+        JsonObject[] items = artists.Select((artist, i) => new JsonObject
         {
             ["name"] = artist.Name,
             ["playcount"] = artist.Plays.ToString(),
@@ -49,7 +49,7 @@ public static class LastFmResponses
             ["url"] = "https://www.last.fm/music/artist",
             ["image"] = Images(),
             ["@attr"] = new JsonObject { ["rank"] = (i + 1).ToString() }
-        })];
+        }).ToArray();
 
         return new JsonObject { ["topartists"] = new JsonObject { ["artist"] = new JsonArray(items), ["@attr"] = Page(1, 1) } }.ToJsonString();
     }
@@ -57,7 +57,7 @@ public static class LastFmResponses
     //One page of a user's top albums
     public static string TopAlbums(params (string Name, string Artist, int Plays)[] albums)
     {
-        JsonNode?[] items = [.. albums.Select((album, i) => new JsonObject
+        JsonObject[] items = albums.Select((album, i) => new JsonObject
         {
             ["name"] = album.Name,
             ["playcount"] = album.Plays.ToString(),
@@ -66,7 +66,7 @@ public static class LastFmResponses
             ["artist"] = new JsonObject { ["name"] = album.Artist, ["mbid"] = "", ["url"] = "https://www.last.fm/music/artist" },
             ["image"] = Images(),
             ["@attr"] = new JsonObject { ["rank"] = (i + 1).ToString() }
-        })];
+        }).ToArray();
 
         return new JsonObject { ["topalbums"] = new JsonObject { ["album"] = new JsonArray(items), ["@attr"] = Page(1, 1) } }.ToJsonString();
     }
@@ -74,7 +74,7 @@ public static class LastFmResponses
     //A user's latest scrobbles, newest first; the first is the one playing now when nowPlaying is set, the others have a date
     public static string RecentTracks(bool nowPlaying, params (string Name, string Artist, string Album)[] tracks)
     {
-        JsonNode?[] items = [.. tracks.Select((track, i) =>
+        JsonObject[] items = tracks.Select((track, i) =>
         {
             JsonObject item = new()
             {
@@ -95,7 +95,7 @@ public static class LastFmResponses
                 item["date"] = new JsonObject { ["uts"] = "1795442400", ["#text"] = "18 Nov 2026, 14:00" };
             }
             return item;
-        })];
+        }).ToArray();
 
         return new JsonObject { ["recenttracks"] = new JsonObject { ["track"] = new JsonArray(items), ["@attr"] = Page(1, 1) } }.ToJsonString();
     }

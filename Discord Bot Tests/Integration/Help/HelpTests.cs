@@ -60,7 +60,7 @@ public sealed class HelpTests : IDisposable
         List<string> problems = [];
         foreach (CommandLevelEnum level in Enum.GetValues<CommandLevelEnum>())
         {
-            List<ModuleInfo> ofLevel = [.. modules.Where(module => module.Remarks == level.ToString())];
+            List<ModuleInfo> ofLevel = modules.Where(module => module.Remarks == level.ToString()).ToList();
             Assert.NotEmpty(ofLevel);
             problems.AddRange(Try($"{level} help", () =>
             {
@@ -72,7 +72,7 @@ public sealed class HelpTests : IDisposable
             {
                 problems.AddRange(Try($"{level} {module.Name}", () =>
                 {
-                    Embed embed = Assert.Single(HelpDetailEmbedProcessor.CreateEmbed(level, module.Name, [.. module.Commands], ""));
+                    Embed embed = Assert.Single(HelpDetailEmbedProcessor.CreateEmbed(level, module.Name, module.Commands, ""));
                     Assert.True(embed.Length <= EmbedBuilder.MaxEmbedLength);
                 }));
             }
@@ -84,7 +84,7 @@ public sealed class HelpTests : IDisposable
     [Fact]
     public async Task Help_ListsTheUserCategoriesWithAMenuOfThem()
     {
-        List<string> userModules = [.. (await ModulesAsync()).Where(module => module.Remarks == "User").Select(module => module.Name)];
+        List<string> userModules = (await ModulesAsync()).Where(module => module.Remarks == "User").Select(module => module.Name).ToList();
 
         CommandResult result = await RunAsync("!help", member);
 
@@ -165,7 +165,7 @@ public sealed class HelpTests : IDisposable
     private async Task<List<ModuleInfo>> ModulesAsync()
     {
         //!help itself has no level; its page adds it by hand
-        return [.. (await host.GetCommandServiceAsync()).Modules.Where(module => !module.Commands.Any(command => command.Name == "help"))];
+        return (await host.GetCommandServiceAsync()).Modules.Where(module => !module.Commands.Any(command => command.Name == "help")).ToList();
     }
 
     private static List<string> Try(string page, Action build)

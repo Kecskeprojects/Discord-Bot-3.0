@@ -17,7 +17,7 @@ public sealed class CollectionToolsTests
     [Fact]
     public void ShufflePlaylist_KeepsTheSongPlayingFirstAndEverySongOnce()
     {
-        List<MusicRequest> playlist = [.. Enumerable.Range(1, 10).Select(i => new MusicRequest($"https://example.com/{i}", $"Song {i}", "", "03:00", "tester"))];
+        List<MusicRequest> playlist = Enumerable.Range(1, 10).Select(i => new MusicRequest($"https://example.com/{i}", $"Song {i}", "", "03:00", "tester")).ToList();
         HashSet<MusicRequest> songs = [.. playlist];
 
         for (int run = 0; run < 20; run++)

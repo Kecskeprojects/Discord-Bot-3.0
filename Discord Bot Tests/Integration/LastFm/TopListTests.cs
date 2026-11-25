@@ -24,7 +24,7 @@ public sealed class TopListTests
             Assert.Equal(57, result.TotalPlays);
             Assert.StartsWith("`#1`**Song A** by **Artist**", result.EmbedFields[0]);
 
-            string[] queries = [.. lastFm.Handler.Requests.Select(uri => uri.Query)];
+            string[] queries = lastFm.Handler.Requests.Select(uri => uri.Query).ToArray();
             Assert.Equal(3, queries.Length);
             Assert.Equal($"?method=user.gettoptracks&user={TestValues.LastFmUsername}&api_key={TestValues.LastFmApiKey}&limit=10&period=7day&format=json", queries[0]);
             Assert.Contains("&page=2&", queries[2]);

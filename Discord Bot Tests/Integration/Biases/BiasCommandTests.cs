@@ -257,7 +257,7 @@ public sealed class BiasCommandTests : IDisposable
     [Fact]
     public async Task Ping_MoreMentionsThanOneMessageHolds_SendsThemInSeveral()
     {
-        ulong[] fans = [.. Enumerable.Range(1, 150).Select(i => 100_000_000_000_000_000UL + (ulong) i)];
+        ulong[] fans = Enumerable.Range(1, 150).Select(i => 100_000_000_000_000_000UL + (ulong) i).ToArray();
         PingFinds(fans);
         ServerHasMembers(fans);
 
@@ -270,7 +270,7 @@ public sealed class BiasCommandTests : IDisposable
 
     private void PingFinds(params ulong[] userIds)
     {
-        idolService.GetUsersByIdolsAsync(default!).ReturnsForAnyArgs(new ListWithDbResult<UserResource>([.. userIds.Select(id => new UserResource { DiscordId = id })], DbProcessResultEnum.Success));
+        idolService.GetUsersByIdolsAsync(default!).ReturnsForAnyArgs(new ListWithDbResult<UserResource>(userIds.Select(id => new UserResource { DiscordId = id }).ToList(), DbProcessResultEnum.Success));
     }
 
     //Anyone else is not on the server (any more)

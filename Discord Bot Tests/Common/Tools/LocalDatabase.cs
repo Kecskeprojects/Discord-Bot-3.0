@@ -40,13 +40,11 @@ public sealed class LocalDatabase : IAsyncLifetime
     public async Task ResetAsync()
     {
         await using MainDbContext context = NewContext();
-        List<string> tables =
-        [
-            .. context.Model.GetEntityTypes()
-                .Where(type => type.GetTableName() is string name && name != "ChannelType")
-                .Select(type => $"[{type.GetSchema() ?? "dbo"}].[{type.GetTableName()}]")
-                .Distinct()
-        ];
+        List<string> tables = context.Model.GetEntityTypes()
+            .Where(type => type.GetTableName() is string name && name != "ChannelType")
+            .Select(type => $"[{type.GetSchema() ?? "dbo"}].[{type.GetTableName()}]")
+            .Distinct()
+            .ToList();
 
         IEnumerable<string> statements = tables.Select(table => $"ALTER TABLE {table} NOCHECK CONSTRAINT ALL;")
             .Concat(tables.Select(table => $"DELETE FROM {table};"))

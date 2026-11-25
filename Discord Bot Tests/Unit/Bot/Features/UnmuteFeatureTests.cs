@@ -155,9 +155,9 @@ public sealed class UnmuteFeatureTests
         logger.Received().Error("UnmuteFeature.cs TryUnmuteAsync", Arg.Any<HttpException>());
     }
 
-    private void ExpiredMutes(params ServerMutedUserResource[] mutes)
+    private void ExpiredMutes(params List<ServerMutedUserResource> mutes)
     {
-        mutedUserService.GetExpiredMutedUsersAsync(minuteStart).Returns([.. mutes]);
+        mutedUserService.GetExpiredMutedUsersAsync(minuteStart).Returns(mutes);
     }
 
     private static ServerMutedUserResource Mute(ulong userId, string removedRoles)

@@ -95,11 +95,11 @@ public sealed class BiasListMessageProcessorTests
 
     private static List<IdolResource> Groups(int count)
     {
-        return [.. Enumerable.Range(1, count).Select(i => Idol("member", $"group {i:000}"))];
+        return Enumerable.Range(1, count).Select(i => Idol("member", $"group {i:000}")).ToList();
     }
 
     private static List<SelectMenuComponent> Menus(BiasMessageResult result)
     {
-        return [.. result.Component!.Components.Cast<ActionRowComponent>().SelectMany(row => row.Components).Cast<SelectMenuComponent>()];
+        return result.Component!.Components.Cast<ActionRowComponent>().SelectMany(row => row.Components).Cast<SelectMenuComponent>().ToList();
     }
 }

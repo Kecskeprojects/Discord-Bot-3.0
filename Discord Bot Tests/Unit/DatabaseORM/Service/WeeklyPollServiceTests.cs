@@ -158,7 +158,7 @@ public sealed class WeeklyPollServiceTests
         WeeklyPoll poll = Poll(PollId, server, "weekly", "Yes", "No");
         WeeklyPollOption otherPolls = new() { WeeklyPollId = 22, Title = "Kept" };
         List<WeeklyPoll> pollTable = polls.HasRows(poll);
-        List<WeeklyPollOption> answerTable = options.HasRows([.. poll.WeeklyPollOptions, otherPolls]);
+        List<WeeklyPollOption> answerTable = options.HasRows(poll.WeeklyPollOptions.Append(otherPolls));
 
         Assert.Equal(DbProcessResultEnum.Success, await service.RemovePollByNameAsync(DiscordIds.Server, "weekly"));
         Assert.Empty(pollTable);

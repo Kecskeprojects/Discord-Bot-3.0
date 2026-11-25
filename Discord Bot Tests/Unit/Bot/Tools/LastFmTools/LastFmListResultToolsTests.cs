@@ -24,7 +24,7 @@ public sealed class LastFmListResultToolsTests
     public void CreateTopTrackList_StartsANewPageAfterTenTracks()
     {
         LastFmListResult result = new() { TotalPlays = 110 };
-        List<Track> tracks = [.. Enumerable.Range(1, 11).Select(i => Track($"Song {i}", "Artist", "10"))];
+        List<Track> tracks = Enumerable.Range(1, 11).Select(i => Track($"Song {i}", "Artist", "10")).ToList();
 
         LastFmListResultTools.CreateTopTrackList(11, result, tracks);
 

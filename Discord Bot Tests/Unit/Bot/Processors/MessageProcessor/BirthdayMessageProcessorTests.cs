@@ -25,7 +25,7 @@ public sealed class BirthdayMessageProcessorTests
     [Fact]
     public void CreateMessage_GivesOneOfTheGreetingsWithTheAgeThisYear()
     {
-        HashSet<string> greetings = [.. Constant.BirthdayMessage.Select(greeting => string.Format(CultureInfo.InvariantCulture, greeting, user.Mention, "26"))];
+        HashSet<string> greetings = Constant.BirthdayMessage.Select(greeting => string.Format(CultureInfo.InvariantCulture, greeting, user.Mention, "26")).ToHashSet();
         BirthdayResource birthday = new() { UserDiscordId = DiscordIds.User, Date = new DateOnly(2000, 3, 4) };
 
         //The pick isn't injected yet, so a few runs cover several greetings

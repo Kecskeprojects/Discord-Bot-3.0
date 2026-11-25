@@ -76,7 +76,7 @@ public sealed class ReminderTests(LocalDatabase database) : IClassFixture<LocalD
         Assert.Equal(["due", "due now"], due.Select(reminder => reminder.Message).Order(StringComparer.Ordinal));
         Assert.Equal([DiscordIds.User, DiscordIds.OtherUser], due.OrderBy(reminder => reminder.Date).Select(reminder => reminder.UserDiscordId));
 
-        Assert.Equal(DbProcessResultEnum.Success, await host.FromNewScope<IReminderService>().RemoveCurrentRemindersAsync([.. due.Select(reminder => reminder.ReminderId)]));
+        Assert.Equal(DbProcessResultEnum.Success, await host.FromNewScope<IReminderService>().RemoveCurrentRemindersAsync(due.Select(reminder => reminder.ReminderId).ToList()));
         Assert.Equal(["later"], await MessagesAsync(DiscordIds.User));
         Assert.Empty(await MessagesAsync(DiscordIds.OtherUser));
     }
@@ -95,6 +95,6 @@ public sealed class ReminderTests(LocalDatabase database) : IClassFixture<LocalD
     private async Task<List<string>> MessagesAsync(ulong userId)
     {
         List<ReminderResource> reminders = await host.FromNewScope<IReminderService>().GetUserReminderListAsync(userId);
-        return [.. reminders.Select(reminder => reminder.Message)];
+        return reminders.Select(reminder => reminder.Message).ToList();
     }
 }

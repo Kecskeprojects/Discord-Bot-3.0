@@ -1,6 +1,6 @@
 # Improvement notes
 
-Open work, kept so it can be picked up later. This file covers every project in the repository. Items are removed once they are applied; the git history has the earlier work. Known issues left as they are are in `known-issues.md`, and decisions and code facts in `decisions.md`. Last brought up to date 2026-11-24.
+Open work, kept so it can be picked up later. This file covers every project in the repository. Items are removed once they are applied; the git history has the earlier work. Known issues left as they are are in `known-issues.md`, and decisions and code facts in `decisions.md`. Last brought up to date 2026-11-25.
 
 ## 1. Discord.Net: optional modernization (investigated 2026-11-15)
 

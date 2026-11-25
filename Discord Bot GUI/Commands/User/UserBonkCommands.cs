@@ -40,7 +40,7 @@ public class UserBonkCommands(
             //A number at the end is the frame delay in milliseconds. Browsers, and Discord's desktop app, play a frame shorter
             //than 20 ms for 100 ms, so 20 is the fastest that works. Until 2026-11-24 the number was used as hundredths of a
             //second, and it was removed from the name by its text, so a padded one ("0250") stayed in the name
-            List<string> paramParts = [.. parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
+            List<string> paramParts = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
             int frameDelay = 100;
             if (paramParts.Count > 0 && int.TryParse(paramParts[^1], out int givenDelay))
             {

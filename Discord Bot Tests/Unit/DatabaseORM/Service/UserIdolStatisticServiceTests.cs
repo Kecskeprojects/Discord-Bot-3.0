@@ -47,7 +47,7 @@ public sealed class UserIdolStatisticServiceTests
         users.HasRows(user);
         List<UserIdolStatistic> table = statistics.HasRows();
 
-        await service.UpdateUserStatisticsAsync(DiscordIds.User, Ranking([.. Enumerable.Range(1, 16).Reverse()]));
+        await service.UpdateUserStatisticsAsync(DiscordIds.User, Ranking(Enumerable.Range(1, 16).Reverse().ToArray()));
 
         Assert.Equal(16, table.Count);
         Assert.Equal(1, table.Single(stat => stat.IdolId == 4).Placed4);

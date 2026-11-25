@@ -31,9 +31,9 @@ public sealed class ListEmbedProcessorTests
     [InlineData(46)]
     public void BirthdayList_CountThatFillsTheFieldsExactly_ShowsThemAll(int count)
     {
-        List<BirthdayResource> birthdays = [.. Enumerable.Range(0, count).Select(_ => new BirthdayResource { Date = new DateOnly(2000, 3, 4) })];
+        List<BirthdayResource> birthdays = Enumerable.Range(0, count).Select(_ => new BirthdayResource { Date = new DateOnly(2000, 3, 4) }).ToList();
 
-        Embed embed = Assert.Single(BirthdayListEmbedProcessor.CreateEmbed(birthdays, [.. Enumerable.Range(1, count).Select(i => $"User {i}")]));
+        Embed embed = Assert.Single(BirthdayListEmbedProcessor.CreateEmbed(birthdays, Enumerable.Range(1, count).Select(i => $"User {i}").ToList()));
 
         Assert.Equal(count, embed.Fields.Sum(field => field.Value.Split('\n', StringSplitOptions.RemoveEmptyEntries).Length));
         Assert.Null(embed.Footer);
@@ -52,7 +52,7 @@ public sealed class ListEmbedProcessorTests
     [Fact]
     public void GreetingList_MoreThanTwentyFive_ShowsTwentyFiveAndCountsTheRest()
     {
-        List<GreetingResource> greetings = [.. Enumerable.Range(1, 30).Select(i => new GreetingResource { GreetingId = i, Url = $"https://example.com/{i}.gif" })];
+        List<GreetingResource> greetings = Enumerable.Range(1, 30).Select(i => new GreetingResource { GreetingId = i, Url = $"https://example.com/{i}.gif" }).ToList();
 
         Embed embed = Assert.Single(GreetingListEmbedProcessor.CreateEmbed(greetings));
 
@@ -84,7 +84,7 @@ public sealed class ListEmbedProcessorTests
     [Fact]
     public void ReminderList_MoreThanTwentyFive_ShowsTheSoonestTwentyFiveAndCountsTheRest()
     {
-        List<ReminderResource> reminders = [.. Enumerable.Range(1, 30).Select(i => new ReminderResource { Date = now.AddHours(i), Message = $"reminder {i}" })];
+        List<ReminderResource> reminders = Enumerable.Range(1, 30).Select(i => new ReminderResource { Date = now.AddHours(i), Message = $"reminder {i}" }).ToList();
 
         Embed embed = Assert.Single(UserReminderListEmbedProcessor.CreateEmbed(reminders));
 
@@ -97,9 +97,9 @@ public sealed class ListEmbedProcessorTests
     [Fact]
     public void BirthdayList_SeventyBirthdays_ShowsTheFirstSixtyOneAndCountsTheRest()
     {
-        List<BirthdayResource> birthdays = [.. Enumerable.Range(0, 70).Select(_ => new BirthdayResource { Date = new DateOnly(2000, 3, 4) })];
+        List<BirthdayResource> birthdays = Enumerable.Range(0, 70).Select(_ => new BirthdayResource { Date = new DateOnly(2000, 3, 4) }).ToList();
 
-        Embed embed = Assert.Single(BirthdayListEmbedProcessor.CreateEmbed(birthdays, [.. Enumerable.Range(1, 70).Select(i => $"User {i}")]));
+        Embed embed = Assert.Single(BirthdayListEmbedProcessor.CreateEmbed(birthdays, Enumerable.Range(1, 70).Select(i => $"User {i}").ToList()));
 
         Assert.Equal(61, embed.Fields.Sum(field => field.Value.Split('\n', StringSplitOptions.RemoveEmptyEntries).Length));
         Assert.Equal("9 more not shown", embed.Footer?.Text);

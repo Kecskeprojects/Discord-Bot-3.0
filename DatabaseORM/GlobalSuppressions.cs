@@ -5,8 +5,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "IDE0305:Simplify collection initialization", Justification = "Decreases readability when it mostly suggests it to .ToList() LINQ method calls", Scope = "namespaceanddescendants", Target = "~N:DatabaseORM")]
-
 // The services pass query lambdas to the repositories, and EF translates those into SQL
 [assembly: SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons", Justification = "Entity Framework cannot translate this type of string comparison", Scope = "namespaceanddescendants", Target = "N:DatabaseORM.Repository")]
 [assembly: SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons", Justification = "Entity Framework cannot translate this type of string comparison", Scope = "namespaceanddescendants", Target = "N:DatabaseORM.Service")]

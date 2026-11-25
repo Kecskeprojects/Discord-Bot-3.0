@@ -50,7 +50,7 @@ public static class BiasListMessageProcessor
         {
             int selectCount = 0;
             //A message holds 5 rows, so 5 menus of 25 groups (more failed the whole list until 2026-11-23); the rest can still be named
-            List<string> keys = [.. groups.Keys.Take(ComponentBuilder.MaxActionRowCount * SelectMenuBuilder.MaxOptionCount)];
+            List<string> keys = groups.Keys.Take(ComponentBuilder.MaxActionRowCount * SelectMenuBuilder.MaxOptionCount).ToList();
             ComponentBuilder builder = new();
             while (Math.Ceiling(keys.Count / 25.0) > selectCount)
             {

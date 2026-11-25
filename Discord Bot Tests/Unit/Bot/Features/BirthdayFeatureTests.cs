@@ -125,9 +125,9 @@ public sealed class BirthdayFeatureTests
         });
     }
 
-    private void Birthdays(params BirthdayResource[] birthdays)
+    private void Birthdays(params List<BirthdayResource> birthdays)
     {
-        birthdayService.GetBirthdaysByDateAsync(TestTimes.Now.UtcDateTime).Returns([.. birthdays]);
+        birthdayService.GetBirthdaysByDateAsync(TestTimes.Now.UtcDateTime).Returns(birthdays);
     }
 
     private static BirthdayResource Birthday(ulong userId, ulong serverId = DiscordIds.Server)

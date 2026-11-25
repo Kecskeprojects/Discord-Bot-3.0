@@ -123,9 +123,9 @@ public sealed class WeeklyPollFeatureTests
         logger.Received().Error("WeeklyPollFeature.cs ProcessWeeklyPollAsync", Arg.Any<HttpException>());
     }
 
-    private void TodaysPolls(params WeeklyPollResource[] polls)
+    private void TodaysPolls(params List<WeeklyPollResource> polls)
     {
-        pollService.GetPollsByDayOfWeekAsync(DayOfWeek.Wednesday).Returns([.. polls]);
+        pollService.GetPollsByDayOfWeekAsync(DayOfWeek.Wednesday).Returns(polls);
     }
 
     private static WeeklyPollResource Poll()
